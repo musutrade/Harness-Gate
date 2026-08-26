@@ -166,4 +166,41 @@ Top 15 contributors to binary size:
 
 ---
 
+## Track 4 Results: Build Profile Tuning
+
+Measured back-to-back on one machine (`cargo clean` before each run) so the two
+numbers are directly comparable. The 1m 20.205s figure recorded earlier in this
+document was a separate, earlier session and should not be diffed against these.
+
+| codegen-units | Clean release build | Binary size |
+| ------------- | ------------------- | ----------- |
+| 1 (before)    | 79.31s              | 4.20 MB     |
+| 4 (after)     | 68.96s              | 4.39 MB     |
+| 16            | 78.1s               | -           |
+
+**Result: -13.0% build time**, against the >=10% target.
+
+Why cu=4 and not more: `harness-gate` itself accounts for 62.95s CPU (33.9% of
+the build) and is the sink of the dependency graph, so it cannot overlap with
+anything -- it *is* the critical path. Splitting its codegen into 4 units
+parallelizes that segment. At cu=16 the win reverses, because fat LTO has to
+reconcile more units and becomes the serial bottleneck.
+
+Cost: +0.19 MB on the `release` binary. Distribution is unaffected -- release.yml
+ships `release-small`, which pins `codegen-units = 1` back explicitly to avoid
+inheriting this trade (2.98 MB, within the <3.5 MB target).
+
+`dev` was measured and deliberately left on cargo's defaults (1.1s incremental
+rebuild, 0.5s `cargo check` -- no headroom worth taking). Only `debug = 1` was
+added: full dev build 19.5s -> 17.9s, `target/debug` 511 MB -> 425 MB, while
+keeping the line numbers panic backtraces need.
+
+Not attempted: the 49% of IR from serde derive expansions identified above.
+Both routes to removing it (hand-written `Deserialize` for ~30 structs, losing
+`deny_unknown_fields`; or two-phase `toml::Value` parsing, losing line numbers in
+config errors) make the most correctness-critical part of the codebase more
+fragile, and the profile change met the target without touching it.
+
+---
+
 This baseline will be compared against Phase 2 results to validate improvements.

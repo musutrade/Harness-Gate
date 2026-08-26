@@ -48,7 +48,8 @@ debug = 1
 [profile.release]
 strip = true          # Remove debug symbols for smaller binary
 lto = true            # Link-time optimization for better performance
-codegen-units = 4     # 4 parallelizes this crate's codegen (79.1s -> 69.4s, -12.3%);
+codegen-units = 4     # 4 parallelizes this crate's codegen (79.31s -> 68.96s, -13.0%,
+                      # measured back-to-back on one machine; binary 4.20 -> 4.39 MB).
                       # cu=16 regresses to 78.1s as fat LTO becomes the serial bottleneck
 opt-level = 3         # Maximum optimization for speed (balanced with size)
 
