@@ -4,6 +4,7 @@ use tempfile::TempDir;
 
 /// Test context providing isolated environment for integration tests
 pub struct TestContext {
+    #[allow(dead_code)]
     pub temp_dir: TempDir,
     pub project_root: PathBuf,
 }
@@ -30,6 +31,7 @@ impl TestContext {
     }
 
     /// Run harness-gate without project-root argument
+    #[allow(dead_code)]
     pub fn run_harness_gate_raw(&self, args: &[&str]) -> Output {
         Command::new(env!("CARGO_BIN_EXE_harness-gate"))
             .args(args)
@@ -48,12 +50,14 @@ impl TestContext {
     }
 
     /// Read a file relative to project root
+    #[allow(dead_code)]
     pub fn read_file(&self, path: impl AsRef<Path>) -> String {
         let full_path = self.project_root.join(path);
         std::fs::read_to_string(full_path).expect("Failed to read file")
     }
 
     /// Check if a file exists relative to project root
+    #[allow(dead_code)]
     pub fn file_exists(&self, path: impl AsRef<Path>) -> bool {
         self.project_root.join(path).exists()
     }
