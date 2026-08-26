@@ -28,13 +28,15 @@ Our specs follow this structure:
 
 ## Current Specifications
 
+### Completed
+- [Phase 1 Optimization](optimization-phase-1.md) - Quick wins for quality improvements (✅ Completed)
+
 ### Active
-- [Phase 1 Optimization](optimization-phase-1.md) - Quick wins for quality improvements
+- [Phase 2 Optimization](optimization-phase-2.md) - Performance and code quality enhancement (🚧 Proposed)
 
 ### Planned
-- Testing Strategy (Phase 2)
-- Performance Optimization (Phase 2)
-- Code Refactoring (Phase 2)
+- Testing Strategy (Phase 3)
+- Feature Expansion (Phase 3)
 
 ## Creating a New Spec
 
