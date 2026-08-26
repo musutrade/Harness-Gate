@@ -22,6 +22,7 @@ We use a simplified version of the Michael Nygard ADR template:
 - [ADR-0002](0002-optimize-release-builds.md) - Optimize release builds with LTO and strip
 - [ADR-0003](0003-enhance-ci-pipeline.md) - Enhance CI pipeline with security and coverage checks
 - [ADR-0004](0004-add-integration-tests.md) - Add integration tests for end-to-end scenarios
+- [ADR-0005](0005-phase-2-optimization-strategy.md) - Phase 2 optimization strategy (performance and code quality)
 
 ## Creating New ADRs
 
