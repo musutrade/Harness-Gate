@@ -80,7 +80,7 @@ fn test_secrets_scan_basic() {
 
     // Add and commit
     std::process::Command::new("git")
-        .args(&["add", "."])
+        .args(["add", "."])
         .current_dir(&ctx.project_root)
         .output()
         .ok();

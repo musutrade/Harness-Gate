@@ -66,20 +66,20 @@ impl TestContext {
     #[allow(dead_code)]
     pub fn init_git(&self) {
         Command::new("git")
-            .args(&["init"])
+            .args(["init"])
             .current_dir(&self.project_root)
             .output()
             .expect("Failed to init git repo");
 
         // Configure git user for commits
         Command::new("git")
-            .args(&["config", "user.name", "Test User"])
+            .args(["config", "user.name", "Test User"])
             .current_dir(&self.project_root)
             .output()
             .ok();
 
         Command::new("git")
-            .args(&["config", "user.email", "test@example.com"])
+            .args(["config", "user.email", "test@example.com"])
             .current_dir(&self.project_root)
             .output()
             .ok();

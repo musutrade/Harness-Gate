@@ -1248,6 +1248,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(target_os = "linux")]
     fn audit_schema_accepts_current_config_and_rejects_incompatible_inputs() {
         let current = include_str!("../presets/empty.audit.toml");
         assert_eq!(
