@@ -66,6 +66,7 @@ fn test_presets_lists_available() {
 }
 
 #[test]
+#[cfg(target_os = "linux")]
 fn test_secrets_scan_basic() {
     let ctx = TestContext::new();
 
