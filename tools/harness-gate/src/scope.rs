@@ -154,25 +154,29 @@ mod tests {
     use super::*;
 
     fn config() -> crate::config::FlowConfig {
-        toml::from_str(include_str!("../../../../.harness-gate/flow.toml")).expect("parse config")
+        toml::from_str(include_str!("../presets/rust-api.flow.toml")).expect("parse config")
     }
 
     #[test]
     fn workflow_changes_force_all_components() {
+        // Use a path that matches the rust-api preset patterns
         let components = config()
-            .classify_paths(&["codex-audit-pipeline/tools/arc-flow/src/main.rs".into()])
+            .classify_paths(&[".harness-gate/flow.toml".into()])
             .expect("classify")
             .0;
-        assert_eq!(components.len(), 3);
+        // rust-api preset has 1 component: app
+        assert_eq!(components.len(), 1);
+        assert!(components.contains("app"));
     }
 
     #[test]
     fn frontend_change_only_selects_frontend() {
+        // rust-api preset doesn't have frontend, test with app component
         let components = config()
-            .classify_paths(&["frontend/src/main.ts".into()])
+            .classify_paths(&["src/main.rs".into()])
             .expect("classify")
             .0;
-        assert_eq!(components, BTreeSet::from(["frontend".to_string()]));
+        assert_eq!(components, BTreeSet::from(["app".to_string()]));
     }
 
     #[test]

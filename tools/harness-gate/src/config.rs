@@ -1114,7 +1114,7 @@ mod tests {
     use super::*;
 
     fn repository_config() -> FlowConfig {
-        toml::from_str(include_str!("../../../../.harness-gate/flow.toml")).expect("parse fixture")
+        toml::from_str(include_str!("../presets/rust-api.flow.toml")).expect("parse fixture")
     }
 
     #[test]
@@ -1124,7 +1124,7 @@ mod tests {
 
     #[test]
     fn existing_v2_config_defaults_the_secret_rule_path() {
-        let source = include_str!("../../../../.harness-gate/flow.toml")
+        let source = include_str!("../presets/rust-api.flow.toml")
             .lines()
             .filter(|line| !line.starts_with("secrets_config = "))
             .collect::<Vec<_>>()
@@ -1147,9 +1147,9 @@ mod tests {
     #[test]
     fn policy_steps_cannot_be_missing() {
         let mut config = repository_config();
-        config.steps.retain(|step| step.id != "backend.tests");
+        config.steps.retain(|step| step.id != "rust.tests");
         let error = config.validate().expect_err("missing step must fail");
-        assert!(error.to_string().contains("backend.tests"));
+        assert!(error.to_string().contains("rust.tests"));
     }
 
     #[test]
@@ -1172,12 +1172,19 @@ mod tests {
                 inject_env: "TEST_DATABASE_URL".into(),
             },
         );
-        let step = config
-            .steps
-            .iter_mut()
-            .find(|step| step.id == "backend.tests")
-            .expect("backend test step");
+        // Add a service to the first step and try to inject duplicate env var
+        let step = config.steps.first_mut().expect("step exists");
         step.services.push("test-cache".into());
+
+        // Add another service with same inject_env
+        config.services.insert(
+            "test-db".into(),
+            ServiceConfig::Environment {
+                source_env: "DB_URL".into(),
+                inject_env: "TEST_DATABASE_URL".into(),
+            },
+        );
+        step.services.push("test-db".into());
 
         let error = config.validate().expect_err("injection must be unique");
         assert!(error.to_string().contains("multiple services injecting"));
@@ -1185,7 +1192,7 @@ mod tests {
 
     #[test]
     fn unknown_fields_are_rejected() {
-        let source = include_str!("../../../../.harness-gate/flow.toml").replacen(
+        let source = include_str!("../presets/rust-api.flow.toml").replacen(
             "version = 2",
             "version = 2\nunknown = true",
             1,
