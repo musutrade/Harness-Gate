@@ -1,0 +1,41 @@
+# Architecture Decision Records (ADR)
+
+This directory contains Architecture Decision Records (ADRs) for the Harness-Gate project.
+
+## What is an ADR?
+
+An Architecture Decision Record (ADR) is a document that captures an important architectural decision made along with its context and consequences.
+
+## Format
+
+We use a simplified version of the Michael Nygard ADR template:
+
+- **Title**: Short noun phrase
+- **Status**: Proposed, Accepted, Deprecated, or Superseded
+- **Context**: What is the issue that we're seeing that is motivating this decision?
+- **Decision**: What is the change that we're proposing and/or doing?
+- **Consequences**: What becomes easier or more difficult to do because of this change?
+
+## Index
+
+- [ADR-0001](0001-use-rust-for-cli.md) - Use Rust for CLI implementation
+- [ADR-0002](0002-optimize-release-builds.md) - Optimize release builds with LTO and strip
+- [ADR-0003](0003-enhance-ci-pipeline.md) - Enhance CI pipeline with security and coverage checks
+- [ADR-0004](0004-add-integration-tests.md) - Add integration tests for end-to-end scenarios
+
+## Creating New ADRs
+
+When making a significant architectural decision:
+
+1. Copy the template from an existing ADR
+2. Number it sequentially (e.g., `0005-your-decision.md`)
+3. Fill in the sections
+4. Submit as part of your PR
+5. Update this README index
+
+## Superseding ADRs
+
+When an ADR is superseded:
+1. Update the status to "Superseded by ADR-XXXX"
+2. Create the new ADR that supersedes it
+3. Link between the two documents
