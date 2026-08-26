@@ -1,5 +1,12 @@
 # Harness-Gate
 
+[![CI](https://github.com/musutrade/Harness-Gate/actions/workflows/ci.yml/badge.svg)](https://github.com/musutrade/Harness-Gate/actions/workflows/ci.yml)
+[![Crates.io](https://img.shields.io/crates/v/harness-gate.svg)](https://crates.io/crates/harness-gate)
+[![Documentation](https://docs.rs/harness-gate/badge.svg)](https://docs.rs/harness-gate)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+[English](README.en.md) | [简体中文](README.md)
+
 `Harness-Gate` is a reusable Rust development workflow and architecture guard CLI. This is an independent tool providing complete quality gate and workflow management capabilities.
 
 It handles changed paths, secret scanning, architecture auditing, environment validation, external command orchestration, test result counting, timeout and interrupt handling, and temporary service lifecycle. Git hooks only keep launchers, and flow decisions do not depend on Shell scripts.
