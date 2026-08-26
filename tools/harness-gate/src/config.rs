@@ -337,7 +337,10 @@ impl FlowConfig {
         override_string("HARNESS_GATE_REPORTS", &mut self.paths.reports);
         override_string("AUDITOR_CONFIG", &mut self.paths.audit_config);
         override_string("HARNESS_GATE_AUDIT_CONFIG", &mut self.paths.audit_config);
-        override_string("HARNESS_GATE_SECRETS_CONFIG", &mut self.paths.secrets_config);
+        override_string(
+            "HARNESS_GATE_SECRETS_CONFIG",
+            &mut self.paths.secrets_config,
+        );
 
         for entry in self.paths.aliases.values_mut() {
             if let Some(name) = &entry.env {
