@@ -1248,6 +1248,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(target_os = "linux")]
     fn audit_schema_accepts_current_config_and_rejects_incompatible_inputs() {
         let current = include_str!("../presets/empty.audit.toml");
         assert_eq!(
@@ -1310,6 +1311,7 @@ allowlist = ["src/generated"]
     }
 
     #[test]
+    #[cfg(target_os = "linux")]
     fn rule_extension_requires_configured_comment_syntax() {
         let test_dir = TestDir::new("missing-comment-syntax");
         let source = test_dir.child("src");
@@ -1332,6 +1334,7 @@ allowlist = ["src/generated"]
     }
 
     #[test]
+    #[cfg(target_os = "linux")]
     fn initialized_project_can_add_and_run_its_first_audit_rule() {
         let test_dir = TestDir::new("initialized-first-rule");
         crate::preset::init(&test_dir.0, "generic", false).expect("initialize project");
@@ -1484,6 +1487,7 @@ exclude_patterns = []
     }
 
     #[test]
+    #[cfg(target_os = "linux")]
     fn architecture_rule_detects_multiline_raw_sql_and_query_builder() {
         let test_dir = TestDir::new("multiline-service-sql");
         let services = test_dir.child("services");
@@ -1518,6 +1522,7 @@ exclude_patterns = []
     }
 
     #[test]
+    #[cfg(target_os = "linux")]
     fn architecture_rule_scans_every_configured_root() {
         let test_dir = TestDir::new("arch-roots");
         let pages = test_dir.child("pages");

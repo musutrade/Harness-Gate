@@ -328,7 +328,7 @@ mod tests {
         let _ = fs::remove_file(log);
     }
 
-    #[cfg(unix)]
+    #[cfg(target_os = "linux")]
     #[test]
     fn task_runs_in_an_isolated_session() {
         let log = std::env::temp_dir().join(format!("arc-flow-session-{}.log", std::process::id()));

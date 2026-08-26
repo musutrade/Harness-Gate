@@ -680,6 +680,7 @@ exact = ["password"]
     }
 
     #[test]
+    #[cfg(target_os = "linux")]
     fn staged_scan_uses_the_staged_secret_config() {
         let unique = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
