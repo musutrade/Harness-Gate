@@ -401,10 +401,10 @@ mod tests {
             .as_nanos();
         let root = std::env::temp_dir().join(format!("arc-flow-verify-{unique}"));
         crate::preset::init(&root, "generic", false).expect("initialize fixture");
-        let flow_path = root.join(".arc-flow/flow.toml");
+        let flow_path = root.join(".harness-gate/flow.toml");
         let source = fs::read_to_string(&flow_path).expect("read fixture config");
         let mut config: FlowConfig = toml::from_str(&source).expect("parse fixture config");
-        let source_env = format!("ARC_FLOW_MISSING_{unique}");
+        let source_env = format!("HARNESS_GATE_MISSING_{unique}");
         assert!(std::env::var_os(&source_env).is_none());
         config.services.insert(
             "missing-service".into(),

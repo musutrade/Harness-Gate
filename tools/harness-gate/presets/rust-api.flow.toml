@@ -6,9 +6,9 @@ default_profile = "full"
 hook_profile = "hook"
 
 [paths]
-reports = ".arc-flow/reports"
-audit_config = ".arc-flow/audit.toml"
-secrets_config = ".arc-flow/secrets.toml"
+reports = ".harness-gate/reports"
+audit_config = ".harness-gate/audit.toml"
+secrets_config = ".harness-gate/secrets.toml"
 
 [paths.aliases.app]
 path = "."
@@ -54,7 +54,7 @@ minimum = 1
 unmatched = "all"
 
 [[scope.rules]]
-patterns = ["src/**", "tests/**", "Cargo.toml", "Cargo.lock", "rust-toolchain*", ".arc-flow/**"]
+patterns = ["src/**", "tests/**", "Cargo.toml", "Cargo.lock", "rust-toolchain*", ".harness-gate/**"]
 components = ["app"]
 
 [[steps]]

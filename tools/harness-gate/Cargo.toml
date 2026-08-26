@@ -1,6 +1,6 @@
 [package]
-name = "arc-flow"
-version = "3.0.0"
+name = "harness-gate"
+version = "1.0.0"
 edition = "2021"
 
 [dependencies]

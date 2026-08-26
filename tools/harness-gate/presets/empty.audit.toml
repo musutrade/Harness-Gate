@@ -84,4 +84,4 @@ strings = [
 ]
 
 [paths]
-exclude = ["target", "node_modules", "dist", ".git", ".arc-flow/reports"]
+exclude = ["target", "node_modules", "dist", ".git", ".harness-gate/reports"]

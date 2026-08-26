@@ -8,7 +8,7 @@ use std::fs;
 use std::path::{Component as PathComponent, Path, PathBuf};
 
 pub const CONFIG_VERSION: u32 = 2;
-pub const DEFAULT_CONFIG_PATH: &str = ".arc-flow/flow.toml";
+pub const DEFAULT_CONFIG_PATH: &str = ".harness-gate/flow.toml";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -48,7 +48,7 @@ pub struct PathsConfig {
 }
 
 fn default_secrets_config_path() -> String {
-    ".arc-flow/secrets.toml".into()
+    ".harness-gate/secrets.toml".into()
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -334,10 +334,10 @@ impl FlowConfig {
 
     fn apply_environment(&mut self) -> Result<()> {
         override_string("REPORT_DIR", &mut self.paths.reports);
-        override_string("ARC_FLOW_REPORTS", &mut self.paths.reports);
+        override_string("HARNESS_GATE_REPORTS", &mut self.paths.reports);
         override_string("AUDITOR_CONFIG", &mut self.paths.audit_config);
-        override_string("ARC_FLOW_AUDIT_CONFIG", &mut self.paths.audit_config);
-        override_string("ARC_FLOW_SECRETS_CONFIG", &mut self.paths.secrets_config);
+        override_string("HARNESS_GATE_AUDIT_CONFIG", &mut self.paths.audit_config);
+        override_string("HARNESS_GATE_SECRETS_CONFIG", &mut self.paths.secrets_config);
 
         for entry in self.paths.aliases.values_mut() {
             if let Some(name) = &entry.env {
@@ -801,7 +801,7 @@ const fn default_minimum() -> usize {
 
 pub fn resolve_config_path(root: &Path, override_path: Option<PathBuf>) -> Result<PathBuf> {
     let path = override_path
-        .or_else(|| env::var_os("ARC_FLOW_CONFIG").map(PathBuf::from))
+        .or_else(|| env::var_os("HARNESS_GATE_CONFIG").map(PathBuf::from))
         .unwrap_or_else(|| PathBuf::from(DEFAULT_CONFIG_PATH));
     let path = if path.is_absolute() {
         path
@@ -891,21 +891,21 @@ pub fn migrate_v1(source: &str, project_name: &str) -> Result<FlowConfig> {
         "backend".into(),
         PathAlias {
             path: legacy.paths.backend,
-            env: Some("ARC_FLOW_BACKEND".into()),
+            env: Some("HARNESS_GATE_BACKEND".into()),
         },
     );
     aliases.insert(
         "frontend".into(),
         PathAlias {
             path: legacy.paths.frontend,
-            env: Some("ARC_FLOW_FRONTEND".into()),
+            env: Some("HARNESS_GATE_FRONTEND".into()),
         },
     );
     aliases.insert(
         "tool_manifest".into(),
         PathAlias {
             path: legacy.paths.tool_manifest,
-            env: Some("ARC_FLOW_TOOL_MANIFEST".into()),
+            env: Some("HARNESS_GATE_TOOL_MANIFEST".into()),
         },
     );
 
@@ -915,12 +915,12 @@ pub fn migrate_v1(source: &str, project_name: &str) -> Result<FlowConfig> {
         service_id.clone(),
         ServiceConfig::Docker {
             image: legacy.database.image,
-            image_env: Some("ARC_FLOW_POSTGRES_IMAGE".into()),
+            image_env: Some("HARNESS_GATE_POSTGRES_IMAGE".into()),
             external_env: Some("TEST_DATABASE_URL".into()),
             inject_env: "TEST_DATABASE_URL".into(),
             external_value_policy: ExternalValuePolicy::IsolatedPostgres,
             startup_timeout_secs: legacy.database.startup_timeout_secs,
-            timeout_env: Some("ARC_FLOW_DATABASE_TIMEOUT_SECS".into()),
+            timeout_env: Some("HARNESS_GATE_DATABASE_TIMEOUT_SECS".into()),
             container_port: legacy.database.container_port,
             environment: BTreeMap::from([
                 ("POSTGRES_USER".into(), legacy.database.user.clone()),
@@ -1095,7 +1095,7 @@ pub fn migrate_v1(source: &str, project_name: &str) -> Result<FlowConfig> {
         paths: PathsConfig {
             reports: legacy.paths.reports,
             audit_config: legacy.paths.audit_config,
-            secrets_config: ".arc-flow/secrets.toml".into(),
+            secrets_config: ".harness-gate/secrets.toml".into(),
             aliases,
         },
         policy: PolicyConfig { required_steps },
@@ -1114,7 +1114,7 @@ mod tests {
     use super::*;
 
     fn repository_config() -> FlowConfig {
-        toml::from_str(include_str!("../../../../.arc-flow/flow.toml")).expect("parse fixture")
+        toml::from_str(include_str!("../../../../.harness-gate/flow.toml")).expect("parse fixture")
     }
 
     #[test]
@@ -1124,14 +1124,14 @@ mod tests {
 
     #[test]
     fn existing_v2_config_defaults_the_secret_rule_path() {
-        let source = include_str!("../../../../.arc-flow/flow.toml")
+        let source = include_str!("../../../../.harness-gate/flow.toml")
             .lines()
             .filter(|line| !line.starts_with("secrets_config = "))
             .collect::<Vec<_>>()
             .join("\n");
         let config = FlowConfig::from_source(&source).expect("compatible v2 config");
 
-        assert_eq!(config.paths.secrets_config, ".arc-flow/secrets.toml");
+        assert_eq!(config.paths.secrets_config, ".harness-gate/secrets.toml");
     }
 
     #[test]
@@ -1185,7 +1185,7 @@ mod tests {
 
     #[test]
     fn unknown_fields_are_rejected() {
-        let source = include_str!("../../../../.arc-flow/flow.toml").replacen(
+        let source = include_str!("../../../../.harness-gate/flow.toml").replacen(
             "version = 2",
             "version = 2\nunknown = true",
             1,
@@ -1236,7 +1236,7 @@ timeout_secs = 60
         let migrated = migrate_v1(source, "example").expect("migrate");
         assert_eq!(migrated.version, 2);
         assert_eq!(migrated.project.name, "example");
-        assert_eq!(migrated.paths.secrets_config, ".arc-flow/secrets.toml");
+        assert_eq!(migrated.paths.secrets_config, ".harness-gate/secrets.toml");
         assert!(migrated.policy.required_steps.contains(&"app.check".into()));
     }
 }

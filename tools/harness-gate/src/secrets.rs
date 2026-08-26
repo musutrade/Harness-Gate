@@ -699,7 +699,7 @@ exact = ["password"]
                 root.to_str().expect("UTF-8 path"),
                 "add",
                 "--",
-                ".arc-flow/secrets.toml",
+                ".harness-gate/secrets.toml",
             ])
             .status()
             .expect("stage secret config")

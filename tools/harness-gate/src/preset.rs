@@ -54,8 +54,8 @@ pub fn init(target: &Path, name: &str, force: bool) -> Result<()> {
         .canonicalize()
         .with_context(|| format!("resolve project directory {}", target.display()))?;
     let flow_path = resolve_inside(&root, PathBuf::from(DEFAULT_CONFIG_PATH))?;
-    let audit_path = resolve_inside(&root, PathBuf::from(".arc-flow/audit.toml"))?;
-    let secrets_path = resolve_inside(&root, PathBuf::from(".arc-flow/secrets.toml"))?;
+    let audit_path = resolve_inside(&root, PathBuf::from(".harness-gate/audit.toml"))?;
+    let secrets_path = resolve_inside(&root, PathBuf::from(".harness-gate/secrets.toml"))?;
     ensure_writable(&flow_path, force)?;
     ensure_writable(&audit_path, force)?;
     ensure_writable(&secrets_path, force)?;
@@ -68,7 +68,7 @@ pub fn init(target: &Path, name: &str, force: bool) -> Result<()> {
     atomic_write(&audit_path, AUDIT_TEMPLATE.as_bytes())?;
     atomic_write(&secrets_path, SECRETS_TEMPLATE.as_bytes())?;
     atomic_write(&flow_path, toml::to_string_pretty(&config)?.as_bytes())?;
-    let gitignore = resolve_inside(&root, PathBuf::from(".arc-flow/.gitignore"))?;
+    let gitignore = resolve_inside(&root, PathBuf::from(".harness-gate/.gitignore"))?;
     if !gitignore.exists() {
         atomic_write(&gitignore, GITIGNORE_TEMPLATE.as_bytes())?;
     }
@@ -108,7 +108,7 @@ pub fn migrate(
     if let Some(parent) = output.parent() {
         fs::create_dir_all(parent)?;
     }
-    let secrets_path = resolve_inside(&root, PathBuf::from(".arc-flow/secrets.toml"))?;
+    let secrets_path = resolve_inside(&root, PathBuf::from(".harness-gate/secrets.toml"))?;
     if !secrets_path.exists() {
         atomic_write(&secrets_path, SECRETS_TEMPLATE.as_bytes())?;
     }
@@ -142,7 +142,7 @@ fn atomic_write(path: &Path, content: &[u8]) -> Result<()> {
         .unwrap_or_default()
         .as_nanos();
     let temporary = parent.join(format!(
-        ".{name}.arc-flow-{}-{unique}.tmp",
+        ".{name}.harness-gate-{}-{unique}.tmp",
         std::process::id()
     ));
 

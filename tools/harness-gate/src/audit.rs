@@ -1341,7 +1341,7 @@ allowlist = ["src/generated"]
             "// forbidden_call()\nfn sample() { forbidden_call(); }\n",
         )
         .expect("write Rust fixture");
-        let config_path = test_dir.0.join(".arc-flow/audit.toml");
+        let config_path = test_dir.0.join(".harness-gate/audit.toml");
         let mut config = fs::read_to_string(&config_path).expect("read initialized audit config");
         config.push_str(
             r#"
@@ -1361,7 +1361,7 @@ exclude_patterns = []
         let outcome = run(
             &test_dir.0,
             &config_path,
-            &test_dir.0.join(".arc-flow/reports"),
+            &test_dir.0.join(".harness-gate/reports"),
             false,
         )
         .expect("run first audit rule");

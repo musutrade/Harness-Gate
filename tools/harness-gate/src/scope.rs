@@ -154,7 +154,7 @@ mod tests {
     use super::*;
 
     fn config() -> crate::config::FlowConfig {
-        toml::from_str(include_str!("../../../../.arc-flow/flow.toml")).expect("parse config")
+        toml::from_str(include_str!("../../../../.harness-gate/flow.toml")).expect("parse config")
     }
 
     #[test]

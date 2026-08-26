@@ -77,24 +77,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "330a5ed07fa54e4702c9d6c4174f74427fc0ef6e214bbd677ae50a5099946470"
 
 [[package]]
-name = "arc-flow"
-version = "3.0.0"
-dependencies = [
- "anyhow",
- "chrono",
- "clap",
- "globset",
- "ignore",
- "libc",
- "rayon",
- "regex",
- "serde",
- "serde_json",
- "toml",
- "url",
-]
-
-[[package]]
 name = "autocfg"
 version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -295,6 +277,24 @@ dependencies = [
  "log",
  "regex-automata",
  "regex-syntax",
+]
+
+[[package]]
+name = "harness-gate"
+version = "1.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "clap",
+ "globset",
+ "ignore",
+ "libc",
+ "rayon",
+ "regex",
+ "serde",
+ "serde_json",
+ "toml",
+ "url",
 ]
 
 [[package]]
