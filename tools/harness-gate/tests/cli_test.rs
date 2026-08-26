@@ -62,7 +62,9 @@ fn test_init_with_invalid_preset() {
 
     assert_failure(&output);
     let stderr = stderr_str(&output);
-    assert!(stderr.contains("preset") || stderr.contains("not found") || stderr.contains("unknown"));
+    assert!(
+        stderr.contains("preset") || stderr.contains("not found") || stderr.contains("unknown")
+    );
 }
 
 #[test]
@@ -75,8 +77,8 @@ fn test_verify_without_project() {
     // Should error about missing config or not being in a project
     assert!(
         stderr.contains("not found")
-        || stderr.contains("No such file")
-        || stderr.contains("config")
+            || stderr.contains("No such file")
+            || stderr.contains("config")
     );
 }
 
@@ -104,11 +106,14 @@ fn test_doctor_basic() {
     let ctx = TestContext::new();
 
     // Create minimal config to avoid error
-    ctx.write_file(".harness-gate/flow.toml", r#"
+    ctx.write_file(
+        ".harness-gate/flow.toml",
+        r#"
 version = 2
 [scope]
 default = []
-"#);
+"#,
+    );
 
     let output = ctx.run_harness_gate(&["doctor"]);
 
