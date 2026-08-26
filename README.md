@@ -1,4 +1,11 @@
-# Harness-Gate (formerly harness-gate)
+# Harness-Gate
+
+[![CI](https://github.com/musutrade/Harness-Gate/actions/workflows/ci.yml/badge.svg)](https://github.com/musutrade/Harness-Gate/actions/workflows/ci.yml)
+[![Crates.io](https://img.shields.io/crates/v/harness-gate.svg)](https://crates.io/crates/harness-gate)
+[![Documentation](https://docs.rs/harness-gate/badge.svg)](https://docs.rs/harness-gate)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+[English](README.en.md) | [简体中文](README.md)
 
 `Harness-Gate` 是可复用的 Rust 开发工作流与架构门禁 CLI。这是一个独立工具，提供完整的质量门禁和工作流管理能力。
 
