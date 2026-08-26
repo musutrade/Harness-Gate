@@ -41,12 +41,12 @@ jobs:
           targets: ${{ matrix.target }}
 
       - name: Build
-        run: cargo build --manifest-path tools/harness-gate/Cargo.toml --locked --release --target ${{ matrix.target }}
+        run: cargo build --manifest-path tools/harness-gate/Cargo.toml --locked --profile release-small --target ${{ matrix.target }}
 
       - name: Rename artifact
         shell: bash
         run: |
-          cp tools/harness-gate/target/${{ matrix.target }}/release/${{ matrix.artifact_name }} ${{ matrix.asset_name }}
+          cp tools/harness-gate/target/${{ matrix.target }}/release-small/${{ matrix.artifact_name }} ${{ matrix.asset_name }}
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
