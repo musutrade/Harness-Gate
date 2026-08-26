@@ -13,11 +13,11 @@ It handles changed paths, secret scanning, architecture auditing, environment va
 
 ## Navigation
 
-- Quick Start: see "Installation and Quick Start"
-- New Project Integration: see "Installation and New Project Integration" and "Built-in Presets"
-- Add Commands, Components or CI Profiles: see "Selection Model" and [schema v2 configuration reference](docs/configuration.md)
-- Handle Failures: see "Reports and Logs" and "Troubleshooting"
-- Extend Rust Engine: see "No Code Change Scope" and "Rust Change Boundary"
+- Quick Start: see [Installation](#installation) and [Quick Start](#installation-and-quick-start)
+- New Project Integration: see [Installation and New Project Integration](#installation-and-new-project-integration) and [Built-in Presets](#built-in-presets)
+- Add Commands, Components or CI Profiles: see [Selection Model](#selection-model) and [schema v2 configuration reference](docs/configuration.md)
+- Handle Failures: see [Reports and Logs](#reports-and-logs) and [Troubleshooting](#troubleshooting)
+- Extend Rust Engine: see [No Code Change Scope](#no-code-change-scope) and [Rust Change Boundary](#rust-change-boundary)
 
 ## Working Model
 
@@ -43,12 +43,52 @@ Git changed files
 
 Components, profiles, commands, paths, parsers and services all come from TOML. Regular project migration does not need to add enums or modify match branches in Rust.
 
-## Installation and Quick Start
+## Installation
 
-Install the standalone binary from source:
+### Install from Crates.io (Recommended)
 
 ```bash
+cargo install harness-gate
+```
+
+### Install from GitHub Release (Pre-built Binaries)
+
+Download the binary for your platform from [GitHub Releases](https://github.com/musutrade/Harness-Gate/releases/latest):
+
+- **Linux (x86_64)**: `harness-gate-linux-amd64`
+- **macOS (Intel)**: `harness-gate-macos-amd64`
+- **macOS (Apple Silicon)**: `harness-gate-macos-arm64`
+- **Windows (x86_64)**: `harness-gate-windows-amd64.exe`
+
+Example installation on Linux/macOS:
+
+```bash
+# Download (replace with your platform)
+wget https://github.com/musutrade/Harness-Gate/releases/download/v0.1.0/harness-gate-linux-amd64
+
+# Make executable
+chmod +x harness-gate-linux-amd64
+
+# Move to PATH
+sudo mv harness-gate-linux-amd64 /usr/local/bin/harness-gate
+
+# Verify installation
+harness-gate --version
+```
+
+### Install from Source
+
+```bash
+git clone https://github.com/musutrade/Harness-Gate.git
+cd Harness-Gate
 cargo install --locked --path tools/harness-gate
+```
+
+## Installation and Quick Start
+
+Verify installation and explore presets:
+
+```bash
 harness-gate --version
 harness-gate presets
 ```
