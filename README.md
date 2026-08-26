@@ -13,11 +13,11 @@
 
 ## 阅读导航
 
-- 快速开始：看”安装与快速开始”；
-- 接入新项目：看”安装与新项目接入”和”内置预设”；
-- 增加命令、组件或 CI profile：看”选择模型”和 [schema v2 配置参考](docs/configuration.md)；
-- 处理失败：看”报告与日志”和”故障排查”；
-- 扩展 Rust 引擎：看”无需改代码的范围”和”需要改 Rust 的边界”。
+- 快速开始：看[安装](#安装)和[快速开始](#安装与快速开始)；
+- 接入新项目：看[安装与新项目接入](#安装与新项目接入)和[内置预设](#内置预设)；
+- 增加命令、组件或 CI profile：看[选择模型](#选择模型)和 [schema v2 配置参考](docs/configuration.md)；
+- 处理失败：看[报告与日志](#报告与日志)和[故障排查](#故障排查)；
+- 扩展 Rust 引擎：看[无需改代码的范围](#无需改代码的范围)和[需要改-rust-的边界](#需要改-rust-的边界)。
 
 ## 工作模型
 
@@ -43,12 +43,52 @@ Git 变更文件
 
 component、profile、命令、路径、parser 和 service 都来自 TOML。常规项目迁移不需要在 Rust 中增加枚举或修改匹配分支。
 
-## 安装与快速开始
+## 安装
 
-从源码安装独立二进制：
+### 从 Crates.io 安装（推荐）
 
 ```bash
+cargo install harness-gate
+```
+
+### 从 GitHub Release 安装（预编译二进制）
+
+从 [GitHub Releases](https://github.com/musutrade/Harness-Gate/releases/latest) 下载适合你平台的二进制文件：
+
+- **Linux (x86_64)**: `harness-gate-linux-amd64`
+- **macOS (Intel)**: `harness-gate-macos-amd64`
+- **macOS (Apple Silicon)**: `harness-gate-macos-arm64`
+- **Windows (x86_64)**: `harness-gate-windows-amd64.exe`
+
+Linux/macOS 安装示例：
+
+```bash
+# 下载（替换为你的平台）
+wget https://github.com/musutrade/Harness-Gate/releases/download/v0.1.0/harness-gate-linux-amd64
+
+# 添加执行权限
+chmod +x harness-gate-linux-amd64
+
+# 移动到 PATH
+sudo mv harness-gate-linux-amd64 /usr/local/bin/harness-gate
+
+# 验证安装
+harness-gate --version
+```
+
+### 从源码安装
+
+```bash
+git clone https://github.com/musutrade/Harness-Gate.git
+cd Harness-Gate
 cargo install --locked --path tools/harness-gate
+```
+
+## 安装与快速开始
+
+验证安装并查看预设：
+
+```bash
 harness-gate --version
 harness-gate presets
 ```
