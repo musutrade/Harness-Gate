@@ -35,8 +35,11 @@ jobs:
             tools/harness-gate/target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
+      - name: Install cargo-nextest
+        uses: taiki-e/install-action@cargo-nextest
+
       - name: Run tests
-        run: cargo test --manifest-path tools/harness-gate/Cargo.toml --locked
+        run: cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked
 
   security-audit:
     name: Security Audit
