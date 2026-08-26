@@ -584,7 +584,7 @@ mod tests {
     use std::process::Command;
 
     fn scanner() -> SecretScanner {
-        SecretScanner::from_source(include_str!("../../../.codex/secrets.toml"))
+        SecretScanner::from_source(include_str!("../../../.harness-gate/secrets.toml"))
             .expect("project secret scan config")
     }
 

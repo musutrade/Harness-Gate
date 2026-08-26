@@ -13,7 +13,7 @@ const AUDIT_CONFIG_VERSION: u32 = 2;
 const AUDIT_MIGRATION_GUIDE: &str = "codex-audit-pipeline/docs/configuration.md#audit-v2-migration";
 
 // ============================================================
-// 配置结构体（与 .codex/audit.toml 对应）
+// 配置结构体（与 .harness-gate/audit.toml 对应）
 // ============================================================
 #[derive(Debug, Default, Deserialize, Clone)]
 struct PathsConfig {
@@ -1235,7 +1235,7 @@ mod tests {
     }
 
     fn configured_audit() -> Config {
-        parse_audit_config(include_str!("../../../.codex/audit.toml"))
+        parse_audit_config(include_str!("../../../.harness-gate/audit.toml"))
             .expect("project audit config must parse")
     }
 
