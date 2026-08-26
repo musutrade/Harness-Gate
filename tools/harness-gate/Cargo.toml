@@ -2,6 +2,14 @@
 name = "harness-gate"
 version = "1.0.0"
 edition = "2021"
+authors = ["Harness-Gate Contributors"]
+description = "Configurable development workflow and architecture guard CLI"
+readme = "../../README.md"
+homepage = "https://github.com/yourusername/Harness-Gate"
+repository = "https://github.com/yourusername/Harness-Gate"
+license = "MIT"
+keywords = ["workflow", "ci", "quality-gate", "lint", "testing"]
+categories = ["development-tools", "command-line-utilities"]
 
 [dependencies]
 anyhow = "1.0"
