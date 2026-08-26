@@ -1,22 +1,22 @@
-# arc-flow schema v2 配置参考
+# harness-gate schema v2 配置参考
 
-本文档说明 `.arc-flow/flow.toml` 和审计规则文件的完整配置模型。首次接入请先阅读上一级的 [操作手册](../README.md)，再按需查阅本参考。
+本文档说明 `.harness-gate/flow.toml` 和审计规则文件的完整配置模型。首次接入请先阅读上一级的 [操作手册](../README.md)，再按需查阅本参考。
 
 ## 1. 文件与加载顺序
 
-默认项目配置是仓库内的 `.arc-flow/flow.toml`。`arc-flow` 从当前目录向父目录查找该文件，也可以显式指定：
+默认项目配置是仓库内的 `.harness-gate/flow.toml`。`harness-gate` 从当前目录向父目录查找该文件，也可以显式指定：
 
 ```bash
-arc-flow --project-root /path/to/project config check
-arc-flow --project-root /path/to/project --config config/ci-flow.toml config check
-ARC_FLOW_CONFIG=config/ci-flow.toml arc-flow --project-root /path/to/project config check
+harness-gate --project-root /path/to/project config check
+harness-gate --project-root /path/to/project --config config/ci-flow.toml config check
+ARC_FLOW_CONFIG=config/ci-flow.toml harness-gate --project-root /path/to/project config check
 ```
 
 配置路径必须位于项目根内部。相对路径按项目根解析；绝对路径、`..` 越界路径和指向仓库外的符号链接会被拒绝。
 
 生效顺序如下，后者覆盖前者：
 
-1. `.arc-flow/flow.toml`；
+1. `.harness-gate/flow.toml`；
 2. 配置字段声明的环境变量；
 3. 通用环境变量，例如 `ARC_FLOW_CONFIG`、`ARC_FLOW_REPORTS`；
 4. CLI 的 `--project-root` 和 `--config`。
@@ -24,8 +24,8 @@ ARC_FLOW_CONFIG=config/ci-flow.toml arc-flow --project-root /path/to/project con
 使用以下命令查看配置是否有效以及环境覆盖后的结果：
 
 ```bash
-arc-flow config check
-arc-flow config print --resolved
+harness-gate config check
+harness-gate config print --resolved
 ```
 
 ## 2. 命名和路径约束
@@ -107,8 +107,8 @@ hook_profile = "hook"
 | 字段              | 说明                                      |
 | ----------------- | ----------------------------------------- |
 | `name`            | 项目 ID，也用于临时容器名称               |
-| `default_profile` | `arc-flow verify` 未传 `--profile` 时使用 |
-| `hook_profile`    | `arc-flow hook` 使用的快速 profile        |
+| `default_profile` | `harness-gate verify` 未传 `--profile` 时使用 |
+| `hook_profile`    | `harness-gate hook` 使用的快速 profile        |
 
 两个 profile 都必须至少被一个步骤引用。profile 不需要单独声明，它由步骤的 `profiles` 集合产生。
 
@@ -116,9 +116,9 @@ hook_profile = "hook"
 
 ```toml
 [paths]
-reports = ".arc-flow/reports"
-audit_config = ".arc-flow/audit.toml"
-secrets_config = ".arc-flow/secrets.toml"
+reports = ".harness-gate/reports"
+audit_config = ".harness-gate/audit.toml"
+secrets_config = ".harness-gate/secrets.toml"
 
 [paths.aliases.api]
 path = "services/api"
@@ -223,7 +223,7 @@ kind = "service"
 service = "test-postgres"
 ```
 
-`path_type` 可取 `any`、`file`、`directory`，默认 `any`。命令、Git 配置、remote 和 service 探测都受 `timeout_secs` 约束，超时时会终止整个子进程组。CI 中通常使用 `arc-flow doctor --strict`，把 WARN 也视为失败。
+`path_type` 可取 `any`、`file`、`directory`，默认 `any`。命令、Git 配置、remote 和 service 探测都受 `timeout_secs` 约束，超时时会终止整个子进程组。CI 中通常使用 `harness-gate doctor --strict`，把 WARN 也视为失败。
 
 ## 8. `[services.*]`
 
@@ -329,7 +329,7 @@ patterns = ["services/api/**", "shared/contracts/**"]
 components = ["api"]
 
 [[scope.rules]]
-patterns = [".arc-flow/**", ".github/workflows/**"]
+patterns = [".harness-gate/**", ".github/workflows/**"]
 components = ["api", "web", "workflow"]
 ```
 
@@ -378,7 +378,7 @@ remove_env = ["DATABASE_URL"]
 
 ## 12. Secret Scan 规则文件
 
-`[paths].secrets_config` 指向独立、受版本控制的 TOML 文件。预设会生成一套通用高置信规则，项目可在不重新编译 `arc-flow` 的情况下增加供应商或业务密钥规则。配置版本、规则 ID、正则、捕获组和最小长度都会在扫描前校验；配置缺失、空规则或无效捕获组会直接让门禁失败。
+`[paths].secrets_config` 指向独立、受版本控制的 TOML 文件。预设会生成一套通用高置信规则，项目可在不重新编译 `harness-gate` 的情况下增加供应商或业务密钥规则。配置版本、规则 ID、正则、捕获组和最小长度都会在扫描前校验；配置缺失、空规则或无效捕获组会直接让门禁失败。
 
 ```toml
 version = 2
@@ -442,7 +442,7 @@ exclude = ["target", "node_modules", "dist", ".git"]
 
 ### Audit v2 迁移
 
-audit v2 是 `arc-flow` 3.0.0 的破坏性配置升级。旧配置不会被静默套用新语义：缺少 `version`、缺少 `[engine]`、未知版本、未知字段或字符串 allowlist 都会 fail closed，并在错误中指向本节。
+audit v2 是 `harness-gate` 3.0.0 的破坏性配置升级。旧配置不会被静默套用新语义：缺少 `version`、缺少 `[engine]`、未知版本、未知字段或字符串 allowlist 都会 fail closed，并在错误中指向本节。
 
 旧配置可能依赖隐式 engine 默认值，并让字符串内容同时承担路径和正则语义：
 
@@ -491,7 +491,7 @@ allowlist = [
 ]
 ```
 
-字符串 allowlist 无法可靠推断原意，因此不自动迁移。完成转换后运行 `arc-flow config check` 和 `arc-flow audit`，确认路径引用、正则和报告配置有效。
+字符串 allowlist 无法可靠推断原意，因此不自动迁移。完成转换后运行 `harness-gate config check` 和 `harness-gate audit`，确认路径引用、正则和报告配置有效。
 
 ### 13.1 Hard rule
 
@@ -544,9 +544,9 @@ default_profile = "full"
 hook_profile = "hook"
 
 [paths]
-reports = ".arc-flow/reports"
-audit_config = ".arc-flow/audit.toml"
-secrets_config = ".arc-flow/secrets.toml"
+reports = ".harness-gate/reports"
+audit_config = ".harness-gate/audit.toml"
+secrets_config = ".harness-gate/secrets.toml"
 
 [paths.aliases.app]
 path = "."
@@ -601,8 +601,8 @@ parser = "rust"
 完成配置后依次执行：
 
 ```bash
-arc-flow config check
-arc-flow doctor
-arc-flow scope --all
-arc-flow verify --all
+harness-gate config check
+harness-gate doctor
+harness-gate scope --all
+harness-gate verify --all
 ```

@@ -317,14 +317,14 @@ mod tests {
     fn task_can_remove_an_inherited_environment_variable() {
         let log = std::env::temp_dir().join(format!("arc-flow-env-{}.log", std::process::id()));
         let result = Task::new("environment fixture", "env", Path::new("."), log.clone())
-            .env("ARC_FLOW_REMOVE_FIXTURE", "must-not-leak")
-            .env_remove("ARC_FLOW_REMOVE_FIXTURE")
+            .env("HARNESS_GATE_REMOVE_FIXTURE", "must-not-leak")
+            .env_remove("HARNESS_GATE_REMOVE_FIXTURE")
             .run()
             .expect("run environment fixture");
 
         assert!(result.passed);
         let output = fs::read_to_string(&log).expect("read environment log");
-        assert!(!output.contains("ARC_FLOW_REMOVE_FIXTURE"));
+        assert!(!output.contains("HARNESS_GATE_REMOVE_FIXTURE"));
         let _ = fs::remove_file(log);
     }
 

@@ -197,7 +197,7 @@ fn find_root(start: &Path, config_override: Option<&Path>) -> Result<PathBuf> {
     let start = canonical_directory(start)?;
     let configured_path = config_override
         .map(Path::to_path_buf)
-        .or_else(|| env::var_os("ARC_FLOW_CONFIG").map(PathBuf::from));
+        .or_else(|| env::var_os("HARNESS_GATE_CONFIG").map(PathBuf::from));
     if let Some(config) = configured_path {
         let candidate = if config.is_absolute() {
             config

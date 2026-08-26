@@ -8,7 +8,7 @@ use std::thread;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 use url::{Host, Url};
 
-const ALLOW_REMOTE_TEST_DATABASE_ENV: &str = "ARC_FLOW_ALLOW_REMOTE_TEST_DATABASE";
+const ALLOW_REMOTE_TEST_DATABASE_ENV: &str = "HARNESS_GATE_ALLOW_REMOTE_TEST_DATABASE";
 
 pub struct ServiceManager<'a> {
     project: &'a Project,

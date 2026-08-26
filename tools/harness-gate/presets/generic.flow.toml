@@ -6,9 +6,9 @@ default_profile = "full"
 hook_profile = "hook"
 
 [paths]
-reports = ".arc-flow/reports"
-audit_config = ".arc-flow/audit.toml"
-secrets_config = ".arc-flow/secrets.toml"
+reports = ".harness-gate/reports"
+audit_config = ".harness-gate/audit.toml"
+secrets_config = ".harness-gate/secrets.toml"
 
 [policy]
 required_steps = ["project.diff-check", "project.staged-diff-check"]

@@ -18,11 +18,11 @@ use std::process::ExitCode;
 
 #[derive(Debug, Parser)]
 #[command(
-    name = "arc-flow",
+    name = "harness-gate",
     version,
     about = "Configurable development workflow and architecture guard",
     arg_required_else_help = true,
-    after_help = "Examples:\n  arc-flow presets\n  arc-flow init --preset rust-api\n  arc-flow doctor\n  arc-flow verify --all\n  cargo flow verify --components backend,frontend"
+    after_help = "Examples:\n  harness-gate presets\n  harness-gate init --preset rust-api\n  harness-gate doctor\n  harness-gate verify --all"
 )]
 struct Cli {
     /// Override automatic project root discovery.
@@ -107,11 +107,11 @@ enum Commands {
         /// Step id from flow.toml, for example api.clippy.
         id: String,
     },
-    /// Initialize .arc-flow configuration from an embedded preset.
+    /// Initialize .harness-gate configuration from an embedded preset.
     Init {
         #[arg(long, default_value = "generic")]
         preset: String,
-        /// Replace existing .arc-flow configuration files.
+        /// Replace existing .harness-gate configuration files.
         #[arg(long)]
         force: bool,
     },
@@ -129,7 +129,7 @@ enum ConfigAction {
         #[arg(long)]
         resolved: bool,
     },
-    /// Convert a schema v1 flow.toml to .arc-flow/flow.toml schema v2.
+    /// Convert a schema v1 flow.toml to .harness-gate/flow.toml schema v2.
     Migrate {
         #[arg(long, value_name = "PATH")]
         input: Option<PathBuf>,

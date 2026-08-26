@@ -6,9 +6,9 @@ default_profile = "full"
 hook_profile = "hook"
 
 [paths]
-reports = ".arc-flow/reports"
-audit_config = ".arc-flow/audit.toml"
-secrets_config = ".arc-flow/secrets.toml"
+reports = ".harness-gate/reports"
+audit_config = ".harness-gate/audit.toml"
+secrets_config = ".harness-gate/secrets.toml"
 
 [paths.aliases.app]
 path = "."
@@ -55,7 +55,7 @@ minimum = 1
 unmatched = "all"
 
 [[scope.rules]]
-patterns = ["src/**", "package.json", "package-lock.json", "angular.json", "tsconfig*.json", ".arc-flow/**"]
+patterns = ["src/**", "package.json", "package-lock.json", "angular.json", "tsconfig*.json", ".harness-gate/**"]
 components = ["app"]
 
 [[steps]]
