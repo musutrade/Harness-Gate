@@ -1,4 +1,6 @@
+use crate::error::CodedError;
 use crate::project::resolve_repo_path;
+use crate::utils::fs as output_fs;
 use anyhow::{bail, Context, Result};
 use ignore::WalkBuilder;
 use rayon::prelude::*;
@@ -11,6 +13,47 @@ use std::path::{Path, PathBuf};
 
 const AUDIT_CONFIG_VERSION: u32 = 2;
 const AUDIT_MIGRATION_GUIDE: &str = "codex-audit-pipeline/docs/configuration.md#audit-v2-migration";
+
+/// Errors emitted by the architecture-audit boundary.
+#[derive(Debug, thiserror::Error)]
+pub enum AuditError {
+    #[error("audit configuration failed: {message}")]
+    Configuration { message: String },
+    #[error("audit execution failed: {message}")]
+    Execution { message: String },
+    #[error("log parsing failed: {message}")]
+    LogParsing { message: String },
+}
+
+impl AuditError {
+    fn configuration(error: anyhow::Error) -> Self {
+        Self::Configuration {
+            message: format!("{error:#}"),
+        }
+    }
+
+    fn execution(error: anyhow::Error) -> Self {
+        Self::Execution {
+            message: format!("{error:#}"),
+        }
+    }
+
+    fn log_parsing(error: anyhow::Error) -> Self {
+        Self::LogParsing {
+            message: format!("{error:#}"),
+        }
+    }
+}
+
+impl CodedError for AuditError {
+    fn code(&self) -> &'static str {
+        match self {
+            Self::Configuration { .. } => "E1101",
+            Self::Execution { .. } => "E1102",
+            Self::LogParsing { .. } => "E1103",
+        }
+    }
+}
 
 // ============================================================
 // 配置结构体（与 .harness-gate/audit.toml 对应）
@@ -1133,11 +1176,22 @@ pub fn run(
     config_path: &Path,
     report_dir: &Path,
     emit_json: bool,
-) -> Result<AuditOutcome> {
+) -> std::result::Result<AuditOutcome, AuditError> {
     let config_str = fs::read_to_string(config_path)
-        .with_context(|| format!("read audit config {}", config_path.display()))?;
+        .with_context(|| format!("read audit config {}", config_path.display()))
+        .map_err(AuditError::configuration)?;
     let config = parse_audit_config(&config_str)
-        .with_context(|| format!("parse audit config {}", config_path.display()))?;
+        .with_context(|| format!("parse audit config {}", config_path.display()))
+        .map_err(AuditError::configuration)?;
+    run_with_config(project_root, report_dir, emit_json, config).map_err(AuditError::execution)
+}
+
+fn run_with_config(
+    project_root: &Path,
+    report_dir: &Path,
+    emit_json: bool,
+    config: Config,
+) -> Result<AuditOutcome> {
     let exclude_dirs = validate_audit_config(project_root, &config)?;
 
     let mut all_hard_violations = Vec::new();
@@ -1165,8 +1219,7 @@ pub fn run(
         report_file: report_dir.join(&config.engine.json_report_filename),
     };
 
-    fs::create_dir_all(report_dir)?;
-    fs::write(&outcome.report_file, &full_json)?;
+    output_fs::write(&outcome.report_file, &full_json)?;
 
     let markdown = generate_markdown(&config, &all_hard_violations, &arch_violations);
     let truncated = if markdown.len() > config.engine.markdown_max_bytes {
@@ -1184,8 +1237,8 @@ pub fn run(
     } else {
         markdown
     };
-    fs::write(
-        report_dir.join(&config.engine.markdown_report_filename),
+    output_fs::write(
+        &report_dir.join(&config.engine.markdown_report_filename),
         truncated,
     )?;
 
@@ -1196,8 +1249,10 @@ pub fn run(
     Ok(outcome)
 }
 
-pub fn parse_logs(input: &Path, output: &Path) -> Result<()> {
+pub fn parse_logs(input: &Path, output: &Path) -> std::result::Result<(), AuditError> {
     log_parser::extract_error_context(&input.to_string_lossy(), &output.to_string_lossy())
+        .with_context(|| format!("parse log file {}", input.display()))
+        .map_err(AuditError::log_parsing)
 }
 
 #[cfg(test)]

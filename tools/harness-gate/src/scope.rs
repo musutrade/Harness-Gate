@@ -1,9 +1,54 @@
 use crate::config::UnmatchedScope;
+use crate::error::CodedError;
 use crate::project::Project;
-use anyhow::{bail, Context, Result};
+use crate::utils::{fs as output_fs, git};
+use anyhow::{bail, Result};
 use serde::Serialize;
 use std::collections::BTreeSet;
-use std::time::Duration;
+
+/// Errors emitted while determining a verification scope.
+#[derive(Debug, thiserror::Error)]
+pub enum ScopeError {
+    #[error("Git scope detection failed: {message}")]
+    Git { message: String },
+    #[error("scope configuration failed: {message}")]
+    Configuration { message: String },
+    #[error("scope has {count} unmatched changed file(s): {files}")]
+    UnmatchedFiles { count: usize, files: String },
+    #[error("scope report failed: {message}")]
+    Report { message: String },
+}
+
+impl ScopeError {
+    fn git(error: anyhow::Error) -> Self {
+        Self::Git {
+            message: format!("{error:#}"),
+        }
+    }
+
+    fn configuration(error: anyhow::Error) -> Self {
+        Self::Configuration {
+            message: format!("{error:#}"),
+        }
+    }
+
+    fn report(error: anyhow::Error) -> Self {
+        Self::Report {
+            message: format!("{error:#}"),
+        }
+    }
+}
+
+impl CodedError for ScopeError {
+    fn code(&self) -> &'static str {
+        match self {
+            Self::Git { .. } => "E1301",
+            Self::Configuration { .. } => "E1302",
+            Self::UnmatchedFiles { .. } => "E1303",
+            Self::Report { .. } => "E1304",
+        }
+    }
+}
 
 #[derive(Debug, Clone)]
 pub enum ScopeMode {
@@ -31,80 +76,92 @@ impl ScopeResult {
         }
     }
 
-    pub fn write_reports(&self, project: &Project) -> Result<()> {
-        std::fs::create_dir_all(&project.reports)?;
+    pub fn write_reports(&self, project: &Project) -> std::result::Result<(), ScopeError> {
         let changed = if self.changed_files.is_empty() {
             String::new()
         } else {
             format!("{}\n", self.changed_files.join("\n"))
         };
-        std::fs::write(project.reports.join("changed_files.txt"), changed)?;
-        std::fs::write(
-            project.reports.join("scope.json"),
-            serde_json::to_string_pretty(self)?,
-        )?;
+        output_fs::write(&project.reports.join("changed_files.txt"), changed)
+            .map_err(ScopeError::report)?;
+        output_fs::write_json(&project.reports.join("scope.json"), self)
+            .map_err(ScopeError::report)?;
         Ok(())
     }
 }
 
-pub fn detect(project: &Project, mode: &ScopeMode) -> Result<ScopeResult> {
+pub fn detect(project: &Project, mode: &ScopeMode) -> std::result::Result<ScopeResult, ScopeError> {
     if matches!(mode, ScopeMode::All) {
         return Ok(ScopeResult::all(project));
     }
 
-    ensure_git_worktree(project)?;
+    ensure_git_worktree(project).map_err(ScopeError::git)?;
     let mut paths = BTreeSet::new();
     let mode_label = match mode {
         ScopeMode::WorkingTree => {
-            paths.extend(git_paths(project, &["diff", "--name-only", "-z"])?);
-            paths.extend(git_paths(
-                project,
-                &["diff", "--cached", "--name-only", "-z"],
-            )?);
-            paths.extend(git_paths(
-                project,
-                &["ls-files", "--others", "--exclude-standard", "-z"],
-            )?);
+            paths.extend(
+                git::null_terminated_paths(&project.root, ["diff", "--name-only", "-z"])
+                    .map_err(ScopeError::git)?,
+            );
+            paths.extend(
+                git::null_terminated_paths(
+                    &project.root,
+                    ["diff", "--cached", "--name-only", "-z"],
+                )
+                .map_err(ScopeError::git)?,
+            );
+            paths.extend(
+                git::null_terminated_paths(
+                    &project.root,
+                    ["ls-files", "--others", "--exclude-standard", "-z"],
+                )
+                .map_err(ScopeError::git)?,
+            );
             "working-tree".to_string()
         }
         ScopeMode::Staged => {
-            paths.extend(git_paths(
-                project,
-                &["diff", "--cached", "--name-only", "-z"],
-            )?);
+            paths.extend(
+                git::null_terminated_paths(
+                    &project.root,
+                    ["diff", "--cached", "--name-only", "-z"],
+                )
+                .map_err(ScopeError::git)?,
+            );
             "staged".to_string()
         }
         ScopeMode::Base(reference) => {
-            let output = git_capture(
-                project,
-                vec![
-                    "rev-parse".into(),
-                    "--verify".into(),
-                    format!("{reference}^{{commit}}"),
-                ],
-            )
-            .context("run git rev-parse")?;
+            let revision = format!("{reference}^{{commit}}");
+            let output = git::capture(&project.root, ["rev-parse", "--verify", revision.as_str()])
+                .map_err(ScopeError::git)?;
             if !output.status.success() {
-                bail!("Git base reference does not exist: {reference}");
+                return Err(ScopeError::Git {
+                    message: format!("base reference does not exist: {reference}"),
+                });
             }
-            paths.extend(git_paths(
-                project,
-                &["diff", "--name-only", "-z", &format!("{reference}...HEAD")],
-            )?);
+            let range = format!("{reference}...HEAD");
+            paths.extend(
+                git::null_terminated_paths(
+                    &project.root,
+                    ["diff", "--name-only", "-z", range.as_str()],
+                )
+                .map_err(ScopeError::git)?,
+            );
             format!("base:{reference}")
         }
         ScopeMode::All => unreachable!(),
     };
 
     let changed_files = paths.into_iter().collect::<Vec<_>>();
-    let (mut components, unmatched_files) = project.config.classify_paths(&changed_files)?;
+    let (mut components, unmatched_files) = project
+        .config
+        .classify_paths(&changed_files)
+        .map_err(ScopeError::configuration)?;
     match project.config.scope.unmatched {
         UnmatchedScope::Fail if !unmatched_files.is_empty() => {
-            bail!(
-                "scope has {} unmatched changed file(s): {}",
-                unmatched_files.len(),
-                unmatched_files.join(", ")
-            );
+            return Err(ScopeError::UnmatchedFiles {
+                count: unmatched_files.len(),
+                files: unmatched_files.join(", "),
+            });
         }
         UnmatchedScope::All => components.extend(project.config.components()),
         UnmatchedScope::Fail | UnmatchedScope::Ignore => {}
@@ -118,35 +175,11 @@ pub fn detect(project: &Project, mode: &ScopeMode) -> Result<ScopeResult> {
 }
 
 fn ensure_git_worktree(project: &Project) -> Result<()> {
-    let output = git_capture(
-        project,
-        vec!["rev-parse".into(), "--is-inside-work-tree".into()],
-    )
-    .context("run git rev-parse")?;
+    let output = git::capture(&project.root, ["rev-parse", "--is-inside-work-tree"])?;
     if !output.status.success() || output.stdout != b"true\n" {
         bail!("project root is not a Git worktree");
     }
     Ok(())
-}
-
-fn git_paths(project: &Project, args: &[&str]) -> Result<Vec<String>> {
-    let output = git_capture(project, args.iter().map(|arg| (*arg).to_string()).collect())
-        .with_context(|| format!("run git {}", args.join(" ")))?;
-    if !output.status.success() {
-        bail!("git {} failed", args.join(" "));
-    }
-    output
-        .stdout
-        .split(|byte| *byte == 0)
-        .filter(|entry| !entry.is_empty())
-        .map(|entry| {
-            String::from_utf8(entry.to_vec()).context("Git returned a non-UTF-8 file path")
-        })
-        .collect()
-}
-
-fn git_capture(project: &Project, args: Vec<String>) -> Result<crate::process::CapturedOutput> {
-    crate::process::capture("git", &args, &project.root, Duration::from_secs(30))
 }
 
 #[cfg(test)]
