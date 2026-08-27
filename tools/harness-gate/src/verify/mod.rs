@@ -1,18 +1,22 @@
+mod parser;
+mod steps;
+
+#[cfg(test)]
+mod tests;
+
 use crate::audit;
-use crate::config::{ParserConfig, StepConfig};
 use crate::error::CodedError;
-use crate::process::{Task, TaskResult};
+use crate::process::TaskResult;
 use crate::project::Project;
 use crate::scope::ScopeResult;
 use crate::secrets::{self, SecretMode};
-use crate::service::ServiceManager;
 use crate::utils::fs as output_fs;
-use anyhow::{bail, Result};
-use regex::Regex;
+use anyhow::Result;
 use serde::Serialize;
 use std::collections::BTreeSet;
-use std::fs;
 use std::time::Instant;
+
+use steps::{print_result, run_configured_steps};
 
 /// Errors emitted by the verification workflow boundary.
 #[derive(Debug, thiserror::Error)]
@@ -254,232 +258,11 @@ fn run_selected(
     );
     Ok(report)
 }
-
-fn run_configured_steps(
-    project: &Project,
-    scope: &ScopeResult,
-    profile: &str,
-    only_step: Option<&str>,
-    results: &mut Vec<TaskResult>,
-) -> Result<()> {
-    let selected = project.config.steps.iter().filter(|step| {
-        scope.components.contains(&step.component)
-            && only_step
-                .map(|id| step.id == id)
-                .unwrap_or_else(|| step.profiles.contains(profile))
-    });
-    let mut services = ServiceManager::new(project);
-
-    'steps: for step in selected {
-        if crate::process::cancelled() {
-            bail!("verification cancelled");
-        }
-        let mut service_env = Vec::new();
-        for service in &step.services {
-            let environment = match services.environment(service) {
-                Ok(environment) => environment,
-                Err(error) => {
-                    let result = TaskResult {
-                        label: format!("{}: service {service} setup", step.label),
-                        passed: false,
-                        timed_out: false,
-                        cancelled: false,
-                        duration_ms: 0,
-                        log: String::new(),
-                        detail: Some(format!("{error:#}")),
-                    };
-                    print_result(&result);
-                    results.push(result);
-                    continue 'steps;
-                }
-            };
-            service_env.push(environment);
-        }
-        let parser = step
-            .parser
-            .as_deref()
-            .and_then(|id| project.config.parser(id));
-        execute(configured_task(project, step, service_env), parser, results)?;
-    }
-    Ok(())
-}
-
-fn configured_task(
-    project: &Project,
-    step: &StepConfig,
-    service_env: Vec<(String, String)>,
-) -> Task {
-    let cwd = std::path::PathBuf::from(project.expand(&step.cwd));
-    let args = step
-        .args
-        .iter()
-        .map(|argument| project.expand(argument))
-        .collect::<Vec<_>>();
-    let mut task = Task::new(&step.label, &step.program, &cwd, log(project, &step.log))
-        .args(args)
-        .timeout(step.timeout_secs);
-    for (name, value) in service_env {
-        task = task.env(name, value);
-    }
-    for name in &step.remove_env {
-        task = task.env_remove(name);
-    }
-    task
-}
-
-fn execute(task: Task, parser: Option<&ParserConfig>, steps: &mut Vec<TaskResult>) -> Result<()> {
-    print!("[RUN ] {} ... ", task.label);
-    use std::io::Write;
-    std::io::stdout().flush().ok();
-    let mut result = task.run()?;
-    if result.passed {
-        if let Some(parser) = parser {
-            let content = fs::read_to_string(&result.log).unwrap_or_default();
-            let (count, minimum) = parse_result_count(&content, parser)?;
-            if count < minimum {
-                result.passed = false;
-                result.detail = Some(format!(
-                    "parsed {count} result(s), expected at least {minimum}"
-                ));
-            } else {
-                result.detail = Some(format!("{count} result(s)"));
-            }
-        }
-    }
-    print_result_inline(&result);
-    if result.cancelled {
-        bail!("verification cancelled");
-    }
-    steps.push(result);
-    Ok(())
-}
-
-fn parse_result_count(content: &str, parser: &ParserConfig) -> Result<(usize, usize)> {
-    let ansi = Regex::new(r"\x1b\[[0-?]*[ -/]*[@-~]")?;
-    let normalized = ansi.replace_all(content, "");
-    match parser {
-        ParserConfig::Regex {
-            patterns,
-            capture,
-            minimum,
-        } => {
-            let mut count = 0;
-            for pattern in patterns {
-                let regex = Regex::new(pattern)?;
-                count += regex
-                    .captures_iter(&normalized)
-                    .filter_map(|captures| captures.get(*capture)?.as_str().parse::<usize>().ok())
-                    .sum::<usize>();
-            }
-            Ok((count, *minimum))
-        }
-    }
-}
-
-fn print_result(result: &TaskResult) {
-    let marker = if result.passed { "PASS" } else { "FAIL" };
-    println!("[{marker}] {} ({} ms)", result.label, result.duration_ms);
-    if !result.passed && !result.log.is_empty() {
-        println!("       log: {}", result.log);
-    }
-}
-
-fn print_result_inline(result: &TaskResult) {
-    let marker = if result.passed { "PASS" } else { "FAIL" };
-    println!("{marker} ({} ms)", result.duration_ms);
-    if !result.passed {
-        println!("       log: {}", result.log);
-    }
-}
-
-fn log(project: &Project, name: &str) -> std::path::PathBuf {
-    project.reports.join("logs").join(name)
-}
-
 pub fn explicit_scope(components: &[String]) -> ScopeResult {
     ScopeResult {
         mode: "components".to_string(),
         changed_files: Vec::new(),
         components: components.iter().cloned().collect::<BTreeSet<_>>(),
         unmatched_files: Vec::new(),
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::config::{FlowConfig, ServiceConfig};
-    use crate::test_support::TestWorkspace;
-
-    #[test]
-    fn configurable_regex_parser_counts_multiple_outputs() {
-        let parser = ParserConfig::Regex {
-            patterns: vec![r"(?m)^running ([0-9]+) tests?$".into()],
-            capture: 1,
-            minimum: 1,
-        };
-        let log = "running 3 tests\n...\nrunning 2 tests\n";
-        assert_eq!(parse_result_count(log, &parser).expect("count"), (5, 1));
-    }
-
-    #[test]
-    fn a_new_test_framework_can_supply_its_own_pattern() {
-        let parser = ParserConfig::Regex {
-            patterns: vec![r"passed: ([0-9]+)".into()],
-            capture: 1,
-            minimum: 2,
-        };
-        assert_eq!(
-            parse_result_count("passed: 7", &parser).expect("count"),
-            (7, 2)
-        );
-    }
-
-    #[test]
-    fn regex_parser_ignores_ansi_color_sequences() {
-        let parser = ParserConfig::Regex {
-            patterns: vec![r"Tests\s+([0-9]+) passed".into()],
-            capture: 1,
-            minimum: 1,
-        };
-        let log = "\u{1b}[1mTests\u{1b}[22m  \u{1b}[32m58 passed\u{1b}[39m";
-        assert_eq!(parse_result_count(log, &parser).expect("count"), (58, 1));
-    }
-
-    #[test]
-    fn service_failure_does_not_skip_unrelated_steps() {
-        let workspace = TestWorkspace::new("verify");
-        crate::preset::init(&workspace.root, "generic", false).expect("initialize fixture");
-        let flow_path = workspace.root.join(".harness-gate/flow.toml");
-        let source = fs::read_to_string(&flow_path).expect("read fixture config");
-        let mut config: FlowConfig = toml::from_str(&source).expect("parse fixture config");
-        let source_env = "HARNESS_GATE_MISSING_TEST".to_string();
-        assert!(std::env::var_os(&source_env).is_none());
-        config.services.insert(
-            "missing-service".into(),
-            ServiceConfig::Environment {
-                source_env,
-                inject_env: "TEST_SERVICE_URL".into(),
-            },
-        );
-        config.steps[0].services = vec!["missing-service".into()];
-        config.steps[1].profiles.insert("full".into());
-        fs::write(
-            &flow_path,
-            toml::to_string_pretty(&config).expect("serialize fixture config"),
-        )
-        .expect("write fixture config");
-        workspace.init_git();
-        let project =
-            Project::discover(Some(workspace.root.clone()), None).expect("discover fixture");
-
-        let report =
-            run(&project, ScopeResult::all(&project), "full", false).expect("verify fixture");
-
-        assert!(!report.passed);
-        assert!(report
-            .steps
-            .iter()
-            .any(|step| step.label == "staged Git whitespace check" && step.passed));
     }
 }
