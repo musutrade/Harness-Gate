@@ -26,6 +26,7 @@ We use a simplified version of the Michael Nygard ADR template:
 - [ADR-0006](0006-test-fixtures-and-internal-boundaries.md) - Test fixtures and internal workflow boundaries
 - [ADR-0007](0007-audit-module-decomposition.md) - Decompose the audit module by responsibility
 - [ADR-0008](0008-config-module-decomposition.md) - Decompose the workflow configuration module by responsibility
+- [ADR-0009](0009-secrets-module-decomposition.md) - Decompose the secret scanner by responsibility
 
 ## Creating New ADRs
 
