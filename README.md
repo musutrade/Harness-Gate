@@ -167,6 +167,8 @@ Presets are starting points, not runtime branches. After initialization is compl
 
 All commands support global `--project-root <PATH>` and `--config <PATH>`. Commands return 0 on success; configuration errors, gate failures, step failures, timeouts or interrupts return non-zero, suitable for direct use in CI.
 
+Interactive `verify` renders a progress bar and colored pass/warning/failure markers. Output stays plain when redirected or in CI. Use `--color auto` (default), `--color always`, or `--color never`; `NO_COLOR` disables automatic color.
+
 ## Typical Workflow
 
 ### Daily Development

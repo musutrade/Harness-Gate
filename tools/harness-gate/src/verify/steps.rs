@@ -4,22 +4,35 @@ use crate::process::{Task, TaskResult};
 use crate::project::Project;
 use crate::scope::ScopeResult;
 use crate::service::ServiceManager;
+use crate::ui::{self, Progress};
 use anyhow::{bail, Result};
 use std::fs;
 
-pub(super) fn run_configured_steps(
-    project: &Project,
+pub(super) fn selected_steps<'a>(
+    project: &'a Project,
     scope: &ScopeResult,
     profile: &str,
     only_step: Option<&str>,
+) -> Vec<&'a StepConfig> {
+    project
+        .config
+        .steps
+        .iter()
+        .filter(|step| {
+            scope.components.contains(&step.component)
+                && only_step
+                    .map(|id| step.id == id)
+                    .unwrap_or_else(|| step.profiles.contains(profile))
+        })
+        .collect()
+}
+
+pub(super) fn run_configured_steps(
+    project: &Project,
+    selected: Vec<&StepConfig>,
     results: &mut Vec<TaskResult>,
+    progress: &mut Progress,
 ) -> Result<()> {
-    let selected = project.config.steps.iter().filter(|step| {
-        scope.components.contains(&step.component)
-            && only_step
-                .map(|id| step.id == id)
-                .unwrap_or_else(|| step.profiles.contains(profile))
-    });
     let mut services = ServiceManager::new(project);
 
     'steps: for step in selected {
@@ -31,6 +44,7 @@ pub(super) fn run_configured_steps(
             let environment = match services.environment(service) {
                 Ok(environment) => environment,
                 Err(error) => {
+                    progress.begin(&step.label);
                     let result = TaskResult {
                         label: format!("{}: service {service} setup", step.label),
                         passed: false,
@@ -40,7 +54,9 @@ pub(super) fn run_configured_steps(
                         log: String::new(),
                         detail: Some(format!("{error:#}")),
                     };
+                    progress.clear();
                     print_result(&result);
+                    progress.complete();
                     results.push(result);
                     continue 'steps;
                 }
@@ -51,7 +67,12 @@ pub(super) fn run_configured_steps(
             .parser
             .as_deref()
             .and_then(|id| project.config.parser(id));
-        execute(configured_task(project, step, service_env), parser, results)?;
+        execute(
+            configured_task(project, step, service_env),
+            parser,
+            results,
+            progress,
+        )?;
     }
     Ok(())
 }
@@ -79,10 +100,18 @@ fn configured_task(
     task
 }
 
-fn execute(task: Task, parser: Option<&ParserConfig>, steps: &mut Vec<TaskResult>) -> Result<()> {
-    print!("[RUN ] {} ... ", task.label);
-    use std::io::Write;
-    std::io::stdout().flush().ok();
+fn execute(
+    task: Task,
+    parser: Option<&ParserConfig>,
+    steps: &mut Vec<TaskResult>,
+    progress: &mut Progress,
+) -> Result<()> {
+    progress.begin(&task.label);
+    if !progress.enabled() {
+        print!("[RUN ] {} ... ", task.label);
+        use std::io::Write;
+        std::io::stdout().flush().ok();
+    }
     let mut result = task.run()?;
     if result.passed {
         if let Some(parser) = parser {
@@ -98,7 +127,13 @@ fn execute(task: Task, parser: Option<&ParserConfig>, steps: &mut Vec<TaskResult
             }
         }
     }
-    print_result_inline(&result);
+    progress.clear();
+    if progress.enabled() {
+        print_result(&result);
+    } else {
+        print_result_inline(&result);
+    }
+    progress.complete();
     if result.cancelled {
         bail!("verification cancelled");
     }
@@ -107,7 +142,11 @@ fn execute(task: Task, parser: Option<&ParserConfig>, steps: &mut Vec<TaskResult
 }
 
 pub(super) fn print_result(result: &TaskResult) {
-    let marker = if result.passed { "PASS" } else { "FAIL" };
+    let marker = if result.passed {
+        ui::pass("PASS")
+    } else {
+        ui::failure("FAIL")
+    };
     println!("[{marker}] {} ({} ms)", result.label, result.duration_ms);
     if !result.passed && !result.log.is_empty() {
         println!("       log: {}", result.log);
@@ -115,7 +154,11 @@ pub(super) fn print_result(result: &TaskResult) {
 }
 
 fn print_result_inline(result: &TaskResult) {
-    let marker = if result.passed { "PASS" } else { "FAIL" };
+    let marker = if result.passed {
+        ui::pass("PASS")
+    } else {
+        ui::failure("FAIL")
+    };
     println!("{marker} ({} ms)", result.duration_ms);
     if !result.passed {
         println!("       log: {}", result.log);

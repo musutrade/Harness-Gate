@@ -1,4 +1,5 @@
 use crate::project::Project;
+use crate::ui;
 use serde::Serialize;
 
 #[derive(Debug, Clone, Copy, Serialize)]
@@ -62,13 +63,13 @@ impl DoctorReport {
     }
 
     pub fn print(&self) {
-        println!("arc-flow doctor");
+        println!("{}", ui::heading("arc-flow doctor"));
         println!("Project: {}\n", self.project_root);
         for check in &self.checks {
             let marker = match check.level {
-                Level::Pass => "PASS",
-                Level::Warn => "WARN",
-                Level::Fail => "FAIL",
+                Level::Pass => ui::pass("PASS"),
+                Level::Warn => ui::warning("WARN"),
+                Level::Fail => ui::failure("FAIL"),
             };
             println!("[{marker}] {:<22} {}", check.name, check.detail);
         }
