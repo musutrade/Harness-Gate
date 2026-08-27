@@ -24,6 +24,7 @@ We use a simplified version of the Michael Nygard ADR template:
 - [ADR-0004](0004-add-integration-tests.md) - Add integration tests for end-to-end scenarios
 - [ADR-0005](0005-phase-2-optimization-strategy.md) - Phase 2 optimization strategy (performance and code quality)
 - [ADR-0006](0006-test-fixtures-and-internal-boundaries.md) - Test fixtures and internal workflow boundaries
+- [ADR-0007](0007-audit-module-decomposition.md) - Decompose the audit module by responsibility
 
 ## Creating New ADRs
 
