@@ -41,22 +41,22 @@
 
 ## 5. Track 4: Error Handling Enhancement
 
-- [ ] 5.1 Add `thiserror` dependency to Cargo.toml and verify it builds (Priority: P0, Effort: S)
-- [ ] 5.2 Create `src/error.rs` module with top-level `CliError` enum and verify it compiles (Priority: P0, Effort: M)
-- [ ] 5.3 Create `AuditError` type in `src/audit.rs` with all audit-specific errors and verify module compiles (Priority: P0, Effort: M)
-- [ ] 5.4 Migrate audit module to use typed errors and verify all audit tests pass (Priority: P0, Effort: L)
-- [ ] 5.5 Create `SecretsError` type in `src/secrets.rs` and migrate secrets module, verify tests pass (Priority: P0, Effort: L)
-- [ ] 5.6 Create `VerifyError` type in `src/verify.rs` and migrate verify module, verify tests pass (Priority: P0, Effort: L)
-- [ ] 5.7 Create `ScopeError` type in `src/scope.rs` and migrate scope module, verify tests pass (Priority: P0, Effort: L)
-- [ ] 5.8 Update main.rs to handle typed CliError and display user-friendly messages, verify error output is improved (Priority: P0, Effort: M)
-- [ ] 5.9 Add error code documentation to README.md and verify all error types are documented (Priority: P2, Effort: M)
-- [ ] 5.10 Update integration tests to check for specific error types and verify error handling is correct (Priority: P1, Effort: M)
+- [x] 5.1 Add `thiserror` dependency to Cargo.toml and verify it builds (Priority: P0, Effort: S)
+- [x] 5.2 Create `src/error.rs` module with top-level `CliError` enum and verify it compiles (Priority: P0, Effort: M)
+- [x] 5.3 Create `AuditError` type in `src/audit.rs` with configuration, execution, and log-parsing categories; verify module compiles (Priority: P0, Effort: M)
+- [x] 5.4 Migrate audit module to use typed boundary errors and verify all audit tests pass (Priority: P0, Effort: L)
+- [x] 5.5 Create `SecretsError` type in `src/secrets.rs` and migrate secret scanning; verify tests pass (Priority: P0, Effort: L)
+- [x] 5.6 Create `VerifyError` type in `src/verify.rs` and migrate verification selection/gate/execution errors; verify tests pass (Priority: P0, Effort: L)
+- [x] 5.7 Create `ScopeError` type in `src/scope.rs` and migrate scope detection/report errors; verify tests pass (Priority: P0, Effort: L)
+- [x] 5.8 Update main.rs to handle typed CliError and display user-friendly `ERROR [E####]` messages (Priority: P0, Effort: M)
+- [x] 5.9 Add error code documentation to README.md and README.zh-CN.md (Priority: P2, Effort: M)
+- [x] 5.10 Add CLI contract tests for audit, secret scan, scope, and verification error codes (Priority: P1, Effort: M)
 
 ## 6. Track 5: Code Quality & Maintainability
 
-- [ ] 6.1 Run `cargo clippy -- -W clippy::all` to identify code quality issues and document findings (Priority: P1, Effort: S)
-- [ ] 6.2 Extract common file I/O patterns into `src/utils/fs.rs` helper module and verify tests pass (Priority: P1, Effort: M)
-- [ ] 6.3 Extract common git command patterns into `src/utils/git.rs` helper module and verify tests pass (Priority: P1, Effort: M)
+- [x] 6.1 Run `cargo clippy --all-targets -- -D warnings`; no warnings remain (Priority: P1, Effort: S)
+- [x] 6.2 Extract common report file I/O into `src/utils/fs.rs` and verify tests pass (Priority: P1, Effort: M)
+- [x] 6.3 Extract shared Git capture, NUL-path parsing, and staged-file reads into `src/utils/git.rs`; verify tests pass (Priority: P1, Effort: M)
 - [ ] 6.4 Identify and refactor code duplication in test fixtures and verify all tests still pass (Priority: P2, Effort: M)
 - [ ] 6.5 Add inline documentation to complex algorithms (gitignore parsing, scope detection) and verify docs build (Priority: P2, Effort: M)
 - [ ] 6.6 Improve module boundaries and reduce cross-module coupling, verify architecture is cleaner (Priority: P2, Effort: L)
@@ -64,21 +64,21 @@
 
 ## 7. Integration & Verification
 
-- [ ] 7.1 Run full test suite with `cargo nextest run` and verify all tests pass (Priority: P0, Effort: S)
-- [ ] 7.2 Run `cargo clippy -- -D warnings` and verify zero warnings (Priority: P0, Effort: S)
-- [ ] 7.3 Run `cargo fmt -- --check` and verify code is properly formatted (Priority: P0, Effort: S)
-- [ ] 7.4 Build release-small binary and verify size meets target (<3.5MB; this is the distributed profile) (Priority: P0, Effort: S)
-- [ ] 7.5 Build release binary and verify it stays unwinding-capable (panic=unwind) for backtrace-based diagnosis (Priority: P1, Effort: S)
-- [ ] 7.6 Run basic smoke tests manually (init, verify, secrets scan) and verify CLI works correctly (Priority: P0, Effort: M)
+- [x] 7.1 Run full test suite with `TMPDIR=/tmp cargo nextest run`; 79 tests pass (Priority: P0, Effort: S)
+- [x] 7.2 Run `cargo clippy --all-targets -- -D warnings`; zero warnings (Priority: P0, Effort: S)
+- [x] 7.3 Run `cargo fmt -- --check`; code is properly formatted (Priority: P0, Effort: S)
+- [x] 7.4 Build release-small binary; 3,138,360 bytes, below the 3.5MB target (Priority: P0, Effort: S)
+- [x] 7.5 Build release binary; it retains Cargo's default `panic = "unwind"` behavior for backtrace-based diagnosis (Priority: P1, Effort: S)
+- [x] 7.6 Run `init`, `config check`, `secrets`, and `verify --all` smoke tests with the release-small binary (Priority: P0, Effort: M)
 - [ ] 7.7 Test on Linux, macOS, and Windows platforms and verify all platforms work (Priority: P0, Effort: L)
 - [ ] 7.8 Compare final metrics with baseline and verify all targets met (test time, binary size) (Priority: P0, Effort: S)
 
 ## 8. Documentation & Completion
 
-- [ ] 8.1 Create `docs/benchmarks/phase-2-results.md` with before/after comparison and verify all metrics documented (Priority: P0, Effort: M)
-- [ ] 8.2 Update CHANGELOG.md with Phase 2 improvements and verify entry follows format (Priority: P0, Effort: S)
-- [ ] 8.3 Update README.md with new build profiles and cargo-nextest usage and verify documentation is clear (Priority: P1, Effort: M)
-- [ ] 8.4 Update ADR 0005 status to "Accepted" and add implementation notes (Priority: P1, Effort: S)
+- [x] 8.1 Create `docs/benchmarks/phase-2-results.md` with current verification and historical baseline references (Priority: P0, Effort: M)
+- [x] 8.2 Update CHANGELOG.md with Phase 2 improvements (Priority: P0, Effort: S)
+- [x] 8.3 Update README.md and README.zh-CN.md with build profiles, cargo-nextest, and error-code usage (Priority: P1, Effort: M)
+- [x] 8.4 Update ADR 0005 status to "Accepted" and add implementation notes (Priority: P1, Effort: S)
 - [ ] 8.5 Create summary PR description with metrics and verification results (Priority: P0, Effort: M)
 - [ ] 8.6 Push changes and create PR, verify CI passes on all platforms (Priority: P0, Effort: S)
 

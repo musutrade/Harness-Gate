@@ -1,16 +1,19 @@
 mod audit;
 mod config;
 mod doctor;
+mod error;
 mod preset;
 mod process;
 mod project;
 mod scope;
 mod secrets;
 mod service;
+mod utils;
 mod verify;
 
-use anyhow::{bail, Context, Result};
+use anyhow::Context;
 use clap::{Args, Parser, Subcommand};
+use error::{CliError, CodedError};
 use project::Project;
 use scope::ScopeMode;
 use std::path::PathBuf;
@@ -173,13 +176,13 @@ fn main() -> ExitCode {
         Ok(true) => ExitCode::SUCCESS,
         Ok(false) => ExitCode::FAILURE,
         Err(error) => {
-            eprintln!("ERROR: {error:#}");
+            eprintln!("ERROR [{}]: {error}", error.code());
             ExitCode::FAILURE
         }
     }
 }
 
-fn run() -> Result<bool> {
+fn run() -> Result<bool, CliError> {
     let cli = Cli::parse();
     if let Commands::Init {
         preset: preset_name,
@@ -225,7 +228,10 @@ fn run() -> Result<bool> {
         Commands::Doctor { json, strict } => {
             let report = doctor::run(&project)?;
             if json {
-                println!("{}", serde_json::to_string_pretty(&report)?);
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&report).map_err(anyhow::Error::from)?
+                );
             } else {
                 report.print();
             }
@@ -235,7 +241,10 @@ fn run() -> Result<bool> {
             let result = scope::detect(&project, &args.mode())?;
             result.write_reports(&project)?;
             if json {
-                println!("{}", serde_json::to_string_pretty(&result)?);
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&result).map_err(anyhow::Error::from)?
+                );
             } else {
                 print_scope(&result);
             }
@@ -254,7 +263,8 @@ fn run() -> Result<bool> {
                     serde_json::to_string_pretty(&serde_json::json!({
                         "passed": findings.is_empty(),
                         "findings": findings,
-                    }))?
+                    }))
+                    .map_err(anyhow::Error::from)?
                 );
             } else if findings.is_empty() {
                 println!("Secret scan passed");
@@ -292,7 +302,9 @@ fn run() -> Result<bool> {
                 let known = project.config.components();
                 for component in &components {
                     if !known.contains(component) {
-                        bail!("unknown component {component:?}");
+                        return Err(CliError::from(anyhow::anyhow!(
+                            "unknown component {component:?}"
+                        )));
                     }
                 }
                 verify::explicit_scope(&components)
@@ -311,8 +323,7 @@ fn run() -> Result<bool> {
             .passed)
         }
         Commands::ParseLogs { input, output } => {
-            audit::parse_logs(&input, &output)
-                .with_context(|| format!("parse log file {}", input.display()))?;
+            audit::parse_logs(&input, &output)?;
             println!("Error context: {}", output.display());
             Ok(true)
         }
@@ -346,7 +357,10 @@ fn run() -> Result<bool> {
             }
             ConfigAction::Print { resolved } => {
                 if resolved {
-                    println!("{}", toml::to_string_pretty(&project.config)?);
+                    println!(
+                        "{}",
+                        toml::to_string_pretty(&project.config).map_err(anyhow::Error::from)?
+                    );
                 } else {
                     print!(
                         "{}",

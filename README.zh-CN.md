@@ -84,6 +84,24 @@ cd Harness-Gate
 cargo install --locked --path tools/harness-gate
 ```
 
+## 开发命令
+
+仓库使用 `cargo-nextest` 执行快速、隔离的测试：
+
+```bash
+cargo nextest run --manifest-path tools/harness-gate/Cargo.toml
+cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings
+cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check
+```
+
+`release` 保留默认的 panic unwind 行为以支持诊断；需要最小分发二进制时使用
+`release-small`：
+
+```bash
+cargo build --manifest-path tools/harness-gate/Cargo.toml --release
+cargo build --manifest-path tools/harness-gate/Cargo.toml --profile release-small
+```
+
 ## 安装与快速开始
 
 验证安装并查看预设：
@@ -210,6 +228,19 @@ harness-gate verify --components backend,frontend --profile full
 ```
 
 显式 components 会覆盖自动 scope，并且不能与 `--staged`、`--base`、`--all` 同时使用。未知 component 或 profile 会立即失败。
+
+## 错误码
+
+运行失败会输出 `ERROR [E####]: message`。错误码可用于 CI 日志与问题定位，
+消息会保留文件路径或 Git 命令等上下文。
+
+| 错误码 | 分类 |
+| ------ | ---- |
+| `E1000` | 通用命令、项目或配置失败 |
+| `E1101`-`E1103` | 审计配置、执行或日志解析 |
+| `E1201`-`E1202` | 秘密扫描配置或执行 |
+| `E1301`-`E1304` | Git scope、scope 配置、未匹配路径或报告 |
+| `E1401`-`E1404` | 验证选择、取消、执行或报告 |
 
 ## Schema v2 概览
 
