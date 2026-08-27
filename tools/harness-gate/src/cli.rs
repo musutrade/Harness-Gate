@@ -1,4 +1,5 @@
 use crate::scope::ScopeMode;
+use crate::ui::ColorMode;
 use clap::{Args, Parser, Subcommand};
 use std::path::PathBuf;
 
@@ -11,6 +12,10 @@ use std::path::PathBuf;
     after_help = "Examples:\n  harness-gate presets\n  harness-gate init --preset rust-api\n  harness-gate doctor\n  harness-gate verify --all"
 )]
 pub(crate) struct Cli {
+    /// Control colored terminal output.
+    #[arg(long, global = true, value_enum, default_value_t = ColorMode::Auto)]
+    pub(crate) color: ColorMode,
+
     /// Override automatic project root discovery.
     #[arg(long, global = true, value_name = "PATH")]
     pub(crate) project_root: Option<PathBuf>,

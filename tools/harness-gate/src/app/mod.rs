@@ -9,6 +9,7 @@ use clap::Parser;
 
 pub(crate) fn run() -> Result<bool, CliError> {
     let cli = Cli::parse();
+    crate::ui::configure(cli.color);
     if let Commands::Init {
         preset: preset_name,
         force,

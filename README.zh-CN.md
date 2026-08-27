@@ -167,6 +167,8 @@ harness-gate --project-root /path/to/new-project verify --all
 
 所有命令都支持全局 `--project-root <PATH>` 和 `--config <PATH>`。命令成功返回 0；配置错误、门禁失败、步骤失败、超时或中断返回非 0，适合直接用于 CI。
 
+交互式终端中的 `verify` 会显示进度条，并以颜色区分通过、警告和失败。重定向输出或 CI 保持纯文本；可使用 `--color auto`（默认）、`--color always` 或 `--color never` 控制颜色，`NO_COLOR` 会关闭自动颜色。
+
 本仓库使用等价的 Cargo 别名：
 
 ```bash

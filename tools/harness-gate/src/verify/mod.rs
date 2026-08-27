@@ -10,13 +10,14 @@ use crate::process::TaskResult;
 use crate::project::Project;
 use crate::scope::ScopeResult;
 use crate::secrets::{self, SecretMode};
+use crate::ui::{self, Progress};
 use crate::utils::fs as output_fs;
 use anyhow::Result;
 use serde::Serialize;
 use std::collections::BTreeSet;
 use std::time::Instant;
 
-use steps::{print_result, run_configured_steps};
+use steps::{print_result, run_configured_steps, selected_steps};
 
 /// Errors emitted by the verification workflow boundary.
 #[derive(Debug, thiserror::Error)]
@@ -159,7 +160,7 @@ fn run_selected(
     staged: bool,
     only_step: Option<&str>,
 ) -> std::result::Result<VerificationReport, VerifyError> {
-    println!("arc-flow verify");
+    println!("{}", ui::heading("arc-flow verify"));
     println!("Scope: {}", scope.mode);
     println!(
         "Components: {}\n",
@@ -175,6 +176,8 @@ fn run_selected(
         }
     );
 
+    let selected_steps = selected_steps(project, &scope, profile, only_step);
+    let mut progress = Progress::new(2 + selected_steps.len());
     scope.write_reports(project)?;
     let mut steps = Vec::new();
     let secret_mode = if staged {
@@ -182,6 +185,7 @@ fn run_selected(
     } else {
         SecretMode::WorkingTree
     };
+    progress.begin("secret scan");
     let secret_started = Instant::now();
     let findings = secrets::scan(project, secret_mode)?;
     let secret_passed = findings.is_empty();
@@ -198,10 +202,13 @@ fn run_selected(
             .to_string(),
         detail: (!secret_passed).then(|| format!("{} file(s) require review", findings.len())),
     };
+    progress.clear();
     print_result(&secret_result);
+    progress.complete();
     steps.push(secret_result);
 
     if secret_passed {
+        progress.begin("architecture audit");
         let audit_started = Instant::now();
         let outcome = audit::run(
             &project.root,
@@ -225,7 +232,9 @@ fn run_selected(
                 outcome.warning_count
             )),
         };
+        progress.clear();
         print_result(&audit_result);
+        progress.complete();
         steps.push(audit_result);
     }
 
@@ -233,7 +242,7 @@ fn run_selected(
         return Err(VerifyError::Cancelled);
     }
     if steps.iter().all(|step| step.passed) {
-        run_configured_steps(project, &scope, profile, only_step, &mut steps)
+        run_configured_steps(project, selected_steps, &mut steps, &mut progress)
             .map_err(VerifyError::execution)?;
     }
 
@@ -248,6 +257,7 @@ fn run_selected(
         passed,
     };
     report.write(project).map_err(VerifyError::report)?;
+    progress.finish();
     println!(
         "\nVerification report: {}",
         project.reports.join("test_result.md").display()

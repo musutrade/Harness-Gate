@@ -12,6 +12,7 @@ mod secrets;
 mod service;
 #[cfg(test)]
 mod test_support;
+mod ui;
 mod utils;
 mod verify;
 
@@ -24,7 +25,10 @@ fn main() -> ExitCode {
         Ok(true) => ExitCode::SUCCESS,
         Ok(false) => ExitCode::FAILURE,
         Err(error) => {
-            eprintln!("ERROR [{}]: {error}", error.code());
+            eprintln!(
+                "{}",
+                ui::error(format!("ERROR [{}]: {error}", error.code()))
+            );
             ExitCode::FAILURE
         }
     }
