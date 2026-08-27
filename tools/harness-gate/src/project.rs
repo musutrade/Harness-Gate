@@ -227,35 +227,20 @@ fn find_root(start: &Path, config_override: Option<&Path>) -> Result<PathBuf> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::time::{SystemTime, UNIX_EPOCH};
-
-    fn fixture(name: &str) -> PathBuf {
-        let unique = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .expect("system clock")
-            .as_nanos();
-        let path = std::env::temp_dir().join(format!(
-            "arc-flow-project-{name}-{}-{unique}",
-            std::process::id()
-        ));
-        fs::create_dir_all(&path).expect("create fixture");
-        path
-    }
+    use crate::test_support::TestWorkspace;
 
     #[cfg(unix)]
     #[test]
     fn repository_path_rejects_symlink_escape() {
         use std::os::unix::fs::symlink;
 
-        let root = fixture("root");
-        let outside = fixture("outside");
-        symlink(&outside, root.join("reports")).expect("create symlink");
+        let root = TestWorkspace::new("project-root");
+        let outside = TestWorkspace::new("project-outside");
+        symlink(&outside.root, root.join("reports")).expect("create symlink");
 
         let error = resolve_repo_path(&root, Path::new("reports"), "reports", false)
             .expect_err("symlink escape must fail");
 
-        fs::remove_dir_all(&root).ok();
-        fs::remove_dir_all(&outside).ok();
         assert!(error.to_string().contains("escapes the repository"));
     }
 }
