@@ -60,7 +60,10 @@
 - [ ] 6.4 Identify and refactor code duplication in test fixtures and verify all tests still pass (Priority: P2, Effort: M)
 - [ ] 6.5 Add inline documentation to complex algorithms (gitignore parsing, scope detection) and verify docs build (Priority: P2, Effort: M)
 - [ ] 6.6 Improve module boundaries and reduce cross-module coupling, verify architecture is cleaner (Priority: P2, Effort: L)
-- [ ] 6.7 Run `cargo doc` and verify all public APIs have documentation (Priority: P2, Effort: S)
+- [x] 6.7 Run `cargo doc` and verify all public APIs have documentation (Priority: P2, Effort: S) - `TMPDIR=/tmp cargo doc --manifest-path tools/harness-gate/Cargo.toml --no-deps` passed. Harness Gate is a binary crate and exposes no public library API.
+
+Tasks 6.4-6.6 are intentionally retained as a follow-up refactoring scope. They
+are not required for the completed error-boundary and build-profile work in PR #7.
 
 ## 7. Integration & Verification
 
@@ -70,8 +73,8 @@
 - [x] 7.4 Build release-small binary; 3,138,360 bytes, below the 3.5MB target (Priority: P0, Effort: S)
 - [x] 7.5 Build release binary; it retains Cargo's default `panic = "unwind"` behavior for backtrace-based diagnosis (Priority: P1, Effort: S)
 - [x] 7.6 Run `init`, `config check`, `secrets`, and `verify --all` smoke tests with the release-small binary (Priority: P0, Effort: M)
-- [ ] 7.7 Test on Linux, macOS, and Windows platforms and verify all platforms work (Priority: P0, Effort: L)
-- [ ] 7.8 Compare final metrics with baseline and verify all targets met (test time, binary size) (Priority: P0, Effort: S)
+- [x] 7.7 Test on Linux, macOS, and Windows platforms and verify all platforms work (Priority: P0, Effort: L) - PR #7 CI passed build and test jobs on Ubuntu, macOS, and Windows.
+- [x] 7.8 Compare final metrics with baseline and verify all targets met (test time, binary size) (Priority: P0, Effort: S) - 79 tests passed; release-small was 3,138,360 bytes (<3.5 MB); clean release build improved 13.0% (79.31s to 68.96s).
 
 ## 8. Documentation & Completion
 
@@ -79,11 +82,12 @@
 - [x] 8.2 Update CHANGELOG.md with Phase 2 improvements (Priority: P0, Effort: S)
 - [x] 8.3 Update README.md and README.zh-CN.md with build profiles, cargo-nextest, and error-code usage (Priority: P1, Effort: M)
 - [x] 8.4 Update ADR 0005 status to "Accepted" and add implementation notes (Priority: P1, Effort: S)
-- [ ] 8.5 Create summary PR description with metrics and verification results (Priority: P0, Effort: M)
-- [ ] 8.6 Push changes and create PR, verify CI passes on all platforms (Priority: P0, Effort: S)
+- [x] 8.5 Create summary PR description with metrics and verification results (Priority: P0, Effort: M) - PR #7 described typed errors, shared helpers, 79 passing tests, release-small size, lint, format, docs, and smoke-test verification.
+- [x] 8.6 Push changes and create PR, verify CI passes on all platforms (Priority: P0, Effort: S) - PR #7 merged to `main` as `3e9c3bd`; all 10 required CI checks passed.
 
 ## 9. Post-Merge Monitoring
 
+- Observation window: 2026-08-27 02:07 UTC through 2026-08-30 02:07 UTC.
 - [ ] 9.1 Monitor CI performance for 3 days after merge and verify no regressions (Priority: P0, Effort: M)
 - [ ] 9.2 Check for any user-reported issues with error messages or CLI behavior (Priority: P1, Effort: M)
 - [ ] 9.3 Validate binary size and test performance remain stable across multiple CI runs (Priority: P1, Effort: S)

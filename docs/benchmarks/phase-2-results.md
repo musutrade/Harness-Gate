@@ -1,6 +1,7 @@
 # Phase 2 Results
 
-**Status:** In progress - performance and error-boundary tracks completed locally on 2026-08-27.
+**Status:** Complete through merge validation - PR #7 merged to `main` and
+cross-platform CI passed on 2026-08-27. Post-merge monitoring remains open.
 
 This report supplements [the Phase 2 baseline](phase-2-baseline.md). Historical
 performance figures remain in that report; the values below are the final local
@@ -13,6 +14,7 @@ verification for the current refactoring.
 | Default release build | 4,622,776 bytes | `cargo build --release`; preserves the default unwind behavior |
 | Lint and format | Clean | `cargo clippy --all-targets -- -D warnings`; `cargo fmt -- --check` |
 | CLI smoke test | Passed | `init`, `config check`, `secrets`, and `verify --all` using the release-small binary |
+| GitHub CI | Passed on Ubuntu, macOS, and Windows | PR #7 build and test jobs, plus format, Clippy, security audit, and code coverage |
 
 ## Error-Boundary Refactoring
 
@@ -26,8 +28,8 @@ verification for the current refactoring.
 - Added CLI contract tests for the audit, secrets, scope, and verification error
   categories.
 
-## Remaining Validation
+## Post-Merge Monitoring
 
-- CI must still validate the change on macOS and Windows.
-- Post-merge monitoring remains required by the OpenSpec change; it cannot be
-  completed from a local run.
+- Cross-platform CI validation is complete.
+- Observe CI performance, user reports, and binary/test metrics through
+  2026-08-30 02:07 UTC before closing the OpenSpec monitoring tasks.
