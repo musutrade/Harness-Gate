@@ -57,13 +57,13 @@
 - [x] 6.1 Run `cargo clippy --all-targets -- -D warnings`; no warnings remain (Priority: P1, Effort: S)
 - [x] 6.2 Extract common report file I/O into `src/utils/fs.rs` and verify tests pass (Priority: P1, Effort: M)
 - [x] 6.3 Extract shared Git capture, NUL-path parsing, and staged-file reads into `src/utils/git.rs`; verify tests pass (Priority: P1, Effort: M)
-- [ ] 6.4 Identify and refactor code duplication in test fixtures and verify all tests still pass (Priority: P2, Effort: M)
-- [ ] 6.5 Add inline documentation to complex algorithms (gitignore parsing, scope detection) and verify docs build (Priority: P2, Effort: M)
-- [ ] 6.6 Improve module boundaries and reduce cross-module coupling, verify architecture is cleaner (Priority: P2, Effort: L)
+- [x] 6.4 Identify and refactor code duplication in test fixtures and verify all tests still pass (Priority: P2, Effort: M) - Completed in PR #11 via the `improve-test-fixtures-and-boundaries` OpenSpec change; shared `TestWorkspace`/`TestContext` fixtures are used by the migrated tests, and the full test suite passes.
+- [x] 6.5 Add inline documentation to complex algorithms (gitignore parsing, scope detection) and verify docs build (Priority: P2, Effort: S) - Completed in PR #11; Git, scope, and audit ignore-file ownership boundaries are documented, and `cargo doc --no-deps` passes.
+- [x] 6.6 Improve module boundaries and reduce cross-module coupling, verify architecture is cleaner (Priority: P2, Effort: L) - Completed in PR #11; internal filesystem/Git helpers are crate-visible and boundary ownership is recorded in ADR-0006.
 - [x] 6.7 Run `cargo doc` and verify all public APIs have documentation (Priority: P2, Effort: S) - `TMPDIR=/tmp cargo doc --manifest-path tools/harness-gate/Cargo.toml --no-deps` passed. Harness Gate is a binary crate and exposes no public library API.
 
-Tasks 6.4-6.6 are intentionally retained as a follow-up refactoring scope. They
-are not required for the completed error-boundary and build-profile work in PR #7.
+Tasks 6.4-6.6 were completed as a follow-up refactoring scope in PR #11. The
+dedicated OpenSpec change records the implementation and verification details.
 
 ## 7. Integration & Verification
 
@@ -90,6 +90,10 @@ are not required for the completed error-boundary and build-profile work in PR #
 - Observation window: 2026-08-27 02:07 UTC through 2026-08-30 02:07 UTC.
 - Checkpoint 2026-08-27 02:49 UTC: `main` CI runs for commits `3e9c3bd`,
   `cc0546f`, and `bc940c3` all passed 10/10 jobs; no open issues or pull
+  requests were reported.
+- Checkpoint 2026-08-27 03:35 UTC: the PR #11 merge commit `38ce54f` passed
+  all 10 `main` CI jobs, including cross-platform tests/builds, Clippy,
+  formatting, security audit, and Code Coverage; no open issues or pull
   requests were reported.
 - [ ] 9.1 Monitor CI performance for 3 days after merge and verify no regressions (Priority: P0, Effort: M)
 - [ ] 9.2 Check for any user-reported issues with error messages or CLI behavior (Priority: P1, Effort: M)
