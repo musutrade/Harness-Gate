@@ -36,6 +36,7 @@ We use a simplified version of the Michael Nygard ADR template:
 - [ADR-0016](0016-project-module-decomposition.md) - Decompose the project module by responsibility
 - [ADR-0017](0017-scope-module-decomposition.md) - Decompose the scope module by responsibility
 - [ADR-0018](0018-audit-boundary-decomposition.md) - Complete the audit boundary decomposition
+- [ADR-0019](0019-config-validation-decomposition.md) - Decompose configuration validation by responsibility
 
 ## Creating New ADRs
 
