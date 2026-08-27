@@ -31,5 +31,9 @@ verification for the current refactoring.
 ## Post-Merge Monitoring
 
 - Cross-platform CI validation is complete.
+- Checkpoint at 2026-08-27 02:49 UTC: the three `main` CI runs after PRs #7,
+  #8, and #9 completed successfully. Each run passed all 10 jobs, including
+  the Ubuntu, macOS, and Windows build/test matrix, security audit, coverage,
+  Clippy, and format checks. No open issues or pull requests were reported.
 - Observe CI performance, user reports, and binary/test metrics through
   2026-08-30 02:07 UTC before closing the OpenSpec monitoring tasks.
