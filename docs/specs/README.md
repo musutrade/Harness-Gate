@@ -32,7 +32,7 @@ Our specs follow this structure:
 - [Phase 1 Optimization](optimization-phase-1.md) - Quick wins for quality improvements (✅ Completed)
 
 ### Active
-- [Phase 2 Optimization](optimization-phase-2.md) - Performance and code quality enhancement (🚧 Proposed)
+- [Phase 2 Optimization](optimization-phase-2.md) - Performance and code quality enhancement (🚧 In Progress)
 
 ### Planned
 - Testing Strategy (Phase 3)

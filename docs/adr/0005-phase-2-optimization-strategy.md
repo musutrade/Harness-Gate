@@ -2,7 +2,7 @@
 
 ## Status
 
-**Proposed** - Awaiting approval
+**Accepted** - Implemented incrementally; final local refactoring verification completed 2026-08-27.
 
 ## Context
 
@@ -39,6 +39,24 @@ Phase 1 optimization successfully resolved all CI failures and established a cle
 ## Decision
 
 We will implement **Phase 2: Performance and Code Quality Enhancement** focusing on:
+
+## Implementation Notes
+
+The implementation retained `anyhow` for internal context propagation and added
+typed errors at public workflow boundaries. `AuditError`, `SecretsError`,
+`ScopeError`, and `VerifyError` classify user-visible failures; `CliError`
+renders them as stable `ERROR [E####]` output without changing CLI arguments or
+TOML schemas. This gives callers a dependable failure category while preserving
+the detailed file and command context from the existing implementation.
+
+The scope and secrets modules now share NUL-delimited Git path and staged-file
+handling, and audit/secrets/scope/verify share report-writing helpers. These
+helpers are intentionally narrow: they remove duplication without introducing a
+generic workflow abstraction.
+
+Local verification is recorded in
+[Phase 2 Results](../benchmarks/phase-2-results.md). macOS and Windows remain
+CI validation requirements.
 
 ### 1. Test Performance Optimization
 
@@ -338,7 +356,7 @@ cargo clippy -- -W clippy::cognitive_complexity # Target: no warnings
 - **Author**: Claude Opus 5
 - **Created**: 2026-08-26
 - **Reviewers**: TBD
-- **Status**: Awaiting approval
+- **Status**: Accepted and locally verified; pending cross-platform CI validation
 
 ## Notes
 
@@ -363,4 +381,4 @@ cargo clippy -- -W clippy::cognitive_complexity # Target: no warnings
 ---
 
 **Decision Made**: 2026-08-26
-**Status**: Proposed → Awaiting approval before implementation
+**Status**: Accepted; pending cross-platform CI validation
