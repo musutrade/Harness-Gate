@@ -3,6 +3,7 @@ use crate::cli::{Commands, ConfigAction};
 use crate::error::CliError;
 use crate::project::Project;
 use crate::scope::ScopeMode;
+use crate::ui;
 use anyhow::Context;
 
 pub(super) fn run(project: &Project, command: Commands) -> Result<bool, CliError> {
@@ -49,9 +50,12 @@ pub(super) fn run(project: &Project, command: Commands) -> Result<bool, CliError
                     .map_err(anyhow::Error::from)?
                 );
             } else if findings.is_empty() {
-                println!("Secret scan passed");
+                println!("{}", ui::pass("Secret scan passed"));
             } else {
-                eprintln!("Secret scan failed in {} file(s):", findings.len());
+                eprintln!(
+                    "{}",
+                    ui::error(format!("Secret scan failed in {} file(s):", findings.len()))
+                );
                 for file in &findings {
                     eprintln!("  {file}");
                 }
@@ -63,12 +67,20 @@ pub(super) fn run(project: &Project, command: Commands) -> Result<bool, CliError
             let outcome =
                 crate::audit::run(&project.root, &project.audit_config, &project.reports, json)?;
             if !json {
-                println!(
+                let summary = format!(
                     "Audit: {} violation(s), {} blocker(s), {} error(s), {} warning(s)",
                     outcome.total_violations,
                     outcome.blocker_count,
                     outcome.error_count,
                     outcome.warning_count
+                );
+                println!(
+                    "{}",
+                    if outcome.total_violations == 0 {
+                        ui::pass(summary)
+                    } else {
+                        ui::failure(summary)
+                    }
                 );
                 println!("Report: {}", outcome.report_file.display());
             }
