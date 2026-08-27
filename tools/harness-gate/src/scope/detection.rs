@@ -1,94 +1,9 @@
+use super::{ScopeError, ScopeMode, ScopeResult};
 use crate::config::UnmatchedScope;
-use crate::error::CodedError;
 use crate::project::Project;
-use crate::utils::{fs as output_fs, git};
+use crate::utils::git;
 use anyhow::{bail, Result};
-use serde::Serialize;
 use std::collections::BTreeSet;
-
-/// Errors emitted while determining a verification scope.
-#[derive(Debug, thiserror::Error)]
-pub enum ScopeError {
-    #[error("Git scope detection failed: {message}")]
-    Git { message: String },
-    #[error("scope configuration failed: {message}")]
-    Configuration { message: String },
-    #[error("scope has {count} unmatched changed file(s): {files}")]
-    UnmatchedFiles { count: usize, files: String },
-    #[error("scope report failed: {message}")]
-    Report { message: String },
-}
-
-impl ScopeError {
-    fn git(error: anyhow::Error) -> Self {
-        Self::Git {
-            message: format!("{error:#}"),
-        }
-    }
-
-    fn configuration(error: anyhow::Error) -> Self {
-        Self::Configuration {
-            message: format!("{error:#}"),
-        }
-    }
-
-    fn report(error: anyhow::Error) -> Self {
-        Self::Report {
-            message: format!("{error:#}"),
-        }
-    }
-}
-
-impl CodedError for ScopeError {
-    fn code(&self) -> &'static str {
-        match self {
-            Self::Git { .. } => "E1301",
-            Self::Configuration { .. } => "E1302",
-            Self::UnmatchedFiles { .. } => "E1303",
-            Self::Report { .. } => "E1304",
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub enum ScopeMode {
-    WorkingTree,
-    Staged,
-    Base(String),
-    All,
-}
-
-#[derive(Debug, Clone, Serialize)]
-pub struct ScopeResult {
-    pub mode: String,
-    pub changed_files: Vec<String>,
-    pub components: BTreeSet<String>,
-    pub unmatched_files: Vec<String>,
-}
-
-impl ScopeResult {
-    pub fn all(project: &Project) -> Self {
-        Self {
-            mode: "all".to_string(),
-            changed_files: Vec::new(),
-            components: project.config.components(),
-            unmatched_files: Vec::new(),
-        }
-    }
-
-    pub fn write_reports(&self, project: &Project) -> std::result::Result<(), ScopeError> {
-        let changed = if self.changed_files.is_empty() {
-            String::new()
-        } else {
-            format!("{}\n", self.changed_files.join("\n"))
-        };
-        output_fs::write(&project.reports.join("changed_files.txt"), changed)
-            .map_err(ScopeError::report)?;
-        output_fs::write_json(&project.reports.join("scope.json"), self)
-            .map_err(ScopeError::report)?;
-        Ok(())
-    }
-}
 
 /// Select changed paths for a mode, de-duplicate them, then classify them
 /// using the project scope rules. Git command selection belongs here; decoding
@@ -183,45 +98,4 @@ fn ensure_git_worktree(project: &Project) -> Result<()> {
         bail!("project root is not a Git worktree");
     }
     Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn config() -> crate::config::FlowConfig {
-        toml::from_str(include_str!("../presets/rust-api.flow.toml")).expect("parse config")
-    }
-
-    #[test]
-    fn workflow_changes_force_all_components() {
-        // Use a path that matches the rust-api preset patterns
-        let components = config()
-            .classify_paths(&[".harness-gate/flow.toml".into()])
-            .expect("classify")
-            .0;
-        // rust-api preset has 1 component: app
-        assert_eq!(components.len(), 1);
-        assert!(components.contains("app"));
-    }
-
-    #[test]
-    fn frontend_change_only_selects_frontend() {
-        // rust-api preset doesn't have frontend, test with app component
-        let components = config()
-            .classify_paths(&["src/main.rs".into()])
-            .expect("classify")
-            .0;
-        assert_eq!(components, BTreeSet::from(["app".to_string()]));
-    }
-
-    #[test]
-    fn unmatched_paths_are_reported() {
-        let (components, unmatched) = config()
-            .classify_paths(&["unconfigured/new-tool.lock".into()])
-            .expect("classify");
-
-        assert!(components.is_empty());
-        assert_eq!(unmatched, vec!["unconfigured/new-tool.lock"]);
-    }
 }

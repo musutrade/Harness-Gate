@@ -34,6 +34,7 @@ We use a simplified version of the Michael Nygard ADR template:
 - [ADR-0014](0014-preset-module-decomposition.md) - Decompose the preset module by responsibility
 - [ADR-0015](0015-main-module-decomposition.md) - Decompose the CLI entry module by responsibility
 - [ADR-0016](0016-project-module-decomposition.md) - Decompose the project module by responsibility
+- [ADR-0017](0017-scope-module-decomposition.md) - Decompose the scope module by responsibility
 
 ## Creating New ADRs
 
