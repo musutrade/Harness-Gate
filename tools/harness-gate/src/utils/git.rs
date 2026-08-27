@@ -6,7 +6,7 @@ use std::time::Duration;
 const GIT_TIMEOUT: Duration = Duration::from_secs(30);
 
 /// Run Git in a project root with the standard Harness-Gate timeout.
-pub fn capture<I, S>(project_root: &Path, args: I) -> Result<CapturedOutput>
+pub(crate) fn capture<I, S>(project_root: &Path, args: I) -> Result<CapturedOutput>
 where
     I: IntoIterator<Item = S>,
     S: AsRef<str>,
@@ -17,7 +17,7 @@ where
 }
 
 /// Return NUL-delimited Git path output as UTF-8 repository-relative paths.
-pub fn null_terminated_paths<I, S>(project_root: &Path, args: I) -> Result<Vec<String>>
+pub(crate) fn null_terminated_paths<I, S>(project_root: &Path, args: I) -> Result<Vec<String>>
 where
     I: IntoIterator<Item = S>,
     S: AsRef<str>,
@@ -27,8 +27,16 @@ where
     if !output.status.success() {
         bail!("git {} failed", args.join(" "));
     }
-    output
-        .stdout
+    parse_null_terminated_paths(&output.stdout)
+}
+
+/// Decode Git's `-z` path format without treating newlines as separators.
+///
+/// Git emits repository-relative paths separated by NUL bytes so filenames
+/// containing newlines remain unambiguous. Invalid UTF-8 is rejected because
+/// the rest of the workflow represents paths as Rust strings.
+fn parse_null_terminated_paths(stdout: &[u8]) -> Result<Vec<String>> {
+    stdout
         .split(|byte| *byte == 0)
         .filter(|entry| !entry.is_empty())
         .map(|entry| {
@@ -38,7 +46,7 @@ where
 }
 
 /// Read a path from the staged Git snapshot when it exists.
-pub fn staged_file(project_root: &Path, file: &str) -> Result<Option<Vec<u8>>> {
+pub(crate) fn staged_file(project_root: &Path, file: &str) -> Result<Option<Vec<u8>>> {
     let args = vec!["show".to_string(), format!(":{file}")];
     let output = capture(project_root, args).with_context(|| format!("read staged file {file}"))?;
     Ok(output.status.success().then_some(output.stdout))
@@ -52,4 +60,23 @@ where
     args.into_iter()
         .map(|arg| arg.as_ref().to_string())
         .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::parse_null_terminated_paths;
+
+    #[test]
+    fn parses_nul_delimited_paths_without_splitting_newlines() {
+        let paths = parse_null_terminated_paths(b"src/line\nname.rs\0Cargo.toml\0")
+            .expect("valid Git paths");
+        assert_eq!(paths, ["src/line\nname.rs", "Cargo.toml"]);
+    }
+
+    #[test]
+    fn rejects_non_utf8_paths() {
+        let error =
+            parse_null_terminated_paths(b"src/\xff.rs\0").expect_err("non-UTF-8 path must fail");
+        assert!(error.to_string().contains("non-UTF-8"));
+    }
 }

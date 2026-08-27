@@ -597,6 +597,7 @@ pub fn scan(project: &Project, mode: SecretMode) -> std::result::Result<Vec<Stri
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::test_support::TestWorkspace;
     use std::process::Command;
 
     fn scanner() -> SecretScanner {
@@ -698,30 +699,18 @@ exact = ["password"]
     #[test]
     #[cfg(target_os = "linux")]
     fn staged_scan_uses_the_staged_secret_config() {
-        let unique = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .expect("system clock")
-            .as_nanos();
-        let root = std::env::temp_dir().join(format!("arc-flow-staged-secrets-{unique}"));
-        fs::create_dir_all(&root).expect("create staged scan fixture");
-        crate::preset::init(&root, "generic", false).expect("initialize staged scan fixture");
+        let workspace = TestWorkspace::new("staged-secrets");
+        crate::preset::init(&workspace.root, "generic", false)
+            .expect("initialize staged scan fixture");
+        workspace.init_git();
         assert!(Command::new("git")
-            .args(["-C", root.to_str().expect("UTF-8 path"), "init", "--quiet"])
-            .status()
-            .expect("initialize Git fixture")
-            .success());
-        assert!(Command::new("git")
-            .args([
-                "-C",
-                root.to_str().expect("UTF-8 path"),
-                "add",
-                "--",
-                ".harness-gate/secrets.toml",
-            ])
+            .args(["add", "--", ".harness-gate/secrets.toml"])
+            .current_dir(&workspace.root)
             .status()
             .expect("stage secret config")
             .success());
-        let project = Project::discover(Some(root.clone()), None).expect("discover Git fixture");
+        let project =
+            Project::discover(Some(workspace.root.clone()), None).expect("discover Git fixture");
         fs::write(
             &project.secrets_config,
             "version = 2\nrules = []\n[placeholders]\nminimum_unique_characters = 4\nmaximum_nonalphanumeric_characters = 2\nprefixes = []\nmarkers = []\nexact = []\n",
@@ -730,7 +719,6 @@ exact = ["password"]
 
         assert!(scanner_for_mode(&project, SecretMode::Staged).is_ok());
         assert!(scanner_for_mode(&project, SecretMode::WorkingTree).is_err());
-        fs::remove_dir_all(root).ok();
     }
 
     #[test]

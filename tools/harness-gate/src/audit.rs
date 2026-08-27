@@ -624,6 +624,8 @@ fn scan_files(
     for root_path in root_paths.iter().skip(1) {
         walk_builder.add(root_path);
     }
+    // `ignore` owns traversal and custom ignore-file semantics; audit only
+    // supplies the configured filename and evaluates returned files.
     let entries = walk_builder
         .add_custom_ignore_filename(&engine.ignore_filename)
         .follow_links(false)
@@ -724,6 +726,8 @@ fn scan_arch_rules(
         for root_path in root_paths.iter().skip(1) {
             walk_builder.add(root_path);
         }
+        // Keep ignore-file traversal in the audit boundary so rule scanning
+        // cannot accidentally bypass repository exclusions.
         let entries = walk_builder
             .add_custom_ignore_filename(&config.engine.ignore_filename)
             .follow_links(false)
@@ -1258,34 +1262,17 @@ pub fn parse_logs(input: &Path, output: &Path) -> std::result::Result<(), AuditE
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::time::{SystemTime, UNIX_EPOCH};
+    use crate::test_support::TestWorkspace;
 
-    struct TestDir(PathBuf);
+    struct TestDir(TestWorkspace);
 
     impl TestDir {
         fn new(name: &str) -> Self {
-            let unique = SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .expect("system time must be after Unix epoch")
-                .as_nanos();
-            let path = std::env::temp_dir().join(format!(
-                "arc-flow-auditor-{name}-{}-{unique}",
-                std::process::id()
-            ));
-            fs::create_dir_all(&path).expect("create test directory");
-            Self(path)
+            Self(TestWorkspace::new(name))
         }
 
         fn child(&self, name: &str) -> PathBuf {
-            let path = self.0.join(name);
-            fs::create_dir_all(&path).expect("create child directory");
-            path
-        }
-    }
-
-    impl Drop for TestDir {
-        fn drop(&mut self) {
-            let _ = fs::remove_dir_all(&self.0);
+            self.0.child(name)
         }
     }
 

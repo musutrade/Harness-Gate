@@ -277,21 +277,15 @@ fn remaining(deadline: Instant) -> Result<Duration> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::time::{SystemTime, UNIX_EPOCH};
+    use crate::test_support::TestWorkspace;
 
     #[test]
     fn git_remote_check_rejects_non_git_directory() {
-        let unique = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .expect("system clock")
-            .as_nanos();
-        let root = std::env::temp_dir().join(format!("arc-flow-doctor-{unique}"));
-        fs::create_dir_all(&root).expect("create doctor fixture");
+        let root = TestWorkspace::new("doctor");
 
         let error =
             check_remotes(&root, Duration::from_secs(2)).expect_err("non-Git directory must fail");
 
-        fs::remove_dir_all(root).ok();
         assert!(error.to_string().contains("not a Git worktree"));
     }
 }

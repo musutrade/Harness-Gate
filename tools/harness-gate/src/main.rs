@@ -8,6 +8,8 @@ mod project;
 mod scope;
 mod secrets;
 mod service;
+#[cfg(test)]
+mod test_support;
 mod utils;
 mod verify;
 

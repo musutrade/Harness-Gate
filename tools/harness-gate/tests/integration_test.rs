@@ -7,8 +7,7 @@ fn test_init_with_rust_api_preset() {
     let ctx = TestContext::new();
 
     // Run init with rust-api preset
-    let output = ctx.run_harness_gate(&["init", "--preset", "rust-api"]);
-    assert_success(&output);
+    ctx.init_preset("rust-api");
 
     // Verify config files were created
     assert!(ctx.file_exists(".harness-gate/flow.toml"));
@@ -26,8 +25,7 @@ fn test_config_check_valid() {
     let ctx = TestContext::new();
 
     // Initialize with preset
-    let output = ctx.run_harness_gate(&["init", "--preset", "rust-api"]);
-    assert_success(&output);
+    ctx.init_preset("rust-api");
 
     // Run config check
     let output = ctx.run_harness_gate(&["config", "check"]);
@@ -71,10 +69,7 @@ fn test_secrets_scan_basic() {
     let ctx = TestContext::new();
 
     // Initialize with preset
-    ctx.run_harness_gate(&["init", "--preset", "rust-api"]);
-
-    // Initialize git repo
-    ctx.init_git();
+    ctx.init_project("rust-api");
 
     // Create a file with no secrets
     ctx.write_file("test.txt", "Hello, world!");
@@ -97,11 +92,7 @@ fn test_secrets_scan_basic() {
 fn test_scope_detection_all() {
     let ctx = TestContext::new();
 
-    // Initialize
-    ctx.run_harness_gate(&["init", "--preset", "rust-api"]);
-
-    // Initialize git
-    ctx.init_git();
+    ctx.init_project("rust-api");
 
     // Run scope with --all
     let output = ctx.run_harness_gate(&["scope", "--all"]);
@@ -129,8 +120,7 @@ fn test_init_creates_gitignore_entry() {
     let ctx = TestContext::new();
 
     // Run init
-    let output = ctx.run_harness_gate(&["init", "--preset", "rust-api"]);
-    assert_success(&output);
+    ctx.init_preset("rust-api");
 
     // Check if .gitignore was created or updated
     if ctx.file_exists(".gitignore") {
@@ -144,8 +134,7 @@ fn test_init_twice_fails() {
     let ctx = TestContext::new();
 
     // First init should succeed
-    let output = ctx.run_harness_gate(&["init", "--preset", "rust-api"]);
-    assert_success(&output);
+    ctx.init_preset("rust-api");
 
     // Second init should fail (already initialized)
     let output = ctx.run_harness_gate(&["init", "--preset", "rust-api"]);
