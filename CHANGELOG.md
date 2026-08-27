@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-27
+
+### Added
+- Terminal-aware colored output and interactive verification progress bars
+- Configurable `--color auto|always|never` output mode with `NO_COLOR` support
+- ADR-0022 and OpenSpec documentation for terminal feedback
+
 ### Added
 - Stable CLI error codes for audit, secret scan, scope, and verification failures
 

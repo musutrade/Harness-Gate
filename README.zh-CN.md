@@ -64,7 +64,7 @@ Linux/macOS 安装示例：
 
 ```bash
 # 下载（替换为你的平台）
-wget https://github.com/musutrade/Harness-Gate/releases/download/v0.1.0/harness-gate-linux-amd64
+wget https://github.com/musutrade/Harness-Gate/releases/download/v0.2.0/harness-gate-linux-amd64
 
 # 添加执行权限
 chmod +x harness-gate-linux-amd64
