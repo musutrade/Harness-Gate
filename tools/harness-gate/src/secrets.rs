@@ -1,14 +1,47 @@
+use crate::error::CodedError;
 use crate::project::Project;
+use crate::utils::{fs as output_fs, git};
 use anyhow::{bail, Context, Result};
 use regex::bytes::Regex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::fs;
 use std::path::Path;
-use std::time::Duration;
 use url::Url;
 
 const SECRET_CONFIG_VERSION: u32 = 2;
+
+/// Errors emitted by the secret-scan boundary.
+#[derive(Debug, thiserror::Error)]
+pub enum SecretsError {
+    #[error("secret scan configuration failed: {message}")]
+    Configuration { message: String },
+    #[error("secret scan failed: {message}")]
+    Scan { message: String },
+}
+
+impl SecretsError {
+    fn configuration(error: anyhow::Error) -> Self {
+        Self::Configuration {
+            message: format!("{error:#}"),
+        }
+    }
+
+    fn scan(error: anyhow::Error) -> Self {
+        Self::Scan {
+            message: format!("{error:#}"),
+        }
+    }
+}
+
+impl CodedError for SecretsError {
+    fn code(&self) -> &'static str {
+        match self {
+            Self::Configuration { .. } => "E1201",
+            Self::Scan { .. } => "E1202",
+        }
+    }
+}
 
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -483,7 +516,7 @@ fn scanner_for_mode(project: &Project, mode: SecretMode) -> Result<SecretScanner
             let relative = relative
                 .to_str()
                 .context("secret scan configuration path must be UTF-8")?;
-            let bytes = staged_file_bytes(project, relative)?.ok_or_else(|| {
+            let bytes = git::staged_file(&project.root, relative)?.ok_or_else(|| {
                 anyhow::anyhow!("staged secret scan configuration is missing: {relative}")
             })?;
             let source = std::str::from_utf8(&bytes)
@@ -494,30 +527,32 @@ fn scanner_for_mode(project: &Project, mode: SecretMode) -> Result<SecretScanner
     }
 }
 
-pub fn scan(project: &Project, mode: SecretMode) -> Result<Vec<String>> {
+pub fn scan(project: &Project, mode: SecretMode) -> std::result::Result<Vec<String>, SecretsError> {
     let files = match mode {
-        SecretMode::WorkingTree => git_files(
-            project,
-            &[
+        SecretMode::WorkingTree => git::null_terminated_paths(
+            &project.root,
+            [
                 "ls-files",
                 "--cached",
                 "--others",
                 "--exclude-standard",
                 "-z",
             ],
-        )?,
-        SecretMode::Staged => git_files(
-            project,
-            &[
+        )
+        .map_err(SecretsError::scan)?,
+        SecretMode::Staged => git::null_terminated_paths(
+            &project.root,
+            [
                 "diff",
                 "--cached",
                 "--diff-filter=ACMR",
                 "--name-only",
                 "-z",
             ],
-        )?,
+        )
+        .map_err(SecretsError::scan)?,
     };
-    let patterns = scanner_for_mode(project, mode)?;
+    let patterns = scanner_for_mode(project, mode).map_err(SecretsError::configuration)?;
     let mut findings = Vec::new();
 
     for file in files {
@@ -525,12 +560,18 @@ pub fn scan(project: &Project, mode: SecretMode) -> Result<Vec<String>> {
             SecretMode::WorkingTree => match fs::read(project.root.join(&file)) {
                 Ok(bytes) => bytes,
                 Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
-                Err(error) => return Err(error).with_context(|| format!("read {file}")),
+                Err(error) => {
+                    return Err(SecretsError::scan(
+                        anyhow::Error::from(error).context(format!("read {file}")),
+                    ));
+                }
             },
-            SecretMode::Staged => match staged_file_bytes(project, &file)? {
-                Some(bytes) => bytes,
-                None => continue,
-            },
+            SecretMode::Staged => {
+                match git::staged_file(&project.root, &file).map_err(SecretsError::scan)? {
+                    Some(bytes) => bytes,
+                    None => continue,
+                }
+            }
         };
         if patterns.is_match(&bytes) {
             findings.push(file);
@@ -541,41 +582,16 @@ pub fn scan(project: &Project, mode: SecretMode) -> Result<Vec<String>> {
         SecretMode::WorkingTree => "working-tree",
         SecretMode::Staged => "staged",
     };
-    fs::create_dir_all(&project.reports)?;
-    fs::write(
-        project.reports.join("secret_scan.json"),
-        serde_json::to_string_pretty(&SecretReport {
+    output_fs::write_json(
+        &project.reports.join("secret_scan.json"),
+        &SecretReport {
             timestamp: chrono::Utc::now().to_rfc3339(),
             mode: mode_label,
             findings: &findings,
-        })?,
-    )?;
+        },
+    )
+    .map_err(SecretsError::scan)?;
     Ok(findings)
-}
-
-fn staged_file_bytes(project: &Project, file: &str) -> Result<Option<Vec<u8>>> {
-    let args = vec!["show".to_string(), format!(":{file}")];
-    let output = crate::process::capture("git", &args, &project.root, Duration::from_secs(30))
-        .with_context(|| format!("read staged file {file}"))?;
-    Ok(output.status.success().then_some(output.stdout))
-}
-
-fn git_files(project: &Project, args: &[&str]) -> Result<Vec<String>> {
-    let args = args
-        .iter()
-        .map(|arg| (*arg).to_string())
-        .collect::<Vec<_>>();
-    let output = crate::process::capture("git", &args, &project.root, Duration::from_secs(30))
-        .with_context(|| format!("run git {}", args.join(" ")))?;
-    if !output.status.success() {
-        bail!("git {} failed", args.join(" "));
-    }
-    output
-        .stdout
-        .split(|byte| *byte == 0)
-        .filter(|entry| !entry.is_empty())
-        .map(|entry| String::from_utf8(entry.to_vec()).context("non-UTF-8 Git path"))
-        .collect()
 }
 
 #[cfg(test)]

@@ -1,16 +1,67 @@
 use crate::audit;
 use crate::config::{ParserConfig, StepConfig};
+use crate::error::CodedError;
 use crate::process::{Task, TaskResult};
 use crate::project::Project;
 use crate::scope::ScopeResult;
 use crate::secrets::{self, SecretMode};
 use crate::service::ServiceManager;
+use crate::utils::fs as output_fs;
 use anyhow::{bail, Result};
 use regex::Regex;
 use serde::Serialize;
 use std::collections::BTreeSet;
 use std::fs;
 use std::time::Instant;
+
+/// Errors emitted by the verification workflow boundary.
+#[derive(Debug, thiserror::Error)]
+pub enum VerifyError {
+    #[error("unknown or empty verification profile {profile:?}")]
+    UnknownProfile { profile: String },
+    #[error("unknown verification step {id:?}")]
+    UnknownStep { id: String },
+    #[error("verification was cancelled")]
+    Cancelled,
+    #[error("verification execution failed: {message}")]
+    Execution { message: String },
+    #[error("verification report failed: {message}")]
+    Report { message: String },
+    #[error(transparent)]
+    Scope(#[from] crate::scope::ScopeError),
+    #[error(transparent)]
+    Secrets(#[from] crate::secrets::SecretsError),
+    #[error(transparent)]
+    Audit(#[from] crate::audit::AuditError),
+}
+
+impl VerifyError {
+    fn execution(error: anyhow::Error) -> Self {
+        Self::Execution {
+            message: format!("{error:#}"),
+        }
+    }
+
+    fn report(error: anyhow::Error) -> Self {
+        Self::Report {
+            message: format!("{error:#}"),
+        }
+    }
+}
+
+impl CodedError for VerifyError {
+    fn code(&self) -> &'static str {
+        match self {
+            Self::UnknownProfile { .. } | Self::UnknownStep { .. } => "E1401",
+            Self::Cancelled => "E1402",
+            Self::Execution { .. } => "E1403",
+            Self::Report { .. } => "E1404",
+            Self::Scope(error) => error.code(),
+            Self::Secrets(error) => error.code(),
+            Self::Audit(error) => error.code(),
+        }
+    }
+}
 
 #[derive(Debug, Serialize)]
 pub struct VerificationReport {
@@ -23,11 +74,7 @@ pub struct VerificationReport {
 
 impl VerificationReport {
     fn write(&self, project: &Project) -> Result<()> {
-        fs::create_dir_all(&project.reports)?;
-        fs::write(
-            project.reports.join("test_result.json"),
-            serde_json::to_string_pretty(self)?,
-        )?;
+        output_fs::write_json(&project.reports.join("test_result.json"), self)?;
 
         let mut markdown = String::from("=== Verification report ===\n");
         markdown.push_str(&format!("Timestamp: {}\n", self.timestamp));
@@ -59,7 +106,7 @@ impl VerificationReport {
             "\nTEST_SUMMARY: {}\n",
             if self.passed { "PASS" } else { "FAIL" }
         ));
-        fs::write(project.reports.join("test_result.md"), markdown)?;
+        output_fs::write(&project.reports.join("test_result.md"), markdown)?;
         Ok(())
     }
 }
@@ -69,23 +116,28 @@ pub fn run(
     scope: ScopeResult,
     profile: &str,
     staged: bool,
-) -> Result<VerificationReport> {
+) -> std::result::Result<VerificationReport, VerifyError> {
     if !project
         .config
         .steps
         .iter()
         .any(|step| step.profiles.contains(profile))
     {
-        bail!("unknown or empty verification profile {profile:?}");
+        return Err(VerifyError::UnknownProfile {
+            profile: profile.to_string(),
+        });
     }
     run_selected(project, scope, profile, staged, None)
 }
 
-pub fn run_step(project: &Project, id: &str) -> Result<VerificationReport> {
+pub fn run_step(
+    project: &Project,
+    id: &str,
+) -> std::result::Result<VerificationReport, VerifyError> {
     let step = project
         .config
         .step(id)
-        .ok_or_else(|| anyhow::anyhow!("unknown verification step {id:?}"))?;
+        .ok_or_else(|| VerifyError::UnknownStep { id: id.to_string() })?;
     let scope = explicit_scope(std::slice::from_ref(&step.component));
     run_selected(
         project,
@@ -102,7 +154,7 @@ fn run_selected(
     profile: &str,
     staged: bool,
     only_step: Option<&str>,
-) -> Result<VerificationReport> {
+) -> std::result::Result<VerificationReport, VerifyError> {
     println!("arc-flow verify");
     println!("Scope: {}", scope.mode);
     println!(
@@ -174,10 +226,11 @@ fn run_selected(
     }
 
     if crate::process::cancelled() {
-        bail!("verification cancelled");
+        return Err(VerifyError::Cancelled);
     }
     if steps.iter().all(|step| step.passed) {
-        run_configured_steps(project, &scope, profile, only_step, &mut steps)?;
+        run_configured_steps(project, &scope, profile, only_step, &mut steps)
+            .map_err(VerifyError::execution)?;
     }
 
     let passed = steps.iter().all(|step| step.passed);
@@ -190,7 +243,7 @@ fn run_selected(
         steps,
         passed,
     };
-    report.write(project)?;
+    report.write(project).map_err(VerifyError::report)?;
     println!(
         "\nVerification report: {}",
         project.reports.join("test_result.md").display()

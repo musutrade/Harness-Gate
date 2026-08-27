@@ -95,10 +95,53 @@ fn test_config_check_without_config() {
 #[test]
 fn test_scope_without_git() {
     let ctx = TestContext::new();
+    assert_success(&ctx.run_harness_gate(&["init", "--preset", "generic"]));
     let output = ctx.run_harness_gate(&["scope"]);
 
     assert_failure(&output);
-    // Should error about not being in a git repository
+    assert!(stderr_str(&output).contains("ERROR [E1301]"));
+}
+
+#[test]
+fn test_audit_reports_a_typed_configuration_error() {
+    let ctx = TestContext::new();
+    assert_success(&ctx.run_harness_gate(&["init", "--preset", "generic"]));
+    ctx.write_file(
+        ".harness-gate/audit.toml",
+        "version = 999\n[engine]\nignore_filename = \".gitignore\"\n",
+    );
+
+    let output = ctx.run_harness_gate(&["audit"]);
+
+    assert_failure(&output);
+    assert!(stderr_str(&output).contains("ERROR [E1101]"));
+}
+
+#[test]
+fn test_secrets_reports_a_typed_configuration_error() {
+    let ctx = TestContext::new();
+    assert_success(&ctx.run_harness_gate(&["init", "--preset", "generic"]));
+    ctx.init_git();
+    ctx.write_file(
+        ".harness-gate/secrets.toml",
+        "version = 2\nrules = []\n[placeholders]\nminimum_unique_characters = 4\nmaximum_nonalphanumeric_characters = 2\nprefixes = []\nmarkers = []\nexact = []\n",
+    );
+
+    let output = ctx.run_harness_gate(&["secrets"]);
+
+    assert_failure(&output);
+    assert!(stderr_str(&output).contains("ERROR [E1201]"));
+}
+
+#[test]
+fn test_verify_reports_a_typed_selection_error() {
+    let ctx = TestContext::new();
+    assert_success(&ctx.run_harness_gate(&["init", "--preset", "generic"]));
+
+    let output = ctx.run_harness_gate(&["verify", "--all", "--profile", "missing"]);
+
+    assert_failure(&output);
+    assert!(stderr_str(&output).contains("ERROR [E1401]"));
 }
 
 #[test]

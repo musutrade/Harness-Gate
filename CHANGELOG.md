@@ -7,7 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Stable CLI error codes for audit, secret scan, scope, and verification failures
+
 ### Changed
+- Refactored audit, secret scan, scope, and verification boundaries to use typed errors while preserving actionable error context
+- Consolidated report output and shared Git snapshot/path handling in internal utilities
 - Updated all Rust dependencies to latest semver-compatible versions
   - serde: 1.0 → 1.0.229
   - serde_json: 1.0 → 1.0.151

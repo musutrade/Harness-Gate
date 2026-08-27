@@ -84,6 +84,24 @@ cd Harness-Gate
 cargo install --locked --path tools/harness-gate
 ```
 
+## Development Commands
+
+The repository uses `cargo-nextest` for fast, isolated test execution:
+
+```bash
+cargo nextest run --manifest-path tools/harness-gate/Cargo.toml
+cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings
+cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check
+```
+
+`release` keeps the default panic unwinding behavior for diagnostics. Use
+`release-small` for the distributed binary when size matters:
+
+```bash
+cargo build --manifest-path tools/harness-gate/Cargo.toml --release
+cargo build --manifest-path tools/harness-gate/Cargo.toml --profile release-small
+```
+
 ## Installation and Quick Start
 
 Verify installation and explore presets:
@@ -202,6 +220,20 @@ harness-gate verify --components backend,frontend --profile full
 ```
 
 Explicit components override automatic scope, and cannot be used with `--staged`, `--base`, `--all` at the same time. Unknown components or profiles fail immediately.
+
+## Error Codes
+
+Operational failures are printed as `ERROR [E####]: message`. The code is stable
+enough for CI logs and support requests; the message keeps the file path or Git
+command context needed to resolve the issue.
+
+| Code | Category |
+| ---- | -------- |
+| `E1000` | General command, project, or configuration failure |
+| `E1101`-`E1103` | Audit configuration, execution, or log parsing |
+| `E1201`-`E1202` | Secret-scan configuration or execution |
+| `E1301`-`E1304` | Git scope, scope configuration, unmatched paths, or reports |
+| `E1401`-`E1404` | Verification selection, cancellation, execution, or reports |
 
 ## Features
 
