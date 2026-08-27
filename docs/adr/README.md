@@ -30,6 +30,7 @@ We use a simplified version of the Michael Nygard ADR template:
 - [ADR-0010](0010-verify-module-decomposition.md) - Decompose the verification module by responsibility
 - [ADR-0011](0011-service-module-decomposition.md) - Decompose the service module by responsibility
 - [ADR-0012](0012-process-module-decomposition.md) - Decompose the process module by responsibility
+- [ADR-0013](0013-doctor-module-decomposition.md) - Decompose the doctor module by responsibility
 
 ## Creating New ADRs
 
