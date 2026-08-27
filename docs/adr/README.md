@@ -29,6 +29,7 @@ We use a simplified version of the Michael Nygard ADR template:
 - [ADR-0009](0009-secrets-module-decomposition.md) - Decompose the secret scanner by responsibility
 - [ADR-0010](0010-verify-module-decomposition.md) - Decompose the verification module by responsibility
 - [ADR-0011](0011-service-module-decomposition.md) - Decompose the service module by responsibility
+- [ADR-0012](0012-process-module-decomposition.md) - Decompose the process module by responsibility
 
 ## Creating New ADRs
 
