@@ -30,6 +30,19 @@ impl TestContext {
             .expect("Failed to execute harness-gate")
     }
 
+    /// Initialize an embedded preset and assert setup succeeds.
+    #[allow(dead_code)]
+    pub fn init_preset(&self, preset: &str) {
+        assert_success(&self.run_harness_gate(&["init", "--preset", preset]));
+    }
+
+    /// Initialize a preset and Git repository for an end-to-end test.
+    #[allow(dead_code)]
+    pub fn init_project(&self, preset: &str) {
+        self.init_preset(preset);
+        self.init_git();
+    }
+
     /// Run harness-gate without project-root argument
     #[allow(dead_code)]
     pub fn run_harness_gate_raw(&self, args: &[&str]) -> Output {

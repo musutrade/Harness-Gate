@@ -409,7 +409,7 @@ pub fn explicit_scope(components: &[String]) -> ScopeResult {
 mod tests {
     use super::*;
     use crate::config::{FlowConfig, ServiceConfig};
-    use std::time::{Duration, SystemTime, UNIX_EPOCH};
+    use crate::test_support::TestWorkspace;
 
     #[test]
     fn configurable_regex_parser_counts_multiple_outputs() {
@@ -448,16 +448,12 @@ mod tests {
 
     #[test]
     fn service_failure_does_not_skip_unrelated_steps() {
-        let unique = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .expect("system clock")
-            .as_nanos();
-        let root = std::env::temp_dir().join(format!("arc-flow-verify-{unique}"));
-        crate::preset::init(&root, "generic", false).expect("initialize fixture");
-        let flow_path = root.join(".harness-gate/flow.toml");
+        let workspace = TestWorkspace::new("verify");
+        crate::preset::init(&workspace.root, "generic", false).expect("initialize fixture");
+        let flow_path = workspace.root.join(".harness-gate/flow.toml");
         let source = fs::read_to_string(&flow_path).expect("read fixture config");
         let mut config: FlowConfig = toml::from_str(&source).expect("parse fixture config");
-        let source_env = format!("HARNESS_GATE_MISSING_{unique}");
+        let source_env = "HARNESS_GATE_MISSING_TEST".to_string();
         assert!(std::env::var_os(&source_env).is_none());
         config.services.insert(
             "missing-service".into(),
@@ -473,10 +469,9 @@ mod tests {
             toml::to_string_pretty(&config).expect("serialize fixture config"),
         )
         .expect("write fixture config");
-        let git = crate::process::capture("git", &["init".into()], &root, Duration::from_secs(5))
-            .expect("initialize Git fixture");
-        assert!(git.status.success());
-        let project = Project::discover(Some(root.clone()), None).expect("discover fixture");
+        workspace.init_git();
+        let project =
+            Project::discover(Some(workspace.root.clone()), None).expect("discover fixture");
 
         let report =
             run(&project, ScopeResult::all(&project), "full", false).expect("verify fixture");
@@ -486,6 +481,5 @@ mod tests {
             .steps
             .iter()
             .any(|step| step.label == "staged Git whitespace check" && step.passed));
-        fs::remove_dir_all(root).ok();
     }
 }

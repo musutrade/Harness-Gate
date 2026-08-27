@@ -221,6 +221,7 @@ fn project_id(root: &Path) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::test_support::TestWorkspace;
 
     #[test]
     fn every_embedded_preset_is_valid() {
@@ -237,20 +238,14 @@ mod tests {
 
     #[test]
     fn init_writes_required_security_configs() {
-        let unique = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .expect("system clock")
-            .as_nanos();
-        let root = std::env::temp_dir().join(format!("arc-flow-init-test-{unique}"));
-        fs::create_dir_all(&root).expect("create init fixture");
+        let root = TestWorkspace::new("preset-init");
 
         init(&root, "generic", false).expect("initialize preset");
-        let project = crate::project::Project::discover(Some(root.clone()), None)
+        let project = crate::project::Project::discover(Some(root.root.clone()), None)
             .expect("discover initialized project");
 
         assert!(project.audit_config.is_file());
         assert!(project.secrets_config.is_file());
-        fs::remove_dir_all(root).ok();
     }
 
     #[cfg(unix)]
@@ -258,33 +253,22 @@ mod tests {
     fn existing_symlink_cannot_escape_project() {
         use std::os::unix::fs::symlink;
 
-        let unique = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .expect("system clock")
-            .as_nanos();
-        let root = std::env::temp_dir().join(format!("arc-flow-path-test-{unique}"));
-        let outside = std::env::temp_dir().join(format!("arc-flow-outside-{unique}"));
-        fs::create_dir_all(&root).expect("create project fixture");
-        fs::write(&outside, "outside").expect("create outside fixture");
-        let link = root.join("flow.toml");
-        symlink(&outside, &link).expect("create symlink fixture");
+        let root = TestWorkspace::new("preset-path");
+        let outside = TestWorkspace::new("preset-outside");
+        let outside_file = outside.root.join("outside");
+        fs::write(&outside_file, "outside").expect("create outside fixture");
+        let link = root.root.join("flow.toml");
+        symlink(&outside_file, &link).expect("create symlink fixture");
 
-        let result = resolve_inside(&root.canonicalize().expect("canonical root"), link);
-        fs::remove_file(&outside).ok();
-        fs::remove_dir_all(&root).ok();
+        let result = resolve_inside(&root.root.canonicalize().expect("canonical root"), link);
 
         assert!(result.is_err());
     }
 
     #[test]
     fn atomic_write_replaces_complete_content() {
-        let unique = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .expect("system clock")
-            .as_nanos();
-        let root = std::env::temp_dir().join(format!("arc-flow-write-{unique}"));
-        fs::create_dir_all(&root).expect("create write fixture");
-        let path = root.join("flow.toml");
+        let root = TestWorkspace::new("preset-write");
+        let path = root.root.join("flow.toml");
         fs::write(&path, "old").expect("write old fixture");
 
         atomic_write(&path, b"new content").expect("replace fixture");
@@ -293,6 +277,5 @@ mod tests {
             fs::read_to_string(&path).expect("read fixture"),
             "new content"
         );
-        fs::remove_dir_all(root).ok();
     }
 }
