@@ -2,7 +2,8 @@
 
 ## Status
 
-**Accepted** - Implemented incrementally; final local refactoring verification completed 2026-08-27.
+**Accepted** - Implemented incrementally, merged to `main`, and verified by
+cross-platform CI on 2026-08-27.
 
 ## Context
 
@@ -55,8 +56,9 @@ helpers are intentionally narrow: they remove duplication without introducing a
 generic workflow abstraction.
 
 Local verification is recorded in
-[Phase 2 Results](../benchmarks/phase-2-results.md). macOS and Windows remain
-CI validation requirements.
+[Phase 2 Results](../benchmarks/phase-2-results.md). PR #7 was merged to
+`main` as `3e9c3bd`; its GitHub CI run passed build and test jobs on Ubuntu,
+macOS, and Windows, plus format, Clippy, security audit, and code coverage.
 
 ### 1. Test Performance Optimization
 
@@ -356,7 +358,7 @@ cargo clippy -- -W clippy::cognitive_complexity # Target: no warnings
 - **Author**: Claude Opus 5
 - **Created**: 2026-08-26
 - **Reviewers**: TBD
-- **Status**: Accepted and locally verified; pending cross-platform CI validation
+- **Status**: Accepted, merged to `main`, and cross-platform CI verified
 
 ## Notes
 
@@ -381,4 +383,4 @@ cargo clippy -- -W clippy::cognitive_complexity # Target: no warnings
 ---
 
 **Decision Made**: 2026-08-26
-**Status**: Accepted; pending cross-platform CI validation
+**Status**: Accepted, merged to `main`, and cross-platform CI verified
