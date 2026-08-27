@@ -5,4 +5,4 @@
 - [x] Extract step, template, shell, and service injection validation.
 - [x] Run complete nextest: 81/81 passed.
 - [x] Run format, Clippy, rustdoc, diff, and strict OpenSpec validation.
-- [ ] Create PR and verify CI.
+- [x] Create PR and verify CI.
