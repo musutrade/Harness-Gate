@@ -165,3 +165,30 @@ default = []
     let stderr = stderr_str(&output);
     assert!(!stderr.contains("panic") && !stderr.contains("thread panicked"));
 }
+
+#[test]
+fn test_color_always_styles_human_readable_output() {
+    let ctx = TestContext::new();
+    ctx.write_file(
+        ".harness-gate/flow.toml",
+        "version = 2\n[scope]\ndefault = []\n",
+    );
+
+    let output = ctx.run_harness_gate(&["--color", "always", "doctor"]);
+
+    assert!(stdout_str(&output).contains("\x1b[") || stderr_str(&output).contains("\x1b["));
+}
+
+#[test]
+fn test_color_never_keeps_human_readable_output_plain() {
+    let ctx = TestContext::new();
+    ctx.write_file(
+        ".harness-gate/flow.toml",
+        "version = 2\n[scope]\ndefault = []\n",
+    );
+
+    let output = ctx.run_harness_gate(&["--color", "never", "doctor"]);
+
+    assert!(!stdout_str(&output).contains("\x1b["));
+    assert!(!stderr_str(&output).contains("\x1b["));
+}
