@@ -5,4 +5,4 @@ process lifecycle helpers while preserving the existing `crate::process`
 boundary and behavior.
 
 - ADR: [0012-process-module-decomposition](../../../docs/adr/0012-process-module-decomposition.md)
-- Status: implementation and local verification complete; PR CI pending
+- Status: merged to `main`; `main` CI passed

@@ -5,4 +5,4 @@ filesystem helpers, and tests while preserving the existing `crate::preset`
 boundary and CLI behavior.
 
 - ADR: [0014-preset-module-decomposition](../../../docs/adr/0014-preset-module-decomposition.md)
-- Status: implementation and local verification complete; PR CI pending
+- Status: merged to `main`; `main` CI passed
