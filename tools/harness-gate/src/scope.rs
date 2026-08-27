@@ -90,6 +90,9 @@ impl ScopeResult {
     }
 }
 
+/// Select changed paths for a mode, de-duplicate them, then classify them
+/// using the project scope rules. Git command selection belongs here; decoding
+/// Git's NUL-delimited output is delegated to [`crate::utils::git`].
 pub fn detect(project: &Project, mode: &ScopeMode) -> std::result::Result<ScopeResult, ScopeError> {
     if matches!(mode, ScopeMode::All) {
         return Ok(ScopeResult::all(project));
