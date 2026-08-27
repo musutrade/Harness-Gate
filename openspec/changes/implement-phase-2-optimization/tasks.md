@@ -88,6 +88,9 @@ are not required for the completed error-boundary and build-profile work in PR #
 ## 9. Post-Merge Monitoring
 
 - Observation window: 2026-08-27 02:07 UTC through 2026-08-30 02:07 UTC.
+- Checkpoint 2026-08-27 02:49 UTC: `main` CI runs for commits `3e9c3bd`,
+  `cc0546f`, and `bc940c3` all passed 10/10 jobs; no open issues or pull
+  requests were reported.
 - [ ] 9.1 Monitor CI performance for 3 days after merge and verify no regressions (Priority: P0, Effort: M)
 - [ ] 9.2 Check for any user-reported issues with error messages or CLI behavior (Priority: P1, Effort: M)
 - [ ] 9.3 Validate binary size and test performance remain stable across multiple CI runs (Priority: P1, Effort: S)
