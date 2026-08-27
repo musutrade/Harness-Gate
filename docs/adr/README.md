@@ -32,6 +32,7 @@ We use a simplified version of the Michael Nygard ADR template:
 - [ADR-0012](0012-process-module-decomposition.md) - Decompose the process module by responsibility
 - [ADR-0013](0013-doctor-module-decomposition.md) - Decompose the doctor module by responsibility
 - [ADR-0014](0014-preset-module-decomposition.md) - Decompose the preset module by responsibility
+- [ADR-0015](0015-main-module-decomposition.md) - Decompose the CLI entry module by responsibility
 
 ## Creating New ADRs
 
