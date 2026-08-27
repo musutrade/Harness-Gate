@@ -1,93 +1,24 @@
+use super::report::DoctorReport;
 use crate::config::{DoctorCheck, DoctorCheckKind, PathType};
 use crate::project::Project;
 use anyhow::{bail, Context, Result};
 use globset::{Glob, GlobSetBuilder};
 use ignore::WalkBuilder;
-use serde::Serialize;
 use std::fs;
 use std::path::Path;
 use std::time::{Duration, Instant};
 
-#[derive(Debug, Clone, Copy, Serialize)]
-#[serde(rename_all = "lowercase")]
-enum Level {
-    Pass,
-    Warn,
-    Fail,
-}
-
-#[derive(Debug, Serialize)]
-struct Check {
-    level: Level,
-    name: String,
-    detail: String,
-}
-
-#[derive(Debug, Serialize)]
-pub struct DoctorReport {
-    project_root: String,
-    checks: Vec<Check>,
-    pub failures: usize,
-    pub warnings: usize,
-}
-
-impl DoctorReport {
-    fn new(project: &Project) -> Self {
-        Self {
-            project_root: project.root.to_string_lossy().to_string(),
-            checks: Vec::new(),
-            failures: 0,
-            warnings: 0,
-        }
-    }
-
-    fn push(&mut self, level: Level, name: impl Into<String>, detail: impl Into<String>) {
-        match level {
-            Level::Fail => self.failures += 1,
-            Level::Warn => self.warnings += 1,
-            Level::Pass => {}
-        }
-        self.checks.push(Check {
-            level,
-            name: name.into(),
-            detail: detail.into(),
-        });
-    }
-
-    pub fn print(&self) {
-        println!("arc-flow doctor");
-        println!("Project: {}\n", self.project_root);
-        for check in &self.checks {
-            let marker = match check.level {
-                Level::Pass => "PASS",
-                Level::Warn => "WARN",
-                Level::Fail => "FAIL",
-            };
-            println!("[{marker}] {:<22} {}", check.name, check.detail);
-        }
-        println!(
-            "\nSummary: {} failure(s), {} warning(s)",
-            self.failures, self.warnings
-        );
-    }
-}
-
-pub fn run(project: &Project) -> Result<DoctorReport> {
+pub fn run(project: &Project) -> Result<super::DoctorReport> {
     let mut report = DoctorReport::new(project);
     for check in &project.config.doctor.checks {
         match run_check(project, check) {
-            Ok(detail) => report.push(Level::Pass, &check.label, detail),
+            Ok(detail) => report.record_pass(&check.label, detail),
             Err(error) => {
-                let level = if check.required {
-                    Level::Fail
-                } else {
-                    Level::Warn
-                };
                 let detail = match &check.help {
                     Some(help) => format!("{error:#}; {help}"),
                     None => format!("{error:#}"),
                 };
-                report.push(level, &check.label, detail);
+                report.record_failure(check.required, &check.label, detail);
             }
         }
     }
@@ -227,7 +158,7 @@ fn check_glob(project: &Project, pattern: &str) -> Result<String> {
     Ok(format!("matched {pattern}"))
 }
 
-fn check_remotes(project_root: &Path, timeout: Duration) -> Result<String> {
+pub(crate) fn check_remotes(project_root: &Path, timeout: Duration) -> Result<String> {
     let deadline = Instant::now() + timeout;
     let remotes = crate::process::capture(
         "git",
@@ -272,20 +203,4 @@ fn remaining(deadline: Instant) -> Result<Duration> {
         .checked_duration_since(Instant::now())
         .filter(|duration| !duration.is_zero())
         .ok_or_else(|| anyhow::anyhow!("doctor check timed out"))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::test_support::TestWorkspace;
-
-    #[test]
-    fn git_remote_check_rejects_non_git_directory() {
-        let root = TestWorkspace::new("doctor");
-
-        let error =
-            check_remotes(&root, Duration::from_secs(2)).expect_err("non-Git directory must fail");
-
-        assert!(error.to_string().contains("not a Git worktree"));
-    }
 }
