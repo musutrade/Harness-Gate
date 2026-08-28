@@ -1,0 +1,703 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FlowConfig",
+  "type": "object",
+  "required": [
+    "paths",
+    "project",
+    "scope",
+    "steps",
+    "version"
+  ],
+  "properties": {
+    "doctor": {
+      "default": {
+        "checks": []
+      },
+      "allOf": [
+        {
+          "$ref": "#/definitions/DoctorConfig"
+        }
+      ]
+    },
+    "parsers": {
+      "default": {},
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/ParserConfig"
+      }
+    },
+    "paths": {
+      "$ref": "#/definitions/PathsConfig"
+    },
+    "policy": {
+      "default": {
+        "required_steps": []
+      },
+      "allOf": [
+        {
+          "$ref": "#/definitions/PolicyConfig"
+        }
+      ]
+    },
+    "project": {
+      "$ref": "#/definitions/ProjectConfig"
+    },
+    "scope": {
+      "$ref": "#/definitions/ScopeConfig"
+    },
+    "services": {
+      "default": {},
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/ServiceConfig"
+      }
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/StepConfig"
+      }
+    },
+    "version": {
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0.0
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "DoctorCheck": {
+      "type": "object",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "program"
+          ],
+          "properties": {
+            "args": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "command"
+              ]
+            },
+            "program": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "path"
+          ],
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "path"
+              ]
+            },
+            "path": {
+              "type": "string"
+            },
+            "path_type": {
+              "default": "any",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/PathType"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "pattern"
+          ],
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "glob"
+              ]
+            },
+            "pattern": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "name"
+          ],
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "env"
+              ]
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "contains",
+            "env",
+            "kind",
+            "path"
+          ],
+          "properties": {
+            "contains": {
+              "type": "string"
+            },
+            "env": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "env-or-file"
+              ]
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "expected",
+            "key",
+            "kind"
+          ],
+          "properties": {
+            "expected": {
+              "type": "string"
+            },
+            "key": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "git-config"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "git-remotes"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "path",
+            "program"
+          ],
+          "properties": {
+            "args": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "version"
+              ]
+            },
+            "path": {
+              "type": "string"
+            },
+            "program": {
+              "type": "string"
+            },
+            "trim_prefix": {
+              "default": "",
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "service"
+          ],
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "service"
+              ]
+            },
+            "service": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      ],
+      "required": [
+        "id",
+        "label"
+      ],
+      "properties": {
+        "help": {
+          "default": null,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "required": {
+          "default": true,
+          "type": "boolean"
+        },
+        "timeout_secs": {
+          "default": 15,
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
+        }
+      }
+    },
+    "DoctorConfig": {
+      "type": "object",
+      "properties": {
+        "checks": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DoctorCheck"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "ExternalValuePolicy": {
+      "type": "string",
+      "enum": [
+        "none",
+        "isolated-postgres"
+      ]
+    },
+    "ParserConfig": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "patterns"
+          ],
+          "properties": {
+            "capture": {
+              "default": 1,
+              "type": "integer",
+              "format": "uint",
+              "minimum": 0.0
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "regex"
+              ]
+            },
+            "minimum": {
+              "default": 1,
+              "type": "integer",
+              "format": "uint",
+              "minimum": 0.0
+            },
+            "patterns": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "PathAlias": {
+      "type": "object",
+      "required": [
+        "path"
+      ],
+      "properties": {
+        "env": {
+          "default": null,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "path": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PathType": {
+      "type": "string",
+      "enum": [
+        "any",
+        "file",
+        "directory"
+      ]
+    },
+    "PathsConfig": {
+      "type": "object",
+      "required": [
+        "audit_config",
+        "reports"
+      ],
+      "properties": {
+        "aliases": {
+          "default": {},
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/PathAlias"
+          }
+        },
+        "audit_config": {
+          "type": "string"
+        },
+        "reports": {
+          "type": "string"
+        },
+        "secrets_config": {
+          "default": ".harness-gate/secrets.toml",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PolicyConfig": {
+      "type": "object",
+      "properties": {
+        "required_steps": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "ProjectConfig": {
+      "type": "object",
+      "required": [
+        "default_profile",
+        "hook_profile",
+        "name"
+      ],
+      "properties": {
+        "default_profile": {
+          "type": "string"
+        },
+        "hook_profile": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ScopeConfig": {
+      "type": "object",
+      "required": [
+        "rules"
+      ],
+      "properties": {
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ScopeRule"
+          }
+        },
+        "unmatched": {
+          "default": "fail",
+          "allOf": [
+            {
+              "$ref": "#/definitions/UnmatchedScope"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "ScopeRule": {
+      "type": "object",
+      "required": [
+        "components",
+        "patterns"
+      ],
+      "properties": {
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "patterns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "ServiceConfig": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "connection",
+            "container_port",
+            "healthcheck",
+            "image",
+            "inject_env",
+            "kind",
+            "startup_timeout_secs"
+          ],
+          "properties": {
+            "connection": {
+              "type": "string"
+            },
+            "container_port": {
+              "type": "integer",
+              "format": "uint16",
+              "minimum": 0.0
+            },
+            "environment": {
+              "default": {},
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "external_env": {
+              "default": null,
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "external_value_policy": {
+              "default": "none",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ExternalValuePolicy"
+                }
+              ]
+            },
+            "healthcheck": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "image": {
+              "type": "string"
+            },
+            "image_env": {
+              "default": null,
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "inject_env": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "docker"
+              ]
+            },
+            "startup_timeout_secs": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            },
+            "timeout_env": {
+              "default": null,
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "inject_env",
+            "kind",
+            "source_env"
+          ],
+          "properties": {
+            "inject_env": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "environment"
+              ]
+            },
+            "source_env": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "StepConfig": {
+      "type": "object",
+      "required": [
+        "args",
+        "component",
+        "cwd",
+        "id",
+        "label",
+        "log",
+        "profiles",
+        "program",
+        "timeout_secs"
+      ],
+      "properties": {
+        "args": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "component": {
+          "type": "string"
+        },
+        "cwd": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "log": {
+          "type": "string"
+        },
+        "parser": {
+          "default": null,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "program": {
+          "type": "string"
+        },
+        "remove_env": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "services": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "timeout_env": {
+          "default": null,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "timeout_secs": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
+        }
+      },
+      "additionalProperties": false
+    },
+    "UnmatchedScope": {
+      "type": "string",
+      "enum": [
+        "fail",
+        "all",
+        "ignore"
+      ]
+    }
+  }
+}

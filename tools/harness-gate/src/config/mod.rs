@@ -8,6 +8,7 @@ mod validation;
 #[cfg(test)]
 mod tests;
 
+pub use loader::schema_json;
 pub use migration::migrate_v1;
 #[allow(unused_imports)]
 pub use model::{

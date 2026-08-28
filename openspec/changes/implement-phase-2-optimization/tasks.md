@@ -99,6 +99,12 @@ dedicated OpenSpec change records the implementation and verification details.
 - [ ] 9.2 Check for any user-reported issues with error messages or CLI behavior (Priority: P1, Effort: M)
 - [ ] 9.3 Validate binary size and test performance remain stable across multiple CI runs (Priority: P1, Effort: S)
 
+## 10. Configuration Foundation Follow-up
+
+- [x] 10.1 Derive a JSON Schema from the v2 configuration model (Priority: P1, Effort: M).
+- [x] 10.2 Add consistent `${NAME}` and `${NAME:-default}` interpolation to all config loading paths (Priority: P1, Effort: M).
+- [x] 10.3 Expose `config schema` and document generation/compatibility behavior (Priority: P1, Effort: S).
+
 ---
 
 **Total Estimated Time:** 8-12 days (can be parallelized across tracks)

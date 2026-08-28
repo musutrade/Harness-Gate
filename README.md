@@ -163,6 +163,7 @@ Presets are starting points, not runtime branches. After initialization is compl
 | `harness-gate config check`                                  | Validate schema, references, paths and environment overrides |
 | `harness-gate config print --resolved`                       | Output final effective configuration      |
 | `harness-gate config migrate`                                | Convert schema v1 to v2                   |
+| `harness-gate schema export`                                 | Generate JSON Schema for flow.toml         |
 | `harness-gate parse-logs`                                    | Extract JSON Lines ERROR trace context    |
 
 All commands support global `--project-root <PATH>` and `--config <PATH>`. Commands return 0 on success; configuration errors, gate failures, step failures, timeouts or interrupts return non-zero, suitable for direct use in CI.

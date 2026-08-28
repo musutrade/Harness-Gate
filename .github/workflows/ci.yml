@@ -41,6 +41,11 @@ jobs:
       - name: Run tests
         run: cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked
 
+      - name: Verify generated configuration schema
+        run: |
+          cargo run --manifest-path tools/harness-gate/Cargo.toml -- schema export
+          git diff --exit-code -- schema/flow.schema.json
+
   security-audit:
     name: Security Audit
     runs-on: ubuntu-latest

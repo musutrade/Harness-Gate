@@ -1,10 +1,11 @@
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 
 pub const CONFIG_VERSION: u32 = 2;
 pub const DEFAULT_CONFIG_PATH: &str = ".harness-gate/flow.toml";
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct FlowConfig {
     pub version: u32,
@@ -22,7 +23,7 @@ pub struct FlowConfig {
     pub steps: Vec<StepConfig>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct ProjectConfig {
     pub name: String,
@@ -30,7 +31,7 @@ pub struct ProjectConfig {
     pub hook_profile: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct PathsConfig {
     pub reports: String,
@@ -45,7 +46,7 @@ fn default_secrets_config_path() -> String {
     ".harness-gate/secrets.toml".into()
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct PathAlias {
     pub path: String,
@@ -53,21 +54,21 @@ pub struct PathAlias {
     pub env: Option<String>,
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct PolicyConfig {
     #[serde(default)]
     pub required_steps: Vec<String>,
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct DoctorConfig {
     #[serde(default)]
     pub checks: Vec<DoctorCheck>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct DoctorCheck {
     pub id: String,
     pub label: String,
@@ -81,7 +82,7 @@ pub struct DoctorCheck {
     pub kind: DoctorCheckKind,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(tag = "kind", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum DoctorCheckKind {
     Command {
@@ -123,7 +124,7 @@ pub enum DoctorCheckKind {
     },
 }
 
-#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "lowercase")]
 pub enum PathType {
     #[default]
@@ -132,7 +133,7 @@ pub enum PathType {
     Directory,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(tag = "kind", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum ServiceConfig {
     Docker {
@@ -159,7 +160,7 @@ pub enum ServiceConfig {
     },
 }
 
-#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, JsonSchema, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
 pub enum ExternalValuePolicy {
     #[default]
@@ -167,7 +168,7 @@ pub enum ExternalValuePolicy {
     IsolatedPostgres,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(tag = "kind", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum ParserConfig {
     Regex {
@@ -179,7 +180,7 @@ pub enum ParserConfig {
     },
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct ScopeConfig {
     #[serde(default)]
@@ -187,7 +188,7 @@ pub struct ScopeConfig {
     pub rules: Vec<ScopeRule>,
 }
 
-#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "lowercase")]
 pub enum UnmatchedScope {
     #[default]
@@ -196,14 +197,14 @@ pub enum UnmatchedScope {
     Ignore,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct ScopeRule {
     pub patterns: Vec<String>,
     pub components: BTreeSet<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct StepConfig {
     pub id: String,

@@ -1,5 +1,6 @@
 use super::model::{FlowConfig, ParserConfig, ServiceConfig, StepConfig};
 use anyhow::{Context, Result};
+use schemars::schema_for;
 use std::collections::BTreeSet;
 use std::env;
 use std::fs;
@@ -9,6 +10,7 @@ impl FlowConfig {
     pub fn load(path: &Path) -> Result<Self> {
         let source = fs::read_to_string(path)
             .with_context(|| format!("read workflow config {}", path.display()))?;
+        let source = interpolate_environment(&source)?;
         let mut config: Self = toml::from_str(&source)
             .with_context(|| format!("parse workflow config {}", path.display()))?;
         config.apply_environment()?;
@@ -17,7 +19,8 @@ impl FlowConfig {
     }
 
     pub fn from_source(source: &str) -> Result<Self> {
-        let config: Self = toml::from_str(source).context("parse workflow config")?;
+        let source = interpolate_environment(source)?;
+        let config: Self = toml::from_str(&source).context("parse workflow config")?;
         config.validate()?;
         Ok(config)
     }
@@ -85,6 +88,46 @@ impl FlowConfig {
         }
         Ok(())
     }
+}
+
+pub fn schema_json() -> Result<String> {
+    serde_json::to_string_pretty(&schema_for!(FlowConfig)).context("serialize workflow schema")
+}
+
+fn interpolate_environment(source: &str) -> Result<String> {
+    let mut output = String::with_capacity(source.len());
+    let mut rest = source;
+    while let Some(start) = rest.find("${") {
+        output.push_str(&rest[..start]);
+        let end = rest[start + 2..]
+            .find('}')
+            .ok_or_else(|| anyhow::anyhow!("unterminated environment interpolation"))?
+            + start
+            + 2;
+        let expression = &rest[start + 2..end];
+        let (name, default) = expression
+            .split_once(":-")
+            .map_or((expression, None), |(name, default)| (name, Some(default)));
+        if name.is_empty()
+            || !name
+                .bytes()
+                .all(|byte| byte.is_ascii_alphanumeric() || byte == b'_')
+        {
+            return Err(anyhow::anyhow!(
+                "invalid environment interpolation `${{{expression}}}`"
+            ));
+        }
+        let value = std::env::var(name)
+            .ok()
+            .or_else(|| default.map(str::to_owned))
+            .ok_or_else(|| {
+                anyhow::anyhow!("environment variable {name} is not set and has no default")
+            })?;
+        output.push_str(&value);
+        rest = &rest[end + 1..];
+    }
+    output.push_str(rest);
+    Ok(output)
 }
 
 fn override_string(name: &str, target: &mut String) {
