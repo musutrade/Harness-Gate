@@ -163,6 +163,7 @@ harness-gate --project-root /path/to/new-project verify --all
 | `harness-gate config check`                                  | 校验 schema、引用、路径和环境覆盖     |
 | `harness-gate config print --resolved`                       | 输出最终生效配置                      |
 | `harness-gate config migrate`                                | 将 schema v1 转换成 v2                |
+| `harness-gate schema export`                                 | 生成 flow.toml 的 JSON Schema          |
 | `harness-gate parse-logs`                                    | 提取 JSON Lines ERROR trace 上下文    |
 
 所有命令都支持全局 `--project-root <PATH>` 和 `--config <PATH>`。命令成功返回 0；配置错误、门禁失败、步骤失败、超时或中断返回非 0，适合直接用于 CI。

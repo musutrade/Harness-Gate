@@ -26,7 +26,13 @@ ARC_FLOW_CONFIG=config/ci-flow.toml harness-gate --project-root /path/to/project
 ```bash
 harness-gate config check
 harness-gate config print --resolved
+harness-gate schema export
 ```
+
+`schema export` 将当前配置模型导出到 `schema/flow.schema.json`，可提交到编辑器或 CI
+进行静态补全和结构检查。配置字符串支持一次性的环境变量插值：`${NAME}` 要求变量已设置，
+`${NAME:-default}` 在变量缺失时使用默认值。不支持递归插值或表达式。插值发生在 TOML 解析前，
+随后仍按现有专用环境变量覆盖规则处理。
 
 ## 2. 命名和路径约束
 

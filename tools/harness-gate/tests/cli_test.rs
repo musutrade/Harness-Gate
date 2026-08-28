@@ -56,6 +56,16 @@ fn test_presets_command() {
 }
 
 #[test]
+fn test_schema_export_writes_the_flow_schema_without_a_project_config() {
+    let ctx = TestContext::new();
+    let output = ctx.run_harness_gate(&["schema", "export"]);
+
+    assert_success(&output);
+    let schema = ctx.read_file("schema/flow.schema.json");
+    assert!(schema.contains("\"title\": \"FlowConfig\""));
+}
+
+#[test]
 fn test_init_with_invalid_preset() {
     let ctx = TestContext::new();
     let output = ctx.run_harness_gate(&["init", "--preset", "nonexistent-preset"]);

@@ -40,6 +40,7 @@ We use a simplified version of the Michael Nygard ADR template:
 - [ADR-0020](0020-audit-scanner-decomposition.md) - Decompose the audit scanner by responsibility
 - [ADR-0021](0021-refactor-documentation-closeout.md) - Close out refactor documentation after merge
 - [ADR-0022](0022-terminal-feedback.md) - Provide terminal-aware CLI feedback
+- [ADR-0023](0023-config-schema-and-interpolation.md) - Generate configuration schema and interpolate environment variables
 
 ## Creating New ADRs
 

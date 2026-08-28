@@ -89,6 +89,24 @@ fn unknown_fields_are_rejected() {
 }
 
 #[test]
+fn environment_interpolation_supports_defaults() {
+    let source = include_str!("../../presets/rust-api.flow.toml").replace(
+        "name = \"rust-api\"",
+        "name = \"${HG_TEST_NAME:-interpolated}\"",
+    );
+    let config = FlowConfig::from_source(&source).expect("interpolated config");
+    assert_eq!(config.project.name, "interpolated");
+}
+
+#[test]
+fn environment_interpolation_requires_defined_variables() {
+    let source = include_str!("../../presets/rust-api.flow.toml")
+        .replace("name = \"rust-api\"", "name = \"${HG_MISSING_VARIABLE}\"");
+    let error = FlowConfig::from_source(&source).expect_err("missing variable must fail");
+    assert!(error.to_string().contains("HG_MISSING_VARIABLE"));
+}
+
+#[test]
 fn version_one_configuration_can_be_migrated() {
     let source = r#"
 version = 1
