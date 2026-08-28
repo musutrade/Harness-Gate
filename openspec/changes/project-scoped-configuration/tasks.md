@@ -17,7 +17,7 @@
   docs. **Acceptance:** each project reads its own audit report despite the
   other project's inherited selector variables; ADR and configuration docs
   describe explicit migration paths.
-- [ ] **1.5 (P0, S)** Complete compatibility review and CI verification.
+- [x] **1.5 (P0, S)** Complete compatibility review and CI verification.
   **Acceptance:** formatter, linter, focused tests, documentation consistency,
   and all required PR checks are green; known local fixture failures remain
   clearly identified as unrelated user working-tree changes.
