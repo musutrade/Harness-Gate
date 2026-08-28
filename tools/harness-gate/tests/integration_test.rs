@@ -2,6 +2,62 @@ mod common;
 
 use common::*;
 
+#[cfg(unix)]
+#[test]
+fn test_verify_cancellation_stops_the_child_process() {
+    use std::process::{Command, Stdio};
+    use std::time::Duration;
+
+    let ctx = TestContext::new();
+    ctx.init_project("generic");
+    ctx.write_file(
+        ".harness-gate/flow.toml",
+        r#"
+version = 2
+[project]
+name = "cancellation"
+default_profile = "full"
+hook_profile = "full"
+[paths]
+reports = ".harness-gate/reports"
+audit_config = ".harness-gate/audit.toml"
+secrets_config = ".harness-gate/secrets.toml"
+[scope]
+unmatched = "all"
+rules = [{ patterns = ["**"], components = ["project"] }]
+[[steps]]
+id = "project.sleep"
+label = "sleep"
+component = "project"
+profiles = ["full"]
+program = "sleep"
+args = ["10"]
+cwd = "{root}"
+log = "sleep.log"
+timeout_secs = 60
+"#,
+    );
+    let child = Command::new(env!("CARGO_BIN_EXE_harness-gate"))
+        .args(["--color", "never", "--project-root"])
+        .arg(&ctx.project_root)
+        .args(["verify", "--all"])
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .expect("spawn cancellation fixture");
+    std::thread::sleep(Duration::from_secs(1));
+    let status = unsafe { libc::kill(child.id() as libc::pid_t, libc::SIGTERM) };
+    assert_eq!(status, 0, "send SIGTERM");
+    let output = child.wait_with_output().expect("wait for cancellation");
+    assert!(!output.status.success());
+    let combined = format!(
+        "{}\n{}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert!(combined.contains("ERROR [E1402]"), "{combined}");
+}
+
 #[test]
 fn test_init_with_rust_api_preset() {
     let ctx = TestContext::new();
