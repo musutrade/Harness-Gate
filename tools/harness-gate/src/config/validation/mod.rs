@@ -569,6 +569,7 @@ fn infer_error_path(config: &FlowConfig, error: &str) -> String {
         "project.hook_profile",
         "report_templates.root",
         "report_templates.template",
+        "execution.max_parallel",
     ] {
         if error.contains(field) {
             return field.into();

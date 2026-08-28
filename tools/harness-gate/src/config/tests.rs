@@ -37,6 +37,15 @@ fn execution_policy_rejects_zero_and_values_above_the_bound() {
 }
 
 #[test]
+fn execution_policy_diagnostic_points_to_max_parallel() {
+    let source = include_str!("../../presets/generic.flow.toml")
+        .replace("[scope]\n", "[execution]\nmax_parallel = 65\n\n[scope]\n");
+    let error = FlowConfig::from_source_with_diagnostics(&source, None, None)
+        .expect_err("invalid execution bound must produce diagnostics");
+    assert_eq!(error.report().diagnostics[0].path, "execution.max_parallel");
+}
+
+#[test]
 fn existing_v2_config_defaults_the_secret_rule_path() {
     let source = include_str!("../../presets/rust-api.flow.toml")
         .lines()
