@@ -644,27 +644,23 @@
     "StepConfig": {
       "type": "object",
       "required": [
-        "args",
-        "component",
-        "cwd",
         "id",
-        "label",
-        "log",
-        "profiles",
-        "program",
-        "timeout_secs"
+        "label"
       ],
       "properties": {
         "args": {
+          "default": [],
           "type": "array",
           "items": {
             "type": "string"
           }
         },
         "component": {
+          "default": "",
           "type": "string"
         },
         "cwd": {
+          "default": "",
           "type": "string"
         },
         "depends_on": {
@@ -674,13 +670,30 @@
             "type": "string"
           }
         },
+        "gate_type": {
+          "description": "Closed vocabulary for built-in gate declarations.",
+          "default": null,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "id": {
           "type": "string"
+        },
+        "kind": {
+          "description": "Optional discriminator. When absent, this entry is a legacy external step.",
+          "default": null,
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "label": {
           "type": "string"
         },
         "log": {
+          "default": "",
           "type": "string"
         },
         "parser": {
@@ -691,6 +704,7 @@
           ]
         },
         "profiles": {
+          "default": [],
           "type": "array",
           "items": {
             "type": "string"
@@ -698,6 +712,7 @@
           "uniqueItems": true
         },
         "program": {
+          "default": "",
           "type": "string"
         },
         "remove_env": {
@@ -722,6 +737,7 @@
           ]
         },
         "timeout_secs": {
+          "default": 0,
           "type": "integer",
           "format": "uint64",
           "minimum": 0.0

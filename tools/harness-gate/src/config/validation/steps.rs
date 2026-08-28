@@ -7,7 +7,6 @@ use std::path::Path;
 
 pub(super) fn validate_step(config: &FlowConfig, step: &StepConfig) -> Result<()> {
     validate_id("verification step id", &step.id)?;
-    validate_id("step component", &step.component)?;
     if step.label.trim().is_empty() || step.profiles.is_empty() {
         bail!(
             "step {:?} requires a label and at least one profile",
@@ -17,6 +16,27 @@ pub(super) fn validate_step(config: &FlowConfig, step: &StepConfig) -> Result<()
     for profile in &step.profiles {
         validate_id("step profile", profile)?;
     }
+
+    match step.kind.as_deref().unwrap_or("external-step") {
+        "builtin-gate" => return validate_builtin_gate(step),
+        "external-step" => {
+            if step.gate_type.is_some() {
+                bail!("external step {:?} may not declare gate_type", step.id);
+            }
+            if matches!(
+                step.id.as_str(),
+                "builtin.secret-scan" | "builtin.architecture-audit"
+            ) {
+                bail!(
+                    "external step {:?} uses a reserved built-in gate id",
+                    step.id
+                );
+            }
+        }
+        other => bail!("step {:?} has unknown kind {other:?}", step.id),
+    }
+
+    validate_id("step component", &step.component)?;
     validate_program(&format!("step {} program", step.id), &step.program)?;
     if is_shell(&step.program)
         && step
@@ -79,6 +99,49 @@ pub(super) fn validate_step(config: &FlowConfig, step: &StepConfig) -> Result<()
     }
     for name in &step.remove_env {
         validate_env_name("step remove_env", name)?;
+    }
+    Ok(())
+}
+
+fn validate_builtin_gate(step: &StepConfig) -> Result<()> {
+    let gate_type = step
+        .gate_type
+        .as_deref()
+        .ok_or_else(|| anyhow::anyhow!("built-in gate {:?} requires gate_type", step.id))?;
+    let expected_id = format!("builtin.{gate_type}");
+    if !matches!(gate_type, "secret-scan" | "architecture-audit") {
+        bail!(
+            "built-in gate {:?} has unknown gate_type {gate_type:?}",
+            step.id
+        );
+    }
+    if step.id != expected_id {
+        bail!(
+            "built-in gate {:?} must use reserved id {expected_id:?}",
+            step.id
+        );
+    }
+    if !step.depends_on.is_empty() {
+        bail!(
+            "built-in gate {:?} may not declare external dependencies",
+            step.id
+        );
+    }
+    if !step.component.is_empty()
+        || !step.program.is_empty()
+        || !step.args.is_empty()
+        || !step.cwd.is_empty()
+        || !step.log.is_empty()
+        || step.timeout_secs != 0
+        || step.timeout_env.is_some()
+        || step.parser.is_some()
+        || !step.services.is_empty()
+        || !step.remove_env.is_empty()
+    {
+        bail!(
+            "built-in gate {:?} may not declare external-step fields",
+            step.id
+        );
     }
     Ok(())
 }

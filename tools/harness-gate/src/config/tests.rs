@@ -102,6 +102,63 @@ fn unknown_fields_are_rejected() {
 }
 
 #[test]
+fn built_in_gate_declarations_are_validated_as_typed_steps() {
+    let mut config = repository_config();
+    let gate = &mut config.steps[0];
+    gate.id = "builtin.secret-scan".into();
+    gate.label = "secret scan".into();
+    gate.component.clear();
+    gate.program.clear();
+    gate.args.clear();
+    gate.cwd.clear();
+    gate.log.clear();
+    gate.timeout_secs = 0;
+    gate.timeout_env = None;
+    gate.parser = None;
+    gate.services.clear();
+    gate.remove_env.clear();
+    gate.depends_on.clear();
+    gate.kind = Some("builtin-gate".into());
+    gate.gate_type = Some("secret-scan".into());
+    config.policy.required_steps.clear();
+    config.validate().expect("built-in gate is valid");
+}
+
+#[test]
+fn unknown_built_in_gate_types_fail_closed() {
+    let mut config = repository_config();
+    let gate = &mut config.steps[0];
+    gate.id = "builtin.future".into();
+    gate.component.clear();
+    gate.program.clear();
+    gate.args.clear();
+    gate.cwd.clear();
+    gate.log.clear();
+    gate.timeout_secs = 0;
+    gate.timeout_env = None;
+    gate.parser = None;
+    gate.services.clear();
+    gate.remove_env.clear();
+    gate.depends_on.clear();
+    gate.kind = Some("builtin-gate".into());
+    gate.gate_type = Some("future-gate".into());
+    config.policy.required_steps.clear();
+    let error = config.validate().expect_err("unknown gate must fail");
+    assert!(error.to_string().contains("unknown gate_type"));
+}
+
+#[test]
+fn external_steps_reject_gate_fields() {
+    let mut config = repository_config();
+    config.steps[0].kind = Some("external-step".into());
+    config.steps[0].gate_type = Some("secret-scan".into());
+    let error = config
+        .validate()
+        .expect_err("external gate field must fail");
+    assert!(error.to_string().contains("may not declare gate_type"));
+}
+
+#[test]
 fn environment_interpolation_supports_defaults() {
     let source = include_str!("../../presets/rust-api.flow.toml").replace(
         "name = \"rust-api\"",

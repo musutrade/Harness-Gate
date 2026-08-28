@@ -1,20 +1,204 @@
 use crate::config::StepConfig;
 use crate::project::Project;
 use crate::scope::ScopeResult;
-use std::collections::{BTreeSet, HashMap, HashSet};
+use anyhow::{bail, Result};
+#[cfg(test)]
+use std::collections::HashMap;
+use std::collections::{BTreeMap, BTreeSet, HashSet};
+use std::time::Duration;
 
-pub(super) fn selected_steps<'a>(
-    project: &'a Project,
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(super) enum BuiltinGate {
+    SecretScan,
+    ArchitectureAudit,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(super) enum PlanNodeKind {
+    Builtin(BuiltinGate),
+    External,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(super) enum NodeStatus {
+    Passed,
+    Failed,
+    Cancelled,
+    Skipped,
+}
+
+impl NodeStatus {
+    pub fn from_passed(passed: bool) -> Self {
+        if passed {
+            Self::Passed
+        } else {
+            Self::Failed
+        }
+    }
+
+    pub fn from_task(result: &crate::process::TaskResult) -> Self {
+        if result.cancelled {
+            Self::Cancelled
+        } else {
+            Self::from_passed(result.passed)
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+#[allow(dead_code)]
+pub(super) struct NodeResult {
+    pub id: String,
+    pub label: String,
+    pub kind: PlanNodeKind,
+    pub status: NodeStatus,
+    pub duration: Duration,
+    pub detail: Option<String>,
+    pub artifact: Option<String>,
+    pub reason: Option<String>,
+}
+
+#[derive(Debug)]
+pub(super) struct PlanNode<'a> {
+    pub id: String,
+    pub label: String,
+    pub kind: PlanNodeKind,
+    pub depends_on: Vec<String>,
+    pub step: Option<&'a StepConfig>,
+}
+
+#[derive(Debug)]
+pub(super) struct VerificationPlan<'a> {
+    pub nodes: Vec<PlanNode<'a>>,
+}
+
+impl<'a> VerificationPlan<'a> {
+    pub fn build(
+        project: &'a Project,
+        scope: &ScopeResult,
+        profile: &str,
+        only_step: Option<&str>,
+    ) -> Result<Self> {
+        let selected = selected_step_ids(project, scope, profile, only_step);
+        if let Some(id) = only_step {
+            if !project.config.steps.iter().any(|step| step.id == id) {
+                bail!("unknown verification step {id:?}");
+            }
+        }
+
+        let mut nodes = BTreeMap::<String, PlanNode<'a>>::new();
+        let mut node_order = Vec::new();
+        for step in &project.config.steps {
+            if selected.contains(&step.id) && step.kind.as_deref() != Some("builtin-gate") {
+                node_order.push(step.id.clone());
+                nodes.insert(
+                    step.id.clone(),
+                    PlanNode {
+                        id: step.id.clone(),
+                        label: step.label.clone(),
+                        kind: PlanNodeKind::External,
+                        depends_on: step.depends_on.clone(),
+                        step: Some(step),
+                    },
+                );
+            }
+        }
+
+        let explicit_secret = project.config.steps.iter().find(|step| {
+            step.kind.as_deref() == Some("builtin-gate")
+                && step.gate_type.as_deref() == Some("secret-scan")
+        });
+        let explicit_audit = project.config.steps.iter().find(|step| {
+            step.kind.as_deref() == Some("builtin-gate")
+                && step.gate_type.as_deref() == Some("architecture-audit")
+        });
+
+        let secret_id = "builtin.secret-scan".to_string();
+        let audit_id = "builtin.architecture-audit".to_string();
+        nodes.insert(
+            secret_id.clone(),
+            PlanNode {
+                id: secret_id.clone(),
+                label: explicit_secret
+                    .map_or_else(|| "secret scan".into(), |step| step.label.clone()),
+                kind: PlanNodeKind::Builtin(BuiltinGate::SecretScan),
+                depends_on: explicit_secret.map_or_else(Vec::new, |step| step.depends_on.clone()),
+                step: explicit_secret,
+            },
+        );
+        node_order.insert(0, secret_id.clone());
+        node_order.insert(1, audit_id.clone());
+        nodes.insert(
+            audit_id.clone(),
+            PlanNode {
+                id: audit_id.clone(),
+                label: explicit_audit
+                    .map_or_else(|| "architecture audit".into(), |step| step.label.clone()),
+                kind: PlanNodeKind::Builtin(BuiltinGate::ArchitectureAudit),
+                depends_on: vec![secret_id.clone()],
+                step: explicit_audit,
+            },
+        );
+
+        for node in nodes.values_mut() {
+            if node.kind == PlanNodeKind::External && !node.depends_on.contains(&audit_id) {
+                node.depends_on.insert(0, audit_id.clone());
+            }
+        }
+
+        let mut ordered = Vec::with_capacity(nodes.len());
+        let mut visiting = HashSet::new();
+        let mut emitted = HashSet::new();
+        fn visit<'a>(
+            id: &str,
+            nodes: &BTreeMap<String, PlanNode<'a>>,
+            visiting: &mut HashSet<String>,
+            emitted: &mut HashSet<String>,
+            ordered: &mut Vec<PlanNode<'a>>,
+        ) -> Result<()> {
+            if emitted.contains(id) {
+                return Ok(());
+            }
+            if !visiting.insert(id.to_string()) {
+                bail!("verification plan dependency cycle includes {id:?}");
+            }
+            let node = nodes.get(id).ok_or_else(|| {
+                anyhow::anyhow!("verification plan references missing node {id:?}")
+            })?;
+            for dependency in &node.depends_on {
+                visit(dependency, nodes, visiting, emitted, ordered)?;
+            }
+            visiting.remove(id);
+            emitted.insert(id.to_string());
+            ordered.push(PlanNode {
+                id: node.id.clone(),
+                label: node.label.clone(),
+                kind: node.kind,
+                depends_on: node.depends_on.clone(),
+                step: node.step,
+            });
+            Ok(())
+        }
+        for id in &node_order {
+            visit(id, &nodes, &mut visiting, &mut emitted, &mut ordered)?;
+        }
+        Ok(Self { nodes: ordered })
+    }
+}
+
+fn selected_step_ids(
+    project: &Project,
     scope: &ScopeResult,
     profile: &str,
     only_step: Option<&str>,
-) -> Vec<&'a StepConfig> {
+) -> BTreeSet<String> {
     let mut selected = project
         .config
         .steps
         .iter()
         .filter(|step| {
-            scope.components.contains(&step.component)
+            step.kind.as_deref() != Some("builtin-gate")
+                && scope.components.contains(&step.component)
                 && only_step
                     .map(|id| step.id == id)
                     .unwrap_or_else(|| step.profiles.contains(profile))
@@ -32,15 +216,10 @@ pub(super) fn selected_steps<'a>(
             break;
         }
     }
-    let candidates = project
-        .config
-        .steps
-        .iter()
-        .filter(|step| selected.contains(&step.id))
-        .collect::<Vec<_>>();
-    topological_order(candidates)
+    selected
 }
 
+#[cfg(test)]
 #[allow(clippy::needless_lifetimes)]
 fn topological_order<'a>(candidates: Vec<&'a StepConfig>) -> Vec<&'a StepConfig> {
     let ids = candidates
@@ -82,8 +261,11 @@ fn topological_order<'a>(candidates: Vec<&'a StepConfig>) -> Vec<&'a StepConfig>
 
 #[cfg(test)]
 mod tests {
-    use super::topological_order;
+    use super::{topological_order, BuiltinGate, PlanNodeKind, VerificationPlan};
     use crate::config::FlowConfig;
+    use crate::project::Project;
+    use crate::scope::ScopeResult;
+    use crate::test_support::TestWorkspace;
 
     #[test]
     fn dependencies_are_stably_topologically_sorted() {
@@ -94,5 +276,26 @@ mod tests {
         let ordered = topological_order(config.steps.iter().collect());
         assert_eq!(ordered[0].id, config.steps[1].id);
         assert_eq!(ordered[1].id, config.steps[0].id);
+    }
+
+    #[test]
+    fn legacy_plan_synthesizes_mandatory_gate_chain() {
+        let workspace = TestWorkspace::new("verify-plan");
+        crate::preset::init(&workspace.root, "generic", false).expect("initialize fixture");
+        workspace.init_git();
+        let project = Project::discover(Some(workspace.root.clone()), None).expect("discover");
+        let plan = VerificationPlan::build(&project, &ScopeResult::all(&project), "full", None)
+            .expect("plan");
+        assert!(matches!(
+            plan.nodes[0].kind,
+            PlanNodeKind::Builtin(BuiltinGate::SecretScan)
+        ));
+        assert!(matches!(
+            plan.nodes[1].kind,
+            PlanNodeKind::Builtin(BuiltinGate::ArchitectureAudit)
+        ));
+        assert!(plan.nodes[2]
+            .depends_on
+            .contains(&"builtin.architecture-audit".into()));
     }
 }
