@@ -412,6 +412,25 @@ services = ["test-postgres"]
 remove_env = ["DATABASE_URL"]
 ```
 
+Built-in safety gates may be declared explicitly with a closed `gate_type`
+vocabulary. The current values are `secret-scan` and `architecture-audit`:
+
+```toml
+[[steps]]
+kind = "builtin-gate"
+id = "builtin.secret-scan"
+label = "secret scan"
+gate_type = "secret-scan"
+profiles = ["full"]
+```
+
+When `kind` is omitted, the entry remains an external step for compatibility.
+Built-in entries must use their reserved IDs and may not specify external-step
+fields such as `program`, `args`, `services`, or `log`. Unknown gate types fail
+closed before any command or service starts. If no built-in entries are
+declared, verification synthesizes the legacy `secret scan -> architecture
+audit -> external steps` chain internally without rewriting `flow.toml`.
+
 | 字段           | 必需 | 说明                               |
 | -------------- | ---- | ---------------------------------- |
 | `id`           | 是   | 全局唯一步骤 ID                    |
@@ -428,6 +447,8 @@ remove_env = ["DATABASE_URL"]
 | `services`     | 否   | 运行前需要准备的 service ID 列表   |
 | `remove_env`   | 否   | 创建子进程前删除的继承环境变量     |
 | `depends_on`   | 否   | 必须先完成的 step ID；支持传递依赖并决定资源是否可并发 |
+| `kind`         | 否   | `builtin-gate` 或省略（省略表示外部步骤） |
+| `gate_type`    | 否   | 内置门禁类型：`secret-scan` 或 `architecture-audit` |
 
 命令直接通过 `program + args[]` 启动，不执行 shell 拼接。`sh -c`、`bash -lc` 等命令字符串会被配置校验拒绝；管道、重定向和条件逻辑应拆成多个步骤，或封装成项目内受版本控制的可执行程序。
 
