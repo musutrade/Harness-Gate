@@ -56,6 +56,24 @@ timeout_secs = 60
         String::from_utf8_lossy(&output.stderr)
     );
     assert!(combined.contains("ERROR [E1402]"), "{combined}");
+    assert!(
+        ctx.project_root
+            .join(".harness-gate/reports/test_result.json")
+            .is_file(),
+        "cancellation must retain a machine-readable report"
+    );
+    let report: serde_json::Value = serde_json::from_slice(
+        &std::fs::read(
+            ctx.project_root
+                .join(".harness-gate/reports/test_result.json"),
+        )
+        .expect("read cancellation report"),
+    )
+    .expect("parse cancellation report");
+    assert_eq!(report["passed"], false);
+    assert!(report["steps"]
+        .as_array()
+        .is_some_and(|steps| { steps.iter().any(|step| step["cancelled"] == true) }));
 }
 
 #[test]

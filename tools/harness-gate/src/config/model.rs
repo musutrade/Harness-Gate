@@ -23,6 +23,8 @@ pub struct FlowConfig {
     pub report_templates: ReportTemplatesConfig,
     #[serde(default)]
     pub execution: ExecutionConfig,
+    #[serde(default)]
+    pub notifications: NotificationsConfig,
     pub scope: ScopeConfig,
     pub steps: Vec<StepConfig>,
 }
@@ -56,6 +58,26 @@ pub struct ReportTemplatesConfig {
     pub root: Option<String>,
     #[serde(default)]
     pub template: Option<String>,
+    /// Optional JUnit XML output path, relative to the report directory.
+    #[serde(default)]
+    pub junit: Option<String>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct NotificationsConfig {
+    #[serde(default)]
+    pub webhooks: Vec<WebhookConfig>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct WebhookConfig {
+    pub url: String,
+    #[serde(default = "default_true")]
+    pub on_failure: bool,
+    #[serde(default)]
+    pub on_success: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
@@ -172,6 +194,10 @@ pub enum PathType {
 #[serde(tag = "kind", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum ServiceConfig {
     Docker {
+        /// Container CLI used for this service. Podman supports the Docker
+        /// command surface and is selected explicitly when requested.
+        #[serde(default)]
+        runtime: ContainerRuntimeKind,
         image: String,
         #[serde(default)]
         image_env: Option<String>,
@@ -193,6 +219,24 @@ pub enum ServiceConfig {
         source_env: String,
         inject_env: String,
     },
+}
+
+/// Supported container runtimes for managed services.
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, JsonSchema, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum ContainerRuntimeKind {
+    #[default]
+    Docker,
+    Podman,
+}
+
+impl ContainerRuntimeKind {
+    pub fn executable(self) -> &'static str {
+        match self {
+            Self::Docker => "docker",
+            Self::Podman => "podman",
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, JsonSchema, PartialEq, Eq)]

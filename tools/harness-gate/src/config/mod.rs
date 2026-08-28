@@ -17,9 +17,9 @@ pub use loader::schema_json;
 pub use migration::migrate_v1;
 #[allow(unused_imports)]
 pub use model::{
-    DoctorCheck, DoctorCheckKind, DoctorConfig, ExecutionConfig, ExternalValuePolicy, FlowConfig,
-    ParserConfig, PathAlias, PathType, PathsConfig, PolicyConfig, ProjectConfig,
-    ReportTemplatesConfig, ScopeConfig, ScopeRule, ServiceConfig, StepConfig, UnmatchedScope,
-    CONFIG_VERSION, DEFAULT_CONFIG_PATH,
+    ContainerRuntimeKind, DoctorCheck, DoctorCheckKind, DoctorConfig, ExecutionConfig,
+    ExternalValuePolicy, FlowConfig, NotificationsConfig, ParserConfig, PathAlias, PathType,
+    PathsConfig, PolicyConfig, ProjectConfig, ReportTemplatesConfig, ScopeConfig, ScopeRule,
+    ServiceConfig, StepConfig, UnmatchedScope, WebhookConfig, CONFIG_VERSION, DEFAULT_CONFIG_PATH,
 };
 pub use path::resolve_config_path;

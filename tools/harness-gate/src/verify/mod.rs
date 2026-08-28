@@ -1,30 +1,24 @@
 mod parser;
 mod plan;
+mod report;
 mod scheduler;
 mod steps;
 
 #[cfg(test)]
 mod tests;
 
-use crate::audit;
 use crate::error::CodedError;
 use crate::process::TaskResult;
 use crate::project::Project;
 use crate::scope::ScopeResult;
-use crate::secrets::{self, SecretMode};
-use crate::ui::{self, Progress};
-use crate::utils::fs as output_fs;
-use anyhow::Result;
-use serde::Serialize;
-use std::collections::{BTreeSet, HashSet};
-use std::sync::Mutex;
-use std::time::Instant;
-
 use crate::service::ServiceManager;
-use plan::{BuiltinGate, NodeResult, NodeStatus, PlanNodeKind, VerificationPlan};
+use crate::ui::{self, Progress};
+use plan::VerificationPlan;
+use serde::Serialize;
+use std::collections::BTreeSet;
+use std::sync::Mutex;
 use steps::{print_external_result, print_result};
 
-/// Errors emitted by the verification workflow boundary.
 #[derive(Debug, thiserror::Error)]
 pub enum VerifyError {
     #[error("unknown or empty verification profile {profile:?}")]
@@ -82,45 +76,6 @@ pub struct VerificationReport {
     pub passed: bool,
 }
 
-impl VerificationReport {
-    fn write(&self, project: &Project) -> Result<()> {
-        output_fs::write_json(&project.reports.join("test_result.json"), self)?;
-
-        let mut markdown = String::from("=== Verification report ===\n");
-        markdown.push_str(&format!("Timestamp: {}\n", self.timestamp));
-        markdown.push_str(&format!("Profile: {}\n", self.profile));
-        markdown.push_str(&format!(
-            "Components: {}\n\n",
-            self.scope
-                .components
-                .iter()
-                .cloned()
-                .collect::<Vec<_>>()
-                .join(",")
-        ));
-        for step in &self.steps {
-            let status = if step.passed { "PASS" } else { "FAIL" };
-            markdown.push_str(&format!(
-                "- {status}: {} ({} ms)",
-                step.label, step.duration_ms
-            ));
-            if let Some(detail) = &step.detail {
-                markdown.push_str(&format!(" - {detail}"));
-            }
-            if !step.passed {
-                markdown.push_str(&format!("; log: {}", step.log));
-            }
-            markdown.push('\n');
-        }
-        markdown.push_str(&format!(
-            "\nTEST_SUMMARY: {}\n",
-            if self.passed { "PASS" } else { "FAIL" }
-        ));
-        output_fs::write(&project.reports.join("test_result.md"), markdown)?;
-        Ok(())
-    }
-}
-
 pub fn run(
     project: &Project,
     scope: ScopeResult,
@@ -148,10 +103,9 @@ pub fn run_step(
         .config
         .step(id)
         .ok_or_else(|| VerifyError::UnknownStep { id: id.to_string() })?;
-    let scope = explicit_scope(std::slice::from_ref(&step.component));
     run_selected(
         project,
-        scope,
+        explicit_scope(std::slice::from_ref(&step.component)),
         &project.config.project.default_profile,
         false,
         Some(id),
@@ -165,6 +119,16 @@ fn run_selected(
     staged: bool,
     only_step: Option<&str>,
 ) -> std::result::Result<VerificationReport, VerifyError> {
+    if project
+        .config
+        .execution
+        .max_parallel
+        .is_some_and(|limit| limit == 0 || limit > 64)
+    {
+        return Err(VerifyError::execution(anyhow::anyhow!(
+            "execution.max_parallel must be between 1 and 64"
+        )));
+    }
     println!("{}", ui::heading("arc-flow verify"));
     println!("Scope: {}", scope.mode);
     println!(
@@ -192,164 +156,54 @@ fn run_selected(
     })?;
     let mut progress = Progress::new(plan.nodes.len());
     scope.write_reports(project)?;
-    let mut steps = Vec::new();
     let services = Mutex::new(ServiceManager::new(project));
-    let mut blocked = HashSet::new();
-    let mut node_results = Vec::<NodeResult>::new();
-    let secret_mode = if staged {
-        SecretMode::Staged
-    } else {
-        SecretMode::WorkingTree
-    };
-    for node in &plan.nodes {
-        if crate::process::cancelled() {
-            return Err(VerifyError::Cancelled);
-        }
-        if node.kind != PlanNodeKind::External
-            && node
-                .depends_on
-                .iter()
-                .any(|dependency| blocked.contains(dependency))
-        {
-            blocked.insert(node.id.clone());
-            node_results.push(NodeResult {
-                id: node.id.clone(),
-                label: node.label.clone(),
-                kind: node.kind,
-                status: NodeStatus::Skipped,
-                duration: std::time::Duration::ZERO,
-                detail: Some("blocked by a failed prerequisite".into()),
-                artifact: None,
-                reason: Some("prerequisite failed".into()),
-            });
-            continue;
-        }
-        match node.kind {
-            PlanNodeKind::Builtin(BuiltinGate::SecretScan) => {
-                progress.begin(&node.label);
-                let started = Instant::now();
-                let findings = secrets::scan(project, secret_mode)?;
-                let passed = findings.is_empty();
-                let result = TaskResult {
-                    label: "secret scan".to_string(),
-                    passed,
-                    timed_out: false,
-                    cancelled: false,
-                    duration_ms: started.elapsed().as_millis(),
-                    log: project
-                        .reports
-                        .join("secret_scan.json")
-                        .to_string_lossy()
-                        .to_string(),
-                    detail: (!passed).then(|| format!("{} file(s) require review", findings.len())),
-                };
-                progress.clear();
-                print_result(&result);
-                progress.complete();
-                node_results.push(node_result(
-                    node,
-                    &result,
-                    NodeStatus::from_passed(result.passed),
-                ));
-                steps.push(result);
-                if !passed {
-                    blocked.insert(node.id.clone());
-                }
-            }
-            PlanNodeKind::Builtin(BuiltinGate::ArchitectureAudit) => {
-                progress.begin(&node.label);
-                let started = Instant::now();
-                let outcome = audit::run(
-                    &project.root,
-                    &project.audit_config,
-                    &project.reports,
-                    false,
-                )?;
-                let passed = outcome.total_violations == 0;
-                let result = TaskResult {
-                    label: "architecture audit".to_string(),
-                    passed,
-                    timed_out: false,
-                    cancelled: false,
-                    duration_ms: started.elapsed().as_millis(),
-                    log: outcome.report_file.to_string_lossy().to_string(),
-                    detail: Some(format!(
-                        "{} violation(s), {} blocker(s), {} error(s), {} warning(s)",
-                        outcome.total_violations,
-                        outcome.blocker_count,
-                        outcome.error_count,
-                        outcome.warning_count
-                    )),
-                };
-                progress.clear();
-                print_result(&result);
-                progress.complete();
-                node_results.push(node_result(
-                    node,
-                    &result,
-                    NodeStatus::from_passed(result.passed),
-                ));
-                steps.push(result);
-                if !passed {
-                    blocked.insert(node.id.clone());
-                }
-            }
-            PlanNodeKind::External => {}
-        }
-    }
-
-    let external_nodes = plan
-        .nodes
-        .iter()
-        .filter(|node| node.kind == PlanNodeKind::External)
-        .collect::<Vec<_>>();
-    if !external_nodes.is_empty() {
-        let initial_statuses = node_results
+    let outcome = scheduler::run_plan(
+        project,
+        &plan,
+        staged,
+        &services,
+        if project.config.execution.parallel {
+            project.config.execution.effective_max_parallel()
+        } else {
+            1
+        },
+    )
+    .map_err(|error| match error {
+        scheduler::SchedulerError::Secrets(error) => VerifyError::Secrets(error),
+        scheduler::SchedulerError::Audit(error) => VerifyError::Audit(error),
+        scheduler::SchedulerError::Execution(error) => VerifyError::execution(error),
+    })?;
+    let scheduler::SchedulerOutcome {
+        results,
+        cancelled,
+        failures,
+    } = outcome;
+    let mut ordered = results;
+    ordered.sort_by_key(|result| {
+        plan.nodes
             .iter()
-            .map(|result| (result.id.clone(), result.status))
-            .collect::<std::collections::HashMap<_, _>>();
-        let outcome = scheduler::run_external(
-            project,
-            &external_nodes.iter().copied().cloned().collect::<Vec<_>>(),
-            &initial_statuses,
-            &services,
-            if project.config.execution.parallel {
-                project.config.execution.effective_max_parallel()
-            } else {
-                1
-            },
-        )
-        .map_err(VerifyError::execution)?;
-        if outcome.cancelled {
-            return Err(VerifyError::Cancelled);
-        }
-        let mut ordered = outcome.results;
-        ordered.sort_by_key(|result| {
-            plan.nodes
-                .iter()
-                .position(|node| node.id == result.node_id)
-                .unwrap_or(usize::MAX)
-        });
-        for result in ordered {
-            if result.node_result.status != NodeStatus::Skipped {
-                progress.clear();
-                if progress.enabled() {
-                    print_result(&result.task_result);
-                } else {
-                    print_external_result(&result.task_result);
+            .position(|node| node.id == result.node_id)
+            .unwrap_or(usize::MAX)
+    });
+    let mut steps = Vec::new();
+    for result in ordered {
+        progress.clear();
+        if result.node_result.status != plan::NodeStatus::Skipped {
+            match result.node_result.kind {
+                plan::PlanNodeKind::Builtin(_) => print_result(&result.task_result),
+                plan::PlanNodeKind::External => {
+                    if progress.enabled() {
+                        print_result(&result.task_result);
+                    } else {
+                        print_external_result(&result.task_result);
+                    }
                 }
-                progress.complete();
-                steps.push(result.task_result);
-            } else {
-                progress.complete();
             }
-            node_results.push(result.node_result);
+            steps.push(result.task_result);
         }
+        progress.complete();
     }
-
-    let passed = node_results
-        .iter()
-        .all(|result| result.status == NodeStatus::Passed);
+    let passed = steps.iter().all(|step| step.passed) && steps.len() == plan.nodes.len();
     let report = VerificationReport {
         timestamp: chrono::Utc::now().to_rfc3339(),
         profile: only_step
@@ -359,7 +213,8 @@ fn run_selected(
         steps,
         passed,
     };
-    report.write(project).map_err(VerifyError::report)?;
+    report::write(&report, project).map_err(VerifyError::report)?;
+    report::notify(&report, project).map_err(VerifyError::report)?;
     progress.finish();
     println!(
         "\nVerification report: {}",
@@ -369,26 +224,27 @@ fn run_selected(
         "TEST_SUMMARY: {}",
         if report.passed { "PASS" } else { "FAIL" }
     );
+
+    // Publication happens before returning cancellation or adapter failures so
+    // callers retain the same report and log evidence as a normal run.
+    if cancelled {
+        return Err(VerifyError::Cancelled);
+    }
+    if let Some(failure) = scheduler::primary_failure(&plan, failures) {
+        return Err(match failure.error {
+            scheduler::SchedulerError::Secrets(error) => VerifyError::Secrets(error),
+            scheduler::SchedulerError::Audit(error) => VerifyError::Audit(error),
+            scheduler::SchedulerError::Execution(error) => VerifyError::execution(error),
+        });
+    }
     Ok(report)
 }
+
 pub fn explicit_scope(components: &[String]) -> ScopeResult {
     ScopeResult {
         mode: "components".to_string(),
         changed_files: Vec::new(),
         components: components.iter().cloned().collect::<BTreeSet<_>>(),
         unmatched_files: Vec::new(),
-    }
-}
-
-fn node_result(node: &plan::PlanNode<'_>, result: &TaskResult, status: NodeStatus) -> NodeResult {
-    NodeResult {
-        id: node.id.clone(),
-        label: node.label.clone(),
-        kind: node.kind,
-        status,
-        duration: std::time::Duration::from_millis(result.duration_ms as u64),
-        detail: result.detail.clone(),
-        artifact: (!result.log.is_empty()).then(|| result.log.clone()),
-        reason: result.detail.clone(),
     }
 }

@@ -1,6 +1,7 @@
 use super::parser::parse_result_count;
 use super::*;
 use crate::config::{FlowConfig, ParserConfig, ServiceConfig};
+use crate::error::CodedError;
 use crate::test_support::TestWorkspace;
 use std::fs;
 use std::path::PathBuf;
@@ -84,8 +85,9 @@ fn independent_steps_run_in_parallel_and_publish_in_plan_order() {
     for step in &mut project.config.steps {
         step.profiles.insert("full".into());
         step.program = "sh".into();
-        step.args = vec!["-c".into(), "sleep 2".into()];
     }
+    project.config.steps[0].args = vec!["-c".into(), "sleep 2".into()];
+    project.config.steps[1].args = vec!["-c".into(), "sleep 1".into()];
 
     let started = std::time::Instant::now();
     let report = run(&project, ScopeResult::all(&project), "full", false)
@@ -108,12 +110,154 @@ fn independent_steps_run_in_parallel_and_publish_in_plan_order() {
     );
 }
 
+#[test]
+fn adapter_failures_choose_primary_by_plan_order() {
+    use super::plan::{BuiltinGate, PlanNode, PlanNodeKind, VerificationPlan};
+    use super::scheduler::{primary_failure, SchedulerError, SchedulerFailure};
+
+    let nodes = vec![
+        PlanNode {
+            id: "first".into(),
+            label: "first".into(),
+            kind: PlanNodeKind::Builtin(BuiltinGate::SecretScan),
+            depends_on: vec![],
+            step: None,
+        },
+        PlanNode {
+            id: "second".into(),
+            label: "second".into(),
+            kind: PlanNodeKind::Builtin(BuiltinGate::ArchitectureAudit),
+            depends_on: vec![],
+            step: None,
+        },
+    ];
+    let plan = VerificationPlan { nodes };
+    let failures = vec![
+        SchedulerFailure {
+            node_id: "second".into(),
+            error: SchedulerError::Execution(anyhow::anyhow!("second")),
+        },
+        SchedulerFailure {
+            node_id: "first".into(),
+            error: SchedulerError::Execution(anyhow::anyhow!("first")),
+        },
+    ];
+    let primary = primary_failure(&plan, failures).expect("primary failure");
+    assert_eq!(primary.node_id, "first");
+    assert!(matches!(primary.error, SchedulerError::Execution(_)));
+}
+
+#[cfg(unix)]
+#[test]
+fn timeout_is_a_failed_step_with_timeout_evidence() {
+    let (_workspace, mut project) = generic_project("verify-timeout");
+    project.config.steps[0].program = "sh".into();
+    project.config.steps[0].args = vec!["-c".into(), "sleep 2".into()];
+    project.config.steps[0].timeout_secs = 0;
+
+    let report = run(&project, ScopeResult::all(&project), "full", false)
+        .expect("timeout is a reported verification failure");
+    let step = report
+        .steps
+        .iter()
+        .find(|step| step.label == project.config.steps[0].label)
+        .expect("timed out step");
+    assert!(!step.passed);
+    assert!(step.timed_out);
+    assert_eq!(step.detail.as_deref(), Some("timed out"));
+}
+
+#[cfg(unix)]
+#[test]
+fn failed_external_node_blocks_only_its_descendants() {
+    let (workspace, mut project) = generic_project("verify-branch-failure");
+    let first_id = project.config.steps[0].id.clone();
+    let marker = workspace.root.join("independent-ran");
+    project.config.steps[0].profiles.insert("full".into());
+    project.config.steps[0].program = "sh".into();
+    project.config.steps[0].args = vec!["-c".into(), "exit 3".into()];
+    project.config.steps[1].profiles.insert("full".into());
+    project.config.steps[1].depends_on = vec![first_id];
+    project.config.steps[1].program = "sh".into();
+    project.config.steps[1].args = vec!["-c".into(), "exit 0".into()];
+    project.config.steps.push(crate::config::StepConfig {
+        id: "project.independent".into(),
+        label: "independent branch".into(),
+        component: "project".into(),
+        profiles: ["full".to_string()].into_iter().collect(),
+        program: "sh".into(),
+        args: vec!["-c".into(), format!("touch {}", marker.display())],
+        cwd: "{root}".into(),
+        log: "independent.log".into(),
+        timeout_secs: 60,
+        timeout_env: None,
+        parser: None,
+        services: vec![],
+        remove_env: vec![],
+        depends_on: vec![],
+        kind: None,
+        gate_type: None,
+    });
+
+    let report = run(&project, ScopeResult::all(&project), "full", false)
+        .expect("dependency-local failure is reportable");
+    assert!(!report.passed);
+    assert!(marker.is_file(), "independent branch should continue");
+    assert!(report
+        .steps
+        .iter()
+        .any(|step| step.label == "independent branch" && step.passed));
+    assert!(!report
+        .steps
+        .iter()
+        .any(|step| step.label == project.config.steps[1].label));
+}
+
 fn generic_project(name: &str) -> (TestWorkspace, Project) {
     let workspace = TestWorkspace::new(name);
     crate::preset::init(&workspace.root, "generic", false).expect("initialize fixture");
     workspace.init_git();
     let project = Project::discover(Some(workspace.root.clone()), None).expect("discover fixture");
     (workspace, project)
+}
+
+#[test]
+fn explicit_builtin_labels_are_preserved_in_the_report() {
+    let (_workspace, mut project) = generic_project("verify-explicit-gate-labels");
+    let mut secret = project.config.steps[0].clone();
+    secret.id = "builtin.secret-scan".into();
+    secret.label = "repository secret policy".into();
+    secret.component.clear();
+    secret.program.clear();
+    secret.args.clear();
+    secret.cwd.clear();
+    secret.log.clear();
+    secret.timeout_secs = 0;
+    secret.timeout_env = None;
+    secret.parser = None;
+    secret.services.clear();
+    secret.remove_env.clear();
+    secret.depends_on.clear();
+    secret.kind = Some("builtin-gate".into());
+    secret.gate_type = Some("secret-scan".into());
+
+    let mut audit = secret.clone();
+    audit.id = "builtin.architecture-audit".into();
+    audit.label = "architecture policy".into();
+    audit.gate_type = Some("architecture-audit".into());
+    project.config.steps.extend([secret, audit]);
+
+    let report = run(&project, ScopeResult::all(&project), "full", false)
+        .expect("explicit built-in gates should execute");
+    let labels = report
+        .steps
+        .iter()
+        .map(|step| step.label.as_str())
+        .collect::<Vec<_>>();
+    assert!(labels.contains(&"repository secret policy"));
+    assert!(labels.contains(&"architecture policy"));
+    assert!(!labels.contains(&"secret scan"));
+    assert!(!labels.contains(&"architecture audit"));
 }
 
 #[test]
@@ -190,6 +334,33 @@ fn gate_failure_writes_compatible_report() {
 }
 
 #[test]
+fn builtin_adapter_failure_writes_report_before_returning_error() {
+    let (workspace, mut project) = generic_project("verify-builtin-adapter-failure");
+    // Keep discovery valid, then make the audit adapter fail at execution time.
+    project.audit_config = workspace.root.join(".harness-gate");
+    let error = run(&project, ScopeResult::all(&project), "full", false)
+        .expect_err("audit adapter failure should retain its typed error");
+    assert!(matches!(error, VerifyError::Audit(_)));
+    let report_path = workspace
+        .root
+        .join(".harness-gate/reports/test_result.json");
+    assert!(report_path.is_file());
+    let report: serde_json::Value =
+        serde_json::from_slice(&fs::read(report_path).expect("read failed-gate report"))
+            .expect("parse failed-gate report");
+    assert_eq!(report["passed"], false);
+    assert!(report["steps"].as_array().is_some_and(|steps| {
+        steps.iter().any(|step| {
+            step["label"] == "architecture audit"
+                && step["passed"] == false
+                && step["detail"]
+                    .as_str()
+                    .is_some_and(|detail| detail.contains("audit"))
+        })
+    }));
+}
+
+#[test]
 fn report_write_failure_returns_error() {
     let (workspace, mut project) = generic_project("verify-report-failure");
     let report_path = workspace.root.join(".harness-gate/reports");
@@ -199,4 +370,24 @@ fn report_write_failure_returns_error() {
     let error =
         run(&project, ScopeResult::all(&project), "full", false).expect_err("report must fail");
     assert!(matches!(error, VerifyError::Report { .. }));
+}
+
+#[test]
+fn webhook_connection_failure_maps_to_e1404() {
+    let (workspace, mut project) = generic_project("verify-webhook-failure");
+    let listener = std::net::TcpListener::bind(("127.0.0.1", 0)).expect("bind listener");
+    let address = listener.local_addr().expect("listener address");
+    drop(listener);
+    project.config.notifications.webhooks = vec![crate::config::WebhookConfig {
+        url: format!("http://{address}/notify"),
+        on_failure: true,
+        on_success: true,
+    }];
+    let error = run(&project, ScopeResult::all(&project), "full", false)
+        .expect_err("webhook connection failure must fail verification");
+    assert_eq!(error.code(), "E1404");
+    assert!(workspace
+        .root
+        .join(".harness-gate/reports/test_result.json")
+        .is_file());
 }

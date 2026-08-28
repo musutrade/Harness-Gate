@@ -68,7 +68,15 @@ def report_snapshot(root: Path, names: list[str]) -> dict[str, Any]:
     return snapshot
 
 
-def scenario(binary: Path, name: str, args: list[str], expected: int, setup: str = "none", report_names: list[str] | None = None) -> dict[str, Any]:
+def scenario(
+    binary: Path,
+    name: str,
+    args: list[str],
+    expected: int,
+    setup: str = "none",
+    report_names: list[str] | None = None,
+    expected_order: list[str] | None = None,
+) -> dict[str, Any]:
     with tempfile.TemporaryDirectory(prefix=f"harness-gate-contract-{name}-") as directory:
         root = Path(directory)
         if setup == "init":
@@ -90,13 +98,35 @@ def scenario(binary: Path, name: str, args: list[str], expected: int, setup: str
                     flags=re.DOTALL,
                 )
             )
+        elif setup == "verify-parallel":
+            init(root, binary, git=True)
+            flow = root / ".harness-gate" / "flow.toml"
+            source = flow.read_text()
+            source = source.replace('profiles = ["hook"]', 'profiles = ["full", "hook"]')
+            source = source.replace(
+                "[execution]\nparallel = false\n",
+                "[execution]\nparallel = true\nmax_parallel = 2\n",
+            )
+            flow.write_text(source)
         result = command(binary, root, args)
         stdout = normalize(result.stdout, root)
         stderr = normalize(result.stderr, root)
         combined = stdout + stderr
         error_codes = sorted(set(re.findall(r"ERROR \[(E\d{4})\]", combined)))
         selected_reports = report_names or []
-        return {
+        publication_order: list[str] | None = None
+        report_path = root / ".harness-gate" / "reports" / "test_result.json"
+        if report_path.is_file() and expected_order is not None:
+            report = json.loads(report_path.read_text())
+            publication_order = [step["label"] for step in report.get("steps", [])]
+            if publication_order != expected_order:
+                result = subprocess.CompletedProcess(
+                    result.args,
+                    1,
+                    result.stdout,
+                    result.stderr,
+                )
+        record = {
             "name": name,
             "args": args,
             "expected_exit_code": expected,
@@ -108,6 +138,9 @@ def scenario(binary: Path, name: str, args: list[str], expected: int, setup: str
             "reports": report_snapshot(root, selected_reports),
             "status": "pass" if result.returncode == expected else "fail",
         }
+        if expected_order is not None:
+            record["publication_order"] = publication_order
+        return record
 
 
 def collect(binary: Path, staged_secrets: bool = True) -> list[dict[str, Any]]:
@@ -124,7 +157,24 @@ def collect(binary: Path, staged_secrets: bool = True) -> list[dict[str, Any]]:
         scenario(binary, "scope", ["scope", "--all"], 0, "git", ["scope.json"]),
         scenario(binary, "secrets", ["secrets", *( ["--staged"] if staged_secrets else [] )], 0, "git", ["secret_scan.json"]),
         scenario(binary, "audit", ["audit"], 0, "init", ["review_context.json", "review_context.md"]),
-        scenario(binary, "verify-success", ["verify", "--all"], 0, "git", ["test_result.json", "test_result.md"]),
+        scenario(
+            binary,
+            "verify-success",
+            ["verify", "--all"],
+            0,
+            "git",
+            ["test_result.json", "test_result.md"],
+            ["secret scan", "architecture audit", "Git whitespace check"],
+        ),
+        scenario(
+            binary,
+            "verify-parallel-success",
+            ["verify", "--all"],
+            0,
+            "verify-parallel",
+            ["test_result.json", "test_result.md"],
+            ["secret scan", "architecture audit", "Git whitespace check", "staged Git whitespace check"],
+        ),
         scenario(binary, "verify-failure", ["verify", "--all"], 1, "verify-failure", ["test_result.json", "test_result.md"]),
         scenario(binary, "verify-one-step", ["step", "project.diff-check"], 0, "git", ["test_result.json", "test_result.md"]),
         scenario(binary, "unknown-profile", ["verify", "--all", "--profile", "missing"], 1, "init"),

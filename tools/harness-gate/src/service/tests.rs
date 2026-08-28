@@ -159,6 +159,59 @@ fn environment_service_rejects_missing_and_empty_values() {
 }
 
 #[test]
+fn shareable_environment_service_supports_concurrent_leases() {
+    let (_workspace, mut project) = project();
+    let name = "HARNESS_GATE_SHARED_SERVICE_FIXTURE";
+    std::env::set_var(name, "http://127.0.0.1:4321");
+    project.config.services.insert(
+        "shared".into(),
+        ServiceConfig::Environment {
+            source_env: name.into(),
+            inject_env: "SHARED_URL".into(),
+        },
+    );
+    let mut manager = ServiceManager::new(&project);
+    let first = manager.handle("shared").expect("first handle");
+    let second = manager.handle("shared").expect("second handle");
+    std::thread::scope(|scope| {
+        let first = scope.spawn(move || first.acquire().expect("first lease"));
+        let second = scope.spawn(move || second.acquire().expect("second lease"));
+        assert_eq!(
+            first.join().expect("first worker").environment().1,
+            "http://127.0.0.1:4321"
+        );
+        assert_eq!(
+            second.join().expect("second worker").environment().1,
+            "http://127.0.0.1:4321"
+        );
+    });
+    std::env::remove_var(name);
+}
+
+#[test]
+fn failed_service_startup_wakes_waiters_without_deadlock() {
+    let (_workspace, mut project) = project();
+    let name = "HARNESS_GATE_FAILED_SHARED_SERVICE_FIXTURE";
+    std::env::remove_var(name);
+    project.config.services.insert(
+        "missing".into(),
+        ServiceConfig::Environment {
+            source_env: name.into(),
+            inject_env: "MISSING_URL".into(),
+        },
+    );
+    let mut manager = ServiceManager::new(&project);
+    let first = manager.handle("missing").expect("first handle");
+    let second = manager.handle("missing").expect("second handle");
+    std::thread::scope(|scope| {
+        let first = scope.spawn(move || first.acquire());
+        let second = scope.spawn(move || second.acquire());
+        assert!(first.join().expect("first worker").is_err());
+        assert!(second.join().expect("second worker").is_err());
+    });
+}
+
+#[test]
 fn check_available_rejects_empty_environment_service() {
     let (_workspace, mut project) = project();
     let name = "HARNESS_GATE_EMPTY_CHECK_SERVICE_FIXTURE";
@@ -182,6 +235,7 @@ fn docker_service_uses_a_valid_external_value_without_docker() {
     project.config.services.insert(
         "database".into(),
         ServiceConfig::Docker {
+            runtime: crate::config::ContainerRuntimeKind::Docker,
             image: "postgres:16-alpine".into(),
             image_env: None,
             external_env: Some(name.into()),
@@ -203,5 +257,122 @@ fn docker_service_uses_a_valid_external_value_without_docker() {
             "postgres://test:test@127.0.0.1:5432/quality_test".into()
         )
     );
+    std::env::remove_var(name);
+}
+
+#[test]
+fn exclusive_external_service_is_not_reused_after_its_last_lease() {
+    let (_workspace, mut project) = project();
+    let name = "HARNESS_GATE_EXCLUSIVE_EXTERNAL_REUSE_FIXTURE";
+    std::env::set_var(name, "postgres://test:test@127.0.0.1:5432/first_test");
+    project.config.services.insert(
+        "database".into(),
+        ServiceConfig::Docker {
+            runtime: crate::config::ContainerRuntimeKind::Docker,
+            image: "postgres:16-alpine".into(),
+            image_env: None,
+            external_env: Some(name.into()),
+            inject_env: "TEST_DATABASE_URL".into(),
+            external_value_policy: crate::config::ExternalValuePolicy::IsolatedPostgres,
+            startup_timeout_secs: 1,
+            timeout_env: None,
+            container_port: 5432,
+            environment: Default::default(),
+            healthcheck: vec!["true".into()],
+            connection: "postgres://unused".into(),
+        },
+    );
+
+    let mut manager = ServiceManager::new(&project);
+    let first = manager
+        .handle("database")
+        .expect("first service handle")
+        .acquire()
+        .expect("first external service lease");
+    assert!(first.environment().1.ends_with("/first_test"));
+    drop(first);
+
+    std::env::set_var(name, "postgres://test:test@127.0.0.1:5432/second_test");
+    let second = manager
+        .handle("database")
+        .expect("second service handle")
+        .acquire()
+        .expect("second external service lease");
+    assert!(second.environment().1.ends_with("/second_test"));
+    std::env::remove_var(name);
+}
+
+#[test]
+fn podman_runtime_uses_external_service_without_starting_a_container() {
+    let (_workspace, mut project) = project();
+    let name = "HARNESS_GATE_PODMAN_EXTERNAL_SERVICE_FIXTURE";
+    std::env::set_var(name, "postgres://test:test@127.0.0.1:5432/quality_test");
+    project.config.services.insert(
+        "database".into(),
+        ServiceConfig::Docker {
+            runtime: crate::config::ContainerRuntimeKind::Podman,
+            image: "postgres:16-alpine".into(),
+            image_env: None,
+            external_env: Some(name.into()),
+            inject_env: "TEST_DATABASE_URL".into(),
+            external_value_policy: crate::config::ExternalValuePolicy::IsolatedPostgres,
+            startup_timeout_secs: 1,
+            timeout_env: None,
+            container_port: 5432,
+            environment: Default::default(),
+            healthcheck: vec!["true".into()],
+            connection: "postgres://unused".into(),
+        },
+    );
+    let mut manager = ServiceManager::new(&project);
+    assert_eq!(
+        manager.environment("database").expect("external value").0,
+        "TEST_DATABASE_URL"
+    );
+    std::env::remove_var(name);
+}
+
+#[cfg(unix)]
+#[test]
+fn managed_service_lease_excludes_concurrent_users() {
+    let (_workspace, mut project) = project();
+    let name = "HARNESS_GATE_EXCLUSIVE_SERVICE_FIXTURE";
+    std::env::set_var(name, "postgres://test:test@127.0.0.1:5432/quality_test");
+    project.config.services.insert(
+        "exclusive".into(),
+        ServiceConfig::Docker {
+            runtime: crate::config::ContainerRuntimeKind::Docker,
+            image: "postgres:16-alpine".into(),
+            image_env: None,
+            external_env: Some(name.into()),
+            inject_env: "EXCLUSIVE_URL".into(),
+            external_value_policy: crate::config::ExternalValuePolicy::IsolatedPostgres,
+            startup_timeout_secs: 1,
+            timeout_env: None,
+            container_port: 5432,
+            environment: Default::default(),
+            healthcheck: vec!["true".into()],
+            connection: "postgres://unused".into(),
+        },
+    );
+
+    let mut manager = ServiceManager::new(&project);
+    let first = manager
+        .handle("exclusive")
+        .expect("first service handle")
+        .acquire()
+        .expect("first service lease");
+    let second_handle = manager.handle("exclusive").expect("second service handle");
+
+    std::thread::scope(|scope| {
+        let second = scope.spawn(move || second_handle.acquire());
+        std::thread::sleep(Duration::from_millis(100));
+        assert!(!second.is_finished(), "exclusive resource must be held");
+        drop(first);
+        second
+            .join()
+            .expect("second lease worker")
+            .expect("second lease after release");
+    });
     std::env::remove_var(name);
 }

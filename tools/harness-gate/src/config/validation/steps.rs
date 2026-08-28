@@ -56,10 +56,8 @@ pub(super) fn validate_step(config: &FlowConfig, step: &StepConfig) -> Result<()
             step.id
         );
     }
-    let log = Path::new(&step.log);
-    if log.components().count() != 1 || log.extension().is_none_or(|value| value != "log") {
-        bail!("step {:?} log must be a single .log file name", step.id);
-    }
+    validate_log_name(&step.log)
+        .map_err(|error| anyhow::anyhow!("step {:?} log {error}", step.id))?;
     if step.timeout_secs == 0 || step.timeout_secs > 3600 {
         bail!("step {:?} timeout_secs must be between 1 and 3600", step.id);
     }
@@ -101,6 +99,45 @@ pub(super) fn validate_step(config: &FlowConfig, step: &StepConfig) -> Result<()
         validate_env_name("step remove_env", name)?;
     }
     Ok(())
+}
+
+/// Validate a log as a filename rather than relying only on the host platform's
+/// `Path` parser. Configuration can be checked on Unix and later executed on
+/// Windows, so both separator styles and Windows prefixes are rejected here.
+pub(super) fn validate_log_name(value: &str) -> Result<()> {
+    let path = Path::new(value);
+    let windows_prefix = value.starts_with("\\\\")
+        || value.starts_with("//")
+        || value.starts_with('\\')
+        || value
+            .as_bytes()
+            .get(1)
+            .is_some_and(|character| *character == b':');
+    if value.is_empty()
+        || value.contains('\0')
+        || value.contains('/')
+        || value.contains('\\')
+        || value.contains(':')
+        || windows_prefix
+        || path.is_absolute()
+        || value == "."
+        || value == ".."
+        || value.len() <= ".log".len()
+        || !value.ends_with(".log")
+    {
+        bail!("must be a single .log file name");
+    }
+    if path.components().count() != 1 {
+        bail!("must be a single .log file name");
+    }
+    Ok(())
+}
+
+/// Return the lexical identity used by duplicate-log preflight. Lowercasing
+/// makes the check conservative on case-insensitive filesystems while keeping
+/// the configured spelling unchanged in reports.
+pub(super) fn normalize_log_identity(value: &str) -> String {
+    value.to_ascii_lowercase()
 }
 
 fn validate_builtin_gate(step: &StepConfig) -> Result<()> {
