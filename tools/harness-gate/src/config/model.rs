@@ -19,8 +19,19 @@ pub struct FlowConfig {
     pub services: BTreeMap<String, ServiceConfig>,
     #[serde(default)]
     pub parsers: BTreeMap<String, ParserConfig>,
+    #[serde(default)]
+    pub report_templates: ReportTemplatesConfig,
     pub scope: ScopeConfig,
     pub steps: Vec<StepConfig>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct ReportTemplatesConfig {
+    #[serde(default)]
+    pub root: Option<String>,
+    #[serde(default)]
+    pub template: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]

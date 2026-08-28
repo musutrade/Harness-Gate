@@ -1,7 +1,7 @@
 mod commands;
 mod output;
 
-use crate::cli::{Cli, Commands, ConfigAction, SchemaAction};
+use crate::cli::{Cli, Commands, ConfigAction, ConfigFormat, SchemaAction};
 use crate::error::CliError;
 use crate::project::Project;
 use anyhow::Context;
@@ -69,7 +69,44 @@ pub(crate) fn run() -> Result<bool, CliError> {
         )?;
         return Ok(true);
     }
+    if let Commands::Config {
+        action: ConfigAction::Check {
+            format: ConfigFormat::Json,
+        },
+    } = &cli.command
+    {
+        let root = cli
+            .project_root
+            .clone()
+            .unwrap_or(std::env::current_dir().context("read current directory")?);
+        match Project::discover(Some(root), cli.config.clone()) {
+            Ok(project) => {
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&project.config.diagnostics_report())
+                        .map_err(anyhow::Error::from)?
+                );
+                return Ok(true);
+            }
+            Err(error) => {
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&crate::config::report_for_error(&error))
+                        .map_err(anyhow::Error::from)?
+                );
+                return Ok(false);
+            }
+        }
+    }
     let project = Project::discover(cli.project_root, cli.config)?;
-    project.prepare()?;
+    let is_config_check = matches!(
+        &cli.command,
+        Commands::Config {
+            action: ConfigAction::Check { .. }
+        }
+    );
+    if !is_config_check {
+        project.prepare()?;
+    }
     commands::run(&project, cli.command)
 }

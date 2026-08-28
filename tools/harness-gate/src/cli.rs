@@ -127,7 +127,11 @@ pub(crate) enum SchemaAction {
 #[derive(Debug, Subcommand)]
 pub(crate) enum ConfigAction {
     /// Validate configuration, environment overrides, and protected steps.
-    Check,
+    Check {
+        /// Render diagnostics as a machine-readable JSON envelope.
+        #[arg(long, value_enum, default_value_t = ConfigFormat::Human)]
+        format: ConfigFormat,
+    },
     /// Print the source or effective configuration.
     Print {
         /// Include environment overrides in the rendered TOML.
@@ -143,6 +147,12 @@ pub(crate) enum ConfigAction {
         #[arg(long)]
         force: bool,
     },
+}
+
+#[derive(Debug, Clone, Copy, clap::ValueEnum)]
+pub(crate) enum ConfigFormat {
+    Human,
+    Json,
 }
 
 #[derive(Debug, Clone, Args)]

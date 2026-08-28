@@ -106,6 +106,36 @@ fn test_config_check_invalid() {
 }
 
 #[test]
+fn test_config_check_json_is_machine_readable_for_success_and_failure() {
+    let ctx = TestContext::new();
+    ctx.init_preset("generic");
+
+    let valid = ctx.run_harness_gate(&["config", "check", "--format", "json"]);
+    assert_success(&valid);
+    let valid_json: serde_json::Value =
+        serde_json::from_slice(&valid.stdout).expect("valid config JSON output");
+    assert_eq!(valid_json["schema_version"], 1);
+    assert_eq!(valid_json["valid"], true);
+    assert_eq!(valid_json["diagnostics"], serde_json::json!([]));
+
+    ctx.write_file(
+        ".harness-gate/flow.toml",
+        "version = 2\n[project]\nname = \"${HG_MISSING_CONFIG_VALUE}\"\n",
+    );
+    let invalid = ctx.run_harness_gate(&["config", "check", "--format", "json"]);
+    assert_failure(&invalid);
+    assert!(invalid.stderr.is_empty(), "stderr must remain JSON-free");
+    let invalid_json: serde_json::Value =
+        serde_json::from_slice(&invalid.stdout).expect("invalid config JSON output");
+    assert_eq!(invalid_json["valid"], false);
+    assert_eq!(invalid_json["diagnostics"][0]["id"], "HGCFG-INTERPOLATION");
+    assert_eq!(invalid_json["diagnostics"][0]["location"]["line"], 3);
+    assert!(invalid_json["diagnostics"][0]["help"]
+        .as_str()
+        .is_some_and(|help| help.contains("HG_MISSING_CONFIG_VALUE")));
+}
+
+#[test]
 fn test_presets_lists_available() {
     let output = std::process::Command::new(env!("CARGO_BIN_EXE_harness-gate"))
         .arg("presets")
