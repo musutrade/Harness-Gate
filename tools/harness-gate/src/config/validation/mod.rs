@@ -160,6 +160,13 @@ impl FlowConfig {
             "execution",
             self.validate_execution(),
         );
+        collect_result(
+            self,
+            source_map,
+            diagnostics,
+            "notifications",
+            self.validate_notifications(),
+        );
     }
 
     fn collect_step_diagnostics(
@@ -300,6 +307,21 @@ impl FlowConfig {
         self.validate_steps()?;
         self.validate_report_templates()?;
         self.validate_execution()?;
+        self.validate_notifications()?;
+        Ok(())
+    }
+
+    fn validate_notifications(&self) -> Result<()> {
+        for (index, webhook) in self.notifications.webhooks.iter().enumerate() {
+            let parsed = url::Url::parse(&webhook.url)
+                .with_context(|| format!("notifications.webhooks[{index}].url is invalid"))?;
+            if !matches!(parsed.scheme(), "http" | "https") || parsed.host_str().is_none() {
+                bail!("notifications.webhooks[{index}].url must be an http(s) URL");
+            }
+            if !webhook.on_failure && !webhook.on_success {
+                bail!("notifications.webhooks[{index}] must enable on_failure or on_success");
+            }
+        }
         Ok(())
     }
 
@@ -314,12 +336,27 @@ impl FlowConfig {
 
     fn validate_report_templates(&self) -> Result<()> {
         match (&self.report_templates.root, &self.report_templates.template) {
-            (None, None) => Ok(()),
+            (None, None) if self.report_templates.junit.is_none() => Ok(()),
             (Some(root), Some(template)) => {
                 validate_repo_path("report_templates.root", root)?;
                 validate_repo_path("report_templates.template", template)?;
                 if !template.ends_with(".html") && !template.ends_with(".tera") {
                     bail!("report_templates.template must use a .html or .tera extension");
+                }
+                if let Some(junit) = &self.report_templates.junit {
+                    validate_repo_path("report_templates.junit", junit)?;
+                    if !junit.ends_with(".xml") {
+                        bail!("report_templates.junit must use a .xml extension");
+                    }
+                }
+                Ok(())
+            }
+            (None, None) => {
+                if let Some(junit) = &self.report_templates.junit {
+                    validate_repo_path("report_templates.junit", junit)?;
+                    if !junit.ends_with(".xml") {
+                        bail!("report_templates.junit must use a .xml extension");
+                    }
                 }
                 Ok(())
             }
@@ -340,6 +377,7 @@ impl FlowConfig {
                     validate_env_name("service.inject_env", inject_env)?;
                 }
                 ServiceConfig::Docker {
+                    runtime: _,
                     image,
                     image_env,
                     external_env,
@@ -569,7 +607,9 @@ fn infer_error_path(config: &FlowConfig, error: &str) -> String {
         "project.hook_profile",
         "report_templates.root",
         "report_templates.template",
+        "report_templates.junit",
         "execution.max_parallel",
+        "notifications.webhooks",
     ] {
         if error.contains(field) {
             return field.into();
@@ -688,9 +728,15 @@ fn validate_resource_conflicts(
     source_map: &SourceMap,
     diagnostics: &mut ConfigDiagnostics,
 ) {
-    let mut logs = std::collections::BTreeMap::<&str, usize>::new();
+    let mut logs = std::collections::BTreeMap::<String, usize>::new();
     for (index, step) in config.steps.iter().enumerate() {
-        if let Some(previous) = logs.insert(step.log.as_str(), index) {
+        // Built-in gates do not own external log files. Their empty `log`
+        // field is intentional and must not collide with another gate.
+        if step.kind.as_deref() == Some("builtin-gate") {
+            continue;
+        }
+        let identity = steps::normalize_log_identity(&step.log);
+        if let Some(previous) = logs.insert(identity, index) {
             let path = format!("steps[{index}].log");
             let related_path = format!("steps[{previous}].log");
             diagnostics.push(ConfigDiagnostic {

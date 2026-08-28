@@ -9,7 +9,17 @@
 - Configuration preflight rejects unordered shared services, unordered service
   injection-name collisions, and duplicate step logs before execution.
 - Optional `[report_templates]` paths are validated as repository-contained,
-  disjoint read-only template input; rendering remains out of scope.
+  disjoint read-only template input; optional HTML and JUnit report output is
+  now available without changing the legacy JSON/Markdown files.
+- HTML report templates are rendered with Tera, including repository-contained
+  `include` and `extends`/`block` composition.
+- Verification plans now use dependency-aware scheduling with serial
+  compatibility by default and opt-in bounded parallel execution through
+  `[execution]`.
+- Docker-backed services can select the Docker-compatible Podman runtime with
+  `runtime = "podman"`; Docker remains the default.
+- Optional `[[notifications.webhooks]]` entries deliver the serialized report
+  over HTTP(S) after report writing.
 
 All notable changes to Harness-Gate will be documented in this file.
 

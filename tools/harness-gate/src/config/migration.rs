@@ -1,7 +1,8 @@
 use super::model::{
-    default_doctor_timeout, DoctorCheck, DoctorCheckKind, DoctorConfig, ExecutionConfig,
-    ExternalValuePolicy, FlowConfig, ParserConfig, PathAlias, PathType, PathsConfig, PolicyConfig,
-    ProjectConfig, ReportTemplatesConfig, ScopeConfig, ServiceConfig, StepConfig, CONFIG_VERSION,
+    default_doctor_timeout, ContainerRuntimeKind, DoctorCheck, DoctorCheckKind, DoctorConfig,
+    ExecutionConfig, ExternalValuePolicy, FlowConfig, NotificationsConfig, ParserConfig, PathAlias,
+    PathType, PathsConfig, PolicyConfig, ProjectConfig, ReportTemplatesConfig, ScopeConfig,
+    ServiceConfig, StepConfig, CONFIG_VERSION,
 };
 use anyhow::{bail, Context, Result};
 use serde::Deserialize;
@@ -101,6 +102,7 @@ pub fn migrate_v1(source: &str, project_name: &str) -> Result<FlowConfig> {
     services.insert(
         service_id.clone(),
         ServiceConfig::Docker {
+            runtime: ContainerRuntimeKind::Docker,
             image: legacy.database.image,
             image_env: Some("HARNESS_GATE_POSTGRES_IMAGE".into()),
             external_env: Some("TEST_DATABASE_URL".into()),
@@ -294,6 +296,7 @@ pub fn migrate_v1(source: &str, project_name: &str) -> Result<FlowConfig> {
         parsers,
         report_templates: ReportTemplatesConfig::default(),
         execution: ExecutionConfig::default(),
+        notifications: NotificationsConfig::default(),
         scope: legacy.scope,
         steps,
     };

@@ -38,7 +38,8 @@ Git 变更文件
   -> secret scan
   -> architecture audit
   -> 按配置顺序执行 steps
-  -> JSON / Markdown / log 报告
+  -> JSON / Markdown / 可选 HTML/JUnit 报告
+  -> 可选 HTTP(S) Webhook 通知
 ```
 
 component、profile、命令、路径、parser 和 service 都来自 TOML。常规项目迁移不需要在 Rust 中增加枚举或修改匹配分支。
@@ -317,7 +318,8 @@ harness-gate doctor --json     # 给 CI 或其他工具消费
 - `kind = "environment"`：从已有环境变量读取连接值并注入步骤；
 - `kind = "docker"`：声明镜像、端口、环境、健康检查、连接串和目标环境变量。
 
-Docker provider 可用于 PostgreSQL、MySQL、Redis 等服务。容器使用随机宿主端口，验证结束或异常退出时自动删除。
+Docker provider 可用于 PostgreSQL、MySQL、Redis 等服务，也可通过 `runtime = "podman"` 使用 Docker
+兼容的 Podman CLI。容器使用随机宿主端口，验证结束或异常退出时自动删除；省略 `runtime` 时默认使用 Docker。
 
 步骤可用 `services = ["test-postgres", "test-redis"]` 组合多个服务，并以 `remove_env = ["DATABASE_URL"]` 删除继承的运行时变量。每个 service 必须注入不同变量，避免静默覆盖。
 
@@ -403,6 +405,8 @@ harness-gate verify --all
 | `review_context.md`   | 截断的人类可读审计摘要          | 终端或 LLM 上下文  |
 | `test_result.json`    | profile、scope、步骤耗时和状态  | CI、统计           |
 | `test_result.md`      | 简洁验证摘要和 `TEST_SUMMARY`   | 人工查看           |
+| `test_result.html`    | 按仓库内模板渲染的可选 HTML      | CI、人工查看       |
+| `<junit>.xml`         | 报告目录内配置的可选 JUnit XML   | CI 测试平台        |
 | `logs/<step>.log`     | 外部命令完整 stdout/stderr      | 失败诊断           |
 
 终端只展示摘要。步骤失败时先看 `test_result.md` 中的日志路径，再打开对应日志；不要只根据最后一行猜测根因。
@@ -455,6 +459,11 @@ harness-gate verify --all
 
 无论成功或失败，都建议上传 `[paths].reports` 目录作为 artifact。这样可以保留审计行号、步骤耗时和完整日志。
 
+可选的 `[[notifications.webhooks]]` 会在报告文件写入后发送 JSON。`on_failure` 默认开启，`on_success`
+默认关闭；非 2xx 响应或连接错误返回报告错误 `E1404`，但不会删除已生成的报告。完整字段、模板路径
+约束和 JUnit 示例见[配置参考](docs/configuration.md#报告模板junit-和通知)。多个 webhook 按配置顺序发送，
+首个失败会停止后续通知。
+
 ## 故障排查
 
 ### 没有 component 被选中
@@ -465,13 +474,15 @@ harness-gate verify --all
 
 component 来自 `[[steps]].component`，profile 来自 `[[steps]].profiles`。运行 `harness-gate config check` 查看引用错误，或 `config print --resolved` 确认最终配置。
 
-### Docker daemon 不可用
+### Docker 或 Podman daemon 不可用
 
-可以启动 Docker，或者设置 service 的 `external_env`，例如 `TEST_DATABASE_URL`。`doctor` 中 `required = false` 的 service 检查只产生 warning，但真正依赖该 service 的步骤仍会失败。
+可以启动配置中选择的 Docker/Podman runtime，或者设置 service 的 `external_env`，例如 `TEST_DATABASE_URL`。
+`doctor` 中 `required = false` 的 service 检查只产生 warning，但真正依赖该 service 的步骤仍会失败。
 
-### Docker image 不存在
+### Docker/Podman image 不存在
 
-Docker provider 使用 `--pull=never`，不会在验证中隐式访问网络。按 Doctor 提示执行 `docker pull <image>`，或通过 `image_env` 指向本机已有镜像。
+容器 provider 使用 `--pull=never`，不会在验证中隐式访问网络。按 Doctor 提示执行 `<runtime> pull <image>`，
+或通过 `image_env` 指向本机已有镜像。
 
 ### 测试命令成功但 parser 失败
 
