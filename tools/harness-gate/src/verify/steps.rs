@@ -7,54 +7,47 @@ use crate::ui::{self, Progress};
 use anyhow::{bail, Result};
 use std::fs;
 
-pub(super) fn run_configured_steps(
+pub(super) fn run_configured_step(
     project: &Project,
-    selected: Vec<&StepConfig>,
+    step: &StepConfig,
+    services: &mut ServiceManager<'_>,
     results: &mut Vec<TaskResult>,
     progress: &mut Progress,
 ) -> Result<()> {
-    let mut services = ServiceManager::new(project);
-
-    'steps: for step in selected {
-        if crate::process::cancelled() {
-            bail!("verification cancelled");
-        }
-        let mut service_env = Vec::new();
-        for service in &step.services {
-            let environment = match services.environment(service) {
-                Ok(environment) => environment,
-                Err(error) => {
-                    progress.begin(&step.label);
-                    let result = TaskResult {
-                        label: format!("{}: service {service} setup", step.label),
-                        passed: false,
-                        timed_out: false,
-                        cancelled: false,
-                        duration_ms: 0,
-                        log: String::new(),
-                        detail: Some(format!("{error:#}")),
-                    };
-                    progress.clear();
-                    print_result(&result);
-                    progress.complete();
-                    results.push(result);
-                    continue 'steps;
-                }
-            };
-            service_env.push(environment);
-        }
-        let parser = step
-            .parser
-            .as_deref()
-            .and_then(|id| project.config.parser(id));
-        execute(
-            configured_task(project, step, service_env),
-            parser,
-            results,
-            progress,
-        )?;
+    let mut service_env = Vec::new();
+    for service in &step.services {
+        let environment = match services.environment(service) {
+            Ok(environment) => environment,
+            Err(error) => {
+                progress.begin(&step.label);
+                let result = TaskResult {
+                    label: format!("{}: service {service} setup", step.label),
+                    passed: false,
+                    timed_out: false,
+                    cancelled: false,
+                    duration_ms: 0,
+                    log: String::new(),
+                    detail: Some(format!("{error:#}")),
+                };
+                progress.clear();
+                print_result(&result);
+                progress.complete();
+                results.push(result);
+                return Ok(());
+            }
+        };
+        service_env.push(environment);
     }
-    Ok(())
+    let parser = step
+        .parser
+        .as_deref()
+        .and_then(|id| project.config.parser(id));
+    execute(
+        configured_task(project, step, service_env),
+        parser,
+        results,
+        progress,
+    )
 }
 
 fn configured_task(
