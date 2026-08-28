@@ -20,8 +20,14 @@ pub(super) fn validate_step(config: &FlowConfig, step: &StepConfig) -> Result<()
     match step.kind.as_deref().unwrap_or("external-step") {
         "builtin-gate" => return validate_builtin_gate(step),
         "external-step" => {
-            if matches!(step.id.as_str(), "builtin.secret-scan" | "builtin.architecture-audit") {
-                bail!("external step {:?} uses a reserved built-in gate id", step.id);
+            if matches!(
+                step.id.as_str(),
+                "builtin.secret-scan" | "builtin.architecture-audit"
+            ) {
+                bail!(
+                    "external step {:?} uses a reserved built-in gate id",
+                    step.id
+                );
             }
         }
         other => bail!("step {:?} has unknown kind {other:?}", step.id),
