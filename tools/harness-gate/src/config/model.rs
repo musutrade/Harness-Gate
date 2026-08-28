@@ -220,12 +220,19 @@ pub struct ScopeRule {
 pub struct StepConfig {
     pub id: String,
     pub label: String,
+    #[serde(default)]
     pub component: String,
+    #[serde(default)]
     pub profiles: BTreeSet<String>,
+    #[serde(default)]
     pub program: String,
+    #[serde(default)]
     pub args: Vec<String>,
+    #[serde(default = "default_step_cwd")]
     pub cwd: String,
+    #[serde(default)]
     pub log: String,
+    #[serde(default = "default_step_timeout")]
     pub timeout_secs: u64,
     #[serde(default)]
     pub timeout_env: Option<String>,
@@ -237,6 +244,20 @@ pub struct StepConfig {
     pub remove_env: Vec<String>,
     #[serde(default)]
     pub depends_on: Vec<String>,
+    /// Optional discriminator. When absent, this entry is a legacy external step.
+    #[serde(default)]
+    pub kind: Option<String>,
+    /// Closed vocabulary for built-in gate declarations.
+    #[serde(default)]
+    pub gate_type: Option<String>,
+}
+
+fn default_step_cwd() -> String {
+    String::new()
+}
+
+fn default_step_timeout() -> u64 {
+    0
 }
 
 const fn default_true() -> bool {

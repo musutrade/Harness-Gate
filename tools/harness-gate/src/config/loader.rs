@@ -63,6 +63,7 @@ impl FlowConfig {
     pub fn components(&self) -> BTreeSet<String> {
         self.steps
             .iter()
+            .filter(|step| !step.component.is_empty())
             .map(|step| step.component.clone())
             .collect()
     }

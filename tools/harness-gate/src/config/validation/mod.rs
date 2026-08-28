@@ -1149,6 +1149,12 @@ fn infer_step_error_path(
     if error.contains("remove service injection") {
         return format!("{base}.remove_env");
     }
+    if error.contains("gate_type") {
+        return format!("{base}.gate_type");
+    }
+    if error.contains("unknown kind") {
+        return format!("{base}.kind");
+    }
     let inferred = infer_error_path(config, error);
     if inferred == "$" || inferred.contains('*') {
         base
