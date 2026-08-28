@@ -81,17 +81,17 @@ fn independent_steps_run_in_parallel_and_publish_in_plan_order() {
     let (_workspace, mut project) = generic_project("verify-parallel");
     project.config.execution.parallel = true;
     project.config.execution.max_parallel = Some(2);
-    for (step, delay) in project.config.steps.iter_mut().zip(["0.35", "0.1"]) {
+    for step in &mut project.config.steps {
         step.profiles.insert("full".into());
         step.program = "sh".into();
-        step.args = vec!["-c".into(), format!("sleep {delay}")];
+        step.args = vec!["-c".into(), "sleep 2".into()];
     }
 
     let started = std::time::Instant::now();
     let report = run(&project, ScopeResult::all(&project), "full", false)
         .expect("parallel verification should pass");
 
-    assert!(started.elapsed() < std::time::Duration::from_millis(800));
+    assert!(started.elapsed() < std::time::Duration::from_millis(3500));
     let labels = report
         .steps
         .iter()

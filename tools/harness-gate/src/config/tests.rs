@@ -38,8 +38,9 @@ fn execution_policy_rejects_zero_and_values_above_the_bound() {
 
 #[test]
 fn execution_policy_diagnostic_points_to_max_parallel() {
-    let source = include_str!("../../presets/generic.flow.toml")
-        .replace("[scope]\n", "[execution]\nmax_parallel = 65\n\n[scope]\n");
+    let mut config = repository_config();
+    config.execution.max_parallel = Some(65);
+    let source = toml::to_string_pretty(&config).expect("serialize invalid execution config");
     let error = FlowConfig::from_source_with_diagnostics(&source, None, None)
         .expect_err("invalid execution bound must produce diagnostics");
     assert_eq!(error.report().diagnostics[0].path, "execution.max_parallel");
