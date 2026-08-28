@@ -1,5 +1,7 @@
 use super::*;
+use crate::test_support::TestWorkspace;
 use std::collections::BTreeSet;
+use std::fs;
 
 fn repository_config() -> FlowConfig {
     toml::from_str(include_str!("../../presets/rust-api.flow.toml")).expect("parse fixture")
@@ -162,4 +164,296 @@ timeout_secs = 60
     assert_eq!(migrated.project.name, "example");
     assert_eq!(migrated.paths.secrets_config, ".harness-gate/secrets.toml");
     assert!(migrated.policy.required_steps.contains(&"app.check".into()));
+}
+
+#[test]
+fn unordered_steps_reusing_a_service_are_rejected_with_field_paths() {
+    let mut config = repository_config();
+    config.services.insert(
+        "test-db".into(),
+        ServiceConfig::Environment {
+            source_env: "DATABASE_URL".into(),
+            inject_env: "TEST_DATABASE_URL".into(),
+        },
+    );
+    config.steps[0].services = vec!["test-db".into()];
+    config.steps[1].services = vec!["test-db".into()];
+
+    let source = toml::to_string_pretty(&config).expect("serialize fixture");
+    let error = FlowConfig::from_source_with_diagnostics(&source, None, None)
+        .expect_err("unordered service reuse must fail");
+    let report = error.report();
+
+    assert!(report.diagnostics.iter().any(|diagnostic| {
+        diagnostic.id == "HGCFG-SHARED-SERVICE"
+            && diagnostic.path == "steps[1].services[0]"
+            && diagnostic
+                .related
+                .iter()
+                .any(|related| related.path == "steps[0].services[0]")
+    }));
+}
+
+#[test]
+fn dependency_order_allows_service_reuse_but_not_log_reuse() {
+    let mut config = repository_config();
+    config.services.insert(
+        "test-db".into(),
+        ServiceConfig::Environment {
+            source_env: "DATABASE_URL".into(),
+            inject_env: "TEST_DATABASE_URL".into(),
+        },
+    );
+    config.steps[0].services = vec!["test-db".into()];
+    config.steps[1].services = vec!["test-db".into()];
+    config.steps[1].depends_on = vec![config.steps[0].id.clone()];
+    config.steps[1].log = config.steps[0].log.clone();
+
+    let source = toml::to_string_pretty(&config).expect("serialize fixture");
+    let error = FlowConfig::from_source_with_diagnostics(&source, None, None)
+        .expect_err("duplicate log must fail");
+    let report = error.report();
+
+    assert!(report
+        .diagnostics
+        .iter()
+        .any(|diagnostic| diagnostic.id == "HGCFG-DUPLICATE-LOG"));
+    assert!(!report
+        .diagnostics
+        .iter()
+        .any(|diagnostic| diagnostic.id == "HGCFG-SHARED-SERVICE"));
+}
+
+#[test]
+fn independent_services_with_the_same_injection_are_rejected() {
+    let mut config = repository_config();
+    config.services.insert(
+        "test-db".into(),
+        ServiceConfig::Environment {
+            source_env: "DATABASE_URL".into(),
+            inject_env: "TEST_SERVICE_URL".into(),
+        },
+    );
+    config.services.insert(
+        "test-cache".into(),
+        ServiceConfig::Environment {
+            source_env: "CACHE_URL".into(),
+            inject_env: "TEST_SERVICE_URL".into(),
+        },
+    );
+    config.steps[0].services = vec!["test-db".into()];
+    config.steps[1].services = vec!["test-cache".into()];
+
+    let source = toml::to_string_pretty(&config).expect("serialize fixture");
+    let error = FlowConfig::from_source_with_diagnostics(&source, None, None)
+        .expect_err("injection conflict must fail");
+    assert!(error
+        .report()
+        .diagnostics
+        .iter()
+        .any(|diagnostic| diagnostic.id == "HGCFG-SERVICE-INJECT-COLLISION"));
+}
+
+#[test]
+fn repeated_service_references_emit_one_shared_resource_diagnostic_per_pair() {
+    let mut config = repository_config();
+    config.services.insert(
+        "test-db".into(),
+        ServiceConfig::Environment {
+            source_env: "DATABASE_URL".into(),
+            inject_env: "TEST_DATABASE_URL".into(),
+        },
+    );
+    config.steps[0].services = vec!["test-db".into()];
+    config.steps[1].services = vec!["test-db".into()];
+
+    let source = toml::to_string_pretty(&config).expect("serialize fixture");
+    let error = FlowConfig::from_source_with_diagnostics(&source, None, None)
+        .expect_err("unordered service reuse must fail");
+    let shared = error
+        .report()
+        .diagnostics
+        .into_iter()
+        .filter(|diagnostic| diagnostic.id == "HGCFG-SHARED-SERVICE")
+        .collect::<Vec<_>>();
+    assert_eq!(shared.len(), 1);
+}
+
+#[test]
+fn transitive_dependency_allows_service_reuse() {
+    let mut config = repository_config();
+    config.services.insert(
+        "test-db".into(),
+        ServiceConfig::Environment {
+            source_env: "DATABASE_URL".into(),
+            inject_env: "TEST_DATABASE_URL".into(),
+        },
+    );
+    config.steps[0].services = vec!["test-db".into()];
+    config.steps[2].services = vec!["test-db".into()];
+    config.steps[1].depends_on = vec![config.steps[0].id.clone()];
+    config.steps[2].depends_on = vec![config.steps[1].id.clone()];
+
+    let source = toml::to_string_pretty(&config).expect("serialize fixture");
+    FlowConfig::from_source_with_diagnostics(&source, None, None)
+        .expect("transitive dependency must order service reuse");
+}
+
+#[test]
+fn independent_semantic_errors_are_aggregated_with_precise_paths() {
+    let mut config = repository_config();
+    config.steps[0].timeout_secs = 0;
+    config.steps[1].parser = Some("missing-parser".into());
+
+    let source = toml::to_string_pretty(&config).expect("serialize fixture");
+    let error = FlowConfig::from_source_with_diagnostics(&source, None, None)
+        .expect_err("independent configuration errors must be aggregated");
+    let report = error.report();
+
+    assert!(report.diagnostics.iter().any(|diagnostic| {
+        diagnostic.path == "steps[0].timeout_secs"
+            && diagnostic.id == "HGCFG-INVALID-FIELD"
+            && diagnostic.location.is_some()
+    }));
+    assert!(report.diagnostics.iter().any(|diagnostic| {
+        diagnostic.path == "steps[1].parser"
+            && diagnostic.id == "HGCFG-UNKNOWN-REFERENCE"
+            && diagnostic.location.is_some()
+    }));
+}
+
+#[test]
+fn human_diagnostic_location_has_one_closing_parenthesis() {
+    let mut config = repository_config();
+    config.steps[0].timeout_secs = 0;
+    let source = toml::to_string_pretty(&config).expect("serialize fixture");
+
+    let error = FlowConfig::from_source_with_diagnostics(&source, None, None)
+        .expect_err("timeout must fail validation");
+    let rendered = error.to_string();
+    assert!(rendered.contains("(line "), "{rendered}");
+    assert!(!rendered.contains("))"), "{rendered}");
+}
+
+#[test]
+fn diagnostics_truncate_at_the_documented_maximum() {
+    let mut diagnostics = ConfigDiagnostics::empty();
+    for index in 0..51 {
+        diagnostics.push(ConfigDiagnostic {
+            id: format!("HGCFG-TEST-{index}"),
+            severity: DiagnosticSeverity::Error,
+            path: format!("steps[{index}]"),
+            message: "test diagnostic".into(),
+            help: "test help".into(),
+            location: None,
+            related: Vec::new(),
+        });
+    }
+
+    let report = diagnostics.report();
+    assert_eq!(report.diagnostics.len(), 50);
+    assert!(report.truncated);
+    assert!(report
+        .diagnostics
+        .iter()
+        .any(|diagnostic| diagnostic.id == "HGCFG-DIAGNOSTICS-TRUNCATED"));
+}
+
+#[test]
+fn discovery_errors_keep_configuration_field_paths_in_json_reports() {
+    let error = anyhow::anyhow!("required secret scan configuration is missing: /tmp/secrets.toml");
+    let report = report_for_error(&error);
+    assert!(!report.valid);
+    assert_eq!(report.diagnostics[0].id, "HGCFG-REQUIRED-FILE");
+    assert_eq!(report.diagnostics[0].path, "paths.secrets_config");
+}
+
+#[test]
+fn template_paths_must_stay_inside_a_disjoint_repository_root() {
+    let workspace = TestWorkspace::new("template-config");
+    fs::create_dir_all(workspace.root.join("templates")).expect("create template root");
+    fs::write(workspace.root.join("templates/report.tera"), "report").expect("write template");
+    let path = workspace.root.join("flow.toml");
+    let source = format!(
+        "{}\n[report_templates]\nroot = \"templates\"\ntemplate = \"templates/report.tera\"\n",
+        include_str!("../../presets/rust-api.flow.toml")
+    );
+    fs::write(&path, source).expect("write config");
+    FlowConfig::load_with_diagnostics(&path, Some(&workspace.root)).expect("safe template config");
+
+    fs::write(
+        &path,
+        format!(
+            "{}\n[report_templates]\nroot = \".harness-gate/reports\"\ntemplate = \".harness-gate/reports/report.tera\"\n",
+            include_str!("../../presets/rust-api.flow.toml")
+        ),
+    )
+    .expect("write overlapping config");
+    fs::create_dir_all(workspace.root.join(".harness-gate/reports"))
+        .expect("create report directory");
+    fs::write(
+        workspace.root.join(".harness-gate/reports/report.tera"),
+        "report",
+    )
+    .expect("write report template");
+    let error = FlowConfig::load_with_diagnostics(&path, Some(&workspace.root))
+        .expect_err("report overlap must fail");
+    assert!(error
+        .report()
+        .diagnostics
+        .iter()
+        .any(|diagnostic| diagnostic.id == "HGCFG-TEMPLATE-PATH"));
+}
+
+#[test]
+fn windows_prefixed_paths_are_rejected_on_every_platform() {
+    let source = include_str!("../../presets/rust-api.flow.toml").replace(
+        "reports = \".harness-gate/reports\"",
+        "reports = \"C:\\\\reports\"",
+    );
+    let error = FlowConfig::from_source(&source).expect_err("Windows prefix must fail");
+    assert!(error.to_string().contains("paths.reports"));
+}
+
+#[test]
+fn windows_style_parent_traversal_is_rejected_on_every_platform() {
+    let source = include_str!("../../presets/rust-api.flow.toml").replace(
+        "reports = \".harness-gate/reports\"",
+        "reports = \"..\\\\outside\"",
+    );
+    let error = FlowConfig::from_source(&source).expect_err("Windows traversal must fail");
+    assert!(error.to_string().contains("paths.reports"));
+}
+
+#[cfg(unix)]
+#[test]
+fn template_symlink_escape_is_rejected() {
+    use std::os::unix::fs::symlink;
+
+    let workspace = TestWorkspace::new("template-symlink");
+    let outside = TestWorkspace::new("template-outside");
+    fs::create_dir_all(workspace.root.join("templates")).expect("create template root");
+    fs::write(outside.root.join("outside.tera"), "outside").expect("write outside template");
+    symlink(
+        outside.root.join("outside.tera"),
+        workspace.root.join("templates/escape.tera"),
+    )
+    .expect("link outside template");
+    let path = workspace.root.join("flow.toml");
+    fs::write(
+        &path,
+        format!(
+            "{}\n[report_templates]\nroot = \"templates\"\ntemplate = \"templates/escape.tera\"\n",
+            include_str!("../../presets/rust-api.flow.toml")
+        ),
+    )
+    .expect("write config");
+
+    let error = FlowConfig::load_with_diagnostics(&path, Some(&workspace.root))
+        .expect_err("symlink escape must fail");
+    assert!(error
+        .report()
+        .diagnostics
+        .iter()
+        .any(|diagnostic| diagnostic.id == "HGCFG-TEMPLATE-PATH"));
 }

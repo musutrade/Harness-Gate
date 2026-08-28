@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- `config check --format json` now emits versioned, field-path diagnostics for
+  configuration parse, interpolation, validation, and resource conflicts.
+- Configuration preflight rejects unordered shared services, unordered service
+  injection-name collisions, and duplicate step logs before execution.
+- Optional `[report_templates]` paths are validated as repository-contained,
+  disjoint read-only template input; rendering remains out of scope.
+
 All notable changes to Harness-Gate will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),

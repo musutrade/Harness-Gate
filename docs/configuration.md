@@ -25,6 +25,7 @@ ARC_FLOW_CONFIG=config/ci-flow.toml harness-gate --project-root /path/to/project
 
 ```bash
 harness-gate config check
+harness-gate config check --format json
 harness-gate config print --resolved
 harness-gate schema export
 ```
@@ -33,6 +34,39 @@ harness-gate schema export
 进行静态补全和结构检查。配置字符串支持一次性的环境变量插值：`${NAME}` 要求变量已设置，
 `${NAME:-default}` 在变量缺失时使用默认值。不支持递归插值或表达式。插值发生在 TOML 解析前，
 随后仍按现有专用环境变量覆盖规则处理。
+
+`config check` 会在启动 service、子进程或写入报告前完成静态验证。默认输出面向
+终端；`--format json` 将 stdout 固定为一个版本化诊断对象，方便 CI 和编辑器集成。每项
+错误包含稳定的 `HGCFG-*` ID、字段路径、原因、修复建议，以及文件输入可用时的行/列；
+不会显示插值后的环境变量值、连接字符串或模板内容。JSON Schema 只验证结构，环境插值、
+环境覆盖、仓库路径、跨字段引用和资源安全必须由 `config check` 验证。
+
+### 编辑器 Schema 关联
+
+仓库中的 `schema/flow.schema.json` 是 `.harness-gate/flow.toml` 的权威本地 Schema。
+先在仓库根执行 `harness-gate schema export`（CI 会检查其与已提交文件一致），再使用以下
+本地关联；两种方式都不要求远程 URL：
+
+**VS Code（Even Better TOML）** 在工作区 `.vscode/settings.json` 中加入：
+
+```json
+{
+  "evenBetterToml.schema.associations": {
+    "./schema/flow.schema.json": [".harness-gate/flow.toml"]
+  }
+}
+```
+
+**Taplo** 在仓库根的 `.taplo.toml` 或个人 Taplo 配置中加入：
+
+```toml
+[[schema.associations]]
+url = "./schema/flow.schema.json"
+include = [".harness-gate/flow.toml"]
+```
+
+编辑器应先展示结构性错误，再运行 `harness-gate config check --format json` 获取路径、
+依赖与资源安全诊断。
 
 ## 2. 命名和路径约束
 
@@ -98,6 +132,7 @@ version = 2
 | `[parsers.*]`       | 否   | 从测试日志计算结果数        |
 | `[[scope.rules]]`   | 是   | 变更路径到 component 的映射 |
 | `[[steps]]`         | 是   | 实际执行的命令步骤          |
+| `[report_templates]` | 否  | 未来 HTML/Tera 报告的只读模板输入；当前仅校验路径安全，不渲染模板 |
 
 未知字段会直接导致解析失败，避免拼写错误被静默忽略。
 
@@ -293,6 +328,21 @@ remove_env = ["DATABASE_URL", "REDIS_URL"]
 
 每个 service 必须注入不同变量；`remove_env` 也不能删除 service 正在注入的变量。
 
+跨步骤预检同样会在任何执行前运行：没有直接或传递 `depends_on` 顺序的两个步骤，不能引用同一
+service，也不能引用两个向子进程注入相同 `inject_env` 的 service。为同一 service 建立明确
+顺序时，将后续步骤依赖于前一个步骤：
+
+```toml
+[[steps]]
+id = "api.integration"
+# ...
+services = ["test-postgres"]
+depends_on = ["api.setup"]
+```
+
+不要依赖 profile、当前串行执行或偶然的启动顺序来规避这项规则；它们不能证明未来并行运行
+时互斥。校验器不会自动加入依赖或重命名变量。
+
 ## 9. `[parsers.*]`
 
 解析器用于防止命令退出码为 0、实际却没有执行任何测试：
@@ -377,6 +427,7 @@ remove_env = ["DATABASE_URL"]
 | `parser`       | 否   | 成功后使用的 parser ID             |
 | `services`     | 否   | 运行前需要准备的 service ID 列表   |
 | `remove_env`   | 否   | 创建子进程前删除的继承环境变量     |
+| `depends_on`   | 否   | 必须先完成的 step ID；支持传递依赖并决定资源是否可并发 |
 
 命令直接通过 `program + args[]` 启动，不执行 shell 拼接。`sh -c`、`bash -lc` 等命令字符串会被配置校验拒绝；管道、重定向和条件逻辑应拆成多个步骤，或封装成项目内受版本控制的可执行程序。
 
@@ -612,3 +663,40 @@ harness-gate doctor
 harness-gate scope --all
 harness-gate verify --all
 ```
+
+### 步骤日志唯一性
+
+每个 `log` 都必须是唯一的单个 `.log` 文件名。即使两个步骤已有 `depends_on` 顺序，也不能复用
+同一日志：串行复用同样会覆盖报告证据。错误诊断会同时指出两个 `steps[*].log` 字段。
+
+### 未来报告模板路径
+
+当前版本不渲染 HTML/Tera 模板，但可以提前声明并检查模板输入路径：
+
+```toml
+[report_templates]
+root = "templates/harness-gate"
+template = "templates/harness-gate/verification.tera"
+```
+
+`root` 和 `template` 必须同时存在；二者必须是仓库内路径，不能是绝对路径、Windows 前缀、
+`..` 跳转或 NUL。模板根必须存在且为目录，模板必须存在且为 `.html` 或 `.tera` 普通文件；
+解析符号链接后仍必须在仓库和模板根内。模板根不能等于、包含或被 `paths.reports` 包含。
+这些路径是只读输入，当前不会创建文件、加载 Tera、处理 include/inheritance，或改变现有
+JSON/Markdown 报告。
+
+### v1 到 v2 配置迁移和安全修复
+
+v1 配置使用迁移命令生成 v2 文件，源文件不会被删除：
+
+```bash
+harness-gate --project-root /path/to/project config migrate \
+  --input legacy.flow.toml \
+  --output .harness-gate/flow.toml
+harness-gate --project-root /path/to/project config check
+```
+
+v2 版本号保持为 `2`，不会自动升级。若原本可加载的 v2 文件因为服务、注入变量或日志关系被
+新预检拒绝，请根据 `config check` 的主字段、related 字段和 `help:` 修复：添加显式的
+`depends_on`、使用不同的 `inject_env` 或 service、或为每个步骤指定独立日志。工具绝不会
+静默重排、插入依赖或改写配置。

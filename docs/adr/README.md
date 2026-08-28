@@ -43,6 +43,7 @@ We use a simplified version of the Michael Nygard ADR template:
 - [ADR-0023](0023-config-schema-and-interpolation.md) - Generate configuration schema and interpolate environment variables
 - [ADR-0024](0024-verification-plan-dependencies.md) - Add dependency ordering to verification steps
 - [ADR-0025](0025-phase-1-quality-baseline-gates.md) - Establish Phase 1 quality baseline gates
+- [ADR-0026](0026-configuration-safety-diagnostics.md) - Add configuration safety diagnostics and future-concurrency preflight
 
 ## Creating New ADRs
 

@@ -160,7 +160,8 @@ harness-gate --project-root /path/to/new-project verify --all
 | `harness-gate verify --profile ci --all`                     | 对全部 components 执行指定 profile    |
 | `harness-gate hook`                                          | 对暂存快照执行 hook profile           |
 | `harness-gate step <id>`                                     | 通过 secrets/audit 后单独运行一个步骤 |
-| `harness-gate config check`                                  | 校验 schema、引用、路径和环境覆盖     |
+| `harness-gate config check`                                  | 校验 schema、引用、路径、环境覆盖和资源安全 |
+| `harness-gate config check --format json`                    | 为编辑器和 CI 输出稳定的字段路径诊断    |
 | `harness-gate config print --resolved`                       | 输出最终生效配置                      |
 | `harness-gate config migrate`                                | 将 schema v1 转换成 v2                |
 | `harness-gate schema export`                                 | 生成 flow.toml 的 JSON Schema          |
