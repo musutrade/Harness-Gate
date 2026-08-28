@@ -86,12 +86,6 @@ impl Progress {
         self.enabled
     }
 
-    pub fn begin(&self, label: &str) {
-        if self.enabled {
-            self.render(label);
-        }
-    }
-
     pub fn clear(&self) {
         if self.enabled {
             eprint!("\r\x1b[2K");

@@ -217,6 +217,11 @@
       "exit_code": 0,
       "expected_exit_code": 0,
       "name": "verify-success",
+      "publication_order": [
+        "secret scan",
+        "architecture audit",
+        "Git whitespace check"
+      ],
       "reports": {
         "logs": {
           "logs/git_diff_check.log": ""
@@ -233,6 +238,40 @@
       "status": "pass",
       "stderr": "",
       "stdout": "arc-flow verify\nScope: all\nComponents: project\n\n[PASS] secret scan (<DURATION>)\n[PASS] architecture audit (<DURATION>)\n[RUN ] Git whitespace check ... PASS (<DURATION>)\n\nVerification report: <PROJECT_ROOT>/.harness-gate/reports/test_result.md\nTEST_SUMMARY: PASS\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "verify",
+        "--all"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "verify-parallel-success",
+      "publication_order": [
+        "secret scan",
+        "architecture audit",
+        "Git whitespace check",
+        "staged Git whitespace check"
+      ],
+      "reports": {
+        "logs": {
+          "logs/git_diff_check.log": "",
+          "logs/git_staged_diff_check.log": ""
+        },
+        "test_result.json": {
+          "content": "{\n  \"timestamp\": \"<TIMESTAMP>\n  \"profile\": \"full\",\n  \"scope\": {\n    \"mode\": \"all\",\n    \"changed_files\": [],\n    \"components\": [\n      \"project\"\n    ],\n    \"unmatched_files\": []\n  },\n  \"steps\": [\n    {\n      \"label\": \"secret scan\",\n      \"passed\": true,\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"<PROJECT_ROOT>/.harness-gate/reports/secret_scan.json\",\n      \"detail\": null\n    },\n    {\n      \"label\": \"architecture audit\",\n      \"passed\": true,\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"<PROJECT_ROOT>/.harness-gate/reports/review_context.json\",\n      \"detail\": \"0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\"\n    },\n    {\n      \"label\": \"Git whitespace check\",\n      \"passed\": true,\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"<PROJECT_ROOT>/.harness-gate/reports/logs/git_diff_check.log\",\n      \"detail\": null\n    },\n    {\n      \"label\": \"staged Git whitespace check\",\n      \"passed\": true,\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"<PROJECT_ROOT>/.harness-gate/reports/logs/git_staged_diff_check.log\",\n      \"detail\": null\n    }\n  ],\n  \"passed\": true\n}",
+          "exists": true
+        },
+        "test_result.md": {
+          "content": "=== Verification report ===\nTimestamp: <TIMESTAMP>\nProfile: full\nComponents: project\n\n- PASS: secret scan (<DURATION>)\n- PASS: architecture audit (<DURATION>) - 0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\n- PASS: Git whitespace check (<DURATION>)\n- PASS: staged Git whitespace check (<DURATION>)\n\nTEST_SUMMARY: PASS\n",
+          "exists": true
+        }
+      },
+      "status": "pass",
+      "stderr": "",
+      "stdout": "arc-flow verify\nScope: all\nComponents: project\n\n[PASS] secret scan (<DURATION>)\n[PASS] architecture audit (<DURATION>)\n[RUN ] Git whitespace check ... PASS (<DURATION>)\n[RUN ] staged Git whitespace check ... PASS (<DURATION>)\n\nVerification report: <PROJECT_ROOT>/.harness-gate/reports/test_result.md\nTEST_SUMMARY: PASS\n"
     },
     {
       "ansi": false,

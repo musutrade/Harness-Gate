@@ -31,6 +31,16 @@
         }
       ]
     },
+    "notifications": {
+      "default": {
+        "webhooks": []
+      },
+      "allOf": [
+        {
+          "$ref": "#/definitions/NotificationsConfig"
+        }
+      ]
+    },
     "parsers": {
       "default": {},
       "type": "object",
@@ -56,6 +66,7 @@
     },
     "report_templates": {
       "default": {
+        "junit": null,
         "root": null,
         "template": null
       },
@@ -89,6 +100,14 @@
   },
   "additionalProperties": false,
   "definitions": {
+    "ContainerRuntimeKind": {
+      "description": "Supported container runtimes for managed services.",
+      "type": "string",
+      "enum": [
+        "docker",
+        "podman"
+      ]
+    },
     "DoctorCheck": {
       "type": "object",
       "oneOf": [
@@ -373,6 +392,19 @@
         "isolated-postgres"
       ]
     },
+    "NotificationsConfig": {
+      "type": "object",
+      "properties": {
+        "webhooks": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/WebhookConfig"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
     "ParserConfig": {
       "oneOf": [
         {
@@ -501,6 +533,14 @@
     "ReportTemplatesConfig": {
       "type": "object",
       "properties": {
+        "junit": {
+          "description": "Optional JUnit XML output path, relative to the report directory.",
+          "default": null,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "root": {
           "default": null,
           "type": [
@@ -631,6 +671,15 @@
               "type": "string",
               "enum": [
                 "docker"
+              ]
+            },
+            "runtime": {
+              "description": "Container CLI used for this service. Podman supports the Docker command surface and is selected explicitly when requested.",
+              "default": "docker",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ContainerRuntimeKind"
+                }
               ]
             },
             "startup_timeout_secs": {
@@ -784,6 +833,26 @@
         "all",
         "ignore"
       ]
+    },
+    "WebhookConfig": {
+      "type": "object",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "on_failure": {
+          "default": true,
+          "type": "boolean"
+        },
+        "on_success": {
+          "default": false,
+          "type": "boolean"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     }
   }
 }

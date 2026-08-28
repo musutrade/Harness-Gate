@@ -106,6 +106,7 @@ impl FlowConfig {
         }
         for service in self.services.values_mut() {
             if let ServiceConfig::Docker {
+                runtime: _,
                 image,
                 image_env,
                 startup_timeout_secs,

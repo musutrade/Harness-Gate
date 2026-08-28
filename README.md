@@ -38,7 +38,8 @@ Git changed files
   -> secret scan
   -> architecture audit
   -> execute steps in configured order
-  -> JSON / Markdown / log reports
+  -> JSON / Markdown / optional HTML/JUnit reports
+  -> optional HTTP(S) Webhook notification
 ```
 
 Components, profiles, commands, paths, parsers and services all come from TOML. Regular project migration does not need to add enums or modify match branches in Rust.
@@ -259,7 +260,7 @@ command context needed to resolve the issue.
 - Git configuration validation
 
 ### Test Service Management
-- Docker temporary containers
+- Docker or Podman temporary containers
 - Random port allocation
 - Health checks
 - Automatic cleanup
@@ -269,6 +270,7 @@ command context needed to resolve the issue.
 - Path aliases and placeholders
 - Environment variable overrides
 - Custom test parsers
+- Optional HTML/JUnit reports and HTTP(S) Webhook notifications
 
 ## Installation
 
@@ -338,6 +340,19 @@ harness-gate verify --all
 To reuse external test services, inject the service configuration's `external_env` into the job; otherwise, pre-pull configured images and allow runner access to Docker daemon. Caching Cargo, npm and build directories only affects performance, should not skip `verify --all`.
 
 Whether successful or failed, it is recommended to upload the `[paths].reports` directory as an artifact. This preserves audit line numbers, step timings and complete logs.
+
+## Reports and Notifications
+
+Every verification keeps the compatible `test_result.json` and `test_result.md` files. A repository-contained
+HTML template can additionally produce `test_result.html`, and `report_templates.junit` can write JUnit XML
+under the report directory. HTML templates use Tera and support `include`, `extends`, and `block`; the full
+serialized report is available as `report` alongside the legacy direct fields. Report output paths are
+containment-checked, including existing symlinks.
+
+Optional `[[notifications.webhooks]]` entries send the serialized report to HTTP(S) endpoints after all report
+files are written. `on_failure` defaults to `true`, `on_success` defaults to `false`; a non-2xx response or
+connection error returns `E1404` while preserving the generated reports. Entries are sent in configuration order;
+the first failure stops notification delivery to later endpoints.
 
 ## License
 
