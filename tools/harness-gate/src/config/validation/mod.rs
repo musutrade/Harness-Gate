@@ -242,6 +242,21 @@ impl FlowConfig {
             validate_step(self, step)?;
             profiles.extend(step.profiles.iter().cloned());
         }
+        for step in &self.steps {
+            for dependency in &step.depends_on {
+                if dependency == &step.id {
+                    bail!("step {:?} may not depend on itself", step.id);
+                }
+                if !ids.contains(dependency.as_str()) {
+                    bail!(
+                        "step {:?} depends on missing step {:?}",
+                        step.id,
+                        dependency
+                    );
+                }
+            }
+        }
+        validate_step_dependencies(self)?;
         for profile in [&self.project.default_profile, &self.project.hook_profile] {
             if !profiles.contains(profile) {
                 bail!("configured profile {profile:?} is not used by any step");
@@ -258,6 +273,35 @@ impl FlowConfig {
         }
         Ok(())
     }
+}
+
+fn validate_step_dependencies(config: &FlowConfig) -> Result<()> {
+    fn visit(
+        id: &str,
+        config: &FlowConfig,
+        visiting: &mut HashSet<String>,
+        visited: &mut HashSet<String>,
+    ) -> Result<()> {
+        if visited.contains(id) {
+            return Ok(());
+        }
+        if !visiting.insert(id.to_string()) {
+            bail!("verification step dependency cycle includes {:?}", id);
+        }
+        let step = config.step(id).expect("validated dependency");
+        for dependency in &step.depends_on {
+            visit(dependency, config, visiting, visited)?;
+        }
+        visiting.remove(id);
+        visited.insert(id.to_string());
+        Ok(())
+    }
+    let mut visiting = HashSet::new();
+    let mut visited = HashSet::new();
+    for step in &config.steps {
+        visit(&step.id, config, &mut visiting, &mut visited)?;
+    }
+    Ok(())
 }
 
 mod primitives;

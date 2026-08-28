@@ -636,6 +636,13 @@
         "cwd": {
           "type": "string"
         },
+        "depends_on": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "id": {
           "type": "string"
         },
