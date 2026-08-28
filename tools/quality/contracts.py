@@ -81,7 +81,15 @@ def scenario(binary: Path, name: str, args: list[str], expected: int, setup: str
         elif setup == "verify-failure":
             init(root, binary, git=True)
             flow = root / ".harness-gate" / "flow.toml"
-            flow.write_text(flow.read_text().replace('id = "project.diff-check"\nlabel = "Git whitespace check"', 'id = "project.diff-check"\nlabel = "Git whitespace check"\nprogram = "false"', 1))
+            flow.write_text(
+                re.sub(
+                    r'(\[\[steps\]\]\nid = "project\.diff-check".*?\nprogram = )"git"',
+                    r'\1"false"',
+                    flow.read_text(),
+                    count=1,
+                    flags=re.DOTALL,
+                )
+            )
         result = command(binary, root, args)
         stdout = normalize(result.stdout, root)
         stderr = normalize(result.stderr, root)
@@ -102,7 +110,7 @@ def scenario(binary: Path, name: str, args: list[str], expected: int, setup: str
         }
 
 
-def collect(binary: Path) -> list[dict[str, Any]]:
+def collect(binary: Path, staged_secrets: bool = True) -> list[dict[str, Any]]:
     return [
         scenario(binary, "help", ["--help"], 0),
         scenario(binary, "version", ["--version"], 0),
@@ -112,7 +120,7 @@ def collect(binary: Path) -> list[dict[str, Any]]:
         scenario(binary, "config-valid", ["config", "check"], 0, "init"),
         scenario(binary, "config-invalid", ["config", "check"], 1, "invalid"),
         scenario(binary, "scope", ["scope", "--all"], 0, "git", ["scope.json"]),
-        scenario(binary, "secrets", ["secrets", "--staged"], 0, "git", ["secret_scan.json"]),
+        scenario(binary, "secrets", ["secrets", *( ["--staged"] if staged_secrets else [] )], 0, "git", ["secret_scan.json"]),
         scenario(binary, "audit", ["audit"], 0, "init", ["review_context.json", "review_context.md"]),
         scenario(binary, "verify-success", ["verify", "--all"], 0, "git", ["test_result.json", "test_result.md"]),
         scenario(binary, "verify-failure", ["verify", "--all"], 1, "verify-failure", ["test_result.json", "test_result.md"]),
@@ -127,7 +135,7 @@ def run(output: Path, accept: bool = False, structured: bool = False) -> int:
     binary = CRATE / "target" / "debug" / ("harness-gate.exe" if os.name == "nt" else "harness-gate")
     if not binary.exists():
         subprocess.run(["cargo", "build", "--manifest-path", str(CRATE / "Cargo.toml"), "--locked"], check=True, cwd=CRATE.parent.parent)
-    scenarios = collect(binary)
+    scenarios = collect(binary, staged_secrets=not structured)
     report = {**metadata(tool="cli-contracts", snapshot_version=1), "scenarios": scenarios}
     write_json(output, report)
     if accept:

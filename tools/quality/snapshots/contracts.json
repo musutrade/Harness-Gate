@@ -208,25 +208,26 @@
         "verify",
         "--all"
       ],
-      "error_codes": [
-        "E1000"
-      ],
+      "error_codes": [],
       "exit_code": 1,
       "expected_exit_code": 1,
       "name": "verify-failure",
       "reports": {
+        "logs": {
+          "logs/git_diff_check.log": ""
+        },
         "test_result.json": {
-          "content": null,
-          "exists": false
+          "content": "{\n  \"timestamp\": \"<TIMESTAMP>\n  \"profile\": \"full\",\n  \"scope\": {\n    \"mode\": \"all\",\n    \"changed_files\": [],\n    \"components\": [\n      \"project\"\n    ],\n    \"unmatched_files\": []\n  },\n  \"steps\": [\n    {\n      \"label\": \"secret scan\",\n      \"passed\": true,\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"<PROJECT_ROOT>/.harness-gate/reports/secret_scan.json\",\n      \"detail\": null\n    },\n    {\n      \"label\": \"architecture audit\",\n      \"passed\": true,\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"<PROJECT_ROOT>/.harness-gate/reports/review_context.json\",\n      \"detail\": \"0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\"\n    },\n    {\n      \"label\": \"Git whitespace check\",\n      \"passed\": false,\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"<PROJECT_ROOT>/.harness-gate/reports/logs/git_diff_check.log\",\n      \"detail\": \"exit code 1\"\n    }\n  ],\n  \"passed\": false\n}",
+          "exists": true
         },
         "test_result.md": {
-          "content": null,
-          "exists": false
+          "content": "=== Verification report ===\nTimestamp: <TIMESTAMP>\nProfile: full\nComponents: project\n\n- PASS: secret scan (<DURATION>)\n- PASS: architecture audit (<DURATION>) - 0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\n- FAIL: Git whitespace check (<DURATION>) - exit code 1; log: <PROJECT_ROOT>/.harness-gate/reports/logs/git_diff_check.log\n\nTEST_SUMMARY: FAIL\n",
+          "exists": true
         }
       },
       "status": "pass",
-      "stderr": "ERROR [E1000]: command failed: parse workflow config <PROJECT_ROOT>/.harness-gate/flow.toml: TOML parse error at line 54, column 1\n   |\n54 | program = \"git\"\n   | ^^^^^^^\nduplicate key\n\n",
-      "stdout": ""
+      "stderr": "",
+      "stdout": "arc-flow verify\nScope: all\nComponents: project\n\n[PASS] secret scan (<DURATION>)\n[PASS] architecture audit (<DURATION>)\n[RUN ] Git whitespace check ... FAIL (<DURATION>)\n       log: <PROJECT_ROOT>/.harness-gate/reports/logs/git_diff_check.log\n\nVerification report: <PROJECT_ROOT>/.harness-gate/reports/test_result.md\nTEST_SUMMARY: FAIL\n"
     },
     {
       "ansi": false,

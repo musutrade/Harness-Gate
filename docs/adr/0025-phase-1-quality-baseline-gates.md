@@ -309,7 +309,6 @@ configuration or scheduler changes can be accepted.
 
 ## References
 
-- [Refactoring plan](../refactoring-plan-2026-08-28.md)
 - [ADR-0003: Enhance CI pipeline](0003-enhance-ci-pipeline.md)
 - [ADR-0004: Add integration tests](0004-add-integration-tests.md)
 - [ADR-0006: Test fixtures and internal boundaries](0006-test-fixtures-and-internal-boundaries.md)
