@@ -432,7 +432,7 @@ predicates = "3.0"
 - [ADR-0002: Optimize Release Builds](../adr/0002-optimize-release-builds.md)
 - [ADR-0003: Enhance CI Pipeline](../adr/0003-enhance-ci-pipeline.md)
 - [ADR-0004: Add Integration Tests](../adr/0004-add-integration-tests.md)
-- [Evaluation Report](../project-evaluation-report.md) (to be created)
+- [Project overview](../../ABOUT.md)
 
 ---
 
