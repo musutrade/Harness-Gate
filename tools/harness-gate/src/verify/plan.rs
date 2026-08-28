@@ -35,14 +35,6 @@ impl NodeStatus {
             Self::Failed
         }
     }
-
-    pub fn from_task(result: &crate::process::TaskResult) -> Self {
-        if result.cancelled {
-            Self::Cancelled
-        } else {
-            Self::from_passed(result.passed)
-        }
-    }
 }
 
 #[derive(Debug, Clone)]
@@ -58,7 +50,7 @@ pub(super) struct NodeResult {
     pub reason: Option<String>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(super) struct PlanNode<'a> {
     pub id: String,
     pub label: String,

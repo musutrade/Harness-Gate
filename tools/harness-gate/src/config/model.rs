@@ -21,8 +21,32 @@ pub struct FlowConfig {
     pub parsers: BTreeMap<String, ParserConfig>,
     #[serde(default)]
     pub report_templates: ReportTemplatesConfig,
+    #[serde(default)]
+    pub execution: ExecutionConfig,
     pub scope: ScopeConfig,
     pub steps: Vec<StepConfig>,
+}
+
+/// Controls how eligible verification-plan nodes are dispatched.
+#[derive(Debug, Clone, Default, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct ExecutionConfig {
+    #[serde(default)]
+    pub parallel: bool,
+    #[serde(default)]
+    #[schemars(range(min = 1, max = 64))]
+    pub max_parallel: Option<usize>,
+}
+
+impl ExecutionConfig {
+    pub const DEFAULT_MAX_PARALLEL: usize = 4;
+    pub const MAX_ALLOWED_PARALLEL: usize = 64;
+
+    pub fn effective_max_parallel(&self) -> usize {
+        self.max_parallel
+            .unwrap_or(Self::DEFAULT_MAX_PARALLEL)
+            .clamp(1, Self::MAX_ALLOWED_PARALLEL)
+    }
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, JsonSchema)]

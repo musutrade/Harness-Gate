@@ -104,6 +104,10 @@ version = 2
 [policy]
 # ...
 
+[execution]
+# parallel = false
+# max_parallel = 4
+
 [[doctor.checks]]
 # ...
 
@@ -126,6 +130,7 @@ version = 2
 | `[project]`         | 是   | 项目标识和默认 profile      |
 | `[paths]`           | 是   | 报告、审计规则和路径别名    |
 | `[policy]`          | 否   | 声明不可缺失的步骤          |
+| `[execution]`       | 否   | 控制依赖就绪步骤的并行调度  |
 | `[scope]`           | 否   | 未匹配变更路径的处理策略    |
 | `[[doctor.checks]]` | 否   | 本机环境体检                |
 | `[services.*]`      | 否   | 外部环境或 Docker 临时服务  |
@@ -188,7 +193,28 @@ path = "apps/web"
 | `ARC_FLOW_SECRETS_CONFIG`                   | `paths.secrets_config` |
 | `ARC_FLOW_CONFIG`                           | 配置文件路径         |
 
-## 6. `[policy]`
+## 6. `[execution]`
+
+默认配置保持串行执行。只有显式设置 `parallel = true` 才会并发运行没有依赖路径的步骤：
+
+```toml
+[execution]
+parallel = true
+max_parallel = 4
+```
+
+| 字段           | 默认值 | 说明 |
+| -------------- | ------ | ---- |
+| `parallel`     | `false` | 是否启用受依赖关系约束的并行调度 |
+| `max_parallel` | 并行时为 `4` | 同时运行的步骤上限，显式值必须为 `1` 到 `64` |
+
+`max_parallel = 0`、负数或大于 `64` 会在执行前拒绝。并行步骤仍受
+`depends_on`、服务资源预检和运行时服务锁约束；secret scan 与 architecture audit
+的默认门禁顺序不会被绕过。每个步骤使用独立日志文件，主线程按稳定计划顺序合并结果和打印输出，
+因此完成时间先后不会改变 CLI 或报告顺序。取消、超时和失败会阻止后续依赖节点，并清理已启动的进程
+与服务。
+
+## 7. `[policy]`
 
 ```toml
 [policy]
@@ -197,7 +223,7 @@ required_steps = ["api.format", "api.clippy", "api.tests"]
 
 `required_steps` 中的每个 ID 都必须出现在 `[[steps]]` 中，而且不能重复。这用于防止项目基础门禁被误删。它不规定步骤属于哪个 profile；profile 仍由步骤自身配置。
 
-## 7. `[[doctor.checks]]`
+## 8. `[[doctor.checks]]`
 
 每项检查都有公共字段：
 
@@ -266,7 +292,7 @@ service = "test-postgres"
 
 `path_type` 可取 `any`、`file`、`directory`，默认 `any`。命令、Git 配置、remote 和 service 探测都受 `timeout_secs` 约束，超时时会终止整个子进程组。CI 中通常使用 `harness-gate doctor --strict`，把 WARN 也视为失败。
 
-## 8. `[services.*]`
+## 9. `[services.*]`
 
 ### 8.1 Environment service
 
@@ -343,7 +369,7 @@ depends_on = ["api.setup"]
 不要依赖 profile、当前串行执行或偶然的启动顺序来规避这项规则；它们不能证明未来并行运行
 时互斥。校验器不会自动加入依赖或重命名变量。
 
-## 9. `[parsers.*]`
+## 10. `[parsers.*]`
 
 解析器用于防止命令退出码为 0、实际却没有执行任何测试：
 
@@ -364,7 +390,7 @@ minimum = 1
 
 每个正则都必须包含对应的 capture group。步骤成功后才解析日志；计数低于 `minimum` 时，该步骤改判为失败。
 
-## 10. `[scope]` 和 `[[scope.rules]]`
+## 11. `[scope]` 和 `[[scope.rules]]`
 
 ```toml
 [scope]
@@ -393,7 +419,7 @@ components = ["api", "web", "workflow"]
 
 建议把共享契约、工作流配置和 CI 文件映射到所有受影响组件，避免只验证单端。
 
-## 11. `[[steps]]`
+## 12. `[[steps]]`
 
 ```toml
 [[steps]]
@@ -454,7 +480,7 @@ audit -> external steps` chain internally without rewriting `flow.toml`.
 
 步骤选择条件是：component 已被 scope 选中，并且步骤包含当前 profile。配置顺序就是执行顺序；任一步失败后，报告判为失败，但仍继续执行不依赖该故障 service 的后续步骤。同一 service 启动失败会被缓存，依赖它的步骤快速失败，不会反复等待启动超时。
 
-## 12. Secret Scan 规则文件
+## 13. Secret Scan 规则文件
 
 `[paths].secrets_config` 指向独立、受版本控制的 TOML 文件。预设会生成一套通用高置信规则，项目可在不重新编译 `harness-gate` 的情况下增加供应商或业务密钥规则。配置版本、规则 ID、正则、捕获组和最小长度都会在扫描前校验；配置缺失、空规则或无效捕获组会直接让门禁失败。
 
@@ -485,7 +511,7 @@ minimum_length = 12
 
 扫描报告只包含命中文件名，不会复制密钥内容。占位符策略只作用于捕获值；`direct` 应仅配置误报概率足够低的模式。
 
-## 13. 审计规则文件
+## 14. 审计规则文件
 
 `[paths].audit_config` 指向独立 TOML 文件。空规则文件可写为：
 
@@ -611,7 +637,7 @@ exclude_patterns = []
 
 auditor 是确定性的整文件正则扫描器，不是语言 parser。正则默认启用 multi-line 模式，因此 `^`/`$` 仍按代码行匹配，`\s` 可以跨行；需要让 `.` 跨行时应在规则中显式使用 `(?s)`。报告定位到匹配起始行。`[engine.comment_syntax.<扩展名>]` 可配置行注释、块注释和字符串定界符；扫描器会跟踪这些词法状态，避免把字符串中的注释标记当成真实注释。需要抽象语法树级判断时，应使用项目语言自己的 lint 工具，并把该工具配置成一个 step。
 
-## 14. 最小完整示例
+## 15. 最小完整示例
 
 ```toml
 version = 2

@@ -45,6 +45,7 @@ We use a simplified version of the Michael Nygard ADR template:
 - [ADR-0025](0025-phase-1-quality-baseline-gates.md) - Establish Phase 1 quality baseline gates
 - [ADR-0026](0026-configuration-safety-diagnostics.md) - Add configuration safety diagnostics and future-concurrency preflight
 - [ADR-0027](0027-unified-verification-plan.md) - Unify built-in gates and configured steps in a verification plan
+- [ADR-0028](0028-parallel-scheduling.md) - Introduce dependency-aware parallel scheduling
 
 ## Creating New ADRs
 
