@@ -20,6 +20,17 @@
         }
       ]
     },
+    "execution": {
+      "default": {
+        "max_parallel": null,
+        "parallel": false
+      },
+      "allOf": [
+        {
+          "$ref": "#/definitions/ExecutionConfig"
+        }
+      ]
+    },
     "parsers": {
       "default": {},
       "type": "object",
@@ -330,6 +341,27 @@
           "items": {
             "$ref": "#/definitions/DoctorCheck"
           }
+        }
+      },
+      "additionalProperties": false
+    },
+    "ExecutionConfig": {
+      "description": "Controls how eligible verification-plan nodes are dispatched.",
+      "type": "object",
+      "properties": {
+        "max_parallel": {
+          "default": null,
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint",
+          "maximum": 64.0,
+          "minimum": 1.0
+        },
+        "parallel": {
+          "default": false,
+          "type": "boolean"
         }
       },
       "additionalProperties": false

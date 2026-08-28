@@ -13,6 +13,40 @@ fn repository_configuration_is_valid() {
 }
 
 #[test]
+fn execution_policy_defaults_to_serial_and_four_workers_when_enabled() {
+    let config = repository_config();
+    assert!(!config.execution.parallel);
+    assert_eq!(config.execution.effective_max_parallel(), 4);
+
+    let mut config = config;
+    config.execution.parallel = true;
+    assert_eq!(config.execution.effective_max_parallel(), 4);
+    config.execution.max_parallel = Some(8);
+    assert_eq!(config.execution.effective_max_parallel(), 8);
+    config.validate().expect("valid execution policy");
+}
+
+#[test]
+fn execution_policy_rejects_zero_and_values_above_the_bound() {
+    let mut config = repository_config();
+    for value in [0, 65] {
+        config.execution.max_parallel = Some(value);
+        let error = config.validate().expect_err("invalid execution bound");
+        assert!(error.to_string().contains("execution.max_parallel"));
+    }
+}
+
+#[test]
+fn execution_policy_diagnostic_points_to_max_parallel() {
+    let mut config = repository_config();
+    config.execution.max_parallel = Some(65);
+    let source = toml::to_string_pretty(&config).expect("serialize invalid execution config");
+    let error = FlowConfig::from_source_with_diagnostics(&source, None, None)
+        .expect_err("invalid execution bound must produce diagnostics");
+    assert_eq!(error.report().diagnostics[0].path, "execution.max_parallel");
+}
+
+#[test]
 fn existing_v2_config_defaults_the_secret_rule_path() {
     let source = include_str!("../../presets/rust-api.flow.toml")
         .lines()
