@@ -41,6 +41,7 @@ We use a simplified version of the Michael Nygard ADR template:
 - [ADR-0021](0021-refactor-documentation-closeout.md) - Close out refactor documentation after merge
 - [ADR-0022](0022-terminal-feedback.md) - Provide terminal-aware CLI feedback
 - [ADR-0023](0023-config-schema-and-interpolation.md) - Generate configuration schema and interpolate environment variables
+- [ADR-0024](0024-verification-plan-dependencies.md) - Add dependency ordering to verification steps
 
 ## Creating New ADRs
 

@@ -41,6 +41,17 @@ fn policy_steps_cannot_be_missing() {
 }
 
 #[test]
+fn step_dependency_cycles_are_rejected() {
+    let mut config = repository_config();
+    let first = config.steps[0].id.clone();
+    let second = config.steps[1].id.clone();
+    config.steps[0].depends_on = vec![second];
+    config.steps[1].depends_on = vec![first];
+    let error = config.validate().expect_err("cycle must fail");
+    assert!(error.to_string().contains("cycle"));
+}
+
+#[test]
 fn shell_command_strings_are_rejected() {
     let mut config = repository_config();
     let step = config.steps.first_mut().expect("step");
