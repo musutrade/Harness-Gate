@@ -1,5 +1,5 @@
 use super::output::print_scope;
-use crate::cli::{Commands, ConfigAction};
+use crate::cli::{Commands, ConfigAction, ConfigFormat};
 use crate::error::CliError;
 use crate::project::Project;
 use crate::scope::ScopeMode;
@@ -132,7 +132,9 @@ pub(super) fn run(project: &Project, command: Commands) -> Result<bool, CliError
 
 fn run_config(project: &Project, action: ConfigAction) -> Result<bool, CliError> {
     match action {
-        ConfigAction::Check => {
+        ConfigAction::Check {
+            format: ConfigFormat::Human,
+        } => {
             println!("Configuration valid: {}", project.config_path.display());
             println!("Schema version: {}", project.config.version);
             println!(
@@ -158,6 +160,16 @@ fn run_config(project: &Project, action: ConfigAction) -> Result<bool, CliError>
             );
             println!("Verification steps: {}", project.config.steps.len());
             Ok(true)
+        }
+        ConfigAction::Check {
+            format: ConfigFormat::Json,
+        } => {
+            let report = project.config.diagnostics_report();
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&report).map_err(anyhow::Error::from)?
+            );
+            Ok(report.valid)
         }
         ConfigAction::Print { resolved } => {
             if resolved {

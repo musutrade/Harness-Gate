@@ -160,7 +160,8 @@ Presets are starting points, not runtime branches. After initialization is compl
 | `harness-gate verify --profile ci --all`                     | Execute specified profile for all components |
 | `harness-gate hook`                                          | Execute hook profile on staged snapshot   |
 | `harness-gate step <id>`                                     | Run a single step after passing secrets/audit |
-| `harness-gate config check`                                  | Validate schema, references, paths and environment overrides |
+| `harness-gate config check`                                  | Validate schema, references, paths, environment overrides, and resource safety |
+| `harness-gate config check --format json`                    | Emit stable field-path diagnostics for editors and CI          |
 | `harness-gate config print --resolved`                       | Output final effective configuration      |
 | `harness-gate config migrate`                                | Convert schema v1 to v2                   |
 | `harness-gate schema export`                                 | Generate JSON Schema for flow.toml         |

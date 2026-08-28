@@ -1,3 +1,4 @@
+use super::diagnostic::{interpolation_diagnostic, parse_diagnostic, ConfigDiagnostics, SourceMap};
 use super::model::{FlowConfig, ParserConfig, ServiceConfig, StepConfig};
 use anyhow::{Context, Result};
 use schemars::schema_for;
@@ -7,21 +8,55 @@ use std::fs;
 use std::path::Path;
 
 impl FlowConfig {
+    #[allow(dead_code)]
     pub fn load(path: &Path) -> Result<Self> {
-        let source = fs::read_to_string(path)
-            .with_context(|| format!("read workflow config {}", path.display()))?;
-        let source = interpolate_environment(&source)?;
-        let mut config: Self = toml::from_str(&source)
-            .with_context(|| format!("parse workflow config {}", path.display()))?;
-        config.apply_environment()?;
-        config.validate()?;
-        Ok(config)
+        Self::load_with_diagnostics(path, None).map_err(anyhow::Error::from)
+    }
+
+    pub fn load_with_diagnostics(
+        path: &Path,
+        repository_root: Option<&Path>,
+    ) -> std::result::Result<Self, ConfigDiagnostics> {
+        let source = fs::read_to_string(path).map_err(|_| {
+            ConfigDiagnostics::single(
+                "HGCFG-READ",
+                "$",
+                "workflow configuration could not be read",
+                "check that the configured file exists and is readable",
+            )
+            .with_source(path)
+        })?;
+        Self::from_source_with_diagnostics(&source, Some(path), repository_root)
     }
 
     pub fn from_source(source: &str) -> Result<Self> {
-        let source = interpolate_environment(source)?;
-        let config: Self = toml::from_str(&source).context("parse workflow config")?;
-        config.validate()?;
+        Self::from_source_with_diagnostics(source, None, None).map_err(anyhow::Error::from)
+    }
+
+    pub fn from_source_with_diagnostics(
+        source: &str,
+        source_path: Option<&Path>,
+        repository_root: Option<&Path>,
+    ) -> std::result::Result<Self, ConfigDiagnostics> {
+        let source_map = SourceMap::from_source(source);
+        let source = interpolate_environment(source, source_path)?;
+        let mut config: Self = toml::from_str(&source)
+            .map_err(|error| parse_diagnostic(&source, error, source_path))?;
+        config.apply_environment().map_err(|error| {
+            let path = if error.to_string().contains("integer") {
+                "steps[*].timeout_env"
+            } else {
+                "$"
+            };
+            ConfigDiagnostics::single(
+                "HGCFG-ENVIRONMENT-OVERRIDE",
+                path,
+                "an environment override has an invalid value",
+                "set the named override to the required value type or unset it",
+            )
+            .with_source_opt(source_path)
+        })?;
+        config.validate_with_diagnostics(&source_map, source_path, repository_root)?;
         Ok(config)
     }
 
@@ -30,6 +65,10 @@ impl FlowConfig {
             .iter()
             .map(|step| step.component.clone())
             .collect()
+    }
+
+    pub fn diagnostics_report(&self) -> super::diagnostic::ConfigCheckReport {
+        ConfigDiagnostics::empty().report()
     }
 
     pub fn step(&self, id: &str) -> Option<&StepConfig> {
@@ -94,15 +133,24 @@ pub fn schema_json() -> Result<String> {
     serde_json::to_string_pretty(&schema_for!(FlowConfig)).context("serialize workflow schema")
 }
 
-fn interpolate_environment(source: &str) -> Result<String> {
+fn interpolate_environment(
+    source: &str,
+    source_path: Option<&Path>,
+) -> std::result::Result<String, ConfigDiagnostics> {
     let mut output = String::with_capacity(source.len());
     let mut rest = source;
+    let mut consumed = 0usize;
     while let Some(start) = rest.find("${") {
         output.push_str(&rest[..start]);
-        let end = rest[start + 2..]
-            .find('}')
-            .ok_or_else(|| anyhow::anyhow!("unterminated environment interpolation"))?
-            + start
+        let end = rest[start + 2..].find('}').ok_or_else(|| {
+            interpolation_diagnostic(
+                source,
+                consumed..consumed + start + 2,
+                "environment interpolation is unterminated",
+                "close the expression with `}` or remove the incomplete `${...` token",
+                source_path,
+            )
+        })? + start
             + 2;
         let expression = &rest[start + 2..end];
         let (name, default) = expression
@@ -113,21 +161,45 @@ fn interpolate_environment(source: &str) -> Result<String> {
                 .bytes()
                 .all(|byte| byte.is_ascii_alphanumeric() || byte == b'_')
         {
-            return Err(anyhow::anyhow!(
-                "invalid environment interpolation `${{{expression}}}`"
+            return Err(interpolation_diagnostic(
+                source,
+                consumed + start..consumed + end + 1,
+                "environment interpolation has an invalid variable name",
+                "use an ASCII letter, digit, or underscore after `${`",
+                source_path,
             ));
         }
         let value = std::env::var(name)
             .ok()
             .or_else(|| default.map(str::to_owned))
             .ok_or_else(|| {
-                anyhow::anyhow!("environment variable {name} is not set and has no default")
+                interpolation_diagnostic(
+                    source,
+                    consumed + start..consumed + end + 1,
+                    format!("environment variable {name} is not set and has no default"),
+                    format!("set {name} or use `${{{name}:-default}}`"),
+                    source_path,
+                )
             })?;
         output.push_str(&value);
         rest = &rest[end + 1..];
+        consumed += end + 1;
     }
     output.push_str(rest);
     Ok(output)
+}
+
+trait DiagnosticsContext {
+    fn with_source_opt(self, source: Option<&Path>) -> Self;
+}
+
+impl DiagnosticsContext for ConfigDiagnostics {
+    fn with_source_opt(self, source: Option<&Path>) -> Self {
+        match source {
+            Some(path) => self.with_source(path),
+            None => self,
+        }
+    }
 }
 
 fn override_string(name: &str, target: &mut String) {

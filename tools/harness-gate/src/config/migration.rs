@@ -1,7 +1,7 @@
 use super::model::{
     default_doctor_timeout, DoctorCheck, DoctorCheckKind, DoctorConfig, ExternalValuePolicy,
     FlowConfig, ParserConfig, PathAlias, PathType, PathsConfig, PolicyConfig, ProjectConfig,
-    ScopeConfig, ServiceConfig, StepConfig, CONFIG_VERSION,
+    ReportTemplatesConfig, ScopeConfig, ServiceConfig, StepConfig, CONFIG_VERSION,
 };
 use anyhow::{bail, Context, Result};
 use serde::Deserialize;
@@ -290,6 +290,7 @@ pub fn migrate_v1(source: &str, project_name: &str) -> Result<FlowConfig> {
         doctor: DoctorConfig { checks },
         services,
         parsers,
+        report_templates: ReportTemplatesConfig::default(),
         scope: legacy.scope,
         steps,
     };

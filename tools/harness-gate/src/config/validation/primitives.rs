@@ -53,8 +53,21 @@ pub(super) fn validate_image(value: &str) -> Result<()> {
 
 pub(super) fn validate_repo_path(name: &str, value: &str) -> Result<()> {
     let path = Path::new(value);
-    if value.is_empty() || path.is_absolute() {
+    let windows_prefixed = value.starts_with("\\\\")
+        || value.starts_with("//")
+        || value
+            .as_bytes()
+            .get(1)
+            .is_some_and(|character| *character == b':')
+        || value.starts_with('\\');
+    if value.is_empty() || value.contains('\0') || path.is_absolute() || windows_prefixed {
         bail!("{name} must be a non-empty repository-relative path");
+    }
+    // `Path` follows the host platform. Reject Windows-style traversal on Unix
+    // too, so a configuration checked in CI cannot become an escape when it is
+    // later used on Windows.
+    if value.split(['/', '\\']).any(|component| component == "..") {
+        bail!("{name} may not escape the repository: {value:?}");
     }
     if path.components().any(|component| {
         matches!(

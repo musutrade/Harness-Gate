@@ -43,6 +43,17 @@
     "project": {
       "$ref": "#/definitions/ProjectConfig"
     },
+    "report_templates": {
+      "default": {
+        "root": null,
+        "template": null
+      },
+      "allOf": [
+        {
+          "$ref": "#/definitions/ReportTemplatesConfig"
+        }
+      ]
+    },
     "scope": {
       "$ref": "#/definitions/ScopeConfig"
     },
@@ -451,6 +462,26 @@
         },
         "name": {
           "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ReportTemplatesConfig": {
+      "type": "object",
+      "properties": {
+        "root": {
+          "default": null,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "template": {
+          "default": null,
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "additionalProperties": false
