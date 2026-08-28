@@ -3,24 +3,26 @@ use crate::config::{ParserConfig, StepConfig};
 use crate::process::{Task, TaskResult};
 use crate::project::Project;
 use crate::service::ServiceManager;
-use crate::ui::{self, Progress};
-use anyhow::{bail, Result};
+use crate::ui;
+use anyhow::Result;
 use std::fs;
+use std::sync::Mutex;
 
 pub(super) fn run_configured_step(
     project: &Project,
     step: &StepConfig,
-    services: &mut ServiceManager<'_>,
-    results: &mut Vec<TaskResult>,
-    progress: &mut Progress,
-) -> Result<()> {
+    services: &Mutex<ServiceManager<'_>>,
+) -> Result<TaskResult> {
     let mut service_env = Vec::new();
     for service in &step.services {
-        let environment = match services.environment(service) {
+        let environment = match services
+            .lock()
+            .map_err(|_| anyhow::anyhow!("service manager lock was poisoned"))?
+            .environment(service)
+        {
             Ok(environment) => environment,
             Err(error) => {
-                progress.begin(&step.label);
-                let result = TaskResult {
+                return Ok(TaskResult {
                     label: format!("{}: service {service} setup", step.label),
                     passed: false,
                     timed_out: false,
@@ -28,12 +30,7 @@ pub(super) fn run_configured_step(
                     duration_ms: 0,
                     log: String::new(),
                     detail: Some(format!("{error:#}")),
-                };
-                progress.clear();
-                print_result(&result);
-                progress.complete();
-                results.push(result);
-                return Ok(());
+                });
             }
         };
         service_env.push(environment);
@@ -42,12 +39,7 @@ pub(super) fn run_configured_step(
         .parser
         .as_deref()
         .and_then(|id| project.config.parser(id));
-    execute(
-        configured_task(project, step, service_env),
-        parser,
-        results,
-        progress,
-    )
+    execute(configured_task(project, step, service_env), parser)
 }
 
 fn configured_task(
@@ -73,18 +65,7 @@ fn configured_task(
     task
 }
 
-fn execute(
-    task: Task,
-    parser: Option<&ParserConfig>,
-    steps: &mut Vec<TaskResult>,
-    progress: &mut Progress,
-) -> Result<()> {
-    progress.begin(&task.label);
-    if !progress.enabled() {
-        print!("[RUN ] {} ... ", task.label);
-        use std::io::Write;
-        std::io::stdout().flush().ok();
-    }
+fn execute(task: Task, parser: Option<&ParserConfig>) -> Result<TaskResult> {
     let mut result = task.run()?;
     if result.passed {
         if let Some(parser) = parser {
@@ -100,18 +81,7 @@ fn execute(
             }
         }
     }
-    progress.clear();
-    if progress.enabled() {
-        print_result(&result);
-    } else {
-        print_result_inline(&result);
-    }
-    progress.complete();
-    if result.cancelled {
-        bail!("verification cancelled");
-    }
-    steps.push(result);
-    Ok(())
+    Ok(result)
 }
 
 pub(super) fn print_result(result: &TaskResult) {
@@ -126,6 +96,13 @@ pub(super) fn print_result(result: &TaskResult) {
     }
 }
 
+pub(super) fn print_external_result(result: &TaskResult) {
+    print!("[RUN ] {} ... ", result.label);
+    use std::io::Write;
+    std::io::stdout().flush().ok();
+    print_result_inline(result);
+}
+
 fn print_result_inline(result: &TaskResult) {
     let marker = if result.passed {
         ui::pass("PASS")
@@ -133,7 +110,7 @@ fn print_result_inline(result: &TaskResult) {
         ui::failure("FAIL")
     };
     println!("{marker} ({} ms)", result.duration_ms);
-    if !result.passed {
+    if !result.passed && !result.log.is_empty() {
         println!("       log: {}", result.log);
     }
 }
