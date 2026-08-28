@@ -21,6 +21,13 @@ python3 tools/quality/benchmarks.py
 python3 tools/quality/docs_consistency.py
 ```
 
+The benchmark runner executes the checked-in no-network fixture in both serial
+and opt-in parallel modes. Its JSON keeps per-mode raw samples, the configured
+concurrency limit, fixture-observed peak concurrency, report-derived step
+timings, scheduler overhead, and the shareable-service startup/reuse counts.
+A median comparison is under
+`verification.serial`, `verification.parallel`, and `verification.comparison`.
+
 `contracts.py --accept` writes the Linux textual golden snapshot and is a
 reviewed local operation; CI never passes that flag. `contracts.py --structured`
 is used for macOS and Windows to assert exit status, error code, reports, and
@@ -29,3 +36,8 @@ the no-ANSI policy without accepting platform-specific text.
 The scheduled `Refresh Quality Baseline` workflow creates a pull request for a
 new candidate baseline rather than rewriting a canonical result on its own.
 Review its JSON, Markdown, and uploaded raw reports together before merging.
+
+The CI workflow keeps coverage, contract, benchmark, and documentation jobs
+independent for diagnostics, then runs `quality-required` with `always()`. That
+aggregate job fails closed when any dependency fails, is cancelled, or is
+skipped, and is the single check to select in repository branch protection.

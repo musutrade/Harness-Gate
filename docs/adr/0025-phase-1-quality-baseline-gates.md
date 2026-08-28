@@ -223,6 +223,7 @@ The implementation adds clearly named, independently rerunnable jobs:
 | `quality-contracts` | CLI/report/error snapshots and cross-platform structured contract results. |
 | `quality-baseline` | Benchmark/size JSON, Markdown comparison, and raw samples. |
 | `docs-consistency` | Link results, example-load results, and schema diff. |
+| `quality-required` | Always-run aggregate that fails unless all four quality jobs succeed. |
 
 All jobs use the locked manifest and pin tool versions in a versioned quality
 tool manifest or action revision. Their output goes under a single predictable

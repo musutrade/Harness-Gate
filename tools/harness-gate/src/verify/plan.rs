@@ -27,16 +27,6 @@ pub(super) enum NodeStatus {
     Skipped,
 }
 
-impl NodeStatus {
-    pub fn from_passed(passed: bool) -> Self {
-        if passed {
-            Self::Passed
-        } else {
-            Self::Failed
-        }
-    }
-}
-
 #[derive(Debug, Clone)]
 #[allow(dead_code)]
 pub(super) struct NodeResult {
@@ -48,6 +38,9 @@ pub(super) struct NodeResult {
     pub detail: Option<String>,
     pub artifact: Option<String>,
     pub reason: Option<String>,
+    /// Preserve timeout/cancellation causes without changing the public report.
+    pub timed_out: bool,
+    pub cancelled: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -71,6 +64,7 @@ impl<'a> VerificationPlan<'a> {
         profile: &str,
         only_step: Option<&str>,
     ) -> Result<Self> {
+        validate_plan_configuration(project)?;
         let selected = selected_step_ids(project, scope, profile, only_step);
         if let Some(id) = only_step {
             if !project.config.steps.iter().any(|step| step.id == id) {
@@ -176,6 +170,75 @@ impl<'a> VerificationPlan<'a> {
         }
         Ok(Self { nodes: ordered })
     }
+}
+
+/// Validate the plan-facing portion of configuration again at the execution
+/// boundary. Normal project discovery already validates this data, but keeping
+/// this check here makes direct library/test callers fail closed as well.
+fn validate_plan_configuration(project: &Project) -> Result<()> {
+    let mut ids = HashSet::new();
+    let mut builtin_gates = HashSet::new();
+    let mut log_names = HashSet::new();
+    for step in &project.config.steps {
+        if !ids.insert(step.id.as_str()) {
+            bail!("verification plan contains duplicate node id {:?}", step.id);
+        }
+        match step.kind.as_deref().unwrap_or("external-step") {
+            "external-step" => {
+                if matches!(
+                    step.id.as_str(),
+                    "builtin.secret-scan" | "builtin.architecture-audit"
+                ) {
+                    bail!(
+                        "external step {:?} uses a reserved built-in gate id",
+                        step.id
+                    );
+                }
+                // Configuration loading normally performs this preflight. Keep
+                // the execution boundary fail-closed for direct Project callers.
+                if !log_names.insert(step.log.to_ascii_lowercase()) {
+                    bail!("verification plan contains duplicate log {:?}", step.log);
+                }
+            }
+            "builtin-gate" => {
+                let gate_type = step.gate_type.as_deref().ok_or_else(|| {
+                    anyhow::anyhow!("built-in gate {:?} requires gate_type", step.id)
+                })?;
+                if !matches!(gate_type, "secret-scan" | "architecture-audit") {
+                    bail!(
+                        "built-in gate {:?} has unknown gate_type {gate_type:?}",
+                        step.id
+                    );
+                }
+                let expected = format!("builtin.{gate_type}");
+                if step.id != expected {
+                    bail!(
+                        "built-in gate {:?} must use reserved id {expected:?}",
+                        step.id
+                    );
+                }
+                if !step.depends_on.is_empty() {
+                    bail!("built-in gate {:?} may not declare dependencies", step.id);
+                }
+                if !builtin_gates.insert(gate_type) {
+                    bail!("duplicate built-in gate type {gate_type:?}");
+                }
+            }
+            other => bail!("step {:?} has unknown kind {other:?}", step.id),
+        }
+    }
+    for step in &project.config.steps {
+        for dependency in &step.depends_on {
+            if !ids.contains(dependency.as_str()) {
+                bail!(
+                    "verification plan node {:?} references missing dependency {:?}",
+                    step.id,
+                    dependency
+                );
+            }
+        }
+    }
+    Ok(())
 }
 
 fn selected_step_ids(
@@ -289,5 +352,43 @@ mod tests {
         assert!(plan.nodes[2]
             .depends_on
             .contains(&"builtin.architecture-audit".into()));
+    }
+
+    #[test]
+    fn plan_rejects_duplicate_ids_before_building_nodes() {
+        let workspace = TestWorkspace::new("verify-plan-duplicate");
+        crate::preset::init(&workspace.root, "generic", false).expect("initialize fixture");
+        workspace.init_git();
+        let mut project = Project::discover(Some(workspace.root.clone()), None).expect("discover");
+        let duplicate = project.config.steps[0].id.clone();
+        project.config.steps[1].id = duplicate.clone();
+        let error = VerificationPlan::build(&project, &ScopeResult::all(&project), "full", None)
+            .expect_err("duplicate plan ids must fail");
+        assert!(error.to_string().contains("duplicate node id"));
+        assert!(error.to_string().contains(&duplicate));
+    }
+
+    #[test]
+    fn plan_rejects_missing_dependency_at_execution_boundary() {
+        let workspace = TestWorkspace::new("verify-plan-missing-dependency");
+        crate::preset::init(&workspace.root, "generic", false).expect("initialize fixture");
+        workspace.init_git();
+        let mut project = Project::discover(Some(workspace.root.clone()), None).expect("discover");
+        project.config.steps[0].depends_on = vec!["does-not-exist".into()];
+        let error = VerificationPlan::build(&project, &ScopeResult::all(&project), "full", None)
+            .expect_err("missing dependencies must fail");
+        assert!(error.to_string().contains("missing dependency"));
+    }
+
+    #[test]
+    fn plan_rejects_duplicate_logs_at_execution_boundary() {
+        let workspace = TestWorkspace::new("verify-plan-duplicate-log");
+        crate::preset::init(&workspace.root, "generic", false).expect("initialize fixture");
+        workspace.init_git();
+        let mut project = Project::discover(Some(workspace.root.clone()), None).expect("discover");
+        project.config.steps[1].log = project.config.steps[0].log.clone();
+        let error = VerificationPlan::build(&project, &ScopeResult::all(&project), "full", None)
+            .expect_err("duplicate logs must fail before execution");
+        assert!(error.to_string().contains("duplicate log"));
     }
 }

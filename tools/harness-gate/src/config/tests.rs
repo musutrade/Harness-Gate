@@ -159,6 +159,35 @@ fn built_in_gate_declarations_are_validated_as_typed_steps() {
 }
 
 #[test]
+fn both_builtin_gate_declarations_can_coexist_without_log_conflicts() {
+    let mut config = repository_config();
+    let mut secret = config.steps[0].clone();
+    secret.id = "builtin.secret-scan".into();
+    secret.label = "repository secret policy".into();
+    secret.component.clear();
+    secret.program.clear();
+    secret.args.clear();
+    secret.cwd.clear();
+    secret.log.clear();
+    secret.timeout_secs = 0;
+    secret.timeout_env = None;
+    secret.parser = None;
+    secret.services.clear();
+    secret.remove_env.clear();
+    secret.depends_on.clear();
+    secret.kind = Some("builtin-gate".into());
+    secret.gate_type = Some("secret-scan".into());
+
+    let mut audit = secret.clone();
+    audit.id = "builtin.architecture-audit".into();
+    audit.label = "architecture policy".into();
+    audit.gate_type = Some("architecture-audit".into());
+    config.steps.extend([secret, audit]);
+
+    config.validate().expect("both built-in gates are valid");
+}
+
+#[test]
 fn unknown_built_in_gate_types_fail_closed() {
     let mut config = repository_config();
     let gate = &mut config.steps[0];
@@ -313,6 +342,40 @@ fn dependency_order_allows_service_reuse_but_not_log_reuse() {
         .diagnostics
         .iter()
         .any(|diagnostic| diagnostic.id == "HGCFG-SHARED-SERVICE"));
+}
+
+#[test]
+fn step_logs_reject_windows_and_path_like_names_on_every_platform() {
+    let mut config = repository_config();
+    for value in [
+        "..\\outside.log",
+        "C:\\outside.log",
+        "\\\\server\\share.log",
+        "nested/output.log",
+        "stream:output.log",
+    ] {
+        config.steps[0].log = value.into();
+        let error = config
+            .validate()
+            .expect_err("path-like log name must fail closed");
+        assert!(error.to_string().contains("log"), "{value}: {error:#}");
+    }
+}
+
+#[test]
+fn duplicate_logs_use_a_conservative_case_normalized_identity() {
+    let mut config = repository_config();
+    config.steps[0].log = "Unit-tests.log".into();
+    config.steps[1].log = "unit-tests.log".into();
+
+    let source = toml::to_string_pretty(&config).expect("serialize fixture");
+    let error = FlowConfig::from_source_with_diagnostics(&source, None, None)
+        .expect_err("case-insensitive log collision must fail");
+    assert!(error
+        .report()
+        .diagnostics
+        .iter()
+        .any(|diagnostic| diagnostic.id == "HGCFG-DUPLICATE-LOG"));
 }
 
 #[test]
@@ -547,4 +610,31 @@ fn template_symlink_escape_is_rejected() {
         .diagnostics
         .iter()
         .any(|diagnostic| diagnostic.id == "HGCFG-TEMPLATE-PATH"));
+}
+
+#[test]
+fn junit_report_path_must_stay_relative_to_the_report_directory() {
+    let source = format!(
+        "{}\n[report_templates]\njunit = \"../junit.xml\"\n",
+        include_str!("../../presets/rust-api.flow.toml")
+    );
+    let error = FlowConfig::from_source(&source).expect_err("JUnit traversal must fail");
+    assert!(error.to_string().contains("report_templates.junit"));
+}
+
+#[test]
+fn webhook_configuration_requires_http_url_and_an_enabled_result() {
+    let invalid_scheme = format!(
+        "{}\n[[notifications.webhooks]]\nurl = \"ftp://example.test/hook\"\n",
+        include_str!("../../presets/rust-api.flow.toml")
+    );
+    let error = FlowConfig::from_source(&invalid_scheme).expect_err("FTP webhook must fail");
+    assert!(error.to_string().contains("notifications"));
+
+    let disabled = format!(
+        "{}\n[[notifications.webhooks]]\nurl = \"https://example.test/hook\"\non_failure = false\non_success = false\n",
+        include_str!("../../presets/rust-api.flow.toml")
+    );
+    let error = FlowConfig::from_source(&disabled).expect_err("disabled webhook must fail");
+    assert!(error.to_string().contains("notifications"));
 }

@@ -108,6 +108,12 @@ version = 2
 # parallel = false
 # max_parallel = 4
 
+[notifications]
+# [[notifications.webhooks]]
+# url = "${HARNESS_GATE_WEBHOOK_URL}"
+# on_failure = true
+# on_success = false
+
 [[doctor.checks]]
 # ...
 
@@ -137,7 +143,8 @@ version = 2
 | `[parsers.*]`       | 否   | 从测试日志计算结果数        |
 | `[[scope.rules]]`   | 是   | 变更路径到 component 的映射 |
 | `[[steps]]`         | 是   | 实际执行的命令步骤          |
-| `[report_templates]` | 否  | 未来 HTML/Tera 报告的只读模板输入；当前仅校验路径安全，不渲染模板 |
+| `[report_templates]` | 否  | 可选 HTML 模板和 JUnit 输出配置 |
+| `[notifications]`   | 否   | 可选 HTTP Webhook 通知         |
 
 未知字段会直接导致解析失败，避免拼写错误被静默忽略。
 
@@ -307,11 +314,12 @@ inject_env = "TEST_REDIS_URL"
 
 步骤启动前读取 `source_env`，并以 `inject_env` 注入子进程。变量不存在时步骤失败。
 
-### 8.2 Docker service
+### 8.2 Docker-compatible container service
 
 ```toml
 [services.test-postgres]
 kind = "docker"
+runtime = "docker" # docker | podman
 image = "postgres:16-alpine"
 image_env = "ARC_FLOW_POSTGRES_IMAGE"
 external_env = "TEST_DATABASE_URL"
@@ -327,6 +335,7 @@ connection = "postgres://test:test@127.0.0.1:{host_port}/app_test"
 
 | 字段                   | 必需 | 说明                                           |
 | ---------------------- | ---- | ---------------------------------------------- |
+| `runtime`              | 否   | 容器 CLI，`docker`（默认）或兼容的 `podman` |
 | `image`                | 是   | 本机已有的 OCI 镜像；运行时使用 `--pull=never` |
 | `image_env`            | 否   | 覆盖镜像名                                     |
 | `external_env`         | 否   | 若该变量已设置，直接使用其值并跳过 Docker      |
@@ -339,7 +348,7 @@ connection = "postgres://test:test@127.0.0.1:{host_port}/app_test"
 | `healthcheck`          | 是   | `docker exec` 后的参数列表，不能为空           |
 | `connection`           | 是   | 注入值，必须包含 `{host_port}`                 |
 
-服务按需启动，同一轮验证内复用。Docker daemon 探测、容器创建、端口查询和健康检查共享一个启动截止时间；验证成功、失败、超时或收到中断信号时都会在独立清理超时内尝试 `docker rm --force`。镜像不会自动拉取，先用 `docker pull <image>` 准备。
+服务按需启动，同一轮验证内复用。选定 runtime 的 daemon 探测、容器创建、端口查询和健康检查共享一个启动截止时间；验证成功、失败、超时或收到中断信号时都会在独立清理超时内尝试 `<runtime> rm --force`。镜像不会自动拉取，先用 `<runtime> pull <image>` 准备。
 
 `isolated-postgres` 会要求 URL 使用 `postgres`/`postgresql` 协议，数据库名以 `_test` 或
 `-test` 结尾，并拒绝与当前 `DATABASE_URL` 指向同一数据库。默认只允许本机回环地址；确需
@@ -716,21 +725,48 @@ harness-gate verify --all
 每个 `log` 都必须是唯一的单个 `.log` 文件名。即使两个步骤已有 `depends_on` 顺序，也不能复用
 同一日志：串行复用同样会覆盖报告证据。错误诊断会同时指出两个 `steps[*].log` 字段。
 
-### 未来报告模板路径
+### 报告模板、JUnit 和通知
 
-当前版本不渲染 HTML/Tera 模板，但可以提前声明并检查模板输入路径：
+HTML 模板和 JUnit 输出是可选的；默认 JSON/Markdown 文件保持不变：
 
 ```toml
 [report_templates]
 root = "templates/harness-gate"
 template = "templates/harness-gate/verification.tera"
+junit = "junit.xml"
 ```
 
 `root` 和 `template` 必须同时存在；二者必须是仓库内路径，不能是绝对路径、Windows 前缀、
 `..` 跳转或 NUL。模板根必须存在且为目录，模板必须存在且为 `.html` 或 `.tera` 普通文件；
 解析符号链接后仍必须在仓库和模板根内。模板根不能等于、包含或被 `paths.reports` 包含。
-这些路径是只读输入，当前不会创建文件、加载 Tera、处理 include/inheritance，或改变现有
-JSON/Markdown 报告。
+模板路径相对于仓库根，模板支持 `{{ timestamp }}`、`{{ profile }}`、`{{ summary }}` 和
+`{{ components }}` 替换，也可使用 Tera 的 `include`、`extends` 和 `block`。模板上下文同时提供
+完整的 `report` 对象及其 `timestamp`、`profile`、`scope`、`steps` 和 `passed` 字段。输出固定为报告目录中的 `test_result.html`。`junit` 路径相对于报告目录，
+必须是报告目录内的 `.xml` 文件名或子路径；运行时还会检查现有目录和符号链接不会把输出重定向到目录外。
+模板输入仍是只读且受路径隔离校验。
+
+### 容器运行时和 Webhook
+
+Docker service 可显式选择 Docker 兼容的 Podman CLI，省略时默认为 Docker：
+
+```toml
+[services.postgres]
+kind = "docker"
+runtime = "podman" # docker | podman
+```
+
+Webhook 在报告写入成功后发送报告 JSON。仅启用的结果类型会发送；URL 建议使用环境变量插值：
+
+```toml
+[[notifications.webhooks]]
+url = "${HARNESS_GATE_WEBHOOK_URL}"
+on_failure = true
+on_success = false
+```
+
+Webhook 只支持 `http` 和 `https`，非 2xx 响应或连接错误会使本次验证返回报告错误（`E1404`）。
+`on_failure` 默认开启，`on_success` 默认关闭；至少启用一个结果类型。通知失败不会改写已经生成的报告。
+多个 webhook 按配置文件中的顺序发送；第一个请求失败后立即停止，后续 endpoint 不会被调用。
 
 ### v1 到 v2 配置迁移和安全修复
 
