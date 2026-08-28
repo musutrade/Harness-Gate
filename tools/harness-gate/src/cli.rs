@@ -93,6 +93,11 @@ pub(crate) enum Commands {
         #[command(subcommand)]
         action: ConfigAction,
     },
+    /// Generate artifacts for the workflow configuration model.
+    Schema {
+        #[command(subcommand)]
+        action: SchemaAction,
+    },
     /// Run one configured full-profile step after secrets and audit gates.
     Step {
         /// Step id from flow.toml, for example api.clippy.
@@ -108,6 +113,15 @@ pub(crate) enum Commands {
     },
     /// List embedded project presets.
     Presets,
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum SchemaAction {
+    /// Export the JSON Schema for flow.toml.
+    Export {
+        #[arg(long, value_name = "PATH", default_value = "schema/flow.schema.json")]
+        output: PathBuf,
+    },
 }
 
 #[derive(Debug, Subcommand)]

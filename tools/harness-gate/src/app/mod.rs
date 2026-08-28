@@ -1,7 +1,7 @@
 mod commands;
 mod output;
 
-use crate::cli::{Cli, Commands, ConfigAction};
+use crate::cli::{Cli, Commands, ConfigAction, SchemaAction};
 use crate::error::CliError;
 use crate::project::Project;
 use anyhow::Context;
@@ -24,6 +24,28 @@ pub(crate) fn run() -> Result<bool, CliError> {
     }
     if matches!(cli.command, Commands::Presets) {
         crate::preset::print_presets();
+        return Ok(true);
+    }
+    if let Commands::Schema {
+        action: SchemaAction::Export { output },
+    } = &cli.command
+    {
+        let root = cli
+            .project_root
+            .clone()
+            .unwrap_or(std::env::current_dir().context("read current directory")?);
+        let path = if output.is_absolute() {
+            output.clone()
+        } else {
+            root.join(output)
+        };
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent)
+                .with_context(|| format!("create schema directory {}", parent.display()))?;
+        }
+        std::fs::write(&path, format!("{}\n", crate::config::schema_json()?))
+            .with_context(|| format!("write workflow schema {}", path.display()))?;
+        println!("Schema written: {}", path.display());
         return Ok(true);
     }
     if let Commands::Config {
