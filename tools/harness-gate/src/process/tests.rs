@@ -15,6 +15,7 @@ fn timeout_terminates_the_task() {
 
     assert!(!result.passed);
     assert!(result.timed_out);
+    assert!(log.is_file());
     let _ = fs::remove_file(log);
 }
 

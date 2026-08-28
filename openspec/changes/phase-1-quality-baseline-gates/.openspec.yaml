@@ -1,0 +1,4 @@
+skip_specs: true
+schema: spec-driven
+created: 2026-08-28
+goal: Establish reproducible quality evidence and blocking baseline gates before structural refactoring

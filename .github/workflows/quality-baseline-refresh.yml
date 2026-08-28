@@ -1,0 +1,51 @@
+name: Refresh Quality Baseline
+
+on:
+  schedule:
+    - cron: '17 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    name: Capture reviewable baseline candidate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-nextest
+        run: cargo install cargo-nextest --locked --force
+
+      - name: Capture candidate measurements
+        run: |
+          python3 tools/quality/benchmarks.py \
+            --samples 5 \
+            --output docs/benchmarks/phase-1/current.json \
+            --raw-dir target/quality/benchmark-runs
+
+      - name: Upload raw benchmark evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: quality-baseline-refresh-${{ github.run_id }}
+          path: target/quality
+          if-no-files-found: warn
+
+      - name: Create baseline update pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: automation/quality-baseline-${{ github.run_id }}
+          delete-branch: true
+          commit-message: 'chore(quality): refresh phase one baseline'
+          title: 'chore(quality): refresh phase one baseline'
+          body: |
+            Automated weekly/manual candidate baseline refresh.
+
+            Review the benchmark JSON and Markdown changes together with the
+            `quality-baseline-refresh-${{ github.run_id }}` artifact before merging.

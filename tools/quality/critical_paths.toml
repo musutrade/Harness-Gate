@@ -1,0 +1,69 @@
+version = 1
+
+[[paths]]
+id = "process.timeout"
+module = "process"
+test = "process::tests::timeout_terminates_the_task"
+platforms = ["linux", "macos"]
+platform_note = "The task test uses the Unix process timeout implementation."
+observable = "TaskResult.timed_out=true, passed=false, and the log exists"
+
+[[paths]]
+id = "process.cancellation"
+module = "process"
+test = "integration_test::test_verify_cancellation_stops_the_child_process"
+platforms = ["linux", "macos"]
+platform_note = "The integration fixture sends SIGTERM to the isolated Unix process group."
+observable = "TaskResult.cancelled=true and the child process is terminated"
+
+[[paths]]
+id = "process.tree_cleanup"
+module = "process"
+test = "process::tests::timeout_terminates_the_task"
+platforms = ["linux"]
+platform_note = "Linux-only process-tree assertion; Windows uses the platform termination implementation."
+observable = "The isolated process tree has no surviving child after timeout"
+
+[[paths]]
+id = "step.non_zero"
+module = "verify"
+test = "verify::tests::non_zero_step_retains_exit_detail_and_log"
+platforms = ["linux", "macos"]
+platform_note = "The failure fixture invokes the Unix `sh` command."
+observable = "Failure result retains exit-code detail and log path"
+
+[[paths]]
+id = "service.environment_failure"
+module = "service"
+test = "verify::tests::service_failure_does_not_skip_unrelated_steps"
+platforms = ["linux", "macos", "windows"]
+observable = "Requesting step fails with service detail and unrelated step is represented"
+
+[[paths]]
+id = "gate.failure_report"
+module = "verify"
+test = "verify::tests::gate_failure_writes_compatible_report"
+platforms = ["linux", "macos", "windows"]
+observable = "Built-in gate failure stops configured steps and writes test_result report"
+
+[[paths]]
+id = "config.invalid"
+module = "config"
+test = "config::tests::unknown_fields_are_rejected"
+platforms = ["linux", "macos", "windows"]
+observable = "Invalid configuration fails before execution"
+
+[[paths]]
+id = "parser.failure"
+module = "verify"
+test = "verify::tests::parser_failure_marks_step_failed"
+platforms = ["linux", "macos"]
+platform_note = "The parser fixture invokes the Unix `sh` command."
+observable = "Parser failure produces a failed task result"
+
+[[paths]]
+id = "report.write_failure"
+module = "verify"
+test = "verify::tests::report_write_failure_returns_error"
+platforms = ["linux", "macos", "windows"]
+observable = "Report write failure returns the report error boundary"
