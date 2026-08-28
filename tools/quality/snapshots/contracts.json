@@ -85,12 +85,27 @@
       "exit_code": 0,
       "expected_exit_code": 0,
       "name": "config-valid",
-      "reports": {
-        "logs": {}
-      },
+      "reports": {},
       "status": "pass",
       "stderr": "",
       "stdout": "Configuration valid: <PROJECT_ROOT>/.harness-gate/flow.toml\nSchema version: 2\nComponents: project\nProfiles: full, hook\nVerification steps: 2\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "config",
+        "check",
+        "--format",
+        "json"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "config-json-valid",
+      "reports": {},
+      "status": "pass",
+      "stderr": "",
+      "stdout": "{\n  \"schema_version\": 1,\n  \"valid\": true,\n  \"truncated\": false,\n  \"diagnostics\": []\n}\n"
     },
     {
       "ansi": false,
@@ -106,8 +121,25 @@
       "name": "config-invalid",
       "reports": {},
       "status": "pass",
-      "stderr": "ERROR [E1000]: command failed: parse workflow config <PROJECT_ROOT>/.harness-gate/flow.toml: TOML parse error at line 2, column 1\n  |\n2 | invalid = true\n  | ^^^^^^^\nunknown field `invalid`, expected one of `version`, `project`, `paths`, `policy`, `doctor`, `services`, `parsers`, `scope`, `steps`\n\n",
+      "stderr": "ERROR [E1000]: command failed: <PROJECT_ROOT>/.harness-gate/flow.toml: error [HGCFG-TOML-PARSE] at $: configuration is not valid TOML (line 2, column 1)\n  help: fix the TOML syntax or unknown field reported by the parser\n",
       "stdout": ""
+    },
+    {
+      "ansi": false,
+      "args": [
+        "config",
+        "check",
+        "--format",
+        "json"
+      ],
+      "error_codes": [],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "name": "config-json-invalid",
+      "reports": {},
+      "status": "pass",
+      "stderr": "",
+      "stdout": "{\n  \"schema_version\": 1,\n  \"valid\": false,\n  \"truncated\": false,\n  \"diagnostics\": [\n    {\n      \"id\": \"HGCFG-TOML-PARSE\",\n      \"severity\": \"error\",\n      \"path\": \"$\",\n      \"message\": \"configuration is not valid TOML\",\n      \"help\": \"fix the TOML syntax or unknown field reported by the parser\",\n      \"location\": {\n        \"line\": 2,\n        \"column\": 1\n      }\n    }\n  ]\n}\n"
     },
     {
       "ansi": false,
