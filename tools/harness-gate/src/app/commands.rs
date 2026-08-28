@@ -124,7 +124,7 @@ pub(super) fn run(project: &Project, command: Commands) -> Result<bool, CliError
         }
         Commands::Config { action } => run_config(project, action),
         Commands::Step { id } => Ok(crate::verify::run_step(project, &id)?.passed),
-        Commands::Init { .. } | Commands::Presets => {
+        Commands::Init { .. } | Commands::Presets | Commands::Schema { .. } => {
             unreachable!("handled before project discovery")
         }
     }
