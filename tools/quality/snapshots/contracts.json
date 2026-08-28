@@ -1,0 +1,315 @@
+{
+  "scenarios": [
+    {
+      "ansi": false,
+      "args": [
+        "--help"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "help",
+      "reports": {},
+      "status": "pass",
+      "stderr": "",
+      "stdout": "Configurable development workflow and architecture guard\n\nUsage: harness-gate [OPTIONS] <COMMAND>\n\nCommands:\n  doctor      Check local tools, configuration, Git, and test database access\n  scope       Show changed files and the verification components they select\n  secrets     Scan file names for high-confidence credential patterns\n  audit       Run deterministic architecture rules and write review_context reports\n  verify      Run gates and configured steps for the selected profile and components [alias: check]\n  hook        Run the staged, fast verification profile used by pre-commit\n  parse-logs  Extract one trace's error context from JSON Lines logs\n  config      Validate or inspect the repository workflow configuration\n  schema      Generate artifacts for the workflow configuration model\n  step        Run one configured full-profile step after secrets and audit gates\n  init        Initialize .harness-gate configuration from an embedded preset\n  presets     List embedded project presets\n  help        Print this message or the help of the given subcommand(s)\n\nOptions:\n      --color <COLOR>        Control colored terminal output [default: auto] [possible values: auto, always, never]\n      --project-root <PATH>  Override automatic project root discovery\n      --config <PATH>        Override the repository workflow configuration file\n  -h, --help                 Print help\n  -V, --version              Print version\n\nExamples:\n  harness-gate presets\n  harness-gate init --preset rust-api\n  harness-gate doctor\n  harness-gate verify --all\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "--version"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "version",
+      "reports": {},
+      "status": "pass",
+      "stderr": "",
+      "stdout": "harness-gate 0.2.0\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "presets"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "presets",
+      "reports": {},
+      "status": "pass",
+      "stderr": "",
+      "stdout": "generic                  Git-based project with a minimal diff check\nrust-api                 Single Rust crate with fmt, Clippy, check, and tests\nangular-only             Angular/npm project with lint, tests, and build\nangular-rust-postgres    Angular frontend, Rust backend, and temporary PostgreSQL\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "init",
+        "--preset",
+        "generic"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "init",
+      "reports": {},
+      "status": "pass",
+      "stderr": "",
+      "stdout": "Initialized preset \"generic\" in <PROJECT_ROOT>/.harness-gate\nNext: arc-flow --project-root <PROJECT_ROOT> config check\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "schema",
+        "export",
+        "--output",
+        "schema/flow.schema.json"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "schema",
+      "reports": {},
+      "status": "pass",
+      "stderr": "",
+      "stdout": "Schema written: <PROJECT_ROOT>/schema/flow.schema.json\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "config",
+        "check"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "config-valid",
+      "reports": {
+        "logs": {}
+      },
+      "status": "pass",
+      "stderr": "",
+      "stdout": "Configuration valid: <PROJECT_ROOT>/.harness-gate/flow.toml\nSchema version: 2\nComponents: project\nProfiles: full, hook\nVerification steps: 2\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "config",
+        "check"
+      ],
+      "error_codes": [
+        "E1000"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "name": "config-invalid",
+      "reports": {},
+      "status": "pass",
+      "stderr": "ERROR [E1000]: command failed: parse workflow config <PROJECT_ROOT>/.harness-gate/flow.toml: TOML parse error at line 2, column 1\n  |\n2 | invalid = true\n  | ^^^^^^^\nunknown field `invalid`, expected one of `version`, `project`, `paths`, `policy`, `doctor`, `services`, `parsers`, `scope`, `steps`\n\n",
+      "stdout": ""
+    },
+    {
+      "ansi": false,
+      "args": [
+        "scope",
+        "--all"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "scope",
+      "reports": {
+        "logs": {},
+        "scope.json": {
+          "content": "{\n  \"mode\": \"all\",\n  \"changed_files\": [],\n  \"components\": [\n    \"project\"\n  ],\n  \"unmatched_files\": []\n}",
+          "exists": true
+        }
+      },
+      "status": "pass",
+      "stderr": "",
+      "stdout": "Scope: all\nChanged files: 0\nComponents: project\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "secrets",
+        "--staged"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "secrets",
+      "reports": {
+        "logs": {},
+        "secret_scan.json": {
+          "content": "{\n  \"timestamp\": \"<TIMESTAMP>\n  \"mode\": \"staged\",\n  \"findings\": []\n}",
+          "exists": true
+        }
+      },
+      "status": "pass",
+      "stderr": "",
+      "stdout": "Secret scan passed\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "audit"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "audit",
+      "reports": {
+        "logs": {},
+        "review_context.json": {
+          "content": "{\n  \"timestamp\": \"<TIMESTAMP>\n  \"hard_violations\": [],\n  \"arch_violations\": [],\n  \"summary\": {\n    \"total_violations\": 0,\n    \"blocker_count\": 0,\n    \"error_count\": 0,\n    \"warning_count\": 0\n  }\n}",
+          "exists": true
+        },
+        "review_context.md": {
+          "content": "=== \u3010\u81ea\u52a8\u5316\u786c\u6027\u7ea6\u675f\u626b\u63cf\u7ed3\u679c\u3011 ===\n\n=== \u3010\u67b6\u6784\u5206\u5c42\u8fdd\u89c4\u9884\u626b\u63cf\u3011 ===\n\n",
+          "exists": true
+        }
+      },
+      "status": "pass",
+      "stderr": "",
+      "stdout": "Audit: 0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\nReport: <PROJECT_ROOT>/.harness-gate/reports/review_context.json\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "verify",
+        "--all"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "verify-success",
+      "reports": {
+        "logs": {
+          "logs/git_diff_check.log": ""
+        },
+        "test_result.json": {
+          "content": "{\n  \"timestamp\": \"<TIMESTAMP>\n  \"profile\": \"full\",\n  \"scope\": {\n    \"mode\": \"all\",\n    \"changed_files\": [],\n    \"components\": [\n      \"project\"\n    ],\n    \"unmatched_files\": []\n  },\n  \"steps\": [\n    {\n      \"label\": \"secret scan\",\n      \"passed\": true,\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"<PROJECT_ROOT>/.harness-gate/reports/secret_scan.json\",\n      \"detail\": null\n    },\n    {\n      \"label\": \"architecture audit\",\n      \"passed\": true,\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"<PROJECT_ROOT>/.harness-gate/reports/review_context.json\",\n      \"detail\": \"0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\"\n    },\n    {\n      \"label\": \"Git whitespace check\",\n      \"passed\": true,\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"<PROJECT_ROOT>/.harness-gate/reports/logs/git_diff_check.log\",\n      \"detail\": null\n    }\n  ],\n  \"passed\": true\n}",
+          "exists": true
+        },
+        "test_result.md": {
+          "content": "=== Verification report ===\nTimestamp: <TIMESTAMP>\nProfile: full\nComponents: project\n\n- PASS: secret scan (<DURATION>)\n- PASS: architecture audit (<DURATION>) - 0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\n- PASS: Git whitespace check (<DURATION>)\n\nTEST_SUMMARY: PASS\n",
+          "exists": true
+        }
+      },
+      "status": "pass",
+      "stderr": "",
+      "stdout": "arc-flow verify\nScope: all\nComponents: project\n\n[PASS] secret scan (<DURATION>)\n[PASS] architecture audit (<DURATION>)\n[RUN ] Git whitespace check ... PASS (<DURATION>)\n\nVerification report: <PROJECT_ROOT>/.harness-gate/reports/test_result.md\nTEST_SUMMARY: PASS\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "verify",
+        "--all"
+      ],
+      "error_codes": [],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "name": "verify-failure",
+      "reports": {
+        "logs": {
+          "logs/git_diff_check.log": ""
+        },
+        "test_result.json": {
+          "content": "{\n  \"timestamp\": \"<TIMESTAMP>\n  \"profile\": \"full\",\n  \"scope\": {\n    \"mode\": \"all\",\n    \"changed_files\": [],\n    \"components\": [\n      \"project\"\n    ],\n    \"unmatched_files\": []\n  },\n  \"steps\": [\n    {\n      \"label\": \"secret scan\",\n      \"passed\": true,\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"<PROJECT_ROOT>/.harness-gate/reports/secret_scan.json\",\n      \"detail\": null\n    },\n    {\n      \"label\": \"architecture audit\",\n      \"passed\": true,\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"<PROJECT_ROOT>/.harness-gate/reports/review_context.json\",\n      \"detail\": \"0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\"\n    },\n    {\n      \"label\": \"Git whitespace check\",\n      \"passed\": false,\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"<PROJECT_ROOT>/.harness-gate/reports/logs/git_diff_check.log\",\n      \"detail\": \"exit code 1\"\n    }\n  ],\n  \"passed\": false\n}",
+          "exists": true
+        },
+        "test_result.md": {
+          "content": "=== Verification report ===\nTimestamp: <TIMESTAMP>\nProfile: full\nComponents: project\n\n- PASS: secret scan (<DURATION>)\n- PASS: architecture audit (<DURATION>) - 0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\n- FAIL: Git whitespace check (<DURATION>) - exit code 1; log: <PROJECT_ROOT>/.harness-gate/reports/logs/git_diff_check.log\n\nTEST_SUMMARY: FAIL\n",
+          "exists": true
+        }
+      },
+      "status": "pass",
+      "stderr": "",
+      "stdout": "arc-flow verify\nScope: all\nComponents: project\n\n[PASS] secret scan (<DURATION>)\n[PASS] architecture audit (<DURATION>)\n[RUN ] Git whitespace check ... FAIL (<DURATION>)\n       log: <PROJECT_ROOT>/.harness-gate/reports/logs/git_diff_check.log\n\nVerification report: <PROJECT_ROOT>/.harness-gate/reports/test_result.md\nTEST_SUMMARY: FAIL\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "step",
+        "project.diff-check"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "verify-one-step",
+      "reports": {
+        "logs": {
+          "logs/git_diff_check.log": ""
+        },
+        "test_result.json": {
+          "content": "{\n  \"timestamp\": \"<TIMESTAMP>\n  \"profile\": \"step:project.diff-check\",\n  \"scope\": {\n    \"mode\": \"components\",\n    \"changed_files\": [],\n    \"components\": [\n      \"project\"\n    ],\n    \"unmatched_files\": []\n  },\n  \"steps\": [\n    {\n      \"label\": \"secret scan\",\n      \"passed\": true,\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"<PROJECT_ROOT>/.harness-gate/reports/secret_scan.json\",\n      \"detail\": null\n    },\n    {\n      \"label\": \"architecture audit\",\n      \"passed\": true,\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"<PROJECT_ROOT>/.harness-gate/reports/review_context.json\",\n      \"detail\": \"0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\"\n    },\n    {\n      \"label\": \"Git whitespace check\",\n      \"passed\": true,\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"<PROJECT_ROOT>/.harness-gate/reports/logs/git_diff_check.log\",\n      \"detail\": null\n    }\n  ],\n  \"passed\": true\n}",
+          "exists": true
+        },
+        "test_result.md": {
+          "content": "=== Verification report ===\nTimestamp: <TIMESTAMP>\nProfile: step:project.diff-check\nComponents: project\n\n- PASS: secret scan (<DURATION>)\n- PASS: architecture audit (<DURATION>) - 0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\n- PASS: Git whitespace check (<DURATION>)\n\nTEST_SUMMARY: PASS\n",
+          "exists": true
+        }
+      },
+      "status": "pass",
+      "stderr": "",
+      "stdout": "arc-flow verify\nScope: components\nComponents: project\n\n[PASS] secret scan (<DURATION>)\n[PASS] architecture audit (<DURATION>)\n[RUN ] Git whitespace check ... PASS (<DURATION>)\n\nVerification report: <PROJECT_ROOT>/.harness-gate/reports/test_result.md\nTEST_SUMMARY: PASS\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "verify",
+        "--all",
+        "--profile",
+        "missing"
+      ],
+      "error_codes": [
+        "E1401"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "name": "unknown-profile",
+      "reports": {
+        "logs": {}
+      },
+      "status": "pass",
+      "stderr": "ERROR [E1401]: unknown or empty verification profile \"missing\"\n",
+      "stdout": ""
+    },
+    {
+      "ansi": false,
+      "args": [
+        "step",
+        "missing.step"
+      ],
+      "error_codes": [
+        "E1401"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "name": "unknown-step",
+      "reports": {
+        "logs": {}
+      },
+      "status": "pass",
+      "stderr": "ERROR [E1401]: unknown verification step \"missing.step\"\n",
+      "stdout": ""
+    },
+    {
+      "ansi": false,
+      "args": [
+        "missing-command"
+      ],
+      "error_codes": [],
+      "exit_code": 2,
+      "expected_exit_code": 2,
+      "name": "unknown-command",
+      "reports": {},
+      "status": "pass",
+      "stderr": "error: unrecognized subcommand 'missing-command'\n\nUsage: harness-gate [OPTIONS] <COMMAND>\n\nFor more information, try '--help'.\n",
+      "stdout": ""
+    }
+  ],
+  "snapshot_version": 1
+}

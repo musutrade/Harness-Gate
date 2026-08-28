@@ -244,8 +244,15 @@ fn run_selected(
         return Err(VerifyError::Cancelled);
     }
     if steps.iter().all(|step| step.passed) {
-        run_configured_steps(project, selected_steps, &mut steps, &mut progress)
-            .map_err(VerifyError::execution)?;
+        run_configured_steps(project, selected_steps, &mut steps, &mut progress).map_err(
+            |error| {
+                if error.to_string().contains("verification cancelled") {
+                    VerifyError::Cancelled
+                } else {
+                    VerifyError::execution(error)
+                }
+            },
+        )?;
     }
 
     let passed = steps.iter().all(|step| step.passed);

@@ -250,15 +250,15 @@ Please review and decide:
 ## 📚 Documentation Reference
 
 ### Created in Phase 1
-- [ABOUT.md](../../ABOUT.md) - Project overview
-- [docs/specs/optimization-phase-1.md](optimization-phase-1.md) - Phase 1 spec
-- [docs/specs/optimization-phase-2.md](optimization-phase-2.md) - Phase 2 spec
-- [docs/adr/0005-phase-2-optimization-strategy.md](../adr/0005-phase-2-optimization-strategy.md) - Phase 2 ADR
+- [ABOUT.md](../ABOUT.md) - Project overview
+- [docs/specs/optimization-phase-1.md](specs/optimization-phase-1.md) - Phase 1 spec
+- [docs/specs/optimization-phase-2.md](specs/optimization-phase-2.md) - Phase 2 spec
+- [docs/adr/0005-phase-2-optimization-strategy.md](adr/0005-phase-2-optimization-strategy.md) - Phase 2 ADR
 
 ### Existing Documentation
-- [README.md](../../README.md) - Installation and usage
-- [CONTRIBUTING.md](../../CONTRIBUTING.md) - Contribution guidelines
-- [docs/adr/](../adr/) - All architecture decisions
+- [README.md](../README.md) - Installation and usage
+- [CONTRIBUTING.md](../CONTRIBUTING.md) - Contribution guidelines
+- [docs/adr/](adr/) - All architecture decisions
 
 ---
 

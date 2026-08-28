@@ -3,6 +3,7 @@ use super::*;
 use crate::config::{FlowConfig, ParserConfig, ServiceConfig};
 use crate::test_support::TestWorkspace;
 use std::fs;
+use std::path::PathBuf;
 
 #[test]
 fn configurable_regex_parser_counts_multiple_outputs() {
@@ -72,4 +73,97 @@ fn service_failure_does_not_skip_unrelated_steps() {
         .steps
         .iter()
         .any(|step| step.label == "staged Git whitespace check" && step.passed));
+}
+
+fn generic_project(name: &str) -> (TestWorkspace, Project) {
+    let workspace = TestWorkspace::new(name);
+    crate::preset::init(&workspace.root, "generic", false).expect("initialize fixture");
+    workspace.init_git();
+    let project = Project::discover(Some(workspace.root.clone()), None).expect("discover fixture");
+    (workspace, project)
+}
+
+#[test]
+fn non_zero_step_retains_exit_detail_and_log() {
+    let (workspace, mut project) = generic_project("verify-non-zero");
+    project.config.steps[0].program = "sh".into();
+    project.config.steps[0].args = vec!["-c".into(), "exit 7".into()];
+    let report = run(&project, ScopeResult::all(&project), "full", false).expect("verify fixture");
+    let step = report
+        .steps
+        .iter()
+        .find(|step| step.label == project.config.steps[0].label)
+        .expect("failed step");
+    assert!(!step.passed);
+    assert_eq!(step.detail.as_deref(), Some("exit code 7"));
+    assert!(PathBuf::from(&step.log).is_file());
+    assert!(workspace
+        .root
+        .join(".harness-gate/reports/test_result.json")
+        .is_file());
+}
+
+#[test]
+fn parser_failure_marks_step_failed() {
+    let (_workspace, mut project) = generic_project("verify-parser-failure");
+    project.config.steps[0].program = "sh".into();
+    project.config.steps[0].args = vec!["-c".into(), "printf 'done\\n'".into()];
+    project.config.parsers.insert(
+        "required-count".into(),
+        ParserConfig::Regex {
+            patterns: vec!["count: ([0-9]+)".into()],
+            capture: 1,
+            minimum: 1,
+        },
+    );
+    project.config.steps[0].parser = Some("required-count".into());
+    let report = run(&project, ScopeResult::all(&project), "full", false).expect("verify fixture");
+    let step = report
+        .steps
+        .iter()
+        .find(|step| step.label == project.config.steps[0].label)
+        .expect("parsed step");
+    assert!(!step.passed);
+    assert!(step
+        .detail
+        .as_deref()
+        .unwrap_or_default()
+        .contains("expected at least 1"));
+}
+
+#[test]
+fn gate_failure_writes_compatible_report() {
+    let (workspace, project) = generic_project("verify-gate-failure");
+    let token = format!("{}{}", "ghp_", "123456789012345678901234567890123456");
+    fs::write(
+        workspace.root.join("leaked.txt"),
+        format!("token = \\\"{token}\\\"\\n"),
+    )
+    .expect("write secret fixture");
+    let report = run(&project, ScopeResult::all(&project), "full", false).expect("gate report");
+    assert!(!report.passed);
+    assert!(report
+        .steps
+        .iter()
+        .any(|step| step.label == "secret scan" && !step.passed));
+    assert!(workspace
+        .root
+        .join(".harness-gate/reports/test_result.json")
+        .is_file());
+    assert!(workspace
+        .root
+        .join(".harness-gate/reports/test_result.md")
+        .is_file());
+}
+
+#[test]
+fn report_write_failure_returns_error() {
+    let (workspace, mut project) = generic_project("verify-report-failure");
+    let report_path = workspace.root.join(".harness-gate/reports");
+    fs::create_dir_all(&report_path).expect("create report directory");
+    fs::create_dir(report_path.join("test_result.json")).expect("block JSON report");
+    project.reports = report_path;
+    let error =
+        run(&project, ScopeResult::all(&project), "full", false).expect_err("report must fail");
+    assert!(matches!(error, VerifyError::Report { .. }));
 }
