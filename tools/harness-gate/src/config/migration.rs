@@ -171,6 +171,7 @@ pub fn migrate_v1(source: &str, project_name: &str) -> Result<FlowConfig> {
                 .then(|| "DATABASE_URL".to_string())
                 .into_iter()
                 .collect(),
+            depends_on: Vec::new(),
         })
         .collect::<Vec<_>>();
     let required_steps = steps.iter().map(|step| step.id.clone()).collect();

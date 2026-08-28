@@ -2,30 +2,10 @@ use super::parser::parse_result_count;
 use crate::config::{ParserConfig, StepConfig};
 use crate::process::{Task, TaskResult};
 use crate::project::Project;
-use crate::scope::ScopeResult;
 use crate::service::ServiceManager;
 use crate::ui::{self, Progress};
 use anyhow::{bail, Result};
 use std::fs;
-
-pub(super) fn selected_steps<'a>(
-    project: &'a Project,
-    scope: &ScopeResult,
-    profile: &str,
-    only_step: Option<&str>,
-) -> Vec<&'a StepConfig> {
-    project
-        .config
-        .steps
-        .iter()
-        .filter(|step| {
-            scope.components.contains(&step.component)
-                && only_step
-                    .map(|id| step.id == id)
-                    .unwrap_or_else(|| step.profiles.contains(profile))
-        })
-        .collect()
-}
 
 pub(super) fn run_configured_steps(
     project: &Project,

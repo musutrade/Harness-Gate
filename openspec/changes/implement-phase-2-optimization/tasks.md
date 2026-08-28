@@ -105,6 +105,12 @@ dedicated OpenSpec change records the implementation and verification details.
 - [x] 10.2 Add consistent `${NAME}` and `${NAME:-default}` interpolation to all config loading paths (Priority: P1, Effort: M).
 - [x] 10.3 Expose `config schema` and document generation/compatibility behavior (Priority: P1, Effort: S).
 
+## 11. Verification Plan Foundation
+
+- [x] 11.1 Add optional `depends_on` to steps while preserving legacy order (Priority: P1, Effort: M).
+- [x] 11.2 Validate missing, self, and cyclic dependencies during config validation (Priority: P1, Effort: M).
+- [x] 11.3 Topologically order selected steps with stable configuration-order tie breaking (Priority: P1, Effort: M).
+
 ---
 
 **Total Estimated Time:** 8-12 days (can be parallelized across tracks)
