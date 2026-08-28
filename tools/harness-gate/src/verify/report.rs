@@ -452,6 +452,36 @@ mod tests {
     use std::io::{Read, Write};
     use std::net::TcpListener;
     use std::thread;
+    use std::time::Duration;
+
+    fn read_http_request(stream: &mut std::net::TcpStream) {
+        stream
+            .set_read_timeout(Some(Duration::from_secs(5)))
+            .expect("set request read timeout");
+        let mut request = Vec::new();
+        let mut chunk = [0_u8; 1024];
+        loop {
+            let size = stream.read(&mut chunk).expect("read webhook request");
+            if size == 0 {
+                break;
+            }
+            request.extend_from_slice(&chunk[..size]);
+            let Some(header_end) = request.windows(4).position(|window| window == b"\r\n\r\n")
+            else {
+                continue;
+            };
+            let headers = String::from_utf8_lossy(&request[..header_end]);
+            let content_length = headers
+                .lines()
+                .filter_map(|line| line.split_once(':'))
+                .find(|(name, _)| name.eq_ignore_ascii_case("content-length"))
+                .and_then(|(_, value)| value.trim().parse::<usize>().ok())
+                .unwrap_or(0);
+            if request.len() >= header_end + 4 + content_length {
+                break;
+            }
+        }
+    }
 
     fn report() -> VerificationReport {
         VerificationReport {
@@ -755,8 +785,7 @@ mod tests {
         let second_address = second.local_addr().expect("second listener address");
         let first_handle = thread::spawn(move || {
             let (mut stream, _) = first.accept().expect("accept first webhook");
-            let mut request = [0_u8; 256];
-            let _ = stream.read(&mut request);
+            read_http_request(&mut stream);
             stream
                 .write_all(b"HTTP/1.1 503 Service Unavailable\r\nContent-Length: 0\r\n\r\n")
                 .expect("write first response");
