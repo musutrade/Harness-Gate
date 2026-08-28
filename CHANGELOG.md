@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Verification steps may declare `depends_on`; invalid dependency graphs fail during configuration validation and selected steps run in stable topological order.
+
+### Added
 - Added `harness-gate config schema` to export `schema/flow.schema.json`.
 - Added `${NAME}` and `${NAME:-default}` configuration environment interpolation.
 

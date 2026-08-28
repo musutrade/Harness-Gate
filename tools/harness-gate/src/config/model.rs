@@ -224,6 +224,8 @@ pub struct StepConfig {
     pub services: Vec<String>,
     #[serde(default)]
     pub remove_env: Vec<String>,
+    #[serde(default)]
+    pub depends_on: Vec<String>,
 }
 
 const fn default_true() -> bool {

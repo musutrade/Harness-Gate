@@ -1,4 +1,5 @@
 mod parser;
+mod plan;
 mod steps;
 
 #[cfg(test)]
@@ -17,7 +18,8 @@ use serde::Serialize;
 use std::collections::BTreeSet;
 use std::time::Instant;
 
-use steps::{print_result, run_configured_steps, selected_steps};
+use plan::selected_steps;
+use steps::{print_result, run_configured_steps};
 
 /// Errors emitted by the verification workflow boundary.
 #[derive(Debug, thiserror::Error)]
