@@ -2,11 +2,11 @@
 
 **Parent:** [proposal.md](proposal.md), [design.md](design.md), and
 [verification-plan specification](specs/verification-plan/spec.md)
-**Status:** Proposed - specification only; all implementation tasks remain
-unchecked.
-**Implementation restriction:** This change authorizes no business or
-production implementation. Tasks below describe bounded future work and its
-acceptance evidence.
+**Status:** Proposed - Phase 3 implementation in progress; unchecked items
+remain acceptance and follow-up work.
+**Implementation boundary:** This change implements only the private plan and
+compatibility behavior described by the parent records. It adds no scheduler,
+new business gate, or report-schema migration.
 
 Every task is intentionally smaller than four hours and must retain the
 existing CLI, report, error-code, configuration, and runtime contracts unless a
@@ -19,12 +19,12 @@ separate ADR explicitly approves a change.
   profile/scope behavior, output streams, report fields/paths, and all
   `E1402`/`E1403`/`E1404` cases with fixture references.
 
-- [ ] **1.2 (P0, S)** Approve the private `VerificationPlan`, `PlanNode`, and
+- [x] **1.2 (P0, S)** Approve the private `VerificationPlan`, `PlanNode`, and
   `NodeResult` field registry.
   **Acceptance:** IDs, kinds, statuses, dependency semantics, selection state,
   adapter ownership, and privacy boundary are reviewed and versioned.
 
-- [ ] **1.3 (P0, S)** Approve the built-in `kind`/`gate_type` registry.
+- [x] **1.3 (P0, S)** Approve the built-in `kind`/`gate_type` registry.
   **Acceptance:** `secret-scan` and `architecture-audit` are the only accepted
   values; unknown values, field combinations, reserved IDs, and migration
   behavior have explicit decisions.
@@ -80,12 +80,12 @@ separate ADR explicitly approves a change.
 
 ## 5. Documentation and Review Closeout
 
-- [ ] **5.1 (P1, S)** Document the configuration discriminator and migration
+- [x] **5.1 (P1, S)** Document the configuration discriminator and migration
   boundary.
   **Acceptance:** Existing files remain valid when `kind` is absent; explicit
   built-in declarations, unknown types, and non-silent repairs are documented.
 
-- [ ] **5.2 (P0, S)** Review the implementation diff for scope compliance.
+- [x] **5.2 (P0, S)** Review the implementation diff for scope compliance.
   **Acceptance:** No scheduler, renderer, new business gate, service lock,
   retry, or unrelated report/configuration behavior is present.
 

@@ -2,10 +2,9 @@
 
 ## Implementation Plan and Timeline
 
-This specification is an implementation-independent contract. The following
-sequence is the planned delivery order for a future, separately reviewed
-implementation; it does not authorize production-code changes in this
-OpenSpec change.
+This specification is the contract implemented by this change. The following
+sequence records the delivery order and evidence gates for the implementation
+and its follow-up acceptance work.
 
 | Window | Deliverable | Evidence gate |
 | --- | --- | --- |
@@ -270,17 +269,18 @@ rewrite `flow.toml`, remove configured dependencies, or delete published
 reports. A rollback returns execution to the fixed orchestration while leaving
 this specification and ADR marked proposed for follow-up.
 
-### Requirement: No business implementation in this change
+### Requirement: Scope-limited implementation
 
-This OpenSpec SHALL remain a specification and acceptance-test plan. It SHALL
-NOT add a scheduler, a new business gate, a renderer, service locks, retries,
-or production behavior. Any future implementation SHALL be delivered in a
-separate reviewed change that references this specification.
+This change SHALL implement only the private verification-plan boundary and
+the compatibility adapter described above. It SHALL NOT add a scheduler, a new
+business gate, a renderer, service locks, retries, or unrelated production
+behavior. Any relaxation of this boundary SHALL be delivered in a separately
+reviewed change that references this specification.
 
-#### Scenario: Scope review detects prohibited implementation
+#### Scenario: Scope review detects prohibited expansion
 
 - **WHEN** this change is reviewed before acceptance
-- **THEN** only ADR/OpenSpec artifacts, fixtures, and explicitly authorized
-  contract tests are present
-- **AND THEN** no production execution behavior has been changed by this
-  specification-only change
+- **THEN** the change contains only the private plan, typed gate declarations,
+  compatibility adapter, focused tests, and related documentation
+- **AND THEN** no scheduler, new business gate, renderer, lock, retry, or
+  unrelated workflow behavior is present

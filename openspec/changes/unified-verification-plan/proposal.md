@@ -6,10 +6,11 @@
 
 ## Scope Notice
 
-This OpenSpec defines the Phase 3 execution-plan contract only. It authorizes
-design, review, fixtures, and acceptance tests; it does not authorize Rust
-implementation, business workflow changes, a parallel scheduler, a new gate,
-or a report-schema migration.
+This OpenSpec defines and implements the Phase 3 execution-plan contract. The
+implementation boundary is limited to the private plan, typed built-in gate
+declarations, and compatibility behavior described here; it does not authorize
+business workflow changes, a parallel scheduler, a new gate, or a report-schema
+migration.
 
 ## Why
 
@@ -58,7 +59,7 @@ gate without falling back to arbitrary commands.
 - No automatic insertion of `depends_on`, configuration rewrites, retries, or
   changed profile/scope semantics.
 - No change to existing CLI output, report names, report fields, or public error
-  codes except through a separately reviewed compatibility decision.
+  codes except through the compatibility adapter defined by this change.
 
 ## Success Metrics
 

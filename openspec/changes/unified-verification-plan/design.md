@@ -2,10 +2,10 @@
 
 ## Scope Boundary
 
-This design is normative for a future implementation of the Phase 3 execution
-boundary. It defines data, graph, compatibility, and evidence contracts only.
-It does not implement those contracts, add a scheduler, change business gates,
-or authorize a public library API.
+This design is normative for the Phase 3 execution boundary implemented by this
+change. It defines the data, graph, compatibility, and evidence contracts. The
+implementation remains limited to this plan boundary; it does not add a
+scheduler, change business gates, or authorize a public library API.
 
 ## Existing Behavior to Preserve
 
