@@ -153,6 +153,13 @@ impl FlowConfig {
             "report_templates",
             self.validate_report_templates(),
         );
+        collect_result(
+            self,
+            source_map,
+            diagnostics,
+            "execution",
+            self.validate_execution(),
+        );
     }
 
     fn collect_step_diagnostics(
@@ -292,6 +299,16 @@ impl FlowConfig {
         self.validate_scope()?;
         self.validate_steps()?;
         self.validate_report_templates()?;
+        self.validate_execution()?;
+        Ok(())
+    }
+
+    fn validate_execution(&self) -> Result<()> {
+        if let Some(max_parallel) = self.execution.max_parallel {
+            if max_parallel == 0 || max_parallel > 64 {
+                bail!("execution.max_parallel must be between 1 and 64 (got {max_parallel})");
+            }
+        }
         Ok(())
     }
 

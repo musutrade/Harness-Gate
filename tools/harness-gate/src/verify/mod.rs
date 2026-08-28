@@ -1,5 +1,6 @@
 mod parser;
 mod plan;
+mod scheduler;
 mod steps;
 
 #[cfg(test)]
@@ -16,11 +17,12 @@ use crate::utils::fs as output_fs;
 use anyhow::Result;
 use serde::Serialize;
 use std::collections::{BTreeSet, HashSet};
+use std::sync::Mutex;
 use std::time::Instant;
 
 use crate::service::ServiceManager;
 use plan::{BuiltinGate, NodeResult, NodeStatus, PlanNodeKind, VerificationPlan};
-use steps::{print_result, run_configured_step};
+use steps::{print_external_result, print_result};
 
 /// Errors emitted by the verification workflow boundary.
 #[derive(Debug, thiserror::Error)]
@@ -191,7 +193,7 @@ fn run_selected(
     let mut progress = Progress::new(plan.nodes.len());
     scope.write_reports(project)?;
     let mut steps = Vec::new();
-    let mut services = ServiceManager::new(project);
+    let services = Mutex::new(ServiceManager::new(project));
     let mut blocked = HashSet::new();
     let mut node_results = Vec::<NodeResult>::new();
     let secret_mode = if staged {
@@ -203,10 +205,11 @@ fn run_selected(
         if crate::process::cancelled() {
             return Err(VerifyError::Cancelled);
         }
-        if node
-            .depends_on
-            .iter()
-            .any(|dependency| blocked.contains(dependency))
+        if node.kind != PlanNodeKind::External
+            && node
+                .depends_on
+                .iter()
+                .any(|dependency| blocked.contains(dependency))
         {
             blocked.insert(node.id.clone());
             node_results.push(NodeResult {
@@ -291,24 +294,56 @@ fn run_selected(
                     blocked.insert(node.id.clone());
                 }
             }
-            PlanNodeKind::External => {
-                if let Some(step) = node.step {
-                    run_configured_step(project, step, &mut services, &mut steps, &mut progress)
-                        .map_err(|error| {
-                            if error.to_string().contains("verification cancelled") {
-                                VerifyError::Cancelled
-                            } else {
-                                VerifyError::execution(error)
-                            }
-                        })?;
-                    if let Some(result) = steps.last() {
-                        node_results.push(node_result(node, result, NodeStatus::from_task(result)));
-                    }
-                    if !steps.last().is_some_and(|step| step.passed) {
-                        blocked.insert(node.id.clone());
-                    }
+            PlanNodeKind::External => {}
+        }
+    }
+
+    let external_nodes = plan
+        .nodes
+        .iter()
+        .filter(|node| node.kind == PlanNodeKind::External)
+        .collect::<Vec<_>>();
+    if !external_nodes.is_empty() {
+        let initial_statuses = node_results
+            .iter()
+            .map(|result| (result.id.clone(), result.status))
+            .collect::<std::collections::HashMap<_, _>>();
+        let outcome = scheduler::run_external(
+            project,
+            &external_nodes.iter().copied().cloned().collect::<Vec<_>>(),
+            &initial_statuses,
+            &services,
+            if project.config.execution.parallel {
+                project.config.execution.effective_max_parallel()
+            } else {
+                1
+            },
+        )
+        .map_err(VerifyError::execution)?;
+        if outcome.cancelled {
+            return Err(VerifyError::Cancelled);
+        }
+        let mut ordered = outcome.results;
+        ordered.sort_by_key(|result| {
+            plan.nodes
+                .iter()
+                .position(|node| node.id == result.node_id)
+                .unwrap_or(usize::MAX)
+        });
+        for result in ordered {
+            if result.node_result.status != NodeStatus::Skipped {
+                progress.clear();
+                if progress.enabled() {
+                    print_result(&result.task_result);
+                } else {
+                    print_external_result(&result.task_result);
                 }
+                progress.complete();
+                steps.push(result.task_result);
+            } else {
+                progress.complete();
             }
+            node_results.push(result.node_result);
         }
     }
 
