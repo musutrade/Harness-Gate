@@ -148,6 +148,17 @@ fn unknown_built_in_gate_types_fail_closed() {
 }
 
 #[test]
+fn external_steps_reject_gate_fields() {
+    let mut config = repository_config();
+    config.steps[0].kind = Some("external-step".into());
+    config.steps[0].gate_type = Some("secret-scan".into());
+    let error = config
+        .validate()
+        .expect_err("external gate field must fail");
+    assert!(error.to_string().contains("may not declare gate_type"));
+}
+
+#[test]
 fn environment_interpolation_supports_defaults() {
     let source = include_str!("../../presets/rust-api.flow.toml").replace(
         "name = \"rust-api\"",
