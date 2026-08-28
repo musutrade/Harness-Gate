@@ -454,7 +454,7 @@ mod tests {
     use std::thread;
     use std::time::Duration;
 
-    fn read_http_request(stream: &mut std::net::TcpStream) {
+    fn read_http_request(stream: &mut std::net::TcpStream) -> Vec<u8> {
         stream
             .set_read_timeout(Some(Duration::from_secs(5)))
             .expect("set request read timeout");
@@ -481,6 +481,7 @@ mod tests {
                 break;
             }
         }
+        request
     }
 
     fn report() -> VerificationReport {
@@ -725,9 +726,8 @@ mod tests {
         let address = listener.local_addr().expect("listener address");
         let handle = thread::spawn(move || {
             let (mut stream, _) = listener.accept().expect("accept webhook");
-            let mut request = [0_u8; 1024];
-            let size = stream.read(&mut request).expect("read webhook");
-            assert!(String::from_utf8_lossy(&request[..size]).contains("POST /notify"));
+            let request = read_http_request(&mut stream);
+            assert!(String::from_utf8_lossy(&request).contains("POST /notify"));
             stream
                 .write_all(b"HTTP/1.1 204 No Content\r\nContent-Length: 0\r\n\r\n")
                 .expect("write response");
@@ -743,8 +743,7 @@ mod tests {
         let address = listener.local_addr().expect("listener address");
         let handle = thread::spawn(move || {
             let (mut stream, _) = listener.accept().expect("accept webhook");
-            let mut request = [0_u8; 256];
-            let _ = stream.read(&mut request);
+            let _ = read_http_request(&mut stream);
             stream
                 .write_all(b"HTTP/1.1 503 Service Unavailable\r\nContent-Length: 0\r\n\r\n")
                 .expect("write response");
@@ -785,7 +784,7 @@ mod tests {
         let second_address = second.local_addr().expect("second listener address");
         let first_handle = thread::spawn(move || {
             let (mut stream, _) = first.accept().expect("accept first webhook");
-            read_http_request(&mut stream);
+            let _ = read_http_request(&mut stream);
             stream
                 .write_all(b"HTTP/1.1 503 Service Unavailable\r\nContent-Length: 0\r\n\r\n")
                 .expect("write first response");
