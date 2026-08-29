@@ -1,6 +1,6 @@
 # Proposal: Fix the docs.rs Build Target
 
-**Status:** Implemented pending green CI
+**Status:** Implemented
 **Date:** 2026-08-29
 **Change type:** Documentation packaging and release metadata
 
