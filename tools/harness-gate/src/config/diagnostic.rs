@@ -419,6 +419,28 @@ pub(super) fn interpolation_diagnostic(
     diagnostics
 }
 
+pub(super) fn audit_config_interpolation_diagnostic(
+    source: &str,
+    source_map: &SourceMap,
+    source_path: Option<&Path>,
+) -> ConfigDiagnostics {
+    let mut diagnostics = ConfigDiagnostics::single(
+        "HGCFG-PROJECT-SCOPED-CONFIG",
+        "paths.audit_config",
+        "audit configuration paths may not use environment interpolation",
+        "set a repository-relative audit configuration path in flow.toml; use --project-root or --config to select a project",
+    );
+    if let Some(path) = source_path {
+        diagnostics = diagnostics.with_source(path);
+    }
+    if let Some(diagnostic) = diagnostics.diagnostics.first_mut() {
+        diagnostic.location = source_map
+            .location("paths.audit_config")
+            .or_else(|| Some(location_for_offset(source, 0)));
+    }
+    diagnostics
+}
+
 fn canonical_table_path(table: &str) -> String {
     let parts = table.split('.').collect::<Vec<_>>();
     match parts.as_slice() {

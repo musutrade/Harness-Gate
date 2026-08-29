@@ -286,7 +286,7 @@ timeout_secs = 180
 
 可用占位符包括 `{root}`、`{reports}`、`{audit_config}` 和任意 `[paths.aliases.*]`。命令使用 `program + args[]`，不经过 Shell 字符串解析。
 
-`REPORT_DIR` / `ARC_FLOW_REPORTS`、`AUDITOR_CONFIG` / `ARC_FLOW_AUDIT_CONFIG`、`ARC_FLOW_SECRETS_CONFIG` 和步骤或服务声明的 `*_env` 字段可覆盖配置值。CLI 的 `--project-root` 决定项目根，`--config` 决定读取哪个仓库内配置文件。
+`REPORT_DIR` / `HARNESS_GATE_REPORTS`、`HARNESS_GATE_SECRETS_CONFIG` 和步骤或服务声明的 `*_env` 字段可覆盖相应配置值。审核配置始终由当前项目 `flow.toml` 中字面量、仓库相对的 `paths.audit_config` 决定，不接受进程级审核配置覆写或环境插值；切换项目或工作流文件时显式传入 `--project-root` 和 `--config`。
 
 完整字段、默认值、限制和示例见 [schema v2 配置参考](docs/configuration.md)。修改配置后先运行：
 
