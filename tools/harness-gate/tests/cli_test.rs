@@ -128,6 +128,113 @@ fn test_audit_reports_a_typed_configuration_error() {
 }
 
 #[test]
+fn test_rust_and_python_projects_use_their_own_audit_configuration() {
+    let rust = TestContext::new();
+    let python = TestContext::new();
+    rust.init_preset("generic");
+    python.init_preset("generic");
+
+    rust.write_file("src/lib.rs", "pub fn ready() {}\n");
+    python.write_file("app/main.py", "def ready():\n    return True\n");
+    let rust_flow = rust
+        .read_file(".harness-gate/flow.toml")
+        .replace(".harness-gate/audit.toml", "policies/rust-audit.toml");
+    rust.write_file(".harness-gate/flow.toml", &rust_flow);
+    let python_flow = python
+        .read_file(".harness-gate/flow.toml")
+        .replace(".harness-gate/audit.toml", "policies/python-audit.toml");
+    python.write_file(".harness-gate/flow.toml", &python_flow);
+
+    let rust_audit = rust
+        .read_file(".harness-gate/audit.toml")
+        .replace("review_context.json", "rust-review-context.json")
+        + r#"
+
+[[hard_rules]]
+name = "Rust unsafe policy"
+severity = "blocker"
+paths = ["src"]
+extensions = ["rs"]
+patterns = ["unsafe\\s*\\{"]
+"#;
+    rust.write_file("policies/rust-audit.toml", &rust_audit);
+    let python_audit = python
+        .read_file(".harness-gate/audit.toml")
+        .replace("review_context.json", "python-review-context.json")
+        + r#"
+
+[engine.comment_syntax.py]
+line = ['#']
+strings = [
+  { start = "'", end = "'", escape = "\\" },
+  { start = "\"", end = "\"", escape = "\\" },
+]
+
+[[hard_rules]]
+name = "Python eval policy"
+severity = "blocker"
+paths = ["app"]
+extensions = ["py"]
+patterns = ["eval\\s*\\("]
+"#;
+    python.write_file("policies/python-audit.toml", &python_audit);
+
+    let rust_output = Command::new(env!("CARGO_BIN_EXE_harness-gate"))
+        .args(["--color", "never", "audit"])
+        .current_dir(&rust.project_root)
+        .env("PROJECT_ROOT", &python.project_root)
+        .env(
+            "HARNESS_GATE_CONFIG",
+            python.project_root.join(".harness-gate/flow.toml"),
+        )
+        .env(
+            "AUDITOR_CONFIG",
+            python.project_root.join("policies/python-audit.toml"),
+        )
+        .env(
+            "HARNESS_GATE_AUDIT_CONFIG",
+            python.project_root.join("policies/python-audit.toml"),
+        )
+        .output()
+        .expect("run audit for the Rust project");
+    assert_success(&rust_output);
+    assert!(
+        stdout_str(&rust_output).contains("rust-review-context.json"),
+        "{}",
+        stdout_str(&rust_output)
+    );
+    assert!(rust.file_exists(".harness-gate/reports/rust-review-context.json"));
+    assert!(!python.file_exists(".harness-gate/reports/rust-review-context.json"));
+
+    let python_output = Command::new(env!("CARGO_BIN_EXE_harness-gate"))
+        .args(["--color", "never", "audit"])
+        .current_dir(&python.project_root)
+        .env("PROJECT_ROOT", &rust.project_root)
+        .env(
+            "HARNESS_GATE_CONFIG",
+            rust.project_root.join(".harness-gate/flow.toml"),
+        )
+        .env(
+            "AUDITOR_CONFIG",
+            rust.project_root.join("policies/rust-audit.toml"),
+        )
+        .env(
+            "HARNESS_GATE_AUDIT_CONFIG",
+            rust.project_root.join("policies/rust-audit.toml"),
+        )
+        .output()
+        .expect("run audit for the Python project");
+    assert_success(&python_output);
+    assert!(
+        stdout_str(&python_output).contains("python-review-context.json"),
+        "{}",
+        stdout_str(&python_output)
+    );
+    assert!(python.file_exists(".harness-gate/reports/python-review-context.json"));
+    assert!(!rust.file_exists(".harness-gate/reports/python-review-context.json"));
+}
+
+#[test]
 fn test_secrets_reports_a_typed_configuration_error() {
     let ctx = TestContext::new();
     assert_success(&ctx.run_harness_gate(&["init", "--preset", "generic"]));

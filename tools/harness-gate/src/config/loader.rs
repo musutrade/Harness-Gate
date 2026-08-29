@@ -1,4 +1,7 @@
-use super::diagnostic::{interpolation_diagnostic, parse_diagnostic, ConfigDiagnostics, SourceMap};
+use super::diagnostic::{
+    audit_config_interpolation_diagnostic, interpolation_diagnostic, parse_diagnostic,
+    ConfigDiagnostics, SourceMap,
+};
 use super::model::{FlowConfig, ParserConfig, ServiceConfig, StepConfig};
 use anyhow::{Context, Result};
 use schemars::schema_for;
@@ -39,6 +42,7 @@ impl FlowConfig {
         repository_root: Option<&Path>,
     ) -> std::result::Result<Self, ConfigDiagnostics> {
         let source_map = SourceMap::from_source(source);
+        reject_audit_config_interpolation(source, &source_map, source_path)?;
         let source = interpolate_environment(source, source_path)?;
         let mut config: Self = toml::from_str(&source)
             .map_err(|error| parse_diagnostic(&source, error, source_path))?;
@@ -92,8 +96,6 @@ impl FlowConfig {
     fn apply_environment(&mut self) -> Result<()> {
         override_string("REPORT_DIR", &mut self.paths.reports);
         override_string("HARNESS_GATE_REPORTS", &mut self.paths.reports);
-        override_string("AUDITOR_CONFIG", &mut self.paths.audit_config);
-        override_string("HARNESS_GATE_AUDIT_CONFIG", &mut self.paths.audit_config);
         override_string(
             "HARNESS_GATE_SECRETS_CONFIG",
             &mut self.paths.secrets_config,
@@ -129,6 +131,32 @@ impl FlowConfig {
         }
         Ok(())
     }
+}
+
+fn reject_audit_config_interpolation(
+    source: &str,
+    source_map: &SourceMap,
+    source_path: Option<&Path>,
+) -> std::result::Result<(), ConfigDiagnostics> {
+    let Ok(raw) = toml::from_str::<toml::Value>(source) else {
+        return Ok(());
+    };
+    let Some(value) = raw
+        .get("paths")
+        .and_then(toml::Value::as_table)
+        .and_then(|paths| paths.get("audit_config"))
+        .and_then(toml::Value::as_str)
+    else {
+        return Ok(());
+    };
+    if !value.contains("${") {
+        return Ok(());
+    }
+    Err(audit_config_interpolation_diagnostic(
+        source,
+        source_map,
+        source_path,
+    ))
 }
 
 pub fn schema_json() -> Result<String> {
