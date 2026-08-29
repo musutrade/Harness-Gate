@@ -1,8 +1,9 @@
 # Tasks: Phase 1 Quality Baseline Gates
 
 **Parent:** [proposal.md](proposal.md) and [design.md](design.md)
-**Status:** In review; implementation is present in this change, with accepted
-`main` baseline and owner closeout intentionally remaining open.
+**Status:** In review; the first `main` evidence package, CI workflow, refresh
+workflow, and exception process are recorded. Branch protection and final
+local-parity/owner closeout remain open where external approval is required.
 **Implementation restriction:** Tasks authorize evidence infrastructure only;
 they do not authorize business or production behavior changes.
 
@@ -67,7 +68,7 @@ the existing CLI, report, error-code, configuration, and runtime contracts.
   assertions are mapped for each command category, including platform-specific
   applicability reasons where needed.
 
-## 4. Local Evidence Runners (Future Implementation)
+## 4. Local Evidence Runners
 
 - [x] **4.1 (P0, M)** Provide a local invocation that generates coverage artifacts
   and the per-module threshold summary.
@@ -94,9 +95,9 @@ the existing CLI, report, error-code, configuration, and runtime contracts.
   **Acceptance:** Local links/fragments, examples, migrations, schema generation,
   byte-for-byte synchronization, and schema validation are evaluated together.
 
-## 5. Baseline and CI Governance (Future Implementation)
+## 5. Baseline and CI Governance
 
-- [ ] **5.1 (P0, S)** Capture the first accepted `main` evidence package.
+- [x] **5.1 (P0, S)** Capture the first accepted `main` evidence package.
   **Acceptance:** The package contains all required summaries, raw artifacts,
   environment metadata, reviewer approval, and a canonical baseline series key.
 
@@ -105,22 +106,22 @@ the existing CLI, report, error-code, configuration, and runtime contracts.
   **Acceptance:** Coverage, contracts, baseline, and documentation failures are
   independently visible; artifacts upload on both success and failure.
 
-- [ ] **5.3 (P1, S)** Add scheduled and manual baseline refresh workflow rules.
+- [x] **5.3 (P1, S)** Add scheduled and manual baseline refresh workflow rules.
   **Acceptance:** Refreshes produce a reviewable change, never rewrite the
   canonical baseline silently, and retain history and raw samples.
 
-- [ ] **5.4 (P1, S)** Define and document the exception process.
+- [x] **5.4 (P1, S)** Define and document the exception process.
   **Acceptance:** An exception requires issue, owner, rationale, expiry, and
   approval; it cannot lower or erase the threshold.
 
-## 6. Verification and Closeout (Future Implementation)
+## 6. Verification and Closeout
 
 - [ ] **6.1 (P0, S)** Run local and CI-parity validation for all four evidence
   classes.
   **Acceptance:** Commands, artifact schemas, and gate outcomes agree locally
   and in CI; incomplete evidence fails closed.
 
-- [ ] **6.2 (P0, S)** Verify cross-platform structured contracts on Ubuntu,
+- [x] **6.2 (P0, S)** Verify cross-platform structured contracts on Ubuntu,
   macOS, and Windows.
   **Acceptance:** Exit status, error codes, relative paths, report shape, and
   ANSI policy match the declared matrix; differences are documented.
@@ -130,3 +131,10 @@ the existing CLI, report, error-code, configuration, and runtime contracts.
   **Acceptance:** ADR-0025 links the accepted evidence package, this change is
   marked implemented only in a later closeout, and no unchecked task is claimed
   complete without its artifact.
+
+## Evidence Review
+
+- First accepted package: [Phase 1 baseline record](../../../docs/benchmarks/phase-1/README.md)
+- Green implementation CI: [PR #33](https://github.com/musutrade/Harness-Gate/pull/33) and [run 33223804928](https://github.com/musutrade/Harness-Gate/actions/runs/33223804928)
+- Cross-platform structured contracts: `quality-contracts-33223804928` artifacts from the linked run
+- Branch protection: repository API returned HTTP 403 because the current token lacks the required administration scope; task 5.2 remains open until an administrator enables `Required Quality Aggregate`.

@@ -1,17 +1,15 @@
 # Proposal: Dependency-Aware Parallel Scheduling
 
-**Status:** Proposed
+**Status:** Implemented
 **Date:** 2026-08-28
 **Change type:** Execution architecture, configuration contract, and test-plan specification
 
 ## Scope Notice
 
-This OpenSpec defines the Phase 4 parallel-scheduling contract. It authorizes
-the design and subsequent implementation of a private scheduler, execution
+This OpenSpec defines and records the implemented Phase 4 parallel-scheduling
+contract. The reviewed implementation adds a private scheduler, execution
 configuration, resource coordination, deterministic publication, and focused
-evidence. This document itself adds no business implementation and does not
-change the current serial runtime until the separately reviewed implementation
-is accepted.
+evidence without adding a new business gate or changing the serial default.
 
 ## Why
 

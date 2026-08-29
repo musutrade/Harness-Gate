@@ -2,7 +2,7 @@
 
 ## Status
 
-**In Review** (2026-08-28)
+**Implemented with renderer follow-up** (2026-08-29)
 
 ## Context
 
@@ -198,6 +198,20 @@ The implementation is complete only when all of the following are true:
 5. The editor instructions, migration guide, configuration reference, and
    examples are synchronized with the generated schema and pass the blocking
    documentation consistency job.
+
+## Implementation Evidence and Follow-up
+
+Typed diagnostics, JSON rendering, dependency/resource preflight, template
+path containment, and their tests were implemented in
+[PR #34](https://github.com/musutrade/Harness-Gate/pull/34). Project-scoped
+audit selection was subsequently corrected in
+[PR #38](https://github.com/musutrade/Harness-Gate/pull/38), whose clean
+cross-platform quality run is [33217867592](https://github.com/musutrade/Harness-Gate/actions/runs/33217867592).
+
+The existing report-template rendering surface is deliberately tracked by the
+separate [confined report-template rendering proposal](../../openspec/changes/report-template-renderer/proposal.md).
+That proposal must settle the schema, migration, compatibility, and loader
+decisions before additional renderer-specific fields are added.
 
 ## Consequences
 
