@@ -1,6 +1,13 @@
 # Changelog
 
-## Unreleased
+All notable changes to Harness-Gate will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [0.3.0] - 2026-08-29
 
 ### Added
 
@@ -21,17 +28,7 @@
 - Optional `[[notifications.webhooks]]` entries deliver the serialized report
   over HTTP(S) after report writing.
 
-All notable changes to Harness-Gate will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
-
-### Added
 - Verification steps may declare `depends_on`; invalid dependency graphs fail during configuration validation and selected steps run in stable topological order.
-
-### Added
 - Added `harness-gate config schema` to export `schema/flow.schema.json`.
 - Added `${NAME}` and `${NAME:-default}` configuration environment interpolation.
 
