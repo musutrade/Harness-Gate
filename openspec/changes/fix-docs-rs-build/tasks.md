@@ -14,6 +14,8 @@
   validation checks.
   **Acceptance:** Package/docs, formatter, Clippy, and strict OpenSpec checks
   pass; the complete test suite passes in a clean worktree.
-- [ ] **1.4 (P0, S)** Create a PR and verify its required CI checks.
-  **Acceptance:** The PR is green; publish a patch release after merge so docs.rs
-  can build the fixed package.
+- [x] **1.4 (P0, S)** Create a PR and verify its required CI checks.
+  **Acceptance:** PR [#43](https://github.com/musutrade/Harness-Gate/pull/43)
+  passed all required checks in workflow
+  [33231933024](https://github.com/musutrade/Harness-Gate/actions/runs/33231933024);
+  publish a patch release after merge so docs.rs can build the fixed package.
