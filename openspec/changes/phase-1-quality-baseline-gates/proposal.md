@@ -1,6 +1,6 @@
 # Proposal: Establish Phase 1 Quality Baseline Gates
 
-**Status:** In Review
+**Status:** Implemented with repository-governance closeout pending
 **Date:** 2026-08-28
 **Change type:** Specification and delivery contract only
 
@@ -88,10 +88,10 @@ The delivery described by this proposal is limited to quality evidence and gate
 orchestration around the existing binary. The expected artifacts and interfaces
 are specified in `design.md`; no product capability is added.
 
-The future implementation may add a quality manifest, coverage summary,
-critical-path matrix, benchmark runner, snapshot fixtures, documentation
-checker, and CI jobs. Those are delivery mechanisms, not new application
-capabilities, and must preserve the existing runtime contract.
+The implementation adds a quality manifest, coverage summary, critical-path
+matrix, benchmark runner, snapshot fixtures, documentation checker, and CI
+jobs. These are delivery mechanisms, not new application capabilities, and
+preserve the existing runtime contract.
 
 ## Success Metrics
 

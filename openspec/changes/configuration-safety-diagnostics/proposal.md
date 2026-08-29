@@ -1,6 +1,6 @@
 # Proposal: Configuration Safety Diagnostics and Future-Concurrency Preflight
 
-**Status:** In Review
+**Status:** Implemented with renderer follow-up
 **Date:** 2026-08-28
 **Change type:** Configuration-contract, diagnostics, documentation, and test-plan specification
 
@@ -9,8 +9,9 @@
 This OpenSpec change defines and implements the remaining Phase 2
 configuration-system safety boundary. It adds typed validation infrastructure,
 the opt-in JSON diagnostic output, safe report-template path declarations, and
-their tests and documentation. It does not start services, schedule work in
-parallel, or render reports; those remain separate future changes.
+their tests and documentation. It does not start services or schedule work in
+parallel. Renderer behavior already present in the report boundary is tracked
+by the separate confined-rendering follow-up proposal.
 
 ## Why
 

@@ -2,9 +2,8 @@
 
 **Parent:** [proposal.md](proposal.md), [design.md](design.md), and
 [configuration-safety specification](specs/configuration-safety/spec.md)
-**Status:** In review — configuration validation, diagnostics, documentation,
-and tests are implemented; the deferred HTML/Tera renderer remains out of
-scope.
+**Status:** Implemented with one documented renderer follow-up; compatibility
+evidence is linked to PR #34 and the subsequent project-scoping fix in PR #38.
 **Implementation restriction:** This change authorizes configuration safety
 infrastructure only; it does not introduce parallel scheduling or template
 rendering.
@@ -76,7 +75,7 @@ compatibility requirements in the parent design remain true.
   **Acceptance:** Equal, ancestor, descendant, and unrelated roots have
   explicit decisions; no case permits renderer writes beside template input.
 
-- [ ] **3.3 (P1, S)** Review the future schema and migration impact before
+- [x] **3.3 (P1, S)** Review the future schema and migration impact before
   adding renderer-specific report-template configuration.
   **Acceptance:** A separate renderer proposal identifies rendering mode,
   defaults, schema diff, compatibility policy, include/inheritance loader
@@ -136,14 +135,22 @@ compatibility requirements in the parent design remain true.
   links/fragments, and negative expected failures run in the documented local
   and CI commands.
 
-- [ ] **5.4 (P0, S)** Run compatibility and cross-platform verification before
+- [x] **5.4 (P0, S)** Run compatibility and cross-platform verification before
   acceptance.
   **Acceptance:** Formatter, linter, tests, configuration snapshots, and
   Linux/macOS/Windows structured checks are green; known platform limitations
   have an owner and expiry.
 
-- [ ] **5.5 (P0, S)** Update ADR/OpenSpec status only after implementation and
+- [x] **5.5 (P0, S)** Update ADR/OpenSpec status only after implementation and
   evidence review.
   **Acceptance:** ADR-0026, this change, quality artifacts, implementation PR,
   and any renderer follow-up decision are linked; no incomplete task is marked
   complete.
+
+## Evidence Review
+
+- Implementation: [PR #34](https://github.com/musutrade/Harness-Gate/pull/34)
+- Project-scoped configuration compatibility fix: [PR #38](https://github.com/musutrade/Harness-Gate/pull/38)
+- Closeout and green CI: [PR #39](https://github.com/musutrade/Harness-Gate/pull/39)
+- Cross-platform quality evidence: [run 33217867592](https://github.com/musutrade/Harness-Gate/actions/runs/33217867592)
+- Renderer follow-up: [confined report-template rendering proposal](../report-template-renderer/proposal.md)

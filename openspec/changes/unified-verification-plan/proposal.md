@@ -1,6 +1,6 @@
 # Proposal: Unify Built-in Gates and Configured Steps in a Verification Plan
 
-**Status:** Proposed
+**Status:** Implemented
 **Date:** 2026-08-28
 **Change type:** Execution architecture and compatibility contract
 

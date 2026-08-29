@@ -27,7 +27,7 @@ closed when required metadata or an evidence file is missing.
 
 ## Evidence Package
 
-The future implementation should publish one package with these logical parts:
+The implementation publishes one package with these logical parts:
 
 | Part | Minimum contents | Required properties |
 | --- | --- | --- |
@@ -239,9 +239,9 @@ owner review remain open until the pull request's required checks are green:
 | A. Inventory | complete | Module boundaries, exclusions, public command/report/error inventory. |
 | B. Contract definition | complete | Versioned matrix, artifact schemas, snapshot normalization rules, benchmark comparison key. |
 | C. Evidence runners | complete | Local/CI-parity runners for coverage, critical paths, benchmarks, contracts, and docs. |
-| D. Baseline capture | pending | Accepted `main` evidence package and initial history entry. |
+| D. Baseline capture | complete | Accepted `main` evidence package and initial history entry. |
 | E. Required checks | in review | Blocking CI mapping and failure artifact upload are present; branch protection and exception approval remain repository governance. |
-| F. Review | pending | Cross-platform confirmation, owner sign-off, and ADR/OpenSpec closeout. |
+| F. Review | in review | Cross-platform confirmation is green; owner sign-off and branch-protection governance remain open. |
 
 Each phase requires its own reviewable artifact and must stop if it would alter
 runtime behavior or a public contract without a separate decision record.
@@ -294,5 +294,5 @@ reversion record.
   are unambiguous.
 - No production Rust, test, CI, fixture, snapshot, schema, or generated-file
   implementation is included.
-- All local references resolve and the OpenSpec change remains proposed until a
-  separate implementation review accepts it.
+- All local references resolve, and implementation/acceptance status is tracked
+  in `tasks.md` with external governance items left open until approved.

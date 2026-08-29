@@ -5,7 +5,8 @@
 This design is normative for the Phase 3 execution boundary implemented by this
 change. It defines the data, graph, compatibility, and evidence contracts. The
 implementation remains limited to this plan boundary; it does not add a
-scheduler, change business gates, or authorize a public library API.
+scheduler or change business gates, and it does not authorize a public library
+API.
 
 ## Existing Behavior to Preserve
 
