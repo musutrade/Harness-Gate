@@ -22,6 +22,9 @@
 
 ## Release Follow-up
 
-- [ ] **2.1 (P0, M)** Publish `harness-gate 0.3.1` and GitHub Release `v0.3.1`.
-  **Acceptance:** The release workflow succeeds, crates.io serves `0.3.1`,
-  and docs.rs reports a successful build for the new version.
+- [x] **2.1 (P0, M)** Publish `harness-gate 0.3.1` and GitHub Release `v0.3.1`.
+  **Acceptance:** Release workflow
+  [33233044134](https://github.com/musutrade/Harness-Gate/actions/runs/33233044134)
+  succeeded; `cargo info harness-gate@0.3.1` resolves the published crate; and
+  docs.rs [Build #4249325](https://docs.rs/crate/harness-gate/0.3.1/builds/4249325)
+  reports all builds succeeded.
