@@ -135,6 +135,6 @@ the existing CLI, report, error-code, configuration, and runtime contracts.
 ## Evidence Review
 
 - First accepted package: [Phase 1 baseline record](../../../docs/benchmarks/phase-1/README.md)
-- Green implementation CI: [PR #33](https://github.com/musutrade/Harness-Gate/pull/33) and [run 33223804928](https://github.com/musutrade/Harness-Gate/actions/runs/33223804928)
+- Green implementation CI: [PR #33](https://github.com/musutrade/Harness-Gate/pull/33), closeout [PR #39](https://github.com/musutrade/Harness-Gate/pull/39), and [run 33223804928](https://github.com/musutrade/Harness-Gate/actions/runs/33223804928)
 - Cross-platform structured contracts: `quality-contracts-33223804928` artifacts from the linked run
 - Branch protection: repository API returned HTTP 403 because the current token lacks the required administration scope; task 5.2 remains open until an administrator enables `Required Quality Aggregate`.

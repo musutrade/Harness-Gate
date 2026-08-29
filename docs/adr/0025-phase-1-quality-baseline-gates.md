@@ -317,6 +317,10 @@ for commit `b92755f9ec87c251516863a0136c28f811187ab5`. The run passed all
 cross-platform tests, quality jobs, and the `Required Quality Aggregate`; its
 raw baseline artifact is retained by GitHub Actions.
 
+The documentation and acceptance-record closeout is reviewed in
+[PR #39](https://github.com/musutrade/Harness-Gate/pull/39), whose required
+quality aggregate and cross-platform checks are green.
+
 The repository token used for this closeout has admin repository permission but
 lacks the GitHub administration scope required to set branch protection. The
 `main` protection rule therefore remains an explicit governance follow-up: an

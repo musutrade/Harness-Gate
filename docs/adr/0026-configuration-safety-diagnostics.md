@@ -2,7 +2,7 @@
 
 ## Status
 
-**Implemented with renderer follow-up** (2026-08-29)
+**Accepted with renderer follow-up** (2026-08-29)
 
 ## Context
 
@@ -211,7 +211,9 @@ cross-platform quality run is [33217867592](https://github.com/musutrade/Harness
 The existing report-template rendering surface is deliberately tracked by the
 separate [confined report-template rendering proposal](../../openspec/changes/report-template-renderer/proposal.md).
 That proposal must settle the schema, migration, compatibility, and loader
-decisions before additional renderer-specific fields are added.
+decisions before additional renderer-specific fields are added. The closeout
+review and green CI evidence are recorded in
+[PR #39](https://github.com/musutrade/Harness-Gate/pull/39).
 
 ## Consequences
 

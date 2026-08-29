@@ -141,7 +141,7 @@ compatibility requirements in the parent design remain true.
   Linux/macOS/Windows structured checks are green; known platform limitations
   have an owner and expiry.
 
-- [ ] **5.5 (P0, S)** Update ADR/OpenSpec status only after implementation and
+- [x] **5.5 (P0, S)** Update ADR/OpenSpec status only after implementation and
   evidence review.
   **Acceptance:** ADR-0026, this change, quality artifacts, implementation PR,
   and any renderer follow-up decision are linked; no incomplete task is marked
@@ -151,5 +151,6 @@ compatibility requirements in the parent design remain true.
 
 - Implementation: [PR #34](https://github.com/musutrade/Harness-Gate/pull/34)
 - Project-scoped configuration compatibility fix: [PR #38](https://github.com/musutrade/Harness-Gate/pull/38)
+- Closeout and green CI: [PR #39](https://github.com/musutrade/Harness-Gate/pull/39)
 - Cross-platform quality evidence: [run 33217867592](https://github.com/musutrade/Harness-Gate/actions/runs/33217867592)
 - Renderer follow-up: [confined report-template rendering proposal](../report-template-renderer/proposal.md)
