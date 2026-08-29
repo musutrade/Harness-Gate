@@ -2,7 +2,7 @@
 
 ## Status
 
-**Proposed** (2026-08-28)
+**In Review** (2026-08-29)
 
 ## Context
 
@@ -307,6 +307,27 @@ a green run supplies the following reviewable artifacts:
 
 The resulting artifacts are the evidence package required before Phase 2
 configuration or scheduler changes can be accepted.
+
+## Current Acceptance Record
+
+The first accepted `main` evidence package is recorded in
+`docs/benchmarks/phase-1/README.md` and was produced by
+[CI run 33223804928](https://github.com/musutrade/Harness-Gate/actions/runs/33223804928)
+for commit `b92755f9ec87c251516863a0136c28f811187ab5`. The run passed all
+cross-platform tests, quality jobs, and the `Required Quality Aggregate`; its
+raw baseline artifact is retained by GitHub Actions.
+
+The documentation and acceptance-record closeout is reviewed in
+[PR #39](https://github.com/musutrade/Harness-Gate/pull/39), whose required
+quality aggregate and cross-platform checks are green.
+
+The repository token used for this closeout has admin repository permission but
+lacks the GitHub administration scope required to set branch protection. The
+`main` protection rule therefore remains an explicit governance follow-up: an
+administrator must require the `Required Quality Aggregate` check before this
+ADR and its OpenSpec change can be marked complete. The local-parity task also
+remains open because the developer worktree contains unrelated project audit
+rules; the clean-checkout CI evidence is unaffected.
 
 ## References
 

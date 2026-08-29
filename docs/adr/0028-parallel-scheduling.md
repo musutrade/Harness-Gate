@@ -2,7 +2,7 @@
 
 ## Status
 
-**Proposed** (2026-08-28)
+**Accepted** (2026-08-29)
 
 ## Context
 
@@ -233,6 +233,16 @@ Benchmark results are evidence, not a promise of a universal speedup. A
 regression threshold and accepted hardware/target-series rules follow
 ADR-0025. Parallel tests must be deterministic in assertions and may use
 controlled barriers or virtual clocks rather than relying on scheduler luck.
+
+## Implementation Evidence
+
+The private scheduler, bounded ready queue, dependency-local blocking,
+resource leases, cancellation/timeout handling, ordered publication, and
+parallel configuration were implemented in [PR #36](https://github.com/musutrade/Harness-Gate/pull/36).
+The cross-platform and quality evidence passed in
+[main CI run 33177851104](https://github.com/musutrade/Harness-Gate/actions/runs/33177851104).
+The benchmark fixture and comparison rules are recorded in
+`docs/benchmarks/parallel-scheduling.md` and the quality baseline artifacts.
 
 ## Consequences
 

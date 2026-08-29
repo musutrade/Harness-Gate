@@ -1,8 +1,7 @@
 # Parallel Scheduling
 
-This OpenSpec defines the Phase 4 execution architecture for dependency-aware
-parallel scheduling. It is a specification and delivery contract; it does not
-implement the scheduler or change production behavior by itself.
+This OpenSpec records the implemented Phase 4 execution architecture for
+dependency-aware parallel scheduling and its reviewed acceptance evidence.
 
 ## Records
 

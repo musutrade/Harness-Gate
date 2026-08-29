@@ -295,7 +295,7 @@ configuration that has already been explicitly migrated or modified by a user.
   resource relation, and template containment requirements are unambiguous.
 - The change distinguishes static preflight from future scheduling and template
   rendering, and does not authorize either implementation.
-- Every implementation task is under four hours, remains unchecked, and has a
-  reviewable acceptance criterion.
+- Every implementation task is under four hours, has a reviewable acceptance
+  criterion, and is checked only when its linked evidence is reviewed.
 - No scheduler, renderer, Tera loader, or business workflow behavior is
   included in this change; all new validation remains pre-execution.
