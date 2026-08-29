@@ -7,8 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Added a documentation-only library target so future crates.io releases build
-  successfully on docs.rs without exposing the CLI's internal modules.
+## [0.3.1] - 2026-08-29
+
+### Fixed
+
+- Added a documentation-only library target so docs.rs can build the package
+  without exposing the CLI's internal modules as a public runtime API.
 
 ## [0.3.0] - 2026-08-29
 

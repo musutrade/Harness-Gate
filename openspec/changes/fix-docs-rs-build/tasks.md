@@ -19,3 +19,9 @@
   passed all required checks in workflow
   [33231933024](https://github.com/musutrade/Harness-Gate/actions/runs/33231933024);
   publish a patch release after merge so docs.rs can build the fixed package.
+
+## Release Follow-up
+
+- [ ] **2.1 (P0, M)** Publish `harness-gate 0.3.1` and GitHub Release `v0.3.1`.
+  **Acceptance:** The release workflow succeeds, crates.io serves `0.3.1`,
+  and docs.rs reports a successful build for the new version.
