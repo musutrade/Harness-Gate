@@ -47,6 +47,7 @@ We use a simplified version of the Michael Nygard ADR template:
 - [ADR-0027](0027-unified-verification-plan.md) - Unify built-in gates and configured steps in a verification plan
 - [ADR-0028](0028-parallel-scheduling.md) - Introduce dependency-aware parallel scheduling
 - [ADR-0029](0029-project-scoped-configuration.md) - Keep workflow and audit configuration project-scoped
+- [ADR-0030](0030-docs-rs-library-target.md) - Provide a documentation target for the CLI crate
 
 ## Creating New ADRs
 
