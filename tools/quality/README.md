@@ -37,6 +37,28 @@ The scheduled `Refresh Quality Baseline` workflow creates a pull request for a
 new candidate baseline rather than rewriting a canonical result on its own.
 Review its JSON, Markdown, and uploaded raw reports together before merging.
 
+## Baseline Exceptions
+
+An exception never converts a failed quality result into a pass. It is a
+temporary review record that must include:
+
+- a tracked issue or pull request;
+- one accountable owner;
+- the measured failure and a concrete rationale;
+- an expiry date; and
+- approval from a repository code owner.
+
+The exception is recorded in the pull request description and linked from the
+evidence summary. The threshold, raw result, and aggregate check remain
+unchanged. At expiry the owner either lands a fix, submits a reviewed baseline
+change, or closes the exception; expired exceptions cannot be carried forward
+silently.
+
+The first accepted baseline is recorded in
+`docs/benchmarks/phase-1/README.md`. New candidates are accepted only after
+the `Required Quality Aggregate` check and the corresponding raw artifacts
+have been reviewed.
+
 The CI workflow keeps coverage, contract, benchmark, and documentation jobs
 independent for diagnostics, then runs `quality-required` with `always()`. That
 aggregate job fails closed when any dependency fails, is cancelled, or is

@@ -2,7 +2,7 @@
 
 ## Status
 
-**Proposed** (2026-08-28)
+**Accepted** (2026-08-29)
 
 ## Context
 
@@ -168,6 +168,16 @@ The plan abstraction must not swallow cancellation as an ordinary gate
 failure, retry it implicitly, or change signal/error-code behavior. Parallel
 execution and cancellation fan-out are explicitly deferred; this ADR defines
 the invariant that any later scheduler must preserve.
+
+## Implementation Evidence
+
+The private plan, built-in gate registry, synthesized legacy DAG, unified
+result mapping, failure propagation, cancellation handling, and compatibility
+adapter were implemented in [PR #35](https://github.com/musutrade/Harness-Gate/pull/35).
+The cross-platform and quality evidence passed in
+[main CI run 33167763113](https://github.com/musutrade/Harness-Gate/actions/runs/33167763113),
+including the CLI contract and report snapshots. Parallel scheduling remains a
+separate follow-up under ADR-0028.
 
 ### 6. Compatibility evidence
 

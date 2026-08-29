@@ -11,7 +11,7 @@ and its follow-up acceptance work.
 | T+0 to T+1 day | Capture the fixed-orchestration reference and approve the private model and closed gate registry | Inventory and field registry reviewed; no behavior changed |
 | T+2 to T+3 days | Specify plan construction, legacy DAG synthesis, explicit-gate validation, and diagnostics | Graph fixtures cover closure, cycles, references, profiles, and scopes |
 | T+4 to T+5 days | Specify adapter result mapping, failure propagation, cancellation, and cleanup | Boundary fixtures cover success, failure, timeout, cancellation, and cleanup |
-| T+6 to T+7 days | Run compatibility review and prepare a separately scoped implementation proposal | CLI/report/error snapshots match the fixed reference; ADR/OpenSpec status remains proposed until implementation evidence exists |
+| T+6 to T+7 days | Run compatibility review and accept the separately scoped implementation | CLI/report/error snapshots match the fixed reference; ADR-0027 and this change are implemented |
 
 The implementation order SHALL follow the dependencies above. A scheduler,
 new gate, report-schema migration, or public API requires a separate reviewed

@@ -2,10 +2,10 @@
 
 ## Scope Boundary
 
-This design is normative for the Phase 4 execution boundary. It defines the
-configuration, scheduler state machine, resource ownership, output, and
-evidence contracts. It does not prescribe concrete Rust types, worker runtime,
-or implementation code, and it does not authorize a new business capability.
+This design is normative for the implemented Phase 4 execution boundary. It
+defines the configuration, scheduler state machine, resource ownership,
+output, and evidence contracts without prescribing a public Rust API or adding
+a new business capability.
 
 ## Existing Behavior to Preserve
 
