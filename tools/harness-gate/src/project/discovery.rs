@@ -10,7 +10,7 @@ impl Project {
         override_root: Option<PathBuf>,
         config_override: Option<PathBuf>,
     ) -> Result<Self> {
-        let root = match override_root.or_else(|| env::var_os("PROJECT_ROOT").map(PathBuf::from)) {
+        let root = match override_root {
             Some(root) => canonical_directory(&root)?,
             None => {
                 let start = env::current_dir().context("read current directory")?;
@@ -95,9 +95,7 @@ fn canonical_directory(path: &Path) -> Result<PathBuf> {
 
 fn find_root(start: &Path, config_override: Option<&Path>) -> Result<PathBuf> {
     let start = canonical_directory(start)?;
-    let configured_path = config_override
-        .map(Path::to_path_buf)
-        .or_else(|| env::var_os("HARNESS_GATE_CONFIG").map(PathBuf::from));
+    let configured_path = config_override.map(Path::to_path_buf);
     if let Some(config) = configured_path {
         let candidate = if config.is_absolute() {
             config

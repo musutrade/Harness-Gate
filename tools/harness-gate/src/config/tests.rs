@@ -240,6 +240,25 @@ fn environment_interpolation_requires_defined_variables() {
 }
 
 #[test]
+fn audit_configuration_path_rejects_environment_interpolation() {
+    let source = include_str!("../../presets/rust-api.flow.toml").replace(
+        "audit_config = \".harness-gate/audit.toml\"",
+        "audit_config = \"${HG_PROJECT_AUDIT_CONFIG:-policies/audit.toml}\"",
+    );
+    let error = FlowConfig::from_source_with_diagnostics(&source, None, None)
+        .expect_err("audit configuration must remain project-scoped");
+    let diagnostic = error
+        .report()
+        .diagnostics
+        .into_iter()
+        .next()
+        .expect("project-scoped diagnostic");
+
+    assert_eq!(diagnostic.id, "HGCFG-PROJECT-SCOPED-CONFIG");
+    assert_eq!(diagnostic.path, "paths.audit_config");
+}
+
+#[test]
 fn version_one_configuration_can_be_migrated() {
     let source = r#"
 version = 1

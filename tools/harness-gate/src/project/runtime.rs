@@ -1,6 +1,5 @@
 use super::{resolve_repo_path, Project};
-use anyhow::{bail, Context, Result};
-use std::env;
+use anyhow::{bail, Result};
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -16,8 +15,6 @@ impl Project {
             bail!("report directory changed during project discovery");
         }
         fs::create_dir_all(self.reports.join("logs"))?;
-        env::set_current_dir(&self.root)
-            .with_context(|| format!("enter project root {}", self.root.display()))?;
         Ok(())
     }
 

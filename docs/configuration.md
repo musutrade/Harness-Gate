@@ -9,17 +9,13 @@
 ```bash
 harness-gate --project-root /path/to/project config check
 harness-gate --project-root /path/to/project --config config/ci-flow.toml config check
-ARC_FLOW_CONFIG=config/ci-flow.toml harness-gate --project-root /path/to/project config check
 ```
 
 配置路径必须位于项目根内部。相对路径按项目根解析；绝对路径、`..` 越界路径和指向仓库外的符号链接会被拒绝。
 
-生效顺序如下，后者覆盖前者：
-
-1. `.harness-gate/flow.toml`；
-2. 配置字段声明的环境变量；
-3. 通用环境变量，例如 `ARC_FLOW_CONFIG`、`ARC_FLOW_REPORTS`；
-4. CLI 的 `--project-root` 和 `--config`。
+默认情况下只读取当前项目的 `.harness-gate/flow.toml`。配置字段声明的
+环境变量只覆盖对应字段；需要选择其他项目或工作流文件时，显式使用
+CLI 的 `--project-root` 和 `--config`。
 
 使用以下命令查看配置是否有效以及环境覆盖后的结果：
 
@@ -33,7 +29,8 @@ harness-gate schema export
 `schema export` 将当前配置模型导出到 `schema/flow.schema.json`，可提交到编辑器或 CI
 进行静态补全和结构检查。配置字符串支持一次性的环境变量插值：`${NAME}` 要求变量已设置，
 `${NAME:-default}` 在变量缺失时使用默认值。不支持递归插值或表达式。插值发生在 TOML 解析前，
-随后仍按现有专用环境变量覆盖规则处理。
+随后仍按现有专用环境变量覆盖规则处理。`paths.audit_config` 是例外：必须使用字面量的
+仓库相对路径，不支持环境插值，以确保审核策略始终属于当前项目。
 
 `config check` 会在启动 service、子进程或写入报告前完成静态验证。默认输出面向
 终端；`--format json` 将 stdout 固定为一个版本化诊断对象，方便 CI 和编辑器集成。每项
@@ -195,10 +192,14 @@ path = "apps/web"
 
 | 环境变量                                    | 覆盖字段             |
 | ------------------------------------------- | -------------------- |
-| `REPORT_DIR` 或 `ARC_FLOW_REPORTS`          | `paths.reports`        |
-| `AUDITOR_CONFIG` 或 `ARC_FLOW_AUDIT_CONFIG` | `paths.audit_config`   |
-| `ARC_FLOW_SECRETS_CONFIG`                   | `paths.secrets_config` |
-| `ARC_FLOW_CONFIG`                           | 配置文件路径         |
+| `REPORT_DIR` 或 `HARNESS_GATE_REPORTS`      | `paths.reports`        |
+| `HARNESS_GATE_SECRETS_CONFIG`               | `paths.secrets_config` |
+
+`paths.audit_config` 始终从当前项目的 `flow.toml` 读取，且必须是字面量的
+仓库相对路径，不能使用 `${...}` 环境插值。`PROJECT_ROOT`、
+`HARNESS_GATE_CONFIG`、`AUDITOR_CONFIG` 和 `HARNESS_GATE_AUDIT_CONFIG` 不参与
+项目或审核配置发现，避免共享终端、IDE 或 CI 环境中的一个项目影响另一个项目。
+需要选择其他项目或工作流文件时，显式使用 `--project-root` 和 `--config`。
 
 ## 6. `[execution]`
 
