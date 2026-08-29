@@ -1,5 +1,7 @@
 # Proposal: Release Harness-Gate 0.3.1
 
+**Status:** Implemented
+
 ## Why
 
 The merged docs.rs fix adds a library target, but the already-published
