@@ -95,17 +95,15 @@ fn scanner_for_mode(project: &Project, mode: SecretMode) -> Result<SecretScanner
                 .secrets_config
                 .strip_prefix(&project.root)
                 .context("secret scan configuration must stay inside the project")?;
-            let relative = relative
-                .to_str()
-                .context("secret scan configuration path must be UTF-8")?;
-            let size = git::staged_file_size(&project.root, relative)?.ok_or_else(|| {
+            let relative = git::index_path(relative)?;
+            let size = git::staged_file_size(&project.root, &relative)?.ok_or_else(|| {
                 anyhow::anyhow!("staged secret scan configuration is missing: {relative}")
             })?;
-            reject_oversized_file(relative, size)?;
-            let bytes = git::staged_file(&project.root, relative)?.ok_or_else(|| {
+            reject_oversized_file(&relative, size)?;
+            let bytes = git::staged_file(&project.root, &relative)?.ok_or_else(|| {
                 anyhow::anyhow!("staged secret scan configuration is missing: {relative}")
             })?;
-            reject_oversized_file(relative, bytes.len() as u64)?;
+            reject_oversized_file(&relative, bytes.len() as u64)?;
             let source = std::str::from_utf8(&bytes)
                 .context("staged secret scan configuration must be UTF-8")?;
             SecretScanner::from_source(source)
