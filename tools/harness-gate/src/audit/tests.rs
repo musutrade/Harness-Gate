@@ -17,16 +17,57 @@ impl TestDir {
 }
 
 fn configured_audit() -> Config {
-    parse_audit_config(include_str!("../../../../.harness-gate/audit.toml"))
-        .expect("project audit config must parse")
+    let mut config = parse_audit_config(include_str!("../../presets/empty.audit.toml"))
+        .expect("audit test preset must parse");
+    config.arch_rules.push(ArchRule {
+        name: "Service 层不应包含 SQL 查询".into(),
+        layer: "service".into(),
+        paths: vec!["services".into()],
+        extensions: vec!["rs".into()],
+        forbidden_patterns: vec![
+            r"sqlx\s*::\s*(?:query|query_as|query_scalar|raw_sql)!?\s*\(".into(),
+            r"(?:sqlx\s*::\s*)?QueryBuilder(?:\s*::<[^>]+>)?\s*::\s*new\s*\(".into(),
+        ],
+        allowed_patterns: Vec::new(),
+        suggestion: "move SQL into a repository".into(),
+        exclude_patterns: Vec::new(),
+        allowlist: Vec::new(),
+    });
+    config
 }
 
 fn configured_hard_rule(name: &str) -> HardRule {
-    configured_audit()
-        .hard_rules
-        .into_iter()
-        .find(|rule| rule.name == name)
-        .expect("configured hard rule must exist")
+    match name {
+        "日志不得记录完整请求头或显式敏感字段" => HardRule {
+            name: name.into(),
+            severity: "blocker".into(),
+            paths: vec!["src".into()],
+            extensions: vec!["rs".into()],
+            patterns: vec![
+                r"include_headers\s*\(\s*true\s*\)".into(),
+                r"(?is)(?:tracing\s*::\s*)?(?:trace|debug|info|warn|error)!\s*\([^;]*?\b(?:authorization|cookie|password|(?:access_|refresh_)?token|database_url)\s*=".into(),
+                r"(?is)(?:tracing\s*::\s*)?(?:trace|debug|info|warn|error)!\s*\([^;]*?[?%]\s*(?:authorization|cookie|password|(?:access_|refresh_)?token|database_url)\b".into(),
+            ],
+            exclude_patterns: Vec::new(),
+            allowlist: Vec::new(),
+        },
+        "SQL 写操作仅允许出现在 Repository/迁移/测试层" => HardRule {
+            name: name.into(),
+            severity: "blocker".into(),
+            paths: vec!["src".into()],
+            extensions: vec!["rs".into(), "sql".into()],
+            patterns: vec![
+                r"(?i)INSERT\s+INTO".into(),
+                r#"(?i)UPDATE\s+(?:"[^"]+"|[A-Za-z_][A-Za-z0-9_.]*)\s+SET"#.into(),
+                r"(?i)DELETE\s+FROM".into(),
+                r"(?:sqlx\s*::\s*)?raw_sql\s*\(".into(),
+                r"(?:sqlx\s*::\s*)?QueryBuilder(?:\s*::<[^>]+>)?\s*::\s*new\s*\(".into(),
+            ],
+            exclude_patterns: Vec::new(),
+            allowlist: Vec::new(),
+        },
+        _ => panic!("unknown audit test rule {name:?}"),
+    }
 }
 
 #[test]
@@ -557,6 +598,36 @@ fn audit_skips_file_symlinks() {
     )
     .expect("scan symlink fixture");
     assert!(violations.is_empty());
+}
+
+#[test]
+fn audit_rejects_an_oversized_source_before_reading_it() {
+    let test_dir = TestDir::new("oversized-source");
+    let source = test_dir.child("src");
+    fs::File::create(source.join("large.rs"))
+        .expect("create large source")
+        .set_len(16 * 1024 * 1024 + 1)
+        .expect("size large source");
+    let rule = HardRule {
+        name: "bounded source".into(),
+        severity: "blocker".into(),
+        paths: Vec::new(),
+        extensions: vec!["rs".into()],
+        patterns: vec!["forbidden".into()],
+        exclude_patterns: Vec::new(),
+        allowlist: Vec::new(),
+    };
+
+    let error = scan_files(
+        &test_dir.0,
+        &[source],
+        &[],
+        &rule,
+        &configured_audit().engine,
+    )
+    .expect_err("oversized source must fail closed");
+
+    assert!(error.to_string().contains("is too large"));
 }
 
 #[test]

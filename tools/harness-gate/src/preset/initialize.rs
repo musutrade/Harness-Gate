@@ -1,5 +1,5 @@
 use super::catalog::{self, AUDIT_TEMPLATE, GITIGNORE_TEMPLATE, SECRETS_TEMPLATE};
-use super::filesystem::{atomic_write, ensure_writable, resolve_inside};
+use super::filesystem::{atomic_write_batch, ensure_writable, resolve_inside};
 use crate::config::{FlowConfig, DEFAULT_CONFIG_PATH};
 use anyhow::{Context, Result};
 use std::fs;
@@ -24,14 +24,17 @@ pub fn init(target: &Path, name: &str, force: bool) -> Result<()> {
     config.project.name = project_id(&root);
     config.validate()?;
     let directory = flow_path.parent().context("flow config has no parent")?;
-    fs::create_dir_all(directory)?;
-    atomic_write(&audit_path, AUDIT_TEMPLATE.as_bytes())?;
-    atomic_write(&secrets_path, SECRETS_TEMPLATE.as_bytes())?;
-    atomic_write(&flow_path, toml::to_string_pretty(&config)?.as_bytes())?;
+    let flow_content = toml::to_string_pretty(&config)?;
     let gitignore = resolve_inside(&root, PathBuf::from(".harness-gate/.gitignore"))?;
-    if !gitignore.exists() {
-        atomic_write(&gitignore, GITIGNORE_TEMPLATE.as_bytes())?;
+    let mut flow_entries = vec![
+        (audit_path.as_path(), AUDIT_TEMPLATE.as_bytes()),
+        (secrets_path.as_path(), SECRETS_TEMPLATE.as_bytes()),
+        (flow_path.as_path(), flow_content.as_bytes()),
+    ];
+    if fs::symlink_metadata(&gitignore).is_err() {
+        flow_entries.push((gitignore.as_path(), GITIGNORE_TEMPLATE.as_bytes()));
     }
+    atomic_write_batch(&flow_entries)?;
 
     println!("Initialized preset {name:?} in {}", directory.display());
     println!(

@@ -39,12 +39,10 @@ log = "git_diff_check.log"
 timeout_secs = 60
 "#;
 
-#[allow(dead_code)]
 #[derive(Debug, Clone, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum DiagnosticSeverity {
     Error,
-    Warning,
 }
 
 #[derive(Debug, Clone, Serialize, PartialEq, Eq)]
@@ -197,7 +195,6 @@ impl ConfigDiagnostics {
                     "{} [{}] at {}: {}",
                     match diagnostic.severity {
                         DiagnosticSeverity::Error => "error",
-                        DiagnosticSeverity::Warning => "warning",
                     },
                     diagnostic.id,
                     diagnostic.path,

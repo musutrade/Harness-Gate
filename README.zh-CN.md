@@ -388,6 +388,8 @@ profile 由步骤的 `profiles = [...]` 隐式声明。`verify` 使用 `[project
 
 secret scan 检查 Git 已追踪文件和未忽略的未跟踪文件。具体规则由 `[paths].secrets_config` 指向的 TOML 文件提供，默认覆盖 GitHub/GitLab/npm Token、AWS access key、JWT、命名签名密钥、PostgreSQL 凭据 URL、Webhook、企业微信/钉钉密钥、HTTP Basic Auth 和 PEM 私钥头。捕获值会经过占位符与低信息值过滤；报告只记录文件名，不把凭据内容复制到终端或 JSON。
 
+为限制扫描过程的内存使用，secret scan 和 architecture audit 都拒绝超过 16 MiB 的单个输入文件，并将该错误作为门禁失败返回。
+
 ## v1 迁移
 
 ```bash
@@ -442,6 +444,8 @@ harness-gate parse-logs \
 ```
 
 解析器优先选择第一条 `level = ERROR` 所在的 `trace_id`，支持从事件字段、`data`、当前 `span` 和 `spans` 中提取，再收集相同 trace 的结构化记录；没有 trace 时退化为原始日志最后 30 行。
+
+解析采用有界流式读取：错误前最多保留 20 条上下文，输出最多 30 条记录，不会把整份无限增长的 JSON Lines 日志载入内存。已启动 service 的清理失败也会使验证失败，并写入验证报告，避免把容器泄漏隐藏为成功。
 
 ## Git Hook
 
