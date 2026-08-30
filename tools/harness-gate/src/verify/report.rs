@@ -2,9 +2,146 @@ use super::VerificationReport;
 use crate::config::WebhookConfig;
 use crate::project::Project;
 use anyhow::{bail, Context, Result};
-use std::fs;
+use serde::Serialize;
+use std::fs::{self, OpenOptions};
+use std::io::Write;
 use std::path::{Component, Path, PathBuf};
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
+
+static INVOCATION_COUNTER: AtomicU64 = AtomicU64::new(1);
+
+#[derive(Debug, Clone)]
+pub(super) struct Invocation {
+    pub(super) id: String,
+    pub(super) root: PathBuf,
+}
+
+#[derive(Debug, Serialize)]
+struct InvocationMetadata<'a> {
+    invocation_id: &'a str,
+    created_at: String,
+    profile: &'a str,
+    staged: bool,
+    executor_version: &'static str,
+}
+
+pub(super) fn allocate_invocation(project: &Project) -> Result<Invocation> {
+    let repository = project
+        .root
+        .canonicalize()
+        .with_context(|| format!("resolve project root {}", project.root.display()))?;
+    let reports = resolve_report_root(project, &repository)?;
+    let invocations = reports.join("invocations");
+    fs::create_dir_all(&invocations)
+        .with_context(|| format!("create invocation directory {}", invocations.display()))?;
+    let resolved_invocations = invocations
+        .canonicalize()
+        .with_context(|| format!("resolve invocation directory {}", invocations.display()))?;
+    if !resolved_invocations.starts_with(&reports) {
+        bail!("invocation directory escapes report directory");
+    }
+
+    for _ in 0..32 {
+        let id = next_invocation_id();
+        let root = invocations.join(&id);
+        match fs::create_dir(&root) {
+            Ok(()) => {
+                fs::create_dir_all(root.join("logs"))
+                    .with_context(|| format!("create invocation logs {}", root.display()))?;
+                return Ok(Invocation { id, root });
+            }
+            Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
+            Err(error) => {
+                return Err(error)
+                    .with_context(|| format!("create invocation root {}", root.display()));
+            }
+        }
+    }
+    bail!("could not allocate a collision-free invocation id")
+}
+
+pub(super) fn write_invocation_metadata(
+    invocation: &Invocation,
+    profile: &str,
+    staged: bool,
+) -> Result<()> {
+    let metadata = InvocationMetadata {
+        invocation_id: &invocation.id,
+        created_at: chrono::Utc::now().to_rfc3339(),
+        profile,
+        staged,
+        executor_version: env!("CARGO_PKG_VERSION"),
+    };
+    let contents = serde_json::to_vec_pretty(&metadata).context("serialize invocation metadata")?;
+    atomic_write(&invocation.root.join("invocation.json"), &contents, false)
+}
+
+pub(super) fn mirror_legacy_outputs(
+    invocation_project: &Project,
+    legacy_project: &Project,
+) -> Result<()> {
+    let mut paths = vec![
+        "test_result.json".to_string(),
+        "test_result.md".to_string(),
+        "test_result.html".to_string(),
+    ];
+    if let Some(path) = &legacy_project.config.report_templates.junit {
+        if !paths.iter().any(|candidate| candidate == path) {
+            paths.push(path.clone());
+        }
+    }
+    for relative in paths {
+        let source = invocation_project.reports.join(&relative);
+        if source.is_file() {
+            let contents = fs::read(&source)
+                .with_context(|| format!("read invocation report {}", source.display()))?;
+            let target = report_target(legacy_project, &relative)?;
+            atomic_write(&target, &contents, true)
+                .with_context(|| format!("mirror legacy report {}", target.display()))?;
+        }
+    }
+    let invocation_logs = invocation_project.reports.join("logs");
+    if invocation_logs.is_dir() {
+        for entry in fs::read_dir(&invocation_logs)
+            .with_context(|| format!("read invocation logs {}", invocation_logs.display()))?
+        {
+            let entry = entry.with_context(|| "read invocation log entry")?;
+            let path = entry.path();
+            if !entry
+                .file_type()
+                .with_context(|| format!("inspect invocation log {}", path.display()))?
+                .is_file()
+            {
+                continue;
+            }
+            let Some(name) = path.file_name().and_then(|name| name.to_str()) else {
+                continue;
+            };
+            let relative = format!("logs/{name}");
+            let contents = fs::read(&path)
+                .with_context(|| format!("read invocation log {}", path.display()))?;
+            let target = report_target(legacy_project, &relative)?;
+            atomic_write(&target, &contents, true)
+                .with_context(|| format!("mirror legacy log {}", target.display()))?;
+        }
+    }
+    Ok(())
+}
+
+fn next_invocation_id() -> String {
+    let timestamp = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default();
+    let counter = INVOCATION_COUNTER.fetch_add(1, Ordering::Relaxed);
+    format!(
+        "inv-{}-{:09}-{}-{}",
+        timestamp.as_secs(),
+        timestamp.subsec_nanos(),
+        std::process::id(),
+        counter
+    )
+}
 
 /// Report output boundary. The verifier produces a report model; this module
 /// owns serialization and optional result delivery.
@@ -314,7 +451,75 @@ fn report_target(project: &Project, relative: &str) -> Result<PathBuf> {
 
 fn write_report_file(project: &Project, relative: &str, contents: impl AsRef<[u8]>) -> Result<()> {
     let target = report_target(project, relative)?;
-    fs::write(&target, contents).with_context(|| format!("write report {}", target.display()))
+    atomic_write(&target, contents.as_ref(), false)
+        .with_context(|| format!("write report {}", target.display()))
+}
+
+fn atomic_write(target: &Path, contents: &[u8], replace_existing: bool) -> Result<()> {
+    let parent = target
+        .parent()
+        .ok_or_else(|| anyhow::anyhow!("output has no parent directory"))?;
+    fs::create_dir_all(parent)
+        .with_context(|| format!("create output directory {}", parent.display()))?;
+    let counter = INVOCATION_COUNTER.fetch_add(1, Ordering::Relaxed);
+    let file_name = target
+        .file_name()
+        .and_then(|name| name.to_str())
+        .ok_or_else(|| anyhow::anyhow!("output has an invalid filename"))?;
+    let temporary = parent.join(format!(".{file_name}.{counter}.tmp"));
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&temporary)
+        .with_context(|| format!("create temporary output {}", temporary.display()))?;
+    let write_result = (|| -> Result<()> {
+        file.write_all(contents)?;
+        file.sync_all()?;
+        drop(file);
+        if replace_existing && fs::symlink_metadata(target).is_ok() {
+            fs::remove_file(target)
+                .with_context(|| format!("replace existing output {}", target.display()))?;
+        }
+        fs::rename(&temporary, target)
+            .with_context(|| format!("publish output {}", target.display()))?;
+        Ok(())
+    })();
+    if write_result.is_err() {
+        let _ = fs::remove_file(&temporary);
+    }
+    write_result
+}
+
+fn resolve_report_root(project: &Project, repository: &Path) -> Result<PathBuf> {
+    let reports = if fs::symlink_metadata(&project.reports).is_ok() {
+        project
+            .reports
+            .canonicalize()
+            .with_context(|| format!("resolve report directory {}", project.reports.display()))?
+    } else {
+        let mut ancestor = project.reports.as_path();
+        while fs::symlink_metadata(ancestor).is_err() {
+            ancestor = ancestor
+                .parent()
+                .ok_or_else(|| anyhow::anyhow!("report directory has no resolvable parent"))?;
+        }
+        let resolved_ancestor = ancestor
+            .canonicalize()
+            .with_context(|| format!("resolve report directory {}", ancestor.display()))?;
+        if !resolved_ancestor.starts_with(repository) {
+            bail!("report directory escapes project root");
+        }
+        fs::create_dir_all(&project.reports)
+            .with_context(|| format!("create report directory {}", project.reports.display()))?;
+        project
+            .reports
+            .canonicalize()
+            .with_context(|| format!("resolve report directory {}", project.reports.display()))?
+    };
+    if !reports.starts_with(repository) {
+        bail!("report directory escapes project root");
+    }
+    Ok(reports)
 }
 
 pub(super) fn notify(report: &VerificationReport, project: &Project) -> Result<()> {
@@ -497,6 +702,9 @@ mod tests {
 
     fn report() -> VerificationReport {
         VerificationReport {
+            invocation_id: "inv-test".into(),
+            executor_version: "0.3.3".into(),
+            report_directory: "reports/invocations/inv-test".into(),
             timestamp: "2026-01-01T00:00:00Z".into(),
             profile: "full".into(),
             scope: ScopeResult {
@@ -506,6 +714,11 @@ mod tests {
                 unmatched_files: vec![],
             },
             steps: vec![TaskResult {
+                step_id: None,
+                invocation_id: None,
+                attempt: None,
+                started_at: None,
+                finished_at: None,
                 label: "unit tests".into(),
                 passed: false,
                 timed_out: false,

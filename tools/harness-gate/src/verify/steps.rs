@@ -24,6 +24,11 @@ pub(super) fn run_configured_step<'a>(
             Err(error) => {
                 let cancelled = crate::process::cancelled();
                 return Ok(TaskResult {
+                    step_id: None,
+                    invocation_id: None,
+                    attempt: None,
+                    started_at: None,
+                    finished_at: None,
                     label: format!("{}: service {service} setup", step.label),
                     passed: false,
                     timed_out: false,
@@ -40,6 +45,11 @@ pub(super) fn run_configured_step<'a>(
             Err(error) => {
                 let cancelled = crate::process::cancelled();
                 return Ok(TaskResult {
+                    step_id: None,
+                    invocation_id: None,
+                    attempt: None,
+                    started_at: None,
+                    finished_at: None,
                     label: format!("{}: service {service} setup", step.label),
                     passed: false,
                     timed_out: false,

@@ -16,6 +16,7 @@ use crate::ui::{self, Progress};
 use plan::VerificationPlan;
 use serde::Serialize;
 use std::collections::BTreeSet;
+use std::path::Path;
 use std::sync::Mutex;
 use steps::{print_external_result, print_result};
 
@@ -73,6 +74,9 @@ impl CodedError for VerifyError {
 
 #[derive(Debug, Serialize)]
 pub struct VerificationReport {
+    pub invocation_id: String,
+    pub executor_version: String,
+    pub report_directory: String,
     pub timestamp: String,
     pub profile: String,
     pub scope: ScopeResult,
@@ -176,11 +180,15 @@ fn run_selected(
             VerifyError::execution(error)
         }
     })?;
+    let invocation = report::allocate_invocation(project).map_err(VerifyError::report)?;
+    report::write_invocation_metadata(&invocation, profile, staged).map_err(VerifyError::report)?;
+    let mut invocation_project = project.clone();
+    invocation_project.reports = invocation.root.clone();
     let mut progress = Progress::new(plan.nodes.len());
-    scope.write_reports(project)?;
-    let services = Mutex::new(ServiceManager::new(project));
+    scope.write_reports(&invocation_project)?;
+    let services = Mutex::new(ServiceManager::new(&invocation_project));
     let scheduler_result = scheduler::run_plan(
-        project,
+        &invocation_project,
         &plan,
         staged,
         &services,
@@ -235,22 +243,39 @@ fn run_selected(
                     .unwrap_or_else(|| "blocked by a failed prerequisite".into()),
             });
         } else {
+            let mut task_result = result.task_result;
+            task_result.step_id = Some(result.node_id.clone());
+            task_result.invocation_id = Some(invocation.id.clone());
+            task_result.attempt = Some(1);
+            if !task_result.log.is_empty() && !Path::new(&task_result.log).is_absolute() {
+                task_result.log = invocation_project
+                    .reports
+                    .join("logs")
+                    .join(&task_result.log)
+                    .to_string_lossy()
+                    .into_owned();
+            }
             match result.node_result.kind {
-                plan::PlanNodeKind::Builtin(_) => print_result(&result.task_result),
+                plan::PlanNodeKind::Builtin(_) => print_result(&task_result),
                 plan::PlanNodeKind::External => {
                     if progress.enabled() {
-                        print_result(&result.task_result);
+                        print_result(&task_result);
                     } else {
-                        print_external_result(&result.task_result);
+                        print_external_result(&task_result);
                     }
                 }
             }
-            steps.push(result.task_result);
+            steps.push(task_result);
         }
         progress.complete();
     }
     if let Some(error) = &cleanup_error {
         steps.push(TaskResult {
+            step_id: Some("service.cleanup".into()),
+            invocation_id: Some(invocation.id.clone()),
+            attempt: Some(1),
+            started_at: None,
+            finished_at: None,
             label: "service cleanup".into(),
             passed: false,
             timed_out: false,
@@ -265,6 +290,9 @@ fn run_selected(
         && steps.iter().all(|step| step.passed)
         && steps.len() == plan.nodes.len();
     let report = VerificationReport {
+        invocation_id: invocation.id.clone(),
+        executor_version: env!("CARGO_PKG_VERSION").into(),
+        report_directory: invocation.root.to_string_lossy().into_owned(),
         timestamp: chrono::Utc::now().to_rfc3339(),
         profile: only_step
             .map(|id| format!("step:{id}"))
@@ -274,8 +302,9 @@ fn run_selected(
         skipped_steps,
         passed,
     };
-    report::write(&report, project).map_err(VerifyError::report)?;
-    report::notify(&report, project).map_err(VerifyError::report)?;
+    report::write(&report, &invocation_project).map_err(VerifyError::report)?;
+    report::mirror_legacy_outputs(&invocation_project, project).map_err(VerifyError::report)?;
+    report::notify(&report, &invocation_project).map_err(VerifyError::report)?;
     progress.finish();
     println!(
         "\nVerification report: {}",
