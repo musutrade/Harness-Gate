@@ -20,6 +20,7 @@ impl Project {
         let config_path = resolve_config_path(&root, config_override)?;
         let config = FlowConfig::load_with_diagnostics(&config_path, Some(&root))
             .map_err(anyhow::Error::from)?;
+        let scope_rules = config.compile_scope_rules()?;
         let reports = resolve_repo_path(
             &root,
             Path::new(&config.paths.reports),
@@ -61,6 +62,7 @@ impl Project {
             audit_config,
             secrets_config,
             aliases,
+            scope_rules,
         };
         project.validate()?;
         Ok(project)
