@@ -275,6 +275,7 @@ review.
 - **Secret Scan**: High-confidence credential detection
 - **Architecture Audit**: Regex architecture rules
 - Enforced before all external steps
+- Scans reject individual files larger than 16 MiB to keep memory use bounded
 
 ### Environment Check (Doctor)
 - Tool version validation
@@ -344,6 +345,13 @@ Optional `[[notifications.webhooks]]` entries send the serialized report to HTTP
 files are written. `on_failure` defaults to `true`, `on_success` defaults to `false`; a non-2xx response or
 connection error returns `E1404` while preserving the generated reports. Entries are sent in configuration order;
 the first failure stops notification delivery to later endpoints.
+
+Service cleanup is part of verification success. If a started service cannot be stopped, verification remains
+failed and the cleanup error is included in `test_result.json`/`test_result.md` so a leaked container is not hidden.
+
+`parse-logs` reads JSON Lines in bounded streaming passes. It keeps at most 20 records before the first matching
+error and 30 records in the output; when no trace ID is available it emits only the last 30 raw lines. This avoids
+loading an unbounded application log into memory.
 
 ## No Code Change Scope
 

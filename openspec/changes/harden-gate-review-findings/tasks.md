@@ -2,8 +2,9 @@
 
 **Parent:** [proposal.md](proposal.md), [design.md], and
 [ADR-0031](../../../docs/adr/0031-harden-gate-boundaries.md)
-**Status:** Implemented; acceptance evidence reviewed against PR #46 and the
-green CI run `33293667323`.
+**Status:** Original implementation accepted against PR #46 and green CI run
+`33293667323`; 2026-08-30 Rust-audit follow-up implemented locally and pending
+pull-request CI evidence.
 
 - [x] **1.1 (P0, S)** Add repository-boundary checks for working-tree secret and audit scans.
   **Acceptance:** outside symlink targets are never read; regression tests pass.
@@ -17,3 +18,16 @@ green CI run `33293667323`.
   **Acceptance:** contract, docs, and version checks pass.
 - [x] **1.6 (P0, S)** Run full validation, update this task list, and verify required CI checks.
   **Acceptance:** all required PR checks are green.
+
+## 2026-08-30 Rust-audit follow-up
+
+- [x] **2.1 (P0, M)** Propagate service cleanup failures, observe cancellation during warmup, and convert worker panics into scheduler failures.
+  **Acceptance:** failures remain visible in reports and focused lifecycle tests pass.
+- [x] **2.2 (P0, M)** Bound scanner memory, stream log extraction, and make preset initialization a rollback-capable batch.
+  **Acceptance:** oversize inputs fail closed; batch success, staging failure, commit rollback, and broken-symlink cases have tests.
+- [x] **2.3 (P1, S)** Remove production and integration-test Clippy allowances by deleting unused state or narrowing visibility.
+  **Acceptance:** no Rust `allow` attributes remain and strict all-target Clippy passes.
+- [x] **2.4 (P1, S)** Decouple audit unit tests from the repository's mutable gate configuration and synchronize user documentation.
+  **Acceptance:** the full suite passes with a locally modified `.harness-gate/audit.toml`.
+- [ ] **2.5 (P0, S)** Review pull-request CI evidence for Linux, macOS, and Windows.
+  **Acceptance:** every required check is green and ADR-0031 links the follow-up PR and CI run.
