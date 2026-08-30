@@ -11,9 +11,12 @@ pub(super) fn parse_result_count(content: &str, parser: &ParserConfig) -> Result
             capture,
             minimum,
         } => {
+            let regexes = patterns
+                .iter()
+                .map(|pattern| Regex::new(pattern))
+                .collect::<std::result::Result<Vec<_>, _>>()?;
             let mut count = 0;
-            for pattern in patterns {
-                let regex = Regex::new(pattern)?;
+            for regex in regexes {
                 count += regex
                     .captures_iter(&normalized)
                     .filter_map(|captures| captures.get(*capture)?.as_str().parse::<usize>().ok())

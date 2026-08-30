@@ -39,7 +39,7 @@ pub(super) fn start_docker(
         .unwrap_or_default()
         .as_millis();
     let name = format!(
-        "arc-flow-{}-{id}-{}-{unique}",
+        "harness-gate-{}-{id}-{}-{unique}",
         project.config.project.name,
         std::process::id()
     );

@@ -107,16 +107,34 @@ pub fn scan(project: &Project, mode: SecretMode) -> std::result::Result<Vec<Stri
     let mut findings = Vec::new();
 
     for file in files {
+        if crate::process::cancelled() {
+            return Err(SecretsError::scan(anyhow::anyhow!("secret scan cancelled")));
+        }
         let bytes = match mode {
-            SecretMode::WorkingTree => match fs::read(project.root.join(&file)) {
-                Ok(bytes) => bytes,
-                Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
-                Err(error) => {
-                    return Err(SecretsError::scan(
-                        anyhow::Error::from(error).context(format!("read {file}")),
-                    ));
+            SecretMode::WorkingTree => {
+                let path = project.root.join(&file);
+                let metadata = match fs::symlink_metadata(&path) {
+                    Ok(metadata) => metadata,
+                    Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
+                    Err(error) => {
+                        return Err(SecretsError::scan(
+                            anyhow::Error::from(error).context(format!("inspect {file}")),
+                        ));
+                    }
+                };
+                if metadata.file_type().is_symlink() || !metadata.file_type().is_file() {
+                    continue;
                 }
-            },
+                match fs::read(&path) {
+                    Ok(bytes) => bytes,
+                    Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
+                    Err(error) => {
+                        return Err(SecretsError::scan(
+                            anyhow::Error::from(error).context(format!("read {file}")),
+                        ));
+                    }
+                }
+            }
             SecretMode::Staged => {
                 match git::staged_file(&project.root, &file).map_err(SecretsError::scan)? {
                     Some(bytes) => bytes,
