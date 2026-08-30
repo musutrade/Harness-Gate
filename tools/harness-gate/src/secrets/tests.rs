@@ -5,8 +5,8 @@ use crate::test_support::TestWorkspace;
 use std::process::Command;
 
 fn scanner() -> SecretScanner {
-    SecretScanner::from_source(include_str!("../../../../.harness-gate/secrets.toml"))
-        .expect("project secret scan config")
+    SecretScanner::from_source(include_str!("../../presets/default.secrets.toml"))
+        .expect("default preset secret scan config")
 }
 
 #[test]
@@ -232,4 +232,59 @@ fn working_tree_scan_skips_file_symlinks() {
 
     let findings = scan(&project, SecretMode::WorkingTree).expect("scan working tree");
     assert!(findings.is_empty());
+}
+
+#[test]
+fn working_tree_scan_rejects_an_oversized_file() {
+    let workspace = TestWorkspace::new("large-working-tree-secret");
+    crate::preset::init(&workspace.root, "generic", false).expect("initialize fixture");
+    workspace.init_git();
+    fs::File::create(workspace.root.join("large.bin"))
+        .expect("create large file")
+        .set_len(MAX_SECRET_SCAN_FILE_BYTES + 1)
+        .expect("size large file");
+    let project = Project::discover(Some(workspace.root.clone()), None).expect("discover fixture");
+
+    let error = scan(&project, SecretMode::WorkingTree)
+        .expect_err("oversized working-tree file must fail closed");
+
+    assert!(error.to_string().contains("large.bin"));
+    assert!(error.to_string().contains("is too large"));
+}
+
+#[test]
+fn staged_scan_rejects_an_oversized_blob_before_loading_it() {
+    let workspace = TestWorkspace::new("large-staged-secret");
+    crate::preset::init(&workspace.root, "generic", false).expect("initialize fixture");
+    workspace.init_git();
+    assert!(Command::new("git")
+        .args(["add", "--", ".harness-gate/secrets.toml"])
+        .current_dir(&workspace.root)
+        .status()
+        .expect("stage secret config")
+        .success());
+    assert!(Command::new("git")
+        .args(["commit", "--quiet", "-m", "add secret config"])
+        .current_dir(&workspace.root)
+        .status()
+        .expect("commit secret config")
+        .success());
+    fs::File::create(workspace.root.join("large.bin"))
+        .expect("create large file")
+        .set_len(MAX_SECRET_SCAN_FILE_BYTES + 1)
+        .expect("size large file");
+    assert!(Command::new("git")
+        .args(["add", "--", "large.bin"])
+        .current_dir(&workspace.root)
+        .status()
+        .expect("stage large file")
+        .success());
+    let project = Project::discover(Some(workspace.root.clone()), None).expect("discover fixture");
+
+    let error = scan(&project, SecretMode::Staged)
+        .expect_err("oversized staged file must fail before loading");
+    let message = error.to_string();
+
+    assert!(message.contains("large.bin"), "{message}");
+    assert!(message.contains("is too large"), "{message}");
 }

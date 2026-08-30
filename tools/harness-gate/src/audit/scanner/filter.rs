@@ -4,7 +4,10 @@ use anyhow::{bail, Context, Result};
 use regex::{Regex, RegexBuilder};
 use std::collections::HashMap;
 use std::fs;
+use std::io::Read;
 use std::path::{Path, PathBuf};
+
+pub(crate) const MAX_SOURCE_FILE_BYTES: u64 = 16 * 1024 * 1024;
 
 pub(crate) fn compile_regexes(patterns: &[String]) -> Result<Vec<Regex>> {
     patterns
@@ -110,4 +113,33 @@ pub(crate) fn is_regular_file(path: &Path) -> bool {
     fs::symlink_metadata(path)
         .map(|metadata| metadata.file_type().is_file() && !metadata.file_type().is_symlink())
         .unwrap_or(false)
+}
+
+pub(crate) fn read_source(path: &Path) -> Result<String> {
+    let size = fs::metadata(path)
+        .with_context(|| format!("inspect audit source {}", path.display()))?
+        .len();
+    if size > MAX_SOURCE_FILE_BYTES {
+        bail!(
+            "audit source {} is too large ({} bytes; limit {} bytes)",
+            path.display(),
+            size,
+            MAX_SOURCE_FILE_BYTES
+        );
+    }
+    let file =
+        fs::File::open(path).with_context(|| format!("open audit source {}", path.display()))?;
+    let mut bytes = Vec::with_capacity(size as usize);
+    file.take(MAX_SOURCE_FILE_BYTES + 1)
+        .read_to_end(&mut bytes)
+        .with_context(|| format!("read audit source {}", path.display()))?;
+    if bytes.len() as u64 > MAX_SOURCE_FILE_BYTES {
+        bail!(
+            "audit source {} grew beyond the {} byte limit while being read",
+            path.display(),
+            MAX_SOURCE_FILE_BYTES
+        );
+    }
+    String::from_utf8(bytes)
+        .with_context(|| format!("audit source {} must be UTF-8", path.display()))
 }

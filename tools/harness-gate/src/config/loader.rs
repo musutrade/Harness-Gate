@@ -11,11 +11,6 @@ use std::fs;
 use std::path::Path;
 
 impl FlowConfig {
-    #[allow(dead_code)]
-    pub fn load(path: &Path) -> Result<Self> {
-        Self::load_with_diagnostics(path, None).map_err(anyhow::Error::from)
-    }
-
     pub fn load_with_diagnostics(
         path: &Path,
         repository_root: Option<&Path>,

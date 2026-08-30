@@ -5,7 +5,6 @@ use anyhow::{bail, Result};
 #[cfg(test)]
 use std::collections::HashMap;
 use std::collections::{BTreeMap, BTreeSet, HashSet};
-use std::time::Duration;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) enum BuiltinGate {
@@ -28,18 +27,12 @@ pub(super) enum NodeStatus {
 }
 
 #[derive(Debug, Clone)]
-#[allow(dead_code)]
 pub(super) struct NodeResult {
     pub id: String,
     pub label: String,
     pub kind: PlanNodeKind,
     pub status: NodeStatus,
-    pub duration: Duration,
-    pub detail: Option<String>,
-    pub artifact: Option<String>,
     pub reason: Option<String>,
-    /// Preserve timeout/cancellation causes without changing the public report.
-    pub timed_out: bool,
     pub cancelled: bool,
 }
 
@@ -275,8 +268,7 @@ fn selected_step_ids(
 }
 
 #[cfg(test)]
-#[allow(clippy::needless_lifetimes)]
-fn topological_order<'a>(candidates: Vec<&'a StepConfig>) -> Vec<&'a StepConfig> {
+fn topological_order(candidates: Vec<&StepConfig>) -> Vec<&StepConfig> {
     let ids = candidates
         .iter()
         .map(|step| step.id.as_str())

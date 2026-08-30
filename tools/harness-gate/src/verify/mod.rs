@@ -179,7 +179,7 @@ fn run_selected(
     let mut progress = Progress::new(plan.nodes.len());
     scope.write_reports(project)?;
     let services = Mutex::new(ServiceManager::new(project));
-    let outcome = scheduler::run_plan(
+    let scheduler_result = scheduler::run_plan(
         project,
         &plan,
         staged,
@@ -189,12 +189,26 @@ fn run_selected(
         } else {
             1
         },
-    )
-    .map_err(|error| match error {
-        scheduler::SchedulerError::Secrets(error) => VerifyError::Secrets(error),
-        scheduler::SchedulerError::Audit(error) => VerifyError::Audit(error),
-        scheduler::SchedulerError::Execution(error) => VerifyError::execution(error),
-    })?;
+    );
+    let cleanup_result = services
+        .lock()
+        .map_err(|_| anyhow::anyhow!("service manager lock was poisoned"))
+        .and_then(|mut manager| manager.cleanup());
+    let outcome = match scheduler_result {
+        Ok(outcome) => outcome,
+        Err(error) => {
+            let cleanup = cleanup_result.err().map(|cleanup| format!("; {cleanup:#}"));
+            let detail = match error {
+                scheduler::SchedulerError::Secrets(error) => VerifyError::Secrets(error),
+                scheduler::SchedulerError::Audit(error) => VerifyError::Audit(error),
+                scheduler::SchedulerError::Execution(error) => VerifyError::execution(
+                    anyhow::anyhow!("{error:#}{}", cleanup.unwrap_or_default()),
+                ),
+            };
+            return Err(detail);
+        }
+    };
+    let cleanup_error = cleanup_result.err();
     let scheduler::SchedulerOutcome {
         results,
         cancelled,
@@ -235,7 +249,20 @@ fn run_selected(
         }
         progress.complete();
     }
-    let passed = steps.iter().all(|step| step.passed) && steps.len() == plan.nodes.len();
+    if let Some(error) = &cleanup_error {
+        steps.push(TaskResult {
+            label: "service cleanup".into(),
+            passed: false,
+            timed_out: false,
+            cancelled: false,
+            duration_ms: 0,
+            log: String::new(),
+            detail: Some(format!("{error:#}")),
+        });
+    }
+    let passed = cleanup_error.is_none()
+        && steps.iter().all(|step| step.passed)
+        && steps.len() == plan.nodes.len();
     let report = VerificationReport {
         timestamp: chrono::Utc::now().to_rfc3339(),
         profile: only_step
@@ -269,6 +296,9 @@ fn run_selected(
             scheduler::SchedulerError::Audit(error) => VerifyError::Audit(error),
             scheduler::SchedulerError::Execution(error) => VerifyError::execution(error),
         });
+    }
+    if let Some(error) = cleanup_error {
+        return Err(VerifyError::execution(error));
     }
     Ok(report)
 }

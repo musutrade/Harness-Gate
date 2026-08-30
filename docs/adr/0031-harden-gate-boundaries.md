@@ -24,6 +24,11 @@ developer interruption, CI reliability, and large-repository throughput.
   attach a stable rule identity to every violation.
 - Resolve Doctor repository-relative paths from `Project::root`, surface service
   cleanup failures, and keep parser read failures distinct from zero results.
+- Bound audit and secret-scan inputs to 16 MiB per file, and parse JSON Lines logs
+  with bounded streaming context so untrusted repository artifacts cannot cause
+  unbounded memory growth.
+- Initialize preset files as one staged batch, including the generated
+  `.harness-gate/.gitignore`, and restore previous files if a commit step fails.
 - Keep `harness-gate` as the only supported command name in source, docs,
   installer, and snapshots.
 
@@ -37,6 +42,9 @@ service runtimes still require a reviewed Rust change rather than a plugin API.
 - Windows builds gain explicit process-tree termination and require platform CI
   coverage.
 - Configuration setup does more work once and less work per changed path/file.
+- Preset initialization has an all-or-nothing boundary for generated files, but
+  still depends on ordinary filesystem rename semantics rather than a
+  filesystem-wide transaction.
 - Existing report fields remain compatible, but rule attribution becomes
   deterministic for names that share prefixes.
 
@@ -59,3 +67,9 @@ service runtimes still require a reviewed Rust change rather than a plugin API.
 
 - [PR #46](https://github.com/musutrade/Harness-Gate/pull/46)
 - [CI run 33293667323](https://github.com/musutrade/Harness-Gate/actions/runs/33293667323)
+- [Follow-up PR #52](https://github.com/musutrade/Harness-Gate/pull/52)
+- [Follow-up CI run 33311791454](https://github.com/musutrade/Harness-Gate/actions/runs/33311791454)
+
+The follow-up run passed the Linux, macOS, and Windows build, test, CLI
+contract, and performance checks, plus formatting, Clippy, security audit,
+coverage, documentation consistency, and the Required Quality Aggregate.
