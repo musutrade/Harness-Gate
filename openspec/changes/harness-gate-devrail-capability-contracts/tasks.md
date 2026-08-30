@@ -29,7 +29,7 @@ effort, and acceptance criterion.
 
 ## 2. Runner and Isolation (P0)
 
-- [ ] **2.1 (P0, M)** Add versioned runner configuration parsing.
+- [x] **2.1 (P0, M)** Add versioned runner configuration parsing.
   **Acceptance:** Threads, environment mapping, argument insertion, result
   format, and isolation fields validate before side effects; unknown fields fail
   with a diagnostic.
