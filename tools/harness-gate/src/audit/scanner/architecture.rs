@@ -33,7 +33,7 @@ pub(crate) fn scan_arch_rules(
         let regexes = compile_regexes(&patterns)?;
         let allowed_regexes = compile_regexes(&allowed_patterns)?;
         let exclude_regexes = compile_regexes(&exclude_patterns)?;
-        let compiled_allowlist = compile_allowlist(project_root, &allowlist, &rule.name)?;
+        let compiled_allowlist = compile_allowlist(&allowlist, &rule.name)?;
 
         let rule_name = rule.name.clone();
         let mut walk_builder = WalkBuilder::new(root_paths[0].clone());
