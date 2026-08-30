@@ -48,6 +48,7 @@ We use a simplified version of the Michael Nygard ADR template:
 - [ADR-0028](0028-parallel-scheduling.md) - Introduce dependency-aware parallel scheduling
 - [ADR-0029](0029-project-scoped-configuration.md) - Keep workflow and audit configuration project-scoped
 - [ADR-0030](0030-docs-rs-library-target.md) - Provide a documentation target for the CLI crate
+- [ADR-0031](0031-harden-gate-boundaries.md) - Harden gate boundaries and delivery contracts
 
 ## Creating New ADRs
 

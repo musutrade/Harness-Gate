@@ -1,0 +1,5 @@
+schema: spec-driven
+
+status: implemented-pending-ci
+change: harden-gate-review-findings
+owner: Harness-Gate maintainers

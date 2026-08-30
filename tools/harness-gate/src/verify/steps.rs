@@ -131,7 +131,8 @@ fn execute(
     let mut result = task.run()?;
     if result.passed {
         if let Some(parser) = parser {
-            let content = fs::read_to_string(&result.log).unwrap_or_default();
+            let content = fs::read_to_string(&result.log)
+                .with_context(|| format!("read parser log {}", result.log))?;
             let (count, minimum) = parse_result_count(&content, parser)?;
             if count < minimum {
                 result.passed = false;

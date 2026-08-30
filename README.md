@@ -272,39 +272,6 @@ command context needed to resolve the issue.
 - Custom test parsers
 - Optional HTML/JUnit reports and HTTP(S) Webhook notifications
 
-## Installation
-
-### Method 1: Install Script
-
-```bash
-# Download and run install script
-curl -sSL https://raw.githubusercontent.com/yourusername/Harness-Gate/main/install.sh | bash
-
-# Or install from source
-curl -sSL https://raw.githubusercontent.com/yourusername/Harness-Gate/main/install.sh | bash -s -- --from-source
-```
-
-### Method 2: Manual Installation from Source
-
-```bash
-# Clone repository
-git clone https://github.com/yourusername/Harness-Gate.git
-cd Harness-Gate
-
-# Compile and install
-cargo install --locked --path tools/harness-gate
-
-# Verify installation
-harness-gate --version
-# Output: harness-gate 1.0.0
-```
-
-### Method 3: From crates.io (Coming Soon)
-
-```bash
-cargo install harness-gate
-```
-
 ## Git Hook Integration
 
 Set up Git hooks:
@@ -354,6 +321,26 @@ files are written. `on_failure` defaults to `true`, `on_success` defaults to `fa
 connection error returns `E1404` while preserving the generated reports. Entries are sent in configuration order;
 the first failure stops notification delivery to later endpoints.
 
+## No Code Change Scope
+
+The following changes only require edits to `.harness-gate/flow.toml` or the
+project audit TOML:
+
+- add or rename components, profiles, and external steps;
+- connect Go, Java, Python, Node, or other CLI tools;
+- adjust monorepo scope rules and path aliases;
+- add Doctor checks expressible by the existing check kinds;
+- add regex result parsers, Docker/environment services, or audit rules;
+- provide CI-specific timeout, image, or directory overrides.
+
+## Rust Change Boundary
+
+Source changes are required for a new behavior category, such as a non-Docker
+service lifecycle provider, a report format that cannot be parsed by regex, a
+new Doctor protocol, a new credential algorithm, or a different process
+cancellation policy. These changes require tests, preset validation, and a
+versioned compatibility review.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -369,5 +356,5 @@ Thanks to all contributors of the arc-admin project, Harness-Gate evolved from t
 ## Links
 
 - **Documentation**: [docs/](docs/)
-- **Issue Tracker**: https://github.com/yourusername/Harness-Gate/issues
+- **Issue Tracker**: https://github.com/musutrade/Harness-Gate/issues
 - **Original Project**: https://github.com/musutrade/arc-admin
