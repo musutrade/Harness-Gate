@@ -1,6 +1,10 @@
+#[cfg(unix)]
 use super::*;
+#[cfg(unix)]
 use std::fs;
+#[cfg(unix)]
 use std::path::Path;
+#[cfg(unix)]
 use std::time::Duration;
 
 #[cfg(unix)]
