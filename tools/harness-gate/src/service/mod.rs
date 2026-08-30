@@ -32,10 +32,28 @@ impl<'a> ServiceManager<'a> {
         }
     }
 
-    #[allow(dead_code)]
+    #[cfg(test)]
     pub fn environment(&mut self, id: &str) -> Result<(String, String)> {
         let lease = self.handle(id)?.acquire()?;
         Ok(lease.environment())
+    }
+
+    pub(super) fn cleanup(&mut self) -> Result<()> {
+        let mut errors = Vec::new();
+        for resource in self.resources.values() {
+            if let Err(error) = resource.cleanup() {
+                errors.push(format!("{error:#}"));
+            }
+            match resource.take_cleanup_errors() {
+                Ok(resource_errors) => errors.extend(resource_errors),
+                Err(error) => errors.push(format!("{error:#}")),
+            }
+        }
+        if errors.is_empty() {
+            Ok(())
+        } else {
+            bail!("service cleanup failed: {}", errors.join("; "))
+        }
     }
 
     pub(super) fn handle(&mut self, id: &str) -> Result<ServiceHandle<'a>> {
@@ -105,6 +123,7 @@ struct ServiceResource {
     state: Mutex<ResourceState>,
     changed: Condvar,
     shareable: bool,
+    cleanup_errors: Arc<Mutex<Vec<String>>>,
 }
 
 enum ResourceState {
@@ -127,7 +146,53 @@ impl ServiceResource {
             state: Mutex::new(ResourceState::Empty),
             changed: Condvar::new(),
             shareable,
+            cleanup_errors: Arc::new(Mutex::new(Vec::new())),
         }
+    }
+
+    fn cleanup(&self) -> Result<()> {
+        let service = {
+            let mut state = self
+                .state
+                .lock()
+                .map_err(|_| anyhow::anyhow!("service resource lock was poisoned"))?;
+            let previous = std::mem::replace(&mut *state, ResourceState::Stopping);
+            self.changed.notify_all();
+            match previous {
+                ResourceState::Ready { service, .. } => Some(service),
+                ResourceState::Empty => {
+                    *state = ResourceState::Empty;
+                    self.changed.notify_all();
+                    None
+                }
+                ResourceState::Failed(error) => {
+                    *state = ResourceState::Failed(error);
+                    self.changed.notify_all();
+                    None
+                }
+                ResourceState::Starting | ResourceState::Stopping => {
+                    *state = ResourceState::Empty;
+                    self.changed.notify_all();
+                    bail!("service resource is still transitioning during cleanup")
+                }
+            }
+        };
+        drop(service);
+        if let Ok(mut state) = self.state.lock() {
+            if matches!(*state, ResourceState::Stopping) {
+                *state = ResourceState::Empty;
+                self.changed.notify_all();
+            }
+        }
+        Ok(())
+    }
+
+    fn take_cleanup_errors(&self) -> Result<Vec<String>> {
+        let mut errors = self
+            .cleanup_errors
+            .lock()
+            .map_err(|_| anyhow::anyhow!("service cleanup error lock was poisoned"))?;
+        Ok(std::mem::take(&mut *errors))
     }
 
     fn acquire(
@@ -173,7 +238,12 @@ impl ServiceResource {
                     }
                     *state = ResourceState::Starting;
                     drop(state);
-                    let result = RunningService::start(project, id, config);
+                    let result = RunningService::start(
+                        project,
+                        id,
+                        config,
+                        Arc::clone(&self.cleanup_errors),
+                    );
                     // A cancellation can arrive while an adapter is starting.
                     // Drop any partial service and return the resource to Empty
                     // instead of publishing it as ready after cancellation.
@@ -250,9 +320,18 @@ impl ServiceResource {
         }
     }
 
-    fn prewarm(self: &Arc<Self>, project: &Project, id: &str, config: ServiceConfig) -> Result<()> {
+    fn prewarm(
+        self: &Arc<Self>,
+        project: &Project,
+        id: &str,
+        config: ServiceConfig,
+        cancelled: &std::sync::atomic::AtomicBool,
+    ) -> Result<()> {
         let started = Instant::now();
         loop {
+            if cancelled.load(std::sync::atomic::Ordering::Acquire) || crate::process::cancelled() {
+                bail!("verification cancelled while warming service {id:?}");
+            }
             let mut state = self
                 .state
                 .lock()
@@ -275,7 +354,24 @@ impl ServiceResource {
                 ResourceState::Empty => {
                     *state = ResourceState::Starting;
                     drop(state);
-                    let result = RunningService::start(project, id, config);
+                    let result = RunningService::start(
+                        project,
+                        id,
+                        config,
+                        Arc::clone(&self.cleanup_errors),
+                    );
+                    if cancelled.load(std::sync::atomic::Ordering::Acquire)
+                        || crate::process::cancelled()
+                    {
+                        drop(result);
+                        let mut state = self
+                            .state
+                            .lock()
+                            .map_err(|_| anyhow::anyhow!("service resource lock was poisoned"))?;
+                        *state = ResourceState::Empty;
+                        self.changed.notify_all();
+                        bail!("verification cancelled while warming service {id:?}");
+                    }
                     let mut state = self
                         .state
                         .lock()
@@ -341,7 +437,9 @@ impl ServiceWarmup {
         if cancelled.load(std::sync::atomic::Ordering::Acquire) || crate::process::cancelled() {
             return;
         }
-        let result = self.resource.prewarm(&self.project, &self.id, self.config);
+        let result = self
+            .resource
+            .prewarm(&self.project, &self.id, self.config, cancelled);
         if (cancelled.load(std::sync::atomic::Ordering::Acquire) || crate::process::cancelled())
             && result.is_ok()
         {
@@ -387,6 +485,7 @@ struct RunningService {
     value: String,
     container: Option<String>,
     project_root: PathBuf,
+    cleanup_errors: Arc<Mutex<Vec<String>>>,
 }
 
 impl Drop for RunningService {
@@ -396,17 +495,26 @@ impl Drop for RunningService {
                 self.runtime
                     .stop_container(&self.project_root, container, Duration::from_secs(5))
             {
-                eprintln!(
-                    "warning: failed to clean up {} container {container:?}: {error:#}",
+                let detail = format!(
+                    "failed to clean up {} container {container:?}: {error:#}",
                     self.runtime.executable()
                 );
+                if let Ok(mut errors) = self.cleanup_errors.lock() {
+                    errors.push(detail.clone());
+                }
+                eprintln!("warning: {detail}");
             }
         }
     }
 }
 
 impl RunningService {
-    fn start(project: &Project, id: &str, config: ServiceConfig) -> Result<Self> {
+    fn start(
+        project: &Project,
+        id: &str,
+        config: ServiceConfig,
+        cleanup_errors: Arc<Mutex<Vec<String>>>,
+    ) -> Result<Self> {
         match config {
             ServiceConfig::Environment {
                 source_env,
@@ -423,6 +531,7 @@ impl RunningService {
                     value,
                     container: None,
                     project_root: project.root.clone(),
+                    cleanup_errors,
                 })
             }
             ServiceConfig::Docker {
@@ -450,6 +559,7 @@ impl RunningService {
                         value,
                         container: None,
                         project_root: project.root.clone(),
+                        cleanup_errors,
                     });
                 }
                 let deadline = Instant::now() + Duration::from_secs(startup_timeout_secs);
@@ -469,6 +579,7 @@ impl RunningService {
                         healthcheck,
                         connection,
                         deadline,
+                        cleanup_errors,
                     },
                 )
             }

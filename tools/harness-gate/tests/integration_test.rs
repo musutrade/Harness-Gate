@@ -9,7 +9,8 @@ fn test_verify_cancellation_stops_the_child_process() {
     use std::time::Duration;
 
     let ctx = TestContext::new();
-    ctx.init_project("generic");
+    ctx.init_preset("generic");
+    ctx.init_git();
     ctx.write_file(
         ".harness-gate/flow.toml",
         r#"
@@ -173,7 +174,8 @@ fn test_secrets_scan_basic() {
     let ctx = TestContext::new();
 
     // Initialize with preset
-    ctx.init_project("rust-api");
+    ctx.init_preset("rust-api");
+    ctx.init_git();
 
     // Create a file with no secrets
     ctx.write_file("test.txt", "Hello, world!");
@@ -196,7 +198,8 @@ fn test_secrets_scan_basic() {
 fn test_scope_detection_all() {
     let ctx = TestContext::new();
 
-    ctx.init_project("rust-api");
+    ctx.init_preset("rust-api");
+    ctx.init_git();
 
     // Run scope with --all
     let output = ctx.run_harness_gate(&["scope", "--all"]);

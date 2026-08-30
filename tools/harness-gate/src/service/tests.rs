@@ -95,7 +95,33 @@ fn environment_service_injects_configured_value() {
         value,
         ("FIXTURE_URL".into(), "http://127.0.0.1:1234".into())
     );
+    manager.cleanup().expect("service cleanup");
     std::env::remove_var(name);
+}
+
+#[test]
+fn cleanup_surfaces_errors_recorded_by_a_service_resource() {
+    let (_workspace, mut project) = project();
+    project.config.services.insert(
+        "fixture".into(),
+        ServiceConfig::Environment {
+            source_env: "HARNESS_GATE_CLEANUP_FIXTURE".into(),
+            inject_env: "FIXTURE_URL".into(),
+        },
+    );
+    let mut manager = ServiceManager::new(&project);
+    manager.handle("fixture").expect("register service");
+    let resource = manager.resources.get("fixture").expect("resource");
+    resource
+        .cleanup_errors
+        .lock()
+        .expect("cleanup error lock")
+        .push("simulated cleanup failure".into());
+
+    let error = manager
+        .cleanup()
+        .expect_err("cleanup failure must propagate");
+    assert!(error.to_string().contains("simulated cleanup failure"));
 }
 
 #[test]

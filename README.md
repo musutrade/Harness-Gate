@@ -5,7 +5,7 @@
 [![Documentation](https://docs.rs/harness-gate/badge.svg)](https://docs.rs/harness-gate)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[English](README.md) | [简体中文](README.zh-CN.md)
+[English](https://github.com/musutrade/Harness-Gate/blob/main/README.md) | [简体中文](https://github.com/musutrade/Harness-Gate/blob/main/README.zh-CN.md)
 
 `Harness-Gate` is a reusable Rust development workflow and architecture guard CLI. This is an independent tool providing complete quality gate and workflow management capabilities.
 
@@ -14,9 +14,9 @@ It handles changed paths, secret scanning, architecture auditing, environment va
 ## Navigation
 
 - Quick Start: see [Installation](#installation) and [Quick Start](#installation-and-quick-start)
-- New Project Integration: see [Installation and New Project Integration](#installation-and-new-project-integration) and [Built-in Presets](#built-in-presets)
-- Add Commands, Components or CI Profiles: see [Selection Model](#selection-model) and [schema v2 configuration reference](docs/configuration.md)
-- Handle Failures: see [Reports and Logs](#reports-and-logs) and [Troubleshooting](#troubleshooting)
+- New Project Integration: see [Installation and Quick Start](#installation-and-quick-start) and [Built-in Presets](#built-in-presets)
+- Add Commands, Components or CI Profiles: see [Command Overview](#command-overview) and [schema v2 configuration reference](https://github.com/musutrade/Harness-Gate/blob/main/docs/configuration.md)
+- Handle Failures: see [Reports and Notifications](#reports-and-notifications) and [Common Repair Paths](#common-repair-paths)
 - Extend Rust Engine: see [No Code Change Scope](#no-code-change-scope) and [Rust Change Boundary](#rust-change-boundary)
 
 ## Working Model
@@ -65,7 +65,7 @@ Example installation on Linux/macOS:
 
 ```bash
 # Download (replace with your platform)
-wget https://github.com/musutrade/Harness-Gate/releases/download/v0.3.2/harness-gate-linux-amd64
+wget https://github.com/musutrade/Harness-Gate/releases/download/v0.3.3/harness-gate-linux-amd64
 
 # Make executable
 chmod +x harness-gate-linux-amd64
@@ -275,6 +275,7 @@ review.
 - **Secret Scan**: High-confidence credential detection
 - **Architecture Audit**: Regex architecture rules
 - Enforced before all external steps
+- Scans reject individual files larger than 16 MiB to keep memory use bounded
 
 ### Environment Check (Doctor)
 - Tool version validation
@@ -345,6 +346,13 @@ files are written. `on_failure` defaults to `true`, `on_success` defaults to `fa
 connection error returns `E1404` while preserving the generated reports. Entries are sent in configuration order;
 the first failure stops notification delivery to later endpoints.
 
+Service cleanup is part of verification success. If a started service cannot be stopped, verification remains
+failed and the cleanup error is included in `test_result.json`/`test_result.md` so a leaked container is not hidden.
+
+`parse-logs` reads JSON Lines in bounded streaming passes. It keeps at most 20 records before the first matching
+error and 30 records in the output; when no trace ID is available it emits only the last 30 raw lines. This avoids
+loading an unbounded application log into memory.
+
 ## No Code Change Scope
 
 The following changes only require edits to `.harness-gate/flow.toml` or the
@@ -367,11 +375,11 @@ versioned compatibility review.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/musutrade/Harness-Gate/blob/main/LICENSE) file for details.
 
 ## Contributing
 
-Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+Contributions are welcome! Please read [CONTRIBUTING.md](https://github.com/musutrade/Harness-Gate/blob/main/CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
 ## Acknowledgments
 
@@ -379,6 +387,6 @@ Thanks to all contributors of the arc-admin project, Harness-Gate evolved from t
 
 ## Links
 
-- **Documentation**: [docs/](docs/)
+- **Documentation**: [docs/](https://github.com/musutrade/Harness-Gate/tree/main/docs)
 - **Issue Tracker**: https://github.com/musutrade/Harness-Gate/issues
 - **Original Project**: https://github.com/musutrade/arc-admin

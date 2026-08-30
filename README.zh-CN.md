@@ -5,7 +5,7 @@
 [![Documentation](https://docs.rs/harness-gate/badge.svg)](https://docs.rs/harness-gate)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[English](README.md) | [简体中文](README.zh-CN.md)
+[English](https://github.com/musutrade/Harness-Gate/blob/main/README.md) | [简体中文](https://github.com/musutrade/Harness-Gate/blob/main/README.zh-CN.md)
 
 `Harness-Gate` 是可复用的 Rust 开发工作流与架构门禁 CLI。这是一个独立工具，提供完整的质量门禁和工作流管理能力。
 
@@ -14,9 +14,9 @@
 ## 阅读导航
 
 - 快速开始：看[安装](#安装)和[快速开始](#安装与快速开始)；
-- 接入新项目：看[安装与新项目接入](#安装与新项目接入)和[内置预设](#内置预设)；
-- 增加命令、组件或 CI profile：看[选择模型](#选择模型)和 [schema v2 配置参考](docs/configuration.md)；
-- 处理失败：看[报告与日志](#报告与日志)和[故障排查](#故障排查)；
+- 接入新项目：看[安装与快速开始](#安装与快速开始)和[内置预设](#内置预设)；
+- 增加命令、组件或 CI profile：看[选择模型](#选择模型)和 [schema v2 配置参考](https://github.com/musutrade/Harness-Gate/blob/main/docs/configuration.md)；
+- 处理失败：看[验证与报告](#验证与报告)和[故障排查](#故障排查)；
 - 扩展 Rust 引擎：看[无需改代码的范围](#无需改代码的范围)和[需要改-rust-的边界](#需要改-rust-的边界)。
 
 ## 工作模型
@@ -65,7 +65,7 @@ Linux/macOS 安装示例：
 
 ```bash
 # 下载（替换为你的平台）
-wget https://github.com/musutrade/Harness-Gate/releases/download/v0.3.2/harness-gate-linux-amd64
+wget https://github.com/musutrade/Harness-Gate/releases/download/v0.3.3/harness-gate-linux-amd64
 
 # 添加执行权限
 chmod +x harness-gate-linux-amd64
@@ -309,7 +309,7 @@ timeout_secs = 180
 
 `REPORT_DIR` / `HARNESS_GATE_REPORTS`、`HARNESS_GATE_SECRETS_CONFIG` 和步骤或服务声明的 `*_env` 字段可覆盖相应配置值。审核配置始终由当前项目 `flow.toml` 中字面量、仓库相对的 `paths.audit_config` 决定，不接受进程级审核配置覆写或环境插值；切换项目或工作流文件时显式传入 `--project-root` 和 `--config`。
 
-完整字段、默认值、限制和示例见 [schema v2 配置参考](docs/configuration.md)。修改配置后先运行：
+完整字段、默认值、限制和示例见 [schema v2 配置参考](https://github.com/musutrade/Harness-Gate/blob/main/docs/configuration.md)。修改配置后先运行：
 
 ```bash
 harness-gate config check
@@ -388,6 +388,8 @@ profile 由步骤的 `profiles = [...]` 隐式声明。`verify` 使用 `[project
 
 secret scan 检查 Git 已追踪文件和未忽略的未跟踪文件。具体规则由 `[paths].secrets_config` 指向的 TOML 文件提供，默认覆盖 GitHub/GitLab/npm Token、AWS access key、JWT、命名签名密钥、PostgreSQL 凭据 URL、Webhook、企业微信/钉钉密钥、HTTP Basic Auth 和 PEM 私钥头。捕获值会经过占位符与低信息值过滤；报告只记录文件名，不把凭据内容复制到终端或 JSON。
 
+为限制扫描过程的内存使用，secret scan 和 architecture audit 都拒绝超过 16 MiB 的单个输入文件，并将该错误作为门禁失败返回。
+
 ## v1 迁移
 
 ```bash
@@ -443,6 +445,8 @@ harness-gate parse-logs \
 
 解析器优先选择第一条 `level = ERROR` 所在的 `trace_id`，支持从事件字段、`data`、当前 `span` 和 `spans` 中提取，再收集相同 trace 的结构化记录；没有 trace 时退化为原始日志最后 30 行。
 
+解析采用有界流式读取：错误前最多保留 20 条上下文，输出最多 30 条记录，不会把整份无限增长的 JSON Lines 日志载入内存。已启动 service 的清理失败也会使验证失败，并写入验证报告，避免把容器泄漏隐藏为成功。
+
 ## Git Hook
 
 当前仓库使用：
@@ -483,7 +487,7 @@ harness-gate verify --all
 
 可选的 `[[notifications.webhooks]]` 会在报告文件写入后发送 JSON。`on_failure` 默认开启，`on_success`
 默认关闭；非 2xx 响应或连接错误返回报告错误 `E1404`，但不会删除已生成的报告。完整字段、模板路径
-约束和 JUnit 示例见[配置参考](docs/configuration.md#报告模板junit-和通知)。多个 webhook 按配置顺序发送，
+约束和 JUnit 示例见[配置参考](https://github.com/musutrade/Harness-Gate/blob/main/docs/configuration.md#报告模板junit-和通知)。多个 webhook 按配置顺序发送，
 首个失败会停止后续通知。
 
 ## 故障排查
@@ -545,7 +549,7 @@ component 来自 `[[steps]].component`，profile 来自 `[[steps]].profiles`。�
 
 ## 当前审计规则
 
-`.harness-gate/audit.toml` 保存项目自己的 SQL、分层和模板约束。audit 配置当前 schema 为 v2，必须显式声明 `version = 2` 和 `[engine]`；规则扩展名没有对应 `comment_syntax` 时会 fail closed。旧版字符串 allowlist、缺失 engine 和版本升级方法见[配置迁移参考](docs/configuration.md#audit-v2-migration)。`arch_rules.allowed_patterns` 可声明逐行例外，不存在写死的 model trait 放行逻辑。
+`.harness-gate/audit.toml` 保存项目自己的 SQL、分层和模板约束。audit 配置当前 schema 为 v2，必须显式声明 `version = 2` 和 `[engine]`；规则扩展名没有对应 `comment_syntax` 时会 fail closed。旧版字符串 allowlist、缺失 engine 和版本升级方法见[配置迁移参考](https://github.com/musutrade/Harness-Gate/blob/main/docs/configuration.md#audit-v2-migration)。`arch_rules.allowed_patterns` 可声明逐行例外，不存在写死的 model trait 放行逻辑。
 
 auditor 以整文件为单位执行正则检查并把命中映射回起始代码行：支持跨行规则、扩展名过滤、路径排除、显式类型的路径 allowlist 和起始行 allowed pattern。行注释、块注释及字符串定界符按扩展名配置，扫描时跟踪词法状态；正则默认启用 multi-line 模式。需要抽象语法树级判断时，应把 Clippy、ESLint 或其他语言 lint 工具配置为 step。
 
