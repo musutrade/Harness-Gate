@@ -1,7 +1,9 @@
 use super::command::{isolate_process_tree, terminate};
 use super::signal::cancelled;
+use crate::config::{RunnerResultFormat, TestIsolation};
 use anyhow::{Context, Result};
 use serde::Serialize;
+use std::collections::BTreeMap;
 use std::ffi::{OsStr, OsString};
 use std::fs::{self, File};
 use std::path::{Path, PathBuf};
@@ -18,6 +20,22 @@ pub struct Task {
     env_remove: Vec<OsString>,
     timeout: Duration,
     log: PathBuf,
+    runner: Option<RunnerExecution>,
+}
+
+/// Records the declared runner contract and the effective inputs used for a task.
+/// Environment values are limited to runner-owned declarations; service values
+/// are intentionally not copied into this report field.
+#[derive(Debug, Clone, Serialize)]
+pub struct RunnerExecution {
+    pub version: u32,
+    pub kind: String,
+    pub effective_args: Vec<String>,
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub environment: BTreeMap<String, String>,
+    pub result_format: RunnerResultFormat,
+    pub isolation: TestIsolation,
+    pub threads: Option<usize>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -29,6 +47,8 @@ pub struct TaskResult {
     pub duration_ms: u128,
     pub log: String,
     pub detail: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub runner: Option<RunnerExecution>,
 }
 
 impl Task {
@@ -47,6 +67,7 @@ impl Task {
             env_remove: Vec::new(),
             timeout: Duration::from_secs(180),
             log,
+            runner: None,
         }
     }
 
@@ -73,6 +94,11 @@ impl Task {
 
     pub fn timeout(mut self, seconds: u64) -> Self {
         self.timeout = Duration::from_secs(seconds);
+        self
+    }
+
+    pub fn runner(mut self, execution: RunnerExecution) -> Self {
+        self.runner = Some(execution);
         self
     }
 
@@ -129,6 +155,7 @@ impl Task {
             } else {
                 status.code().map(|code| format!("exit code {code}"))
             },
+            runner: self.runner,
         })
     }
 }

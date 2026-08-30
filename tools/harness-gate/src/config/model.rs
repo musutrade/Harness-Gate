@@ -4,6 +4,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 pub const CONFIG_VERSION: u32 = 2;
 pub const DEFAULT_CONFIG_PATH: &str = ".harness-gate/flow.toml";
+pub const RUNNER_CONFIG_VERSION: u32 = 1;
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
@@ -318,6 +319,49 @@ pub struct StepConfig {
     /// Closed vocabulary for built-in gate declarations.
     #[serde(default)]
     pub gate_type: Option<String>,
+    /// Optional versioned test-runner contract. Omitted for legacy steps.
+    #[serde(default)]
+    pub runner: Option<RunnerConfig>,
+}
+
+/// Declares how a test runner receives concurrency and result-contract inputs.
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct RunnerConfig {
+    pub version: u32,
+    pub kind: String,
+    #[serde(default)]
+    #[schemars(range(min = 1, max = 256))]
+    pub threads: Option<usize>,
+    #[serde(default)]
+    pub threads_env: Option<String>,
+    #[serde(default)]
+    pub args: Vec<String>,
+    /// Insert runner arguments at this index in the configured step arguments.
+    /// When omitted, arguments are appended.
+    #[serde(default)]
+    pub args_position: Option<usize>,
+    #[serde(default)]
+    pub result_format: RunnerResultFormat,
+    pub isolation: TestIsolation,
+}
+
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, JsonSchema, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum RunnerResultFormat {
+    #[default]
+    Regex,
+    Junit,
+    Trx,
+    Json,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, JsonSchema, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum TestIsolation {
+    Shared,
+    SchemaPerWorker,
+    DatabasePerWorker,
 }
 
 fn default_step_cwd() -> String {

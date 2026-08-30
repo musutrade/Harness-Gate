@@ -176,6 +176,7 @@ pub fn migrate_v1(source: &str, project_name: &str) -> Result<FlowConfig> {
             depends_on: Vec::new(),
             kind: None,
             gate_type: None,
+            runner: None,
         })
         .collect::<Vec<_>>();
     let required_steps = steps.iter().map(|step| step.id.clone()).collect();
