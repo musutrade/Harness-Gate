@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.3] - 2026-08-30
+
+### Fixed
+
+- Corrected README navigation anchors and made repository documentation links
+  work from GitHub, crates.io, and docs.rs.
+- Added explicit docs.rs package metadata and expanded the crate-level CLI
+  documentation target.
+- Confirmed production and test targets have no unused imports under strict
+  Clippy, and no unused dependencies under `cargo +nightly udeps`.
+
 ## [0.3.2] - 2026-08-30
 
 ### Fixed
