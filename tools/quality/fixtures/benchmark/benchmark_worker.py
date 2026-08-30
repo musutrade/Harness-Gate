@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import fcntl
 import json
 import os
 import sys
@@ -14,20 +13,28 @@ from pathlib import Path
 def update_state(path: Path, delta: int) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     lock_path = path.with_suffix(path.suffix + ".lock")
-    with lock_path.open("a+") as lock:
-        fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+    deadline = time.monotonic() + 10
+    while True:
         try:
-            if path.is_file():
-                state = json.loads(path.read_text())
-            else:
-                state = {"current": 0, "observed_peak": 0, "workers": 0}
-            state["current"] += delta
-            state["workers"] += 1 if delta > 0 else 0
-            if delta > 0:
-                state["observed_peak"] = max(state["observed_peak"], state["current"])
-            path.write_text(json.dumps(state, sort_keys=True) + "\n")
-        finally:
-            fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+            descriptor = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            os.close(descriptor)
+            break
+        except FileExistsError:
+            if time.monotonic() >= deadline:
+                raise RuntimeError("timed out acquiring benchmark state lock")
+            time.sleep(0.01)
+    try:
+        if path.is_file():
+            state = json.loads(path.read_text())
+        else:
+            state = {"current": 0, "observed_peak": 0, "workers": 0}
+        state["current"] += delta
+        state["workers"] += 1 if delta > 0 else 0
+        if delta > 0:
+            state["observed_peak"] = max(state["observed_peak"], state["current"])
+        path.write_text(json.dumps(state, sort_keys=True) + "\n")
+    finally:
+        lock_path.unlink(missing_ok=True)
 
 
 def main() -> int:

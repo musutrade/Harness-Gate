@@ -53,7 +53,8 @@ debug = 1
 strip = true          # Remove debug symbols for smaller binary
 lto = true            # Link-time optimization for better performance
 codegen-units = 4     # 4 parallelizes this crate's codegen (79.31s -> 68.96s, -13.0%,
-                      # measured back-to-back on one machine; binary 4.20 -> 4.39 MB).
+                      # measured back-to-back on one machine). Historical binary-size
+                      # measurements are not the canonical baseline; see docs/benchmarks/phase-1.
                       # cu=16 regresses to 78.1s as fat LTO becomes the serial bottleneck
 opt-level = 3         # Maximum optimization for speed (balanced with size)
 
@@ -61,5 +62,5 @@ opt-level = 3         # Maximum optimization for speed (balanced with size)
 inherits = "release"
 opt-level = "z"       # Optimize for size
 panic = "abort"       # No unwinding support for smaller binary
-codegen-units = 1     # Pinned back to 1: distribution builds trade compile time for size
-                      # (cu=4 would inflate the binary 4.20 -> 4.39 MB via inherits)
+codegen-units = 1     # Pinned back to 1: distribution builds trade compile time for size.
+                      # Compare exact bytes only within the same target/toolchain series.

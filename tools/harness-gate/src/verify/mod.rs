@@ -77,7 +77,18 @@ pub struct VerificationReport {
     pub profile: String,
     pub scope: ScopeResult,
     pub steps: Vec<TaskResult>,
+    /// Steps that were not dispatched because a prerequisite failed.
+    /// Successful reports omit this field to preserve the existing JSON shape.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub skipped_steps: Vec<SkippedStep>,
     pub passed: bool,
+}
+
+#[derive(Debug, Serialize)]
+pub struct SkippedStep {
+    pub id: String,
+    pub label: String,
+    pub reason: String,
 }
 
 pub fn run(
@@ -197,9 +208,19 @@ fn run_selected(
             .unwrap_or(usize::MAX)
     });
     let mut steps = Vec::new();
+    let mut skipped_steps = Vec::new();
     for result in ordered {
         progress.clear();
-        if result.node_result.status != plan::NodeStatus::Skipped {
+        if result.node_result.status == plan::NodeStatus::Skipped {
+            skipped_steps.push(SkippedStep {
+                id: result.node_result.id,
+                label: result.node_result.label,
+                reason: result
+                    .node_result
+                    .reason
+                    .unwrap_or_else(|| "blocked by a failed prerequisite".into()),
+            });
+        } else {
             match result.node_result.kind {
                 plan::PlanNodeKind::Builtin(_) => print_result(&result.task_result),
                 plan::PlanNodeKind::External => {
@@ -222,6 +243,7 @@ fn run_selected(
             .unwrap_or_else(|| profile.to_string()),
         scope,
         steps,
+        skipped_steps,
         passed,
     };
     report::write(&report, project).map_err(VerifyError::report)?;
