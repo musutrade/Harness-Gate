@@ -227,6 +227,43 @@ max_parallel = 4
 报告使用 `SKIPPED` 行，JUnit 报告使用 `<skipped>` testcase。被跳过的节点不会被计为
 已执行失败，但会使整个验证结果保持失败。
 
+## 6.1 `[[steps]].runner`
+
+步骤可以声明一个版本化的测试 runner 契约。省略 `runner` 时保持旧版步骤行为；声明后，
+runner 的有效参数和线程环境会写入该步骤的机器结果摘要：
+
+```toml
+[[steps]]
+id = "backend.tests"
+label = "backend tests"
+component = "backend"
+profiles = ["full"]
+program = "cargo"
+args = ["test", "--manifest-path", "backend/Cargo.toml"]
+cwd = "{root}"
+log = "backend_tests.log"
+timeout_secs = 300
+
+runner = { version = 1, kind = "cargo-test", threads = 4,
+           result_format = "junit", isolation = "schema-per-worker" }
+```
+
+| 字段 | 必需 | 说明 |
+| --- | --- | --- |
+| `version` | 是 | runner 契约版本，当前为 `1` |
+| `kind` | 是 | runner 类型 ID；`cargo-test` 要求 `program = "cargo"` |
+| `threads` | 否 | runner worker 数，范围 1 到 256；`cargo-test` 会生成 `-- --test-threads N` |
+| `threads_env` | 否 | 将线程数注入子进程的环境变量；设置时必须同时设置 `threads` |
+| `args` | 否 | runner 专用参数 |
+| `args_position` | 否 | 将 `args` 插入原始步骤参数的索引；省略时追加 |
+| `result_format` | 否 | `regex`（默认）、`junit`、`trx` 或 `json`；标准结果解析契约仍在逐步建设 |
+| `isolation` | 是 | `shared`、`schema-per-worker` 或 `database-per-worker` |
+
+`threads > 1` 时不能使用 `shared` 隔离；非 `cargo-test` runner 还必须声明 `threads_env`，
+否则 `config check` 会在启动 service 或 worker 前失败。隔离声明目前用于验证和证据记录，
+不会自动创建数据库 schema；schema/database 的初始化、锁和清理由后续 runner adapter 提供。
+不要通过字符串拼接或未声明的环境变量修改测试线程参数。
+
 ## 7. `[policy]`
 
 ```toml

@@ -16,8 +16,8 @@ pub use loader::schema_json;
 pub use migration::migrate_v1;
 pub(crate) use model::{
     ContainerRuntimeKind, DoctorCheck, DoctorCheckKind, ExternalValuePolicy, FlowConfig,
-    ParserConfig, PathType, ServiceConfig, StepConfig, UnmatchedScope, WebhookConfig,
-    CONFIG_VERSION, DEFAULT_CONFIG_PATH,
+    ParserConfig, PathType, RunnerConfig, RunnerResultFormat, ServiceConfig, StepConfig,
+    TestIsolation, UnmatchedScope, WebhookConfig, CONFIG_VERSION, DEFAULT_CONFIG_PATH,
 };
 pub use path::resolve_config_path;
 

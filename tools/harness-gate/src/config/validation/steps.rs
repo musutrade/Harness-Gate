@@ -1,4 +1,6 @@
-use super::super::model::{ServiceConfig, StepConfig};
+use super::super::model::{
+    RunnerConfig, ServiceConfig, StepConfig, TestIsolation, RUNNER_CONFIG_VERSION,
+};
 use super::primitives::{validate_env_name, validate_id, validate_program};
 use super::FlowConfig;
 use anyhow::{bail, Result};
@@ -47,6 +49,10 @@ pub(super) fn validate_step(config: &FlowConfig, step: &StepConfig) -> Result<()
         bail!("step {:?} may not execute a shell command string", step.id);
     }
     validate_arguments(config, &step.id, &step.args)?;
+    let runner = step.runner.as_ref();
+    if let Some(runner) = runner {
+        validate_runner(config, step, runner)?;
+    }
     let Some(cwd_name) = exact_placeholder(&step.cwd) else {
         bail!("step {:?} cwd must be one path placeholder", step.id);
     };
@@ -93,6 +99,16 @@ pub(super) fn validate_step(config: &FlowConfig, step: &StepConfig) -> Result<()
                 "step {:?} may not remove service injection variable {inject_env}",
                 step.id
             );
+        }
+    }
+    if let Some(runner) = runner {
+        if let Some(name) = &runner.threads_env {
+            if service_envs.contains(name) {
+                bail!(
+                    "step {:?} runner threads_env collides with a service injection variable {name}",
+                    step.id
+                );
+            }
         }
     }
     for name in &step.remove_env {
@@ -174,6 +190,7 @@ fn validate_builtin_gate(step: &StepConfig) -> Result<()> {
         || step.parser.is_some()
         || !step.services.is_empty()
         || !step.remove_env.is_empty()
+        || step.runner.is_some()
     {
         bail!(
             "built-in gate {:?} may not declare external-step fields",
@@ -181,6 +198,75 @@ fn validate_builtin_gate(step: &StepConfig) -> Result<()> {
         );
     }
     Ok(())
+}
+
+fn validate_runner(config: &FlowConfig, step: &StepConfig, runner: &RunnerConfig) -> Result<()> {
+    if runner.version != RUNNER_CONFIG_VERSION {
+        bail!(
+            "step {:?} runner version {} is unsupported; expected {}",
+            step.id,
+            runner.version,
+            RUNNER_CONFIG_VERSION
+        );
+    }
+    validate_id("runner kind", &runner.kind)?;
+    if runner.kind == "cargo-test" && step.program != "cargo" {
+        bail!(
+            "step {:?} cargo-test runner requires program \"cargo\"",
+            step.id
+        );
+    }
+    if let Some(threads) = runner.threads {
+        if threads == 0 || threads > 256 {
+            bail!(
+                "step {:?} runner threads must be between 1 and 256",
+                step.id
+            );
+        }
+    }
+    if let Some(name) = &runner.threads_env {
+        validate_env_name("runner threads_env", name)?;
+        if runner.threads.is_none() {
+            bail!("step {:?} runner threads_env requires threads", step.id);
+        }
+        if step.remove_env.iter().any(|removed| removed == name) {
+            bail!(
+                "step {:?} may not remove runner threads_env variable {name}",
+                step.id
+            );
+        }
+    }
+    if runner.threads.is_some_and(|threads| threads > 1)
+        && runner.kind != "cargo-test"
+        && runner.threads_env.is_none()
+    {
+        bail!(
+            "step {:?} runner threads requires threads_env unless kind is cargo-test",
+            step.id
+        );
+    }
+    if runner.threads.is_some_and(|threads| threads > 1)
+        && matches!(runner.isolation, TestIsolation::Shared)
+    {
+        bail!(
+            "step {:?} runner shared isolation is not allowed with more than one worker",
+            step.id
+        );
+    }
+    if runner
+        .args_position
+        .is_some_and(|position| position > step.args.len())
+    {
+        bail!(
+            "step {:?} runner args_position must not exceed step argument count",
+            step.id
+        );
+    }
+    validate_arguments(
+        config,
+        &format!("step {} runner args", step.id),
+        &runner.args,
+    )
 }
 
 pub(super) fn validate_arguments(config: &FlowConfig, owner: &str, args: &[String]) -> Result<()> {

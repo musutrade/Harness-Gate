@@ -258,6 +258,7 @@ fn run_selected(
             duration_ms: 0,
             log: String::new(),
             detail: Some(format!("{error:#}")),
+            runner: None,
         });
     }
     let passed = cleanup_error.is_none()

@@ -47,6 +47,84 @@ fn execution_policy_diagnostic_points_to_max_parallel() {
 }
 
 #[test]
+fn versioned_runner_contract_accepts_explicit_isolation() {
+    let mut config = repository_config();
+    let step = config
+        .steps
+        .iter_mut()
+        .find(|step| step.id == "rust.tests")
+        .expect("rust tests step");
+    step.runner = Some(RunnerConfig {
+        version: 1,
+        kind: "cargo-test".into(),
+        threads: Some(4),
+        threads_env: None,
+        args: vec!["--nocapture".into()],
+        args_position: None,
+        result_format: RunnerResultFormat::Junit,
+        isolation: TestIsolation::SchemaPerWorker,
+    });
+
+    config.validate().expect("runner contract is valid");
+}
+
+#[test]
+fn runner_rejects_shared_isolation_for_multiple_workers() {
+    let mut config = repository_config();
+    let step = config
+        .steps
+        .iter_mut()
+        .find(|step| step.id == "rust.tests")
+        .expect("rust tests step");
+    step.runner = Some(RunnerConfig {
+        version: 1,
+        kind: "cargo-test".into(),
+        threads: Some(2),
+        threads_env: None,
+        args: Vec::new(),
+        args_position: None,
+        result_format: RunnerResultFormat::Regex,
+        isolation: TestIsolation::Shared,
+    });
+
+    let error = config
+        .validate()
+        .expect_err("shared runner isolation must fail closed");
+    assert!(error.to_string().contains("shared isolation"));
+}
+
+#[test]
+fn generic_runner_requires_an_explicit_thread_environment() {
+    let mut config = repository_config();
+    let step = config
+        .steps
+        .iter_mut()
+        .find(|step| step.id == "rust.tests")
+        .expect("rust tests step");
+    step.runner = Some(RunnerConfig {
+        version: 1,
+        kind: "generic".into(),
+        threads: Some(2),
+        threads_env: None,
+        args: Vec::new(),
+        args_position: None,
+        result_format: RunnerResultFormat::Regex,
+        isolation: TestIsolation::DatabasePerWorker,
+    });
+
+    let source = toml::to_string_pretty(&config).expect("serialize invalid runner config");
+    let error = FlowConfig::from_source_with_diagnostics(&source, None, None)
+        .expect_err("generic runner must declare thread injection");
+    let diagnostic = error
+        .report()
+        .diagnostics
+        .into_iter()
+        .find(|diagnostic| diagnostic.path == "steps[3].runner.threads_env")
+        .expect("runner field diagnostic");
+    assert_eq!(diagnostic.id, "HGCFG-INVALID-FIELD");
+}
+
+#[test]
 fn existing_v2_config_defaults_the_secret_rule_path() {
     let source = include_str!("../../presets/rust-api.flow.toml")
         .lines()
@@ -123,6 +201,45 @@ fn duplicate_service_injection_variables_are_rejected() {
 
     let error = config.validate().expect_err("injection must be unique");
     assert!(error.to_string().contains("multiple services injecting"));
+}
+
+#[test]
+fn runner_thread_environment_cannot_shadow_service_injection() {
+    let mut config = repository_config();
+    config.services.insert(
+        "test-db".into(),
+        ServiceConfig::Environment {
+            source_env: "DATABASE_URL".into(),
+            inject_env: "RUST_TEST_THREADS".into(),
+        },
+    );
+    let step = config
+        .steps
+        .iter_mut()
+        .find(|step| step.id == "rust.tests")
+        .expect("rust tests step");
+    step.services = vec!["test-db".into()];
+    step.runner = Some(RunnerConfig {
+        version: 1,
+        kind: "generic".into(),
+        threads: Some(2),
+        threads_env: Some("RUST_TEST_THREADS".into()),
+        args: Vec::new(),
+        args_position: None,
+        result_format: RunnerResultFormat::Regex,
+        isolation: TestIsolation::SchemaPerWorker,
+    });
+
+    let source = toml::to_string_pretty(&config).expect("serialize conflicting runner config");
+    let error = FlowConfig::from_source_with_diagnostics(&source, None, None)
+        .expect_err("runner and service env collision must fail");
+    let diagnostic = error
+        .report()
+        .diagnostics
+        .into_iter()
+        .find(|diagnostic| diagnostic.path == "steps[3].runner.threads_env")
+        .expect("runner collision diagnostic");
+    assert_eq!(diagnostic.id, "HGCFG-INVALID-FIELD");
 }
 
 #[test]

@@ -1,6 +1,6 @@
 use super::parser::parse_result_count;
 use crate::config::{ParserConfig, StepConfig};
-use crate::process::{Task, TaskResult};
+use crate::process::{RunnerExecution, Task, TaskResult};
 use crate::project::Project;
 use crate::service::{ServiceLease, ServiceManager};
 use crate::ui;
@@ -31,6 +31,7 @@ pub(super) fn run_configured_step<'a>(
                     duration_ms: 0,
                     log: String::new(),
                     detail: Some(format!("{error:#}")),
+                    runner: None,
                 });
             }
         };
@@ -46,6 +47,7 @@ pub(super) fn run_configured_step<'a>(
                     duration_ms: 0,
                     log: String::new(),
                     detail: Some(format!("{error:#}")),
+                    runner: None,
                 });
             }
         };
@@ -111,8 +113,17 @@ fn configured_task(
         .map(|argument| project.expand(argument))
         .collect::<Vec<_>>();
     let mut task = Task::new(&step.label, &step.program, &cwd, log(project, &step.log)?)
-        .args(args)
         .timeout(step.timeout_secs);
+    if let Some(runner) = &step.runner {
+        let (effective_args, execution) = runner_inputs(runner, &args)?;
+        let runner_environment = execution.environment.clone();
+        task = task.args(effective_args).runner(execution);
+        for (name, value) in runner_environment {
+            task = task.env(name, value);
+        }
+    } else {
+        task = task.args(args);
+    }
     for lease in service_leases {
         let (name, value) = lease.environment();
         task = task.env(name, value);
@@ -121,6 +132,48 @@ fn configured_task(
         task = task.env_remove(name);
     }
     Ok(task)
+}
+
+fn runner_inputs(
+    runner: &crate::config::RunnerConfig,
+    step_args: &[String],
+) -> Result<(Vec<String>, RunnerExecution)> {
+    let mut effective_args = step_args.to_vec();
+    let insertion = runner.args_position.unwrap_or(effective_args.len());
+    effective_args.splice(insertion..insertion, runner.args.iter().cloned());
+
+    if runner.kind == "cargo-test" {
+        if let Some(threads) = runner.threads {
+            let insertion = effective_args
+                .iter()
+                .position(|argument| argument == "--")
+                .map(|index| index + 1)
+                .unwrap_or_else(|| {
+                    effective_args.push("--".into());
+                    effective_args.len()
+                });
+            effective_args.splice(
+                insertion..insertion,
+                ["--test-threads".into(), threads.to_string()],
+            );
+        }
+    }
+
+    let mut environment = std::collections::BTreeMap::new();
+    if let (Some(name), Some(threads)) = (&runner.threads_env, runner.threads) {
+        let value = threads.to_string();
+        environment.insert(name.clone(), value);
+    }
+    let execution = RunnerExecution {
+        version: runner.version,
+        kind: runner.kind.clone(),
+        effective_args: effective_args.clone(),
+        environment,
+        result_format: runner.result_format,
+        isolation: runner.isolation,
+        threads: runner.threads,
+    };
+    Ok((effective_args, execution))
 }
 
 fn execute(
@@ -244,4 +297,49 @@ fn safe_log_name(value: &str) -> bool {
         && path.components().count() == 1
         && value.len() > ".log".len()
         && value.ends_with(".log")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::runner_inputs;
+    use crate::config::{RunnerConfig, RunnerResultFormat, TestIsolation};
+
+    #[test]
+    fn runner_arguments_and_environment_are_recorded() {
+        let runner = RunnerConfig {
+            version: 1,
+            kind: "generic".into(),
+            threads: Some(3),
+            threads_env: Some("TEST_THREADS".into()),
+            args: vec!["--runner-flag".into()],
+            args_position: Some(1),
+            result_format: RunnerResultFormat::Json,
+            isolation: TestIsolation::DatabasePerWorker,
+        };
+        let (args, execution) =
+            runner_inputs(&runner, &["check".into(), "target".into()]).expect("runner inputs");
+
+        assert_eq!(args, ["check", "--runner-flag", "target"]);
+        assert_eq!(execution.effective_args, args);
+        assert_eq!(execution.environment["TEST_THREADS"], "3");
+        assert_eq!(execution.threads, Some(3));
+    }
+
+    #[test]
+    fn cargo_test_threads_are_inserted_after_the_test_separator() {
+        let runner = RunnerConfig {
+            version: 1,
+            kind: "cargo-test".into(),
+            threads: Some(4),
+            threads_env: None,
+            args: vec!["--nocapture".into()],
+            args_position: None,
+            result_format: RunnerResultFormat::Junit,
+            isolation: TestIsolation::SchemaPerWorker,
+        };
+        let (args, _) =
+            runner_inputs(&runner, &["test".into(), "--".into()]).expect("runner inputs");
+
+        assert_eq!(args, ["test", "--", "--test-threads", "4", "--nocapture"]);
+    }
 }
