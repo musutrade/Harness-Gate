@@ -208,3 +208,28 @@ fn detects_postgres_credentials_and_secret_bearing_webhooks() {
         .as_bytes()
     ));
 }
+
+#[test]
+#[cfg(unix)]
+fn working_tree_scan_skips_file_symlinks() {
+    use std::os::unix::fs::symlink;
+
+    let workspace = TestWorkspace::new("symlink-secret");
+    let outside = TestWorkspace::new("symlink-secret-outside");
+    crate::preset::init(&workspace.root, "generic", false).expect("initialize fixture");
+    workspace.init_git();
+    fs::write(
+        outside.root.join("secret.txt"),
+        "outside-only-secret-marker",
+    )
+    .expect("write outside secret fixture");
+    symlink(
+        outside.root.join("secret.txt"),
+        workspace.root.join("linked.txt"),
+    )
+    .expect("create secret symlink");
+    let project = Project::discover(Some(workspace.root.clone()), None).expect("discover fixture");
+
+    let findings = scan(&project, SecretMode::WorkingTree).expect("scan working tree");
+    assert!(findings.is_empty());
+}

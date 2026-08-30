@@ -6,8 +6,7 @@ use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 
 pub(super) const AUDIT_CONFIG_VERSION: u32 = 2;
-pub(super) const AUDIT_MIGRATION_GUIDE: &str =
-    "codex-audit-pipeline/docs/configuration.md#audit-v2-migration";
+pub(super) const AUDIT_MIGRATION_GUIDE: &str = "docs/configuration.md#audit-v2-migration";
 
 #[derive(Debug, Default, Deserialize, Clone)]
 pub(super) struct PathsConfig {

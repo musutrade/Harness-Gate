@@ -479,6 +479,87 @@ fn invalid_rule_regex_returns_an_error() {
 }
 
 #[test]
+fn report_keeps_rule_names_with_shared_prefixes_separate() {
+    let config = Config {
+        version: AUDIT_CONFIG_VERSION,
+        engine: configured_audit().engine,
+        paths: PathsConfig::default(),
+        hard_rules: vec![
+            HardRule {
+                name: "foo".into(),
+                severity: "error".into(),
+                paths: vec!["src".into()],
+                extensions: vec!["rs".into()],
+                patterns: vec!["foo".into()],
+                exclude_patterns: Vec::new(),
+                allowlist: Vec::new(),
+            },
+            HardRule {
+                name: "foobar".into(),
+                severity: "blocker".into(),
+                paths: vec!["src".into()],
+                extensions: vec!["rs".into()],
+                patterns: vec!["bar".into()],
+                exclude_patterns: Vec::new(),
+                allowlist: Vec::new(),
+            },
+        ],
+        arch_rules: Vec::new(),
+    };
+    let violations = vec![
+        Violation {
+            file: PathBuf::from("src/foo.rs"),
+            line: 1,
+            content: "foo".into(),
+            rule_name: "foo".into(),
+        },
+        Violation {
+            file: PathBuf::from("src/bar.rs"),
+            line: 1,
+            content: "bar".into(),
+            rule_name: "foobar".into(),
+        },
+    ];
+
+    let report = super::report::generate_report(&config, &violations, &[]);
+    assert_eq!(report.summary.total_violations, 2);
+    assert_eq!(report.hard_violations[0].count, 1);
+    assert_eq!(report.hard_violations[1].count, 1);
+}
+
+#[test]
+#[cfg(unix)]
+fn audit_skips_file_symlinks() {
+    use std::os::unix::fs::symlink;
+
+    let test_dir = TestDir::new("symlink-boundary");
+    let outside = TestDir::new("symlink-outside");
+    let source = test_dir.child("src");
+    let outside_file = outside.0.root.join("outside.rs");
+    fs::write(&outside_file, "forbidden").expect("write outside fixture");
+    symlink(outside_file, source.join("linked.rs")).expect("create symlink");
+    let rule = HardRule {
+        name: "boundary".into(),
+        severity: "blocker".into(),
+        paths: Vec::new(),
+        extensions: vec!["rs".into()],
+        patterns: vec!["forbidden".into()],
+        exclude_patterns: Vec::new(),
+        allowlist: Vec::new(),
+    };
+
+    let violations = scan_files(
+        &test_dir.0,
+        &[source],
+        &[],
+        &rule,
+        &configured_audit().engine,
+    )
+    .expect("scan symlink fixture");
+    assert!(violations.is_empty());
+}
+
+#[test]
 fn log_parser_keeps_the_error_trace() {
     let test_dir = TestDir::new("parse-logs");
     let input = test_dir.0.join("input.jsonl");

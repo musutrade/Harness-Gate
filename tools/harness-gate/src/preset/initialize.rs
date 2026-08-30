@@ -7,7 +7,7 @@ use std::path::{Path, PathBuf};
 
 pub fn init(target: &Path, name: &str, force: bool) -> Result<()> {
     let preset = catalog::find(name)
-        .ok_or_else(|| anyhow::anyhow!("unknown preset {name:?}; run `arc-flow presets`"))?;
+        .ok_or_else(|| anyhow::anyhow!("unknown preset {name:?}; run `harness-gate presets`"))?;
     fs::create_dir_all(target)
         .with_context(|| format!("create project directory {}", target.display()))?;
     let root = target
@@ -35,7 +35,7 @@ pub fn init(target: &Path, name: &str, force: bool) -> Result<()> {
 
     println!("Initialized preset {name:?} in {}", directory.display());
     println!(
-        "Next: arc-flow --project-root {} config check",
+        "Next: harness-gate --project-root {} config check",
         root.display()
     );
     Ok(())
