@@ -77,6 +77,69 @@ def configure_execution(root: Path, parallel: bool) -> int:
     return 2
 
 
+def configure_scope_fixture(root: Path, files: int = 600, rules: int = 48) -> None:
+    """Create a large, unmatched-safe scope workload for matcher evidence."""
+    flow = root / ".harness-gate" / "flow.toml"
+    source = flow.read_text()
+    source = source.replace(
+        '[services.benchmark]\n'
+        'kind = "environment"\n'
+        'source_env = "HARNESS_GATE_BENCHMARK_SERVICE_URL"\n'
+        'inject_env = "BENCHMARK_SERVICE_URL"\n\n',
+        "",
+    )
+    source = source.replace('\nservices = ["benchmark"]', "")
+    start = source.index("rules = [{")
+    end = source.index("\n\n[[steps]]", start)
+    entries = []
+    for index in range(rules):
+        entries.append(
+            '  { patterns = ["src/module%02d/**", "src/module%02d/**/*.rs", "src/module%02d/**/*.toml"], components = ["project"] },'
+            % (index, index, index)
+        )
+    replacement = "rules = [\n" + "\n".join(entries) + "\n]"
+    flow.write_text(source[:start] + replacement + source[end:])
+    for index in range(files):
+        module = index % rules
+        path = root / "src" / (f"module{module:02d}") / f"generated-{index:04d}.rs"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("// generated benchmark input\n")
+
+
+def scope_matcher_sample(
+    binary: Path, raw_root: Path, number: int, repeats: int = 100
+) -> dict[str, Any]:
+    with tempfile.TemporaryDirectory(prefix="harness-gate-quality-benchmark-scope-") as directory:
+        root = Path(directory)
+        init_fixture(root)
+        configure_scope_fixture(root)
+        seconds, result = timed(
+            [
+                str(binary),
+                "--color",
+                "never",
+                "--project-root",
+                str(root),
+                "scope",
+                "--benchmark-repeat",
+                str(repeats),
+            ],
+            CRATE.parent.parent,
+        )
+        if result.returncode != 0:
+            fail(f"scope matcher benchmark sample {number} failed: {result.stderr or result.stdout}")
+        try:
+            evidence = json.loads(result.stdout)
+        except json.JSONDecodeError as error:
+            fail(f"scope matcher benchmark sample {number} returned invalid JSON: {error}")
+        evidence["wall_seconds"] = seconds
+        evidence["sample"] = number
+        archive = raw_root / "scope" / f"sample-{number}.json"
+        write_json(archive, evidence)
+        evidence["raw"] = str(Path("benchmark-runs") / "scope" / f"sample-{number}.json")
+        return evidence
+
+
 def verification_sample(
     binary: Path, root: Path, raw_root: Path, number: int, mode: str, max_parallel: int
 ) -> dict[str, Any]:
@@ -215,6 +278,20 @@ def run(output: Path, samples: int, raw_dir: Path | None = None) -> int:
         }
     serial_median = verification_summary["serial"]["median"]
     parallel_median = verification_summary["parallel"]["median"]
+    scope_samples = [scope_matcher_sample(binary, raw_root, index + 1) for index in range(samples)]
+    scope_summary = {
+        "cached_per_iteration_us": stats(
+            sample["cached_per_iteration_us"] for sample in scope_samples
+        ),
+        "uncached_per_iteration_us": stats(
+            sample["uncached_per_iteration_us"] for sample in scope_samples
+        ),
+        "speedup": stats(sample["speedup"] or 0.0 for sample in scope_samples),
+        "paths": scope_samples[0]["paths"],
+        "iterations": scope_samples[0]["iterations"],
+        "equivalent": all(sample["equivalent"] for sample in scope_samples),
+        "runs": scope_samples,
+    }
     run_metadata = metadata(
         tool="quality-benchmarks",
         harness_version=HARNESS_VERSION,
@@ -252,6 +329,7 @@ def run(output: Path, samples: int, raw_dir: Path | None = None) -> int:
             },
         },
         "tests_seconds": {"cold": cold_seconds, "warm_samples": warm_seconds, **stats(warm_seconds)},
+        "scope_matcher": scope_summary,
         "binary": {"path": str(binary), "bytes": binary.stat().st_size, "sha256": sha256(binary)},
     }
     write_json(output, result)
@@ -261,6 +339,9 @@ def run(output: Path, samples: int, raw_dir: Path | None = None) -> int:
         f"Parallel verification median: **{result['verification']['parallel']['median']:.3f}s**\n\n"
         f"Comparison speedup: **{result['verification']['comparison']['speedup']:.3f}x**\n\n"
         f"Comparison delta: **{result['verification']['comparison']['delta_percent']:.2f}%**\n\n"
+        f"Scope matcher cached median: **{result['scope_matcher']['cached_per_iteration_us']['median']:.1f}us**; "
+        f"uncached: **{result['scope_matcher']['uncached_per_iteration_us']['median']:.1f}us** "
+        f"({result['scope_matcher']['speedup']['median']:.2f}x speedup)\n\n"
         f"Series key: `{result['series_key']}`\n\n"
         f"Test warm median: **{result['tests_seconds']['median']:.3f}s** (cold: {cold_seconds:.3f}s)\n\n"
         f"Release-small binary: **{result['binary']['bytes']} bytes**\n"
