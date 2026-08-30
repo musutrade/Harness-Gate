@@ -1,3 +1,5 @@
+//! # Harness-Gate
+//!
 //! `harness-gate` is a configurable development workflow and architecture
 //! guard command-line tool.
 //!
@@ -5,5 +7,17 @@
 //! contains no public runtime API; it provides crate-level documentation for
 //! the CLI package on docs.rs without exposing the binary's internal modules.
 //!
-//! See the [project documentation](https://github.com/musutrade/Harness-Gate)
-//! for installation and command usage.
+//! ## Install
+//!
+//! ```text
+//! cargo install harness-gate
+//! ```
+//!
+//! ## Documentation
+//!
+//! - [User guide](https://github.com/musutrade/Harness-Gate/blob/main/README.md)
+//! - [Configuration reference](https://github.com/musutrade/Harness-Gate/blob/main/docs/configuration.md)
+//! - [GitHub repository](https://github.com/musutrade/Harness-Gate)
+//! - [Crates.io package](https://crates.io/crates/harness-gate)
+//!
+//! The binary's command reference is available with `harness-gate --help`.

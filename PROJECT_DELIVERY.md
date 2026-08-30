@@ -136,17 +136,17 @@ Harness-Gate/                    # 项目根目录
 
 ```bash
 # 下载并运行安装脚本
-curl -sSL https://raw.githubusercontent.com/yourusername/Harness-Gate/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/musutrade/Harness-Gate/main/install.sh | bash
 
 # 或从源码安装
-curl -sSL https://raw.githubusercontent.com/yourusername/Harness-Gate/main/install.sh | bash -s -- --from-source
+curl -sSL https://raw.githubusercontent.com/musutrade/Harness-Gate/main/install.sh | bash -s -- --from-source
 ```
 
 ### 安装方式 2: 从源码手动安装
 
 ```bash
 # 克隆仓库
-git clone https://github.com/yourusername/Harness-Gate.git
+git clone https://github.com/musutrade/Harness-Gate.git
 cd Harness-Gate
 
 # 编译并安装
@@ -273,9 +273,9 @@ harness-gate hook
 
 ## 🔗 相关链接
 
-- **源码仓库**: https://github.com/yourusername/Harness-Gate
-- **问题跟踪**: https://github.com/yourusername/Harness-Gate/issues
-- **文档**: https://github.com/yourusername/Harness-Gate/tree/main/docs
+- **源码仓库**: https://github.com/musutrade/Harness-Gate
+- **问题跟踪**: https://github.com/musutrade/Harness-Gate/issues
+- **文档**: https://github.com/musutrade/Harness-Gate/tree/main/docs
 - **原项目**: https://github.com/musutrade/arc-admin
 
 ---
