@@ -9,19 +9,15 @@ mod validation;
 #[cfg(test)]
 mod tests;
 
-#[allow(unused_imports)]
-pub use diagnostic::{
-    report_for_error, ConfigCheckReport, ConfigDiagnostic, ConfigDiagnostics, DiagnosticSeverity,
-    MINIMAL_CONFIG_SNIPPET,
-};
+pub(crate) use diagnostic::{report_for_error, ConfigDiagnostics, MINIMAL_CONFIG_SNIPPET};
+#[cfg(test)]
+pub(crate) use diagnostic::{ConfigDiagnostic, DiagnosticSeverity};
 pub use loader::schema_json;
 pub use migration::migrate_v1;
-#[allow(unused_imports)]
-pub use model::{
-    ContainerRuntimeKind, DoctorCheck, DoctorCheckKind, DoctorConfig, ExecutionConfig,
-    ExternalValuePolicy, FlowConfig, NotificationsConfig, ParserConfig, PathAlias, PathType,
-    PathsConfig, PolicyConfig, ProjectConfig, ReportTemplatesConfig, ScopeConfig, ScopeRule,
-    ServiceConfig, StepConfig, UnmatchedScope, WebhookConfig, CONFIG_VERSION, DEFAULT_CONFIG_PATH,
+pub(crate) use model::{
+    ContainerRuntimeKind, DoctorCheck, DoctorCheckKind, ExternalValuePolicy, FlowConfig,
+    ParserConfig, PathType, ServiceConfig, StepConfig, UnmatchedScope, WebhookConfig,
+    CONFIG_VERSION, DEFAULT_CONFIG_PATH,
 };
 pub use path::resolve_config_path;
 

@@ -5,7 +5,7 @@ use std::hint::black_box;
 use std::time::Instant;
 
 #[derive(Debug, Serialize)]
-pub struct ScopeBenchmark {
+pub(crate) struct ScopeBenchmark {
     pub mode: String,
     pub iterations: usize,
     pub paths: usize,

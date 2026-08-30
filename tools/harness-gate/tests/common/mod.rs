@@ -4,8 +4,7 @@ use tempfile::TempDir;
 
 /// Test context providing isolated environment for integration tests
 pub struct TestContext {
-    #[allow(dead_code)]
-    pub temp_dir: TempDir,
+    pub _temp_dir: TempDir,
     pub project_root: PathBuf,
 }
 
@@ -15,7 +14,7 @@ impl TestContext {
         let temp_dir = TempDir::new().expect("Failed to create temp dir");
         let project_root = temp_dir.path().to_path_buf();
         Self {
-            temp_dir,
+            _temp_dir: temp_dir,
             project_root,
         }
     }
@@ -31,26 +30,8 @@ impl TestContext {
     }
 
     /// Initialize an embedded preset and assert setup succeeds.
-    #[allow(dead_code)]
     pub fn init_preset(&self, preset: &str) {
         assert_success(&self.run_harness_gate(&["init", "--preset", preset]));
-    }
-
-    /// Initialize a preset and Git repository for an end-to-end test.
-    #[allow(dead_code)]
-    pub fn init_project(&self, preset: &str) {
-        self.init_preset(preset);
-        self.init_git();
-    }
-
-    /// Run harness-gate without project-root argument
-    #[allow(dead_code)]
-    pub fn run_harness_gate_raw(&self, args: &[&str]) -> Output {
-        Command::new(env!("CARGO_BIN_EXE_harness-gate"))
-            .args(args)
-            .current_dir(&self.project_root)
-            .output()
-            .expect("Failed to execute harness-gate")
     }
 
     /// Write a file relative to project root
@@ -63,20 +44,17 @@ impl TestContext {
     }
 
     /// Read a file relative to project root
-    #[allow(dead_code)]
     pub fn read_file(&self, path: impl AsRef<Path>) -> String {
         let full_path = self.project_root.join(path);
         std::fs::read_to_string(full_path).expect("Failed to read file")
     }
 
     /// Check if a file exists relative to project root
-    #[allow(dead_code)]
     pub fn file_exists(&self, path: impl AsRef<Path>) -> bool {
         self.project_root.join(path).exists()
     }
 
     /// Initialize a Git repository in the project root
-    #[allow(dead_code)]
     pub fn init_git(&self) {
         Command::new("git")
             .args(["init"])

@@ -152,8 +152,9 @@ fn command_output(
         .ok_or_else(|| anyhow::anyhow!("command {program} produced no output"))
 }
 
-fn check_glob(project: &Project, pattern: &str) -> Result<String> {
+pub(crate) fn check_glob(project: &Project, pattern: &str) -> Result<String> {
     let pattern = project.expand(pattern);
+    let absolute_pattern = Path::new(&pattern).is_absolute();
     let mut builder = GlobSetBuilder::new();
     builder.add(Glob::new(&pattern)?);
     let matcher = builder.build()?;
@@ -162,7 +163,19 @@ fn check_glob(project: &Project, pattern: &str) -> Result<String> {
         .build()
         .filter_map(Result::ok)
         .any(|entry| {
-            entry.file_type().is_some_and(|kind| kind.is_file()) && matcher.is_match(entry.path())
+            if !entry.file_type().is_some_and(|kind| kind.is_file()) {
+                return false;
+            }
+            let candidate = if absolute_pattern {
+                entry.path().to_path_buf()
+            } else {
+                entry
+                    .path()
+                    .strip_prefix(&project.root)
+                    .unwrap_or(entry.path())
+                    .to_path_buf()
+            };
+            matcher.is_match(candidate)
         });
     if !found {
         bail!("no files match {pattern}");

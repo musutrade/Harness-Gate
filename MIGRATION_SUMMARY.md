@@ -178,7 +178,7 @@ Harness-Gate/
 ### 从源码安装
 
 ```bash
-git clone https://github.com/yourusername/Harness-Gate.git
+git clone https://github.com/musutrade/Harness-Gate.git
 cd Harness-Gate
 cargo install --locked --path tools/harness-gate
 ```

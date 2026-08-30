@@ -3,11 +3,10 @@ use super::{
     comment_ranges, compile_allowlist, compile_regexes, is_allowlisted_compiled, is_comment_offset,
     is_regular_file, resolve_rule_roots, source_line_at, source_line_starts,
 };
-use anyhow::{Context, Result};
+use anyhow::Result;
 use ignore::WalkBuilder;
 use rayon::prelude::*;
 use std::collections::HashSet;
-use std::fs;
 use std::path::{Path, PathBuf};
 
 pub(crate) fn scan_arch_rules(
@@ -78,8 +77,7 @@ pub(crate) fn scan_arch_rules(
                     return Err(anyhow::anyhow!("audit scan cancelled"));
                 }
                 let path = entry.path();
-                let content = fs::read_to_string(path)
-                    .with_context(|| format!("read audit source {}", path.display()))?;
+                let content = super::read_source(path)?;
                 let mut violations = Vec::new();
                 let mut reported_lines = HashSet::new();
                 let line_starts = source_line_starts(&content);
