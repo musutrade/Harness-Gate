@@ -1,7 +1,7 @@
 use super::super::{EngineConfig, HardRule, Violation};
 use super::{
-    comment_ranges, compile_regexes, is_allowlisted, is_comment_offset, source_line_at,
-    source_line_starts,
+    comment_ranges, compile_allowlist, compile_regexes, is_allowlisted_compiled, is_comment_offset,
+    is_regular_file, source_line_at, source_line_starts,
 };
 use anyhow::{Context, Result};
 use ignore::WalkBuilder;
@@ -23,6 +23,7 @@ pub(crate) fn scan_files(
 
     let regexes = compile_regexes(&rule.patterns)?;
     let exclude_regexes = compile_regexes(&rule.exclude_patterns)?;
+    let allowlist = compile_allowlist(project_root, &rule.allowlist, &rule.name)?;
 
     let rule_name = rule.name.clone();
     let mut walk_builder = WalkBuilder::new(root_paths[0].clone());
@@ -40,7 +41,7 @@ pub(crate) fn scan_files(
         .into_par_iter()
         .filter(|entry| {
             let path = entry.path();
-            if path.is_dir() {
+            if !is_regular_file(path) {
                 return false;
             }
             if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
@@ -60,9 +61,12 @@ pub(crate) fn scan_files(
             if exclude_regexes.iter().any(|re| re.is_match(path_str)) {
                 return false;
             }
-            !is_allowlisted(path, project_root, &rule.allowlist)
+            !is_allowlisted_compiled(path, project_root, &allowlist)
         })
         .map(|entry| -> Result<Vec<Violation>> {
+            if crate::process::cancelled() {
+                return Err(anyhow::anyhow!("audit scan cancelled"));
+            }
             let path = entry.path();
             let content = fs::read_to_string(path)
                 .with_context(|| format!("read audit source {}", path.display()))?;
@@ -75,7 +79,7 @@ pub(crate) fn scan_files(
                 .map(|syntax| comment_ranges(&content, syntax))
                 .unwrap_or_default();
 
-            for (idx, re) in regexes.iter().enumerate() {
+            for re in &regexes {
                 for matched in re.find_iter(&content) {
                     let (line_number, line, _) =
                         source_line_at(&content, &line_starts, matched.start());
@@ -91,7 +95,7 @@ pub(crate) fn scan_files(
                             .to_path_buf(),
                         line: line_number,
                         content: line.trim().to_string(),
-                        rule_name: format!("{}:{}", rule_name, rule.patterns[idx]),
+                        rule_name: rule_name.clone(),
                     });
                 }
             }
@@ -99,5 +103,8 @@ pub(crate) fn scan_files(
             Ok(violations)
         })
         .collect::<Result<Vec<_>>>()?;
+    if crate::process::cancelled() {
+        return Err(anyhow::anyhow!("audit scan cancelled"));
+    }
     Ok(violations.into_iter().flatten().collect())
 }

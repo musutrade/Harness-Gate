@@ -3,6 +3,7 @@ use crate::project::resolve_repo_path;
 use anyhow::{bail, Context, Result};
 use regex::{Regex, RegexBuilder};
 use std::collections::HashMap;
+use std::fs;
 use std::path::{Path, PathBuf};
 
 pub(crate) fn compile_regexes(patterns: &[String]) -> Result<Vec<Regex>> {
@@ -49,6 +50,7 @@ pub(crate) fn resolve_excludes(project_root: &Path, entries: &[String]) -> Resul
         .collect()
 }
 
+#[cfg(test)]
 pub(crate) fn is_allowlisted(
     path: &Path,
     project_root: &Path,
@@ -62,4 +64,57 @@ pub(crate) fn is_allowlisted(
             .map(|re| re.is_match(path_str))
             .unwrap_or(false),
     })
+}
+
+#[derive(Debug, Clone)]
+pub(crate) enum CompiledAllowlistEntry {
+    PathPrefix(PathBuf),
+    Regex(Regex),
+}
+
+pub(crate) fn compile_allowlist(
+    project_root: &Path,
+    allowlist: &[AllowlistEntry],
+    rule_name: &str,
+) -> Result<Vec<CompiledAllowlistEntry>> {
+    allowlist
+        .iter()
+        .map(|entry| match entry {
+            AllowlistEntry::PathPrefix { path } => {
+                resolve_repo_path(
+                    project_root,
+                    Path::new(path),
+                    &format!("audit rule {rule_name:?} allowlist path"),
+                    false,
+                )?;
+                Ok(CompiledAllowlistEntry::PathPrefix(PathBuf::from(path)))
+            }
+            AllowlistEntry::Regex { pattern } => Regex::new(pattern)
+                .map(CompiledAllowlistEntry::Regex)
+                .with_context(|| {
+                    format!("audit rule {rule_name:?} has invalid allowlist regex {pattern:?}")
+                }),
+        })
+        .collect()
+}
+
+pub(crate) fn is_allowlisted_compiled(
+    path: &Path,
+    project_root: &Path,
+    allowlist: &[CompiledAllowlistEntry],
+) -> bool {
+    let relative = path.strip_prefix(project_root).unwrap_or(path);
+    let path_str = relative.to_str().unwrap_or("");
+    allowlist.iter().any(|entry| match entry {
+        CompiledAllowlistEntry::PathPrefix(prefix) => relative.starts_with(prefix),
+        CompiledAllowlistEntry::Regex(regex) => regex.is_match(path_str),
+    })
+}
+
+/// `ignore` can return file symlinks even when link traversal is disabled.
+/// Reject them immediately before any scanner reads file contents.
+pub(crate) fn is_regular_file(path: &Path) -> bool {
+    fs::symlink_metadata(path)
+        .map(|metadata| metadata.file_type().is_file() && !metadata.file_type().is_symlink())
+        .unwrap_or(false)
 }

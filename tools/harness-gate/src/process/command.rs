@@ -18,7 +18,10 @@ pub(super) fn isolate_process_tree(command: &mut Command) {
 }
 
 #[cfg(not(unix))]
-pub(super) fn isolate_process_tree(_command: &mut Command) {}
+pub(super) fn isolate_process_tree(_command: &mut Command) {
+    // Windows termination uses `taskkill /T` below to cover descendants. The
+    // command itself has no portable process-group primitive to configure here.
+}
 
 #[cfg(unix)]
 pub(super) fn terminate(child: &mut Child) -> std::io::Result<ExitStatus> {
@@ -42,6 +45,17 @@ pub(super) fn terminate(child: &mut Child) -> std::io::Result<ExitStatus> {
 
 #[cfg(not(unix))]
 pub(super) fn terminate(child: &mut Child) -> std::io::Result<ExitStatus> {
+    #[cfg(windows)]
+    {
+        let pid = child.id().to_string();
+        let tree_status = Command::new("taskkill")
+            .args(["/PID", &pid, "/T", "/F"])
+            .status();
+        if !tree_status.is_ok_and(|status| status.success()) {
+            let _ = child.kill();
+        }
+    }
+    #[cfg(not(windows))]
     child.kill()?;
     child.wait()
 }

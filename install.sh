@@ -3,7 +3,7 @@
 
 set -e
 
-REPO="yourusername/Harness-Gate"
+REPO="musutrade/Harness-Gate"
 BINARY_NAME="harness-gate"
 
 # 检测操作系统和架构
