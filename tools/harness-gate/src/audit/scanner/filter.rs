@@ -73,7 +73,6 @@ pub(crate) enum CompiledAllowlistEntry {
 }
 
 pub(crate) fn compile_allowlist(
-    project_root: &Path,
     allowlist: &[AllowlistEntry],
     rule_name: &str,
 ) -> Result<Vec<CompiledAllowlistEntry>> {
@@ -81,12 +80,6 @@ pub(crate) fn compile_allowlist(
         .iter()
         .map(|entry| match entry {
             AllowlistEntry::PathPrefix { path } => {
-                resolve_repo_path(
-                    project_root,
-                    Path::new(path),
-                    &format!("audit rule {rule_name:?} allowlist path"),
-                    false,
-                )?;
                 Ok(CompiledAllowlistEntry::PathPrefix(PathBuf::from(path)))
             }
             AllowlistEntry::Regex { pattern } => Regex::new(pattern)
