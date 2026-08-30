@@ -247,6 +247,27 @@ harness-gate verify --components backend,frontend --profile full
 | `E1301`-`E1304` | Git scope、scope 配置、未匹配路径或报告 |
 | `E1401`-`E1404` | 验证选择、取消、执行或报告 |
 
+### 常见修复路径
+
+新项目可以按以下顺序接入：
+
+```bash
+harness-gate init --preset generic
+harness-gate config check
+harness-gate doctor
+harness-gate verify --all
+```
+
+`config check` 失败时，人类可读输出会包含稳定错误码、字段路径、修复
+提示和最小 schema v2 `flow.toml` 骨架。按提示修改，或执行
+`harness-gate init --preset generic` 重新生成配置，然后再次运行
+`harness-gate config check`。编辑器和 CI 需要结构化结果时使用
+`config check --format json`。
+
+日常开发先运行 `harness-gate scope`，再运行 `harness-gate verify`；提交前
+暂存明确文件，执行 `harness-gate scope --staged` 和 `harness-gate hook`；
+PR 或发布前执行 `harness-gate verify --all`，失败时上传 reports 目录供定位。
+
 ## Schema v2 概览
 
 项目根由 `.harness-gate/flow.toml` 标识，不要求固定的 `backend/`、`frontend/` 或工具目录。component 和 profile 都是配置中的小写字符串 ID。
@@ -320,6 +341,7 @@ harness-gate doctor --json     # 给 CI 或其他工具消费
 
 Docker provider 可用于 PostgreSQL、MySQL、Redis 等服务，也可通过 `runtime = "podman"` 使用 Docker
 兼容的 Podman CLI。容器使用随机宿主端口，验证结束或异常退出时自动删除；省略 `runtime` 时默认使用 Docker。
+本次计划选中的服务会在 secret scan 和 architecture audit 门禁运行时预热，减少首个步骤的等待时间。
 
 步骤可用 `services = ["test-postgres", "test-redis"]` 组合多个服务，并以 `remove_env = ["DATABASE_URL"]` 删除继承的运行时变量。每个 service 必须注入不同变量，避免静默覆盖。
 

@@ -3,6 +3,7 @@ use super::{check_available, ServiceManager};
 use crate::config::ServiceConfig;
 use crate::project::Project;
 use crate::test_support::TestWorkspace;
+use std::sync::atomic::AtomicBool;
 use std::time::Duration;
 
 #[test]
@@ -95,6 +96,58 @@ fn environment_service_injects_configured_value() {
         ("FIXTURE_URL".into(), "http://127.0.0.1:1234".into())
     );
     std::env::remove_var(name);
+}
+
+#[test]
+fn warmup_populates_resource_before_the_first_lease() {
+    let (_workspace, mut project) = project();
+    let name = "HARNESS_GATE_WARMUP_SERVICE_FIXTURE";
+    std::env::set_var(name, "http://127.0.0.1:4322");
+    project.config.services.insert(
+        "warmup".into(),
+        ServiceConfig::Environment {
+            source_env: name.into(),
+            inject_env: "WARMUP_URL".into(),
+        },
+    );
+    let mut manager = ServiceManager::new(&project);
+    let jobs = manager
+        .warmup_jobs(vec!["warmup".into()])
+        .expect("warmup job");
+    assert_eq!(jobs.len(), 1);
+    let cancelled = AtomicBool::new(false);
+    jobs.into_iter().next().expect("warmup job").run(&cancelled);
+    assert_eq!(
+        manager.environment("warmup").expect("warmed service"),
+        ("WARMUP_URL".into(), "http://127.0.0.1:4322".into())
+    );
+    std::env::remove_var(name);
+}
+
+#[test]
+fn failed_warmup_is_cached_for_the_first_real_lease() {
+    let (_workspace, mut project) = project();
+    let name = "HARNESS_GATE_FAILED_WARMUP_SERVICE_FIXTURE";
+    std::env::remove_var(name);
+    project.config.services.insert(
+        "warmup-failed".into(),
+        ServiceConfig::Environment {
+            source_env: name.into(),
+            inject_env: "WARMUP_FAILED_URL".into(),
+        },
+    );
+    let mut manager = ServiceManager::new(&project);
+    let jobs = manager
+        .warmup_jobs(vec!["warmup-failed".into()])
+        .expect("warmup job");
+    jobs.into_iter()
+        .next()
+        .expect("warmup job")
+        .run(&AtomicBool::new(false));
+    let error = manager
+        .environment("warmup-failed")
+        .expect_err("failed warmup must fail the real lease");
+    assert!(error.to_string().contains(name));
 }
 
 #[test]

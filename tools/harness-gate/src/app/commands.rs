@@ -20,7 +20,19 @@ pub(super) fn run(project: &Project, command: Commands) -> Result<bool, CliError
             }
             Ok(report.failures == 0 && (!strict || report.warnings == 0))
         }
-        Commands::Scope { scope: args, json } => {
+        Commands::Scope {
+            scope: args,
+            json,
+            benchmark_repeat,
+        } => {
+            if benchmark_repeat > 0 {
+                let benchmark = crate::scope::benchmark(project, &args.mode(), benchmark_repeat)?;
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&benchmark).map_err(anyhow::Error::from)?
+                );
+                return Ok(true);
+            }
             let result = crate::scope::detect(project, &args.mode())?;
             result.write_reports(project)?;
             if json {

@@ -121,7 +121,7 @@
       "name": "config-invalid",
       "reports": {},
       "status": "pass",
-      "stderr": "ERROR [E1000]: command failed: <PROJECT_ROOT>/.harness-gate/flow.toml: error [HGCFG-TOML-PARSE] at $: configuration is not valid TOML (line 2, column 1)\n  help: fix the TOML syntax or unknown field reported by the parser\n",
+      "stderr": "ERROR [E1000]: configuration check failed\n<PROJECT_ROOT>/.harness-gate/flow.toml: error [HGCFG-TOML-PARSE] at $: configuration is not valid TOML (line 2, column 1)\n  help: fix the TOML syntax or unknown field reported by the parser\nNext: harness-gate init --preset generic\nMinimal flow.toml shape:\nversion = 2\n\n[project]\nname = \"my-project\"\ndefault_profile = \"full\"\nhook_profile = \"hook\"\n\n[paths]\nreports = \".harness-gate/reports\"\naudit_config = \".harness-gate/audit.toml\"\nsecrets_config = \".harness-gate/secrets.toml\"\n\n[scope]\nunmatched = \"all\"\nrules = [{ patterns = [\"**\"], components = [\"project\"] }]\n\n[[steps]]\nid = \"project.diff-check\"\nlabel = \"Git whitespace check\"\ncomponent = \"project\"\nprofiles = [\"full\"]\nprogram = \"git\"\nargs = [\"diff\", \"--check\"]\ncwd = \"{root}\"\nlog = \"git_diff_check.log\"\ntimeout_secs = 60\n\nThen run: harness-gate config check\n",
       "stdout": ""
     },
     {
