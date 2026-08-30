@@ -1,6 +1,6 @@
 use crate::process::CapturedOutput;
 use anyhow::{bail, Context, Result};
-use std::path::Path;
+use std::path::{Component, Path};
 use std::time::Duration;
 
 const GIT_TIMEOUT: Duration = Duration::from_secs(30);
@@ -45,6 +45,31 @@ fn parse_null_terminated_paths(stdout: &[u8]) -> Result<Vec<String>> {
         .collect()
 }
 
+/// Encode a repository-relative filesystem path for Git's index syntax.
+pub(crate) fn index_path(path: &Path) -> Result<String> {
+    let mut parts = Vec::new();
+    for component in path.components() {
+        match component {
+            Component::Normal(part) => parts.push(
+                part.to_str()
+                    .context("Git index path must be UTF-8")?
+                    .to_string(),
+            ),
+            Component::CurDir => {}
+            Component::ParentDir | Component::RootDir | Component::Prefix(_) => {
+                bail!(
+                    "Git index path must be repository-relative: {}",
+                    path.display()
+                );
+            }
+        }
+    }
+    if parts.is_empty() {
+        bail!("Git index path must not be empty");
+    }
+    Ok(parts.join("/"))
+}
+
 /// Read a path from the staged Git snapshot when it exists.
 pub(crate) fn staged_file(project_root: &Path, file: &str) -> Result<Option<Vec<u8>>> {
     let args = vec!["show".to_string(), format!(":{file}")];
@@ -80,7 +105,26 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::parse_null_terminated_paths;
+    use super::{index_path, parse_null_terminated_paths};
+    use std::path::Path;
+
+    #[test]
+    fn index_paths_use_git_separators_on_every_platform() {
+        let path = Path::new(".harness-gate").join("secrets.toml");
+
+        assert_eq!(
+            index_path(&path).expect("valid repository path"),
+            ".harness-gate/secrets.toml"
+        );
+    }
+
+    #[test]
+    fn index_paths_reject_parent_traversal() {
+        let error = index_path(Path::new("../secrets.toml"))
+            .expect_err("parent traversal must not reach Git");
+
+        assert!(error.to_string().contains("repository-relative"));
+    }
 
     #[test]
     fn parses_nul_delimited_paths_without_splitting_newlines() {
