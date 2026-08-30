@@ -25,8 +25,8 @@ outbox, LLM review/repair, organizational audit, and GitHub required-check
 integration. Moving those responsibilities into a reusable CLI would create a
 larger and less separable product rather than close a Harness-Gate contract.
 
-The source assessment is recorded in
-[Harness-Gate capability gaps](../harness-gate-capability-gaps.md).
+The source assessment is recorded in the working-tree document
+`docs/harness-gate-capability-gaps.md`.
 
 ## Decision
 
@@ -124,4 +124,4 @@ first canary has green cross-platform and evidence-integrity checks.
 - [ADR-0031: Harden Gate Boundaries and Delivery Contracts](0031-harden-gate-boundaries.md)
 - [ADR-0025: Phase 1 Quality Baseline Gates](0025-phase-1-quality-baseline-gates.md)
 - [ADR-0028: Dependency-Aware Parallel Scheduling](0028-parallel-scheduling.md)
-- [Capability gap assessment](../harness-gate-capability-gaps.md)
+- Capability gap assessment: `docs/harness-gate-capability-gaps.md` (working-tree source)

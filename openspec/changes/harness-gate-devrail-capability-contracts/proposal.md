@@ -89,6 +89,6 @@ leak a service, or publish an unverifiable artifact.
 
 - [ADR-0032: Define Harness-Gate capability contracts and the DevRail boundary](../../../docs/adr/0032-harness-gate-devrail-capability-contracts.md)
 - [ADR-0031: Harden Gate Boundaries and Delivery Contracts](../../../docs/adr/0031-harden-gate-boundaries.md)
-- [Capability gap assessment](../../../docs/harness-gate-capability-gaps.md)
+- Capability gap assessment: `docs/harness-gate-capability-gaps.md` (working-tree source)
 - [ADR-0025: Phase 1 Quality Baseline Gates](../../../docs/adr/0025-phase-1-quality-baseline-gates.md)
 - [ADR-0028: Dependency-Aware Parallel Scheduling](../../../docs/adr/0028-parallel-scheduling.md)
