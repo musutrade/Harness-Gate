@@ -27,6 +27,11 @@ ADAPTER_MODULES = {
     "service": "src/service/",
 }
 
+# Benchmark-only harness code is exercised by the performance workflow, not by
+# the functional coverage suite. Keep it out of the scope engine threshold so
+# adding measurement scenarios does not dilute production-path coverage.
+EXCLUDED_FILES = {"scope/benchmark.rs"}
+
 
 def run(output: Path, threshold: float) -> int:
     raw = output.with_name("coverage.raw.json")
@@ -68,6 +73,8 @@ def run(output: Path, threshold: float) -> int:
         filename = item["filename"].replace("\\", "/")
         marker = "/src/"
         relative = filename.split(marker, 1)[-1] if marker in filename else filename
+        if relative in EXCLUDED_FILES:
+            continue
         module = relative.split("/", 1)[0]
         if module not in CORE_MODULES and module not in ADAPTER_MODULES:
             continue
