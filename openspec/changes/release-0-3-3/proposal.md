@@ -1,6 +1,6 @@
 # Proposal: Release Harness-Gate 0.3.3
 
-**Status:** In progress
+**Status:** Implemented
 
 ## Why
 
@@ -34,6 +34,21 @@ crates.io versions are immutable.
   OpenSpec validation pass.
 - crates.io and docs.rs expose version `0.3.3` with the updated links.
 - GitHub Release `v0.3.3` contains all platform binaries.
+
+## Acceptance Evidence
+
+- PR [#52](https://github.com/musutrade/Harness-Gate/pull/52) merged as
+  `95678d93ac0815e37e5ab52f3f6a84c97729f85c` after all required checks passed
+  in [CI run 33314576672](https://github.com/musutrade/Harness-Gate/actions/runs/33314576672).
+- Tag `v0.3.3` published the four platform assets in the
+  [GitHub Release](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.3);
+  the [release workflow 33315285211](https://github.com/musutrade/Harness-Gate/actions/runs/33315285211)
+  completed successfully.
+- [harness-gate 0.3.3 on crates.io](https://crates.io/crates/harness-gate/0.3.3)
+  is published with the corrected README links.
+- [docs.rs 0.3.3 documentation](https://docs.rs/harness-gate/0.3.3/harness_gate/)
+  is available; [build 4264644](https://docs.rs/crate/harness-gate/0.3.3/builds/4264644)
+  reports that all builds succeeded.
 
 ## Risk Assessment
 
