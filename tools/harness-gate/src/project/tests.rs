@@ -1,6 +1,8 @@
 use super::*;
 use crate::test_support::TestWorkspace;
-use std::{env, path::Path};
+use std::env;
+#[cfg(unix)]
+use std::path::Path;
 
 #[test]
 fn preparation_does_not_change_the_process_working_directory() {

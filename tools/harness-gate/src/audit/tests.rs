@@ -1,5 +1,6 @@
 use super::*;
 use crate::test_support::TestWorkspace;
+#[cfg(target_os = "linux")]
 use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
