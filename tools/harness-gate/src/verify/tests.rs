@@ -299,6 +299,32 @@ fn non_zero_step_retains_exit_detail_and_log() {
 }
 
 #[test]
+fn verification_runs_use_distinct_invocation_evidence_directories() {
+    let (workspace, project) = generic_project("verify-invocations");
+    let first =
+        run(&project, ScopeResult::all(&project), "full", false).expect("first verification");
+    let second =
+        run(&project, ScopeResult::all(&project), "full", false).expect("second verification");
+
+    assert_ne!(first.invocation_id, second.invocation_id);
+    for report in [&first, &second] {
+        let directory = PathBuf::from(&report.report_directory);
+        assert!(directory.is_dir(), "invocation directory should exist");
+        assert!(directory.join("invocation.json").is_file());
+        assert!(directory.join("test_result.json").is_file());
+        assert!(report.steps.iter().all(|step| {
+            step.step_id.is_some()
+                && step.invocation_id.as_deref() == Some(report.invocation_id.as_str())
+                && step.attempt == Some(1)
+        }));
+    }
+    assert!(workspace
+        .root
+        .join(".harness-gate/reports/test_result.json")
+        .is_file());
+}
+
+#[test]
 fn parser_failure_marks_step_failed() {
     let (_workspace, mut project) = generic_project("verify-parser-failure");
     project.config.steps[0].program = "sh".into();

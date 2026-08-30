@@ -40,6 +40,16 @@ pub struct RunnerExecution {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct TaskResult {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub step_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub invocation_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub attempt: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub finished_at: Option<String>,
     pub label: String,
     pub passed: bool,
     pub timed_out: bool,
@@ -110,6 +120,7 @@ impl Task {
             .with_context(|| format!("create log {}", self.log.display()))?;
         let stderr = stdout.try_clone()?;
         let started = Instant::now();
+        let started_at = chrono::Utc::now().to_rfc3339();
         let mut command = Command::new(&self.program);
         command
             .args(&self.args)
@@ -140,6 +151,11 @@ impl Task {
         };
 
         Ok(TaskResult {
+            step_id: None,
+            invocation_id: None,
+            attempt: None,
+            started_at: Some(started_at),
+            finished_at: Some(chrono::Utc::now().to_rfc3339()),
             label: self.label,
             passed: status.success() && !timed_out && !was_cancelled,
             timed_out,

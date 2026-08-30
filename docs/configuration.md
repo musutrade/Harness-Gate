@@ -770,7 +770,9 @@ harness-gate verify --all
 
 ### 报告模板、JUnit 和通知
 
-HTML 模板和 JUnit 输出是可选的；默认 JSON/Markdown 文件保持不变：
+HTML 模板和 JUnit 输出是可选的。每次验证的规范证据写入
+`<reports>/invocations/<invocation_id>/`，包括 `invocation.json`、`scope.json`、步骤日志和报告；
+为兼容现有消费者，`test_result.json` 与 `test_result.md` 仍会镜像到报告根目录：
 
 ```toml
 [report_templates]
@@ -787,6 +789,7 @@ junit = "junit.xml"
 完整的 `report` 对象及其 `timestamp`、`profile`、`scope`、`steps` 和 `passed` 字段。输出固定为报告目录中的 `test_result.html`。`junit` 路径相对于报告目录，
 必须是报告目录内的 `.xml` 文件名或子路径；运行时还会检查现有目录和符号链接不会把输出重定向到目录外。
 模板输入仍是只读且受路径隔离校验。
+规范报告和日志先写入临时同级文件，再通过原子 rename 发布；失败会使本次验证返回报告错误。
 
 ### 容器运行时和 Webhook
 
