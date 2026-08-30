@@ -1,5 +1,7 @@
 use super::catalog::PRESETS;
-use super::filesystem::{atomic_write, atomic_write_batch, resolve_inside};
+#[cfg(unix)]
+use super::filesystem::resolve_inside;
+use super::filesystem::{atomic_write, atomic_write_batch};
 use super::initialize::{init, project_id};
 use crate::config::FlowConfig;
 use crate::test_support::TestWorkspace;

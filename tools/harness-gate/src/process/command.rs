@@ -1,5 +1,7 @@
 use std::process::{Child, Command, ExitStatus};
+#[cfg(unix)]
 use std::thread;
+#[cfg(unix)]
 use std::time::{Duration, Instant};
 
 #[cfg(unix)]
