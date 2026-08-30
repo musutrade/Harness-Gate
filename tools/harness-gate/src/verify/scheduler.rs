@@ -287,6 +287,7 @@ fn failed_task_result(
         duration_ms: 0,
         log,
         detail: Some(format!("{error:#}")),
+        runner: None,
     }
 }
 
@@ -317,6 +318,7 @@ fn run_secret_scan(
             .to_string_lossy()
             .into(),
         detail: (!passed).then(|| format!("{} file(s) require review", findings.len())),
+        runner: None,
     })
 }
 
@@ -346,6 +348,7 @@ fn run_architecture_audit(
             outcome.error_count,
             outcome.warning_count
         )),
+        runner: None,
     })
 }
 
@@ -366,6 +369,7 @@ fn run_external_step<'a>(
             duration_ms: 0,
             log: step.log.clone(),
             detail: Some(format!("{error:#}")),
+            runner: None,
         }),
     )
 }
@@ -421,6 +425,7 @@ fn skipped<'a>(node: &PlanNode<'a>, reason: &str) -> ScheduledResult {
             duration_ms: 0,
             log: node.step.map(|step| step.log.clone()).unwrap_or_default(),
             detail: Some(reason.into()),
+            runner: None,
         },
     }
 }

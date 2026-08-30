@@ -197,6 +197,7 @@ fn failed_external_node_blocks_only_its_descendants() {
         depends_on: vec![],
         kind: None,
         gate_type: None,
+        runner: None,
     });
 
     let report = run(&project, ScopeResult::all(&project), "full", false)

@@ -513,6 +513,7 @@ mod tests {
                 duration_ms: 42,
                 log: "logs/unit.log".into(),
                 detail: Some("exit code 1".into()),
+                runner: None,
             }],
             skipped_steps: vec![],
             passed: false,
