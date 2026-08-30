@@ -1,6 +1,6 @@
 # Proposal: Release Harness-Gate 0.3.2
 
-**Status:** Proposed
+**Status:** Implemented
 
 ## Why
 
