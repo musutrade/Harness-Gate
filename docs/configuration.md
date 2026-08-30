@@ -222,6 +222,11 @@ max_parallel = 4
 因此完成时间先后不会改变 CLI 或报告顺序。取消、超时和失败会阻止后续依赖节点，并清理已启动的进程
 与服务。
 
+当依赖失败导致节点未执行时，JSON 报告会额外写入 `skipped_steps`，其中包含节点
+`id`、`label` 和阻塞 `reason`；成功报告会省略空数组以保持原有字段形状。Markdown
+报告使用 `SKIPPED` 行，JUnit 报告使用 `<skipped>` testcase。被跳过的节点不会被计为
+已执行失败，但会使整个验证结果保持失败。
+
 ## 7. `[policy]`
 
 ```toml
