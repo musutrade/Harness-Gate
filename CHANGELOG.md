@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-08-30
+
+### Fixed
+
+- Hardened working-tree secret and audit scans against symlink traversal and
+  non-regular files.
+- Made cancellation stop built-in scans promptly and terminate complete
+  process trees on Windows.
+- Corrected audit rule attribution, allowlist handling, Doctor path resolution,
+  parser error propagation, and service cleanup diagnostics.
+- Reduced repeated scope and audit matcher compilation and synchronized CLI,
+  installation, and remediation contracts.
+
 ## [0.3.1] - 2026-08-29
 
 ### Fixed
