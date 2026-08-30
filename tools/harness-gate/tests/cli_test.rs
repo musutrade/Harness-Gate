@@ -99,7 +99,9 @@ fn test_config_check_without_config() {
 
     // Should fail when no config exists
     assert_failure(&output);
-    // Error message format varies by platform, just verify it failed
+    let stderr = stderr_str(&output);
+    assert!(stderr.contains("harness-gate init --preset generic"));
+    assert!(stderr.contains("version = 2"));
 }
 
 #[test]

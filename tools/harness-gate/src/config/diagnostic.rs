@@ -8,6 +8,37 @@ use std::path::{Path, PathBuf};
 pub const DIAGNOSTIC_SCHEMA_VERSION: u32 = 1;
 const MAX_DIAGNOSTICS: usize = 50;
 
+/// A deliberately small, valid starting point for users repairing a missing
+/// or malformed workflow configuration. The generated preset also creates the
+/// required audit and secret-scan files; this snippet is only the flow shape.
+pub const MINIMAL_CONFIG_SNIPPET: &str = r#"version = 2
+
+[project]
+name = "my-project"
+default_profile = "full"
+hook_profile = "hook"
+
+[paths]
+reports = ".harness-gate/reports"
+audit_config = ".harness-gate/audit.toml"
+secrets_config = ".harness-gate/secrets.toml"
+
+[scope]
+unmatched = "all"
+rules = [{ patterns = ["**"], components = ["project"] }]
+
+[[steps]]
+id = "project.diff-check"
+label = "Git whitespace check"
+component = "project"
+profiles = ["full"]
+program = "git"
+args = ["diff", "--check"]
+cwd = "{root}"
+log = "git_diff_check.log"
+timeout_secs = 60
+"#;
+
 #[allow(dead_code)]
 #[derive(Debug, Clone, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]

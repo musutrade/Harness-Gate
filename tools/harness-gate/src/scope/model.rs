@@ -10,7 +10,7 @@ pub enum ScopeMode {
     All,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct ScopeResult {
     pub mode: String,
     pub changed_files: Vec<String>,

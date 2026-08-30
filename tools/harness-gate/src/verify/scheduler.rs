@@ -6,7 +6,7 @@ use crate::project::Project;
 use crate::secrets::{self, SecretMode};
 use crate::service::ServiceManager;
 use std::collections::{HashMap, HashSet};
-use std::sync::{mpsc, Mutex};
+use std::sync::{atomic::AtomicBool, mpsc, Arc, Mutex};
 use std::time::{Duration, Instant};
 
 #[derive(Debug, thiserror::Error)]
@@ -79,10 +79,32 @@ pub(super) fn run_plan<'a>(
     let (sender, receiver) = mpsc::channel::<(String, WorkerResult)>();
     let mut cancellation_observed = false;
 
+    let service_ids = nodes
+        .iter()
+        .filter(|node| node.kind == PlanNodeKind::External)
+        .filter_map(|node| node.step)
+        .flat_map(|step| step.services.iter().cloned())
+        .collect::<Vec<_>>();
+    let warmups = {
+        let mut manager = services.lock().map_err(|_| {
+            SchedulerError::Execution(anyhow::anyhow!("service manager lock was poisoned"))
+        })?;
+        manager
+            .warmup_jobs(service_ids)
+            .map_err(SchedulerError::Execution)?
+    };
+    let warmup_cancelled = Arc::new(AtomicBool::new(false));
+
     std::thread::scope(|scope| {
+        let mut warmup_handles = Vec::with_capacity(warmups.len());
+        for warmup in warmups {
+            let cancelled = Arc::clone(&warmup_cancelled);
+            warmup_handles.push(scope.spawn(move || warmup.run(&cancelled)));
+        }
         loop {
             if !cancellation_observed && crate::process::cancelled() {
                 cancellation_observed = true;
+                warmup_cancelled.store(true, std::sync::atomic::Ordering::Release);
                 mark_pending(
                     nodes,
                     &mut pending,
@@ -133,6 +155,7 @@ pub(super) fn run_plan<'a>(
             let task_result = match worker_result {
                 WorkerResult::Completed(result) => result,
                 WorkerResult::Failed(error) => {
+                    warmup_cancelled.store(true, std::sync::atomic::Ordering::Release);
                     let task_result = failed_task_result(node, &error, project);
                     failures.push(SchedulerFailure {
                         node_id: node_id.clone(),
@@ -148,6 +171,9 @@ pub(super) fn run_plan<'a>(
             } else {
                 NodeStatus::Failed
             };
+            if !task_result.passed {
+                warmup_cancelled.store(true, std::sync::atomic::Ordering::Release);
+            }
             statuses.insert(node_id.clone(), status);
             let node_cancelled = status == NodeStatus::Cancelled;
             results.push(ScheduledResult {
@@ -157,6 +183,7 @@ pub(super) fn run_plan<'a>(
             });
             if node_cancelled || crate::process::cancelled() {
                 cancellation_observed = true;
+                warmup_cancelled.store(true, std::sync::atomic::Ordering::Release);
                 mark_pending(
                     nodes,
                     &mut pending,
@@ -166,6 +193,9 @@ pub(super) fn run_plan<'a>(
                     "verification cancelled before dispatch",
                 );
             }
+        }
+        for handle in warmup_handles {
+            let _ = handle.join();
         }
         Ok(SchedulerOutcome {
             results,
