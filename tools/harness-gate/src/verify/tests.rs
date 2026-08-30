@@ -211,6 +211,23 @@ fn failed_external_node_blocks_only_its_descendants() {
         .steps
         .iter()
         .any(|step| step.label == project.config.steps[1].label));
+    let json: serde_json::Value = serde_json::from_slice(
+        &fs::read(
+            workspace
+                .root
+                .join(".harness-gate/reports/test_result.json"),
+        )
+        .expect("read verification report"),
+    )
+    .expect("parse verification report");
+    assert_eq!(
+        json["skipped_steps"][0]["label"],
+        project.config.steps[1].label
+    );
+    assert_eq!(
+        json["skipped_steps"][0]["reason"],
+        "blocked by a failed prerequisite"
+    );
 }
 
 fn generic_project(name: &str) -> (TestWorkspace, Project) {

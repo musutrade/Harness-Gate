@@ -6,6 +6,7 @@ pub enum ScopeError {
     #[error("Git scope detection failed: {message}")]
     Git { message: String },
     #[error("scope configuration failed: {message}")]
+    #[allow(dead_code)]
     Configuration { message: String },
     #[error("scope has {count} unmatched changed file(s): {files}")]
     UnmatchedFiles { count: usize, files: String },
@@ -20,6 +21,7 @@ impl ScopeError {
         }
     }
 
+    #[allow(dead_code)]
     pub(super) fn configuration(error: anyhow::Error) -> Self {
         Self::Configuration {
             message: format!("{error:#}"),
