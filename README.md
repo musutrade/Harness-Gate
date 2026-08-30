@@ -335,11 +335,14 @@ Whether successful or failed, it is recommended to upload the `[paths].reports` 
 
 ## Reports and Notifications
 
-Every verification keeps the compatible `test_result.json` and `test_result.md` files. A repository-contained
-HTML template can additionally produce `test_result.html`, and `report_templates.junit` can write JUnit XML
-under the report directory. HTML templates use Tera and support `include`, `extends`, and `block`; the full
-serialized report is available as `report` alongside the legacy direct fields. Report output paths are
-containment-checked, including existing symlinks.
+Every verification writes canonical evidence below `reports/invocations/<invocation_id>/`, including
+`invocation.json`, `scope.json`, step logs, and the machine/human reports. The compatible
+`test_result.json` and `test_result.md` files are mirrored at the report root for existing consumers. A
+repository-contained HTML template can additionally produce `test_result.html`, and `report_templates.junit`
+can write JUnit XML under the invocation directory. HTML templates use Tera and support `include`, `extends`,
+and `block`; the full serialized report is available as `report` alongside the legacy direct fields. Report
+output paths are containment-checked, including existing symlinks, and published files use temporary-file plus
+atomic-rename semantics.
 
 Optional `[[notifications.webhooks]]` entries send the serialized report to HTTP(S) endpoints after all report
 files are written. `on_failure` defaults to `true`, `on_success` defaults to `false`; a non-2xx response or
