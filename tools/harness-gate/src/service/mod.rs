@@ -57,6 +57,40 @@ impl<'a> ServiceManager<'a> {
             resource,
         })
     }
+
+    /// Build owned startup jobs for services referenced by the selected plan.
+    /// Jobs deliberately do not hold a lease: managed services are exclusive,
+    /// so a normal lease would block the first real step until the gates finish.
+    pub(super) fn warmup_jobs<I>(&mut self, ids: I) -> Result<Vec<ServiceWarmup>>
+    where
+        I: IntoIterator<Item = String>,
+    {
+        let mut jobs = Vec::new();
+        let mut seen = std::collections::BTreeSet::new();
+        for id in ids {
+            if !seen.insert(id.clone()) {
+                continue;
+            }
+            let config = self
+                .project
+                .config
+                .service(&id)
+                .cloned()
+                .ok_or_else(|| anyhow::anyhow!("unknown service {id:?}"))?;
+            let resource = self
+                .resources
+                .entry(id.clone())
+                .or_insert_with(|| Arc::new(ServiceResource::new(is_shareable(&config))))
+                .clone();
+            jobs.push(ServiceWarmup {
+                project: self.project.clone(),
+                id,
+                config,
+                resource,
+            });
+        }
+        Ok(jobs)
+    }
 }
 
 /// A service resource is shareable only when its adapter can safely serve
@@ -213,6 +247,105 @@ impl ServiceResource {
                     self.changed.notify_all();
                 }
             }
+        }
+    }
+
+    fn prewarm(self: &Arc<Self>, project: &Project, id: &str, config: ServiceConfig) -> Result<()> {
+        let started = Instant::now();
+        loop {
+            let mut state = self
+                .state
+                .lock()
+                .map_err(|_| anyhow::anyhow!("service resource lock was poisoned"))?;
+            match &*state {
+                ResourceState::Ready { .. } => return Ok(()),
+                ResourceState::Failed(error) => bail!("service {id:?} previously failed: {error}"),
+                ResourceState::Starting | ResourceState::Stopping => {
+                    let remaining = RESOURCE_LOCK_WAIT.saturating_sub(started.elapsed());
+                    if remaining.is_zero() {
+                        bail!("timed out waiting for service {id:?} resource");
+                    }
+                    let wait = remaining.min(RESOURCE_LOCK_POLL);
+                    let (next, _) = self
+                        .changed
+                        .wait_timeout(state, wait)
+                        .map_err(|_| anyhow::anyhow!("service resource lock was poisoned"))?;
+                    drop(next);
+                }
+                ResourceState::Empty => {
+                    *state = ResourceState::Starting;
+                    drop(state);
+                    let result = RunningService::start(project, id, config);
+                    let mut state = self
+                        .state
+                        .lock()
+                        .map_err(|_| anyhow::anyhow!("service resource lock was poisoned"))?;
+                    match result {
+                        Ok(service) => {
+                            *state = ResourceState::Ready { service, users: 0 };
+                            self.changed.notify_all();
+                            return Ok(());
+                        }
+                        Err(error) => {
+                            let detail = format!("{error:#}");
+                            *state = ResourceState::Failed(detail.clone());
+                            self.changed.notify_all();
+                            bail!("{detail}");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fn discard_if_idle(&self) {
+        let service = {
+            let Ok(mut state) = self.state.lock() else {
+                return;
+            };
+            let ResourceState::Ready { users, .. } = &mut *state else {
+                return;
+            };
+            if *users != 0 {
+                return;
+            }
+            let previous = std::mem::replace(&mut *state, ResourceState::Stopping);
+            self.changed.notify_all();
+            match previous {
+                ResourceState::Ready { service, .. } => Some(service),
+                _ => None,
+            }
+        };
+        if let Some(service) = service {
+            drop(service);
+            if let Ok(mut state) = self.state.lock() {
+                if matches!(*state, ResourceState::Stopping) {
+                    *state = ResourceState::Empty;
+                    self.changed.notify_all();
+                }
+            }
+        }
+    }
+}
+
+/// Owned worker payload used to overlap service startup with mandatory gates.
+pub(super) struct ServiceWarmup {
+    project: Project,
+    id: String,
+    config: ServiceConfig,
+    resource: Arc<ServiceResource>,
+}
+
+impl ServiceWarmup {
+    pub(super) fn run(self, cancelled: &std::sync::atomic::AtomicBool) {
+        if cancelled.load(std::sync::atomic::Ordering::Acquire) || crate::process::cancelled() {
+            return;
+        }
+        let result = self.resource.prewarm(&self.project, &self.id, self.config);
+        if (cancelled.load(std::sync::atomic::Ordering::Acquire) || crate::process::cancelled())
+            && result.is_ok()
+        {
+            self.resource.discard_if_idle();
         }
     }
 }

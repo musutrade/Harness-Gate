@@ -98,15 +98,47 @@ pub(crate) fn run() -> Result<bool, CliError> {
             }
         }
     }
-    let project = Project::discover(cli.project_root, cli.config)?;
     let is_config_check = matches!(
         &cli.command,
         Commands::Config {
             action: ConfigAction::Check { .. }
         }
     );
+    let project = match Project::discover(cli.project_root, cli.config) {
+        Ok(project) => project,
+        Err(error) if is_config_check => {
+            print_human_config_error(&error);
+            return Ok(false);
+        }
+        Err(error) => return Err(error.into()),
+    };
     if !is_config_check {
         project.prepare()?;
     }
     commands::run(&project, cli.command)
+}
+
+fn print_human_config_error(error: &anyhow::Error) {
+    if let Some(diagnostics) = error.downcast_ref::<crate::config::ConfigDiagnostics>() {
+        eprintln!(
+            "{}",
+            crate::ui::error("ERROR [E1000]: configuration check failed")
+        );
+        eprintln!("{}", diagnostics);
+    } else {
+        eprintln!(
+            "{}",
+            crate::ui::error(format!(
+                "ERROR [E1000]: configuration check failed: {error:#}"
+            ))
+        );
+        let report = crate::config::report_for_error(error);
+        for diagnostic in report.diagnostics {
+            eprintln!("  help: {}", diagnostic.help);
+        }
+    }
+    eprintln!("Next: harness-gate init --preset generic");
+    eprintln!("Minimal flow.toml shape:");
+    eprintln!("{}", crate::config::MINIMAL_CONFIG_SNIPPET);
+    eprintln!("Then run: harness-gate config check");
 }

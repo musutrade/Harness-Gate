@@ -240,6 +240,29 @@ command context needed to resolve the issue.
 | `E1301`-`E1304` | Git scope, scope configuration, unmatched paths, or reports |
 | `E1401`-`E1404` | Verification selection, cancellation, execution, or reports |
 
+### Common Repair Paths
+
+For a new repository, use the shortest repeatable setup:
+
+```bash
+harness-gate init --preset generic
+harness-gate config check
+harness-gate doctor
+harness-gate verify --all
+```
+
+When `config check` fails, the human output includes the stable error code,
+field path, a repair hint, and a minimal schema v2 `flow.toml` shape. Apply the
+hint (or regenerate with `harness-gate init --preset generic`), then run
+`harness-gate config check` again. Use `--format json` when an editor or CI
+needs machine-readable diagnostics.
+
+For daily work, inspect `harness-gate scope`, then run `harness-gate verify`.
+Before a commit, stage the intended files and run `harness-gate scope --staged`
+followed by `harness-gate hook`. Before a PR or release, run
+`harness-gate verify --all`; upload the reports directory when a failure needs
+review.
+
 ## Features
 
 ### Multi-component Workflow Management
@@ -264,6 +287,7 @@ command context needed to resolve the issue.
 - Random port allocation
 - Health checks
 - Automatic cleanup
+- Selected services are prewarmed while the mandatory secret and architecture gates run
 
 ### Flexible Configuration
 - Schema v2 TOML configuration
