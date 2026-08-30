@@ -2,9 +2,8 @@
 
 **Parent:** [proposal.md](proposal.md), [design.md], and
 [ADR-0031](../../../docs/adr/0031-harden-gate-boundaries.md)
-**Status:** Original implementation accepted against PR #46 and green CI run
-`33293667323`; 2026-08-30 Rust-audit follow-up implemented locally and pending
-pull-request CI evidence.
+**Status:** Implemented; follow-up PR #52 and CI run `33311791454` passed on
+2026-08-30.
 
 - [x] **1.1 (P0, S)** Add repository-boundary checks for working-tree secret and audit scans.
   **Acceptance:** outside symlink targets are never read; regression tests pass.
@@ -29,5 +28,10 @@ pull-request CI evidence.
   **Acceptance:** no Rust `allow` attributes remain and strict all-target Clippy passes.
 - [x] **2.4 (P1, S)** Decouple audit unit tests from the repository's mutable gate configuration and synchronize user documentation.
   **Acceptance:** the full suite passes with a locally modified `.harness-gate/audit.toml`.
-- [ ] **2.5 (P0, S)** Review pull-request CI evidence for Linux, macOS, and Windows.
+- [x] **2.5 (P0, S)** Review pull-request CI evidence for Linux, macOS, and Windows.
   **Acceptance:** every required check is green and ADR-0031 links the follow-up PR and CI run.
+
+  Completed in PR [#52](https://github.com/musutrade/Harness-Gate/pull/52);
+  final commit `24aa22c` passed all required checks in CI run
+  [33311791454](https://github.com/musutrade/Harness-Gate/actions/runs/33311791454),
+  including the Required Quality Aggregate.
