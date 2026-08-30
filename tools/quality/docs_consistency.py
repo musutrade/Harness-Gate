@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check local Markdown links, embedded examples, and generated Schema sync."""
+"""Check Markdown links, embedded examples, and generated Schema sync."""
 
 from __future__ import annotations
 
@@ -26,13 +26,13 @@ def local_links() -> list[dict[str, str]]:
         }
         headings.update({identifier: identifier for identifier in re.findall(r"<a\s+id=[\"']([^\"']+)[\"']", source)})
         for target in pattern.findall(source):
-            if target.startswith(("http://", "https://", "mailto:", "#")):
+            if target.startswith(("http://", "https://", "mailto:")):
                 continue
             path, fragment = (target.split("#", 1) + [""])[:2] if "#" in target else (target, "")
-            if path and not (document.parent / path).exists():
+            linked = document if not path else document.parent / path
+            if path and not linked.exists():
                 failures.append({"document": str(document.relative_to(ROOT)), "target": target})
             elif fragment:
-                linked = (document.parent / path) if path else document
                 if linked.resolve() == document.resolve():
                     linked_headings = headings
                 elif linked.is_file():
