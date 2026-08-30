@@ -4,7 +4,7 @@
 **评审版本**: v0.3.2（主分支 `01f0bba`）
 **评审维度**: 可用性、性能、扩展性
 **依据**: 项目文档（README.zh-CN.md、docs/configuration.md）、`.harness-gate/flow.toml` 与 `.harness-gate/audit.toml` 门禁配置、`tools/harness-gate/src` 源码
-**前序报告**: [2026-08-28 代码评审](code-review-2026-08-28.md)、[重构方案](refactoring-plan-2026-08-28.md)
+**前序报告**: 2026-08-28 代码评审与重构方案（均为本地评审材料，未纳入发布树）
 
 ---
 
