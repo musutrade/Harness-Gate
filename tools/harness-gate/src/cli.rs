@@ -46,6 +46,9 @@ pub(crate) enum Commands {
         /// Emit machine-readable JSON.
         #[arg(long)]
         json: bool,
+        /// Repeat the in-process matcher benchmark (used by quality baselines).
+        #[arg(long, hide = true, default_value_t = 0, value_name = "N")]
+        benchmark_repeat: usize,
     },
     /// Scan file names for high-confidence credential patterns.
     Secrets {

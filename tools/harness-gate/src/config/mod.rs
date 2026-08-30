@@ -12,6 +12,7 @@ mod tests;
 #[allow(unused_imports)]
 pub use diagnostic::{
     report_for_error, ConfigCheckReport, ConfigDiagnostic, ConfigDiagnostics, DiagnosticSeverity,
+    MINIMAL_CONFIG_SNIPPET,
 };
 pub use loader::schema_json;
 pub use migration::migrate_v1;
