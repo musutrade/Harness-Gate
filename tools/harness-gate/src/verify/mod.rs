@@ -25,6 +25,8 @@ pub enum VerifyError {
     UnknownProfile { profile: String },
     #[error("unknown verification step {id:?}")]
     UnknownStep { id: String },
+    #[error("verification step {id:?} is not part of profile {profile:?}")]
+    StepNotInProfile { id: String, profile: String },
     #[error("verification was cancelled")]
     Cancelled,
     #[error("verification execution failed: {message}")]
@@ -56,7 +58,9 @@ impl VerifyError {
 impl CodedError for VerifyError {
     fn code(&self) -> &'static str {
         match self {
-            Self::UnknownProfile { .. } | Self::UnknownStep { .. } => "E1401",
+            Self::UnknownProfile { .. }
+            | Self::UnknownStep { .. }
+            | Self::StepNotInProfile { .. } => "E1401",
             Self::Cancelled => "E1402",
             Self::Execution { .. } => "E1403",
             Self::Report { .. } => "E1404",
@@ -103,6 +107,13 @@ pub fn run_step(
         .config
         .step(id)
         .ok_or_else(|| VerifyError::UnknownStep { id: id.to_string() })?;
+    let profile = project.config.project.default_profile.clone();
+    if !step.profiles.contains(&profile) {
+        return Err(VerifyError::StepNotInProfile {
+            id: id.to_string(),
+            profile,
+        });
+    }
     run_selected(
         project,
         explicit_scope(std::slice::from_ref(&step.component)),
@@ -129,7 +140,7 @@ fn run_selected(
             "execution.max_parallel must be between 1 and 64"
         )));
     }
-    println!("{}", ui::heading("arc-flow verify"));
+    println!("{}", ui::heading("harness-gate verify"));
     println!("Scope: {}", scope.mode);
     println!(
         "Components: {}\n",

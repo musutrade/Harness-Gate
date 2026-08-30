@@ -13,7 +13,7 @@
 ### 克隆和构建
 
 ```bash
-git clone https://github.com/yourusername/Harness-Gate.git
+git clone https://github.com/musutrade/Harness-Gate.git
 cd Harness-Gate
 cargo build --manifest-path tools/harness-gate/Cargo.toml
 cargo test --manifest-path tools/harness-gate/Cargo.toml

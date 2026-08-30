@@ -5,7 +5,7 @@ use anyhow::{bail, Context, Result};
 use globset::{Glob, GlobSetBuilder};
 use ignore::WalkBuilder;
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 pub fn run(project: &Project) -> Result<super::DoctorReport> {
@@ -36,8 +36,7 @@ fn run_check(project: &Project, check: &DoctorCheck) -> Result<String> {
             command_output(project, program, &args, timeout)
         }
         DoctorCheckKind::Path { path, path_type } => {
-            let path = project.expand(path);
-            let path = Path::new(&path);
+            let path = resolve_check_path(project, path);
             let exists = match path_type {
                 PathType::Any => path.exists(),
                 PathType::File => path.is_file(),
@@ -61,7 +60,7 @@ fn run_check(project: &Project, check: &DoctorCheck) -> Result<String> {
             if std::env::var_os(env).is_some() {
                 return Ok(format!("{env} is configured"));
             }
-            let path = project.expand(path);
+            let path = resolve_check_path(project, path);
             let found = fs::read_to_string(&path)
                 .map(|content| {
                     content
@@ -70,9 +69,12 @@ fn run_check(project: &Project, check: &DoctorCheck) -> Result<String> {
                 })
                 .unwrap_or(false);
             if !found {
-                bail!("{env} is absent and {path} does not define {contains}");
+                bail!(
+                    "{env} is absent and {} does not define {contains}",
+                    path.display()
+                );
             }
-            Ok(format!("{contains} found in {path}"))
+            Ok(format!("{contains} found in {}", path.display()))
         }
         DoctorCheckKind::GitConfig { key, expected } => {
             let args = vec!["config".into(), "--get".into(), key.clone()];
@@ -101,9 +103,9 @@ fn run_check(project: &Project, check: &DoctorCheck) -> Result<String> {
             let actual = command_output(project, program, &args, timeout)?
                 .trim_start_matches(trim_prefix)
                 .to_string();
-            let path = project.expand(path);
+            let path = resolve_check_path(project, path);
             let expected = fs::read_to_string(&path)
-                .with_context(|| format!("read version file {path}"))?
+                .with_context(|| format!("read version file {}", path.display()))?
                 .trim()
                 .to_string();
             if actual != expected {
@@ -114,6 +116,16 @@ fn run_check(project: &Project, check: &DoctorCheck) -> Result<String> {
         DoctorCheckKind::Service { service } => {
             crate::service::check_available(project, service, timeout)
         }
+    }
+}
+
+fn resolve_check_path(project: &Project, value: &str) -> PathBuf {
+    let expanded = project.expand(value);
+    let path = Path::new(&expanded);
+    if path.is_absolute() {
+        path.to_path_buf()
+    } else {
+        project.root.join(path)
     }
 }
 

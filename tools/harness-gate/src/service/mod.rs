@@ -259,9 +259,15 @@ struct RunningService {
 impl Drop for RunningService {
     fn drop(&mut self) {
         if let Some(container) = &self.container {
-            let _ =
+            if let Err(error) =
                 self.runtime
-                    .stop_container(&self.project_root, container, Duration::from_secs(5));
+                    .stop_container(&self.project_root, container, Duration::from_secs(5))
+            {
+                eprintln!(
+                    "warning: failed to clean up {} container {container:?}: {error:#}",
+                    self.runtime.executable()
+                );
+            }
         }
     }
 }

@@ -274,7 +274,7 @@ impl FlowConfig {
     pub fn validate(&self) -> Result<()> {
         if self.version != CONFIG_VERSION {
             bail!(
-                "unsupported workflow config version {}; expected {}; run `arc-flow config migrate` for v1 configurations",
+                "unsupported workflow config version {}; expected {}; run `harness-gate config migrate` for v1 configurations",
                 self.version,
                 CONFIG_VERSION
             );
@@ -1040,7 +1040,7 @@ use steps::{validate_arguments, validate_step, validate_template};
 fn validate_version(version: u32) -> Result<()> {
     if version != CONFIG_VERSION {
         bail!(
-            "unsupported workflow config version {}; expected {}; run `arc-flow config migrate` for v1 configurations",
+            "unsupported workflow config version {}; expected {}; run `harness-gate config migrate` for v1 configurations",
             version,
             CONFIG_VERSION
         );

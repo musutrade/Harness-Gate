@@ -22,7 +22,7 @@ pub(super) fn atomic_write(path: &Path, content: &[u8]) -> Result<()> {
     let name = path
         .file_name()
         .and_then(|value| value.to_str())
-        .unwrap_or("arc-flow");
+        .unwrap_or("harness-gate");
     let unique = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .unwrap_or_default()
