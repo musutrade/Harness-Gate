@@ -11,6 +11,37 @@ use anyhow::{Context, Result};
 use config::SecretScanner;
 use serde::Serialize;
 use std::fs;
+use std::io::Read;
+use std::path::Path;
+
+const MAX_SECRET_SCAN_FILE_BYTES: u64 = 16 * 1024 * 1024;
+
+fn reject_oversized_file(file: &str, size: u64) -> Result<()> {
+    if size > MAX_SECRET_SCAN_FILE_BYTES {
+        anyhow::bail!(
+            "secret scan file {file:?} is too large ({} bytes; limit {} bytes)",
+            size,
+            MAX_SECRET_SCAN_FILE_BYTES
+        );
+    }
+    Ok(())
+}
+
+fn read_working_tree_file(path: &Path, file: &str, size: u64) -> Result<Option<Vec<u8>>> {
+    reject_oversized_file(file, size)?;
+    let source = match fs::File::open(path) {
+        Ok(source) => source,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(None),
+        Err(error) => return Err(anyhow::Error::from(error).context(format!("open {file}"))),
+    };
+    let mut bytes = Vec::with_capacity(size as usize);
+    source
+        .take(MAX_SECRET_SCAN_FILE_BYTES + 1)
+        .read_to_end(&mut bytes)
+        .with_context(|| format!("read {file}"))?;
+    reject_oversized_file(file, bytes.len() as u64)?;
+    Ok(Some(bytes))
+}
 
 /// Errors emitted by the secret-scan boundary.
 #[derive(Debug, thiserror::Error)]
@@ -67,9 +98,14 @@ fn scanner_for_mode(project: &Project, mode: SecretMode) -> Result<SecretScanner
             let relative = relative
                 .to_str()
                 .context("secret scan configuration path must be UTF-8")?;
+            let size = git::staged_file_size(&project.root, relative)?.ok_or_else(|| {
+                anyhow::anyhow!("staged secret scan configuration is missing: {relative}")
+            })?;
+            reject_oversized_file(relative, size)?;
             let bytes = git::staged_file(&project.root, relative)?.ok_or_else(|| {
                 anyhow::anyhow!("staged secret scan configuration is missing: {relative}")
             })?;
+            reject_oversized_file(relative, bytes.len() as u64)?;
             let source = std::str::from_utf8(&bytes)
                 .context("staged secret scan configuration must be UTF-8")?;
             SecretScanner::from_source(source)
@@ -125,23 +161,28 @@ pub fn scan(project: &Project, mode: SecretMode) -> std::result::Result<Vec<Stri
                 if metadata.file_type().is_symlink() || !metadata.file_type().is_file() {
                     continue;
                 }
-                match fs::read(&path) {
-                    Ok(bytes) => bytes,
-                    Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
-                    Err(error) => {
-                        return Err(SecretsError::scan(
-                            anyhow::Error::from(error).context(format!("read {file}")),
-                        ));
-                    }
+                let size = fs::metadata(&path)
+                    .map_err(|error| SecretsError::scan(anyhow::Error::from(error)))?
+                    .len();
+                match read_working_tree_file(&path, &file, size).map_err(SecretsError::scan)? {
+                    Some(bytes) => bytes,
+                    None => continue,
                 }
             }
             SecretMode::Staged => {
+                let Some(size) =
+                    git::staged_file_size(&project.root, &file).map_err(SecretsError::scan)?
+                else {
+                    continue;
+                };
+                reject_oversized_file(&file, size).map_err(SecretsError::scan)?;
                 match git::staged_file(&project.root, &file).map_err(SecretsError::scan)? {
                     Some(bytes) => bytes,
                     None => continue,
                 }
             }
         };
+        reject_oversized_file(&file, bytes.len() as u64).map_err(SecretsError::scan)?;
         if patterns.is_match(&bytes) {
             findings.push(file);
         }

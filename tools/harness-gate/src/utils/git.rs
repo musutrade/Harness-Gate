@@ -52,6 +52,22 @@ pub(crate) fn staged_file(project_root: &Path, file: &str) -> Result<Option<Vec<
     Ok(output.status.success().then_some(output.stdout))
 }
 
+/// Return the size of a path in the staged Git snapshot when it exists.
+pub(crate) fn staged_file_size(project_root: &Path, file: &str) -> Result<Option<u64>> {
+    let args = vec!["cat-file".to_string(), "-s".into(), format!(":{file}")];
+    let output =
+        capture(project_root, args).with_context(|| format!("inspect staged file {file}"))?;
+    if !output.status.success() {
+        return Ok(None);
+    }
+    let size = std::str::from_utf8(&output.stdout)
+        .context("Git returned a non-UTF-8 staged file size")?
+        .trim()
+        .parse::<u64>()
+        .with_context(|| format!("parse staged file size for {file}"))?;
+    Ok(Some(size))
+}
+
 fn command_args<I, S>(args: I) -> Vec<String>
 where
     I: IntoIterator<Item = S>,

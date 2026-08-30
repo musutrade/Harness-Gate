@@ -6,8 +6,9 @@ use crate::project::Project;
 use crate::secrets::{self, SecretMode};
 use crate::service::ServiceManager;
 use std::collections::{HashMap, HashSet};
+use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::sync::{atomic::AtomicBool, mpsc, Arc, Mutex};
-use std::time::{Duration, Instant};
+use std::time::Instant;
 
 #[derive(Debug, thiserror::Error)]
 pub(super) enum SchedulerError {
@@ -125,9 +126,17 @@ pub(super) fn run_plan<'a>(
                     pending.remove(&node.id);
                     running.insert(node.id.clone());
                     let sender = sender.clone();
+                    let node_id = node.id.clone();
                     scope.spawn(move || {
-                        let result = execute_node(project, node, staged, services);
-                        let _ = sender.send((node.id.clone(), result));
+                        let result = catch_unwind(AssertUnwindSafe(|| {
+                            execute_node(project, node, staged, services)
+                        }))
+                        .unwrap_or_else(|_| {
+                            WorkerResult::Failed(SchedulerError::Execution(anyhow::anyhow!(
+                                "verification worker panicked while executing node {node_id:?}"
+                            )))
+                        });
+                        let _ = sender.send((node_id, result));
                     });
                 }
             }
@@ -388,11 +397,7 @@ fn node_result(node: &PlanNode<'_>, result: &TaskResult, status: NodeStatus) -> 
         label: node.label.clone(),
         kind: node.kind,
         status,
-        duration: Duration::from_millis(result.duration_ms as u64),
-        detail: result.detail.clone(),
-        artifact: (!result.log.is_empty()).then(|| result.log.clone()),
         reason: result.detail.clone(),
-        timed_out: result.timed_out,
         cancelled: result.cancelled,
     }
 }
@@ -405,11 +410,7 @@ fn skipped<'a>(node: &PlanNode<'a>, reason: &str) -> ScheduledResult {
             label: node.label.clone(),
             kind: node.kind,
             status: NodeStatus::Skipped,
-            duration: Duration::ZERO,
-            detail: Some(reason.into()),
-            artifact: None,
             reason: Some(reason.into()),
-            timed_out: false,
             cancelled: false,
         },
         task_result: TaskResult {

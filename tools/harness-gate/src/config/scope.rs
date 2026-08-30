@@ -52,7 +52,6 @@ impl FlowConfig {
     ///
     /// Project discovery uses [`Self::compile_scope_rules`] and retains the
     /// result so repeated commands do not rebuild the globsets.
-    #[allow(dead_code)]
     pub fn classify_paths(&self, paths: &[String]) -> Result<(BTreeSet<String>, Vec<String>)> {
         let matchers = self.compile_scope_rules()?;
         Ok(matchers.classify(self, paths))

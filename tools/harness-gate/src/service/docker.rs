@@ -4,6 +4,7 @@ use crate::project::Project;
 use crate::service::runtime::ContainerRuntime;
 use anyhow::{bail, Result};
 use std::collections::BTreeMap;
+use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
@@ -17,6 +18,7 @@ pub(super) struct DockerStartOptions {
     pub(super) healthcheck: Vec<String>,
     pub(super) connection: String,
     pub(super) deadline: Instant,
+    pub(super) cleanup_errors: Arc<Mutex<Vec<String>>>,
 }
 pub(super) fn start_docker(
     project: &Project,
@@ -33,6 +35,7 @@ pub(super) fn start_docker(
         healthcheck,
         connection,
         deadline,
+        cleanup_errors,
     } = options;
     let unique = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -61,6 +64,7 @@ pub(super) fn start_docker(
         value: String::new(),
         container: Some(name),
         project_root: project.root.clone(),
+        cleanup_errors,
     };
     while Instant::now() < deadline {
         if crate::process::cancelled() {
