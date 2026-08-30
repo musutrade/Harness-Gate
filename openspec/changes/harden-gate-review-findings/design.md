@@ -9,11 +9,12 @@ to read Git blobs, which do not follow filesystem links.
 
 ## Cancellation and Process Ownership
 
-Unix keeps the existing session/process-group implementation. Windows uses a
-Job Object with kill-on-close semantics so descendants cannot outlive the
-verification command. Secret and audit loops check the shared cancellation
-flag between files and return a typed cancellation error. Platform-specific
-tests cover descendant cleanup where the host supports it.
+Unix keeps the existing session/process-group implementation. Windows uses
+`taskkill /PID <pid> /T /F` to terminate the complete descendant tree, with a
+direct-kill fallback when the command is unavailable. Secret and audit loops
+check the shared cancellation flag between files and return a typed
+cancellation error. Platform-specific tests cover descendant cleanup where
+the host supports it.
 
 ## Compiled Configuration
 
