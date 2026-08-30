@@ -1,6 +1,6 @@
 # Proposal: Close Code-Review Follow-ups
 
-**Status:** Proposed
+**Status:** Implemented
 **Date:** 2026-08-30
 **Change type:** Verification observability, scope performance, and quality evidence
 
