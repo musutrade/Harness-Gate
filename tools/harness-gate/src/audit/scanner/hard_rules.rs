@@ -23,7 +23,7 @@ pub(crate) fn scan_files(
 
     let regexes = compile_regexes(&rule.patterns)?;
     let exclude_regexes = compile_regexes(&rule.exclude_patterns)?;
-    let allowlist = compile_allowlist(project_root, &rule.allowlist, &rule.name)?;
+    let allowlist = compile_allowlist(&rule.allowlist, &rule.name)?;
 
     let rule_name = rule.name.clone();
     let mut walk_builder = WalkBuilder::new(root_paths[0].clone());
