@@ -26,7 +26,7 @@
       "reports": {},
       "status": "pass",
       "stderr": "",
-      "stdout": "harness-gate 0.2.0\n"
+      "stdout": "harness-gate 0.3.1\n"
     },
     {
       "ansi": false,
@@ -56,7 +56,7 @@
       "reports": {},
       "status": "pass",
       "stderr": "",
-      "stdout": "Initialized preset \"generic\" in <PROJECT_ROOT>/.harness-gate\nNext: arc-flow --project-root <PROJECT_ROOT> config check\n"
+      "stdout": "Initialized preset \"generic\" in <PROJECT_ROOT>/.harness-gate\nNext: harness-gate --project-root <PROJECT_ROOT> config check\n"
     },
     {
       "ansi": false,
@@ -237,7 +237,7 @@
       },
       "status": "pass",
       "stderr": "",
-      "stdout": "arc-flow verify\nScope: all\nComponents: project\n\n[PASS] secret scan (<DURATION>)\n[PASS] architecture audit (<DURATION>)\n[RUN ] Git whitespace check ... PASS (<DURATION>)\n\nVerification report: <PROJECT_ROOT>/.harness-gate/reports/test_result.md\nTEST_SUMMARY: PASS\n"
+      "stdout": "harness-gate verify\nScope: all\nComponents: project\n\n[PASS] secret scan (<DURATION>)\n[PASS] architecture audit (<DURATION>)\n[RUN ] Git whitespace check ... PASS (<DURATION>)\n\nVerification report: <PROJECT_ROOT>/.harness-gate/reports/test_result.md\nTEST_SUMMARY: PASS\n"
     },
     {
       "ansi": false,
@@ -271,7 +271,7 @@
       },
       "status": "pass",
       "stderr": "",
-      "stdout": "arc-flow verify\nScope: all\nComponents: project\n\n[PASS] secret scan (<DURATION>)\n[PASS] architecture audit (<DURATION>)\n[RUN ] Git whitespace check ... PASS (<DURATION>)\n[RUN ] staged Git whitespace check ... PASS (<DURATION>)\n\nVerification report: <PROJECT_ROOT>/.harness-gate/reports/test_result.md\nTEST_SUMMARY: PASS\n"
+      "stdout": "harness-gate verify\nScope: all\nComponents: project\n\n[PASS] secret scan (<DURATION>)\n[PASS] architecture audit (<DURATION>)\n[RUN ] Git whitespace check ... PASS (<DURATION>)\n[RUN ] staged Git whitespace check ... PASS (<DURATION>)\n\nVerification report: <PROJECT_ROOT>/.harness-gate/reports/test_result.md\nTEST_SUMMARY: PASS\n"
     },
     {
       "ansi": false,
@@ -298,7 +298,7 @@
       },
       "status": "pass",
       "stderr": "",
-      "stdout": "arc-flow verify\nScope: all\nComponents: project\n\n[PASS] secret scan (<DURATION>)\n[PASS] architecture audit (<DURATION>)\n[RUN ] Git whitespace check ... FAIL (<DURATION>)\n       log: <PROJECT_ROOT>/.harness-gate/reports/logs/git_diff_check.log\n\nVerification report: <PROJECT_ROOT>/.harness-gate/reports/test_result.md\nTEST_SUMMARY: FAIL\n"
+      "stdout": "harness-gate verify\nScope: all\nComponents: project\n\n[PASS] secret scan (<DURATION>)\n[PASS] architecture audit (<DURATION>)\n[RUN ] Git whitespace check ... FAIL (<DURATION>)\n       log: <PROJECT_ROOT>/.harness-gate/reports/logs/git_diff_check.log\n\nVerification report: <PROJECT_ROOT>/.harness-gate/reports/test_result.md\nTEST_SUMMARY: FAIL\n"
     },
     {
       "ansi": false,
@@ -325,7 +325,7 @@
       },
       "status": "pass",
       "stderr": "",
-      "stdout": "arc-flow verify\nScope: components\nComponents: project\n\n[PASS] secret scan (<DURATION>)\n[PASS] architecture audit (<DURATION>)\n[RUN ] Git whitespace check ... PASS (<DURATION>)\n\nVerification report: <PROJECT_ROOT>/.harness-gate/reports/test_result.md\nTEST_SUMMARY: PASS\n"
+      "stdout": "harness-gate verify\nScope: components\nComponents: project\n\n[PASS] secret scan (<DURATION>)\n[PASS] architecture audit (<DURATION>)\n[RUN ] Git whitespace check ... PASS (<DURATION>)\n\nVerification report: <PROJECT_ROOT>/.harness-gate/reports/test_result.md\nTEST_SUMMARY: PASS\n"
     },
     {
       "ansi": false,

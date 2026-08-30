@@ -14,7 +14,7 @@ pub(super) fn generate_markdown(
     for rule in &config.hard_rules {
         let rule_violations: Vec<&Violation> = hard_violations
             .iter()
-            .filter(|v| v.rule_name.starts_with(&rule.name))
+            .filter(|v| v.rule_name == rule.name)
             .collect();
 
         let count = rule_violations.len();
@@ -72,22 +72,22 @@ pub(super) fn generate_markdown(
 }
 
 #[derive(Debug, Serialize)]
-struct JsonOccurrence {
+pub(super) struct JsonOccurrence {
     file: String,
     line: usize,
     content: String,
 }
 
 #[derive(Debug, Serialize)]
-struct JsonViolation {
-    rule: String,
-    severity: String,
-    count: usize,
-    occurrences: Vec<JsonOccurrence>,
+pub(super) struct JsonViolation {
+    pub(super) rule: String,
+    pub(super) severity: String,
+    pub(super) count: usize,
+    pub(super) occurrences: Vec<JsonOccurrence>,
 }
 
 #[derive(Debug, Serialize)]
-struct JsonArchViolation {
+pub(super) struct JsonArchViolation {
     rule: String,
     layer: String,
     count: usize,
@@ -105,9 +105,9 @@ pub(super) struct JsonSummary {
 
 #[derive(Debug, Serialize)]
 pub(super) struct JsonReport {
-    timestamp: String,
-    hard_violations: Vec<JsonViolation>,
-    arch_violations: Vec<JsonArchViolation>,
+    pub(super) timestamp: String,
+    pub(super) hard_violations: Vec<JsonViolation>,
+    pub(super) arch_violations: Vec<JsonArchViolation>,
     pub(super) summary: JsonSummary,
 }
 
@@ -120,7 +120,7 @@ pub(super) fn generate_report(
     for rule in &config.hard_rules {
         let rule_violations: Vec<&Violation> = hard_violations
             .iter()
-            .filter(|v| v.rule_name.starts_with(&rule.name))
+            .filter(|v| v.rule_name == rule.name)
             .collect();
 
         let occurrences: Vec<JsonOccurrence> = rule_violations

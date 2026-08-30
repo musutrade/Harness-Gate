@@ -6,7 +6,7 @@ use std::time::Duration;
 #[cfg(unix)]
 #[test]
 fn timeout_terminates_the_task() {
-    let log = std::env::temp_dir().join(format!("arc-flow-timeout-{}.log", std::process::id()));
+    let log = std::env::temp_dir().join(format!("harness-gate-timeout-{}.log", std::process::id()));
     let result = Task::new("timeout fixture", "sleep", Path::new("."), log.clone())
         .args(["5"])
         .timeout(0)
@@ -22,7 +22,7 @@ fn timeout_terminates_the_task() {
 #[cfg(unix)]
 #[test]
 fn task_can_remove_an_inherited_environment_variable() {
-    let log = std::env::temp_dir().join(format!("arc-flow-env-{}.log", std::process::id()));
+    let log = std::env::temp_dir().join(format!("harness-gate-env-{}.log", std::process::id()));
     let result = Task::new("environment fixture", "env", Path::new("."), log.clone())
         .env("HARNESS_GATE_REMOVE_FIXTURE", "must-not-leak")
         .env_remove("HARNESS_GATE_REMOVE_FIXTURE")
@@ -38,7 +38,7 @@ fn task_can_remove_an_inherited_environment_variable() {
 #[cfg(target_os = "linux")]
 #[test]
 fn task_runs_in_an_isolated_session() {
-    let log = std::env::temp_dir().join(format!("arc-flow-session-{}.log", std::process::id()));
+    let log = std::env::temp_dir().join(format!("harness-gate-session-{}.log", std::process::id()));
     let result = Task::new("session fixture", "sh", Path::new("."), log.clone())
         .args(["-c", "ps -o sid= -p $$"])
         .run()

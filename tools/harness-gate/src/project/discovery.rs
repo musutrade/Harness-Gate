@@ -115,7 +115,7 @@ fn find_root(start: &Path, config_override: Option<&Path>) -> Result<PathBuf> {
         .map(Path::to_path_buf)
         .ok_or_else(|| {
             anyhow::anyhow!(
-                "could not find project root above {}; expected {}; run `arc-flow init --preset <name>`",
+                "could not find project root above {}; expected {}; run `harness-gate init --preset <name>`",
                 start.display(),
                 DEFAULT_CONFIG_PATH
             )

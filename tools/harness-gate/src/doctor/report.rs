@@ -63,7 +63,7 @@ impl DoctorReport {
     }
 
     pub fn print(&self) {
-        println!("{}", ui::heading("arc-flow doctor"));
+        println!("{}", ui::heading("harness-gate doctor"));
         println!("Project: {}\n", self.project_root);
         for check in &self.checks {
             let marker = match check.level {
