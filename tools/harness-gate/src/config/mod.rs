@@ -23,3 +23,5 @@ pub use model::{
     ServiceConfig, StepConfig, UnmatchedScope, WebhookConfig, CONFIG_VERSION, DEFAULT_CONFIG_PATH,
 };
 pub use path::resolve_config_path;
+
+pub(crate) use scope::CompiledScopeRules;

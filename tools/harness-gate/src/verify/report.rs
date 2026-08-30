@@ -371,6 +371,9 @@ fn markdown(report: &VerificationReport) -> String {
         }
         output.push('\n');
     }
+    for step in &report.skipped_steps {
+        output.push_str(&format!("- SKIPPED: {} - {}\n", step.label, step.reason));
+    }
     output.push_str(&format!(
         "\nTEST_SUMMARY: {}\n",
         if report.passed { "PASS" } else { "FAIL" }
@@ -401,7 +404,8 @@ fn render_html(template: &str, report: &VerificationReport) -> String {
 
 fn junit(report: &VerificationReport) -> String {
     let failures = report.steps.iter().filter(|step| !step.passed).count();
-    let mut output = format!("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<testsuite name=\"harness-gate\" tests=\"{}\" failures=\"{}\">\n", report.steps.len(), failures);
+    let total = report.steps.len() + report.skipped_steps.len();
+    let mut output = format!("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<testsuite name=\"harness-gate\" tests=\"{}\" failures=\"{}\">\n", total, failures);
     for step in &report.steps {
         output.push_str(&format!(
             "  <testcase name=\"{}\" time=\"{:.3}\">",
@@ -415,6 +419,13 @@ fn junit(report: &VerificationReport) -> String {
             ));
         }
         output.push_str("</testcase>\n");
+    }
+    for step in &report.skipped_steps {
+        output.push_str(&format!(
+            "  <testcase name=\"{}\" time=\"0.000\"><skipped message=\"{}\"/></testcase>\n",
+            escape(&step.label),
+            escape(&step.reason)
+        ));
     }
     output.push_str("</testsuite>\n");
     output
@@ -448,7 +459,7 @@ mod tests {
     use crate::config::WebhookConfig;
     use crate::process::TaskResult;
     use crate::scope::ScopeResult;
-    use crate::verify::VerificationReport;
+    use crate::verify::{SkippedStep, VerificationReport};
     use std::io::{Read, Write};
     use std::net::TcpListener;
     use std::thread;
@@ -503,6 +514,7 @@ mod tests {
                 log: "logs/unit.log".into(),
                 detail: Some("exit code 1".into()),
             }],
+            skipped_steps: vec![],
             passed: false,
         }
     }
@@ -513,6 +525,21 @@ mod tests {
         assert!(output.contains("=== Verification report ==="));
         assert!(output.contains("TEST_SUMMARY: FAIL"));
         assert!(output.contains("logs/unit.log"));
+    }
+
+    #[test]
+    fn markdown_and_junit_expose_skipped_steps() {
+        let mut report = report();
+        report.skipped_steps.push(SkippedStep {
+            id: "dependent.tests".into(),
+            label: "dependent tests".into(),
+            reason: "blocked by a failed prerequisite".into(),
+        });
+        let markdown_output = markdown(&report);
+        assert!(markdown_output.contains("SKIPPED: dependent tests"));
+        let junit_output = junit(&report);
+        assert!(junit_output.contains("tests=\"2\" failures=\"1\""));
+        assert!(junit_output.contains("<skipped message=\"blocked by a failed prerequisite\"/>"));
     }
 
     #[test]

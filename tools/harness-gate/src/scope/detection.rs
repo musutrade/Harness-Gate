@@ -72,8 +72,7 @@ pub fn detect(project: &Project, mode: &ScopeMode) -> std::result::Result<ScopeR
     let changed_files = paths.into_iter().collect::<Vec<_>>();
     let (mut components, unmatched_files) = project
         .config
-        .classify_paths(&changed_files)
-        .map_err(ScopeError::configuration)?;
+        .classify_paths_with(&project.scope_rules, &changed_files);
     match project.config.scope.unmatched {
         UnmatchedScope::Fail if !unmatched_files.is_empty() => {
             return Err(ScopeError::UnmatchedFiles {
