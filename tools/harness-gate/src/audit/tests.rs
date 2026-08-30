@@ -708,3 +708,24 @@ fn log_parser_keeps_the_error_in_a_long_trace() {
         .iter()
         .any(|entry| entry["error"] == "retained root cause"));
 }
+
+#[test]
+fn log_parser_falls_back_to_the_last_thirty_raw_lines() {
+    let test_dir = TestDir::new("parse-unstructured-logs");
+    let input = test_dir.0.join("input.log");
+    let output = test_dir.0.join("output.log");
+    let logs = (0..40)
+        .map(|index| format!("unstructured line {index}"))
+        .collect::<Vec<_>>()
+        .join("\n");
+    fs::write(&input, logs).expect("write unstructured log fixture");
+
+    log_parser::extract_error_context(&input.to_string_lossy(), &output.to_string_lossy())
+        .expect("parse unstructured logs");
+    let extracted = fs::read_to_string(output).expect("read fallback output");
+    let lines = extracted.lines().collect::<Vec<_>>();
+
+    assert_eq!(lines.len(), 30);
+    assert_eq!(lines.first(), Some(&"unstructured line 10"));
+    assert_eq!(lines.last(), Some(&"unstructured line 39"));
+}
