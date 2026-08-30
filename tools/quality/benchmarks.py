@@ -8,6 +8,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
 from pathlib import Path
@@ -38,6 +39,13 @@ def init_fixture(destination: Path) -> None:
     subprocess.run(["git", "config", "user.email", "quality@example.invalid"], cwd=destination, check=True)
     subprocess.run(["git", "add", "."], cwd=destination, check=True)
     subprocess.run(["git", "commit", "--quiet", "-m", "fixture"], cwd=destination, check=True)
+
+
+def configure_interpreter(root: Path) -> None:
+    """Use the interpreter that launched this benchmark on every platform."""
+    flow = root / ".harness-gate" / "flow.toml"
+    interpreter = Path(sys.executable).name
+    flow.write_text(flow.read_text().replace('program = "python3"', f'program = "{interpreter}"'))
 
 
 def configure_execution(root: Path, parallel: bool) -> int:
@@ -174,6 +182,7 @@ def run(output: Path, samples: int, raw_dir: Path | None = None) -> int:
         with tempfile.TemporaryDirectory(prefix=f"harness-gate-quality-benchmark-{mode}-") as directory:
             root = Path(directory)
             init_fixture(root)
+            configure_interpreter(root)
             max_parallel = configure_execution(root, parallel)
             verification[mode] = [
                 verification_sample(binary, root, raw_root, index + 1, mode, max_parallel)

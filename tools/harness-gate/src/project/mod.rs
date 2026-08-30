@@ -4,7 +4,7 @@ mod runtime;
 #[cfg(test)]
 mod tests;
 
-use crate::config::FlowConfig;
+use crate::config::{CompiledScopeRules, FlowConfig};
 use std::collections::BTreeMap;
 use std::path::PathBuf;
 
@@ -19,4 +19,5 @@ pub struct Project {
     pub audit_config: PathBuf,
     pub secrets_config: PathBuf,
     aliases: BTreeMap<String, PathBuf>,
+    pub(crate) scope_rules: CompiledScopeRules,
 }
