@@ -6,13 +6,14 @@ on:
       - 'v*'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  build-and-release:
-    name: Build and Release
+  build:
+    name: Build (${{ matrix.target }})
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
@@ -43,24 +44,116 @@ jobs:
       - name: Build
         run: cargo build --manifest-path tools/harness-gate/Cargo.toml --locked --profile release-small --target ${{ matrix.target }}
 
-      - name: Rename artifact
+      - name: Stage release asset
+        shell: bash
+        run: cp tools/harness-gate/target/${{ matrix.target }}/release-small/${{ matrix.artifact_name }} ${{ matrix.asset_name }}
+
+      - name: Upload release asset
+        uses: actions/upload-artifact@v6
+        with:
+          name: release-${{ matrix.asset_name }}
+          path: ${{ matrix.asset_name }}
+          if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    name: Publish signed release
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Download release assets
+        uses: actions/download-artifact@v6
+        with:
+          pattern: release-*
+          path: dist
+          merge-multiple: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Generate SBOM
         shell: bash
         run: |
-          cp tools/harness-gate/target/${{ matrix.target }}/release-small/${{ matrix.artifact_name }} ${{ matrix.asset_name }}
+          set -euo pipefail
+          cargo metadata --manifest-path tools/harness-gate/Cargo.toml --locked --format-version 1 > /tmp/harness-gate-cargo-metadata.json
+          python tools/release/generate-sbom.py \
+            --metadata /tmp/harness-gate-cargo-metadata.json \
+            --lockfile tools/harness-gate/Cargo.lock \
+            --output dist/harness-gate.sbom.cdx.json
 
-      - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
+      - name: Generate checksum manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd dist && sha256sum harness-gate-* > SHA256SUMS)
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3.8.1
+
+      - name: Sign release metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in dist/harness-gate-* dist/SHA256SUMS; do
+            case "$file" in
+              *.sig|*.pem|*.crt) continue ;;
+            esac
+            cosign sign-blob --yes \
+              --output-signature "${file}.sig" \
+              --output-certificate "${file}.crt" \
+              "$file"
+          done
+
+      - name: Verify release metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd dist && sha256sum --check SHA256SUMS)
+          for file in dist/harness-gate-* dist/SHA256SUMS; do
+            case "$file" in
+              *.sig|*.pem|*.crt) continue ;;
+            esac
+            cosign verify-blob \
+              --signature "${file}.sig" \
+              --certificate "${file}.crt" \
+              --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+              --certificate-identity-regexp 'https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v.*' \
+              "$file"
+          done
+
+      - name: Attest release assets
+        uses: actions/attest-build-provenance@v2
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{ matrix.asset_name }}
-          asset_name: ${{ matrix.asset_name }}
-          tag: ${{ github.ref }}
-          overwrite: true
+          subject-path: |
+            dist/harness-gate-*
+            dist/SHA256SUMS
+
+      - name: Create immutable GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --verify-tag --generate-notes
+          fi
+          gh release upload "$TAG" dist/*
 
   publish-crate:
     name: Publish to crates.io
     runs-on: ubuntu-latest
-    needs: build-and-release
+    needs: publish
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v5
 
@@ -68,4 +161,4 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Publish
-        run: cargo publish --manifest-path tools/harness-gate/Cargo.toml --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish --manifest-path tools/harness-gate/Cargo.toml --locked --token ${{ secrets.CARGO_REGISTRY_TOKEN }}

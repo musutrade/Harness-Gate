@@ -141,7 +141,22 @@ def run(output: Path) -> int:
         } <= required
     except (OSError, json.JSONDecodeError, TypeError):
         machine_schema_valid = False
-    result = {**metadata(tool="docs-consistency"), "link_failures": link_failures, "examples": examples, "migration": {"path": str(migration_fixture.relative_to(ROOT)), "status": "pass" if migration_checked else "fail"}, "schema_synced": schema_synced, "machine_schema_valid": machine_schema_valid, "status": "pass" if not link_failures and schema_synced and machine_schema_valid and migration_checked and all(item["status"] == "pass" for item in examples) else "fail"}
+    manifest_schema = ROOT / "schema" / "artifact-manifest.schema.json"
+    manifest_schema_valid = False
+    try:
+        manifest_data = json.loads(manifest_schema.read_text())
+        manifest_required = set(manifest_data.get("required", []))
+        artifact_required = set(
+            manifest_data.get("definitions", {}).get("artifact", {}).get("required", [])
+        )
+        manifest_schema_valid = (
+            manifest_data.get("properties", {}).get("schema_version", {}).get("const") == "1"
+            and {"schema_version", "invocation_id", "generated_at", "artifacts"} <= manifest_required
+            and {"path", "kind", "size_bytes", "sha256"} <= artifact_required
+        )
+    except (OSError, json.JSONDecodeError, TypeError):
+        manifest_schema_valid = False
+    result = {**metadata(tool="docs-consistency"), "link_failures": link_failures, "examples": examples, "migration": {"path": str(migration_fixture.relative_to(ROOT)), "status": "pass" if migration_checked else "fail"}, "schema_synced": schema_synced, "machine_schema_valid": machine_schema_valid, "manifest_schema_valid": manifest_schema_valid, "status": "pass" if not link_failures and schema_synced and machine_schema_valid and manifest_schema_valid and migration_checked and all(item["status"] == "pass" for item in examples) else "fail"}
     write_json(output, result)
     if result["status"] != "pass":
         fail("documentation, examples, or schema synchronization failed")

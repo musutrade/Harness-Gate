@@ -39,7 +39,8 @@ The source assessment is recorded in the working-tree document
    versioned, tested contracts:
    - runner arguments, environment snapshots, and explicit shared/schema/
      database isolation;
-   - invocation-scoped reports, logs, and artifact manifests;
+   - invocation-scoped reports, logs, artifact manifests, SHA-256 digests, and
+     redaction/retention boundaries;
    - cross-process resource identity, leases, heartbeats, and owner recovery;
    - one result schema with stable IDs, status/error semantics, and evidence
      integrity; and
@@ -122,6 +123,7 @@ first canary has green cross-platform and evidence-integrity checks.
 
 - [OpenSpec: Harness-Gate and DevRail capability contracts](../../openspec/changes/harness-gate-devrail-capability-contracts/proposal.md)
 - [Machine-result JSON Schema](../../schema/machine-result.schema.json)
+- [Artifact manifest JSON Schema](../../schema/artifact-manifest.schema.json)
 - [ADR-0031: Harden Gate Boundaries and Delivery Contracts](0031-harden-gate-boundaries.md)
 - [ADR-0025: Phase 1 Quality Baseline Gates](0025-phase-1-quality-baseline-gates.md)
 - [ADR-0028: Dependency-Aware Parallel Scheduling](0028-parallel-scheduling.md)
