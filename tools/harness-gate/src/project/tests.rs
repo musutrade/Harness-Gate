@@ -20,6 +20,18 @@ fn preparation_does_not_change_the_process_working_directory() {
     );
 }
 
+#[test]
+fn invocation_reports_resolve_their_stable_invocation_id() {
+    let workspace = TestWorkspace::new("project-invocation-id");
+    crate::preset::init(&workspace.root, "generic", false).expect("initialize fixture");
+    let project = Project::discover(Some(workspace.root.clone()), None).expect("discover fixture");
+    let mut invocation = project.clone();
+    invocation.reports = project.reports.join("invocations/inv-test");
+
+    assert_eq!(invocation.invocation_id(), "inv-test");
+    assert!(project.invocation_id().starts_with("standalone-"));
+}
+
 #[cfg(unix)]
 #[test]
 fn repository_path_rejects_symlink_escape() {

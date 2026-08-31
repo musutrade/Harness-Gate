@@ -58,9 +58,10 @@ impl Project {
             root,
             config_path,
             config,
-            reports,
+            reports: reports.clone(),
             audit_config,
             secrets_config,
+            resource_leases: reports.join("leases"),
             aliases,
             scope_rules,
         };

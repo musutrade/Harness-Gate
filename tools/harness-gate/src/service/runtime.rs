@@ -14,13 +14,18 @@ pub(crate) trait ContainerRuntime {
     fn start_container(
         &self,
         project: &Project,
-        name: &str,
-        image: &str,
-        environment: &BTreeMap<String, String>,
-        container_port: u16,
+        options: ContainerStartOptions<'_>,
         timeout: Duration,
     ) -> Result<()> {
-        let args = start_container_args(name, image, environment, container_port);
+        let name = options.name;
+        let image = options.image;
+        let args = start_container_args(
+            name,
+            image,
+            options.environment,
+            options.labels,
+            options.container_port,
+        );
         let output = crate::process::capture(self.executable(), &args, &project.root, timeout)
             .with_context(|| format!("start {} container {name:?}", self.executable()))?;
         if !output.status.success() {
@@ -96,6 +101,23 @@ pub(crate) trait ContainerRuntime {
     }
 }
 
+pub(crate) struct ContainerStartOptions<'a> {
+    pub(crate) name: &'a str,
+    pub(crate) image: &'a str,
+    pub(crate) environment: &'a BTreeMap<String, String>,
+    pub(crate) labels: &'a BTreeMap<String, String>,
+    pub(crate) container_port: u16,
+}
+
+pub(crate) fn stop_owned_container(
+    runtime: ContainerRuntimeKind,
+    cwd: &Path,
+    name: &str,
+    timeout: Duration,
+) -> Result<()> {
+    runtime.stop_container(cwd, name, timeout)
+}
+
 impl ContainerRuntime for ContainerRuntimeKind {
     fn executable(&self) -> &'static str {
         match self {
@@ -109,6 +131,7 @@ fn start_container_args(
     name: &str,
     image: &str,
     environment: &BTreeMap<String, String>,
+    labels: &BTreeMap<String, String>,
     container_port: u16,
 ) -> Vec<String> {
     let mut args = vec![
@@ -121,6 +144,9 @@ fn start_container_args(
     ];
     for (key, value) in environment {
         args.extend(["--env".into(), format!("{key}={value}")]);
+    }
+    for (key, value) in labels {
+        args.extend(["--label".into(), format!("{key}={value}")]);
     }
     args.extend([
         "--publish".into(),
@@ -170,7 +196,13 @@ mod tests {
             ("ALPHA".to_string(), "first".to_string()),
         ]);
         assert_eq!(
-            start_container_args("fixture", "postgres:16", &environment, 5432),
+            start_container_args(
+                "fixture",
+                "postgres:16",
+                &environment,
+                &BTreeMap::new(),
+                5432
+            ),
             vec![
                 "run",
                 "--rm",
