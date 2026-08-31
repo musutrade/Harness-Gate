@@ -4,7 +4,7 @@
 [trust-boundaries specification](specs/trust-boundaries/spec.md), and
 [ADR-0034](../../../docs/adr/0034-fail-closed-trust-boundaries.md)
 **Status:** Implemented; acceptance evidence reviewed against PR #60 and CI
-run `33429874357` on 2026-08-31.
+run `33434212725` on 2026-08-31.
 
 Tasks are bounded to less than four hours. A task is checked only after its
 focused tests pass and its acceptance evidence is reviewable.
@@ -80,7 +80,7 @@ focused tests pass and its acceptance evidence is reviewable.
 
 Implementation is delivered in pull request
 [#60](https://github.com/musutrade/Harness-Gate/pull/60). CI run
-[33429874357](https://github.com/musutrade/Harness-Gate/actions/runs/33429874357)
+[33434212725](https://github.com/musutrade/Harness-Gate/actions/runs/33434212725)
 passed the Linux, macOS, and Windows test matrices, CLI contracts, performance
 baseline, release inventory, and Required Quality Aggregate. Local verification
 also passed 215 Rust unit tests, 17 CLI contract tests, 11 integration tests,

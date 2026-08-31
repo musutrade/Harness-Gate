@@ -321,7 +321,7 @@ evidence was reviewed before accepting this ADR:
   formatting, strict Clippy, staged-hook verification, and the ten release
   inventory tests pass;
 - CI run
-  [33429874357](https://github.com/musutrade/Harness-Gate/actions/runs/33429874357)
+  [33434212725](https://github.com/musutrade/Harness-Gate/actions/runs/33434212725)
   passes the Linux, macOS, and Windows matrices, CLI contracts, performance
   baseline, release inventory, and Required Quality Aggregate checks; and
 - public documentation contains no unsupported OS-sandbox or complete-process-
