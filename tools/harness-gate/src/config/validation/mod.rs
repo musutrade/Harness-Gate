@@ -655,6 +655,8 @@ fn infer_error_path(config: &FlowConfig, error: &str) -> String {
 fn diagnostic_id(error: &str) -> &'static str {
     if error.contains("unsupported workflow config version") {
         "HGCFG-VERSION"
+    } else if error.contains("runner version") {
+        "HGCFG-RUNNER-VERSION"
     } else if error.contains("cycle") {
         "HGCFG-DEPENDENCY-CYCLE"
     } else if error.contains("dependenc") {
@@ -703,6 +705,14 @@ fn redact_error(error: &str) -> String {
 fn repair_help(error: &str) -> String {
     if error.contains("unsupported workflow config version") {
         "migrate a v1 file with `harness-gate config migrate` or use version 2".into()
+    } else if error.contains("remove runner threads_env") {
+        "remove the runner's threads_env name from remove_env".into()
+    } else if error.contains("runner") && error.contains("isolation") {
+        "declare schema-per-worker or database-per-worker isolation for concurrent tests".into()
+    } else if error.contains("runner") && error.contains("threads_env") {
+        "declare threads_env with threads, or use the cargo-test runner kind".into()
+    } else if error.contains("runner version") {
+        "use the supported runner contract version".into()
     } else if error.contains("cycle") || error.contains("dependenc") {
         "remove the invalid dependency or add an explicit acyclic prerequisite".into()
     } else if error.contains("multiple services injecting") {
@@ -1212,6 +1222,27 @@ fn infer_step_error_path(
     }
     if error.contains("remove service injection") {
         return format!("{base}.remove_env");
+    }
+    if error.contains("runner version") {
+        return format!("{base}.runner.version");
+    }
+    if error.contains("runner kind") {
+        return format!("{base}.runner.kind");
+    }
+    if error.contains("requires threads_env") || error.contains("runner threads_env") {
+        return format!("{base}.runner.threads_env");
+    }
+    if error.contains("runner threads") {
+        return format!("{base}.runner.threads");
+    }
+    if error.contains("runner args_position") {
+        return format!("{base}.runner.args_position");
+    }
+    if error.contains("runner shared isolation") {
+        return format!("{base}.runner.isolation");
+    }
+    if error.contains("cargo-test runner") {
+        return format!("{base}.runner.kind");
     }
     if error.contains("gate_type") {
         return format!("{base}.gate_type");

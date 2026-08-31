@@ -558,6 +558,80 @@
       },
       "additionalProperties": false
     },
+    "RunnerConfig": {
+      "description": "Declares how a test runner receives concurrency and result-contract inputs.",
+      "type": "object",
+      "required": [
+        "isolation",
+        "kind",
+        "version"
+      ],
+      "properties": {
+        "args": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "args_position": {
+          "description": "Insert runner arguments at this index in the configured step arguments. When omitted, arguments are appended.",
+          "default": null,
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint",
+          "minimum": 0.0
+        },
+        "isolation": {
+          "$ref": "#/definitions/TestIsolation"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "result_format": {
+          "default": "regex",
+          "allOf": [
+            {
+              "$ref": "#/definitions/RunnerResultFormat"
+            }
+          ]
+        },
+        "threads": {
+          "default": null,
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint",
+          "maximum": 256.0,
+          "minimum": 1.0
+        },
+        "threads_env": {
+          "default": null,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "version": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        }
+      },
+      "additionalProperties": false
+    },
+    "RunnerResultFormat": {
+      "type": "string",
+      "enum": [
+        "regex",
+        "junit",
+        "trx",
+        "json"
+      ]
+    },
     "ScopeConfig": {
       "type": "object",
       "required": [
@@ -803,6 +877,18 @@
             "type": "string"
           }
         },
+        "runner": {
+          "description": "Optional versioned test-runner contract. Omitted for legacy steps.",
+          "default": null,
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RunnerConfig"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "services": {
           "default": [],
           "type": "array",
@@ -825,6 +911,14 @@
         }
       },
       "additionalProperties": false
+    },
+    "TestIsolation": {
+      "type": "string",
+      "enum": [
+        "shared",
+        "schema-per-worker",
+        "database-per-worker"
+      ]
     },
     "UnmatchedScope": {
       "type": "string",

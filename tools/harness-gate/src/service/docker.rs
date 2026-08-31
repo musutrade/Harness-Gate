@@ -1,7 +1,8 @@
 use super::{remaining, RunningService};
 use crate::config::ContainerRuntimeKind;
 use crate::project::Project;
-use crate::service::runtime::ContainerRuntime;
+use crate::service::runtime::{ContainerRuntime, ContainerStartOptions};
+use crate::service::ResourceLease;
 use anyhow::{bail, Result};
 use std::collections::BTreeMap;
 use std::sync::{Arc, Mutex};
@@ -19,6 +20,7 @@ pub(super) struct DockerStartOptions {
     pub(super) connection: String,
     pub(super) deadline: Instant,
     pub(super) cleanup_errors: Arc<Mutex<Vec<String>>>,
+    pub(super) invocation_id: String,
 }
 pub(super) fn start_docker(
     project: &Project,
@@ -36,6 +38,7 @@ pub(super) fn start_docker(
         connection,
         deadline,
         cleanup_errors,
+        invocation_id,
     } = options;
     let unique = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -46,14 +49,29 @@ pub(super) fn start_docker(
         project.config.project.name,
         std::process::id()
     );
+    let lease = ResourceLease::acquire(
+        project,
+        format!("service:{id}"),
+        "container",
+        invocation_id.clone(),
+        Some(name.clone()),
+        Some(runtime),
+    )?;
     let executable = runtime.executable();
     runtime
         .start_container(
             project,
-            &name,
-            &image,
-            &environment,
-            container_port,
+            ContainerStartOptions {
+                name: &name,
+                image: &image,
+                environment: &environment,
+                labels: &std::collections::BTreeMap::from([
+                    ("harness-gate.owner".to_string(), "harness-gate".to_string()),
+                    ("harness-gate.resource".to_string(), format!("service:{id}")),
+                    ("harness-gate.invocation".to_string(), invocation_id),
+                ]),
+                container_port,
+            },
             remaining(deadline)?,
         )
         .map_err(|error| anyhow::anyhow!("start {executable} service {id:?}: {error:#}"))?;
@@ -65,8 +83,12 @@ pub(super) fn start_docker(
         container: Some(name),
         project_root: project.root.clone(),
         cleanup_errors,
+        lease: Some(lease),
     };
     while Instant::now() < deadline {
+        if let Some(lease) = &running.lease {
+            lease.renew()?;
+        }
         if crate::process::cancelled() {
             bail!("verification cancelled while waiting for service {id:?}");
         }

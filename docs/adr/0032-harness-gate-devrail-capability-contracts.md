@@ -39,7 +39,8 @@ The source assessment is recorded in the working-tree document
    versioned, tested contracts:
    - runner arguments, environment snapshots, and explicit shared/schema/
      database isolation;
-   - invocation-scoped reports, logs, and artifact manifests;
+   - invocation-scoped reports, logs, artifact manifests, SHA-256 digests, and
+     redaction/retention boundaries;
    - cross-process resource identity, leases, heartbeats, and owner recovery;
    - one result schema with stable IDs, status/error semantics, and evidence
      integrity; and
@@ -115,12 +116,19 @@ The source assessment is recorded in the working-tree document
 
 The OpenSpec change linked below defines the contract schemas, implementation
 tasks, compatibility launcher, shadow/canary evidence, and rollback procedure.
+The invocation manifest, redaction, retention, checksum, SBOM, signature, and
+provenance implementation is covered by the green branch CI
+[run 33348751556](https://github.com/musutrade/Harness-Gate/actions/runs/33348751556).
+The tag-triggered release workflow still requires a real release run to attach
+clean-environment verification evidence.
 This ADR remains **Proposed** until the P0 contracts are implemented and the
 first canary has green cross-platform and evidence-integrity checks.
 
 ## Related
 
 - [OpenSpec: Harness-Gate and DevRail capability contracts](../../openspec/changes/harness-gate-devrail-capability-contracts/proposal.md)
+- [Machine-result JSON Schema](../../schema/machine-result.schema.json)
+- [Artifact manifest JSON Schema](../../schema/artifact-manifest.schema.json)
 - [ADR-0031: Harden Gate Boundaries and Delivery Contracts](0031-harden-gate-boundaries.md)
 - [ADR-0025: Phase 1 Quality Baseline Gates](0025-phase-1-quality-baseline-gates.md)
 - [ADR-0028: Dependency-Aware Parallel Scheduling](0028-parallel-scheduling.md)

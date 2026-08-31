@@ -286,6 +286,21 @@ default = []
 }
 
 #[test]
+fn test_cleanup_dry_run_writes_machine_readable_evidence() {
+    let ctx = TestContext::new();
+    assert_success(&ctx.run_harness_gate(&["init", "--preset", "generic"]));
+
+    let output = ctx.run_harness_gate(&["cleanup", "--dry-run", "--json"]);
+    assert_success(&output);
+    let report: serde_json::Value =
+        serde_json::from_slice(&output.stdout).expect("cleanup JSON output");
+    assert_eq!(report["schema_version"], 1);
+    assert_eq!(report["owner_marker"], "harness-gate");
+    assert_eq!(report["dry_run"], true);
+    assert!(ctx.file_exists(".harness-gate/reports/cleanup.json"));
+}
+
+#[test]
 fn test_color_always_styles_human_readable_output() {
     let ctx = TestContext::new();
     ctx.write_file(

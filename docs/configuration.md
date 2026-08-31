@@ -227,6 +227,43 @@ max_parallel = 4
 报告使用 `SKIPPED` 行，JUnit 报告使用 `<skipped>` testcase。被跳过的节点不会被计为
 已执行失败，但会使整个验证结果保持失败。
 
+## 6.1 `[[steps]].runner`
+
+步骤可以声明一个版本化的测试 runner 契约。省略 `runner` 时保持旧版步骤行为；声明后，
+runner 的有效参数和线程环境会写入该步骤的机器结果摘要：
+
+```toml
+[[steps]]
+id = "backend.tests"
+label = "backend tests"
+component = "backend"
+profiles = ["full"]
+program = "cargo"
+args = ["test", "--manifest-path", "backend/Cargo.toml"]
+cwd = "{root}"
+log = "backend_tests.log"
+timeout_secs = 300
+
+runner = { version = 1, kind = "cargo-test", threads = 4,
+           result_format = "junit", isolation = "schema-per-worker" }
+```
+
+| 字段 | 必需 | 说明 |
+| --- | --- | --- |
+| `version` | 是 | runner 契约版本，当前为 `1` |
+| `kind` | 是 | runner 类型 ID；`cargo-test` 要求 `program = "cargo"` |
+| `threads` | 否 | runner worker 数，范围 1 到 256；`cargo-test` 会生成 `-- --test-threads N` |
+| `threads_env` | 否 | 将线程数注入子进程的环境变量；设置时必须同时设置 `threads` |
+| `args` | 否 | runner 专用参数 |
+| `args_position` | 否 | 将 `args` 插入原始步骤参数的索引；省略时追加 |
+| `result_format` | 否 | `regex`（默认）、`junit`、`trx` 或 `json`；标准结果解析契约仍在逐步建设 |
+| `isolation` | 是 | `shared`、`schema-per-worker` 或 `database-per-worker` |
+
+`threads > 1` 时不能使用 `shared` 隔离；非 `cargo-test` runner 还必须声明 `threads_env`，
+否则 `config check` 会在启动 service 或 worker 前失败。隔离声明目前用于验证和证据记录，
+不会自动创建数据库 schema；schema/database 的初始化、锁和清理由后续 runner adapter 提供。
+不要通过字符串拼接或未声明的环境变量修改测试线程参数。
+
 ## 7. `[policy]`
 
 ```toml
@@ -304,6 +341,27 @@ service = "test-postgres"
 ```
 
 `path_type` 可取 `any`、`file`、`directory`，默认 `any`。命令、Git 配置、remote 和 service 探测都受 `timeout_secs` 约束，超时时会终止整个子进程组。CI 中通常使用 `harness-gate doctor --strict`，把 WARN 也视为失败。
+
+### 8.1 资源租约和孤儿回收
+
+管理型 Docker/Podman service 和 invocation 报告目录会在
+`<reports>/leases/` 写入带 `owner_marker = "harness-gate"` 的 JSON 租约。租约
+包含 `schema_version`、稳定 `resource_id`、`resource_kind`、
+`invocation_id`、PID、进程启动身份、创建/心跳/过期时间；容器租约还记录
+runtime 和容器名。文件以原子 `create_new` 抢占，续租和释放会校验完整 owner
+身份，避免 PID 重用或并发调用误删资源。
+
+```bash
+# 只观察，不停止容器或删除租约
+harness-gate cleanup --dry-run --json
+
+# 回收已死亡或已过期的 Harness-Gate 租约
+harness-gate cleanup --json
+```
+
+每次清理都会在报告根目录生成 `cleanup.json`。`dry-run` 只列出带合法
+Harness-Gate marker 的记录；未知 marker、损坏记录和活动 owner 永不回收。
+容器停止失败会保留租约并返回非零状态，便于 CI 重试或人工处置。
 
 ## 9. `[services.*]`
 
@@ -733,7 +791,9 @@ harness-gate verify --all
 
 ### 报告模板、JUnit 和通知
 
-HTML 模板和 JUnit 输出是可选的；默认 JSON/Markdown 文件保持不变：
+HTML 模板和 JUnit 输出是可选的。每次验证的规范证据写入
+`<reports>/invocations/<invocation_id>/`，包括 `invocation.json`、`scope.json`、步骤日志和报告；
+为兼容现有消费者，`test_result.json` 与 `test_result.md` 仍会镜像到报告根目录：
 
 ```toml
 [report_templates]
@@ -750,6 +810,21 @@ junit = "junit.xml"
 完整的 `report` 对象及其 `timestamp`、`profile`、`scope`、`steps` 和 `passed` 字段。输出固定为报告目录中的 `test_result.html`。`junit` 路径相对于报告目录，
 必须是报告目录内的 `.xml` 文件名或子路径；运行时还会检查现有目录和符号链接不会把输出重定向到目录外。
 模板输入仍是只读且受路径隔离校验。
+规范报告和日志先写入临时同级文件，再通过原子 rename 发布；失败会使本次验证返回报告错误。
+
+`test_result.json` 使用仓库中的 [machine-result schema](../schema/machine-result.schema.json)（当前版本 `1`）。
+顶层和步骤状态使用 `PASS`、`FAIL`、`SKIPPED`、`CANCELLED` 等稳定值，并提供 attempts、结构化 failures、
+invocation-relative artifacts 及 `evidence_complete`；集成方不应从 Markdown 或日志内容推断门禁状态。
+
+每次 invocation 还会生成 `manifest.json`，格式见 [artifact manifest schema](../schema/artifact-manifest.schema.json)。
+清单列出 invocation 目录内除清单自身外的每个普通文件、相对路径、类型、字节数和 SHA-256；路径越界、文件
+被修改或摘要不一致都会使报告发布失败。日志、报告和通知中的文本会统一脱敏，包含授权/Cookie 请求头、
+Bearer/Basic 凭据、API key、密码、私钥块及常见数据库连接串的值都不会导出。默认保留最新 50 个 invocation；
+仅清理超过 15 分钟租约窗口且超出数量上限的旧目录，活动或最近修改的 invocation 不会被清理。
+
+发布二进制同时提供 `SHA256SUMS`、CycloneDX SBOM 以及 Sigstore `.sig`/`.crt` 文件。离线升级时应先运行
+`sha256sum --check SHA256SUMS`，再按 README 中的 `cosign verify-blob` 命令校验二进制和 SBOM；任意字节
+被修改都会导致摘要或签名校验失败。发布资产不覆盖旧文件，替换必须使用新的版本 tag。
 
 ### 容器运行时和 Webhook
 

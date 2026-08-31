@@ -77,6 +77,24 @@ sudo mv harness-gate-linux-amd64 /usr/local/bin/harness-gate
 harness-gate --version
 ```
 
+Release assets include `SHA256SUMS`, a CycloneDX SBOM, and Sigstore bundles. For
+an offline integrity check, download the binary, `SHA256SUMS`, and the matching
+`.sig`/`.crt` files, then run:
+
+```bash
+sha256sum --check SHA256SUMS
+cosign verify-blob --signature harness-gate-linux-amd64.sig \
+  --certificate harness-gate-linux-amd64.crt \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+  --certificate-identity-regexp 'https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v.*' \
+  harness-gate-linux-amd64
+```
+
+Verify `harness-gate.sbom.cdx.json` with its corresponding signature as well;
+the SBOM records the source commit, Cargo.lock digest, and Rust toolchain used
+for the build. Published release assets are immutable: a replacement requires
+a new version tag and a new attestation.
+
 ### Install from Source
 
 ```bash
@@ -118,6 +136,7 @@ Initialize in target project:
 harness-gate --project-root /path/to/new-project init --preset rust-api
 harness-gate --project-root /path/to/new-project config check
 harness-gate --project-root /path/to/new-project doctor
+harness-gate --project-root /path/to/new-project cleanup --dry-run
 harness-gate --project-root /path/to/new-project verify --all
 ```
 
@@ -154,6 +173,7 @@ Presets are starting points, not runtime branches. After initialization is compl
 | `harness-gate presets`                                       | List built-in project presets             |
 | `harness-gate init --preset <name>`                          | Generate schema v2 configuration          |
 | `harness-gate doctor [--strict] [--json]`                    | Execute environment checks declared in config |
+| `harness-gate cleanup [--dry-run] [--json]`                 | Inspect or reclaim stale resource leases  |
 | `harness-gate scope [--staged\|--base REF\|--all] [--json]`  | List changes and selected components      |
 | `harness-gate secrets [--staged] [--json]`                   | Scan high-confidence credential patterns, only output matched filenames |
 | `harness-gate audit [--json]`                                | Execute regex architecture rules and generate audit report |
@@ -169,6 +189,14 @@ Presets are starting points, not runtime branches. After initialization is compl
 | `harness-gate parse-logs`                                    | Extract JSON Lines ERROR trace context    |
 
 All commands support global `--project-root <PATH>` and `--config <PATH>`. Commands return 0 on success; configuration errors, gate failures, step failures, timeouts or interrupts return non-zero, suitable for direct use in CI.
+
+`cleanup --dry-run` is safe to run before a retry or on a shared CI host. It
+only lists lease records carrying the `harness-gate` owner marker and writes
+the structured observation to `<reports>/cleanup.json`. Without `--dry-run`,
+only stale marked leases are reclaimed; unknown files and active owners are
+left untouched. A container is stopped only when its lease records both the
+runtime and container name, and a failed stop remains a blocking cleanup
+failure for a later retry.
 
 Interactive `verify` renders a progress bar and colored pass/warning/failure markers. Output stays plain when redirected or in CI. Use `--color auto` (default), `--color always`, or `--color never`; `NO_COLOR` disables automatic color.
 
@@ -335,11 +363,27 @@ Whether successful or failed, it is recommended to upload the `[paths].reports` 
 
 ## Reports and Notifications
 
-Every verification keeps the compatible `test_result.json` and `test_result.md` files. A repository-contained
-HTML template can additionally produce `test_result.html`, and `report_templates.junit` can write JUnit XML
-under the report directory. HTML templates use Tera and support `include`, `extends`, and `block`; the full
-serialized report is available as `report` alongside the legacy direct fields. Report output paths are
-containment-checked, including existing symlinks.
+Every verification writes canonical evidence below `reports/invocations/<invocation_id>/`, including
+`invocation.json`, `scope.json`, step logs, and the machine/human reports. The compatible
+`test_result.json` and `test_result.md` files are mirrored at the report root for existing consumers. A
+repository-contained HTML template can additionally produce `test_result.html`, and `report_templates.junit`
+can write JUnit XML under the invocation directory. HTML templates use Tera and support `include`, `extends`,
+and `block`; the full serialized report is available as `report` alongside the legacy direct fields. Report
+output paths are containment-checked, including existing symlinks, and published files use temporary-file plus
+atomic-rename semantics.
+
+`test_result.json` follows the versioned [machine-result schema](https://github.com/musutrade/Harness-Gate/blob/main/schema/machine-result.schema.json). It keeps
+the legacy `passed` field while exposing stable `status` values, per-step `attempts`, structured `failures`,
+invocation-relative `artifacts`, and `evidence_complete`; consumers should use `status` and these structured
+fields instead of parsing Markdown or log text.
+
+Each invocation also publishes `manifest.json`, described by the [artifact manifest schema](https://github.com/musutrade/Harness-Gate/blob/main/schema/artifact-manifest.schema.json).
+It lists every invocation-local evidence file (excluding the manifest itself) with its relative path, byte size,
+kind, and SHA-256 digest. Re-running verification against a modified file fails manifest verification. Text evidence
+is redacted before publication: authorization and cookie headers, bearer/basic credentials, API keys, passwords,
+private-key blocks, and common database connection strings are replaced with `[REDACTED]`. The default retention
+policy keeps the newest 50 invocation directories and only removes older directories after the 15-minute lease
+window; active or recently modified invocations are retained.
 
 Optional `[[notifications.webhooks]]` entries send the serialized report to HTTP(S) endpoints after all report
 files are written. `on_failure` defaults to `true`, `on_success` defaults to `false`; a non-2xx response or

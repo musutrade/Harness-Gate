@@ -74,6 +74,17 @@ fn service_failure_does_not_skip_unrelated_steps() {
         .steps
         .iter()
         .any(|step| step.label == "staged Git whitespace check" && step.passed));
+    let json: serde_json::Value = serde_json::from_slice(
+        &fs::read(
+            workspace
+                .root
+                .join(".harness-gate/reports/test_result.json"),
+        )
+        .expect("read verification report"),
+    )
+    .expect("parse verification report");
+    assert_eq!(json["services"][0]["id"], "missing-service");
+    assert_eq!(json["services"][0]["status"], "CLEANED");
 }
 
 #[cfg(unix)]
@@ -197,6 +208,7 @@ fn failed_external_node_blocks_only_its_descendants() {
         depends_on: vec![],
         kind: None,
         gate_type: None,
+        runner: None,
     });
 
     let report = run(&project, ScopeResult::all(&project), "full", false)
@@ -291,6 +303,32 @@ fn non_zero_step_retains_exit_detail_and_log() {
     assert!(!step.passed);
     assert_eq!(step.detail.as_deref(), Some("exit code 7"));
     assert!(PathBuf::from(&step.log).is_file());
+    assert!(workspace
+        .root
+        .join(".harness-gate/reports/test_result.json")
+        .is_file());
+}
+
+#[test]
+fn verification_runs_use_distinct_invocation_evidence_directories() {
+    let (workspace, project) = generic_project("verify-invocations");
+    let first =
+        run(&project, ScopeResult::all(&project), "full", false).expect("first verification");
+    let second =
+        run(&project, ScopeResult::all(&project), "full", false).expect("second verification");
+
+    assert_ne!(first.invocation_id, second.invocation_id);
+    for report in [&first, &second] {
+        let directory = PathBuf::from(&report.report_directory);
+        assert!(directory.is_dir(), "invocation directory should exist");
+        assert!(directory.join("invocation.json").is_file());
+        assert!(directory.join("test_result.json").is_file());
+        assert!(report.steps.iter().all(|step| {
+            step.step_id.is_some()
+                && step.invocation_id.as_deref() == Some(report.invocation_id.as_str())
+                && step.attempt == Some(1)
+        }));
+    }
     assert!(workspace
         .root
         .join(".harness-gate/reports/test_result.json")

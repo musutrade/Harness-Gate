@@ -56,7 +56,7 @@ pub(super) fn primary_failure<'a>(
 }
 
 enum WorkerResult {
-    Completed(TaskResult),
+    Completed(Box<TaskResult>),
     Failed(SchedulerError),
 }
 
@@ -162,7 +162,7 @@ pub(super) fn run_plan<'a>(
                 .find(|candidate| candidate.id == node_id)
                 .expect("worker node remains in plan");
             let task_result = match worker_result {
-                WorkerResult::Completed(result) => result,
+                WorkerResult::Completed(result) => *result,
                 WorkerResult::Failed(error) => {
                     warmup_cancelled.store(true, std::sync::atomic::Ordering::Release);
                     let task_result = failed_task_result(node, &error, project);
@@ -256,7 +256,7 @@ fn execute_node<'a>(
         PlanNodeKind::External => run_external_step(project, node, services),
     };
     match result {
-        Ok(task_result) => WorkerResult::Completed(task_result),
+        Ok(task_result) => WorkerResult::Completed(Box::new(task_result)),
         Err(error) => WorkerResult::Failed(error),
     }
 }
@@ -280,6 +280,11 @@ fn failed_task_result(
         PlanNodeKind::External => node.step.map(|step| step.log.clone()).unwrap_or_default(),
     };
     TaskResult {
+        step_id: None,
+        invocation_id: None,
+        attempt: None,
+        started_at: None,
+        finished_at: None,
         label: node.label.clone(),
         passed: false,
         timed_out: false,
@@ -287,6 +292,7 @@ fn failed_task_result(
         duration_ms: 0,
         log,
         detail: Some(format!("{error:#}")),
+        runner: None,
     }
 }
 
@@ -306,6 +312,11 @@ fn run_secret_scan(
     )?;
     let passed = findings.is_empty();
     Ok(TaskResult {
+        step_id: None,
+        invocation_id: None,
+        attempt: None,
+        started_at: None,
+        finished_at: None,
         label: label.to_string(),
         passed,
         timed_out: false,
@@ -317,6 +328,7 @@ fn run_secret_scan(
             .to_string_lossy()
             .into(),
         detail: (!passed).then(|| format!("{} file(s) require review", findings.len())),
+        runner: None,
     })
 }
 
@@ -333,6 +345,11 @@ fn run_architecture_audit(
     )?;
     let passed = outcome.total_violations == 0;
     Ok(TaskResult {
+        step_id: None,
+        invocation_id: None,
+        attempt: None,
+        started_at: None,
+        finished_at: None,
         label: label.to_string(),
         passed,
         timed_out: false,
@@ -346,6 +363,7 @@ fn run_architecture_audit(
             outcome.error_count,
             outcome.warning_count
         )),
+        runner: None,
     })
 }
 
@@ -359,6 +377,11 @@ fn run_external_step<'a>(
     })?;
     Ok(
         run_configured_step(project, step, services).unwrap_or_else(|error| TaskResult {
+            step_id: None,
+            invocation_id: None,
+            attempt: None,
+            started_at: None,
+            finished_at: None,
             label: node.label.clone(),
             passed: false,
             timed_out: false,
@@ -366,6 +389,7 @@ fn run_external_step<'a>(
             duration_ms: 0,
             log: step.log.clone(),
             detail: Some(format!("{error:#}")),
+            runner: None,
         }),
     )
 }
@@ -414,6 +438,11 @@ fn skipped<'a>(node: &PlanNode<'a>, reason: &str) -> ScheduledResult {
             cancelled: false,
         },
         task_result: TaskResult {
+            step_id: None,
+            invocation_id: None,
+            attempt: None,
+            started_at: None,
+            finished_at: None,
             label: node.label.clone(),
             passed: false,
             timed_out: false,
@@ -421,6 +450,7 @@ fn skipped<'a>(node: &PlanNode<'a>, reason: &str) -> ScheduledResult {
             duration_ms: 0,
             log: node.step.map(|step| step.log.clone()).unwrap_or_default(),
             detail: Some(reason.into()),
+            runner: None,
         },
     }
 }
