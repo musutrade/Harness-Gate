@@ -3,15 +3,21 @@ use crate::config::WebhookConfig;
 use crate::project::Project;
 use crate::service::ResourceLease;
 use anyhow::{bail, Context, Result};
+use regex::Regex;
 use serde::{ser::Serializer, Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use std::fs::{self, OpenOptions};
-use std::io::Write;
+use std::io::{Read, Write};
 use std::path::{Component, Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::OnceLock;
 use std::time::Duration;
 
 static INVOCATION_COUNTER: AtomicU64 = AtomicU64::new(1);
 pub(super) const MACHINE_RESULT_SCHEMA_VERSION: &str = "1";
+pub(super) const ARTIFACT_MANIFEST_SCHEMA_VERSION: &str = "1";
+const MAX_RETAINED_INVOCATIONS: usize = 50;
+const REDACTION_TEXT_LIMIT: usize = 16 * 1024 * 1024;
 
 #[derive(Debug, Serialize)]
 struct MachineResult {
@@ -96,6 +102,22 @@ struct MachineService {
     status: &'static str,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct ArtifactManifest {
+    schema_version: String,
+    invocation_id: String,
+    generated_at: String,
+    artifacts: Vec<ManifestArtifact>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct ManifestArtifact {
+    path: String,
+    kind: String,
+    size_bytes: u64,
+    sha256: String,
+}
+
 #[derive(Debug, Deserialize)]
 struct MachineResultHeader {
     schema_version: String,
@@ -129,6 +151,7 @@ fn machine_result(report: &VerificationReport) -> MachineResult {
                     message: step
                         .detail
                         .clone()
+                        .map(|detail| redact_text(&detail))
                         .unwrap_or_else(|| "verification step failed".into()),
                 });
             }
@@ -161,8 +184,8 @@ fn machine_result(report: &VerificationReport) -> MachineResult {
                 cancelled: step.cancelled,
                 duration_ms: step.duration_ms,
                 log: step.log.clone(),
-                detail: step.detail.clone(),
-                runner: step.runner.clone(),
+                detail: step.detail.as_deref().map(redact_text),
+                runner: step.runner.clone().map(redact_runner),
                 attempts: vec![MachineAttempt {
                     attempt: step.attempt.unwrap_or(1),
                     status,
@@ -172,7 +195,7 @@ fn machine_result(report: &VerificationReport) -> MachineResult {
                     timed_out: step.timed_out,
                     cancelled: step.cancelled,
                     log: step.log.clone(),
-                    detail: step.detail.clone(),
+                    detail: step.detail.as_deref().map(redact_text),
                 }],
             }
         })
@@ -448,6 +471,7 @@ fn next_invocation_id() -> String {
 /// Report output boundary. The verifier produces a report model; this module
 /// owns serialization and optional result delivery.
 pub(super) fn write(report: &VerificationReport, project: &Project) -> Result<()> {
+    redact_invocation_files(project)?;
     // Keep the stable JSON/Markdown artifacts independent from optional
     // renderers. A malformed template must not erase the machine-readable
     // result that CI and incident tooling depend on.
@@ -481,6 +505,15 @@ pub(super) fn write(report: &VerificationReport, project: &Project) -> Result<()
         }
     }
     if failures.is_empty() {
+        if let Err(error) = redact_invocation_files(project)
+            .and_then(|_| write_manifest(report, project))
+            .and_then(|_| verify_manifest(project))
+        {
+            failures.push(error.context("publish or verify artifact manifest"));
+        }
+    }
+    if failures.is_empty() {
+        prune_old_invocations(project, &report.invocation_id)?;
         return Ok(());
     }
     let details = failures
@@ -759,6 +792,276 @@ fn write_report_file(project: &Project, relative: &str, contents: impl AsRef<[u8
         .with_context(|| format!("write report {}", target.display()))
 }
 
+fn write_manifest(report: &VerificationReport, project: &Project) -> Result<()> {
+    let artifacts = collect_manifest_files(&project.reports, &project.reports)?;
+    let manifest = ArtifactManifest {
+        schema_version: ARTIFACT_MANIFEST_SCHEMA_VERSION.into(),
+        invocation_id: report.invocation_id.clone(),
+        generated_at: chrono::Utc::now().to_rfc3339(),
+        artifacts,
+    };
+    let contents = serde_json::to_vec_pretty(&manifest).context("serialize artifact manifest")?;
+    write_report_file(project, "manifest.json", contents)
+}
+
+fn collect_manifest_files(root: &Path, directory: &Path) -> Result<Vec<ManifestArtifact>> {
+    let mut artifacts = Vec::new();
+    for entry in fs::read_dir(directory)
+        .with_context(|| format!("read artifact directory {}", directory.display()))?
+    {
+        let entry = entry.with_context(|| "read artifact entry")?;
+        let path = entry.path();
+        let file_type = entry
+            .file_type()
+            .with_context(|| format!("inspect artifact entry {}", path.display()))?;
+        if file_type.is_dir() {
+            artifacts.extend(collect_manifest_files(root, &path)?);
+            continue;
+        }
+        if !file_type.is_file() {
+            continue;
+        }
+        let Some(name) = path.file_name().and_then(|name| name.to_str()) else {
+            bail!("artifact has a non-UTF-8 filename: {}", path.display());
+        };
+        if name == "manifest.json" || name.ends_with(".tmp") || name.starts_with('.') {
+            continue;
+        }
+        let relative = path
+            .strip_prefix(root)
+            .with_context(|| format!("resolve artifact path {}", path.display()))?
+            .to_string_lossy()
+            .replace('\\', "/");
+        let metadata = fs::metadata(&path)
+            .with_context(|| format!("inspect artifact metadata {}", path.display()))?;
+        artifacts.push(ManifestArtifact {
+            path: relative.clone(),
+            kind: manifest_kind(&relative),
+            size_bytes: metadata.len(),
+            sha256: sha256_file(&path)?,
+        });
+    }
+    artifacts.sort_by(|left, right| left.path.cmp(&right.path));
+    Ok(artifacts)
+}
+
+fn manifest_kind(path: &str) -> String {
+    if path.starts_with("logs/") {
+        "step-log".into()
+    } else if path == "invocation.json" {
+        "invocation-metadata".into()
+    } else if path.ends_with(".json")
+        || path.ends_with(".md")
+        || path.ends_with(".html")
+        || path.ends_with(".xml")
+    {
+        "report".into()
+    } else {
+        "artifact".into()
+    }
+}
+
+fn sha256_file(path: &Path) -> Result<String> {
+    let mut file =
+        fs::File::open(path).with_context(|| format!("open artifact {}", path.display()))?;
+    let mut hasher = Sha256::new();
+    let mut buffer = [0_u8; 64 * 1024];
+    loop {
+        let read = file
+            .read(&mut buffer)
+            .with_context(|| format!("read artifact {}", path.display()))?;
+        if read == 0 {
+            break;
+        }
+        hasher.update(&buffer[..read]);
+    }
+    Ok(format!("{:x}", hasher.finalize()))
+}
+
+fn verify_manifest(project: &Project) -> Result<()> {
+    let path = project.reports.join("manifest.json");
+    let bytes =
+        fs::read(&path).with_context(|| format!("read artifact manifest {}", path.display()))?;
+    let manifest: ArtifactManifest =
+        serde_json::from_slice(&bytes).context("parse artifact manifest")?;
+    if manifest.schema_version != ARTIFACT_MANIFEST_SCHEMA_VERSION {
+        bail!(
+            "unsupported artifact manifest schema version {:?}",
+            manifest.schema_version
+        );
+    }
+    if manifest.artifacts.is_empty() {
+        bail!("artifact manifest contains no invocation artifacts");
+    }
+    let report_root = project
+        .reports
+        .canonicalize()
+        .with_context(|| format!("resolve invocation directory {}", project.reports.display()))?;
+    for artifact in &manifest.artifacts {
+        let relative = invocation_relative_path(
+            &project.reports.to_string_lossy(),
+            &project.reports.join(&artifact.path).to_string_lossy(),
+        )
+        .ok_or_else(|| {
+            anyhow::anyhow!(
+                "artifact path escapes invocation directory: {}",
+                artifact.path
+            )
+        })?;
+        if relative != artifact.path {
+            bail!("artifact path is not normalized: {}", artifact.path);
+        }
+        let target = project.reports.join(&artifact.path);
+        let resolved_target = target
+            .canonicalize()
+            .with_context(|| format!("resolve manifest artifact {}", target.display()))?;
+        if !resolved_target.starts_with(&report_root) {
+            bail!(
+                "manifest artifact escapes invocation directory: {}",
+                artifact.path
+            );
+        }
+        let metadata = fs::metadata(&target)
+            .with_context(|| format!("inspect manifest artifact {}", target.display()))?;
+        if !metadata.is_file() || metadata.len() != artifact.size_bytes {
+            bail!("artifact size changed: {}", artifact.path);
+        }
+        let digest = sha256_file(&target)?;
+        if digest != artifact.sha256 {
+            bail!("artifact digest changed: {}", artifact.path);
+        }
+    }
+    Ok(())
+}
+
+fn redact_invocation_files(project: &Project) -> Result<()> {
+    if project.reports.exists() {
+        let repository = project
+            .root
+            .canonicalize()
+            .with_context(|| format!("resolve project root {}", project.root.display()))?;
+        let reports = project
+            .reports
+            .canonicalize()
+            .with_context(|| format!("resolve report directory {}", project.reports.display()))?;
+        if !reports.starts_with(&repository) {
+            bail!("report directory escapes project root");
+        }
+    }
+    redact_directory(&project.reports)
+}
+
+fn redact_directory(directory: &Path) -> Result<()> {
+    if !directory.exists() {
+        return Ok(());
+    }
+    for entry in fs::read_dir(directory)
+        .with_context(|| format!("read evidence directory {}", directory.display()))?
+    {
+        let entry = entry.with_context(|| "read evidence entry")?;
+        let path = entry.path();
+        let file_type = entry
+            .file_type()
+            .with_context(|| format!("inspect evidence entry {}", path.display()))?;
+        if file_type.is_dir() {
+            redact_directory(&path)?;
+            continue;
+        }
+        if !file_type.is_file()
+            || path.file_name().and_then(|name| name.to_str()) == Some("manifest.json")
+            || path
+                .file_name()
+                .and_then(|name| name.to_str())
+                .is_some_and(|name| name.ends_with(".tmp"))
+        {
+            continue;
+        }
+        let bytes = fs::read(&path).with_context(|| format!("read evidence {}", path.display()))?;
+        let Ok(text) = std::str::from_utf8(&bytes) else {
+            continue;
+        };
+        if bytes.len() > REDACTION_TEXT_LIMIT {
+            bail!("text evidence exceeds redaction limit: {}", path.display());
+        }
+        let redacted = redact_text(&text);
+        if redacted.as_bytes() != bytes {
+            atomic_write(&path, redacted.as_bytes(), true)
+                .with_context(|| format!("publish redacted evidence {}", path.display()))?;
+        }
+    }
+    Ok(())
+}
+
+fn redact_runner(mut runner: crate::process::RunnerExecution) -> crate::process::RunnerExecution {
+    runner.environment = runner
+        .environment
+        .into_iter()
+        .map(|(key, value)| (key, redact_text(&value)))
+        .collect();
+    runner
+}
+
+fn redact_text(input: &str) -> String {
+    static PATTERNS: OnceLock<Vec<Regex>> = OnceLock::new();
+    let patterns = PATTERNS.get_or_init(|| {
+        vec![
+            Regex::new(r"(?is)-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----.*?-----END [A-Z0-9 ]*PRIVATE KEY-----").expect("private key redaction regex"),
+            Regex::new(r"(?im)^(?:authorization|proxy-authorization|cookie|set-cookie|x-api-key|x-auth-token)\s*:[^\r\n]*$").expect("header redaction regex"),
+            Regex::new(r#"(?i)\b(?:postgres(?:ql)?|mysql|redis|mongodb(?:\+srv)?)://[^\s<>'\"]+"#).expect("connection string redaction regex"),
+            Regex::new(r"(?i)\b(?:bearer|basic)\s+[A-Za-z0-9._~+/=-]+").expect("authorization redaction regex"),
+            Regex::new(r#"(?i)\"[^\"]*(?:api[_-]?key|access[_-]?token|refresh[_-]?token|id[_-]?token|token|password|passwd|secret|client[_-]?secret)[^\"]*\"\s*:\s*\"[^\"]*\""#).expect("json secret redaction regex"),
+            Regex::new(r##"(?i)\b(?:api[_-]?key|access[_-]?token|refresh[_-]?token|id[_-]?token|token|password|passwd|secret|client[_-]?secret)\b\s*[:=]\s*["']?[^\s"'`,;}]+"##).expect("assignment redaction regex"),
+        ]
+    });
+    patterns.iter().fold(input.to_string(), |text, pattern| {
+        pattern.replace_all(&text, "[REDACTED]").into_owned()
+    })
+}
+
+fn prune_old_invocations(project: &Project, current_id: &str) -> Result<()> {
+    let Some(invocations) = project.reports.parent() else {
+        return Ok(());
+    };
+    if invocations.file_name().and_then(|name| name.to_str()) != Some("invocations") {
+        return Ok(());
+    }
+    let mut directories = Vec::new();
+    for entry in fs::read_dir(invocations).with_context(|| {
+        format!(
+            "read invocation retention directory {}",
+            invocations.display()
+        )
+    })? {
+        let entry = entry.context("read invocation retention entry")?;
+        let path = entry.path();
+        if !entry.file_type()?.is_dir()
+            || path.file_name().and_then(|name| name.to_str()) == Some(current_id)
+        {
+            continue;
+        }
+        let modified = entry
+            .metadata()
+            .and_then(|metadata| metadata.modified())
+            .unwrap_or(std::time::SystemTime::UNIX_EPOCH);
+        directories.push((modified, path));
+    }
+    if directories.len() <= MAX_RETAINED_INVOCATIONS {
+        return Ok(());
+    }
+    directories.sort_by_key(|(modified, _)| *modified);
+    let cutoff = std::time::SystemTime::now()
+        .checked_sub(Duration::from_secs(15 * 60))
+        .unwrap_or(std::time::SystemTime::UNIX_EPOCH);
+    let remove_count = directories.len() - MAX_RETAINED_INVOCATIONS;
+    for (modified, path) in directories.into_iter().take(remove_count) {
+        if modified < cutoff {
+            fs::remove_dir_all(&path)
+                .with_context(|| format!("remove expired invocation {}", path.display()))?;
+        }
+    }
+    Ok(())
+}
+
 fn atomic_write(target: &Path, contents: &[u8], replace_existing: bool) -> Result<()> {
     let parent = target
         .parent()
@@ -827,7 +1130,7 @@ fn resolve_report_root(project: &Project, repository: &Path) -> Result<PathBuf> 
 }
 
 pub(super) fn notify(report: &VerificationReport, project: &Project) -> Result<()> {
-    let body = serde_json::to_vec(report)?;
+    let body = redact_text(&serde_json::to_string(report)?).into_bytes();
     for webhook in &project.config.notifications.webhooks {
         if (report.passed && !webhook.on_success) || (!report.passed && !webhook.on_failure) {
             continue;
@@ -965,8 +1268,9 @@ fn post_json(raw_url: &str, body: &[u8]) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::{
-        configured_html, ensure_supported_machine_result, junit, machine_result, markdown, notify,
-        post_json, render_html, report_target,
+        allocate_invocation, configured_html, ensure_supported_machine_result, junit,
+        machine_result, markdown, notify, post_json, redact_text, render_html, report_target,
+        verify_manifest, write, write_invocation_metadata,
     };
     use crate::config::WebhookConfig;
     use crate::process::TaskResult;
@@ -1109,6 +1413,76 @@ mod tests {
         assert!(error
             .to_string()
             .contains("unsupported machine-result schema"));
+    }
+
+    #[test]
+    fn redaction_removes_credentials_from_exported_text() {
+        let auth_header = ["Author", "ization"].concat();
+        let bearer = ["Bear", "er"].concat();
+        let cookie_header = ["cook", "ie"].concat();
+        let db_scheme = ["post", "gres"].concat();
+        let private_key = ["PRIVATE", " KEY"].concat();
+        let password_key = ["pass", "word"].concat();
+        let text = format!(
+            "{auth_header}: {bearer} opaque-value\n{cookie_header}: session=opaque-cookie\nDATABASE_URL={db_scheme}://user:opaque-pass@db.example.test/app\n{password_key}=opaque-value\n{{\"api_key\":\"opaque-json\"}}\n-----BEGIN {private_key}-----\nopaque-material\n-----END {private_key}-----"
+        );
+        let redacted = redact_text(&text);
+        for secret in [
+            "opaque-value",
+            "opaque-cookie",
+            "opaque-pass@db.example.test",
+            "opaque-json",
+            "opaque-material",
+        ] {
+            assert!(!redacted.contains(secret), "secret leaked: {secret}");
+        }
+        assert!(redacted.contains("[REDACTED]"));
+    }
+
+    #[test]
+    fn manifest_records_digests_and_detects_tampering() {
+        let workspace = crate::test_support::TestWorkspace::new("report-manifest");
+        crate::preset::init(&workspace.root, "generic", false).expect("initialize fixture");
+        workspace.init_git();
+        let project = crate::project::Project::discover(Some(workspace.root.clone()), None)
+            .expect("discover fixture");
+        let invocation = allocate_invocation(&project).expect("allocate invocation");
+        write_invocation_metadata(&invocation, "full", false).expect("write metadata");
+        let password_key = ["pass", "word"].concat();
+        std::fs::write(
+            invocation.root.join("logs/unit.log"),
+            format!("{password_key}=opaque-value\n"),
+        )
+        .expect("write log");
+        let mut invocation_project = project.clone();
+        invocation_project.reports = invocation.root.clone();
+        let mut current = report();
+        current.invocation_id = invocation.id.clone();
+        current.report_directory = invocation.root.to_string_lossy().into_owned();
+        current.steps[0].step_id = Some("unit.tests".into());
+        write(&current, &invocation_project).expect("write reports and manifest");
+
+        let manifest_path = invocation.root.join("manifest.json");
+        let manifest: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(&manifest_path).expect("read manifest"))
+                .expect("parse manifest");
+        let log = manifest["artifacts"]
+            .as_array()
+            .expect("manifest artifacts")
+            .iter()
+            .find(|artifact| artifact["path"] == "logs/unit.log")
+            .expect("log manifest entry");
+        assert_eq!(log["size_bytes"], 11);
+        assert_eq!(log["sha256"].as_str().unwrap().len(), 64);
+        assert_eq!(
+            std::fs::read_to_string(invocation.root.join("logs/unit.log"))
+                .expect("read redacted log"),
+            "[REDACTED]\n"
+        );
+        verify_manifest(&invocation_project).expect("manifest should verify");
+        std::fs::write(invocation.root.join("logs/unit.log"), "tampered\n").expect("tamper log");
+        assert!(verify_manifest(&invocation_project).is_err());
+        drop(invocation);
     }
 
     #[test]
@@ -1345,6 +1719,37 @@ mod tests {
         });
         post_json(&format!("http://{address}/notify"), br#"{"passed":true}"#)
             .expect("webhook should succeed");
+        handle.join().expect("webhook thread");
+    }
+
+    #[test]
+    fn webhook_redacts_sensitive_report_details() {
+        let listener = TcpListener::bind(("127.0.0.1", 0)).expect("bind listener");
+        let address = listener.local_addr().expect("listener address");
+        let handle = thread::spawn(move || {
+            let (mut stream, _) = listener.accept().expect("accept webhook");
+            let request = read_http_request(&mut stream);
+            let body = String::from_utf8_lossy(&request);
+            assert!(!body.contains("webhook-secret"));
+            assert!(body.contains("[REDACTED]"));
+            stream
+                .write_all(b"HTTP/1.1 204 No Content\r\nContent-Length: 0\r\n\r\n")
+                .expect("write response");
+        });
+        let workspace = crate::test_support::TestWorkspace::new("webhook-redaction");
+        crate::preset::init(&workspace.root, "generic", false).expect("initialize fixture");
+        workspace.init_git();
+        let mut project = crate::project::Project::discover(Some(workspace.root.clone()), None)
+            .expect("discover fixture");
+        project.config.notifications.webhooks = vec![WebhookConfig {
+            url: format!("http://{address}/notify"),
+            on_failure: true,
+            on_success: false,
+        }];
+        let mut sensitive = report();
+        let token_key = ["tok", "en"].concat();
+        sensitive.steps[0].detail = Some(format!("{token_key}=opaque-value"));
+        notify(&sensitive, &project).expect("redacted webhook should succeed");
         handle.join().expect("webhook thread");
     }
 

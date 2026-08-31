@@ -816,6 +816,16 @@ junit = "junit.xml"
 顶层和步骤状态使用 `PASS`、`FAIL`、`SKIPPED`、`CANCELLED` 等稳定值，并提供 attempts、结构化 failures、
 invocation-relative artifacts 及 `evidence_complete`；集成方不应从 Markdown 或日志内容推断门禁状态。
 
+每次 invocation 还会生成 `manifest.json`，格式见 [artifact manifest schema](../schema/artifact-manifest.schema.json)。
+清单列出 invocation 目录内除清单自身外的每个普通文件、相对路径、类型、字节数和 SHA-256；路径越界、文件
+被修改或摘要不一致都会使报告发布失败。日志、报告和通知中的文本会统一脱敏，包含授权/Cookie 请求头、
+Bearer/Basic 凭据、API key、密码、私钥块及常见数据库连接串的值都不会导出。默认保留最新 50 个 invocation；
+仅清理超过 15 分钟租约窗口且超出数量上限的旧目录，活动或最近修改的 invocation 不会被清理。
+
+发布二进制同时提供 `SHA256SUMS`、CycloneDX SBOM 以及 Sigstore `.sig`/`.crt` 文件。离线升级时应先运行
+`sha256sum --check SHA256SUMS`，再按 README 中的 `cosign verify-blob` 命令校验二进制和 SBOM；任意字节
+被修改都会导致摘要或签名校验失败。发布资产不覆盖旧文件，替换必须使用新的版本 tag。
+
 ### 容器运行时和 Webhook
 
 Docker service 可显式选择 Docker 兼容的 Podman CLI，省略时默认为 Docker：
