@@ -92,8 +92,12 @@ cosign verify-blob --signature harness-gate-linux-amd64.sig \
 
 Verify `harness-gate.sbom.cdx.json` with its corresponding signature as well;
 the SBOM records the source commit, Cargo.lock digest, and Rust toolchain used
-for the build. Published release assets are immutable: a replacement requires
-a new version tag and a new attestation.
+for the build. The release workflow first writes one explicit
+`release-inventory.json`; checksum, Sigstore signature/certificate, GitHub
+provenance, verification, and upload subjects are all derived from that same
+inventory, including the SBOM. Missing, extra, unsigned, or unattested assets
+block release creation. Published release assets are immutable: a replacement
+requires a new version tag and a new attestation.
 
 ### Install from Source
 
@@ -179,7 +183,7 @@ Presets are starting points, not runtime branches. After initialization is compl
 | `harness-gate audit [--json]`                                | Execute regex architecture rules and generate audit report |
 | `harness-gate verify`                                        | Execute default profile based on workspace changes |
 | `harness-gate verify --profile ci --all`                     | Execute specified profile for all components |
-| `harness-gate hook`                                          | Execute hook profile on staged snapshot   |
+| `harness-gate hook`                                          | Execute hook profile on a private staged snapshot |
 | `harness-gate step <id>`                                     | Run a single step after passing secrets/audit |
 | `harness-gate config check`                                  | Validate schema, references, paths, environment overrides, and resource safety |
 | `harness-gate config check --format json`                    | Emit stable field-path diagnostics for editors and CI          |
@@ -193,10 +197,13 @@ All commands support global `--project-root <PATH>` and `--config <PATH>`. Comma
 
 `cleanup --dry-run` is safe to run before a retry or on a shared CI host. It
 only lists lease records carrying the `harness-gate` owner marker and writes
-the structured observation to `<reports>/cleanup.json`. Without `--dry-run`,
-only stale marked leases are reclaimed; unknown files and active owners are
-left untouched. A container is stopped only when its lease records both the
-runtime and container name, and a failed stop remains a blocking cleanup
+the structured observation to `<reports>/cleanup.json`. Lease schema `2`
+records the canonical project, logical resource, invocation, complete runtime
+labels, container name, and immutable runtime object ID. Without `--dry-run`,
+expiry only makes a lease eligible for reclaim: the runtime object is inspected
+again and its filename, labels, project, resource, invocation, and immutable ID
+must all match before removal. Unknown, malformed, renamed, active, or
+ambiguous leases are retained, and a failed stop remains a blocking cleanup
 failure for a later retry.
 
 Interactive `verify` renders a progress bar and colored pass/warning/failure markers. Output stays plain when redirected or in CI. Use `--color auto` (default), `--color always`, or `--color never`; `NO_COLOR` disables automatic color.
@@ -227,7 +234,9 @@ harness-gate hook
 git commit -m "..."
 ```
 
-The repository's pre-commit automatically executes `harness-gate hook`. The hook profile only retains fast deterministic checks, not a replacement for complete testing.
+The repository's pre-commit automatically executes `harness-gate hook`. The command materializes the complete Git index into a private staged snapshot before loading configuration, selecting scope, running built-in gates, or executing ordinary steps. It therefore does not mix staged and unstaged file contents. The hook profile only retains fast deterministic checks, not a replacement for complete testing.
+
+Configured steps use `input = "snapshot"` by default, so `{root}`, path aliases, and arguments resolve against the invocation input root. A step that genuinely needs the original checkout or direct Git metadata may opt into `input = "repository"`; this is an explicit compatibility capability and does not change scope, secret-scan, or architecture-audit input. Invocation reports record the input mode, source identity, execution root, and configuration digest.
 
 ### Before PR or Release
 
@@ -386,13 +395,18 @@ results expose a merge identity and reject missing or duplicate test identities.
 An approved expiring waiver is machine-distinct as `WAIVED` and includes its
 approval and compensating-control evidence.
 
-Each invocation also publishes `manifest.json`, described by the [artifact manifest schema](https://github.com/musutrade/Harness-Gate/blob/main/schema/artifact-manifest.schema.json).
-It lists every invocation-local evidence file (excluding the manifest itself) with its relative path, byte size,
-kind, and SHA-256 digest. Re-running verification against a modified file fails manifest verification. Text evidence
-is redacted before publication: authorization and cookie headers, bearer/basic credentials, API keys, passwords,
-private-key blocks, and common database connection strings are replaced with `[REDACTED]`. The default retention
-policy keeps the newest 50 invocation directories and only removes older directories after the 15-minute lease
-window; active or recently modified invocations are retained.
+Each invocation also publishes `artifact-registry.json` and `manifest.json`, described by the
+[artifact registry schema](https://github.com/musutrade/Harness-Gate/blob/main/schema/artifact-registry.schema.json)
+and [artifact manifest schema](https://github.com/musutrade/Harness-Gate/blob/main/schema/artifact-manifest.schema.json).
+The registry and manifest record every invocation-local evidence file (excluding control files) with its relative
+path, kind, byte size, and SHA-256 digest; step artifacts also carry invocation and step bindings. Result
+declarations, registry entries, manifest entries, and publishable files on disk must match as one closed set.
+Missing, undeclared, escaped, symlinked, replaced, or digest-mismatched evidence fails publication and leaves
+`evidence_complete` false. The final machine result is written only after the manifest has passed validation.
+Text evidence is redacted before publication: authorization and cookie headers, bearer/basic credentials, API keys,
+passwords, private-key blocks, and common database connection strings are replaced with `[REDACTED]`. The default
+retention policy keeps the newest 50 invocation directories and only removes older directories after the 15-minute
+lease window; active or recently modified invocations are retained.
 
 Optional `[[notifications.webhooks]]` entries send the serialized report to HTTP(S) endpoints after all report
 files are written. `on_failure` defaults to `true`, `on_success` defaults to `false`; a non-2xx response or
@@ -424,9 +438,9 @@ harness-gate adapter run \
 ```
 
 The host verifies the Ed25519 declaration and executable SHA-256 digest before
-starting the adapter, clears inherited environment variables, enforces the
-declared capability allowlist, terminates the process tree on timeout or
-cancellation, and rejects malformed results or artifacts outside the
+starting the adapter, clears inherited environment variables, applies the
+declared capability allowlist, attempts bounded process-tree cleanup on timeout
+or cancellation, and rejects malformed results or artifacts outside the
 invocation root. Adapter failures are reported as
 `ADAPTER_PROTOCOL_FAILURE`.
 
@@ -436,8 +450,9 @@ Ed25519 key and pass only the capabilities that the invocation is allowed to
 use (`--allow-network`, `--allow-resource`, or `--allow-environment`). Keep the
 request, executable, and artifact root inside the project or another explicitly
 managed deployment directory, and review the signer before execution. The
-capability allowlist is a protocol-level boundary, not an operating-system
-network sandbox.
+capability allowlist is a protocol-level declaration check, not an operating-
+system network, filesystem, resource, or process sandbox; process cleanup is
+best effort and is not proof of complete descendant containment.
 
 `parse-logs` reads JSON Lines in bounded streaming passes. It keeps at most 20 records before the first matching
 error and 30 records in the output; when no trace ID is available it emits only the last 30 raw lines. This avoids

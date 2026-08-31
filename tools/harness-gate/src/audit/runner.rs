@@ -51,7 +51,12 @@ fn run_with_config(
         warning_count: report.summary.warning_count,
         report_file: report_dir.join(&config.engine.json_report_filename),
     };
-    output_fs::write(&outcome.report_file, &full_json)?;
+    output_fs::confined_atomic_write(
+        report_dir,
+        Path::new(&config.engine.json_report_filename),
+        &full_json,
+        true,
+    )?;
     let markdown = generate_markdown(&config, &all_hard_violations, &arch_violations);
     let truncated = if markdown.len() > config.engine.markdown_max_bytes {
         let mut value = markdown;
@@ -68,9 +73,11 @@ fn run_with_config(
     } else {
         markdown
     };
-    output_fs::write(
-        &report_dir.join(&config.engine.markdown_report_filename),
+    output_fs::confined_atomic_write(
+        report_dir,
+        Path::new(&config.engine.markdown_report_filename),
         truncated,
+        true,
     )?;
     if emit_json {
         println!("{full_json}");

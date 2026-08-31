@@ -1,6 +1,7 @@
 use super::output::print_scope;
 use crate::cli::{Commands, CompatAction, ConfigAction, ConfigFormat};
 use crate::error::CliError;
+use crate::project::InputMode;
 use crate::project::Project;
 use crate::scope::ScopeMode;
 use crate::ui;
@@ -47,8 +48,13 @@ pub(super) fn run(project: &Project, command: Commands) -> Result<bool, CliError
         }
         Commands::Cleanup { dry_run, json } => {
             let report = crate::service::cleanup_resources(project, dry_run)?;
-            crate::utils::fs::write_json(&project.reports.join("cleanup.json"), &report)
-                .context("write cleanup evidence")?;
+            crate::utils::fs::confined_write_json(
+                &project.reports,
+                std::path::Path::new("cleanup.json"),
+                &report,
+                true,
+            )
+            .context("write cleanup evidence")?;
             if json {
                 println!(
                     "{}",
@@ -131,8 +137,12 @@ pub(super) fn run(project: &Project, command: Commands) -> Result<bool, CliError
             Ok(findings.is_empty())
         }
         Commands::Audit { json } => {
-            let outcome =
-                crate::audit::run(&project.root, &project.audit_config, &project.reports, json)?;
+            let outcome = crate::audit::run(
+                &project.execution_root,
+                &project.audit_config,
+                &project.reports,
+                json,
+            )?;
             if !json {
                 let summary = format!(
                     "Audit: {} violation(s), {} blocker(s), {} error(s), {} warning(s)",
@@ -158,10 +168,17 @@ pub(super) fn run(project: &Project, command: Commands) -> Result<bool, CliError
             components,
             profile,
         } => {
+            let mode = args.mode();
+            let execution_project = match &mode {
+                ScopeMode::Staged => project.staged_snapshot()?,
+                ScopeMode::Base(_) => project.clone().with_input_mode(InputMode::Base),
+                ScopeMode::All => project.clone().with_input_mode(InputMode::All),
+                ScopeMode::WorkingTree => project.clone(),
+            };
             let selected = if components.is_empty() {
-                crate::scope::detect(project, &args.mode())?
+                crate::scope::detect(&execution_project, &mode)?
             } else {
-                let known = project.config.components();
+                let known = execution_project.config.components();
                 for component in &components {
                     if !known.contains(component) {
                         return Err(CliError::from(anyhow::anyhow!(
@@ -171,15 +188,23 @@ pub(super) fn run(project: &Project, command: Commands) -> Result<bool, CliError
                 }
                 crate::verify::explicit_scope(&components)
             };
-            let profile = profile.unwrap_or_else(|| project.config.project.default_profile.clone());
-            Ok(crate::verify::run(project, selected, &profile, false)?.passed)
+            let profile =
+                profile.unwrap_or_else(|| execution_project.config.project.default_profile.clone());
+            Ok(crate::verify::run(
+                &execution_project,
+                selected,
+                &profile,
+                matches!(mode, ScopeMode::Staged),
+            )?
+            .passed)
         }
         Commands::Hook => {
-            let selected = crate::scope::detect(project, &ScopeMode::Staged)?;
+            let execution_project = project.staged_snapshot()?;
+            let selected = crate::scope::detect(&execution_project, &ScopeMode::Staged)?;
             Ok(crate::verify::run(
-                project,
+                &execution_project,
                 selected,
-                &project.config.project.hook_profile,
+                &execution_project.config.project.hook_profile,
                 true,
             )?
             .passed)

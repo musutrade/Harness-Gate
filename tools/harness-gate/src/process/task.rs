@@ -6,7 +6,6 @@ use anyhow::{Context, Result};
 use serde::Serialize;
 use std::collections::BTreeMap;
 use std::ffi::{OsStr, OsString};
-use std::fs::{self, File};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
@@ -187,12 +186,10 @@ impl Task {
             .isolation_state
             .as_deref()
             .map(IsolationStateGuard::new);
-        if let Some(parent) = self.log.parent() {
-            fs::create_dir_all(parent)?;
-        }
-        let stdout = File::create(&self.log)
+        let log_file = crate::utils::fs::create_atomic_output(&self.log, true)
             .with_context(|| format!("create log {}", self.log.display()))?;
-        let stderr = stdout.try_clone()?;
+        let stdout = log_file.try_clone()?;
+        let stderr = log_file.try_clone()?;
         let started = Instant::now();
         let started_at = chrono::Utc::now().to_rfc3339();
         let mut command = Command::new(&self.program);
@@ -223,6 +220,10 @@ impl Task {
             }
             std::thread::sleep(Duration::from_millis(100));
         };
+
+        log_file
+            .publish()
+            .with_context(|| format!("publish log {}", self.log.display()))?;
 
         Ok(TaskResult {
             step_id: None,
