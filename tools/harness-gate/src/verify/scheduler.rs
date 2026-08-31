@@ -3,6 +3,7 @@ use super::steps::run_configured_step;
 use crate::audit;
 use crate::process::TaskResult;
 use crate::project::Project;
+use crate::scope::ScopeResult;
 use crate::secrets::{self, SecretMode};
 use crate::service::ServiceManager;
 use std::collections::{HashMap, HashSet};
@@ -65,6 +66,7 @@ pub(super) fn run_plan<'a>(
     plan: &'a VerificationPlan<'a>,
     staged: bool,
     services: &'a Mutex<ServiceManager<'a>>,
+    selected_scope: &ScopeResult,
     max_parallel: usize,
 ) -> std::result::Result<SchedulerOutcome, SchedulerError> {
     let limit = max_parallel.max(1);
@@ -161,7 +163,7 @@ pub(super) fn run_plan<'a>(
                 .iter()
                 .find(|candidate| candidate.id == node_id)
                 .expect("worker node remains in plan");
-            let task_result = match worker_result {
+            let mut task_result = match worker_result {
                 WorkerResult::Completed(result) => *result,
                 WorkerResult::Failed(error) => {
                     warmup_cancelled.store(true, std::sync::atomic::Ordering::Release);
@@ -173,6 +175,7 @@ pub(super) fn run_plan<'a>(
                     task_result
                 }
             };
+            crate::verify::waiver::apply(project, &node_id, selected_scope, &mut task_result);
             let status = if task_result.cancelled {
                 NodeStatus::Cancelled
             } else if task_result.passed {
@@ -292,6 +295,13 @@ fn failed_task_result(
         duration_ms: 0,
         log,
         detail: Some(format!("{error:#}")),
+        failure_code: Some("SCHEDULER_FAILURE".into()),
+        attempts: Vec::new(),
+        flaky: false,
+        retry_class: None,
+        parser: None,
+        waived: false,
+        waiver: None,
         runner: None,
     }
 }
@@ -328,6 +338,13 @@ fn run_secret_scan(
             .to_string_lossy()
             .into(),
         detail: (!passed).then(|| format!("{} file(s) require review", findings.len())),
+        failure_code: (!passed).then(|| "SECRET_SCAN_FAILURE".into()),
+        attempts: Vec::new(),
+        flaky: false,
+        retry_class: None,
+        parser: None,
+        waived: false,
+        waiver: None,
         runner: None,
     })
 }
@@ -363,6 +380,13 @@ fn run_architecture_audit(
             outcome.error_count,
             outcome.warning_count
         )),
+        failure_code: (!passed).then(|| "ARCHITECTURE_AUDIT_FAILURE".into()),
+        attempts: Vec::new(),
+        flaky: false,
+        retry_class: None,
+        parser: None,
+        waived: false,
+        waiver: None,
         runner: None,
     })
 }
@@ -389,6 +413,13 @@ fn run_external_step<'a>(
             duration_ms: 0,
             log: step.log.clone(),
             detail: Some(format!("{error:#}")),
+            failure_code: Some("STEP_EXECUTION_FAILURE".into()),
+            attempts: Vec::new(),
+            flaky: false,
+            retry_class: None,
+            parser: None,
+            waived: false,
+            waiver: None,
             runner: None,
         }),
     )
@@ -450,6 +481,13 @@ fn skipped<'a>(node: &PlanNode<'a>, reason: &str) -> ScheduledResult {
             duration_ms: 0,
             log: node.step.map(|step| step.log.clone()).unwrap_or_default(),
             detail: Some(reason.into()),
+            failure_code: Some("STEP_SKIPPED".into()),
+            attempts: Vec::new(),
+            flaky: false,
+            retry_class: None,
+            parser: None,
+            waived: false,
+            waiver: None,
             runner: None,
         },
     }

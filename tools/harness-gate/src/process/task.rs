@@ -1,4 +1,5 @@
 use super::command::{isolate_process_tree, terminate};
+use super::isolation;
 use super::signal::cancelled;
 use crate::config::{RunnerResultFormat, TestIsolation};
 use anyhow::{Context, Result};
@@ -21,6 +22,7 @@ pub struct Task {
     timeout: Duration,
     log: PathBuf,
     runner: Option<RunnerExecution>,
+    isolation_state: Option<PathBuf>,
 }
 
 /// Records the declared runner contract and the effective inputs used for a task.
@@ -30,12 +32,27 @@ pub struct Task {
 pub struct RunnerExecution {
     pub version: u32,
     pub kind: String,
+    pub program: String,
     pub effective_args: Vec<String>,
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub environment: BTreeMap<String, String>,
     pub result_format: RunnerResultFormat,
     pub isolation: TestIsolation,
     pub threads: Option<usize>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub isolation_id: Option<String>,
+    #[serde(default)]
+    pub worker_ids: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub isolation_root: Option<String>,
+    pub migration_decision: String,
+    pub lock_decision: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub shard_index: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub shard_total: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub merge_identity: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -58,7 +75,54 @@ pub struct TaskResult {
     pub log: String,
     pub detail: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub failure_code: Option<String>,
+    #[serde(default)]
+    pub attempts: Vec<TaskAttempt>,
+    #[serde(default)]
+    pub flaky: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub retry_class: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub parser: Option<ParserEvidence>,
+    #[serde(default)]
+    pub waived: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub waiver: Option<WaiverEvidence>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub runner: Option<RunnerExecution>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct ParserEvidence {
+    pub mode: String,
+    pub version: u32,
+    pub observed: usize,
+    pub minimum: usize,
+    pub complete: bool,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct TaskAttempt {
+    pub attempt: u32,
+    pub status: String,
+    pub started_at: Option<String>,
+    pub finished_at: Option<String>,
+    pub duration_ms: u128,
+    pub timed_out: bool,
+    pub cancelled: bool,
+    pub log: String,
+    pub detail: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct WaiverEvidence {
+    pub id: String,
+    pub risk: String,
+    pub owner: String,
+    pub approved_by: String,
+    pub created_at: String,
+    pub expires_at: String,
+    pub compensating_control: String,
 }
 
 impl Task {
@@ -78,6 +142,7 @@ impl Task {
             timeout: Duration::from_secs(180),
             log,
             runner: None,
+            isolation_state: None,
         }
     }
 
@@ -112,7 +177,16 @@ impl Task {
         self
     }
 
+    pub fn isolation_state(mut self, state_file: PathBuf) -> Self {
+        self.isolation_state = Some(state_file);
+        self
+    }
+
     pub fn run(self) -> Result<TaskResult> {
+        let _state_guard = self
+            .isolation_state
+            .as_deref()
+            .map(IsolationStateGuard::new);
         if let Some(parent) = self.log.parent() {
             fs::create_dir_all(parent)?;
         }
@@ -171,7 +245,31 @@ impl Task {
             } else {
                 status.code().map(|code| format!("exit code {code}"))
             },
+            failure_code: None,
+            attempts: Vec::new(),
+            flaky: false,
+            retry_class: None,
+            parser: None,
+            waived: false,
+            waiver: None,
             runner: self.runner,
         })
+    }
+}
+
+struct IsolationStateGuard<'a> {
+    path: &'a Path,
+}
+
+impl<'a> IsolationStateGuard<'a> {
+    fn new(path: &'a Path) -> Self {
+        Self { path }
+    }
+}
+
+impl Drop for IsolationStateGuard<'_> {
+    fn drop(&mut self) {
+        let _ = isolation::mark_terminal(self.path, "worker exited");
+        let _ = isolation::remove(self.path);
     }
 }

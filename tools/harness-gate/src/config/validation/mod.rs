@@ -167,6 +167,13 @@ impl FlowConfig {
             "notifications",
             self.validate_notifications(),
         );
+        collect_result(
+            self,
+            source_map,
+            diagnostics,
+            "policy",
+            self.validate_policy(),
+        );
     }
 
     fn collect_step_diagnostics(
@@ -308,6 +315,7 @@ impl FlowConfig {
         self.validate_report_templates()?;
         self.validate_execution()?;
         self.validate_notifications()?;
+        self.validate_policy()?;
         Ok(())
     }
 
@@ -329,6 +337,101 @@ impl FlowConfig {
         if let Some(max_parallel) = self.execution.max_parallel {
             if max_parallel == 0 || max_parallel > 64 {
                 bail!("execution.max_parallel must be between 1 and 64 (got {max_parallel})");
+            }
+        }
+        let step_ids = self
+            .steps
+            .iter()
+            .map(|step| step.id.as_str())
+            .collect::<HashSet<_>>();
+        for (step_id, retry) in &self.execution.retries {
+            validate_id("execution retry step", step_id)?;
+            if !step_ids.contains(step_id.as_str()) {
+                bail!("execution retry policy references missing step {step_id:?}");
+            }
+            if retry.max_attempts == 0 || retry.max_attempts > 5 {
+                bail!("execution.retries[{step_id:?}].max_attempts must be between 1 and 5");
+            }
+            if retry.backoff_ms > 60_000 {
+                bail!("execution.retries[{step_id:?}].backoff_ms must not exceed 60000");
+            }
+            for class in &retry.retryable {
+                validate_id("retryable failure class", class)?;
+            }
+        }
+        for (step_id, shard) in &self.execution.shards {
+            validate_id("execution shard step", step_id)?;
+            if !step_ids.contains(step_id.as_str()) {
+                bail!("execution shard policy references missing step {step_id:?}");
+            }
+            if !self
+                .steps
+                .iter()
+                .any(|step| step.id == *step_id && step.runner.is_some())
+            {
+                bail!("execution shard policy requires a runner on step {step_id:?}");
+            }
+            if shard.total == 0 || shard.index >= shard.total {
+                bail!("execution.shards[{step_id:?}] requires 0 <= index < total and total > 0");
+            }
+        }
+        Ok(())
+    }
+
+    fn validate_policy(&self) -> Result<()> {
+        let step_ids = self
+            .steps
+            .iter()
+            .map(|step| step.id.as_str())
+            .collect::<HashSet<_>>();
+        let mut waiver_ids = HashSet::new();
+        for waiver in &self.policy.waivers {
+            validate_id("policy waiver id", &waiver.id)?;
+            if !waiver_ids.insert(waiver.id.as_str()) {
+                bail!("duplicate policy waiver id {:?}", waiver.id);
+            }
+            if !step_ids.contains(waiver.step.as_str()) {
+                bail!(
+                    "policy waiver {:?} references missing step {:?}",
+                    waiver.id,
+                    waiver.step
+                );
+            }
+            for (field, value) in [
+                ("risk", &waiver.risk),
+                ("reason", &waiver.reason),
+                ("owner", &waiver.owner),
+                ("approved_by", &waiver.approved_by),
+                ("created_at", &waiver.created_at),
+                ("compensating_control", &waiver.compensating_control),
+            ] {
+                if value.trim().is_empty() {
+                    bail!("policy waiver {:?} requires {field}", waiver.id);
+                }
+            }
+            if waiver.owner == waiver.approved_by {
+                bail!("policy waiver {:?} may not be self-approved", waiver.id);
+            }
+            let created_at = chrono::DateTime::parse_from_rfc3339(&waiver.created_at)
+                .with_context(|| {
+                    format!("policy waiver {:?} created_at must be RFC3339", waiver.id)
+                })?;
+            let expires_at = chrono::DateTime::parse_from_rfc3339(&waiver.expires_at)
+                .with_context(|| {
+                    format!("policy waiver {:?} expires_at must be RFC3339", waiver.id)
+                })?;
+            if expires_at <= created_at {
+                bail!(
+                    "policy waiver {:?} expires_at must be after created_at",
+                    waiver.id
+                );
+            }
+            if waiver
+                .scope
+                .as_deref()
+                .is_some_and(|scope| scope.trim().is_empty())
+            {
+                bail!("policy waiver {:?} scope must not be empty", waiver.id);
             }
         }
         Ok(())
@@ -449,6 +552,25 @@ impl FlowConfig {
                         if *capture >= regex.captures_len() {
                             bail!("parser {id:?} regex has no capture group {capture}");
                         }
+                    }
+                }
+                ParserConfig::Junit { minimum } | ParserConfig::Trx { minimum } => {
+                    if *minimum == 0 {
+                        bail!("parser {id:?} minimum must be greater than zero");
+                    }
+                }
+                ParserConfig::Json {
+                    count_path,
+                    minimum,
+                } => {
+                    if *minimum == 0 {
+                        bail!("parser {id:?} minimum must be greater than zero");
+                    }
+                    if count_path
+                        .as_deref()
+                        .is_some_and(|path| path.trim().is_empty() || path.starts_with('.'))
+                    {
+                        bail!("parser {id:?} count_path must be a non-empty dot path");
                     }
                 }
             }

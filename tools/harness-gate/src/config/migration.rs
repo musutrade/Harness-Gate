@@ -291,7 +291,10 @@ pub fn migrate_v1(source: &str, project_name: &str) -> Result<FlowConfig> {
             secrets_config: ".harness-gate/secrets.toml".into(),
             aliases,
         },
-        policy: PolicyConfig { required_steps },
+        policy: PolicyConfig {
+            required_steps,
+            waivers: Vec::new(),
+        },
         doctor: DoctorConfig { checks },
         services,
         parsers,

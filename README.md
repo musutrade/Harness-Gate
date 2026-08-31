@@ -377,6 +377,14 @@ the legacy `passed` field while exposing stable `status` values, per-step `attem
 invocation-relative `artifacts`, and `evidence_complete`; consumers should use `status` and these structured
 fields instead of parsing Markdown or log text.
 
+Runner results also record parser mode/version and completeness. JUnit, TRX, and
+JSON parsers are preferred over regex compatibility mode; malformed, zero, and
+partial result files map to `RESULT_PARSE_FAILURE`, `RESULT_ZERO`, and
+`RESULT_PARTIAL`. Bounded retries expose `retry_count` and `flaky`, while shard
+results expose a merge identity and reject missing or duplicate test identities.
+An approved expiring waiver is machine-distinct as `WAIVED` and includes its
+approval and compensating-control evidence.
+
 Each invocation also publishes `manifest.json`, described by the [artifact manifest schema](https://github.com/musutrade/Harness-Gate/blob/main/schema/artifact-manifest.schema.json).
 It lists every invocation-local evidence file (excluding the manifest itself) with its relative path, byte size,
 kind, and SHA-256 digest. Re-running verification against a modified file fails manifest verification. Text evidence
@@ -392,6 +400,19 @@ the first failure stops notification delivery to later endpoints.
 
 Service cleanup is part of verification success. If a started service cannot be stopped, verification remains
 failed and the cleanup error is included in `test_result.json`/`test_result.md` so a leaked container is not hidden.
+
+For a DevRail migration, replay a serial request and compare normalized results:
+
+```bash
+harness-gate compat run --input request.json --output result.json --old-result frozen.json
+harness-gate compat compare --old frozen.json --new result.json --output comparison.json
+harness-gate compat canary --state migration-canary.json --slice team-a
+harness-gate compat rollback --state migration-canary.json
+```
+
+These commands retain raw result digests and never delete invocation evidence.
+The P2 signed adapter boundary is specified separately in
+[ADR-0033](docs/adr/0033-signed-out-of-process-adapter-protocol.md).
 
 `parse-logs` reads JSON Lines in bounded streaming passes. It keeps at most 20 records before the first matching
 error and 30 records in the output; when no trace ID is available it emits only the last 30 raw lines. This avoids

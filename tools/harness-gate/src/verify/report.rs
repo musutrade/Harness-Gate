@@ -52,8 +52,24 @@ struct MachineStep {
     duration_ms: u128,
     log: String,
     detail: Option<String>,
+    failure_code: Option<String>,
+    waived: bool,
+    waiver: Option<crate::process::WaiverEvidence>,
     runner: Option<crate::process::RunnerExecution>,
     attempts: Vec<MachineAttempt>,
+    retry_count: u32,
+    flaky: bool,
+    retry_class: Option<String>,
+    parser: Option<MachineParser>,
+}
+
+#[derive(Debug, Serialize)]
+struct MachineParser {
+    mode: String,
+    version: u32,
+    observed: usize,
+    minimum: usize,
+    complete: bool,
 }
 
 #[derive(Debug, Serialize)]
@@ -174,6 +190,40 @@ fn machine_result(report: &VerificationReport) -> MachineResult {
                     }
                 }
             }
+            let attempts = if step.attempts.is_empty() {
+                vec![MachineAttempt {
+                    attempt: step.attempt.unwrap_or(1),
+                    status,
+                    started_at: step.started_at.clone(),
+                    finished_at: step.finished_at.clone(),
+                    duration_ms: step.duration_ms,
+                    timed_out: step.timed_out,
+                    cancelled: step.cancelled,
+                    log: step.log.clone(),
+                    detail: step.detail.as_deref().map(redact_text),
+                }]
+            } else {
+                step.attempts
+                    .iter()
+                    .map(|attempt| MachineAttempt {
+                        attempt: attempt.attempt,
+                        status: if attempt.cancelled {
+                            "CANCELLED"
+                        } else if attempt.status == "PASS" {
+                            "PASS"
+                        } else {
+                            "FAIL"
+                        },
+                        started_at: attempt.started_at.clone(),
+                        finished_at: attempt.finished_at.clone(),
+                        duration_ms: attempt.duration_ms,
+                        timed_out: attempt.timed_out,
+                        cancelled: attempt.cancelled,
+                        log: attempt.log.clone(),
+                        detail: attempt.detail.as_deref().map(redact_text),
+                    })
+                    .collect()
+            };
             MachineStep {
                 step_id: step.step_id.clone(),
                 invocation_id: step.invocation_id.clone(),
@@ -185,18 +235,24 @@ fn machine_result(report: &VerificationReport) -> MachineResult {
                 duration_ms: step.duration_ms,
                 log: step.log.clone(),
                 detail: step.detail.as_deref().map(redact_text),
+                failure_code: step
+                    .failure_code
+                    .clone()
+                    .or_else(|| (!step.passed).then(|| failure_code(step))),
+                waived: step.waived,
+                waiver: step.waiver.clone(),
                 runner: step.runner.clone().map(redact_runner),
-                attempts: vec![MachineAttempt {
-                    attempt: step.attempt.unwrap_or(1),
-                    status,
-                    started_at: step.started_at.clone(),
-                    finished_at: step.finished_at.clone(),
-                    duration_ms: step.duration_ms,
-                    timed_out: step.timed_out,
-                    cancelled: step.cancelled,
-                    log: step.log.clone(),
-                    detail: step.detail.as_deref().map(redact_text),
-                }],
+                attempts,
+                retry_count: step.attempts.len().saturating_sub(1) as u32,
+                flaky: step.flaky,
+                retry_class: step.retry_class.clone(),
+                parser: step.parser.as_ref().map(|parser| MachineParser {
+                    mode: parser.mode.clone(),
+                    version: parser.version,
+                    observed: parser.observed,
+                    minimum: parser.minimum,
+                    complete: parser.complete,
+                }),
             }
         })
         .collect::<Vec<_>>();
@@ -267,6 +323,8 @@ fn ensure_supported_machine_result(raw: &[u8]) -> Result<()> {
 fn task_status(step: &crate::process::TaskResult) -> &'static str {
     if step.cancelled {
         "CANCELLED"
+    } else if step.waived {
+        "WAIVED"
     } else if step.passed {
         "PASS"
     } else {
@@ -275,6 +333,20 @@ fn task_status(step: &crate::process::TaskResult) -> &'static str {
 }
 
 fn failure_code(step: &crate::process::TaskResult) -> String {
+    if let Some(code) = &step.failure_code {
+        return code.clone();
+    }
+    if let Some(detail) = &step.detail {
+        if detail.starts_with("parser failure:") {
+            return "RESULT_PARSE_FAILURE".into();
+        }
+        if detail.starts_with("zero test results:") {
+            return "RESULT_ZERO".into();
+        }
+        if detail.starts_with("partial test results:") {
+            return "RESULT_PARTIAL".into();
+        }
+    }
     if step.cancelled {
         "STEP_CANCELLED"
     } else if step.timed_out {
@@ -286,7 +358,9 @@ fn failure_code(step: &crate::process::TaskResult) -> String {
 }
 
 fn report_status(report: &VerificationReport) -> &'static str {
-    if report.passed {
+    if report.passed && report.steps.iter().any(|step| step.waived) {
+        "WAIVED"
+    } else if report.passed {
         "PASS"
     } else if report.steps.iter().any(|step| step.cancelled)
         || report
@@ -336,6 +410,10 @@ struct InvocationMetadata<'a> {
     profile: &'a str,
     staged: bool,
     executor_version: &'static str,
+    commit: String,
+    platform: String,
+    toolchain: String,
+    request_id: Option<String>,
 }
 
 pub(super) fn allocate_invocation(project: &Project) -> Result<Invocation> {
@@ -391,15 +469,52 @@ pub(super) fn write_invocation_metadata(
     profile: &str,
     staged: bool,
 ) -> Result<()> {
+    write_invocation_metadata_with_request(invocation, profile, staged, None)
+}
+
+pub(super) fn write_invocation_metadata_with_request(
+    invocation: &Invocation,
+    profile: &str,
+    staged: bool,
+    request_id: Option<&str>,
+) -> Result<()> {
     let metadata = InvocationMetadata {
         invocation_id: &invocation.id,
         created_at: chrono::Utc::now().to_rfc3339(),
         profile,
         staged,
         executor_version: env!("CARGO_PKG_VERSION"),
+        commit: current_commit(),
+        platform: format!("{}-{}", std::env::consts::OS, std::env::consts::ARCH),
+        toolchain: rustc_version(),
+        request_id: request_id.map(str::to_string),
     };
     let contents = serde_json::to_vec_pretty(&metadata).context("serialize invocation metadata")?;
     atomic_write(&invocation.root.join("invocation.json"), &contents, false)
+}
+
+fn current_commit() -> String {
+    std::process::Command::new("git")
+        .args(["rev-parse", "HEAD"])
+        .output()
+        .ok()
+        .filter(|output| output.status.success())
+        .and_then(|output| String::from_utf8(output.stdout).ok())
+        .map(|value| value.trim().to_string())
+        .filter(|value| !value.is_empty())
+        .unwrap_or_else(|| "unknown".into())
+}
+
+fn rustc_version() -> String {
+    std::process::Command::new("rustc")
+        .arg("--version")
+        .output()
+        .ok()
+        .filter(|output| output.status.success())
+        .and_then(|output| String::from_utf8(output.stdout).ok())
+        .map(|value| value.trim().to_string())
+        .filter(|value| !value.is_empty())
+        .unwrap_or_else(|| "unknown".into())
 }
 
 pub(super) fn mirror_legacy_outputs(
@@ -1170,7 +1285,13 @@ fn markdown(report: &VerificationReport) -> String {
             .join(",")
     ));
     for step in &report.steps {
-        let status = if step.passed { "PASS" } else { "FAIL" };
+        let status = if step.waived {
+            "WAIVED"
+        } else if step.passed {
+            "PASS"
+        } else {
+            "FAIL"
+        };
         output.push_str(&format!(
             "- {status}: {} ({} ms)",
             step.label, step.duration_ms
@@ -1178,7 +1299,7 @@ fn markdown(report: &VerificationReport) -> String {
         if let Some(detail) = &step.detail {
             output.push_str(&format!(" - {detail}"));
         }
-        if !step.passed {
+        if !step.passed && !step.waived {
             output.push_str(&format!("; log: {}", step.log));
         }
         output.push('\n');
@@ -1188,14 +1309,26 @@ fn markdown(report: &VerificationReport) -> String {
     }
     output.push_str(&format!(
         "\nTEST_SUMMARY: {}\n",
-        if report.passed { "PASS" } else { "FAIL" }
+        if report.passed && report.steps.iter().any(|step| step.waived) {
+            "WAIVED"
+        } else if report.passed {
+            "PASS"
+        } else {
+            "FAIL"
+        }
     ));
     output
 }
 
 #[cfg(test)]
 fn render_html(template: &str, report: &VerificationReport) -> String {
-    let summary = if report.passed { "PASS" } else { "FAIL" };
+    let summary = if report.passed && report.steps.iter().any(|step| step.waived) {
+        "WAIVED"
+    } else if report.passed {
+        "PASS"
+    } else {
+        "FAIL"
+    };
     template
         .replace("{{ timestamp }}", &escape(&report.timestamp))
         .replace("{{ profile }}", &escape(&report.profile))
@@ -1229,6 +1362,8 @@ fn junit(report: &VerificationReport) -> String {
                 "<failure message=\"{}\"/>",
                 escape(step.detail.as_deref().unwrap_or("failed"))
             ));
+        } else if step.waived {
+            output.push_str("<skipped message=\"WAIVED\"/>");
         }
         output.push_str("</testcase>\n");
     }
@@ -1338,6 +1473,13 @@ mod tests {
                 duration_ms: 42,
                 log: "logs/unit.log".into(),
                 detail: Some("exit code 1".into()),
+                failure_code: None,
+                attempts: Vec::new(),
+                flaky: false,
+                retry_class: None,
+                parser: None,
+                waived: false,
+                waiver: None,
                 runner: None,
             }],
             skipped_steps: vec![],

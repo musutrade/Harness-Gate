@@ -1,7 +1,7 @@
 mod commands;
 mod output;
 
-use crate::cli::{Cli, Commands, ConfigAction, ConfigFormat, SchemaAction};
+use crate::cli::{Cli, Commands, CompatAction, ConfigAction, ConfigFormat, SchemaAction};
 use crate::error::CliError;
 use crate::project::Project;
 use anyhow::Context;
@@ -26,6 +26,39 @@ pub(crate) fn run() -> Result<bool, CliError> {
         crate::preset::print_presets();
         return Ok(true);
     }
+    if let Commands::Compat {
+        action: CompatAction::Compare { old, new, output },
+    } = &cli.command
+    {
+        let comparison = crate::compat::compare_files(old, new)?;
+        crate::utils::fs::atomic_write(
+            output,
+            format!(
+                "{}\n",
+                serde_json::to_string_pretty(&comparison).map_err(anyhow::Error::from)?
+            ),
+            true,
+        )
+        .with_context(|| format!("write comparison report {}", output.display()))?;
+        println!("Comparison written: {}", output.display());
+        return Ok(comparison.equivalent);
+    }
+    if let Commands::Compat {
+        action: CompatAction::Canary { state, slice },
+    } = &cli.command
+    {
+        let state = crate::compat::set_canary(state, slice)?;
+        println!("Canary enabled for {}: {}", state.slice, state.updated_at);
+        return Ok(true);
+    }
+    if let Commands::Compat {
+        action: CompatAction::Rollback { state },
+    } = &cli.command
+    {
+        let state = crate::compat::rollback(state)?;
+        println!("Canary rolled back: {}", state.updated_at);
+        return Ok(true);
+    }
     if let Commands::Schema {
         action: SchemaAction::Export { output },
     } = &cli.command
@@ -43,7 +76,7 @@ pub(crate) fn run() -> Result<bool, CliError> {
             std::fs::create_dir_all(parent)
                 .with_context(|| format!("create schema directory {}", parent.display()))?;
         }
-        std::fs::write(&path, format!("{}\n", crate::config::schema_json()?))
+        crate::utils::fs::atomic_write(&path, format!("{}\n", crate::config::schema_json()?), true)
             .with_context(|| format!("write workflow schema {}", path.display()))?;
         println!("Schema written: {}", path.display());
         return Ok(true);

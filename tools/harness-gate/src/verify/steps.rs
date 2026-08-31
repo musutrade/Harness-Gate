@@ -1,6 +1,8 @@
 use super::parser::parse_result_count;
-use crate::config::{ParserConfig, StepConfig};
-use crate::process::{RunnerExecution, Task, TaskResult};
+use crate::config::{ParserConfig, StepConfig, TestIsolation};
+use crate::process::{
+    allocate_isolation, ParserEvidence, RunnerExecution, Task, TaskAttempt, TaskResult,
+};
 use crate::project::Project;
 use crate::service::{ServiceLease, ServiceManager};
 use crate::ui;
@@ -36,6 +38,13 @@ pub(super) fn run_configured_step<'a>(
                     duration_ms: 0,
                     log: String::new(),
                     detail: Some(format!("{error:#}")),
+                    failure_code: Some("SERVICE_SETUP_FAILURE".into()),
+                    attempts: Vec::new(),
+                    flaky: false,
+                    retry_class: None,
+                    parser: None,
+                    waived: false,
+                    waiver: None,
                     runner: None,
                 });
             }
@@ -57,6 +66,13 @@ pub(super) fn run_configured_step<'a>(
                     duration_ms: 0,
                     log: String::new(),
                     detail: Some(format!("{error:#}")),
+                    failure_code: Some("SERVICE_LEASE_FAILURE".into()),
+                    attempts: Vec::new(),
+                    flaky: false,
+                    retry_class: None,
+                    parser: None,
+                    waived: false,
+                    waiver: None,
                     runner: None,
                 });
             }
@@ -67,8 +83,92 @@ pub(super) fn run_configured_step<'a>(
         .parser
         .as_deref()
         .and_then(|id| project.config.parser(id));
-    let task = configured_task(project, step, &service_leases)?;
-    execute(task, parser, service_leases)
+    let retry = project.config.execution.retries.get(&step.id);
+    let max_attempts = retry.map_or(1, |policy| policy.max_attempts.max(1));
+    let mut attempts = Vec::with_capacity(max_attempts as usize);
+    let mut final_result = None;
+    for attempt in 1..=max_attempts {
+        if attempt > 1 {
+            let backoff = retry.map_or(0, |policy| policy.backoff_ms);
+            if backoff > 0 {
+                std::thread::sleep(Duration::from_millis(backoff));
+            }
+        }
+        let mut attempt_step = step.clone();
+        if max_attempts > 1 && attempt > 1 {
+            attempt_step.log = attempt_log_name(&step.log, attempt);
+        }
+        let task = configured_task(project, &attempt_step, &service_leases)?;
+        let mut result = execute(task, parser)?;
+        result.attempt = Some(attempt);
+        if !result.passed {
+            result.retry_class = Some(retry_class(&result).into());
+        }
+        attempts.push(TaskAttempt {
+            attempt,
+            status: task_status(&result).into(),
+            started_at: result.started_at.clone(),
+            finished_at: result.finished_at.clone(),
+            duration_ms: result.duration_ms,
+            timed_out: result.timed_out,
+            cancelled: result.cancelled,
+            log: result.log.clone(),
+            detail: result.detail.clone(),
+        });
+        let should_retry = !result.passed
+            && !result.cancelled
+            && attempt < max_attempts
+            && retry.is_some_and(|policy| policy.retryable.contains(retry_class(&result)));
+        result.attempts = attempts.clone();
+        if !should_retry {
+            result.flaky = result.passed && attempts.iter().any(|attempt| attempt.status == "FAIL");
+            final_result = Some(result);
+            break;
+        }
+    }
+    Ok(final_result.expect("at least one configured step attempt"))
+}
+
+fn attempt_log_name(log: &str, attempt: u32) -> String {
+    let stem = log.strip_suffix(".log").unwrap_or(log);
+    format!("{stem}.attempt-{attempt}.log")
+}
+
+fn isolation_mode_name(mode: TestIsolation) -> &'static str {
+    match mode {
+        TestIsolation::Shared => "shared",
+        TestIsolation::SchemaPerWorker => "schema-per-worker",
+        TestIsolation::DatabasePerWorker => "database-per-worker",
+    }
+}
+
+fn task_status(result: &TaskResult) -> &'static str {
+    if result.cancelled {
+        "CANCELLED"
+    } else if result.passed {
+        "PASS"
+    } else {
+        "FAIL"
+    }
+}
+
+fn retry_class(result: &TaskResult) -> &'static str {
+    if result.cancelled {
+        "cancelled"
+    } else if result.timed_out {
+        "timeout"
+    } else if result.failure_code.as_deref() == Some("RESULT_PARSE_FAILURE")
+        || result.failure_code.as_deref() == Some("RESULT_ZERO")
+        || result.failure_code.as_deref() == Some("RESULT_PARTIAL")
+        || result
+            .detail
+            .as_deref()
+            .is_some_and(|detail| detail.starts_with("parsed "))
+    {
+        "parser"
+    } else {
+        "exit"
+    }
 }
 
 fn lock_services<'a>(
@@ -125,9 +225,70 @@ fn configured_task(
     let mut task = Task::new(&step.label, &step.program, &cwd, log(project, &step.log)?)
         .timeout(step.timeout_secs);
     if let Some(runner) = &step.runner {
-        let (effective_args, execution) = runner_inputs(runner, &args)?;
+        let (effective_args, mut execution) = runner_inputs(runner, &args)?;
+        execution.program = step.program.clone();
+        let mut isolation_state = None;
+        execution.migration_decision = if runner.isolation == TestIsolation::Shared {
+            "legacy-serial".into()
+        } else {
+            "explicit-runner-isolation".into()
+        };
+        execution.lock_decision = if runner.isolation == TestIsolation::Shared {
+            "not-required".into()
+        } else {
+            "invocation-scoped".into()
+        };
+        if runner.isolation != TestIsolation::Shared {
+            let worker_count = runner.threads.unwrap_or(1);
+            let (allocation, state_file) = allocate_isolation(
+                &project.reports,
+                &project.invocation_id(),
+                &step.id,
+                runner.isolation,
+                worker_count,
+            )?;
+            execution.isolation_id = Some(format!(
+                "{}:{}",
+                allocation.invocation_id, allocation.step_id
+            ));
+            execution.worker_ids = allocation.workers.clone();
+            execution.isolation_root = state_file
+                .parent()
+                .map(|path| path.to_string_lossy().into_owned());
+            execution.environment.insert(
+                crate::process::ISOLATION_MODE_ENV.into(),
+                isolation_mode_name(runner.isolation).into(),
+            );
+            execution.environment.insert(
+                crate::process::ISOLATION_IDS_ENV.into(),
+                allocation.workers.join(","),
+            );
+            execution.environment.insert(
+                crate::process::ISOLATION_ROOT_ENV.into(),
+                state_file
+                    .parent()
+                    .map(|path| path.to_string_lossy().into_owned())
+                    .unwrap_or_default(),
+            );
+            isolation_state = Some(state_file);
+        }
+        if let Some(shard) = project.config.execution.shards.get(&step.id) {
+            execution.shard_index = Some(shard.index);
+            execution.shard_total = Some(shard.total);
+            execution
+                .environment
+                .insert("HARNESS_GATE_SHARD_INDEX".into(), shard.index.to_string());
+            execution
+                .environment
+                .insert("HARNESS_GATE_SHARD_TOTAL".into(), shard.total.to_string());
+            execution.merge_identity =
+                Some(format!("{}:shard-{}/{}", step.id, shard.index, shard.total));
+        }
         let runner_environment = execution.environment.clone();
         task = task.args(effective_args).runner(execution);
+        if let Some(state_file) = isolation_state {
+            task = task.isolation_state(state_file);
+        }
         for (name, value) in runner_environment {
             task = task.env(name, value);
         }
@@ -177,30 +338,85 @@ fn runner_inputs(
     let execution = RunnerExecution {
         version: runner.version,
         kind: runner.kind.clone(),
+        program: String::new(),
         effective_args: effective_args.clone(),
         environment,
         result_format: runner.result_format,
         isolation: runner.isolation,
         threads: runner.threads,
+        isolation_id: None,
+        worker_ids: Vec::new(),
+        isolation_root: None,
+        migration_decision: "pending".into(),
+        lock_decision: "pending".into(),
+        shard_index: None,
+        shard_total: None,
+        merge_identity: None,
     };
     Ok((effective_args, execution))
 }
 
-fn execute(
-    task: Task,
-    parser: Option<&ParserConfig>,
-    _service_leases: Vec<ServiceLease>,
-) -> Result<TaskResult> {
+fn execute(task: Task, parser: Option<&ParserConfig>) -> Result<TaskResult> {
     let mut result = task.run()?;
     if result.passed {
         if let Some(parser) = parser {
-            let content = fs::read_to_string(&result.log)
-                .with_context(|| format!("read parser log {}", result.log))?;
-            let (count, minimum) = parse_result_count(&content, parser)?;
+            let content = match fs::read_to_string(&result.log) {
+                Ok(content) => content,
+                Err(error) => {
+                    result.passed = false;
+                    result.failure_code = Some("RESULT_PARSE_FAILURE".into());
+                    result.detail = Some(format!("parser failure: read result log: {error}"));
+                    result.parser = Some(ParserEvidence {
+                        mode: parser_mode(parser).into(),
+                        version: 1,
+                        observed: 0,
+                        minimum: parser_minimum(parser),
+                        complete: false,
+                    });
+                    return Ok(result);
+                }
+            };
+            let (count, minimum) = match parse_result_count(&content, parser) {
+                Ok(value) => value,
+                Err(error) => {
+                    result.passed = false;
+                    result.failure_code = Some("RESULT_PARSE_FAILURE".into());
+                    result.detail = Some(format!("parser failure: {error:#}"));
+                    result.parser = Some(ParserEvidence {
+                        mode: parser_mode(parser).into(),
+                        version: 1,
+                        observed: 0,
+                        minimum: parser_minimum(parser),
+                        complete: false,
+                    });
+                    return Ok(result);
+                }
+            };
+            let complete = count >= minimum;
+            result.parser = Some(ParserEvidence {
+                mode: parser_mode(parser).into(),
+                version: 1,
+                observed: count,
+                minimum,
+                complete,
+            });
             if count < minimum {
                 result.passed = false;
+                result.failure_code = Some(
+                    if count == 0 {
+                        "RESULT_ZERO"
+                    } else {
+                        "RESULT_PARTIAL"
+                    }
+                    .into(),
+                );
                 result.detail = Some(format!(
-                    "parsed {count} result(s), expected at least {minimum}"
+                    "{}: parsed {count} result(s), expected at least {minimum}",
+                    if count == 0 {
+                        "zero test results"
+                    } else {
+                        "partial test results"
+                    }
                 ));
             } else {
                 result.detail = Some(format!("{count} result(s)"));
@@ -208,6 +424,24 @@ fn execute(
         }
     }
     Ok(result)
+}
+
+fn parser_mode(parser: &ParserConfig) -> &'static str {
+    match parser {
+        ParserConfig::Regex { .. } => "regex",
+        ParserConfig::Junit { .. } => "junit",
+        ParserConfig::Trx { .. } => "trx",
+        ParserConfig::Json { .. } => "json",
+    }
+}
+
+fn parser_minimum(parser: &ParserConfig) -> usize {
+    match parser {
+        ParserConfig::Regex { minimum, .. }
+        | ParserConfig::Junit { minimum }
+        | ParserConfig::Trx { minimum }
+        | ParserConfig::Json { minimum, .. } => *minimum,
+    }
 }
 
 pub(super) fn print_result(result: &TaskResult) {
