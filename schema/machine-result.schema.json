@@ -11,6 +11,11 @@
     "report_directory",
     "timestamp",
     "profile",
+    "input_mode",
+    "project_identity",
+    "source_identity",
+    "execution_root",
+    "configuration_digest",
     "scope",
     "services",
     "steps",
@@ -29,6 +34,11 @@
     "report_directory": {"type": "string", "minLength": 1},
     "timestamp": {"type": "string", "format": "date-time"},
     "profile": {"type": "string", "minLength": 1},
+    "input_mode": {"enum": ["working-tree", "staged", "base", "all"]},
+    "project_identity": {"type": "string", "minLength": 1},
+    "source_identity": {"type": "string", "minLength": 1},
+    "execution_root": {"type": "string", "minLength": 1},
+    "configuration_digest": {"type": "string", "pattern": "^sha256:[A-Fa-f0-9]{64}$"},
     "scope": {
       "type": "object",
       "additionalProperties": false,
@@ -201,7 +211,11 @@
       "required": ["path", "kind"],
       "properties": {
         "path": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
-        "kind": {"type": "string"}
+        "kind": {"type": "string", "minLength": 1},
+        "invocation_id": {"type": ["string", "null"], "minLength": 1},
+        "step_id": {"type": ["string", "null"], "minLength": 1},
+        "size_bytes": {"type": ["integer", "null"], "minimum": 0},
+        "sha256": {"type": ["string", "null"], "pattern": "^[A-Fa-f0-9]{64}$"}
       }
     },
     "service": {

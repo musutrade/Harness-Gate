@@ -122,14 +122,16 @@ fn atomic_write_batch_restores_backups_when_commit_fails() {
 
 #[cfg(unix)]
 #[test]
-fn atomic_write_batch_replaces_broken_symlink() {
+fn atomic_write_batch_rejects_broken_symlink() {
     use std::os::unix::fs::symlink;
 
     let root = TestWorkspace::new("preset-batch-symlink");
     let path = root.root.join("config");
     symlink(root.root.join("missing-target"), &path).expect("create broken symlink");
 
-    atomic_write_batch(&[(path.as_path(), b"content")]).expect("replace symlink");
-
-    assert_eq!(fs::read_to_string(path).expect("read config"), "content");
+    assert!(atomic_write_batch(&[(path.as_path(), b"content")]).is_err());
+    assert!(fs::symlink_metadata(path)
+        .expect("inspect link")
+        .file_type()
+        .is_symlink());
 }

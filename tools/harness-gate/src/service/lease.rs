@@ -2,25 +2,77 @@ use crate::config::ContainerRuntimeKind;
 use crate::project::Project;
 use anyhow::{bail, Context, Result};
 use serde::{Deserialize, Serialize};
-use std::collections::hash_map::DefaultHasher;
+use sha2::{Digest, Sha256};
+use std::collections::BTreeMap;
 use std::fs::{self, OpenOptions};
-use std::hash::{Hash, Hasher};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Mutex;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
-pub(crate) const LEASE_SCHEMA_VERSION: u32 = 1;
+pub(crate) const LEASE_SCHEMA_VERSION: u32 = 2;
+/// Cleanup evidence has its own public schema.  Lease records may evolve
+/// independently without invalidating consumers of `cleanup.json`.
+pub(crate) const CLEANUP_REPORT_SCHEMA_VERSION: u32 = 1;
 pub(crate) const OWNER_MARKER: &str = "harness-gate";
+pub(crate) const LABEL_OWNER: &str = "harness-gate.owner";
+pub(crate) const LABEL_SCHEMA: &str = "harness-gate.schema";
+pub(crate) const LABEL_PROJECT: &str = "harness-gate.project";
+pub(crate) const LABEL_RESOURCE: &str = "harness-gate.resource";
+pub(crate) const LABEL_KIND: &str = "harness-gate.kind";
+pub(crate) const LABEL_INVOCATION: &str = "harness-gate.invocation";
 const LEASE_TTL: Duration = Duration::from_secs(15 * 60);
 const RENEW_AFTER: Duration = Duration::from_secs(30);
 static TEMP_COUNTER: AtomicU64 = AtomicU64::new(1);
+
+trait RuntimeOperations {
+    fn inspect(
+        &self,
+        runtime: ContainerRuntimeKind,
+        project: &Project,
+        name: &str,
+        timeout: Duration,
+    ) -> Result<super::runtime::RuntimeInspection>;
+
+    fn stop(
+        &self,
+        runtime: ContainerRuntimeKind,
+        cwd: &Path,
+        name: &str,
+        timeout: Duration,
+    ) -> Result<()>;
+}
+
+struct CliRuntimeOperations;
+
+impl RuntimeOperations for CliRuntimeOperations {
+    fn inspect(
+        &self,
+        runtime: ContainerRuntimeKind,
+        project: &Project,
+        name: &str,
+        timeout: Duration,
+    ) -> Result<super::runtime::RuntimeInspection> {
+        super::runtime::inspect_owned_container(runtime, project, name, timeout)
+    }
+
+    fn stop(
+        &self,
+        runtime: ContainerRuntimeKind,
+        cwd: &Path,
+        name: &str,
+        timeout: Duration,
+    ) -> Result<()> {
+        super::runtime::stop_owned_container(runtime, cwd, name, timeout)
+    }
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct LeaseRecord {
     pub(crate) owner_marker: String,
     pub(crate) schema_version: u32,
+    pub(crate) project_identity: String,
     pub(crate) resource_id: String,
     pub(crate) resource_kind: String,
     pub(crate) invocation_id: String,
@@ -33,6 +85,8 @@ pub(crate) struct LeaseRecord {
     pub(crate) resource_name: Option<String>,
     #[serde(default)]
     pub(crate) runtime: Option<String>,
+    pub(crate) runtime_labels: BTreeMap<String, String>,
+    pub(crate) runtime_object_id: Option<String>,
 }
 
 #[derive(Debug)]
@@ -59,9 +113,17 @@ impl ResourceLease {
             .with_context(|| format!("create lease directory {}", directory.display()))?;
         let path = directory.join(format!("{}.json", resource_key(&resource_id)));
         let now = epoch_seconds();
+        let project_identity = project.input().project_identity.clone();
+        let runtime_labels = ownership_labels(
+            &project_identity,
+            &resource_id,
+            &resource_kind,
+            &invocation_id,
+        );
         let record = LeaseRecord {
             owner_marker: OWNER_MARKER.into(),
             schema_version: LEASE_SCHEMA_VERSION,
+            project_identity,
             resource_id: resource_id.clone(),
             resource_kind,
             invocation_id,
@@ -72,6 +134,8 @@ impl ResourceLease {
             expires_at: now.saturating_add(LEASE_TTL.as_secs()),
             resource_name,
             runtime: runtime.map(|kind| kind.executable().to_string()),
+            runtime_labels,
+            runtime_object_id: None,
         };
 
         loop {
@@ -87,7 +151,7 @@ impl ResourceLease {
                     let existing = read_record(&path).with_context(|| {
                         format!("inspect existing lease for resource {resource_id:?}")
                     })?;
-                    validate_record(&existing, &resource_id)?;
+                    validate_record(&existing, &resource_id, &path, &directory, project)?;
                     if !is_stale(&existing, epoch_seconds()) {
                         bail!(
                             "resource lease conflict for {resource_id:?}: invocation {} (pid {}) owns it",
@@ -126,6 +190,40 @@ impl ResourceLease {
         write_record(&self.path, &record)?;
         *last = Instant::now();
         Ok(())
+    }
+
+    /// Bind a newly created runtime object to this lease. The object ID is
+    /// immutable for the lifetime of the object and is never accepted from
+    /// repository-controlled configuration.
+    pub(crate) fn bind_runtime_identity(
+        &self,
+        project: &Project,
+        inspection: &super::runtime::RuntimeInspection,
+    ) -> Result<()> {
+        let mut record = self
+            .record
+            .lock()
+            .map_err(|_| anyhow::anyhow!("lease record lock was poisoned"))?;
+        let current = read_record(&self.path)
+            .with_context(|| format!("read lease {}", self.path.display()))?;
+        ensure_owner(&current, &record)?;
+        validate_runtime_ownership(project, &self.path, &current, inspection)?;
+        if inspection.object_id.trim().is_empty() {
+            bail!("runtime inspection returned an empty immutable object ID");
+        }
+        record.runtime_object_id = Some(inspection.object_id.clone());
+        record.runtime_labels = inspection.labels.clone();
+        write_record(&self.path, &record)?;
+        Ok(())
+    }
+
+    pub(crate) fn verify_runtime_ownership(&self, project: &Project) -> Result<()> {
+        let record = self
+            .record
+            .lock()
+            .map_err(|_| anyhow::anyhow!("lease record lock was poisoned"))?
+            .clone();
+        verify_runtime_record(&CliRuntimeOperations, project, &self.path, &record)
     }
 
     pub(crate) fn release(&self) -> Result<()> {
@@ -181,9 +279,17 @@ pub(crate) struct CleanupResource {
 }
 
 pub(crate) fn cleanup(project: &Project, dry_run: bool) -> Result<CleanupReport> {
+    cleanup_with_runtime(project, dry_run, &CliRuntimeOperations)
+}
+
+fn cleanup_with_runtime<O: RuntimeOperations + ?Sized>(
+    project: &Project,
+    dry_run: bool,
+    runtime: &O,
+) -> Result<CleanupReport> {
     let directory = lease_directory(project)?;
     let mut report = CleanupReport {
-        schema_version: LEASE_SCHEMA_VERSION,
+        schema_version: CLEANUP_REPORT_SCHEMA_VERSION,
         owner_marker: OWNER_MARKER,
         dry_run,
         scanned: 0,
@@ -212,8 +318,15 @@ pub(crate) fn cleanup(project: &Project, dry_run: bool) -> Result<CleanupReport>
                 continue;
             }
         };
-        if validate_record(&record, &record.resource_id).is_err() {
-            // Unknown or malformed markers are intentionally never reclaimed.
+        if let Err(error) =
+            validate_record(&record, &record.resource_id, &path, &directory, project)
+        {
+            // Unknown or malformed markers are intentionally never reclaimed,
+            // but the failure is retained as structured cleanup evidence.
+            report.failures.push(format!(
+                "{}: ownership validation failed: {error:#}",
+                path.display()
+            ));
             continue;
         }
         let stale = is_stale(&record, epoch_seconds());
@@ -237,7 +350,7 @@ pub(crate) fn cleanup(project: &Project, dry_run: bool) -> Result<CleanupReport>
             "reclaimed"
         };
         if !dry_run {
-            if let Err(error) = reclaim_resource(project, &path, &record) {
+            if let Err(error) = reclaim_resource_with_runtime(project, &path, &record, runtime) {
                 action = "failed";
                 report.failures.push(format!(
                     "reclaim {} ({}) failed: {error:#}",
@@ -260,6 +373,15 @@ pub(crate) fn cleanup(project: &Project, dry_run: bool) -> Result<CleanupReport>
 }
 
 fn reclaim_resource(project: &Project, path: &Path, record: &LeaseRecord) -> Result<()> {
+    reclaim_resource_with_runtime(project, path, record, &CliRuntimeOperations)
+}
+
+fn reclaim_resource_with_runtime<O: RuntimeOperations + ?Sized>(
+    project: &Project,
+    path: &Path,
+    record: &LeaseRecord,
+    runtime_operations: &O,
+) -> Result<()> {
     if record.resource_kind == "container" {
         let name = record
             .resource_name
@@ -274,7 +396,9 @@ fn reclaim_resource(project: &Project, path: &Path, record: &LeaseRecord) -> Res
             Some(value) => bail!("unsupported container runtime {value:?}"),
             None => bail!("container lease has no runtime"),
         };
-        super::runtime::stop_owned_container(runtime, &project.root, name, Duration::from_secs(5))
+        verify_runtime_record(runtime_operations, project, path, record)?;
+        runtime_operations
+            .stop(runtime, &project.root, name, Duration::from_secs(5))
             .with_context(|| format!("stop owned container {name:?}"))?;
     }
     match fs::remove_file(path) {
@@ -331,7 +455,13 @@ fn publish_replacement(temporary: &Path, target: &Path) -> Result<()> {
     Ok(())
 }
 
-fn validate_record(record: &LeaseRecord, resource_id: &str) -> Result<()> {
+fn validate_record(
+    record: &LeaseRecord,
+    resource_id: &str,
+    path: &Path,
+    lease_directory: &Path,
+    project: &Project,
+) -> Result<()> {
     if record.owner_marker != OWNER_MARKER {
         bail!("lease owner marker is not Harness-Gate");
     }
@@ -341,11 +471,68 @@ fn validate_record(record: &LeaseRecord, resource_id: &str) -> Result<()> {
     if record.resource_id != resource_id {
         bail!("lease resource identity mismatch");
     }
+    let expected_name = format!("{}.json", resource_key(&record.resource_id));
+    if path.file_name().and_then(|name| name.to_str()) != Some(expected_name.as_str()) {
+        bail!("lease filename does not match the deterministic resource key");
+    }
+    if path.parent() != Some(lease_directory) {
+        bail!("lease is not directly inside the project lease directory");
+    }
+    if record.project_identity != project.input().project_identity {
+        bail!("lease project identity does not match the current project");
+    }
+    if record.resource_id.trim().is_empty()
+        || record.resource_kind.trim().is_empty()
+        || record.invocation_id.trim().is_empty()
+    {
+        bail!("lease ownership fields must be non-empty");
+    }
+    if record.resource_kind == "container" {
+        if record
+            .resource_name
+            .as_deref()
+            .unwrap_or_default()
+            .trim()
+            .is_empty()
+        {
+            bail!("container lease has no resource name");
+        }
+        if record.runtime.is_none() {
+            bail!("container lease has no runtime");
+        }
+        if record
+            .runtime_object_id
+            .as_deref()
+            .unwrap_or_default()
+            .trim()
+            .is_empty()
+        {
+            bail!("container lease has no immutable runtime object ID");
+        }
+        let expected = ownership_labels(
+            &record.project_identity,
+            &record.resource_id,
+            &record.resource_kind,
+            &record.invocation_id,
+        );
+        for (key, value) in expected {
+            if record.runtime_labels.get(&key) != Some(&value) {
+                bail!("container lease is missing expected runtime label {key:?}");
+            }
+        }
+    }
     Ok(())
 }
 
 fn ensure_owner(current: &LeaseRecord, expected: &LeaseRecord) -> Result<()> {
-    validate_record(current, &expected.resource_id)?;
+    if current.owner_marker != OWNER_MARKER
+        || current.schema_version != LEASE_SCHEMA_VERSION
+        || current.resource_id != expected.resource_id
+        || current.project_identity != expected.project_identity
+        || current.resource_kind != expected.resource_kind
+    {
+        bail!("lease ownership changed while operating on the resource");
+    }
     if current.invocation_id != expected.invocation_id
         || current.pid != expected.pid
         || current.process_start_identity != expected.process_start_identity
@@ -368,9 +555,95 @@ fn is_stale(record: &LeaseRecord, now: u64) -> bool {
 }
 
 fn resource_key(resource_id: &str) -> String {
-    let mut hasher = DefaultHasher::new();
-    resource_id.hash(&mut hasher);
-    format!("{:016x}", hasher.finish())
+    let mut digest = Sha256::new();
+    digest.update(resource_id.as_bytes());
+    let encoded = format!("{:x}", digest.finalize());
+    encoded[..16].to_string()
+}
+
+pub(crate) fn ownership_labels(
+    project_identity: &str,
+    resource_id: &str,
+    resource_kind: &str,
+    invocation_id: &str,
+) -> BTreeMap<String, String> {
+    BTreeMap::from([
+        (LABEL_OWNER.into(), OWNER_MARKER.into()),
+        (LABEL_SCHEMA.into(), LEASE_SCHEMA_VERSION.to_string()),
+        (LABEL_PROJECT.into(), project_identity.into()),
+        (LABEL_RESOURCE.into(), resource_id.into()),
+        (LABEL_KIND.into(), resource_kind.into()),
+        (LABEL_INVOCATION.into(), invocation_id.into()),
+    ])
+}
+
+fn validate_runtime_ownership(
+    project: &Project,
+    path: &Path,
+    record: &LeaseRecord,
+    inspection: &super::runtime::RuntimeInspection,
+) -> Result<()> {
+    let expected_name = record.resource_name.as_deref().unwrap_or_default();
+    if expected_name.trim().is_empty() {
+        bail!("container lease has no resource name");
+    }
+    if inspection.name != expected_name.trim_start_matches('/') {
+        bail!("runtime object name does not match the lease resource name");
+    }
+    let expected = ownership_labels(
+        &record.project_identity,
+        &record.resource_id,
+        &record.resource_kind,
+        &record.invocation_id,
+    );
+    for (key, value) in expected {
+        if inspection.labels.get(&key) != Some(&value) {
+            bail!("runtime object is missing or mismatches ownership label {key:?}");
+        }
+    }
+    if record.project_identity != project.input().project_identity {
+        bail!("lease project identity does not match the current project");
+    }
+    if path.file_name().and_then(|name| name.to_str())
+        != Some(format!("{}.json", resource_key(&record.resource_id)).as_str())
+    {
+        bail!("lease filename does not match the deterministic resource key");
+    }
+    Ok(())
+}
+
+fn verify_runtime_record<O: RuntimeOperations + ?Sized>(
+    runtime_operations: &O,
+    project: &Project,
+    path: &Path,
+    record: &LeaseRecord,
+) -> Result<()> {
+    let runtime = match record.runtime.as_deref() {
+        Some("docker") => ContainerRuntimeKind::Docker,
+        Some("podman") => ContainerRuntimeKind::Podman,
+        Some(value) => bail!("unsupported container runtime {value:?}"),
+        None => bail!("container lease has no runtime"),
+    };
+    let name = record
+        .resource_name
+        .as_deref()
+        .ok_or_else(|| anyhow::anyhow!("container lease has no resource name"))?;
+    let inspection = runtime_operations.inspect(runtime, project, name, Duration::from_secs(5))?;
+    validate_runtime_ownership(project, path, record, &inspection)?;
+    let object_id = record
+        .runtime_object_id
+        .as_deref()
+        .filter(|id| !id.trim().is_empty())
+        .ok_or_else(|| anyhow::anyhow!("container lease has no immutable runtime object ID"))?;
+    if inspection.object_id != object_id {
+        bail!("runtime object identity changed since the lease was recorded");
+    }
+    for (key, value) in &record.runtime_labels {
+        if inspection.labels.get(key) != Some(value) {
+            bail!("runtime ownership label {key:?} changed since lease creation");
+        }
+    }
+    Ok(())
 }
 
 fn lease_directory(project: &Project) -> Result<PathBuf> {
@@ -464,7 +737,144 @@ fn process_alive(pid: u32) -> Option<bool> {
 mod tests {
     #[cfg(target_os = "linux")]
     use super::process_start_identity_checked;
-    use super::{is_stale, resource_key, LeaseRecord, OWNER_MARKER};
+    use super::{
+        cleanup_with_runtime, is_stale, ownership_labels, read_record, resource_key, write_record,
+        LeaseRecord, RuntimeOperations, LEASE_SCHEMA_VERSION, OWNER_MARKER,
+    };
+    use crate::config::ContainerRuntimeKind;
+    use crate::project::Project;
+    use crate::service::runtime::RuntimeInspection;
+    use crate::test_support::TestWorkspace;
+    use std::collections::BTreeMap;
+    use std::path::{Path, PathBuf};
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    use std::sync::Arc;
+    use std::time::Duration;
+
+    #[derive(Clone)]
+    struct FakeRuntime {
+        expected_kind: ContainerRuntimeKind,
+        inspection: Option<RuntimeInspection>,
+        remove_calls: Arc<AtomicUsize>,
+    }
+
+    impl RuntimeOperations for FakeRuntime {
+        fn inspect(
+            &self,
+            runtime: ContainerRuntimeKind,
+            _project: &Project,
+            _name: &str,
+            _timeout: Duration,
+        ) -> anyhow::Result<RuntimeInspection> {
+            if runtime != self.expected_kind {
+                anyhow::bail!("fake runtime kind mismatch");
+            }
+            self.inspection
+                .clone()
+                .ok_or_else(|| anyhow::anyhow!("fake inspection failed"))
+        }
+
+        fn stop(
+            &self,
+            runtime: ContainerRuntimeKind,
+            _cwd: &Path,
+            _name: &str,
+            _timeout: Duration,
+        ) -> anyhow::Result<()> {
+            if runtime != self.expected_kind {
+                anyhow::bail!("fake runtime kind mismatch");
+            }
+            self.remove_calls.fetch_add(1, Ordering::SeqCst);
+            Ok(())
+        }
+    }
+
+    fn runtime_project(name: &str) -> (TestWorkspace, Project) {
+        let workspace = TestWorkspace::new(name);
+        crate::preset::init(&workspace.root, "generic", false).expect("initialize fixture");
+        workspace.init_git();
+        let project =
+            Project::discover(Some(workspace.root.clone()), None).expect("discover fixture");
+        (workspace, project)
+    }
+
+    fn container_lease(
+        project: &Project,
+        runtime: ContainerRuntimeKind,
+        stale: bool,
+    ) -> (PathBuf, LeaseRecord, RuntimeInspection) {
+        let resource_id = "service:database";
+        let invocation_id = "invocation-runtime-fixture";
+        let resource_name = "harness-gate-fixture-container";
+        let lease = super::ResourceLease::acquire(
+            project,
+            resource_id,
+            "container",
+            invocation_id,
+            Some(resource_name.into()),
+            Some(runtime),
+        )
+        .expect("acquire container lease");
+        let path = lease.path.clone();
+        let mut record = read_record(&path).expect("read fixture lease");
+        let inspection = RuntimeInspection {
+            object_id: "runtime-object-1".into(),
+            name: resource_name.into(),
+            labels: ownership_labels(
+                &project.input().project_identity,
+                resource_id,
+                "container",
+                invocation_id,
+            ),
+        };
+        record.runtime_object_id = Some(inspection.object_id.clone());
+        record.runtime_labels = inspection.labels.clone();
+        if stale {
+            record.pid = 0;
+            record.process_start_identity = "dead-process".into();
+            record.expires_at = 0;
+        } else {
+            record.expires_at = record.expires_at.saturating_add(3600);
+        }
+        write_record(&path, &record).expect("write fixture lease");
+        // The fixture intentionally leaves the marker for cleanup to inspect.
+        std::mem::forget(lease);
+        (path, record, inspection)
+    }
+
+    fn fake_runtime(
+        kind: ContainerRuntimeKind,
+        inspection: Option<RuntimeInspection>,
+    ) -> (FakeRuntime, Arc<AtomicUsize>) {
+        let remove_calls = Arc::new(AtomicUsize::new(0));
+        (
+            FakeRuntime {
+                expected_kind: kind,
+                inspection,
+                remove_calls: Arc::clone(&remove_calls),
+            },
+            remove_calls,
+        )
+    }
+
+    fn assert_failed_without_remove(
+        project: &Project,
+        path: &Path,
+        runtime: &FakeRuntime,
+        expected_code: &str,
+    ) {
+        let report = cleanup_with_runtime(project, false, runtime).expect("cleanup report");
+        assert_eq!(runtime.remove_calls.load(Ordering::SeqCst), 0);
+        assert!(path.exists(), "ambiguous lease must remain available");
+        assert!(
+            report
+                .failures
+                .iter()
+                .any(|failure| failure.contains(expected_code)),
+            "expected {expected_code} in {:?}",
+            report.failures
+        );
+    }
 
     #[test]
     fn resource_keys_are_stable_and_path_safe() {
@@ -484,7 +894,8 @@ mod tests {
     fn expired_process_lease_is_stale() {
         let record = LeaseRecord {
             owner_marker: OWNER_MARKER.into(),
-            schema_version: 1,
+            schema_version: LEASE_SCHEMA_VERSION,
+            project_identity: "fixture-project".into(),
             resource_id: "fixture".into(),
             resource_kind: "workspace".into(),
             invocation_id: "invocation".into(),
@@ -495,7 +906,99 @@ mod tests {
             expires_at: 1,
             resource_name: None,
             runtime: None,
+            runtime_labels: BTreeMap::new(),
+            runtime_object_id: None,
         };
         assert!(is_stale(&record, 2));
+    }
+
+    #[test]
+    fn fake_docker_and_podman_cleanup_requires_fresh_complete_ownership() {
+        for (index, runtime) in [ContainerRuntimeKind::Docker, ContainerRuntimeKind::Podman]
+            .into_iter()
+            .enumerate()
+        {
+            let (workspace, project) = runtime_project(&format!("runtime-owned-{index}"));
+            let (path, _record, inspection) = container_lease(&project, runtime, true);
+            let (fake, remove_calls) = fake_runtime(runtime, Some(inspection.clone()));
+            let report = cleanup_with_runtime(&project, false, &fake).expect("cleanup report");
+            assert_eq!(report.reclaimed, 1);
+            assert!(report.failures.is_empty());
+            assert_eq!(remove_calls.load(Ordering::SeqCst), 1);
+            assert!(!path.exists());
+            drop(workspace);
+
+            let (workspace, project) = runtime_project(&format!("runtime-object-{index}"));
+            let (path, _record, mut mismatch) = container_lease(&project, runtime, true);
+            mismatch.object_id = "replacement-object".into();
+            let (fake, _) = fake_runtime(runtime, Some(mismatch));
+            assert_failed_without_remove(&project, &path, &fake, "runtime object identity changed");
+            drop(workspace);
+
+            let (workspace, project) = runtime_project(&format!("runtime-label-{index}"));
+            let (path, _record, mut mismatch) = container_lease(&project, runtime, true);
+            mismatch
+                .labels
+                .insert(super::LABEL_PROJECT.into(), "other-project".into());
+            let (fake, _) = fake_runtime(runtime, Some(mismatch));
+            assert_failed_without_remove(&project, &path, &fake, "ownership label");
+            drop(workspace);
+
+            let (workspace, project) = runtime_project(&format!("runtime-renamed-{index}"));
+            let (path, _record, mut mismatch) = container_lease(&project, runtime, true);
+            mismatch.name = "harness-gate-renamed-container".into();
+            let (fake, _) = fake_runtime(runtime, Some(mismatch));
+            assert_failed_without_remove(&project, &path, &fake, "object name");
+            drop(workspace);
+
+            let (workspace, project) = runtime_project(&format!("runtime-inspect-{index}"));
+            let (path, _record, _inspection) = container_lease(&project, runtime, true);
+            let (fake, _) = fake_runtime(runtime, None);
+            assert_failed_without_remove(&project, &path, &fake, "fake inspection failed");
+            drop(workspace);
+
+            let (workspace, project) = runtime_project(&format!("runtime-cross-project-{index}"));
+            let (path, mut record, inspection) = container_lease(&project, runtime, true);
+            record.project_identity = "other-project".into();
+            write_record(&path, &record).expect("forge cross-project lease");
+            let (fake, _) = fake_runtime(runtime, Some(inspection));
+            assert_failed_without_remove(&project, &path, &fake, "project identity");
+            drop(workspace);
+
+            let (workspace, project) = runtime_project(&format!("runtime-forged-{index}"));
+            let (path, mut record, inspection) = container_lease(&project, runtime, true);
+            record.owner_marker = "forged".into();
+            write_record(&path, &record).expect("forge owner marker");
+            let (fake, _) = fake_runtime(runtime, Some(inspection));
+            assert_failed_without_remove(&project, &path, &fake, "owner marker");
+            drop(workspace);
+
+            let (workspace, project) = runtime_project(&format!("runtime-renamed-lease-{index}"));
+            let (path, _record, inspection) = container_lease(&project, runtime, true);
+            let renamed = path.with_file_name("renamed-lease.json");
+            std::fs::rename(&path, &renamed).expect("rename lease marker");
+            let (fake, _) = fake_runtime(runtime, Some(inspection));
+            assert_failed_without_remove(&project, &renamed, &fake, "deterministic resource key");
+            drop(workspace);
+
+            let (workspace, project) = runtime_project(&format!("runtime-malformed-{index}"));
+            let directory = super::lease_directory(&project).expect("lease directory");
+            let malformed = directory.join(format!("{}.json", resource_key("service:database")));
+            std::fs::write(&malformed, b"not-json").expect("write malformed lease");
+            let (fake, _) = fake_runtime(runtime, None);
+            assert_failed_without_remove(&project, &malformed, &fake, "parse");
+            drop(workspace);
+
+            let (workspace, project) = runtime_project(&format!("runtime-active-{index}"));
+            let (path, _record, inspection) = container_lease(&project, runtime, false);
+            let (fake, remove_calls) = fake_runtime(runtime, Some(inspection));
+            let report = cleanup_with_runtime(&project, false, &fake).expect("cleanup report");
+            assert_eq!(report.active, 1);
+            assert_eq!(report.reclaimed, 0);
+            assert!(report.failures.is_empty());
+            assert_eq!(remove_calls.load(Ordering::SeqCst), 0);
+            assert!(path.exists());
+            drop(workspace);
+        }
     }
 }

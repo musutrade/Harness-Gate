@@ -42,6 +42,7 @@ args = ["diff", "--check"]
 cwd = "{root}"
 log = "git_diff_check.log"
 timeout_secs = 60
+input = "repository"
 
 [[steps]]
 id = "project.staged-diff-check"
@@ -53,3 +54,4 @@ args = ["diff", "--cached", "--check"]
 cwd = "{root}"
 log = "git_staged_diff_check.log"
 timeout_secs = 60
+input = "repository"

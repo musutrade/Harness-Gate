@@ -90,6 +90,9 @@ struct SecretReport<'a> {
 fn scanner_for_mode(project: &Project, mode: SecretMode) -> Result<SecretScanner> {
     match mode {
         SecretMode::WorkingTree => SecretScanner::load(&project.secrets_config),
+        SecretMode::Staged if project.input().is_snapshot() => {
+            SecretScanner::load(&project.secrets_config)
+        }
         SecretMode::Staged => {
             let relative = project
                 .secrets_config
@@ -146,7 +149,7 @@ pub fn scan(project: &Project, mode: SecretMode) -> std::result::Result<Vec<Stri
         }
         let bytes = match mode {
             SecretMode::WorkingTree => {
-                let path = project.root.join(&file);
+                let path = project.execution_root.join(&file);
                 let metadata = match fs::symlink_metadata(&path) {
                     Ok(metadata) => metadata,
                     Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
@@ -168,15 +171,37 @@ pub fn scan(project: &Project, mode: SecretMode) -> std::result::Result<Vec<Stri
                 }
             }
             SecretMode::Staged => {
-                let Some(size) =
-                    git::staged_file_size(&project.root, &file).map_err(SecretsError::scan)?
-                else {
-                    continue;
-                };
-                reject_oversized_file(&file, size).map_err(SecretsError::scan)?;
-                match git::staged_file(&project.root, &file).map_err(SecretsError::scan)? {
-                    Some(bytes) => bytes,
-                    None => continue,
+                if project.input().is_snapshot() {
+                    let path = project.execution_root.join(&file);
+                    let metadata = match fs::symlink_metadata(&path) {
+                        Ok(metadata) => metadata,
+                        Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
+                        Err(error) => {
+                            return Err(SecretsError::scan(
+                                anyhow::Error::from(error).context(format!("inspect {file}")),
+                            ));
+                        }
+                    };
+                    if metadata.file_type().is_symlink() || !metadata.is_file() {
+                        continue;
+                    }
+                    match read_working_tree_file(&path, &file, metadata.len())
+                        .map_err(SecretsError::scan)?
+                    {
+                        Some(bytes) => bytes,
+                        None => continue,
+                    }
+                } else {
+                    let Some(size) =
+                        git::staged_file_size(&project.root, &file).map_err(SecretsError::scan)?
+                    else {
+                        continue;
+                    };
+                    reject_oversized_file(&file, size).map_err(SecretsError::scan)?;
+                    match git::staged_file(&project.root, &file).map_err(SecretsError::scan)? {
+                        Some(bytes) => bytes,
+                        None => continue,
+                    }
                 }
             }
         };
@@ -190,13 +215,15 @@ pub fn scan(project: &Project, mode: SecretMode) -> std::result::Result<Vec<Stri
         SecretMode::WorkingTree => "working-tree",
         SecretMode::Staged => "staged",
     };
-    output_fs::write_json(
-        &project.reports.join("secret_scan.json"),
+    output_fs::confined_write_json(
+        &project.reports,
+        Path::new("secret_scan.json"),
         &SecretReport {
             timestamp: chrono::Utc::now().to_rfc3339(),
             mode: mode_label,
             findings: &findings,
         },
+        true,
     )
     .map_err(SecretsError::scan)?;
     Ok(findings)

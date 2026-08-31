@@ -6,8 +6,9 @@ use anyhow::{bail, Context, Result};
 use regex::Regex;
 use serde::{ser::Serializer, Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use std::fs::{self, OpenOptions};
-use std::io::{Read, Write};
+use std::collections::{BTreeMap, BTreeSet};
+use std::fs;
+use std::io::Read;
 use std::path::{Component, Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::OnceLock;
@@ -16,6 +17,10 @@ use std::time::Duration;
 static INVOCATION_COUNTER: AtomicU64 = AtomicU64::new(1);
 pub(super) const MACHINE_RESULT_SCHEMA_VERSION: &str = "1";
 pub(super) const ARTIFACT_MANIFEST_SCHEMA_VERSION: &str = "1";
+const ARTIFACT_REGISTRY_SCHEMA_VERSION: &str = "1";
+const ARTIFACT_REGISTRY_FILE: &str = "artifact-registry.json";
+const MANIFEST_FILE: &str = "manifest.json";
+const MACHINE_RESULT_FILE: &str = "test_result.json";
 const MAX_RETAINED_INVOCATIONS: usize = 50;
 const REDACTION_TEXT_LIMIT: usize = 16 * 1024 * 1024;
 
@@ -27,6 +32,11 @@ struct MachineResult {
     report_directory: String,
     timestamp: String,
     profile: String,
+    input_mode: String,
+    project_identity: String,
+    source_identity: String,
+    execution_root: String,
+    configuration_digest: String,
     scope: crate::scope::ScopeResult,
     services: Vec<MachineService>,
     steps: Vec<MachineStep>,
@@ -99,7 +109,7 @@ struct MachineWarning {
     message: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 struct MachineFailure {
     step_id: Option<String>,
     code: String,
@@ -109,7 +119,15 @@ struct MachineFailure {
 #[derive(Debug, Serialize)]
 struct MachineArtifact {
     path: String,
-    kind: &'static str,
+    kind: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    invocation_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    step_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    size_bytes: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    sha256: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -127,6 +145,36 @@ struct ArtifactManifest {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+struct ArtifactRegistry {
+    schema_version: String,
+    invocation_id: String,
+    artifacts: Vec<ArtifactBinding>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+struct ArtifactBinding {
+    invocation_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    step_id: Option<String>,
+    kind: String,
+    path: String,
+    size_bytes: u64,
+    sha256: String,
+}
+
+#[derive(Debug, Clone)]
+struct EvidenceAssessment {
+    bindings: Vec<ArtifactBinding>,
+    failures: Vec<MachineFailure>,
+}
+
+impl EvidenceAssessment {
+    fn complete(&self) -> bool {
+        self.failures.is_empty()
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 struct ManifestArtifact {
     path: String,
     kind: String,
@@ -137,6 +185,35 @@ struct ManifestArtifact {
 #[derive(Debug, Deserialize)]
 struct MachineResultHeader {
     schema_version: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct InvocationMetadataRecord {
+    invocation_id: String,
+    input_mode: String,
+    project_identity: String,
+    source_identity: String,
+    execution_root: String,
+    configuration_digest: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct MachineResultEvidence {
+    schema_version: String,
+    invocation_id: String,
+    evidence_complete: bool,
+    status: String,
+    artifacts: Vec<MachineArtifactEvidence>,
+}
+
+#[derive(Debug, Deserialize)]
+struct MachineArtifactEvidence {
+    path: String,
+    kind: String,
+    invocation_id: Option<String>,
+    step_id: Option<String>,
+    size_bytes: Option<u64>,
+    sha256: Option<String>,
 }
 
 impl Serialize for VerificationReport {
@@ -175,7 +252,11 @@ fn machine_result(report: &VerificationReport) -> MachineResult {
                 match invocation_relative_path(&report.report_directory, &step.log) {
                     Some(path) => artifacts.push(MachineArtifact {
                         path,
-                        kind: "step-log",
+                        kind: "step-log".into(),
+                        invocation_id: None,
+                        step_id: None,
+                        size_bytes: None,
+                        sha256: None,
                     }),
                     None => {
                         evidence_complete = false;
@@ -283,6 +364,11 @@ fn machine_result(report: &VerificationReport) -> MachineResult {
         report_directory: report.report_directory.clone(),
         timestamp: report.timestamp.clone(),
         profile: report.profile.clone(),
+        input_mode: report.input_mode.clone(),
+        project_identity: report.project_identity.clone(),
+        source_identity: report.source_identity.clone(),
+        execution_root: report.execution_root.clone(),
+        configuration_digest: report.configuration_digest.clone(),
         scope: report.scope.clone(),
         services: report
             .services
@@ -306,6 +392,36 @@ fn machine_result(report: &VerificationReport) -> MachineResult {
         passed: report.passed && evidence_complete,
         status,
     }
+}
+
+fn machine_result_with_assessment(
+    report: &VerificationReport,
+    assessment: &EvidenceAssessment,
+) -> MachineResult {
+    let mut result = machine_result(report);
+    let baseline_complete = result.evidence_complete;
+    result.artifacts = assessment
+        .bindings
+        .iter()
+        .map(|binding| MachineArtifact {
+            path: binding.path.clone(),
+            kind: binding.kind.clone(),
+            invocation_id: Some(binding.invocation_id.clone()),
+            step_id: binding.step_id.clone(),
+            size_bytes: Some(binding.size_bytes),
+            sha256: Some(binding.sha256.clone()),
+        })
+        .collect();
+    let complete = baseline_complete && assessment.complete();
+    result.evidence_complete = complete;
+    result.passed = report.passed && complete;
+    result.status = if !complete {
+        "FAIL"
+    } else {
+        report_status(report)
+    };
+    result.failures.extend(assessment.failures.clone());
+    result
 }
 
 fn ensure_supported_machine_result(raw: &[u8]) -> Result<()> {
@@ -409,6 +525,11 @@ struct InvocationMetadata<'a> {
     created_at: String,
     profile: &'a str,
     staged: bool,
+    input_mode: &'a str,
+    project_identity: &'a str,
+    source_identity: &'a str,
+    execution_root: String,
+    configuration_digest: &'a str,
     executor_version: &'static str,
     commit: String,
     platform: String,
@@ -466,14 +587,16 @@ pub(super) fn allocate_invocation(project: &Project) -> Result<Invocation> {
 
 pub(super) fn write_invocation_metadata(
     invocation: &Invocation,
+    project: &Project,
     profile: &str,
     staged: bool,
 ) -> Result<()> {
-    write_invocation_metadata_with_request(invocation, profile, staged, None)
+    write_invocation_metadata_with_request(invocation, project, profile, staged, None)
 }
 
 pub(super) fn write_invocation_metadata_with_request(
     invocation: &Invocation,
+    project: &Project,
     profile: &str,
     staged: bool,
     request_id: Option<&str>,
@@ -483,19 +606,35 @@ pub(super) fn write_invocation_metadata_with_request(
         created_at: chrono::Utc::now().to_rfc3339(),
         profile,
         staged,
+        input_mode: project.input().mode.as_str(),
+        project_identity: &project.input().project_identity,
+        source_identity: &project.input().source_identity,
+        execution_root: project
+            .input()
+            .execution_root
+            .to_string_lossy()
+            .into_owned(),
+        configuration_digest: &project.input().configuration_digest,
         executor_version: env!("CARGO_PKG_VERSION"),
-        commit: current_commit(),
+        commit: current_commit(project.repository_root()),
         platform: format!("{}-{}", std::env::consts::OS, std::env::consts::ARCH),
         toolchain: rustc_version(),
         request_id: request_id.map(str::to_string),
     };
     let contents = serde_json::to_vec_pretty(&metadata).context("serialize invocation metadata")?;
-    atomic_write(&invocation.root.join("invocation.json"), &contents, false)
+    crate::utils::fs::confined_atomic_write(
+        &invocation.root,
+        Path::new("invocation.json"),
+        &contents,
+        false,
+    )
+    .map(|_| ())
 }
 
-fn current_commit() -> String {
+fn current_commit(repository_root: &Path) -> String {
     std::process::Command::new("git")
         .args(["rev-parse", "HEAD"])
+        .current_dir(repository_root)
         .output()
         .ok()
         .filter(|output| output.status.success())
@@ -536,9 +675,13 @@ pub(super) fn mirror_legacy_outputs(
         if source.is_file() {
             let contents = fs::read(&source)
                 .with_context(|| format!("read invocation report {}", source.display()))?;
-            let target = report_target(legacy_project, &relative)?;
-            atomic_write(&target, &contents, true)
-                .with_context(|| format!("mirror legacy report {}", target.display()))?;
+            crate::utils::fs::confined_atomic_write(
+                &legacy_project.reports,
+                Path::new(&relative),
+                &contents,
+                true,
+            )
+            .with_context(|| format!("mirror legacy report {relative}"))?;
         }
     }
     let invocation_logs = invocation_project.reports.join("logs");
@@ -561,9 +704,13 @@ pub(super) fn mirror_legacy_outputs(
             let relative = format!("logs/{name}");
             let contents = fs::read(&path)
                 .with_context(|| format!("read invocation log {}", path.display()))?;
-            let target = report_target(legacy_project, &relative)?;
-            atomic_write(&target, &contents, true)
-                .with_context(|| format!("mirror legacy log {}", target.display()))?;
+            crate::utils::fs::confined_atomic_write(
+                &legacy_project.reports,
+                Path::new(&relative),
+                &contents,
+                true,
+            )
+            .with_context(|| format!("mirror legacy log {relative}"))?;
         }
     }
     Ok(())
@@ -587,15 +734,22 @@ fn next_invocation_id() -> String {
 /// owns serialization and optional result delivery.
 pub(super) fn write(report: &VerificationReport, project: &Project) -> Result<()> {
     redact_invocation_files(project)?;
-    // Keep the stable JSON/Markdown artifacts independent from optional
-    // renderers. A malformed template must not erase the machine-readable
-    // result that CI and incident tooling depend on.
+    // Publish an explicitly incomplete machine result first. Only the closed-
+    // set validation below is allowed to replace it with a complete result.
+    let preliminary = EvidenceAssessment {
+        bindings: Vec::new(),
+        failures: vec![MachineFailure {
+            step_id: None,
+            code: "EVIDENCE_PENDING".into(),
+            message: "invocation evidence has not been finalized".into(),
+        }],
+    };
     let mut failures = Vec::new();
-    match serde_json::to_string_pretty(report)
+    match serde_json::to_string_pretty(&machine_result_with_assessment(report, &preliminary))
         .context("serialize verification report as JSON")
         .and_then(|json| {
             ensure_supported_machine_result(json.as_bytes())?;
-            write_report_file(project, "test_result.json", json)
+            write_report_file(project, MACHINE_RESULT_FILE, json)
         }) {
         Ok(()) => {}
         Err(error) => failures.push(error),
@@ -619,23 +773,65 @@ pub(super) fn write(report: &VerificationReport, project: &Project) -> Result<()
             failures.push(error);
         }
     }
-    if failures.is_empty() {
-        if let Err(error) = redact_invocation_files(project)
-            .and_then(|_| write_manifest(report, project))
-            .and_then(|_| verify_manifest(project))
-        {
-            failures.push(error.context("publish or verify artifact manifest"));
-        }
+    if !failures.is_empty() {
+        return finish_incomplete_report(report, project, failures);
     }
-    if failures.is_empty() {
-        prune_old_invocations(project, &report.invocation_id)?;
+
+    redact_invocation_files(project)?;
+    let assessment = assess_evidence(report, project)?;
+    if !assessment.complete() {
+        let details = format_failures(&assessment.failures);
+        write_machine_result(report, project, &assessment, true)?;
+        if report.passed {
+            bail!("evidence finalization failed: {details}");
+        }
         return Ok(());
     }
+
+    // The assessment has already validated the closed set. Publish the
+    // registry and manifest before the final machine result. That ordering
+    // leaves the preliminary result incomplete if publication is interrupted
+    // between control files.
+    if let Err(error) = write_registry(report, project, &assessment.bindings)
+        .and_then(|()| write_manifest(report, project, &assessment.bindings))
+        .and_then(|()| verify_manifest_without_result(project))
+        .and_then(|()| write_machine_result(report, project, &assessment, true))
+        .and_then(|()| verify_manifest(project))
+    {
+        let failure = EvidenceAssessment {
+            bindings: assessment.bindings.clone(),
+            failures: vec![MachineFailure {
+                step_id: None,
+                code: "EVIDENCE_FINALIZATION_FAILURE".into(),
+                message: format!("{error:#}"),
+            }],
+        };
+        let _ = write_machine_result(report, project, &failure, true);
+        return Err(error);
+    }
+    prune_old_invocations(project, &report.invocation_id)?;
+    Ok(())
+}
+
+fn finish_incomplete_report(
+    report: &VerificationReport,
+    project: &Project,
+    failures: Vec<anyhow::Error>,
+) -> Result<()> {
     let details = failures
         .iter()
         .map(|error| format!("{error:#}"))
         .collect::<Vec<_>>()
         .join("; ");
+    let assessment = EvidenceAssessment {
+        bindings: Vec::new(),
+        failures: vec![MachineFailure {
+            step_id: None,
+            code: "EVIDENCE_PUBLICATION_FAILURE".into(),
+            message: details.clone(),
+        }],
+    };
+    write_machine_result(report, project, &assessment, true)?;
     bail!("one or more report outputs failed: {details}");
 }
 
@@ -902,13 +1098,57 @@ fn report_target(project: &Project, relative: &str) -> Result<PathBuf> {
 }
 
 fn write_report_file(project: &Project, relative: &str, contents: impl AsRef<[u8]>) -> Result<()> {
-    let target = report_target(project, relative)?;
-    atomic_write(&target, contents.as_ref(), false)
-        .with_context(|| format!("write report {}", target.display()))
+    report_target(project, relative)?;
+    crate::utils::fs::confined_atomic_write(
+        &project.reports,
+        Path::new(relative),
+        contents.as_ref(),
+        true,
+    )
+    .map(|_| ())
+    .with_context(|| format!("write report {relative}"))
 }
 
-fn write_manifest(report: &VerificationReport, project: &Project) -> Result<()> {
-    let artifacts = collect_manifest_files(&project.reports, &project.reports)?;
+fn write_machine_result(
+    report: &VerificationReport,
+    project: &Project,
+    assessment: &EvidenceAssessment,
+    _final: bool,
+) -> Result<()> {
+    let value = machine_result_with_assessment(report, assessment);
+    let contents = serde_json::to_vec_pretty(&value).context("serialize machine result")?;
+    ensure_supported_machine_result(&contents)?;
+    write_report_file(project, MACHINE_RESULT_FILE, contents)
+}
+
+fn write_registry(
+    report: &VerificationReport,
+    project: &Project,
+    bindings: &[ArtifactBinding],
+) -> Result<()> {
+    let registry = ArtifactRegistry {
+        schema_version: ARTIFACT_REGISTRY_SCHEMA_VERSION.into(),
+        invocation_id: report.invocation_id.clone(),
+        artifacts: bindings.to_vec(),
+    };
+    let contents = serde_json::to_vec_pretty(&registry).context("serialize artifact registry")?;
+    write_report_file(project, ARTIFACT_REGISTRY_FILE, contents)
+}
+
+fn write_manifest(
+    report: &VerificationReport,
+    project: &Project,
+    bindings: &[ArtifactBinding],
+) -> Result<()> {
+    let artifacts = bindings
+        .iter()
+        .map(|binding| ManifestArtifact {
+            path: binding.path.clone(),
+            kind: binding.kind.clone(),
+            size_bytes: binding.size_bytes,
+            sha256: binding.sha256.clone(),
+        })
+        .collect();
     let manifest = ArtifactManifest {
         schema_version: ARTIFACT_MANIFEST_SCHEMA_VERSION.into(),
         invocation_id: report.invocation_id.clone(),
@@ -916,48 +1156,7 @@ fn write_manifest(report: &VerificationReport, project: &Project) -> Result<()> 
         artifacts,
     };
     let contents = serde_json::to_vec_pretty(&manifest).context("serialize artifact manifest")?;
-    write_report_file(project, "manifest.json", contents)
-}
-
-fn collect_manifest_files(root: &Path, directory: &Path) -> Result<Vec<ManifestArtifact>> {
-    let mut artifacts = Vec::new();
-    for entry in fs::read_dir(directory)
-        .with_context(|| format!("read artifact directory {}", directory.display()))?
-    {
-        let entry = entry.with_context(|| "read artifact entry")?;
-        let path = entry.path();
-        let file_type = entry
-            .file_type()
-            .with_context(|| format!("inspect artifact entry {}", path.display()))?;
-        if file_type.is_dir() {
-            artifacts.extend(collect_manifest_files(root, &path)?);
-            continue;
-        }
-        if !file_type.is_file() {
-            continue;
-        }
-        let Some(name) = path.file_name().and_then(|name| name.to_str()) else {
-            bail!("artifact has a non-UTF-8 filename: {}", path.display());
-        };
-        if name == "manifest.json" || name.ends_with(".tmp") || name.starts_with('.') {
-            continue;
-        }
-        let relative = path
-            .strip_prefix(root)
-            .with_context(|| format!("resolve artifact path {}", path.display()))?
-            .to_string_lossy()
-            .replace('\\', "/");
-        let metadata = fs::metadata(&path)
-            .with_context(|| format!("inspect artifact metadata {}", path.display()))?;
-        artifacts.push(ManifestArtifact {
-            path: relative.clone(),
-            kind: manifest_kind(&relative),
-            size_bytes: metadata.len(),
-            sha256: sha256_file(&path)?,
-        });
-    }
-    artifacts.sort_by(|left, right| left.path.cmp(&right.path));
-    Ok(artifacts)
+    write_report_file(project, MANIFEST_FILE, contents)
 }
 
 fn manifest_kind(path: &str) -> String {
@@ -974,6 +1173,465 @@ fn manifest_kind(path: &str) -> String {
     } else {
         "artifact".into()
     }
+}
+
+fn declare_artifact(
+    root: &Path,
+    declarations: &mut BTreeMap<String, (String, Option<String>, bool)>,
+    failures: &mut Vec<MachineFailure>,
+    path: &str,
+    kind: &str,
+    step_id: Option<String>,
+    required: bool,
+) {
+    match invocation_relative_path(&root.to_string_lossy(), path) {
+        Some(relative) => {
+            if let Some((old_kind, old_step, old_required)) = declarations.get(&relative) {
+                if old_kind != kind && old_kind != "step-log" && kind != "step-log" {
+                    failures.push(MachineFailure {
+                        step_id: step_id.clone(),
+                        code: "EVIDENCE_DUPLICATE_PATH".into(),
+                        message: format!("artifact path has conflicting declarations: {relative}"),
+                    });
+                } else if kind == "step-log" && old_kind != "step-log" {
+                    declarations
+                        .insert(relative, (kind.into(), step_id, required || *old_required));
+                } else if old_step.is_none() && step_id.is_some() {
+                    declarations.insert(
+                        relative,
+                        (old_kind.clone(), step_id, required || *old_required),
+                    );
+                } else if old_step.is_some() && step_id.is_some() && old_step != &step_id {
+                    failures.push(MachineFailure {
+                        step_id: step_id.clone(),
+                        code: "EVIDENCE_DUPLICATE_PATH".into(),
+                        message: format!("artifact path has conflicting step bindings: {relative}"),
+                    });
+                }
+            } else {
+                declarations.insert(relative, (kind.into(), step_id, required));
+            }
+        }
+        None => failures.push(MachineFailure {
+            step_id,
+            code: "EVIDENCE_PATH_ESCAPE".into(),
+            message: format!("artifact path is outside invocation directory: {path}"),
+        }),
+    }
+}
+
+fn assess_evidence(report: &VerificationReport, project: &Project) -> Result<EvidenceAssessment> {
+    let root = project.reports.canonicalize().with_context(|| {
+        format!(
+            "resolve invocation report root {}",
+            project.reports.display()
+        )
+    })?;
+    if !root.is_dir() {
+        bail!(
+            "invocation report root is not a directory: {}",
+            root.display()
+        );
+    }
+
+    let mut declarations = BTreeMap::<String, (String, Option<String>, bool)>::new();
+    let mut failures = Vec::new();
+
+    validate_invocation_metadata(&root, report, &mut failures);
+
+    for step in &report.steps {
+        let Some(step_id) = step.step_id.clone() else {
+            failures.push(MachineFailure {
+                step_id: None,
+                code: "EVIDENCE_STEP_UNBOUND".into(),
+                message: format!("step {:?} has no invocation-bound step id", step.label),
+            });
+            continue;
+        };
+        if step.invocation_id.as_deref() != Some(report.invocation_id.as_str()) {
+            failures.push(MachineFailure {
+                step_id: Some(step_id.clone()),
+                code: "EVIDENCE_INVOCATION_MISMATCH".into(),
+                message: format!(
+                    "step {:?} is not bound to invocation {}",
+                    step.label, report.invocation_id
+                ),
+            });
+        }
+        if !step.log.is_empty() {
+            declare_artifact(
+                &root,
+                &mut declarations,
+                &mut failures,
+                &step.log,
+                "step-log",
+                Some(step_id.clone()),
+                true,
+            );
+        }
+        for attempt in &step.attempts {
+            if !attempt.log.is_empty() {
+                declare_artifact(
+                    &root,
+                    &mut declarations,
+                    &mut failures,
+                    &attempt.log,
+                    "step-log",
+                    Some(step_id.clone()),
+                    true,
+                );
+            }
+        }
+    }
+
+    // These are deterministic outputs owned by the invocation coordinator.
+    // They are declarations, not an implicit directory listing: an unrelated
+    // file under the report root remains an evidence failure.
+    declare_artifact(
+        &root,
+        &mut declarations,
+        &mut failures,
+        "invocation.json",
+        "invocation-metadata",
+        None,
+        true,
+    );
+    declare_artifact(
+        &root,
+        &mut declarations,
+        &mut failures,
+        "test_result.md",
+        "report",
+        None,
+        true,
+    );
+    let mut optional_outputs = vec![
+        "changed_files.txt".to_string(),
+        "scope.json".to_string(),
+        "secret_scan.json".to_string(),
+        "review_context.json".to_string(),
+        "review_context.md".to_string(),
+        "test_result.html".to_string(),
+    ];
+    optional_outputs.extend(audit_report_names(project));
+    optional_outputs.sort();
+    optional_outputs.dedup();
+    for relative in optional_outputs {
+        if root.join(&relative).exists() {
+            let kind = manifest_kind(&relative);
+            declare_artifact(
+                &root,
+                &mut declarations,
+                &mut failures,
+                &relative,
+                &kind,
+                None,
+                false,
+            );
+        }
+    }
+    if let Some(junit) = &project.config.report_templates.junit {
+        if root.join(junit).exists() {
+            declare_artifact(
+                &root,
+                &mut declarations,
+                &mut failures,
+                junit,
+                "report",
+                None,
+                false,
+            );
+        }
+    }
+    let disk = collect_publishable_files(&root, &root, &mut failures)?;
+    let declared_paths = declarations.keys().cloned().collect::<BTreeSet<_>>();
+    for path in declared_paths.difference(&disk) {
+        if declarations
+            .get(path)
+            .is_some_and(|(_, _, required)| *required)
+        {
+            failures.push(MachineFailure {
+                step_id: declarations.get(path).and_then(|(_, step, _)| step.clone()),
+                code: "EVIDENCE_MISSING".into(),
+                message: format!("declared artifact is missing: {path}"),
+            });
+        }
+    }
+    for path in disk.difference(&declared_paths) {
+        failures.push(MachineFailure {
+            step_id: None,
+            code: "EVIDENCE_UNDECLARED_FILE".into(),
+            message: format!("publishable file has no declaration: {path}"),
+        });
+    }
+
+    let mut bindings = Vec::new();
+    for (path, (kind, step_id, _required)) in declarations {
+        if !disk.contains(&path) {
+            continue;
+        }
+        match binding_for(&root, &path, &kind, step_id.clone(), &report.invocation_id) {
+            Ok(binding) => bindings.push(binding),
+            Err(failure) => failures.push(failure),
+        }
+    }
+    bindings.sort_by(|left, right| left.path.cmp(&right.path));
+    Ok(EvidenceAssessment { bindings, failures })
+}
+
+fn audit_report_names(project: &Project) -> Vec<String> {
+    let Ok(source) = fs::read_to_string(&project.audit_config) else {
+        return Vec::new();
+    };
+    let Ok(value) = toml::from_str::<toml::Value>(&source) else {
+        return Vec::new();
+    };
+    let Some(engine) = value.get("engine").and_then(toml::Value::as_table) else {
+        return Vec::new();
+    };
+    ["json_report_filename", "markdown_report_filename"]
+        .into_iter()
+        .filter_map(|field| engine.get(field).and_then(toml::Value::as_str))
+        .map(str::to_string)
+        .collect()
+}
+
+fn validate_invocation_metadata(
+    root: &Path,
+    report: &VerificationReport,
+    failures: &mut Vec<MachineFailure>,
+) {
+    let path = root.join("invocation.json");
+    match fs::symlink_metadata(&path) {
+        Ok(metadata) if metadata.file_type().is_symlink() => {
+            failures.push(MachineFailure {
+                step_id: None,
+                code: "EVIDENCE_SYMLINK".into(),
+                message: "invocation metadata is a symbolic link".into(),
+            });
+            return;
+        }
+        Ok(metadata) if !metadata.is_file() => {
+            failures.push(MachineFailure {
+                step_id: None,
+                code: "EVIDENCE_INVALID_TYPE".into(),
+                message: "invocation metadata is not a regular file".into(),
+            });
+            return;
+        }
+        Ok(_) => {}
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return,
+        Err(error) => {
+            failures.push(MachineFailure {
+                step_id: None,
+                code: "EVIDENCE_READ_FAILURE".into(),
+                message: format!("inspect invocation metadata: {error}"),
+            });
+            return;
+        }
+    };
+    let bytes = match fs::read(&path) {
+        Ok(bytes) => bytes,
+        Err(error) => {
+            failures.push(MachineFailure {
+                step_id: None,
+                code: "EVIDENCE_READ_FAILURE".into(),
+                message: format!("read invocation metadata: {error}"),
+            });
+            return;
+        }
+    };
+    let record: InvocationMetadataRecord = match serde_json::from_slice(&bytes) {
+        Ok(record) => record,
+        Err(error) => {
+            failures.push(MachineFailure {
+                step_id: None,
+                code: "EVIDENCE_INVALID_METADATA".into(),
+                message: format!("parse invocation metadata: {error}"),
+            });
+            return;
+        }
+    };
+    let expected = [
+        (
+            "invocation_id",
+            record.invocation_id.as_str(),
+            report.invocation_id.as_str(),
+        ),
+        (
+            "input_mode",
+            record.input_mode.as_str(),
+            report.input_mode.as_str(),
+        ),
+        (
+            "project_identity",
+            record.project_identity.as_str(),
+            report.project_identity.as_str(),
+        ),
+        (
+            "source_identity",
+            record.source_identity.as_str(),
+            report.source_identity.as_str(),
+        ),
+        (
+            "execution_root",
+            record.execution_root.as_str(),
+            report.execution_root.as_str(),
+        ),
+        (
+            "configuration_digest",
+            record.configuration_digest.as_str(),
+            report.configuration_digest.as_str(),
+        ),
+    ];
+    for (field, actual, expected) in expected {
+        if actual != expected {
+            failures.push(MachineFailure {
+                step_id: None,
+                code: "EVIDENCE_INVOCATION_MISMATCH".into(),
+                message: format!("invocation metadata field {field} does not match the report"),
+            });
+        }
+    }
+}
+
+fn collect_publishable_files(
+    root: &Path,
+    directory: &Path,
+    failures: &mut Vec<MachineFailure>,
+) -> Result<BTreeSet<String>> {
+    let mut files = BTreeSet::new();
+    for entry in fs::read_dir(directory)
+        .with_context(|| format!("read invocation evidence directory {}", directory.display()))?
+    {
+        let entry = entry.context("read invocation evidence entry")?;
+        let path = entry.path();
+        let metadata = fs::symlink_metadata(&path)
+            .with_context(|| format!("inspect invocation evidence entry {}", path.display()))?;
+        if metadata.file_type().is_symlink() {
+            failures.push(MachineFailure {
+                step_id: None,
+                code: "EVIDENCE_SYMLINK".into(),
+                message: format!(
+                    "invocation evidence contains a symbolic link: {}",
+                    path.display()
+                ),
+            });
+            continue;
+        }
+        if metadata.is_dir() {
+            let relative = path
+                .strip_prefix(root)
+                .with_context(|| format!("resolve invocation evidence path {}", path.display()))?
+                .to_string_lossy()
+                .replace('\\', "/");
+            if is_internal_directory(&relative) {
+                continue;
+            }
+            collect_publishable_files(root, &path, failures)?
+                .into_iter()
+                .for_each(|file| {
+                    files.insert(file);
+                });
+            continue;
+        }
+        if !metadata.is_file() {
+            failures.push(MachineFailure {
+                step_id: None,
+                code: "EVIDENCE_INVALID_TYPE".into(),
+                message: format!(
+                    "invocation evidence is not a regular file: {}",
+                    path.display()
+                ),
+            });
+            continue;
+        }
+        let relative = path
+            .strip_prefix(root)
+            .with_context(|| format!("resolve invocation evidence path {}", path.display()))?
+            .to_string_lossy()
+            .replace('\\', "/");
+        // Control files are finalized separately. A leftover temporary is
+        // deliberately *not* ignored: it indicates an incomplete publication
+        // and must be reported as undeclared evidence.
+        if is_control_file(&relative) {
+            continue;
+        }
+        files.insert(relative);
+    }
+    Ok(files)
+}
+
+fn is_control_file(relative: &str) -> bool {
+    matches!(
+        relative,
+        MACHINE_RESULT_FILE | ARTIFACT_REGISTRY_FILE | MANIFEST_FILE
+    )
+}
+
+fn is_internal_directory(relative: &str) -> bool {
+    relative == "isolation"
+}
+
+fn binding_for(
+    root: &Path,
+    relative: &str,
+    kind: &str,
+    step_id: Option<String>,
+    invocation_id: &str,
+) -> std::result::Result<ArtifactBinding, MachineFailure> {
+    let target = root.join(relative);
+    let components = relative
+        .split('/')
+        .filter(|component| !component.is_empty());
+    let mut current = root.to_path_buf();
+    for component in components {
+        current.push(component);
+        let metadata = fs::symlink_metadata(&current).map_err(|error| MachineFailure {
+            step_id: step_id.clone(),
+            code: "EVIDENCE_MISSING".into(),
+            message: format!("inspect declared artifact {relative}: {error}"),
+        })?;
+        if metadata.file_type().is_symlink() {
+            return Err(MachineFailure {
+                step_id: step_id.clone(),
+                code: "EVIDENCE_SYMLINK".into(),
+                message: format!("declared artifact crosses a symbolic link: {relative}"),
+            });
+        }
+        if current != target && !metadata.is_dir() {
+            return Err(MachineFailure {
+                step_id: step_id.clone(),
+                code: "EVIDENCE_INVALID_TYPE".into(),
+                message: format!("declared artifact parent is not a directory: {relative}"),
+            });
+        }
+        if current == target && !metadata.is_file() {
+            return Err(MachineFailure {
+                step_id: step_id.clone(),
+                code: "EVIDENCE_INVALID_TYPE".into(),
+                message: format!("declared artifact is not a regular file: {relative}"),
+            });
+        }
+    }
+    let metadata = fs::metadata(&target).map_err(|error| MachineFailure {
+        step_id: step_id.clone(),
+        code: "EVIDENCE_MISSING".into(),
+        message: format!("inspect declared artifact {relative}: {error}"),
+    })?;
+    let sha256 = sha256_file(&target).map_err(|error| MachineFailure {
+        step_id: step_id.clone(),
+        code: "EVIDENCE_READ_FAILURE".into(),
+        message: format!("digest declared artifact {relative}: {error:#}"),
+    })?;
+    Ok(ArtifactBinding {
+        invocation_id: invocation_id.into(),
+        step_id,
+        kind: kind.into(),
+        path: relative.into(),
+        size_bytes: metadata.len(),
+        sha256,
+    })
 }
 
 fn sha256_file(path: &Path) -> Result<String> {
@@ -993,8 +1651,8 @@ fn sha256_file(path: &Path) -> Result<String> {
     Ok(format!("{:x}", hasher.finalize()))
 }
 
-fn verify_manifest(project: &Project) -> Result<()> {
-    let path = project.reports.join("manifest.json");
+fn verify_manifest_without_result(project: &Project) -> Result<()> {
+    let path = project.reports.join(MANIFEST_FILE);
     let bytes =
         fs::read(&path).with_context(|| format!("read artifact manifest {}", path.display()))?;
     let manifest: ArtifactManifest =
@@ -1005,68 +1663,174 @@ fn verify_manifest(project: &Project) -> Result<()> {
             manifest.schema_version
         );
     }
+    let registry_path = project.reports.join(ARTIFACT_REGISTRY_FILE);
+    let registry: ArtifactRegistry = serde_json::from_slice(
+        &fs::read(&registry_path)
+            .with_context(|| format!("read artifact registry {}", registry_path.display()))?,
+    )
+    .context("parse artifact registry")?;
+    if registry.schema_version != ARTIFACT_REGISTRY_SCHEMA_VERSION {
+        bail!(
+            "unsupported artifact registry schema version {:?}",
+            registry.schema_version
+        );
+    }
+    if registry.invocation_id != manifest.invocation_id {
+        bail!("artifact registry and manifest invocation IDs differ");
+    }
     if manifest.artifacts.is_empty() {
         bail!("artifact manifest contains no invocation artifacts");
+    }
+    let registry_manifest = registry
+        .artifacts
+        .iter()
+        .map(|binding| ManifestArtifact {
+            path: binding.path.clone(),
+            kind: binding.kind.clone(),
+            size_bytes: binding.size_bytes,
+            sha256: binding.sha256.clone(),
+        })
+        .collect::<Vec<_>>();
+    if registry_manifest != manifest.artifacts {
+        bail!("artifact registry and manifest entries differ");
     }
     let report_root = project
         .reports
         .canonicalize()
         .with_context(|| format!("resolve invocation directory {}", project.reports.display()))?;
+    let mut failures = Vec::new();
+    let disk = collect_publishable_files(&report_root, &report_root, &mut failures)?;
+    if !failures.is_empty() {
+        bail!(
+            "manifest evidence validation failed: {}",
+            format_failures(&failures)
+        );
+    }
+    let manifest_paths = manifest
+        .artifacts
+        .iter()
+        .map(|artifact| artifact.path.clone())
+        .collect::<BTreeSet<_>>();
+    if manifest_paths != disk {
+        bail!("manifest and publishable disk artifact sets differ");
+    }
     for artifact in &manifest.artifacts {
-        let relative = invocation_relative_path(
-            &project.reports.to_string_lossy(),
-            &project.reports.join(&artifact.path).to_string_lossy(),
+        let binding = registry
+            .artifacts
+            .iter()
+            .find(|binding| binding.path == artifact.path)
+            .ok_or_else(|| {
+                anyhow::anyhow!("artifact registry entry is missing: {}", artifact.path)
+            })?;
+        if binding.invocation_id != manifest.invocation_id {
+            bail!("artifact invocation binding differs: {}", artifact.path);
+        }
+        let actual = binding_for(
+            &report_root,
+            &artifact.path,
+            &artifact.kind,
+            binding.step_id.clone(),
+            &manifest.invocation_id,
         )
-        .ok_or_else(|| {
-            anyhow::anyhow!(
-                "artifact path escapes invocation directory: {}",
-                artifact.path
-            )
-        })?;
-        if relative != artifact.path {
-            bail!("artifact path is not normalized: {}", artifact.path);
-        }
-        let target = project.reports.join(&artifact.path);
-        let resolved_target = target
-            .canonicalize()
-            .with_context(|| format!("resolve manifest artifact {}", target.display()))?;
-        if !resolved_target.starts_with(&report_root) {
-            bail!(
-                "manifest artifact escapes invocation directory: {}",
-                artifact.path
-            );
-        }
-        let metadata = fs::metadata(&target)
-            .with_context(|| format!("inspect manifest artifact {}", target.display()))?;
-        if !metadata.is_file() || metadata.len() != artifact.size_bytes {
-            bail!("artifact size changed: {}", artifact.path);
-        }
-        let digest = sha256_file(&target)?;
-        if digest != artifact.sha256 {
-            bail!("artifact digest changed: {}", artifact.path);
+        .map_err(|failure| anyhow::anyhow!("{}: {}", failure.code, failure.message))?;
+        if actual.size_bytes != artifact.size_bytes || actual.sha256 != artifact.sha256 {
+            bail!("artifact digest or size changed: {}", artifact.path);
         }
     }
     Ok(())
 }
 
-fn redact_invocation_files(project: &Project) -> Result<()> {
-    if project.reports.exists() {
-        let repository = project
-            .root
-            .canonicalize()
-            .with_context(|| format!("resolve project root {}", project.root.display()))?;
-        let reports = project
-            .reports
-            .canonicalize()
-            .with_context(|| format!("resolve report directory {}", project.reports.display()))?;
-        if !reports.starts_with(&repository) {
-            bail!("report directory escapes project root");
-        }
+fn verify_manifest(project: &Project) -> Result<()> {
+    verify_manifest_without_result(project)?;
+    let result_path = project.reports.join(MACHINE_RESULT_FILE);
+    let result_bytes = fs::read(&result_path)
+        .with_context(|| format!("read machine result {}", result_path.display()))?;
+    let result: MachineResultEvidence =
+        serde_json::from_slice(&result_bytes).context("parse final machine result")?;
+    if result.schema_version != MACHINE_RESULT_SCHEMA_VERSION {
+        bail!(
+            "unsupported final machine-result schema version {:?}",
+            result.schema_version
+        );
     }
-    redact_directory(&project.reports)
+    let manifest: ArtifactManifest = serde_json::from_slice(
+        &fs::read(project.reports.join(MANIFEST_FILE)).context("read final artifact manifest")?,
+    )
+    .context("parse final artifact manifest")?;
+    if result.invocation_id != manifest.invocation_id {
+        bail!("machine result and manifest invocation IDs differ");
+    }
+    if !result.evidence_complete {
+        bail!("final machine result does not claim complete evidence");
+    }
+    let result_artifacts = result
+        .artifacts
+        .iter()
+        .map(|artifact| {
+            let invocation_id = artifact.invocation_id.as_deref().ok_or_else(|| {
+                anyhow::anyhow!(
+                    "machine artifact has no invocation binding: {}",
+                    artifact.path
+                )
+            })?;
+            let size_bytes = artifact.size_bytes.ok_or_else(|| {
+                anyhow::anyhow!("machine artifact has no size: {}", artifact.path)
+            })?;
+            let sha256 = artifact.sha256.as_deref().ok_or_else(|| {
+                anyhow::anyhow!("machine artifact has no digest: {}", artifact.path)
+            })?;
+            if invocation_id != result.invocation_id {
+                bail!(
+                    "machine artifact invocation binding differs: {}",
+                    artifact.path
+                );
+            }
+            let _ = &artifact.step_id;
+            Ok(ManifestArtifact {
+                path: artifact.path.clone(),
+                kind: artifact.kind.clone(),
+                size_bytes,
+                sha256: sha256.to_string(),
+            })
+        })
+        .collect::<Result<Vec<_>>>()?;
+    if result_artifacts != manifest.artifacts {
+        bail!("machine result and manifest artifact entries differ");
+    }
+    if matches!(result.status.as_str(), "PASS" | "WAIVED") && !result.evidence_complete {
+        bail!("successful machine result cannot omit complete evidence");
+    }
+    Ok(())
 }
 
-fn redact_directory(directory: &Path) -> Result<()> {
+fn format_failures(failures: &[MachineFailure]) -> String {
+    failures
+        .iter()
+        .map(|failure| format!("{}: {}", failure.code, failure.message))
+        .collect::<Vec<_>>()
+        .join("; ")
+}
+
+fn redact_invocation_files(project: &Project) -> Result<()> {
+    if !project.reports.exists() {
+        return Ok(());
+    }
+
+    let repository = project
+        .root
+        .canonicalize()
+        .with_context(|| format!("resolve project root {}", project.root.display()))?;
+    let reports = project
+        .reports
+        .canonicalize()
+        .with_context(|| format!("resolve report directory {}", project.reports.display()))?;
+    if !reports.starts_with(&repository) {
+        bail!("report directory escapes project root");
+    }
+    redact_directory(&reports, &reports)
+}
+
+fn redact_directory(root: &Path, directory: &Path) -> Result<()> {
     if !directory.exists() {
         return Ok(());
     }
@@ -1079,7 +1843,7 @@ fn redact_directory(directory: &Path) -> Result<()> {
             .file_type()
             .with_context(|| format!("inspect evidence entry {}", path.display()))?;
         if file_type.is_dir() {
-            redact_directory(&path)?;
+            redact_directory(root, &path)?;
             continue;
         }
         if !file_type.is_file()
@@ -1100,7 +1864,10 @@ fn redact_directory(directory: &Path) -> Result<()> {
         }
         let redacted = redact_text(text);
         if redacted.as_bytes() != bytes {
-            atomic_write(&path, redacted.as_bytes(), true)
+            let relative = path
+                .strip_prefix(root)
+                .with_context(|| format!("resolve evidence path {}", path.display()))?;
+            crate::utils::fs::confined_atomic_write(root, relative, redacted.as_bytes(), true)
                 .with_context(|| format!("publish redacted evidence {}", path.display()))?;
         }
     }
@@ -1175,41 +1942,6 @@ fn prune_old_invocations(project: &Project, current_id: &str) -> Result<()> {
         }
     }
     Ok(())
-}
-
-fn atomic_write(target: &Path, contents: &[u8], replace_existing: bool) -> Result<()> {
-    let parent = target
-        .parent()
-        .ok_or_else(|| anyhow::anyhow!("output has no parent directory"))?;
-    fs::create_dir_all(parent)
-        .with_context(|| format!("create output directory {}", parent.display()))?;
-    let counter = INVOCATION_COUNTER.fetch_add(1, Ordering::Relaxed);
-    let file_name = target
-        .file_name()
-        .and_then(|name| name.to_str())
-        .ok_or_else(|| anyhow::anyhow!("output has an invalid filename"))?;
-    let temporary = parent.join(format!(".{file_name}.{counter}.tmp"));
-    let mut file = OpenOptions::new()
-        .write(true)
-        .create_new(true)
-        .open(&temporary)
-        .with_context(|| format!("create temporary output {}", temporary.display()))?;
-    let write_result = (|| -> Result<()> {
-        file.write_all(contents)?;
-        file.sync_all()?;
-        drop(file);
-        if replace_existing && fs::symlink_metadata(target).is_ok() {
-            fs::remove_file(target)
-                .with_context(|| format!("replace existing output {}", target.display()))?;
-        }
-        fs::rename(&temporary, target)
-            .with_context(|| format!("publish output {}", target.display()))?;
-        Ok(())
-    })();
-    if write_result.is_err() {
-        let _ = fs::remove_file(&temporary);
-    }
-    write_result
 }
 
 fn resolve_report_root(project: &Project, repository: &Path) -> Result<PathBuf> {
@@ -1405,7 +2137,8 @@ mod tests {
     use super::{
         allocate_invocation, configured_html, ensure_supported_machine_result, junit,
         machine_result, markdown, notify, post_json, redact_text, render_html, report_target,
-        verify_manifest, write, write_invocation_metadata,
+        verify_manifest, write, write_invocation_metadata, ARTIFACT_REGISTRY_FILE,
+        MACHINE_RESULT_FILE, MANIFEST_FILE,
     };
     use crate::config::WebhookConfig;
     use crate::process::TaskResult;
@@ -1453,6 +2186,11 @@ mod tests {
             report_directory: "reports/invocations/inv-test".into(),
             timestamp: "2026-01-01T00:00:00Z".into(),
             profile: "full".into(),
+            input_mode: "working-tree".into(),
+            project_identity: "/repository".into(),
+            source_identity: "working-tree:fixture".into(),
+            execution_root: "/repository".into(),
+            configuration_digest: format!("sha256:{}", "0".repeat(64)),
             scope: ScopeResult {
                 mode: "all".into(),
                 changed_files: vec![],
@@ -1485,6 +2223,55 @@ mod tests {
             skipped_steps: vec![],
             passed: false,
         }
+    }
+
+    fn complete_invocation_fixture(
+        name: &str,
+    ) -> (
+        crate::test_support::TestWorkspace,
+        crate::project::Project,
+        super::Invocation,
+        crate::project::Project,
+        VerificationReport,
+    ) {
+        let workspace = crate::test_support::TestWorkspace::new(name);
+        crate::preset::init(&workspace.root, "generic", false).expect("initialize fixture");
+        workspace.init_git();
+        let project = crate::project::Project::discover(Some(workspace.root.clone()), None)
+            .expect("discover fixture");
+        let invocation = allocate_invocation(&project).expect("allocate invocation");
+        write_invocation_metadata(&invocation, &project, "full", false)
+            .expect("write invocation metadata");
+        let mut invocation_project = project.clone();
+        invocation_project.reports = invocation.root.clone();
+        let mut current = report();
+        current.invocation_id = invocation.id.clone();
+        current.report_directory = invocation.root.to_string_lossy().into_owned();
+        current.input_mode = project.input().mode.as_str().into();
+        current.project_identity = project.input().project_identity.clone();
+        current.source_identity = project.input().source_identity.clone();
+        current.execution_root = project
+            .input()
+            .execution_root
+            .to_string_lossy()
+            .into_owned();
+        current.configuration_digest = project.input().configuration_digest.clone();
+        current.passed = true;
+        current.steps[0].passed = true;
+        current.steps[0].detail = None;
+        current.steps[0].step_id = Some("unit.tests".into());
+        current.steps[0].invocation_id = Some(invocation.id.clone());
+        std::fs::write(invocation.root.join("logs/unit.log"), b"complete\n")
+            .expect("write fixture log");
+        (workspace, project, invocation, invocation_project, current)
+    }
+
+    fn assert_incomplete_result(project: &crate::project::Project) {
+        let bytes = std::fs::read(project.reports.join(MACHINE_RESULT_FILE))
+            .expect("read incomplete machine result");
+        let value: serde_json::Value = serde_json::from_slice(&bytes).expect("parse result");
+        assert_eq!(value["evidence_complete"], false);
+        assert_eq!(value["passed"], false);
     }
 
     #[test]
@@ -1589,7 +2376,7 @@ mod tests {
         let project = crate::project::Project::discover(Some(workspace.root.clone()), None)
             .expect("discover fixture");
         let invocation = allocate_invocation(&project).expect("allocate invocation");
-        write_invocation_metadata(&invocation, "full", false).expect("write metadata");
+        write_invocation_metadata(&invocation, &project, "full", false).expect("write metadata");
         let password_key = ["pass", "word"].concat();
         std::fs::write(
             invocation.root.join("logs/unit.log"),
@@ -1601,7 +2388,17 @@ mod tests {
         let mut current = report();
         current.invocation_id = invocation.id.clone();
         current.report_directory = invocation.root.to_string_lossy().into_owned();
+        current.input_mode = project.input().mode.as_str().into();
+        current.project_identity = project.input().project_identity.clone();
+        current.source_identity = project.input().source_identity.clone();
+        current.execution_root = project
+            .input()
+            .execution_root
+            .to_string_lossy()
+            .into_owned();
+        current.configuration_digest = project.input().configuration_digest.clone();
         current.steps[0].step_id = Some("unit.tests".into());
+        current.steps[0].invocation_id = Some(invocation.id.clone());
         write(&current, &invocation_project).expect("write reports and manifest");
 
         let manifest_path = invocation.root.join("manifest.json");
@@ -1625,6 +2422,126 @@ mod tests {
         std::fs::write(invocation.root.join("logs/unit.log"), "tampered\n").expect("tamper log");
         assert!(verify_manifest(&invocation_project).is_err());
         drop(invocation);
+    }
+
+    #[test]
+    fn missing_required_log_blocks_complete_evidence() {
+        let (_workspace, _project, invocation, invocation_project, current) =
+            complete_invocation_fixture("report-missing-log");
+        std::fs::remove_file(invocation.root.join("logs/unit.log")).expect("remove log");
+
+        let error = write(&current, &invocation_project).expect_err("missing log must fail");
+        assert!(error.to_string().contains("EVIDENCE_MISSING"));
+        assert_incomplete_result(&invocation_project);
+        assert!(!invocation.root.join(MANIFEST_FILE).exists());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn symlink_required_log_blocks_publication_without_touching_target() {
+        use std::os::unix::fs::symlink;
+
+        let (_workspace, _project, invocation, invocation_project, current) =
+            complete_invocation_fixture("report-symlink-log");
+        let outside = invocation
+            .root
+            .parent()
+            .expect("invocation root has a parent")
+            .join("outside-log.txt");
+        std::fs::write(&outside, b"outside\n").expect("write outside fixture");
+        let log = invocation.root.join("logs/unit.log");
+        std::fs::remove_file(&log).expect("remove regular log");
+        symlink(&outside, &log).expect("create log symlink");
+
+        let error = write(&current, &invocation_project).expect_err("symlink log must fail");
+        assert!(error.to_string().contains("EVIDENCE_SYMLINK"));
+        assert_eq!(std::fs::read(&outside).expect("read outside"), b"outside\n");
+        assert_incomplete_result(&invocation_project);
+        let _ = std::fs::remove_file(outside);
+    }
+
+    #[test]
+    fn stale_invocation_metadata_blocks_publication() {
+        let (_workspace, _project, invocation, invocation_project, current) =
+            complete_invocation_fixture("report-stale-invocation");
+        std::fs::write(
+            invocation.root.join("invocation.json"),
+            serde_json::json!({
+                "invocation_id": "inv-stale",
+                "input_mode": current.input_mode,
+                "project_identity": current.project_identity,
+                "source_identity": current.source_identity,
+                "execution_root": current.execution_root,
+                "configuration_digest": current.configuration_digest,
+            })
+            .to_string(),
+        )
+        .expect("forge stale metadata");
+
+        let error = write(&current, &invocation_project).expect_err("stale metadata must fail");
+        assert!(error.to_string().contains("EVIDENCE_INVOCATION_MISMATCH"));
+        assert_incomplete_result(&invocation_project);
+        assert!(!invocation.root.join(MANIFEST_FILE).exists());
+    }
+
+    #[test]
+    fn undeclared_file_blocks_publication() {
+        let (_workspace, _project, invocation, invocation_project, current) =
+            complete_invocation_fixture("report-undeclared-file");
+        std::fs::write(invocation.root.join("unexpected.txt"), b"unexpected\n")
+            .expect("write undeclared file");
+
+        let error = write(&current, &invocation_project).expect_err("undeclared file must fail");
+        assert!(error.to_string().contains("EVIDENCE_UNDECLARED_FILE"));
+        assert_incomplete_result(&invocation_project);
+        assert!(!invocation.root.join(MANIFEST_FILE).exists());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn unlink_open_log_blocks_publication() {
+        let (_workspace, _project, invocation, invocation_project, current) =
+            complete_invocation_fixture("report-unlink-open");
+        let log = invocation.root.join("logs/unit.log");
+        let handle = std::fs::File::open(&log).expect("open log");
+        std::fs::remove_file(&log).expect("unlink open log");
+
+        let error = write(&current, &invocation_project).expect_err("unlinked log must fail");
+        assert!(error.to_string().contains("EVIDENCE_MISSING"));
+        assert_incomplete_result(&invocation_project);
+        drop(handle);
+    }
+
+    #[test]
+    fn registry_and_machine_result_bindings_are_verified() {
+        let (_workspace, _project, invocation, invocation_project, current) =
+            complete_invocation_fixture("report-binding-mismatch");
+        write(&current, &invocation_project).expect("publish complete evidence");
+
+        let registry_path = invocation.root.join(ARTIFACT_REGISTRY_FILE);
+        let mut registry: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(&registry_path).expect("read registry"))
+                .expect("parse registry");
+        registry["artifacts"][0]["invocation_id"] = serde_json::Value::String("other".into());
+        std::fs::write(
+            &registry_path,
+            serde_json::to_vec_pretty(&registry).expect("serialize registry"),
+        )
+        .expect("tamper registry");
+        assert!(verify_manifest(&invocation_project).is_err());
+
+        write(&current, &invocation_project).expect("republish complete evidence");
+        let result_path = invocation.root.join(MACHINE_RESULT_FILE);
+        let mut result: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(&result_path).expect("read result"))
+                .expect("parse result");
+        result["artifacts"][0]["invocation_id"] = serde_json::Value::String("other".into());
+        std::fs::write(
+            &result_path,
+            serde_json::to_vec_pretty(&result).expect("serialize result"),
+        )
+        .expect("tamper result");
+        assert!(verify_manifest(&invocation_project).is_err());
     }
 
     #[test]

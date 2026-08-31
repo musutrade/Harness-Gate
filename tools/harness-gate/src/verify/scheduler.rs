@@ -355,7 +355,7 @@ fn run_architecture_audit(
 ) -> std::result::Result<TaskResult, SchedulerError> {
     let started = Instant::now();
     let outcome = audit::run(
-        &project.root,
+        &project.execution_root,
         &project.audit_config,
         &project.reports,
         false,
