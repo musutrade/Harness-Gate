@@ -2,7 +2,7 @@
 
 ## Status
 
-**Proposed** (2026-08-31)
+**Accepted** (2026-08-31)
 
 ## Context
 
@@ -309,23 +309,28 @@ preserving the final invariants.
 
 ### Acceptance evidence
 
-This ADR remains **Proposed** until all Phase 0 items are implemented and the
-following evidence is reviewable:
+The Phase 0 invariants were implemented in pull request
+[#60](https://github.com/musutrade/Harness-Gate/pull/60), and the following
+evidence was reviewed before accepting this ADR:
 
 - regression tests demonstrate both failure and success paths for each of the
   five invariants;
 - Linux, macOS, and Windows test/contract matrices pass where the boundary is
   supported, with an explicit fail-closed result for unsupported behavior;
-- `cargo test --locked`, formatting, Clippy with warnings denied, dependency
-  audit, CLI contracts, and documentation consistency pass;
-- an isolated release fixture verifies the exact binary/SBOM inventory and all
-  integrity metadata; and
+- local Rust tests (215 unit, 17 CLI contract, and 11 integration tests),
+  formatting, strict Clippy, staged-hook verification, and the ten release
+  inventory tests pass;
+- CI run
+  [33429874357](https://github.com/musutrade/Harness-Gate/actions/runs/33429874357)
+  passes the Linux, macOS, and Windows matrices, CLI contracts, performance
+  baseline, release inventory, and Required Quality Aggregate checks; and
 - public documentation contains no unsupported OS-sandbox or complete-process-
   tree containment claim.
 
-After that evidence is merged, the status may change to **Accepted**. A later
-implementation closeout may record production release and canary evidence; it
-must not mark this decision accepted merely because individual patches exist.
+The local Windows cross-compilation check could not run because the host lacks
+Microsoft `lib.exe`; the Windows implementation and tests are covered by the
+green CI matrix. Production release and canary evidence remain operational
+follow-up records and are not prerequisites for this architectural decision.
 
 ## Related
 

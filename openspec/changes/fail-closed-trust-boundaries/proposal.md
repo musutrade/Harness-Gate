@@ -1,6 +1,6 @@
 # Proposal: Fail-Closed Trust Boundaries
 
-**Status:** Proposed
+**Status:** Implemented
 **Date:** 2026-08-31
 **Change type:** Invocation input, resource ownership, evidence, filesystem, and release integrity
 
