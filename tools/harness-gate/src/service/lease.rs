@@ -462,9 +462,9 @@ fn process_alive(pid: u32) -> Option<bool> {
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        is_stale, process_start_identity_checked, resource_key, LeaseRecord, OWNER_MARKER,
-    };
+    #[cfg(target_os = "linux")]
+    use super::process_start_identity_checked;
+    use super::{is_stale, resource_key, LeaseRecord, OWNER_MARKER};
 
     #[test]
     fn resource_keys_are_stable_and_path_safe() {
