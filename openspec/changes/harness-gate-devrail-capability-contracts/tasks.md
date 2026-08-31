@@ -161,6 +161,10 @@ verify::report::tests::`, `cargo fmt --manifest-path
 tools/harness-gate/Cargo.toml -- --check`, and
 `python3 tools/release/generate-sbom.py` all pass. The manifest test verifies
 redaction, SHA-256 publication, and tamper detection. Link the PR CI run and
-release verification output here after the new branch CI completes. Shadow,
-canary, and rollback evidence remain required before this change and ADR-0032
-can be marked **Implemented**.
+redaction, SHA-256 publication, and tamper detection. Branch CI
+[run 33348751556](https://github.com/musutrade/Harness-Gate/actions/runs/33348751556)
+passed all required tests, Clippy, format, security, cross-platform quality,
+and Required Quality Aggregate checks. The release workflow is tag-triggered,
+so its clean-environment signature/provenance evidence must be linked from the
+next release run; shadow, canary, and rollback evidence remain required before
+this change and ADR-0032 can be marked **Implemented**.
