@@ -354,6 +354,11 @@ and `block`; the full serialized report is available as `report` alongside the l
 output paths are containment-checked, including existing symlinks, and published files use temporary-file plus
 atomic-rename semantics.
 
+`test_result.json` follows the versioned [machine-result schema](https://github.com/musutrade/Harness-Gate/blob/main/schema/machine-result.schema.json). It keeps
+the legacy `passed` field while exposing stable `status` values, per-step `attempts`, structured `failures`,
+invocation-relative `artifacts`, and `evidence_complete`; consumers should use `status` and these structured
+fields instead of parsing Markdown or log text.
+
 Optional `[[notifications.webhooks]]` entries send the serialized report to HTTP(S) endpoints after all report
 files are written. `on_failure` defaults to `true`, `on_success` defaults to `false`; a non-2xx response or
 connection error returns `E1404` while preserving the generated reports. Entries are sent in configuration order;

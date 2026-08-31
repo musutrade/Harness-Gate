@@ -121,6 +121,7 @@ first canary has green cross-platform and evidence-integrity checks.
 ## Related
 
 - [OpenSpec: Harness-Gate and DevRail capability contracts](../../openspec/changes/harness-gate-devrail-capability-contracts/proposal.md)
+- [Machine-result JSON Schema](../../schema/machine-result.schema.json)
 - [ADR-0031: Harden Gate Boundaries and Delivery Contracts](0031-harden-gate-boundaries.md)
 - [ADR-0025: Phase 1 Quality Baseline Gates](0025-phase-1-quality-baseline-gates.md)
 - [ADR-0028: Dependency-Aware Parallel Scheduling](0028-parallel-scheduling.md)

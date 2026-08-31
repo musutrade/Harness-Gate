@@ -3,7 +3,7 @@ use crate::config::WebhookConfig;
 use crate::project::Project;
 use crate::service::ResourceLease;
 use anyhow::{bail, Context, Result};
-use serde::Serialize;
+use serde::{ser::Serializer, Deserialize, Serialize};
 use std::fs::{self, OpenOptions};
 use std::io::Write;
 use std::path::{Component, Path, PathBuf};
@@ -11,6 +11,293 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
 
 static INVOCATION_COUNTER: AtomicU64 = AtomicU64::new(1);
+pub(super) const MACHINE_RESULT_SCHEMA_VERSION: &str = "1";
+
+#[derive(Debug, Serialize)]
+struct MachineResult {
+    schema_version: &'static str,
+    invocation_id: String,
+    executor_version: String,
+    report_directory: String,
+    timestamp: String,
+    profile: String,
+    scope: crate::scope::ScopeResult,
+    services: Vec<MachineService>,
+    steps: Vec<MachineStep>,
+    skipped_steps: Vec<MachineSkippedStep>,
+    warnings: Vec<MachineWarning>,
+    failures: Vec<MachineFailure>,
+    artifacts: Vec<MachineArtifact>,
+    evidence_complete: bool,
+    /// Kept for consumers of the pre-schema report while `status` is adopted.
+    passed: bool,
+    status: &'static str,
+}
+
+#[derive(Debug, Serialize)]
+struct MachineStep {
+    step_id: Option<String>,
+    invocation_id: Option<String>,
+    label: String,
+    passed: bool,
+    status: &'static str,
+    timed_out: bool,
+    cancelled: bool,
+    duration_ms: u128,
+    log: String,
+    detail: Option<String>,
+    runner: Option<crate::process::RunnerExecution>,
+    attempts: Vec<MachineAttempt>,
+}
+
+#[derive(Debug, Serialize)]
+struct MachineAttempt {
+    attempt: u32,
+    status: &'static str,
+    started_at: Option<String>,
+    finished_at: Option<String>,
+    duration_ms: u128,
+    timed_out: bool,
+    cancelled: bool,
+    log: String,
+    detail: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+struct MachineSkippedStep {
+    id: String,
+    label: String,
+    status: &'static str,
+    reason: String,
+}
+
+#[derive(Debug, Serialize)]
+struct MachineWarning {
+    code: String,
+    message: String,
+}
+
+#[derive(Debug, Serialize)]
+struct MachineFailure {
+    step_id: Option<String>,
+    code: String,
+    message: String,
+}
+
+#[derive(Debug, Serialize)]
+struct MachineArtifact {
+    path: String,
+    kind: &'static str,
+}
+
+#[derive(Debug, Serialize)]
+struct MachineService {
+    id: String,
+    status: &'static str,
+}
+
+#[derive(Debug, Deserialize)]
+struct MachineResultHeader {
+    schema_version: String,
+}
+
+impl Serialize for VerificationReport {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        machine_result(self).serialize(serializer)
+    }
+}
+
+fn machine_result(report: &VerificationReport) -> MachineResult {
+    let mut artifacts = Vec::new();
+    let mut evidence_complete = true;
+    let mut failures = Vec::new();
+    let steps = report
+        .steps
+        .iter()
+        .map(|step| {
+            let status = task_status(step);
+            if step.step_id.is_none() {
+                evidence_complete = false;
+            }
+            if !step.passed {
+                failures.push(MachineFailure {
+                    step_id: step.step_id.clone(),
+                    code: failure_code(step),
+                    message: step
+                        .detail
+                        .clone()
+                        .unwrap_or_else(|| "verification step failed".into()),
+                });
+            }
+            if !step.log.is_empty() {
+                match invocation_relative_path(&report.report_directory, &step.log) {
+                    Some(path) => artifacts.push(MachineArtifact {
+                        path,
+                        kind: "step-log",
+                    }),
+                    None => {
+                        evidence_complete = false;
+                        failures.push(MachineFailure {
+                            step_id: step.step_id.clone(),
+                            code: "EVIDENCE_PATH_ESCAPE".into(),
+                            message: format!(
+                                "step log is outside invocation directory: {}",
+                                step.log
+                            ),
+                        });
+                    }
+                }
+            }
+            MachineStep {
+                step_id: step.step_id.clone(),
+                invocation_id: step.invocation_id.clone(),
+                label: step.label.clone(),
+                passed: step.passed,
+                status,
+                timed_out: step.timed_out,
+                cancelled: step.cancelled,
+                duration_ms: step.duration_ms,
+                log: step.log.clone(),
+                detail: step.detail.clone(),
+                runner: step.runner.clone(),
+                attempts: vec![MachineAttempt {
+                    attempt: step.attempt.unwrap_or(1),
+                    status,
+                    started_at: step.started_at.clone(),
+                    finished_at: step.finished_at.clone(),
+                    duration_ms: step.duration_ms,
+                    timed_out: step.timed_out,
+                    cancelled: step.cancelled,
+                    log: step.log.clone(),
+                    detail: step.detail.clone(),
+                }],
+            }
+        })
+        .collect::<Vec<_>>();
+    let skipped_steps = report
+        .skipped_steps
+        .iter()
+        .map(|step| MachineSkippedStep {
+            id: step.id.clone(),
+            label: step.label.clone(),
+            status: "SKIPPED",
+            reason: step.reason.clone(),
+        })
+        .collect::<Vec<_>>();
+    let status = if !evidence_complete {
+        "FAIL"
+    } else {
+        report_status(report)
+    };
+    if status == "CANCELLED" {
+        failures.retain(|failure| failure.code != "STEP_CANCELLED");
+    }
+    artifacts.sort_by(|left, right| left.path.cmp(&right.path));
+    artifacts.dedup_by(|left, right| left.path == right.path);
+    MachineResult {
+        schema_version: MACHINE_RESULT_SCHEMA_VERSION,
+        invocation_id: report.invocation_id.clone(),
+        executor_version: report.executor_version.clone(),
+        report_directory: report.report_directory.clone(),
+        timestamp: report.timestamp.clone(),
+        profile: report.profile.clone(),
+        scope: report.scope.clone(),
+        services: report
+            .services
+            .iter()
+            .map(|service| MachineService {
+                id: service.id.clone(),
+                status: match service.status.as_str() {
+                    "READY" => "READY",
+                    "FAILED" => "FAILED",
+                    "LEAKED" => "LEAKED",
+                    _ => "CLEANED",
+                },
+            })
+            .collect(),
+        steps,
+        skipped_steps,
+        warnings: Vec::new(),
+        failures,
+        artifacts,
+        evidence_complete,
+        passed: report.passed && evidence_complete,
+        status,
+    }
+}
+
+fn ensure_supported_machine_result(raw: &[u8]) -> Result<()> {
+    let header: MachineResultHeader =
+        serde_json::from_slice(raw).context("parse machine-result schema header")?;
+    if header.schema_version != MACHINE_RESULT_SCHEMA_VERSION {
+        bail!(
+            "unsupported machine-result schema version {:?}",
+            header.schema_version
+        );
+    }
+    Ok(())
+}
+
+fn task_status(step: &crate::process::TaskResult) -> &'static str {
+    if step.cancelled {
+        "CANCELLED"
+    } else if step.passed {
+        "PASS"
+    } else {
+        "FAIL"
+    }
+}
+
+fn failure_code(step: &crate::process::TaskResult) -> String {
+    if step.cancelled {
+        "STEP_CANCELLED"
+    } else if step.timed_out {
+        "STEP_TIMEOUT"
+    } else {
+        "STEP_FAILED"
+    }
+    .into()
+}
+
+fn report_status(report: &VerificationReport) -> &'static str {
+    if report.passed {
+        "PASS"
+    } else if report.steps.iter().any(|step| step.cancelled)
+        || report
+            .skipped_steps
+            .iter()
+            .any(|step| step.reason.contains("cancel"))
+    {
+        "CANCELLED"
+    } else {
+        "FAIL"
+    }
+}
+
+fn invocation_relative_path(report_directory: &str, path: &str) -> Option<String> {
+    let report_root = Path::new(report_directory);
+    let candidate = Path::new(path);
+    let relative = if candidate.is_absolute() {
+        candidate.strip_prefix(report_root).ok()?.to_path_buf()
+    } else {
+        candidate.to_path_buf()
+    };
+    if relative.as_os_str().is_empty()
+        || relative.is_absolute()
+        || relative.components().any(|component| {
+            matches!(
+                component,
+                Component::ParentDir | Component::RootDir | Component::Prefix(_)
+            )
+        })
+    {
+        return None;
+    }
+    Some(relative.to_string_lossy().replace('\\', "/"))
+}
 
 #[derive(Debug)]
 pub(super) struct Invocation {
@@ -167,8 +454,10 @@ pub(super) fn write(report: &VerificationReport, project: &Project) -> Result<()
     let mut failures = Vec::new();
     match serde_json::to_string_pretty(report)
         .context("serialize verification report as JSON")
-        .and_then(|json| write_report_file(project, "test_result.json", json))
-    {
+        .and_then(|json| {
+            ensure_supported_machine_result(json.as_bytes())?;
+            write_report_file(project, "test_result.json", json)
+        }) {
         Ok(()) => {}
         Err(error) => failures.push(error),
     }
@@ -675,7 +964,10 @@ fn post_json(raw_url: &str, body: &[u8]) -> Result<()> {
 
 #[cfg(test)]
 mod tests {
-    use super::{configured_html, junit, markdown, notify, post_json, render_html, report_target};
+    use super::{
+        configured_html, ensure_supported_machine_result, junit, machine_result, markdown, notify,
+        post_json, render_html, report_target,
+    };
     use crate::config::WebhookConfig;
     use crate::process::TaskResult;
     use crate::scope::ScopeResult;
@@ -728,6 +1020,7 @@ mod tests {
                 components: ["api".to_string()].into_iter().collect(),
                 unmatched_files: vec![],
             },
+            services: vec![],
             steps: vec![TaskResult {
                 step_id: None,
                 invocation_id: None,
@@ -754,6 +1047,68 @@ mod tests {
         assert!(output.contains("=== Verification report ==="));
         assert!(output.contains("TEST_SUMMARY: FAIL"));
         assert!(output.contains("logs/unit.log"));
+    }
+
+    #[test]
+    fn machine_result_uses_versioned_status_attempts_and_artifact_references() {
+        let value = serde_json::to_value(machine_result(&report())).expect("machine result JSON");
+        assert_eq!(value["schema_version"], "1");
+        assert_eq!(value["status"], "FAIL");
+        assert!(value["services"].as_array().is_some());
+        assert_eq!(value["steps"][0]["status"], "FAIL");
+        assert_eq!(value["steps"][0]["attempts"][0]["attempt"], 1);
+        assert_eq!(value["artifacts"][0]["path"], "logs/unit.log");
+        assert_eq!(value["artifacts"][0]["kind"], "step-log");
+        assert_eq!(value["evidence_complete"], false);
+        assert_eq!(value["failures"][0]["code"], "STEP_FAILED");
+    }
+
+    #[test]
+    fn machine_result_keeps_cancellation_distinct_from_failure() {
+        let mut report = report();
+        report.steps[0].passed = false;
+        report.steps[0].cancelled = true;
+        report.steps[0].step_id = Some("unit.tests".into());
+        report.skipped_steps.push(SkippedStep {
+            id: "dependent.tests".into(),
+            label: "dependent tests".into(),
+            reason: "verification cancelled before dispatch".into(),
+        });
+        let value = serde_json::to_value(machine_result(&report)).expect("machine result JSON");
+        assert_eq!(value["status"], "CANCELLED");
+        assert_eq!(value["steps"][0]["status"], "CANCELLED");
+        assert_eq!(value["skipped_steps"][0]["status"], "SKIPPED");
+        assert!(value["failures"]
+            .as_array()
+            .expect("failures array")
+            .is_empty());
+    }
+
+    #[test]
+    fn machine_result_rejects_artifacts_outside_the_invocation() {
+        let mut report = report();
+        report.passed = true;
+        report.steps[0].passed = true;
+        report.steps[0].step_id = Some("unit.tests".into());
+        report.steps[0].log = "/tmp/outside-invocation.log".into();
+        let value = serde_json::to_value(machine_result(&report)).expect("machine result JSON");
+        assert_eq!(value["status"], "FAIL");
+        assert_eq!(value["passed"], false);
+        assert_eq!(value["evidence_complete"], false);
+        assert_eq!(value["failures"][0]["code"], "EVIDENCE_PATH_ESCAPE");
+        assert!(value["artifacts"]
+            .as_array()
+            .expect("artifacts array")
+            .is_empty());
+    }
+
+    #[test]
+    fn unsupported_machine_result_versions_fail_closed() {
+        let error = ensure_supported_machine_result(br#"{"schema_version":"2"}"#)
+            .expect_err("unsupported schema version must fail");
+        assert!(error
+            .to_string()
+            .contains("unsupported machine-result schema"));
     }
 
     #[test]
