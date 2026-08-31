@@ -77,7 +77,10 @@ effort, and acceptance criterion.
   **Acceptance:** Dry-run lists only marked Harness-Gate resources; reclaim
   failures remain blocking structured results and preserve audit evidence. The
   `cleanup` command writes `cleanup.json` and leaves failed lease records intact.
-- [ ] **4.5 (P0, M)** Add Linux/macOS/Windows lifecycle tests.
+- [x] **4.5 (P0, M)** Add Linux/macOS/Windows lifecycle tests. Cross-platform
+  tests cover process-tree timeout termination, service cleanup, lease expiry,
+  and no-leak assertions; the Unix-specific session/process-start checks remain
+  enabled where those operating-system APIs exist.
   **Acceptance:** Process-tree termination, service cleanup, lease expiry, and
   no-leak assertions run on each supported CI platform.
 
