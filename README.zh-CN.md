@@ -338,7 +338,8 @@ harness-gate doctor --json     # 给 CI 或其他工具消费
 
 ### 测试解析器
 
-`[parsers.<id>]` 定义一个或多个正则、计数 capture group 和最低结果数。步骤通过 `parser = "<id>"` 引用，因此 Jest、Pytest、Go test 等文本输出无需修改 Rust 代码即可增加零测试保护。
+`[parsers.<id>]` 支持 `regex`、JUnit、TRX 和 JSON 标准结果；步骤通过 `parser = "<id>"` 引用。
+解析器会把 malformed、零结果和部分结果记录为不同失败码，避免命令虽退出 0 却没有真正执行测试。
 
 ### 临时服务
 
@@ -446,6 +447,24 @@ harness-gate verify --all
 `test_result.json` 遵循[版本化 machine-result schema](https://github.com/musutrade/Harness-Gate/blob/main/schema/machine-result.schema.json)。为兼容旧消费者仍保留
 `passed`，新消费者应使用稳定的 `status`、步骤 `attempts`、结构化 `failures`、invocation-relative 的
 `artifacts` 和 `evidence_complete`，不要解析 Markdown 或日志文本来判断结果。
+
+机器结果还记录 parser 模式/版本和完整性。优先使用 JUnit、TRX 或 JSON
+标准结果；malformed、零结果和部分结果分别映射为 `RESULT_PARSE_FAILURE`、
+`RESULT_ZERO` 和 `RESULT_PARTIAL`。有界重试记录 `retry_count` 与 `flaky`，
+分片记录 merge identity 并拒绝缺失或重复测试身份。有效的到期 waiver 使用
+机器可区分的 `WAIVED`，并包含审批和补偿控制证据。
+
+迁移时可重放串行请求、比较归一化结果并记录金丝雀/回滚：
+
+```bash
+harness-gate compat run --input request.json --output result.json --old-result frozen.json
+harness-gate compat compare --old frozen.json --new result.json --output comparison.json
+harness-gate compat canary --state migration-canary.json --slice team-a
+harness-gate compat rollback --state migration-canary.json
+```
+
+这些命令保留原始摘要和 invocation 证据，不会删除已有报告。
+P2 进程外签名 adapter 边界见 [ADR-0033](docs/adr/0033-signed-out-of-process-adapter-protocol.md)。
 
 JSON Lines 应用日志可提取同一 trace 的上下文：
 

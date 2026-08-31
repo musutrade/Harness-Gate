@@ -1,6 +1,7 @@
 mod app;
 mod audit;
 mod cli;
+mod compat;
 mod config;
 mod doctor;
 mod error;

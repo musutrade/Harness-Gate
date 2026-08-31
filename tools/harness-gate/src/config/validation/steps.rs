@@ -71,7 +71,8 @@ pub(super) fn validate_step(config: &FlowConfig, step: &StepConfig) -> Result<()
         validate_env_name("step timeout_env", name)?;
     }
     if let Some(parser) = &step.parser {
-        if !config.parsers.contains_key(parser) {
+        let parser_config = config.parsers.get(parser);
+        if parser_config.is_none() {
             bail!("step {:?} references unknown parser {parser:?}", step.id);
         }
     }

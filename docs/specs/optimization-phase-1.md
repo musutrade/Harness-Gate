@@ -1,11 +1,16 @@
 # Phase 1 Optimization Specification
 
 **Version**: 1.0  
-**Status**: In Progress  
+**Status**: Historical / superseded
 **Created**: 2024-08-26  
 **Owner**: Harness-Gate Team  
 
 ## Overview
+
+> This is the original 2024 planning document. Its implementation checklist
+> is retained for historical context and is superseded by
+> [ADR-0025](../adr/0025-phase-1-quality-baseline-gates.md) and the Phase 1
+> quality-baseline OpenSpec change. Current acceptance status is tracked there.
 
 This specification details the Phase 1 optimization work for Harness-Gate, focusing on quick wins that significantly improve project quality with minimal effort.
 
@@ -438,11 +443,9 @@ predicates = "3.0"
 
 ## Sign-off
 
-- [ ] Technical Lead Review
-- [ ] Security Review (for cargo-audit addition)
-- [ ] Documentation Review
-- [ ] Ready for Implementation
+This historical plan is superseded. Technical, security, and documentation
+acceptance are recorded in ADR-0025 and its OpenSpec evidence package.
 
 ---
 
-**Next Steps**: Begin Task #2 (Add release profile configuration)
+**Next Steps**: See the current Phase 1 and Phase 2 OpenSpec records.

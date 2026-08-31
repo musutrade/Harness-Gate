@@ -1,8 +1,9 @@
-mod parser;
+pub(crate) mod parser;
 mod plan;
 mod report;
 mod scheduler;
 mod steps;
+mod waiver;
 
 #[cfg(test)]
 mod tests;
@@ -116,7 +117,27 @@ pub fn run(
             profile: profile.to_string(),
         });
     }
-    run_selected(project, scope, profile, staged, None)
+    run_selected(project, scope, profile, staged, None, None)
+}
+
+pub(crate) fn run_with_request_id(
+    project: &Project,
+    scope: ScopeResult,
+    profile: &str,
+    staged: bool,
+    request_id: Option<&str>,
+) -> std::result::Result<VerificationReport, VerifyError> {
+    if !project
+        .config
+        .steps
+        .iter()
+        .any(|step| step.profiles.contains(profile))
+    {
+        return Err(VerifyError::UnknownProfile {
+            profile: profile.to_string(),
+        });
+    }
+    run_selected(project, scope, profile, staged, None, request_id)
 }
 
 pub fn run_step(
@@ -140,6 +161,7 @@ pub fn run_step(
         &project.config.project.default_profile,
         false,
         Some(id),
+        None,
     )
 }
 
@@ -149,6 +171,7 @@ fn run_selected(
     profile: &str,
     staged: bool,
     only_step: Option<&str>,
+    request_id: Option<&str>,
 ) -> std::result::Result<VerificationReport, VerifyError> {
     if project
         .config
@@ -185,8 +208,20 @@ fn run_selected(
             VerifyError::execution(error)
         }
     })?;
+    waiver::validate_plan_waivers(project, &plan, &scope).map_err(VerifyError::execution)?;
     let invocation = report::allocate_invocation(project).map_err(VerifyError::report)?;
-    report::write_invocation_metadata(&invocation, profile, staged).map_err(VerifyError::report)?;
+    if let Some(request_id) = request_id {
+        report::write_invocation_metadata_with_request(
+            &invocation,
+            profile,
+            staged,
+            Some(request_id),
+        )
+        .map_err(VerifyError::report)?;
+    } else {
+        report::write_invocation_metadata(&invocation, profile, staged)
+            .map_err(VerifyError::report)?;
+    }
     let mut invocation_project = project.clone();
     invocation_project.reports = invocation.root.clone();
     let mut progress = Progress::new(plan.nodes.len());
@@ -197,6 +232,7 @@ fn run_selected(
         &plan,
         staged,
         &services,
+        &scope,
         if project.config.execution.parallel {
             project.config.execution.effective_max_parallel()
         } else {
@@ -268,7 +304,12 @@ fn run_selected(
             let mut task_result = result.task_result;
             task_result.step_id = Some(result.node_id.clone());
             task_result.invocation_id = Some(invocation.id.clone());
-            task_result.attempt = Some(1);
+            // The scheduler preserves the terminal attempt selected by the
+            // retry policy. Legacy/builtin results have no attempt yet and
+            // are normalized to one at the report boundary.
+            if task_result.attempt.is_none() {
+                task_result.attempt = Some(1);
+            }
             if !task_result.log.is_empty() && !Path::new(&task_result.log).is_absolute() {
                 task_result.log = invocation_project
                     .reports
@@ -305,6 +346,13 @@ fn run_selected(
             duration_ms: 0,
             log: String::new(),
             detail: Some(format!("{error:#}")),
+            failure_code: Some("SCHEDULER_FAILURE".into()),
+            attempts: Vec::new(),
+            flaky: false,
+            retry_class: None,
+            parser: None,
+            waived: false,
+            waiver: None,
             runner: None,
         });
     }

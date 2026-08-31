@@ -39,6 +39,13 @@ pub struct ExecutionConfig {
     #[serde(default)]
     #[schemars(range(min = 1, max = 64))]
     pub max_parallel: Option<usize>,
+    /// Optional per-step retry policies. Retries are opt-in and fail closed.
+    #[serde(default)]
+    pub retries: BTreeMap<String, RetryConfig>,
+    /// Optional per-step shard declaration. A runner receives the shard
+    /// identity through reserved environment variables.
+    #[serde(default)]
+    pub shards: BTreeMap<String, ShardConfig>,
 }
 
 impl ExecutionConfig {
@@ -117,6 +124,51 @@ pub struct PathAlias {
 pub struct PolicyConfig {
     #[serde(default)]
     pub required_steps: Vec<String>,
+    /// Explicit, expiring exceptions. DevRail owns approval policy; the
+    /// executor validates scope and expiry before dispatch.
+    #[serde(default)]
+    pub waivers: Vec<WaiverConfig>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct WaiverConfig {
+    pub id: String,
+    pub step: String,
+    #[serde(default)]
+    pub scope: Option<String>,
+    pub risk: String,
+    pub reason: String,
+    pub owner: String,
+    pub approved_by: String,
+    pub created_at: String,
+    pub expires_at: String,
+    pub compensating_control: String,
+    #[serde(default)]
+    pub revoked: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct RetryConfig {
+    #[serde(default = "default_retry_attempts")]
+    #[schemars(range(min = 1, max = 5))]
+    pub max_attempts: u32,
+    #[serde(default)]
+    pub backoff_ms: u64,
+    #[serde(default)]
+    pub retryable: BTreeSet<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct ShardConfig {
+    pub index: u32,
+    pub total: u32,
+}
+
+fn default_retry_attempts() -> u32 {
+    1
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, JsonSchema)]
@@ -255,6 +307,24 @@ pub enum ParserConfig {
         patterns: Vec<String>,
         #[serde(default = "default_capture")]
         capture: usize,
+        #[serde(default = "default_minimum")]
+        minimum: usize,
+    },
+    /// Parse standard JUnit XML testcases instead of counting log text.
+    Junit {
+        #[serde(default = "default_minimum")]
+        minimum: usize,
+    },
+    /// Parse Visual Studio TRX XML test results.
+    Trx {
+        #[serde(default = "default_minimum")]
+        minimum: usize,
+    },
+    /// Parse stable JSON results. `count_path` may point at an array or a
+    /// numeric field; when omitted, common test-result arrays are discovered.
+    Json {
+        #[serde(default)]
+        count_path: Option<String>,
         #[serde(default = "default_minimum")]
         minimum: usize,
     },

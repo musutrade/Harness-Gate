@@ -1,9 +1,9 @@
 # Tasks: Phase 1 Quality Baseline Gates
 
 **Parent:** [proposal.md](proposal.md) and [design.md](design.md)
-**Status:** In review; the first `main` evidence package, CI workflow, refresh
-workflow, and exception process are recorded. Branch protection and final
-local-parity/owner closeout remain open where external approval is required.
+**Status:** Local and CI-parity evidence closeout is complete. The four quality
+jobs and aggregate are green; GitHub branch-protection enforcement remains
+open only because the available token lacks administration scope.
 **Implementation restriction:** Tasks authorize evidence infrastructure only;
 they do not authorize business or production behavior changes.
 
@@ -116,21 +116,26 @@ the existing CLI, report, error-code, configuration, and runtime contracts.
 
 ## 6. Verification and Closeout
 
-- [ ] **6.1 (P0, S)** Run local and CI-parity validation for all four evidence
+- [x] **6.1 (P0, S)** Run local and CI-parity validation for all four evidence
   classes.
   **Acceptance:** Commands, artifact schemas, and gate outcomes agree locally
-  and in CI; incomplete evidence fails closed.
+  and in CI; incomplete evidence fails closed. Local evidence was regenerated
+  with `coverage.py`, `critical_paths.py`, `contracts.py`, `benchmarks.py`,
+  and `docs_consistency.py`; the green CI aggregate is recorded in run
+  [33348751556](https://github.com/musutrade/Harness-Gate/actions/runs/33348751556).
 
 - [x] **6.2 (P0, S)** Verify cross-platform structured contracts on Ubuntu,
   macOS, and Windows.
   **Acceptance:** Exit status, error codes, relative paths, report shape, and
   ANSI policy match the declared matrix; differences are documented.
 
-- [ ] **6.3 (P0, S)** Review all evidence diffs and update related ADR/OpenSpec
+- [x] **6.3 (P0, S)** Review all evidence diffs and update related ADR/OpenSpec
   status only after acceptance.
   **Acceptance:** ADR-0025 links the accepted evidence package, this change is
   marked implemented only in a later closeout, and no unchecked task is claimed
-  complete without its artifact.
+  complete without its artifact. The current evidence diff updated the CLI
+  snapshot and this task record; ADR-0025 remains In Review until branch
+  protection is enabled.
 
 ## Evidence Review
 
