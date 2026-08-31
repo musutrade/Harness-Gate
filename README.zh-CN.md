@@ -118,6 +118,7 @@ harness-gate presets
 harness-gate --project-root /path/to/new-project init --preset rust-api
 harness-gate --project-root /path/to/new-project config check
 harness-gate --project-root /path/to/new-project doctor
+harness-gate --project-root /path/to/new-project cleanup --dry-run
 harness-gate --project-root /path/to/new-project verify --all
 ```
 
@@ -154,6 +155,7 @@ harness-gate --project-root /path/to/new-project verify --all
 | `harness-gate presets`                                       | 列出内置项目预设                      |
 | `harness-gate init --preset <name>`                          | 生成 schema v2 配置                   |
 | `harness-gate doctor [--strict] [--json]`                    | 执行配置声明的环境检查                |
+| `harness-gate cleanup [--dry-run] [--json]`                 | 检查或回收过期的 Harness-Gate 资源租约 |
 | `harness-gate scope [--staged\|--base REF\|--all] [--json]`  | 列出变更和选择的 components           |
 | `harness-gate secrets [--staged] [--json]`                   | 扫描高置信凭据模式，只输出命中文件名  |
 | `harness-gate audit [--json]`                                | 执行正则架构规则并生成审计报告        |
@@ -169,6 +171,12 @@ harness-gate --project-root /path/to/new-project verify --all
 | `harness-gate parse-logs`                                    | 提取 JSON Lines ERROR trace 上下文    |
 
 所有命令都支持全局 `--project-root <PATH>` 和 `--config <PATH>`。命令成功返回 0；配置错误、门禁失败、步骤失败、超时或中断返回非 0，适合直接用于 CI。
+
+`cleanup --dry-run` 可以在重试前或共享 CI 主机上安全执行，只列出带有
+`harness-gate` owner marker 的租约，并把结构化观察写入
+`<reports>/cleanup.json`。不带 `--dry-run` 时只回收已过期且 owner 已死亡的
+标记租约；未知文件和活动 owner 不会被触碰。容器只有在租约同时记录 runtime
+和容器名时才会停止，停止失败会保留租约并返回非零状态。
 
 交互式终端中的 `verify` 会显示进度条，并以颜色区分通过、警告和失败。重定向输出或 CI 保持纯文本；可使用 `--color auto`（默认）、`--color always` 或 `--color never` 控制颜色，`NO_COLOR` 会关闭自动颜色。
 

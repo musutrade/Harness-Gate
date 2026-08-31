@@ -20,6 +20,36 @@ pub(super) fn run(project: &Project, command: Commands) -> Result<bool, CliError
             }
             Ok(report.failures == 0 && (!strict || report.warnings == 0))
         }
+        Commands::Cleanup { dry_run, json } => {
+            let report = crate::service::cleanup_resources(project, dry_run)?;
+            crate::utils::fs::write_json(&project.reports.join("cleanup.json"), &report)
+                .context("write cleanup evidence")?;
+            if json {
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&report).map_err(anyhow::Error::from)?
+                );
+            } else {
+                println!(
+                    "Cleanup {}: scanned {}, active {}, stale {}, reclaimed {}",
+                    if dry_run { "(dry-run)" } else { "complete" },
+                    report.scanned,
+                    report.active,
+                    report.stale,
+                    report.reclaimed
+                );
+                for resource in &report.resources {
+                    println!(
+                        "  {:<12} {:<24} {}",
+                        resource.action, resource.resource_id, resource.lease_file
+                    );
+                }
+                for failure in &report.failures {
+                    eprintln!("  cleanup failure: {failure}");
+                }
+            }
+            Ok(report.failures.is_empty())
+        }
         Commands::Scope {
             scope: args,
             json,

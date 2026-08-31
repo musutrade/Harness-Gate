@@ -60,18 +60,23 @@ effort, and acceptance criterion.
 
 ## 4. Cross-Process Resource Leases (P0)
 
-- [ ] **4.1 (P0, M)** Define owner markers and lease records.
+- [x] **4.1 (P0, M)** Define owner markers and lease records.
   **Acceptance:** Resource identity, invocation/process-start identity, heartbeat,
-  expiry, kind, and schema version are persisted and validated.
-- [ ] **4.2 (P0, M)** Implement idempotent acquire/renew/release.
+  expiry, kind, and schema version are persisted and validated. Implemented by
+  report-root lease records and owner labels on managed containers.
+- [x] **4.2 (P0, M)** Implement idempotent acquire/renew/release.
   **Acceptance:** Concurrent owners receive one lease and a structured conflict;
-  retries of lifecycle operations do not corrupt ownership.
-- [ ] **4.3 (P0, M)** Implement stale-owner detection and reclaim.
+  retries of lifecycle operations do not corrupt ownership. Atomic acquisition,
+  owner-checked renewal/release, and conflict diagnostics are covered by tests.
+- [x] **4.3 (P0, M)** Implement stale-owner detection and reclaim.
   **Acceptance:** Killed owners are reclaimable within the configured bound;
-  PID reuse and host restart do not cause false ownership transfer.
-- [ ] **4.4 (P0, S)** Add `doctor/cleanup --dry-run` evidence.
+  PID reuse and host restart do not cause false ownership transfer. Dead PIDs,
+  process-start identity, expiry, and conservative unknown-platform handling are
+  implemented.
+- [x] **4.4 (P0, S)** Add `doctor/cleanup --dry-run` evidence.
   **Acceptance:** Dry-run lists only marked Harness-Gate resources; reclaim
-  failures remain blocking structured results and preserve audit evidence.
+  failures remain blocking structured results and preserve audit evidence. The
+  `cleanup` command writes `cleanup.json` and leaves failed lease records intact.
 - [ ] **4.5 (P0, M)** Add Linux/macOS/Windows lifecycle tests.
   **Acceptance:** Process-tree termination, service cleanup, lease expiry, and
   no-leak assertions run on each supported CI platform.
