@@ -186,6 +186,7 @@ Presets are starting points, not runtime branches. After initialization is compl
 | `harness-gate config print --resolved`                       | Output final effective configuration      |
 | `harness-gate config migrate`                                | Convert schema v1 to v2                   |
 | `harness-gate schema export`                                 | Generate JSON Schema for flow.toml         |
+| `harness-gate adapter run --request <PATH> --trusted-key <PATH>` | Validate and execute one signed out-of-process adapter request |
 | `harness-gate parse-logs`                                    | Extract JSON Lines ERROR trace context    |
 
 All commands support global `--project-root <PATH>` and `--config <PATH>`. Commands return 0 on success; configuration errors, gate failures, step failures, timeouts or interrupts return non-zero, suitable for direct use in CI.
@@ -428,6 +429,15 @@ declared capability allowlist, terminates the process tree on timeout or
 cancellation, and rejects malformed results or artifacts outside the
 invocation root. Adapter failures are reported as
 `ADAPTER_PROTOCOL_FAILURE`.
+
+The request is a single JSON document; it is not read from `flow.toml` and does
+not enable adapters in built-in steps. Repeat `--trusted-key` for every trusted
+Ed25519 key and pass only the capabilities that the invocation is allowed to
+use (`--allow-network`, `--allow-resource`, or `--allow-environment`). Keep the
+request, executable, and artifact root inside the project or another explicitly
+managed deployment directory, and review the signer before execution. The
+capability allowlist is a protocol-level boundary, not an operating-system
+network sandbox.
 
 `parse-logs` reads JSON Lines in bounded streaming passes. It keeps at most 20 records before the first matching
 error and 30 records in the output; when no trace ID is available it emits only the last 30 raw lines. This avoids

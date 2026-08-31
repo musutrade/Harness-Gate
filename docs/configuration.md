@@ -901,3 +901,74 @@ v2 版本号保持为 `2`，不会自动升级。若原本可加载的 v2 文件
 新预检拒绝，请根据 `config check` 的主字段、related 字段和 `help:` 修复：添加显式的
 `depends_on`、使用不同的 `inject_env` 或 service、或为每个步骤指定独立日志。工具绝不会
 静默重排、插入依赖或改写配置。
+
+## 16. 进程外 Adapter 请求（P2，显式 opt-in）
+
+签名 adapter 不是 `flow.toml` 中的步骤类型，也不会改变内置 runner 的行为。它通过一份
+独立 JSON 请求交给 `harness-gate adapter run` 执行；只有调用方显式提供请求、受信任公钥和
+能力 allowlist 时才会启动。协议和结果约束见
+[ADR-0033](adr/0033-signed-out-of-process-adapter-protocol.md) 及
+[Adapter OpenSpec](../openspec/changes/harness-gate-adapter-protocol/proposal.md)。
+
+最小请求形状如下（`signature.value` 是对声明字段的 Ed25519 签名，均使用 base64）：
+
+```json
+{
+  "protocol_version": 1,
+  "result_schema_version": "1",
+  "adapter": {
+    "name": "org-scanner",
+    "version": "1.0.0",
+    "executable": "adapters/org-scanner",
+    "source_digest": "<64 lowercase hex SHA-256>",
+    "signature": {
+      "algorithm": "ed25519",
+      "key_id": "release-2026",
+      "value": "<base64 signature>"
+    }
+  },
+  "invocation_id": "inv-2026-08-31-0001",
+  "step_id": "security.org-scanner",
+  "timeout_ms": 120000,
+  "config_digest": "<configuration digest>",
+  "artifact_root": ".harness-gate/reports/invocations/inv-2026-08-31-0001",
+  "args": [],
+  "environment": {},
+  "capabilities": {
+    "network": [],
+    "resources": [],
+    "environment": []
+  },
+  "input": {}
+}
+```
+
+每个受信任公钥是一个独立 JSON 文件：
+
+```json
+{"key_id":"release-2026","public_key":"<base64 32-byte Ed25519 key>"}
+```
+
+执行命令和能力选项：
+
+```bash
+harness-gate adapter run \
+  --request adapter-request.json \
+  --trusted-key release-2026.json \
+  --allow-network internal-api \
+  --allow-resource test-database \
+  --allow-environment ORG_SCANNER_MODE
+```
+
+`--trusted-key`、`--allow-network`、`--allow-resource` 和 `--allow-environment` 都可以重复。
+请求中的能力必须分别出现在对应 allowlist 中；环境变量还必须同时列在
+`capabilities.environment`，否则在启动前失败。host 启动 adapter 前会校验协议/结果版本、
+可执行文件 SHA-256 和签名，清空继承环境，仅注入 Harness-Gate 的 invocation 元数据及请求中
+声明的环境变量。能力 allowlist 是协议级失败边界，不等同于操作系统级网络沙箱。
+
+adapter 通过 stdin 接收一份 JSON，请在 stdout 只返回一份 JSON 对象，`schema_version` 必须为
+`"1"`，`status` 必须是 `PASS`、`FAIL`、`CANCELLED`、`SKIPPED` 或 `WAIVED` 之一。产物路径必须
+是相对于 `artifact_root` 的普通相对路径；绝对路径、Windows 前缀、`..` 越界路径、缺失文件和
+符号链接逃逸都会失败。超时、取消、崩溃、非零退出、malformed 响应和上述校验错误统一映射为
+`ADAPTER_PROTOCOL_FAILURE`，并清理 adapter 的整个进程树。该 host 当前是独立执行入口；若要把
+adapter 纳入验证 DAG，应先在上层编排器中显式安排 invocation 和结果映射。
