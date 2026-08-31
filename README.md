@@ -412,7 +412,22 @@ harness-gate compat rollback --state migration-canary.json
 
 These commands retain raw result digests and never delete invocation evidence.
 The P2 signed adapter boundary is specified separately in
-[ADR-0033](docs/adr/0033-signed-out-of-process-adapter-protocol.md).
+[ADR-0033](docs/adr/0033-signed-out-of-process-adapter-protocol.md). A host can
+execute one signed adapter request without loading code into the CLI process:
+
+```bash
+harness-gate adapter run \
+  --request adapter-request.json \
+  --trusted-key adapter-key.json \
+  --allow-resource test-database
+```
+
+The host verifies the Ed25519 declaration and executable SHA-256 digest before
+starting the adapter, clears inherited environment variables, enforces the
+declared capability allowlist, terminates the process tree on timeout or
+cancellation, and rejects malformed results or artifacts outside the
+invocation root. Adapter failures are reported as
+`ADAPTER_PROTOCOL_FAILURE`.
 
 `parse-logs` reads JSON Lines in bounded streaming passes. It keeps at most 20 records before the first matching
 error and 30 records in the output; when no trace ID is available it emits only the last 30 raw lines. This avoids

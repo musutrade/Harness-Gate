@@ -8,6 +8,9 @@ use anyhow::Context;
 
 pub(super) fn run(project: &Project, command: Commands) -> Result<bool, CliError> {
     match command {
+        Commands::Adapter { .. } => {
+            unreachable!("adapter execution is handled before project discovery")
+        }
         Commands::Compat {
             action:
                 CompatAction::Run {

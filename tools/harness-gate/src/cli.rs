@@ -35,6 +35,11 @@ pub(crate) enum Commands {
         #[command(subcommand)]
         action: CompatAction,
     },
+    /// Execute a signed out-of-process adapter request.
+    Adapter {
+        #[command(subcommand)]
+        action: AdapterAction,
+    },
     /// Check local tools, configuration, Git, and test database access.
     Doctor {
         /// Emit machine-readable JSON.
@@ -164,6 +169,25 @@ pub(crate) enum CompatAction {
     Rollback {
         #[arg(long, value_name = "PATH")]
         state: PathBuf,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum AdapterAction {
+    /// Validate and execute one JSON adapter request.
+    Run {
+        #[arg(short, long, value_name = "PATH")]
+        request: PathBuf,
+        /// Trusted Ed25519 key JSON files ({"key_id": ..., "public_key": ...}).
+        #[arg(long = "trusted-key", value_name = "PATH")]
+        trusted_keys: Vec<PathBuf>,
+        /// Capability values allowed by the host. Repeat for multiple values.
+        #[arg(long = "allow-network", value_name = "CAPABILITY")]
+        allow_network: Vec<String>,
+        #[arg(long = "allow-resource", value_name = "CAPABILITY")]
+        allow_resources: Vec<String>,
+        #[arg(long = "allow-environment", value_name = "NAME")]
+        allow_environment: Vec<String>,
     },
 }
 

@@ -2,7 +2,7 @@
 
 ## Status
 
-**Proposed** (2026-08-31)
+**Implemented** (2026-08-31)
 
 ## Decision
 
@@ -45,5 +45,10 @@ response, or artifact escape is a blocking `ADAPTER_PROTOCOL_FAILURE`.
 ## Rollout
 
 This ADR is a P2 evolution track. Built-in runner cutover does not depend on
-adapter support. A future implementation must add an OpenSpec change and pass
-the protocol fixtures before enabling an adapter for a canary slice.
+adapter support. The host implementation is in
+`tools/harness-gate/src/process/adapter.rs`, with the
+`harness-gate adapter run` entry point and deterministic fixture in
+`tools/quality/fixtures/adapter/`. The protocol fixtures cover signature and
+digest validation, capability rejection, malformed responses, crash, timeout,
+cancellation, and artifact escape on every supported platform in CI. Adapter
+execution remains opt-in and is not enabled by built-in steps.
