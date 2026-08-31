@@ -1,6 +1,7 @@
 use super::VerificationReport;
 use crate::config::WebhookConfig;
 use crate::project::Project;
+use crate::service::ResourceLease;
 use anyhow::{bail, Context, Result};
 use serde::Serialize;
 use std::fs::{self, OpenOptions};
@@ -11,10 +12,11 @@ use std::time::Duration;
 
 static INVOCATION_COUNTER: AtomicU64 = AtomicU64::new(1);
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub(super) struct Invocation {
     pub(super) id: String,
     pub(super) root: PathBuf,
+    pub(super) _lease: ResourceLease,
 }
 
 #[derive(Debug, Serialize)]
@@ -49,7 +51,20 @@ pub(super) fn allocate_invocation(project: &Project) -> Result<Invocation> {
             Ok(()) => {
                 fs::create_dir_all(root.join("logs"))
                     .with_context(|| format!("create invocation logs {}", root.display()))?;
-                return Ok(Invocation { id, root });
+                let lease = ResourceLease::acquire(
+                    project,
+                    format!("invocation:{id}"),
+                    "report-directory",
+                    id.clone(),
+                    Some(root.to_string_lossy().into_owned()),
+                    None,
+                )
+                .with_context(|| format!("acquire invocation lease {id:?}"))?;
+                return Ok(Invocation {
+                    id,
+                    root,
+                    _lease: lease,
+                });
             }
             Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
             Err(error) => {

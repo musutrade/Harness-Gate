@@ -342,6 +342,27 @@ service = "test-postgres"
 
 `path_type` 可取 `any`、`file`、`directory`，默认 `any`。命令、Git 配置、remote 和 service 探测都受 `timeout_secs` 约束，超时时会终止整个子进程组。CI 中通常使用 `harness-gate doctor --strict`，把 WARN 也视为失败。
 
+### 8.1 资源租约和孤儿回收
+
+管理型 Docker/Podman service 和 invocation 报告目录会在
+`<reports>/leases/` 写入带 `owner_marker = "harness-gate"` 的 JSON 租约。租约
+包含 `schema_version`、稳定 `resource_id`、`resource_kind`、
+`invocation_id`、PID、进程启动身份、创建/心跳/过期时间；容器租约还记录
+runtime 和容器名。文件以原子 `create_new` 抢占，续租和释放会校验完整 owner
+身份，避免 PID 重用或并发调用误删资源。
+
+```bash
+# 只观察，不停止容器或删除租约
+harness-gate cleanup --dry-run --json
+
+# 回收已死亡或已过期的 Harness-Gate 租约
+harness-gate cleanup --json
+```
+
+每次清理都会在报告根目录生成 `cleanup.json`。`dry-run` 只列出带合法
+Harness-Gate marker 的记录；未知 marker、损坏记录和活动 owner 永不回收。
+容器停止失败会保留租约并返回非零状态，便于 CI 重试或人工处置。
+
 ## 9. `[services.*]`
 
 ### 8.1 Environment service

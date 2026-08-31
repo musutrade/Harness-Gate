@@ -118,6 +118,7 @@ Initialize in target project:
 harness-gate --project-root /path/to/new-project init --preset rust-api
 harness-gate --project-root /path/to/new-project config check
 harness-gate --project-root /path/to/new-project doctor
+harness-gate --project-root /path/to/new-project cleanup --dry-run
 harness-gate --project-root /path/to/new-project verify --all
 ```
 
@@ -154,6 +155,7 @@ Presets are starting points, not runtime branches. After initialization is compl
 | `harness-gate presets`                                       | List built-in project presets             |
 | `harness-gate init --preset <name>`                          | Generate schema v2 configuration          |
 | `harness-gate doctor [--strict] [--json]`                    | Execute environment checks declared in config |
+| `harness-gate cleanup [--dry-run] [--json]`                 | Inspect or reclaim stale resource leases  |
 | `harness-gate scope [--staged\|--base REF\|--all] [--json]`  | List changes and selected components      |
 | `harness-gate secrets [--staged] [--json]`                   | Scan high-confidence credential patterns, only output matched filenames |
 | `harness-gate audit [--json]`                                | Execute regex architecture rules and generate audit report |
@@ -169,6 +171,14 @@ Presets are starting points, not runtime branches. After initialization is compl
 | `harness-gate parse-logs`                                    | Extract JSON Lines ERROR trace context    |
 
 All commands support global `--project-root <PATH>` and `--config <PATH>`. Commands return 0 on success; configuration errors, gate failures, step failures, timeouts or interrupts return non-zero, suitable for direct use in CI.
+
+`cleanup --dry-run` is safe to run before a retry or on a shared CI host. It
+only lists lease records carrying the `harness-gate` owner marker and writes
+the structured observation to `<reports>/cleanup.json`. Without `--dry-run`,
+only stale marked leases are reclaimed; unknown files and active owners are
+left untouched. A container is stopped only when its lease records both the
+runtime and container name, and a failed stop remains a blocking cleanup
+failure for a later retry.
 
 Interactive `verify` renders a progress bar and colored pass/warning/failure markers. Output stays plain when redirected or in CI. Use `--color auto` (default), `--color always`, or `--color never`; `NO_COLOR` disables automatic color.
 
