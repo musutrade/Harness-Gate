@@ -72,7 +72,7 @@ impl CodedError for VerifyError {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug)]
 pub struct VerificationReport {
     pub invocation_id: String,
     pub executor_version: String,
@@ -80,12 +80,17 @@ pub struct VerificationReport {
     pub timestamp: String,
     pub profile: String,
     pub scope: ScopeResult,
+    pub services: Vec<ServiceResult>,
     pub steps: Vec<TaskResult>,
     /// Steps that were not dispatched because a prerequisite failed.
-    /// Successful reports omit this field to preserve the existing JSON shape.
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub skipped_steps: Vec<SkippedStep>,
     pub passed: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct ServiceResult {
+    pub id: String,
+    pub status: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -217,6 +222,23 @@ fn run_selected(
         }
     };
     let cleanup_error = cleanup_result.err();
+    let service_ids = plan
+        .nodes
+        .iter()
+        .filter_map(|node| node.step)
+        .flat_map(|step| step.services.iter().cloned())
+        .collect::<BTreeSet<_>>();
+    let services = service_ids
+        .into_iter()
+        .map(|id| ServiceResult {
+            id,
+            status: if cleanup_error.is_some() {
+                "LEAKED".into()
+            } else {
+                "CLEANED".into()
+            },
+        })
+        .collect();
     let scheduler::SchedulerOutcome {
         results,
         cancelled,
@@ -298,6 +320,7 @@ fn run_selected(
             .map(|id| format!("step:{id}"))
             .unwrap_or_else(|| profile.to_string()),
         scope,
+        services,
         steps,
         skipped_steps,
         passed,

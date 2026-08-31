@@ -812,6 +812,10 @@ junit = "junit.xml"
 模板输入仍是只读且受路径隔离校验。
 规范报告和日志先写入临时同级文件，再通过原子 rename 发布；失败会使本次验证返回报告错误。
 
+`test_result.json` 使用仓库中的 [machine-result schema](../schema/machine-result.schema.json)（当前版本 `1`）。
+顶层和步骤状态使用 `PASS`、`FAIL`、`SKIPPED`、`CANCELLED` 等稳定值，并提供 attempts、结构化 failures、
+invocation-relative artifacts 及 `evidence_complete`；集成方不应从 Markdown 或日志内容推断门禁状态。
+
 ### 容器运行时和 Webhook
 
 Docker service 可显式选择 Docker 兼容的 Podman CLI，省略时默认为 Docker：

@@ -86,10 +86,14 @@ effort, and acceptance criterion.
 
 ## 5. Result Protocol and Test Semantics
 
-- [ ] **5.1 (P0, M)** Emit the unified machine-result schema.
+- [x] **5.1 (P0, M)** Emit the unified machine-result schema. Version 1 is
+  serialized at the report boundary with stable statuses, attempts, failure
+  classes, artifact references, and evidence completeness.
   **Acceptance:** Scope, step, service, warning, failure, artifact, and
   skipped/cancelled fields are stable and ordered by validated plan order.
-- [ ] **5.2 (P0, S)** Add schema contract and compatibility tests.
+- [x] **5.2 (P0, S)** Add schema contract and compatibility tests. The checked-in
+  JSON Schema and serialization tests cover PASS/FAIL/CANCELLED/SKIPPED
+  semantics and reject evidence paths outside the invocation boundary.
   **Acceptance:** DevRail fixture consumers map results without parsing Markdown
   or logs; unsupported schema versions fail closed.
 - [ ] **5.3 (P1, M)** Add waiver validation and `WAIVED` status.

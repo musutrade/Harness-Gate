@@ -74,6 +74,17 @@ fn service_failure_does_not_skip_unrelated_steps() {
         .steps
         .iter()
         .any(|step| step.label == "staged Git whitespace check" && step.passed));
+    let json: serde_json::Value = serde_json::from_slice(
+        &fs::read(
+            workspace
+                .root
+                .join(".harness-gate/reports/test_result.json"),
+        )
+        .expect("read verification report"),
+    )
+    .expect("parse verification report");
+    assert_eq!(json["services"][0]["id"], "missing-service");
+    assert_eq!(json["services"][0]["status"], "CLEANED");
 }
 
 #[cfg(unix)]

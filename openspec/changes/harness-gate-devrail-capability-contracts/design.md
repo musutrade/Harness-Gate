@@ -97,24 +97,50 @@ CI retry and human remediation.
 
 ### Unified result and evidence protocol
 
-The machine result is versioned independently from Markdown/HTML rendering:
+The machine result is versioned independently from Markdown/HTML rendering and
+is defined by the checked-in [machine-result JSON Schema](../../../schema/machine-result.schema.json):
 
 ```json
 {
   "schema_version": "1",
   "invocation_id": "inv-20260830-01HX...",
-  "commit_sha": "...",
   "executor_version": "0.4.0",
-  "status": "FAIL",
+  "report_directory": ".harness-gate/reports/invocations/inv-20260830-01HX...",
+  "timestamp": "2026-08-30T00:00:00Z",
+  "profile": "full",
+  "scope": {"mode": "all", "changed_files": [], "components": ["backend"], "unmatched_files": []},
+  "services": [],
   "steps": [{
     "step_id": "backend.tests",
-    "attempt": 1,
+    "invocation_id": "inv-20260830-01HX...",
+    "label": "backend tests",
+    "passed": false,
     "status": "FAIL",
-    "exit_code": 101,
-    "log": "steps/backend.tests/attempt-1/stderr.log"
+    "timed_out": false,
+    "cancelled": false,
+    "duration_ms": 1200,
+    "log": ".harness-gate/reports/invocations/inv-20260830-01HX.../logs/backend.log",
+    "detail": "exit code 101",
+    "runner": null,
+    "attempts": [{
+      "attempt": 1,
+      "status": "FAIL",
+      "started_at": "2026-08-30T00:00:00Z",
+      "finished_at": "2026-08-30T00:00:01Z",
+      "duration_ms": 1200,
+      "timed_out": false,
+      "cancelled": false,
+      "log": ".harness-gate/reports/invocations/inv-20260830-01HX.../logs/backend.log",
+      "detail": "exit code 101"
+    }]
   }],
-  "artifacts": [{"path": "manifest.json", "sha256": "..."}],
-  "evidence_complete": true
+  "skipped_steps": [],
+  "warnings": [],
+  "failures": [{"step_id": "backend.tests", "code": "STEP_FAILED", "message": "exit code 101"}],
+  "artifacts": [{"path": "logs/backend.log", "kind": "step-log"}],
+  "evidence_complete": true,
+  "passed": false,
+  "status": "FAIL"
 }
 ```
 

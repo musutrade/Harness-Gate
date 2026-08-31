@@ -435,13 +435,17 @@ harness-gate verify --all
 | `secret_scan.json`    | 扫描模式和命中文件名            | 安全门禁           |
 | `review_context.json` | 完整审计结果、规则、文件和行号  | 修复代理、Reviewer |
 | `review_context.md`   | 截断的人类可读审计摘要          | 终端或 LLM 上下文  |
-| `test_result.json`    | profile、scope、步骤耗时和状态  | CI、统计           |
+| `test_result.json`    | schema v1、scope、步骤状态/attempts、失败和 artifact 引用 | CI、统计 |
 | `test_result.md`      | 简洁验证摘要和 `TEST_SUMMARY`   | 人工查看           |
 | `test_result.html`    | 按仓库内模板渲染的可选 HTML      | CI、人工查看       |
 | `<junit>.xml`         | 报告目录内配置的可选 JUnit XML   | CI 测试平台        |
 | `logs/<step>.log`     | 外部命令完整 stdout/stderr      | 失败诊断           |
 
 终端只展示摘要。步骤失败时先看 `test_result.md` 中的日志路径，再打开对应日志；不要只根据最后一行猜测根因。
+
+`test_result.json` 遵循[版本化 machine-result schema](https://github.com/musutrade/Harness-Gate/blob/main/schema/machine-result.schema.json)。为兼容旧消费者仍保留
+`passed`，新消费者应使用稳定的 `status`、步骤 `attempts`、结构化 `failures`、invocation-relative 的
+`artifacts` 和 `evidence_complete`，不要解析 Markdown 或日志文本来判断结果。
 
 JSON Lines 应用日志可提取同一 trace 的上下文：
 
