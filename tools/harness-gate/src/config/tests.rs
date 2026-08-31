@@ -125,6 +125,128 @@ fn generic_runner_requires_an_explicit_thread_environment() {
 }
 
 #[test]
+fn runner_contract_rejects_invalid_fields() {
+    fn runner() -> RunnerConfig {
+        RunnerConfig {
+            version: 1,
+            kind: "generic".into(),
+            threads: Some(1),
+            threads_env: None,
+            args: Vec::new(),
+            args_position: None,
+            result_format: RunnerResultFormat::Regex,
+            isolation: TestIsolation::SchemaPerWorker,
+        }
+    }
+
+    let mut config = repository_config();
+    let step_index = config
+        .steps
+        .iter()
+        .position(|step| step.id == "rust.tests")
+        .expect("rust tests step");
+
+    config.steps[step_index].runner = Some(RunnerConfig {
+        version: 2,
+        ..runner()
+    });
+    assert!(config
+        .validate()
+        .expect_err("unsupported runner version")
+        .to_string()
+        .contains("runner version"));
+
+    config.steps[step_index].runner = Some(RunnerConfig {
+        kind: "cargo-test".into(),
+        ..runner()
+    });
+    config.steps[step_index].program = "git".into();
+    assert!(config
+        .validate()
+        .expect_err("cargo runner on another program")
+        .to_string()
+        .contains("requires program"));
+    config.steps[step_index].program = "cargo".into();
+
+    config.steps[step_index].runner = Some(RunnerConfig {
+        threads: Some(0),
+        ..runner()
+    });
+    assert!(config
+        .validate()
+        .expect_err("zero runner threads")
+        .to_string()
+        .contains("threads must be between"));
+
+    config.steps[step_index].runner = Some(RunnerConfig {
+        threads_env: Some("RUST_TEST_THREADS".into()),
+        threads: None,
+        ..runner()
+    });
+    assert!(config
+        .validate()
+        .expect_err("thread environment without a count")
+        .to_string()
+        .contains("requires threads"));
+
+    config.steps[step_index].runner = Some(RunnerConfig {
+        args_position: Some(99),
+        ..runner()
+    });
+    assert!(config
+        .validate()
+        .expect_err("runner argument position outside the step")
+        .to_string()
+        .contains("args_position"));
+
+    config.steps[step_index].runner = Some(RunnerConfig {
+        args: vec!["{unknown}".into()],
+        ..runner()
+    });
+    assert!(config
+        .validate()
+        .expect_err("unsupported runner argument placeholder")
+        .to_string()
+        .contains("unsupported placeholder"));
+
+    config.steps[step_index].remove_env = vec!["RUST_TEST_THREADS".into()];
+    config.steps[step_index].runner = Some(RunnerConfig {
+        threads: Some(2),
+        threads_env: Some("RUST_TEST_THREADS".into()),
+        ..runner()
+    });
+    assert!(config
+        .validate()
+        .expect_err("removed runner thread environment")
+        .to_string()
+        .contains("may not remove runner threads_env"));
+
+    config.steps[step_index].remove_env.clear();
+    config.steps[step_index].runner = None;
+    config.steps[step_index].kind = Some("future-step".into());
+    assert!(config
+        .validate()
+        .expect_err("unknown step kind")
+        .to_string()
+        .contains("unknown kind"));
+
+    config.steps[step_index].kind = None;
+    config.steps[step_index].cwd = "{unknown}".into();
+    assert!(config
+        .validate()
+        .expect_err("unknown working directory placeholder")
+        .to_string()
+        .contains("cwd references unknown path"));
+
+    config.steps[step_index].cwd = "root".into();
+    assert!(config
+        .validate()
+        .expect_err("non-placeholder working directory")
+        .to_string()
+        .contains("cwd must be one path placeholder"));
+}
+
+#[test]
 fn existing_v2_config_defaults_the_secret_rule_path() {
     let source = include_str!("../../presets/rust-api.flow.toml")
         .lines()

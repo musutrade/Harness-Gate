@@ -23,7 +23,9 @@
     "execution": {
       "default": {
         "max_parallel": null,
-        "parallel": false
+        "parallel": false,
+        "retries": {},
+        "shards": {}
       },
       "allOf": [
         {
@@ -53,7 +55,8 @@
     },
     "policy": {
       "default": {
-        "required_steps": []
+        "required_steps": [],
+        "waivers": []
       },
       "allOf": [
         {
@@ -381,6 +384,22 @@
         "parallel": {
           "default": false,
           "type": "boolean"
+        },
+        "retries": {
+          "description": "Optional per-step retry policies. Retries are opt-in and fail closed.",
+          "default": {},
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/RetryConfig"
+          }
+        },
+        "shards": {
+          "description": "Optional per-step shard declaration. A runner receives the shard identity through reserved environment variables.",
+          "default": {},
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/ShardConfig"
+          }
         }
       },
       "additionalProperties": false
@@ -437,6 +456,79 @@
               "items": {
                 "type": "string"
               }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "Parse standard JUnit XML testcases instead of counting log text.",
+          "type": "object",
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "junit"
+              ]
+            },
+            "minimum": {
+              "default": 1,
+              "type": "integer",
+              "format": "uint",
+              "minimum": 0.0
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "Parse Visual Studio TRX XML test results.",
+          "type": "object",
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "trx"
+              ]
+            },
+            "minimum": {
+              "default": 1,
+              "type": "integer",
+              "format": "uint",
+              "minimum": 0.0
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "Parse stable JSON results. `count_path` may point at an array or a numeric field; when omitted, common test-result arrays are discovered.",
+          "type": "object",
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "count_path": {
+              "default": null,
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "json"
+              ]
+            },
+            "minimum": {
+              "default": 1,
+              "type": "integer",
+              "format": "uint",
+              "minimum": 0.0
             }
           },
           "additionalProperties": false
@@ -506,6 +598,14 @@
           "items": {
             "type": "string"
           }
+        },
+        "waivers": {
+          "description": "Explicit, expiring exceptions. DevRail owns approval policy; the executor validates scope and expiry before dispatch.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/WaiverConfig"
+          }
         }
       },
       "additionalProperties": false
@@ -554,6 +654,33 @@
             "string",
             "null"
           ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "RetryConfig": {
+      "type": "object",
+      "properties": {
+        "backoff_ms": {
+          "default": 0,
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
+        },
+        "max_attempts": {
+          "default": 1,
+          "type": "integer",
+          "format": "uint32",
+          "maximum": 5.0,
+          "minimum": 1.0
+        },
+        "retryable": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
         }
       },
       "additionalProperties": false
@@ -796,6 +923,26 @@
         }
       ]
     },
+    "ShardConfig": {
+      "type": "object",
+      "required": [
+        "index",
+        "total"
+      ],
+      "properties": {
+        "index": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        },
+        "total": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        }
+      },
+      "additionalProperties": false
+    },
     "StepConfig": {
       "type": "object",
       "required": [
@@ -927,6 +1074,61 @@
         "all",
         "ignore"
       ]
+    },
+    "WaiverConfig": {
+      "type": "object",
+      "required": [
+        "approved_by",
+        "compensating_control",
+        "created_at",
+        "expires_at",
+        "id",
+        "owner",
+        "reason",
+        "risk",
+        "step"
+      ],
+      "properties": {
+        "approved_by": {
+          "type": "string"
+        },
+        "compensating_control": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string"
+        },
+        "expires_at": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "revoked": {
+          "default": false,
+          "type": "boolean"
+        },
+        "risk": {
+          "type": "string"
+        },
+        "scope": {
+          "default": null,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "step": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     },
     "WebhookConfig": {
       "type": "object",

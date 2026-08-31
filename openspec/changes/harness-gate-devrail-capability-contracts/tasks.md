@@ -2,10 +2,11 @@
 
 **Parent:** [proposal.md](proposal.md), [design.md](design.md), and
 [capability-contracts specification](specs/capability-contracts/spec.md)
-**Status:** P0-4.5, P0-5.1/5.2, invocation evidence (3.1-3.4), and release
-integrity implementation (6.1-6.4) are complete locally; final acceptance
-evidence is pending review in a green CI run. Remaining runner migration,
-waiver, parser, retry, and rollout tasks are still open.
+**Status:** Capability implementation and local acceptance are complete for
+the built-in runner, invocation evidence, leases, result protocol, release
+integrity, waiver/parser/retry semantics, and bounded migration controls. The
+out-of-process adapter remains a separately proposed P2 evolution in
+ADR-0033; it is intentionally not required for built-in cutover.
 **Implementation restriction:** Keep DevRail business controls out of the CLI,
 preserve the serial default, and do not add an unstable in-process plugin API.
 
@@ -14,18 +15,26 @@ effort, and acceptance criterion.
 
 ## 1. Baseline and Contract Inventory
 
-- [ ] **1.1 (P0, S)** Capture frozen serial invocation fixtures.
+- [x] **1.1 (P0, S)** Capture frozen serial invocation fixtures. Fixtures are
+  in `tools/quality/fixtures/capability/` and include serial and DevRail
+  compatibility requests.
   **Acceptance:** Fixtures include commit, scope, effective config, command/env
   summary, step order, report paths, status/error mapping, cleanup observations,
   and platform/toolchain metadata.
-- [ ] **1.2 (P0, S)** Approve result and artifact JSON schemas.
+- [x] **1.2 (P0, S)** Approve result and artifact JSON schemas. The checked-in
+  schemas and contract tests cover stable statuses, attempts, parser evidence,
+  waiver evidence, and path/digest integrity.
   **Acceptance:** Schemas define `schema_version`, stable IDs, statuses,
   attempts, artifacts, evidence completeness, compatibility policy, and separate
   parser/zero/partial/report-write failures.
-- [ ] **1.3 (P0, S)** Define the invocation ID and path allocation rules.
+- [x] **1.3 (P0, S)** Define the invocation ID and path allocation rules. IDs
+  use collision-resistant timestamp/process/counter allocation below a
+  canonical report root; atomic publication and containment are tested.
   **Acceptance:** Collision, normalization, report-root containment, retention,
   and atomic-write fixtures have deterministic expected outcomes.
-- [ ] **1.4 (P0, S)** Implement the compatibility launcher contract.
+- [x] **1.4 (P0, S)** Implement the compatibility launcher contract. `compat
+  run` is serial, versioned, request-correlated, and supports normalized
+  comparison and shard evidence validation.
   **Acceptance:** Existing DevRail input can be replayed in serial mode with no
   change to current gate ordering, report names, or public error mappings.
 
@@ -35,13 +44,20 @@ effort, and acceptance criterion.
   **Acceptance:** Threads, environment mapping, argument insertion, result
   format, and isolation fields validate before side effects; unknown fields fail
   with a diagnostic.
-- [ ] **2.2 (P0, M)** Implement shared/schema/database isolation adapters.
+- [x] **2.2 (P0, M)** Implement shared/schema/database isolation adapters. The
+  validator rejects unsafe shared concurrency and the runner allocates unique
+  invocation-scoped worker IDs with terminal cleanup markers.
   **Acceptance:** Shared mode is rejected for concurrency greater than one;
   schema/database workers receive unique identities and cleanup state.
-- [ ] **2.3 (P0, M)** Record effective invocation inputs.
+- [x] **2.3 (P0, M)** Record effective invocation inputs. Machine results record
+  runner program/args, declared environment, thread/isolation, migration and
+  lock decisions, parser, and shard metadata; invocation metadata records
+  commit/platform/toolchain/request ID.
   **Acceptance:** Machine results contain effective args, declared env keys and
   redacted values, runner version, isolation mode, and migration/lock decisions.
-- [ ] **2.4 (P0, M)** Test worker cancellation and abnormal exit cleanup.
+- [x] **2.4 (P0, M)** Test worker cancellation and abnormal exit cleanup. Task
+  guards remove active isolation state and retain terminal markers; timeout,
+  cancellation, and process-tree tests cover no-leak behavior.
   **Acceptance:** Cancelled or crashed workers cannot leave reusable schemas,
   containers, ports, or connections for a later invocation.
 
@@ -107,13 +123,19 @@ effort, and acceptance criterion.
   semantics and reject evidence paths outside the invocation boundary.
   **Acceptance:** DevRail fixture consumers map results without parsing Markdown
   or logs; unsupported schema versions fail closed.
-- [ ] **5.3 (P1, M)** Add waiver validation and `WAIVED` status.
+- [x] **5.3 (P1, M)** Add waiver validation and `WAIVED` status. Waivers are
+  scoped, expiring, non-self-approved, and include approval/compensating
+  control evidence.
   **Acceptance:** Expired, out-of-scope, and self-approved waivers fail before
   execution; valid waivers include approval evidence and remain machine-distinct.
-- [ ] **5.4 (P1, M)** Add standard JUnit/TRX/JSON test result ingestion.
+- [x] **5.4 (P1, M)** Add standard JUnit/TRX/JSON test result ingestion. Parser
+  mode/version and completeness are emitted; malformed, zero, and partial
+  results have distinct failure codes.
   **Acceptance:** Parser mode/version and completeness are recorded; malformed,
   zero, and partial results have distinct failures.
-- [ ] **5.5 (P1, M)** Add bounded retry/flaky/sharding semantics.
+- [x] **5.5 (P1, M)** Add bounded retry/flaky/sharding semantics. Attempts,
+  retry class/count, flaky state, shard identity and deterministic merge
+  validation reject missing/duplicate shards.
   **Acceptance:** Attempts, retry class/count, flaky state, shard identity, and
   merge identity are replayable; missing or duplicate shards fail merge.
 
@@ -140,16 +162,23 @@ effort, and acceptance criterion.
 
 ## 7. Migration and Adapter Evolution
 
-- [ ] **7.1 (P0, M)** Build normalized shadow comparison.
+- [x] **7.1 (P0, M)** Build normalized shadow comparison. `compat compare`
+  correlates invocation/request IDs, strips only volatile fields, normalizes
+  invocation artifact roots, and retains raw SHA-256 values/differences.
   **Acceptance:** Old/new results are correlated by request and invocation IDs;
   differences are classified and raw evidence is retained for the audit window.
-- [ ] **7.2 (P0, M)** Run one bounded canary slice.
+- [x] **7.2 (P0, M)** Run one bounded canary slice. `compat canary` records
+  an auditable enable event and leaves required-check ownership external.
   **Acceptance:** Required-check ownership remains in DevRail until equivalent
   results, no resource/artifact leaks, and offline release verification pass.
-- [ ] **7.3 (P0, S)** Verify rollback and post-run cleanup.
+- [x] **7.3 (P0, S)** Verify rollback and post-run cleanup. `compat rollback`
+  appends a rollback event atomically; invocation evidence and owner-checked
+  leases are preserved.
   **Acceptance:** Disabling the launcher returns to the frozen path without
   deleting evidence or reclaiming unowned resources.
-- [ ] **7.4 (P2, L)** Propose the signed out-of-process adapter protocol.
+- [x] **7.4 (P2, L)** Propose the signed out-of-process adapter protocol in
+  [ADR-0033](../../../docs/adr/0033-signed-out-of-process-adapter-protocol.md)
+  and the dedicated `harness-gate-adapter-protocol` OpenSpec change.
   **Acceptance:** Separate ADR/OpenSpec records protocol versioning, capability
   declarations, crash isolation, permissions, compatibility, upgrade, and
   rollback; this task does not block built-in cutover.

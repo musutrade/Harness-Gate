@@ -1,5 +1,5 @@
 use super::output::print_scope;
-use crate::cli::{Commands, ConfigAction, ConfigFormat};
+use crate::cli::{Commands, CompatAction, ConfigAction, ConfigFormat};
 use crate::error::CliError;
 use crate::project::Project;
 use crate::scope::ScopeMode;
@@ -8,6 +8,28 @@ use anyhow::Context;
 
 pub(super) fn run(project: &Project, command: Commands) -> Result<bool, CliError> {
     match command {
+        Commands::Compat {
+            action:
+                CompatAction::Run {
+                    input,
+                    output,
+                    old_result,
+                },
+        } => {
+            let response = crate::compat::run(project, &input, &output, old_result.as_deref())?;
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&response).map_err(anyhow::Error::from)?
+            );
+            Ok(response.status == "PASS"
+                && response
+                    .comparison
+                    .as_ref()
+                    .is_none_or(|result| result.equivalent))
+        }
+        Commands::Compat { .. } => {
+            unreachable!("compatibility maintenance actions handled before project discovery")
+        }
         Commands::Doctor { json, strict } => {
             let report = crate::doctor::run(project)?;
             if json {
