@@ -983,7 +983,7 @@ fn redact_directory(directory: &Path) -> Result<()> {
         if bytes.len() > REDACTION_TEXT_LIMIT {
             bail!("text evidence exceeds redaction limit: {}", path.display());
         }
-        let redacted = redact_text(&text);
+        let redacted = redact_text(text);
         if redacted.as_bytes() != bytes {
             atomic_write(&path, redacted.as_bytes(), true)
                 .with_context(|| format!("publish redacted evidence {}", path.display()))?;
