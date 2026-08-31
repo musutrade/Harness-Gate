@@ -356,6 +356,11 @@ fn parser_failure_marks_step_failed() {
         .find(|step| step.label == project.config.steps[0].label)
         .expect("parsed step");
     assert!(!step.passed);
+    assert_eq!(step.failure_code.as_deref(), Some("RESULT_ZERO"));
+    assert_eq!(
+        step.parser.as_ref().map(|parser| parser.mode.as_str()),
+        Some("regex")
+    );
     assert!(step
         .detail
         .as_deref()

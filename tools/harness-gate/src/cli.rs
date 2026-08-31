@@ -30,6 +30,11 @@ pub(crate) struct Cli {
 
 #[derive(Debug, Subcommand)]
 pub(crate) enum Commands {
+    /// Run the versioned serial compatibility launcher and migration tools.
+    Compat {
+        #[command(subcommand)]
+        action: CompatAction,
+    },
     /// Check local tools, configuration, Git, and test database access.
     Doctor {
         /// Emit machine-readable JSON.
@@ -125,6 +130,41 @@ pub(crate) enum Commands {
     },
     /// List embedded project presets.
     Presets,
+}
+
+#[derive(Debug, Subcommand)]
+pub(crate) enum CompatAction {
+    /// Replay an existing DevRail request through the serial verifier.
+    Run {
+        #[arg(short, long, value_name = "PATH")]
+        input: PathBuf,
+        #[arg(short, long, value_name = "PATH")]
+        output: PathBuf,
+        /// Optional frozen/legacy result to compare in shadow mode.
+        #[arg(long, value_name = "PATH")]
+        old_result: Option<PathBuf>,
+    },
+    /// Compare two machine results after removing volatile execution fields.
+    Compare {
+        #[arg(long, value_name = "PATH")]
+        old: PathBuf,
+        #[arg(long, value_name = "PATH")]
+        new: PathBuf,
+        #[arg(short, long, value_name = "PATH")]
+        output: PathBuf,
+    },
+    /// Enable a bounded migration canary slice.
+    Canary {
+        #[arg(long, value_name = "PATH")]
+        state: PathBuf,
+        #[arg(long)]
+        slice: String,
+    },
+    /// Disable the launcher and record a rollback event.
+    Rollback {
+        #[arg(long, value_name = "PATH")]
+        state: PathBuf,
+    },
 }
 
 #[derive(Debug, Subcommand)]

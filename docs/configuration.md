@@ -260,9 +260,10 @@ runner = { version = 1, kind = "cargo-test", threads = 4,
 | `isolation` | 是 | `shared`、`schema-per-worker` 或 `database-per-worker` |
 
 `threads > 1` 时不能使用 `shared` 隔离；非 `cargo-test` runner 还必须声明 `threads_env`，
-否则 `config check` 会在启动 service 或 worker 前失败。隔离声明目前用于验证和证据记录，
-不会自动创建数据库 schema；schema/database 的初始化、锁和清理由后续 runner adapter 提供。
-不要通过字符串拼接或未声明的环境变量修改测试线程参数。
+否则 `config check` 会在启动 service 或 worker 前失败。schema/database runner 会为每次
+invocation 生成唯一 worker ID，并通过 `HARNESS_GATE_ISOLATION_*` 环境变量传入；执行结束
+会写入 terminal marker 并清理 active state。启用全局并行时，所有外部步骤也必须声明 runner
+隔离，避免隐式共享资源。不要通过字符串拼接或未声明的环境变量修改测试线程参数。
 
 ## 7. `[policy]`
 
@@ -272,6 +273,41 @@ required_steps = ["api.format", "api.clippy", "api.tests"]
 ```
 
 `required_steps` 中的每个 ID 都必须出现在 `[[steps]]` 中，而且不能重复。这用于防止项目基础门禁被误删。它不规定步骤属于哪个 profile；profile 仍由步骤自身配置。
+
+### 7.1 Waiver、重试和分片
+
+例外必须显式记录责任、审批和补偿控制，并且有 RFC3339 创建/到期时间：
+
+```toml
+[[policy.waivers]]
+id = "incident-123"
+step = "api.tests"
+scope = "api"
+risk = "medium"
+reason = "upstream fixture unavailable"
+owner = "team-api"
+approved_by = "security-reviewer"
+created_at = "2026-08-30T00:00:00Z"
+expires_at = "2026-09-02T00:00:00Z"
+compensating_control = "manual smoke test attached to incident"
+```
+
+过期、撤销、越权或自批准 waiver 在执行前失败；有效 waiver 在机器结果中标记为 `WAIVED`，
+不会伪装成普通 `PASS`。重试只允许配置的失败类别且最多 5 次：
+
+```toml
+[execution.retries.api.tests]
+max_attempts = 3
+backoff_ms = 250
+retryable = ["timeout", "exit"]
+
+[execution.shards.api.tests]
+index = 0
+total = 2
+```
+
+结果会记录每次 attempt、`retry_count`、flaky 标记、parser 完整性和分片 merge identity；
+标准 parser 支持 `junit`、`trx`、`json`，解析错误、零结果和部分结果分别失败。
 
 ## 8. `[[doctor.checks]]`
 
@@ -456,12 +492,13 @@ minimum = 1
 
 | 字段       | 默认值 | 说明                          |
 | ---------- | ------ | ----------------------------- |
-| `kind`     | 无     | 当前支持 `regex`              |
-| `patterns` | 无     | 一个或多个 Rust regex         |
+| `kind`     | 无     | 支持 `regex`、`junit`、`trx`、`json` |
+| `patterns` | 无     | regex 模式下的一个或多个 Rust regex |
 | `capture`  | `1`    | 包含数值的 capture group 索引 |
 | `minimum`  | `1`    | 所有匹配计数之和的最低值      |
 
-每个正则都必须包含对应的 capture group。步骤成功后才解析日志；计数低于 `minimum` 时，该步骤改判为失败。
+每个正则都必须包含对应的 capture group。步骤成功后才解析日志；计数低于 `minimum` 时，该步骤改判为失败，
+并按 `RESULT_ZERO` 或 `RESULT_PARTIAL` 记录。XML/JSON malformed 输入记录 `RESULT_PARSE_FAILURE`。
 
 ## 11. `[scope]` 和 `[[scope.rules]]`
 
