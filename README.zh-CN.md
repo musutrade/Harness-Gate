@@ -103,6 +103,27 @@ cargo build --manifest-path tools/harness-gate/Cargo.toml --release
 cargo build --manifest-path tools/harness-gate/Cargo.toml --profile release-small
 ```
 
+Release 资产同时提供 `SHA256SUMS`、CycloneDX SBOM 和 Sigstore 签名 bundle。
+安装前下载二进制、清单以及对应的 `.sig`/`.crt` 文件，先校验摘要，再校验
+二进制和 SBOM 的签名：
+
+```bash
+sha256sum --check SHA256SUMS
+cosign verify-blob --signature harness-gate-linux-amd64.sig \
+  --certificate harness-gate-linux-amd64.crt \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+  --certificate-identity-regexp 'https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v.*' \
+  harness-gate-linux-amd64
+cosign verify-blob --signature harness-gate.sbom.cdx.json.sig \
+  --certificate harness-gate.sbom.cdx.json.crt \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+  --certificate-identity-regexp 'https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v.*' \
+  harness-gate.sbom.cdx.json
+```
+
+SBOM 记录源码提交、`Cargo.lock` 摘要和构建工具链。发布资产不可覆盖；任何
+替换都必须使用新的版本 tag 和新的 provenance 证明。
+
 ## 安装与快速开始
 
 验证安装并查看预设：
@@ -168,6 +189,7 @@ harness-gate --project-root /path/to/new-project verify --all
 | `harness-gate config print --resolved`                       | 输出最终生效配置                      |
 | `harness-gate config migrate`                                | 将 schema v1 转换成 v2                |
 | `harness-gate schema export`                                 | 生成 flow.toml 的 JSON Schema          |
+| `harness-gate adapter run --request <PATH> --trusted-key <PATH>` | 校验并执行一个进程外签名 adapter 请求 |
 | `harness-gate parse-logs`                                    | 提取 JSON Lines ERROR trace 上下文    |
 
 所有命令都支持全局 `--project-root <PATH>` 和 `--config <PATH>`。命令成功返回 0；配置错误、门禁失败、步骤失败、超时或中断返回非 0，适合直接用于 CI。
@@ -477,6 +499,11 @@ harness-gate adapter run \
 host 会在启动前校验 Ed25519 声明和可执行文件 SHA-256，清空继承环境，执行能力白名单，
 在超时或取消时终止整个进程树，并拒绝 malformed 结果或越过 invocation 根目录的产物。
 adapter 失败统一记录为 `ADAPTER_PROTOCOL_FAILURE`。
+
+请求是一个独立的 JSON 文档，不从 `flow.toml` 读取，也不会自动启用内置步骤的
+adapter。每个受信任的 Ed25519 公钥重复传入一次 `--trusted-key`；只传入本次调用
+允许的 `--allow-network`、`--allow-resource` 和 `--allow-environment` 能力。执行前应
+确认请求、可执行文件、产物根目录位于项目或明确受管控的部署目录内，并审核签名者。
 
 JSON Lines 应用日志可提取同一 trace 的上下文：
 
