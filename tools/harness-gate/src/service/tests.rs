@@ -78,6 +78,7 @@ fn cleanup_reclaims_a_stale_marked_lease() {
         serde_json::from_slice(&std::fs::read(&path).expect("lease contents")).expect("json");
     record["pid"] = serde_json::json!(0);
     record["process_start_identity"] = serde_json::json!("dead-process");
+    record["expires_at"] = serde_json::json!(0);
     std::fs::write(
         &path,
         serde_json::to_vec_pretty(&record).expect("serialize"),
