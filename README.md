@@ -77,6 +77,24 @@ sudo mv harness-gate-linux-amd64 /usr/local/bin/harness-gate
 harness-gate --version
 ```
 
+Release assets include `SHA256SUMS`, a CycloneDX SBOM, and Sigstore bundles. For
+an offline integrity check, download the binary, `SHA256SUMS`, and the matching
+`.sig`/`.crt` files, then run:
+
+```bash
+sha256sum --check SHA256SUMS
+cosign verify-blob --signature harness-gate-linux-amd64.sig \
+  --certificate harness-gate-linux-amd64.crt \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+  --certificate-identity-regexp 'https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v.*' \
+  harness-gate-linux-amd64
+```
+
+Verify `harness-gate.sbom.cdx.json` with its corresponding signature as well;
+the SBOM records the source commit, Cargo.lock digest, and Rust toolchain used
+for the build. Published release assets are immutable: a replacement requires
+a new version tag and a new attestation.
+
 ### Install from Source
 
 ```bash
@@ -358,6 +376,14 @@ atomic-rename semantics.
 the legacy `passed` field while exposing stable `status` values, per-step `attempts`, structured `failures`,
 invocation-relative `artifacts`, and `evidence_complete`; consumers should use `status` and these structured
 fields instead of parsing Markdown or log text.
+
+Each invocation also publishes `manifest.json`, described by the [artifact manifest schema](https://github.com/musutrade/Harness-Gate/blob/main/schema/artifact-manifest.schema.json).
+It lists every invocation-local evidence file (excluding the manifest itself) with its relative path, byte size,
+kind, and SHA-256 digest. Re-running verification against a modified file fails manifest verification. Text evidence
+is redacted before publication: authorization and cookie headers, bearer/basic credentials, API keys, passwords,
+private-key blocks, and common database connection strings are replaced with `[REDACTED]`. The default retention
+policy keeps the newest 50 invocation directories and only removes older directories after the 15-minute lease
+window; active or recently modified invocations are retained.
 
 Optional `[[notifications.webhooks]]` entries send the serialized report to HTTP(S) endpoints after all report
 files are written. `on_failure` defaults to `true`, `on_success` defaults to `false`; a non-2xx response or
