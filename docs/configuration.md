@@ -201,6 +201,24 @@ path = "apps/web"
 项目或审核配置发现，避免共享终端、IDE 或 CI 环境中的一个项目影响另一个项目。
 需要选择其他项目或工作流文件时，显式使用 `--project-root` 和 `--config`。
 
+### 5.1 Invocation input 与步骤输入
+
+每次验证都会先建立 invocation input descriptor，并记录输入模式、项目身份、源身份、执行根目录和配置摘要。
+普通 `verify` 默认使用工作区；`scope --staged` 和 `hook` 会把完整 Git index 物化到一个私有临时目录，
+再从该 snapshot 加载配置、选择 scope、运行内置门禁和普通步骤。临时 snapshot 在 invocation 结束后自动清理。
+因此 hook 不会把暂存内容和未暂存工作区内容混合成一个结果。
+
+步骤的 `input` 字段默认为 `"snapshot"`（`"staged"` 是兼容别名）：
+
+| `input` 值 | 行为 |
+| --- | --- |
+| `snapshot` | 从当前 invocation 的执行根读取文件；hook 中指向完整 staged snapshot |
+| `repository` | 显式使用原始 checkout，适用于确实需要 Git 元数据或工作区能力的兼容步骤 |
+
+`repository` 是需要审阅的显式兼容能力，不会改变 secret scan、architecture audit 或 scope 的输入语义。
+步骤的 `{root}`、path alias 和参数占位符都会按所选输入解析。machine result 和 `invocation.json` 会记录
+`input_mode`、`source_identity`、`execution_root` 与 `configuration_digest`，便于复现一次决定。
+
 ## 6. `[execution]`
 
 默认配置保持串行执行。只有显式设置 `parallel = true` 才会并发运行没有依赖路径的步骤：
@@ -381,11 +399,16 @@ service = "test-postgres"
 ### 8.1 资源租约和孤儿回收
 
 管理型 Docker/Podman service 和 invocation 报告目录会在
-`<reports>/leases/` 写入带 `owner_marker = "harness-gate"` 的 JSON 租约。租约
-包含 `schema_version`、稳定 `resource_id`、`resource_kind`、
-`invocation_id`、PID、进程启动身份、创建/心跳/过期时间；容器租约还记录
-runtime 和容器名。文件以原子 `create_new` 抢占，续租和释放会校验完整 owner
-身份，避免 PID 重用或并发调用误删资源。
+`<reports>/leases/` 写入带 `owner_marker = "harness-gate"` 的 JSON 租约。
+当前 lease schema 为 `2`，包含 `project_identity`、稳定 `resource_id`、
+`resource_kind`、`invocation_id`、PID、进程启动身份、创建/心跳/过期时间；容器
+租约还记录 runtime、容器名、完整 runtime labels 和创建后读取的不可变
+`runtime_object_id`。租约文件名是 resource ID 的确定性键；旧 schema、改名、
+缺字段或跨项目记录只会产生 cleanup failure，不会被回收。
+
+租约只是资源声明，不是删除授权。停止或回收容器前会重新 inspect，并比较文件名、
+项目、资源、invocation、所有权 labels 和不可变对象 ID；inspect 失败、label 不全、
+名称或 ID 不一致时保留容器和租约。过期只说明可以尝试回收，不能替代 ownership proof。
 
 ```bash
 # 只观察，不停止容器或删除租约
@@ -395,9 +418,9 @@ harness-gate cleanup --dry-run --json
 harness-gate cleanup --json
 ```
 
-每次清理都会在报告根目录生成 `cleanup.json`。`dry-run` 只列出带合法
-Harness-Gate marker 的记录；未知 marker、损坏记录和活动 owner 永不回收。
-容器停止失败会保留租约并返回非零状态，便于 CI 重试或人工处置。
+每次清理都会在报告根目录生成 `cleanup.json`（cleanup report schema 仍为 `1`）。
+`dry-run` 只列出带合法 Harness-Gate marker 的记录；未知 marker、损坏记录和活动
+owner 永不回收。容器停止失败会保留租约并返回非零状态，便于 CI 重试或人工处置。
 
 ## 9. `[services.*]`
 
@@ -583,6 +606,7 @@ audit -> external steps` chain internally without rewriting `flow.toml`.
 | `services`     | 否   | 运行前需要准备的 service ID 列表   |
 | `remove_env`   | 否   | 创建子进程前删除的继承环境变量     |
 | `depends_on`   | 否   | 必须先完成的 step ID；支持传递依赖并决定资源是否可并发 |
+| `input`        | 否   | `snapshot`（默认）或显式兼容能力 `repository` |
 | `kind`         | 否   | `builtin-gate` 或省略（省略表示外部步骤） |
 | `gate_type`    | 否   | 内置门禁类型：`secret-scan` 或 `architecture-audit` |
 
@@ -853,15 +877,26 @@ junit = "junit.xml"
 顶层和步骤状态使用 `PASS`、`FAIL`、`SKIPPED`、`CANCELLED` 等稳定值，并提供 attempts、结构化 failures、
 invocation-relative artifacts 及 `evidence_complete`；集成方不应从 Markdown 或日志内容推断门禁状态。
 
-每次 invocation 还会生成 `manifest.json`，格式见 [artifact manifest schema](../schema/artifact-manifest.schema.json)。
-清单列出 invocation 目录内除清单自身外的每个普通文件、相对路径、类型、字节数和 SHA-256；路径越界、文件
-被修改或摘要不一致都会使报告发布失败。日志、报告和通知中的文本会统一脱敏，包含授权/Cookie 请求头、
-Bearer/Basic 凭据、API key、密码、私钥块及常见数据库连接串的值都不会导出。默认保留最新 50 个 invocation；
-仅清理超过 15 分钟租约窗口且超出数量上限的旧目录，活动或最近修改的 invocation 不会被清理。
+每次 invocation 还会生成 `artifact-registry.json` 和 `manifest.json`。registry 使用
+[artifact registry schema](../schema/artifact-registry.schema.json)，manifest 使用
+[artifact manifest schema](../schema/artifact-manifest.schema.json)。两者都只接受当前
+invocation 内的普通文件，并记录相对路径、kind、字节数和 SHA-256；步骤日志还绑定
+invocation 和 step ID。报告声明、registry、manifest 和磁盘上的可发布文件必须组成同一闭集；
+缺失、未声明、越界、符号链接、替换或摘要不一致都会使报告发布失败并保持
+`evidence_complete = false`。控制文件先完成校验，最终 machine result 在 manifest 之后发布，
+作为完整证据的提交标记。
 
-发布二进制同时提供 `SHA256SUMS`、CycloneDX SBOM 以及 Sigstore `.sig`/`.crt` 文件。离线升级时应先运行
-`sha256sum --check SHA256SUMS`，再按 README 中的 `cosign verify-blob` 命令校验二进制和 SBOM；任意字节
-被修改都会导致摘要或签名校验失败。发布资产不覆盖旧文件，替换必须使用新的版本 tag。
+日志、报告和通知中的文本会统一脱敏，包含授权/Cookie 请求头、Bearer/Basic 凭据、API key、密码、
+私钥块及常见数据库连接串的值都不会导出。默认保留最新 50 个 invocation；仅清理超过 15 分钟租约窗口
+且超出数量上限的旧目录，活动或最近修改的 invocation 不会被清理。
+
+发布流程先生成一个由 `tools/release/release_inventory.py` 管理的显式
+`release-inventory.json`，其中列出每个平台二进制和 CycloneDX SBOM。checksum、Sigstore
+签名/证书、GitHub provenance 验证和最终上传集合都从同一 inventory 派生；inventory、
+`SHA256SUMS`、二进制、SBOM 以及对应 `.sig`/`.crt` 的集合必须完全一致，缺失或额外文件会在
+创建 release 前失败。离线升级时应先运行 `sha256sum --check SHA256SUMS`，再按 README 中的
+`cosign verify-blob` 命令校验二进制和 SBOM；任意字节被修改都会导致摘要或签名校验失败。
+发布资产不覆盖旧文件，替换必须使用新的版本 tag。
 
 ### 容器运行时和 Webhook
 

@@ -100,7 +100,11 @@ pub(crate) fn run(
 
     // The launcher is deliberately serial. Parallel execution remains an
     // explicit, separately reviewed configuration choice in the native CLI.
-    let mut serial_project = project.clone();
+    let mut serial_project = if request.staged {
+        project.staged_snapshot()?
+    } else {
+        project.clone()
+    };
     serial_project.config.execution.parallel = false;
     serial_project.config.execution.max_parallel = Some(1);
     let scope = if !request.components.is_empty() {

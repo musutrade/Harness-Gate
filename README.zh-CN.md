@@ -121,8 +121,10 @@ cosign verify-blob --signature harness-gate.sbom.cdx.json.sig \
   harness-gate.sbom.cdx.json
 ```
 
-SBOM 记录源码提交、`Cargo.lock` 摘要和构建工具链。发布资产不可覆盖；任何
-替换都必须使用新的版本 tag 和新的 provenance 证明。
+SBOM 记录源码提交、`Cargo.lock` 摘要和构建工具链。发布流程先生成一个显式的
+`release-inventory.json`；checksum、Sigstore 签名/证书、GitHub provenance、校验和上传
+都从同一 inventory 派生，并完整覆盖 SBOM。缺失、额外、未签名或未 attested 的资产会在
+创建 release 前失败。发布资产不可覆盖；任何替换都必须使用新的版本 tag 和新的 provenance 证明。
 
 ## 安装与快速开始
 
@@ -196,9 +198,10 @@ harness-gate --project-root /path/to/new-project verify --all
 
 `cleanup --dry-run` 可以在重试前或共享 CI 主机上安全执行，只列出带有
 `harness-gate` owner marker 的租约，并把结构化观察写入
-`<reports>/cleanup.json`。不带 `--dry-run` 时只回收已过期且 owner 已死亡的
-标记租约；未知文件和活动 owner 不会被触碰。容器只有在租约同时记录 runtime
-和容器名时才会停止，停止失败会保留租约并返回非零状态。
+`<reports>/cleanup.json`。lease schema `2` 记录规范化项目身份、逻辑资源、invocation、
+完整 runtime labels、容器名和不可变 runtime object ID。过期只表示可以尝试回收；停止前
+会重新 inspect，并比较租约文件名、项目、资源、invocation、labels 和不可变 ID。未知、
+损坏、改名、活动或无法证明 ownership 的租约会保留，停止失败也会保留租约并返回非零状态。
 
 交互式终端中的 `verify` 会显示进度条，并以颜色区分通过、警告和失败。重定向输出或 CI 保持纯文本；可使用 `--color auto`（默认）、`--color always` 或 `--color never` 控制颜色，`NO_COLOR` 会关闭自动颜色。
 
@@ -396,6 +399,13 @@ Docker provider 可用于 PostgreSQL、MySQL、Redis 等服务，也可通过 `r
 
 `scope --staged` 和 `hook` 只读取暂存快照。secret scan 也通过 Git index 读取文件内容，而不是读取可能不同的工作区版本。
 
+### Step input
+
+配置步骤默认使用 `input = "snapshot"`，因此 `{root}`、path alias 和参数都相对于本次 invocation
+的输入根解析。确实需要原始 checkout 或直接读取 Git 元数据的步骤，可以显式设置
+`input = "repository"`；这是一项需要审阅的兼容能力，不会改变 scope、secret scan 或 architecture audit
+的输入语义。invocation 报告会记录输入模式、source identity、execution root 和 configuration digest。
+
 ### All
 
 `--all` 不依赖 Git diff，直接选择配置步骤中出现的全部 component。适合交付门禁和干净 checkout。
@@ -497,13 +507,15 @@ harness-gate adapter run \
 ```
 
 host 会在启动前校验 Ed25519 声明和可执行文件 SHA-256，清空继承环境，执行能力白名单，
-在超时或取消时终止整个进程树，并拒绝 malformed 结果或越过 invocation 根目录的产物。
+在超时或取消时尝试有界的进程树清理，并拒绝 malformed 结果或越过 invocation 根目录的产物。
 adapter 失败统一记录为 `ADAPTER_PROTOCOL_FAILURE`。
 
 请求是一个独立的 JSON 文档，不从 `flow.toml` 读取，也不会自动启用内置步骤的
 adapter。每个受信任的 Ed25519 公钥重复传入一次 `--trusted-key`；只传入本次调用
 允许的 `--allow-network`、`--allow-resource` 和 `--allow-environment` 能力。执行前应
 确认请求、可执行文件、产物根目录位于项目或明确受管控的部署目录内，并审核签名者。
+能力白名单只是协议层声明检查，不是操作系统级的网络、文件系统、资源或进程 sandbox；
+进程清理也不等于完整的 descendant containment 证明。
 
 JSON Lines 应用日志可提取同一 trace 的上下文：
 

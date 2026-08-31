@@ -1,8 +1,9 @@
-use super::{resolve_repo_path, Project};
+use super::{resolve_repo_path, InvocationInput, Project};
 use crate::config::{resolve_config_path, FlowConfig, DEFAULT_CONFIG_PATH};
 use anyhow::{bail, Context, Result};
 use std::collections::BTreeMap;
 use std::env;
+use std::fs;
 use std::path::{Path, PathBuf};
 
 impl Project {
@@ -18,8 +19,42 @@ impl Project {
             }
         };
         let config_path = resolve_config_path(&root, config_override)?;
-        let config = FlowConfig::load_with_diagnostics(&config_path, Some(&root))
+        let config_relative = config_path
+            .strip_prefix(&root)
+            .with_context(|| {
+                format!(
+                    "workflow config must be inside the repository: {}",
+                    config_path.display()
+                )
+            })?
+            .to_path_buf();
+        let config_bytes = fs::read(&config_path)
+            .with_context(|| format!("read workflow config {}", config_path.display()))?;
+        let input = InvocationInput::working_tree(&root, &config_bytes)?;
+        Self::from_input(root, &config_relative, input)
+    }
+
+    pub(crate) fn staged_snapshot(&self) -> Result<Self> {
+        let config_relative = self
+            .config_path
+            .strip_prefix(&self.execution_root)
+            .with_context(|| {
+                format!(
+                    "workflow config must be inside the invocation input: {}",
+                    self.config_path.display()
+                )
+            })?;
+        let input = InvocationInput::materialize_staged(&self.root, config_relative)?;
+        Self::from_input(self.root.clone(), config_relative, input)
+    }
+
+    fn from_input(root: PathBuf, config_relative: &Path, input: InvocationInput) -> Result<Self> {
+        let execution_root = input.execution_root.clone();
+        let config_path = execution_root.join(config_relative);
+        let config = FlowConfig::load_with_diagnostics(&config_path, Some(&execution_root))
             .map_err(anyhow::Error::from)?;
+        let mut input = input;
+        input.configuration_digest = configuration_digest(&config)?;
         let scope_rules = config.compile_scope_rules()?;
         let reports = resolve_repo_path(
             &root,
@@ -28,13 +63,13 @@ impl Project {
             false,
         )?;
         let audit_config = resolve_repo_path(
-            &root,
+            &execution_root,
             Path::new(&config.paths.audit_config),
             "audit configuration",
             true,
         )?;
         let secrets_config = resolve_repo_path(
-            &root,
+            &execution_root,
             Path::new(&config.paths.secrets_config),
             "secret scan configuration",
             true,
@@ -45,7 +80,7 @@ impl Project {
             .iter()
             .map(|(name, entry)| {
                 resolve_repo_path(
-                    &root,
+                    &execution_root,
                     Path::new(&entry.path),
                     &format!("path alias {name:?}"),
                     false,
@@ -56,6 +91,8 @@ impl Project {
 
         let project = Self {
             root,
+            execution_root,
+            invocation_input: input,
             config_path,
             config,
             reports: reports.clone(),
@@ -84,6 +121,15 @@ impl Project {
         }
         Ok(())
     }
+}
+
+fn configuration_digest(config: &FlowConfig) -> Result<String> {
+    use sha2::{Digest, Sha256};
+    let canonical =
+        toml::to_string(config).context("serialize effective workflow configuration")?;
+    let mut digest = Sha256::new();
+    digest.update(canonical.as_bytes());
+    Ok(format!("sha256:{:x}", digest.finalize()))
 }
 
 fn canonical_directory(path: &Path) -> Result<PathBuf> {

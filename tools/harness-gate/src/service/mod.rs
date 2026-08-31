@@ -13,7 +13,6 @@ use docker::{start_docker, DockerStartOptions};
 use postgres::validate_external_value;
 use runtime::ContainerRuntime;
 use std::collections::BTreeMap;
-use std::path::PathBuf;
 use std::sync::{Arc, Condvar, Mutex};
 use std::time::{Duration, Instant};
 
@@ -493,7 +492,7 @@ struct RunningService {
     inject_env: String,
     value: String,
     container: Option<String>,
-    project_root: PathBuf,
+    project: Project,
     cleanup_errors: Arc<Mutex<Vec<String>>>,
     lease: Option<ResourceLease>,
 }
@@ -502,10 +501,15 @@ impl Drop for RunningService {
     fn drop(&mut self) {
         let mut cleanup_succeeded = true;
         if let Some(container) = &self.container {
-            if let Err(error) =
+            let ownership = self
+                .lease
+                .as_ref()
+                .ok_or_else(|| anyhow::anyhow!("managed container has no ownership lease"))
+                .and_then(|lease| lease.verify_runtime_ownership(&self.project));
+            if let Err(error) = ownership.and_then(|()| {
                 self.runtime
-                    .stop_container(&self.project_root, container, Duration::from_secs(5))
-            {
+                    .stop_container(&self.project.root, container, Duration::from_secs(5))
+            }) {
                 cleanup_succeeded = false;
                 let detail = format!(
                     "failed to clean up {} container {container:?}: {error:#}",
@@ -551,7 +555,7 @@ impl RunningService {
                     inject_env,
                     value,
                     container: None,
-                    project_root: project.root.clone(),
+                    project: project.clone(),
                     cleanup_errors,
                     lease: None,
                 })
@@ -580,7 +584,7 @@ impl RunningService {
                         inject_env,
                         value,
                         container: None,
-                        project_root: project.root.clone(),
+                        project: project.clone(),
                         cleanup_errors,
                         lease: None,
                     });

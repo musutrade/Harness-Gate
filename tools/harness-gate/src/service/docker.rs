@@ -1,6 +1,7 @@
 use super::{remaining, RunningService};
 use crate::config::ContainerRuntimeKind;
 use crate::project::Project;
+use crate::service::lease::ownership_labels;
 use crate::service::runtime::{ContainerRuntime, ContainerStartOptions};
 use crate::service::ResourceLease;
 use anyhow::{bail, Result};
@@ -58,30 +59,52 @@ pub(super) fn start_docker(
         Some(runtime),
     )?;
     let executable = runtime.executable();
-    runtime
-        .start_container(
-            project,
-            ContainerStartOptions {
-                name: &name,
-                image: &image,
-                environment: &environment,
-                labels: &std::collections::BTreeMap::from([
-                    ("harness-gate.owner".to_string(), "harness-gate".to_string()),
-                    ("harness-gate.resource".to_string(), format!("service:{id}")),
-                    ("harness-gate.invocation".to_string(), invocation_id),
-                ]),
-                container_port,
-            },
-            remaining(deadline)?,
-        )
-        .map_err(|error| anyhow::anyhow!("start {executable} service {id:?}: {error:#}"))?;
+    if let Err(error) = runtime.start_container(
+        project,
+        ContainerStartOptions {
+            name: &name,
+            image: &image,
+            environment: &environment,
+            labels: &ownership_labels(
+                &project.input().project_identity,
+                &format!("service:{id}"),
+                "container",
+                &invocation_id,
+            ),
+            container_port,
+        },
+        remaining(deadline)?,
+    ) {
+        // A failed CLI call may have created the object before reporting an
+        // error. Retain the lease so cleanup cannot silently lose the marker.
+        std::mem::forget(lease);
+        return Err(anyhow::anyhow!(
+            "start {executable} service {id:?}: {error:#}"
+        ));
+    }
+
+    // Creation alone is not authority. Bind the lease only after a fresh
+    // inspect proves that the runtime object carries every ownership label.
+    let inspection = match runtime.inspect_container(project, &name, remaining(deadline)?) {
+        Ok(inspection) => inspection,
+        Err(error) => {
+            // The object may exist, but ownership could not be proved. Retain
+            // the lease for explicit operator investigation.
+            std::mem::forget(lease);
+            return Err(error);
+        }
+    };
+    if let Err(error) = lease.bind_runtime_identity(project, &inspection) {
+        std::mem::forget(lease);
+        return Err(error);
+    }
 
     let mut running = RunningService {
         runtime,
         inject_env,
         value: String::new(),
         container: Some(name),
-        project_root: project.root.clone(),
+        project: project.clone(),
         cleanup_errors,
         lease: Some(lease),
     };

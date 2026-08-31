@@ -52,10 +52,7 @@ pub(crate) fn allocate(
         state_file: state_file.to_string_lossy().into_owned(),
     };
     let bytes = serde_json::to_vec_pretty(&allocation).context("serialize isolation allocation")?;
-    let temporary = state_file.with_extension("json.tmp");
-    fs::write(&temporary, bytes)
-        .with_context(|| format!("write isolation allocation {}", temporary.display()))?;
-    fs::rename(&temporary, &state_file)
+    crate::utils::fs::atomic_write(&state_file, bytes, true)
         .with_context(|| format!("publish isolation allocation {}", state_file.display()))?;
     Ok((allocation, state_file))
 }
@@ -81,10 +78,7 @@ pub(crate) fn mark_terminal(state_file: &Path, reason: &str) -> Result<PathBuf> 
         "at": chrono::Utc::now().to_rfc3339(),
     });
     let bytes = serde_json::to_vec_pretty(&record).context("serialize terminal isolation state")?;
-    let temporary = terminal.with_extension("terminal.json.tmp");
-    fs::write(&temporary, bytes)
-        .with_context(|| format!("write terminal isolation state {}", terminal.display()))?;
-    fs::rename(&temporary, &terminal)
+    crate::utils::fs::atomic_write(&terminal, bytes, true)
         .with_context(|| format!("publish terminal isolation state {}", terminal.display()))?;
     Ok(terminal)
 }

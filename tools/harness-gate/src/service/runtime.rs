@@ -85,6 +85,32 @@ pub(crate) trait ContainerRuntime {
         Ok(())
     }
 
+    /// Inspect the current object immediately before a destructive action.
+    /// The caller must compare this identity and label set with its lease.
+    fn inspect_container(
+        &self,
+        project: &Project,
+        name: &str,
+        timeout: Duration,
+    ) -> Result<RuntimeInspection> {
+        let output = crate::process::capture(
+            self.executable(),
+            &inspect_container_args(name),
+            &project.root,
+            timeout,
+        )
+        .with_context(|| format!("inspect {} container {name:?}", self.executable()))?;
+        if !output.status.success() {
+            bail!(
+                "failed to inspect {} container {name:?}: {}",
+                self.executable(),
+                String::from_utf8_lossy(&output.stderr).trim()
+            );
+        }
+        parse_runtime_inspection(&output.stdout)
+            .with_context(|| format!("parse {} inspection for {name:?}", self.executable()))
+    }
+
     fn check_available(&self, project: &Project, timeout: Duration) -> Result<()> {
         let output = crate::process::capture(
             self.executable(),
@@ -109,6 +135,13 @@ pub(crate) struct ContainerStartOptions<'a> {
     pub(crate) container_port: u16,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct RuntimeInspection {
+    pub(crate) object_id: String,
+    pub(crate) name: String,
+    pub(crate) labels: BTreeMap<String, String>,
+}
+
 pub(crate) fn stop_owned_container(
     runtime: ContainerRuntimeKind,
     cwd: &Path,
@@ -116,6 +149,15 @@ pub(crate) fn stop_owned_container(
     timeout: Duration,
 ) -> Result<()> {
     runtime.stop_container(cwd, name, timeout)
+}
+
+pub(crate) fn inspect_owned_container(
+    runtime: ContainerRuntimeKind,
+    project: &Project,
+    name: &str,
+    timeout: Duration,
+) -> Result<RuntimeInspection> {
+    runtime.inspect_container(project, name, timeout)
 }
 
 impl ContainerRuntime for ContainerRuntimeKind {
@@ -170,15 +212,71 @@ fn stop_container_args(name: &str) -> Vec<String> {
     vec!["rm".into(), "--force".into(), name.into()]
 }
 
+fn inspect_container_args(name: &str) -> Vec<String> {
+    vec![
+        "container".into(),
+        "inspect".into(),
+        "--format".into(),
+        "{{json .}}".into(),
+        name.into(),
+    ]
+}
+
 fn runtime_info_args() -> Vec<String> {
     vec!["info".into()]
+}
+
+fn parse_runtime_inspection(raw: &[u8]) -> Result<RuntimeInspection> {
+    let value: serde_json::Value =
+        serde_json::from_slice(raw).context("runtime inspection is not valid JSON")?;
+    let object = value
+        .as_array()
+        .and_then(|items| items.first())
+        .unwrap_or(&value);
+    let object_id = object
+        .get("Id")
+        .or_else(|| object.get("ID"))
+        .and_then(serde_json::Value::as_str)
+        .filter(|id| !id.trim().is_empty())
+        .ok_or_else(|| anyhow::anyhow!("runtime inspection has no immutable object ID"))?
+        .to_string();
+    let name = object
+        .get("Name")
+        .or_else(|| {
+            object
+                .get("Names")
+                .and_then(serde_json::Value::as_array)
+                .and_then(|names| names.first())
+        })
+        .and_then(serde_json::Value::as_str)
+        .unwrap_or_default()
+        .trim_start_matches('/')
+        .to_string();
+    let labels_value = object
+        .get("Config")
+        .and_then(|config| config.get("Labels"))
+        .or_else(|| object.get("Labels"));
+    let mut labels = BTreeMap::new();
+    if let Some(map) = labels_value.and_then(serde_json::Value::as_object) {
+        for (key, value) in map {
+            let value = value
+                .as_str()
+                .ok_or_else(|| anyhow::anyhow!("runtime label {key:?} is not a string"))?;
+            labels.insert(key.clone(), value.to_string());
+        }
+    }
+    Ok(RuntimeInspection {
+        object_id,
+        name,
+        labels,
+    })
 }
 
 #[cfg(test)]
 mod tests {
     use super::{
-        healthcheck_args, mapped_port_args, runtime_info_args, start_container_args,
-        stop_container_args,
+        healthcheck_args, inspect_container_args, mapped_port_args, runtime_info_args,
+        start_container_args, stop_container_args,
     };
     use crate::config::ContainerRuntimeKind;
     use std::collections::BTreeMap;
@@ -239,5 +337,23 @@ mod tests {
             vec!["rm", "--force", "fixture"]
         );
         assert_eq!(runtime_info_args(), vec!["info"]);
+        assert_eq!(
+            inspect_container_args("fixture"),
+            vec!["container", "inspect", "--format", "{{json .}}", "fixture"]
+        );
+    }
+
+    #[test]
+    fn parses_docker_style_inspection() {
+        let value = super::parse_runtime_inspection(
+            br#"[{"Id":"sha256:abc","Name":"/fixture","Config":{"Labels":{"harness-gate.owner":"harness-gate"}}}]"#,
+        )
+        .expect("inspection");
+        assert_eq!(value.object_id, "sha256:abc");
+        assert_eq!(value.name, "fixture");
+        assert_eq!(
+            value.labels.get("harness-gate.owner"),
+            Some(&"harness-gate".into())
+        );
     }
 }

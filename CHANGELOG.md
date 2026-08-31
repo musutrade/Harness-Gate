@@ -14,6 +14,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   capability allowlists, timeout/cancellation cleanup, and artifact confinement.
 - Added release checksum, CycloneDX SBOM, Sigstore signature, and GitHub build
   provenance generation and verification to the release workflow.
+- Added staged-snapshot invocation inputs, runtime ownership proof for Docker and
+  Podman leases, closed artifact registry/manifest publication, and an explicit
+  release asset inventory with exact-set verification.
+
+### Changed
+
+- Release publication now runs the locked quality, formatting, lint, dependency
+  audit, schema, and offline inventory gates before credentials are available.
+- Privileged release workflow actions are pinned to reviewed commit identities.
 
 ## [0.3.3] - 2026-08-30
 
