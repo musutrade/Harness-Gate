@@ -1,5 +1,7 @@
 # Proposal: Harden Gate Boundaries and Delivery Contracts
 
+**Status:** Implemented
+
 ## Goals
 
 - Keep secret and audit scans inside the selected repository, including when
