@@ -561,7 +561,9 @@ mod tests {
             adapter: declaration,
             invocation_id: "inv-1".into(),
             step_id: "step-1".into(),
-            timeout_ms: 1_000,
+            // Windows-hosted runners can spend more than one second starting
+            // the Python interpreter before the deterministic fixture runs.
+            timeout_ms: 5_000,
             config_digest: "config".into(),
             artifact_root: root.to_path_buf(),
             args: vec![fixture.to_string_lossy().to_string()],
