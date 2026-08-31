@@ -1,11 +1,15 @@
 mod commands;
 mod output;
 
-use crate::cli::{Cli, Commands, CompatAction, ConfigAction, ConfigFormat, SchemaAction};
+use crate::cli::{
+    AdapterAction, Cli, Commands, CompatAction, ConfigAction, ConfigFormat, SchemaAction,
+};
 use crate::error::CliError;
 use crate::project::Project;
 use anyhow::Context;
 use clap::Parser;
+use std::collections::BTreeSet;
+use std::fs;
 
 pub(crate) fn run() -> Result<bool, CliError> {
     let cli = Cli::parse();
@@ -24,6 +28,45 @@ pub(crate) fn run() -> Result<bool, CliError> {
     }
     if matches!(cli.command, Commands::Presets) {
         crate::preset::print_presets();
+        return Ok(true);
+    }
+    if let Commands::Adapter {
+        action:
+            AdapterAction::Run {
+                request,
+                trusted_keys,
+                allow_network,
+                allow_resources,
+                allow_environment,
+            },
+    } = &cli.command
+    {
+        let request = crate::process::read_adapter_request(request)
+            .map_err(|error| anyhow::anyhow!(error.to_string()))?;
+        let trusted_keys = trusted_keys
+            .iter()
+            .map(|path| {
+                let bytes = fs::read(path)
+                    .with_context(|| format!("read trusted adapter key {}", path.display()))?;
+                serde_json::from_slice(&bytes)
+                    .with_context(|| format!("parse trusted adapter key {}", path.display()))
+            })
+            .collect::<anyhow::Result<Vec<crate::process::TrustedKey>>>()?;
+        let policy = crate::process::HostPolicy {
+            trusted_keys,
+            capabilities: crate::process::CapabilityPolicy {
+                network: allow_network.iter().cloned().collect::<BTreeSet<_>>(),
+                resources: allow_resources.iter().cloned().collect::<BTreeSet<_>>(),
+                environment: allow_environment.iter().cloned().collect::<BTreeSet<_>>(),
+            },
+            ..crate::process::HostPolicy::default()
+        };
+        let outcome = crate::process::run_adapter(request, &policy)
+            .map_err(|error| anyhow::anyhow!(error.to_string()))?;
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&outcome.response).map_err(anyhow::Error::from)?
+        );
         return Ok(true);
     }
     if let Commands::Compat {

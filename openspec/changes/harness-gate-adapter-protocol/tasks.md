@@ -5,8 +5,15 @@
   rollback requirements (P2, M).
 - [x] 1.3 Add OpenSpec requirements and bounded implementation acceptance
   criteria (P2, S).
-- [ ] 2.1 Implement the adapter host and signed fixture (P2, L).
-- [ ] 2.2 Add cross-platform crash, cancellation, and capability tests (P2, M).
+- [x] 2.1 Implement the adapter host and signed fixture (P2, L).
+- [x] 2.2 Add cross-platform crash, cancellation, and capability tests (P2, M).
 
-Implementation tasks remain intentionally open because this ADR only proposes
-the protocol; built-in cutover is not blocked by them.
+The host is opt-in and does not alter built-in step behavior. Release signing
+and DevRail required-check ownership remain external governance decisions.
+
+## Evidence Review
+
+`cargo test --manifest-path tools/harness-gate/Cargo.toml
+process::adapter::tests::` covers signed execution, capability and signature
+rejection, crash, timeout, cancellation, malformed response, and artifact
+escape. The same tests run in the Linux, macOS, and Windows CI matrix.
