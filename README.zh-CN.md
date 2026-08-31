@@ -464,7 +464,19 @@ harness-gate compat rollback --state migration-canary.json
 ```
 
 这些命令保留原始摘要和 invocation 证据，不会删除已有报告。
-P2 进程外签名 adapter 边界见 [ADR-0033](docs/adr/0033-signed-out-of-process-adapter-protocol.md)。
+P2 进程外签名 adapter 边界见 [ADR-0033](docs/adr/0033-signed-out-of-process-adapter-protocol.md)。可使用 host
+执行单个签名请求：
+
+```bash
+harness-gate adapter run \
+  --request adapter-request.json \
+  --trusted-key adapter-key.json \
+  --allow-resource test-database
+```
+
+host 会在启动前校验 Ed25519 声明和可执行文件 SHA-256，清空继承环境，执行能力白名单，
+在超时或取消时终止整个进程树，并拒绝 malformed 结果或越过 invocation 根目录的产物。
+adapter 失败统一记录为 `ADAPTER_PROTOCOL_FAILURE`。
 
 JSON Lines 应用日志可提取同一 trace 的上下文：
 
