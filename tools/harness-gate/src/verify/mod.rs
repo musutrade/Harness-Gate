@@ -80,6 +80,11 @@ pub struct VerificationReport {
     pub report_directory: String,
     pub timestamp: String,
     pub profile: String,
+    pub input_mode: String,
+    pub project_identity: String,
+    pub source_identity: String,
+    pub execution_root: String,
+    pub configuration_digest: String,
     pub scope: ScopeResult,
     pub services: Vec<ServiceResult>,
     pub steps: Vec<TaskResult>,
@@ -213,13 +218,14 @@ fn run_selected(
     if let Some(request_id) = request_id {
         report::write_invocation_metadata_with_request(
             &invocation,
+            project,
             profile,
             staged,
             Some(request_id),
         )
         .map_err(VerifyError::report)?;
     } else {
-        report::write_invocation_metadata(&invocation, profile, staged)
+        report::write_invocation_metadata(&invocation, project, profile, staged)
             .map_err(VerifyError::report)?;
     }
     let mut invocation_project = project.clone();
@@ -367,6 +373,15 @@ fn run_selected(
         profile: only_step
             .map(|id| format!("step:{id}"))
             .unwrap_or_else(|| profile.to_string()),
+        input_mode: invocation_project.input().mode.as_str().into(),
+        project_identity: invocation_project.input().project_identity.clone(),
+        source_identity: invocation_project.input().source_identity.clone(),
+        execution_root: invocation_project
+            .input()
+            .execution_root
+            .to_string_lossy()
+            .into_owned(),
+        configuration_digest: invocation_project.input().configuration_digest.clone(),
         scope,
         services,
         steps,

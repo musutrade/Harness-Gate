@@ -1,7 +1,6 @@
 use anyhow::Result;
 use serde_json::Value;
 use std::collections::VecDeque;
-use std::fs;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
@@ -58,7 +57,7 @@ pub(super) fn extract_error_context(input_path: &str, output_path: &str) -> Resu
     if target_trace_id.is_empty() {
         eprintln!("⚠️ 未找到 trace_id，降级输出原始日志尾部 30 行");
         let last_lines = get_last_n_lines(input_path, 30)?;
-        fs::write(output_path, last_lines)?;
+        crate::utils::fs::atomic_write(std::path::Path::new(output_path), last_lines, true)?;
         return Ok(());
     }
 
@@ -106,7 +105,7 @@ pub(super) fn extract_error_context(input_path: &str, output_path: &str) -> Resu
     output.truncate(30);
 
     let json_output = serde_json::to_string_pretty(&output)?;
-    fs::write(output_path, json_output)?;
+    crate::utils::fs::atomic_write(std::path::Path::new(output_path), json_output, true)?;
     eprintln!(
         "✅ 结构化日志已提取: {} ({} 条, trace_id={})",
         output_path,

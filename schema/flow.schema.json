@@ -983,6 +983,15 @@
         "id": {
           "type": "string"
         },
+        "input": {
+          "description": "Repository input required by this step. Snapshot is the default and is the only source available to ordinary hook steps; `repository` is an explicit compatibility capability for commands that must inspect Git.",
+          "default": "snapshot",
+          "allOf": [
+            {
+              "$ref": "#/definitions/StepInput"
+            }
+          ]
+        },
         "kind": {
           "description": "Optional discriminator. When absent, this entry is a legacy external step.",
           "default": null,
@@ -1058,6 +1067,24 @@
         }
       },
       "additionalProperties": false
+    },
+    "StepInput": {
+      "oneOf": [
+        {
+          "description": "Read files from the invocation's immutable input root.",
+          "type": "string",
+          "enum": [
+            "snapshot"
+          ]
+        },
+        {
+          "description": "Read files from the original checkout. This is intentionally explicit.",
+          "type": "string",
+          "enum": [
+            "repository"
+          ]
+        }
+      ]
     },
     "TestIsolation": {
       "type": "string",

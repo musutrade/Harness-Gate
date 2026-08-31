@@ -216,11 +216,11 @@ fn configured_task(
     step: &StepConfig,
     service_leases: &[ServiceLease],
 ) -> Result<Task> {
-    let cwd = std::path::PathBuf::from(project.expand(&step.cwd));
+    let cwd = std::path::PathBuf::from(project.expand_for_input(&step.cwd, step.input));
     let args = step
         .args
         .iter()
-        .map(|argument| project.expand(argument))
+        .map(|argument| project.expand_for_input(argument, step.input))
         .collect::<Vec<_>>();
     let mut task = Task::new(&step.label, &step.program, &cwd, log(project, &step.log)?)
         .timeout(step.timeout_secs);

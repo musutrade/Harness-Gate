@@ -144,17 +144,24 @@ fn abnormal_or_cancelled_worker_removes_isolation_state() {
     let state = root.path().join("worker.json");
     fs::write(&state, b"{\"worker\":true}").expect("seed isolation state");
     let log = root.path().join("worker.log");
+    let marker = root.path().join("worker.marker");
     let executable = env::current_exe().expect("test executable");
     let result = Task::new("abnormal worker", executable, Path::new("."), log)
         .args(["--exact", "process::tests::process_tree_child_fixture"])
+        .env("HARNESS_GATE_PROCESS_TREE_MARKER", &marker)
         .timeout(0)
         .isolation_state(state.clone())
         .run()
         .expect("run worker fixture");
     assert!(!result.passed);
+    assert!(result.timed_out || result.cancelled);
     assert!(
         !state.exists(),
         "terminal worker state must not be reusable"
     );
     assert!(state.with_extension("terminal.json").is_file());
+    assert!(
+        !marker.exists(),
+        "abnormal worker fixture outlived its task"
+    );
 }

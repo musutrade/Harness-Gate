@@ -20,7 +20,7 @@ impl Project {
 
     pub fn path(&self, alias: &str) -> Option<&Path> {
         match alias {
-            "root" => Some(&self.root),
+            "root" => Some(&self.execution_root),
             "reports" => Some(&self.reports),
             "audit_config" => Some(&self.audit_config),
             "secrets_config" => Some(&self.secrets_config),

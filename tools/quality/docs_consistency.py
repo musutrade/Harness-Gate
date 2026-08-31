@@ -118,8 +118,27 @@ def run(output: Path) -> int:
         ).returncode == 0
         migration_checked = migration_checked and (root / ".harness-gate" / "secrets.toml").is_file()
     with tempfile.TemporaryDirectory(prefix="harness-gate-schema-") as directory:
-        generated = Path(directory) / "flow.schema.json"
-        schema = subprocess.run(["cargo", "run", "--manifest-path", str(CRATE / "Cargo.toml"), "--locked", "--", "schema", "export", "--output", str(generated)], cwd=ROOT, capture_output=True, text=True)
+        schema_root = Path(directory)
+        generated = schema_root / "flow.schema.json"
+        schema = subprocess.run(
+            [
+                "cargo",
+                "run",
+                "--manifest-path",
+                str(CRATE / "Cargo.toml"),
+                "--locked",
+                "--",
+                "--project-root",
+                str(schema_root),
+                "schema",
+                "export",
+                "--output",
+                "flow.schema.json",
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
         committed = ROOT / "schema" / "flow.schema.json"
         schema_synced = schema.returncode == 0 and generated.read_bytes() == committed.read_bytes()
     machine_schema = ROOT / "schema" / "machine-result.schema.json"
@@ -129,6 +148,11 @@ def run(output: Path) -> int:
         required = set(machine_data.get("required", []))
         machine_schema_valid = machine_data.get("properties", {}).get("schema_version", {}).get("const") == "1" and {
             "schema_version",
+            "input_mode",
+            "project_identity",
+            "source_identity",
+            "execution_root",
+            "configuration_digest",
             "scope",
             "services",
             "steps",
@@ -156,7 +180,23 @@ def run(output: Path) -> int:
         )
     except (OSError, json.JSONDecodeError, TypeError):
         manifest_schema_valid = False
-    result = {**metadata(tool="docs-consistency"), "link_failures": link_failures, "examples": examples, "migration": {"path": str(migration_fixture.relative_to(ROOT)), "status": "pass" if migration_checked else "fail"}, "schema_synced": schema_synced, "machine_schema_valid": machine_schema_valid, "manifest_schema_valid": manifest_schema_valid, "status": "pass" if not link_failures and schema_synced and machine_schema_valid and manifest_schema_valid and migration_checked and all(item["status"] == "pass" for item in examples) else "fail"}
+    registry_schema = ROOT / "schema" / "artifact-registry.schema.json"
+    registry_schema_valid = False
+    try:
+        registry_data = json.loads(registry_schema.read_text())
+        registry_required = set(registry_data.get("required", []))
+        registry_artifact_required = set(
+            registry_data.get("definitions", {}).get("artifact", {}).get("required", [])
+        )
+        registry_schema_valid = (
+            registry_data.get("properties", {}).get("schema_version", {}).get("const") == "1"
+            and {"schema_version", "invocation_id", "artifacts"} <= registry_required
+            and {"invocation_id", "path", "kind", "size_bytes", "sha256"}
+            <= registry_artifact_required
+        )
+    except (OSError, json.JSONDecodeError, TypeError):
+        registry_schema_valid = False
+    result = {**metadata(tool="docs-consistency"), "link_failures": link_failures, "examples": examples, "migration": {"path": str(migration_fixture.relative_to(ROOT)), "status": "pass" if migration_checked else "fail"}, "schema_synced": schema_synced, "machine_schema_valid": machine_schema_valid, "manifest_schema_valid": manifest_schema_valid, "registry_schema_valid": registry_schema_valid, "status": "pass" if not link_failures and schema_synced and machine_schema_valid and manifest_schema_valid and registry_schema_valid and migration_checked and all(item["status"] == "pass" for item in examples) else "fail"}
     write_json(output, result)
     if result["status"] != "pass":
         fail("documentation, examples, or schema synchronization failed")

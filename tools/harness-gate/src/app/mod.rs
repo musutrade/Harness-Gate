@@ -110,17 +110,18 @@ pub(crate) fn run() -> Result<bool, CliError> {
             .project_root
             .clone()
             .unwrap_or(std::env::current_dir().context("read current directory")?);
-        let path = if output.is_absolute() {
-            output.clone()
-        } else {
-            root.join(output)
-        };
-        if let Some(parent) = path.parent() {
-            std::fs::create_dir_all(parent)
-                .with_context(|| format!("create schema directory {}", parent.display()))?;
+        if output.is_absolute() {
+            return Err(
+                anyhow::anyhow!("schema output must be relative to the project root").into(),
+            );
         }
-        crate::utils::fs::atomic_write(&path, format!("{}\n", crate::config::schema_json()?), true)
-            .with_context(|| format!("write workflow schema {}", path.display()))?;
+        let path = crate::utils::fs::confined_atomic_write(
+            &root,
+            output,
+            format!("{}\n", crate::config::schema_json()?),
+            true,
+        )
+        .with_context(|| format!("write workflow schema {}", root.join(output).display()))?;
         println!("Schema written: {}", path.display());
         return Ok(true);
     }

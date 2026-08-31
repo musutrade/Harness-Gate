@@ -177,6 +177,7 @@ pub fn migrate_v1(source: &str, project_name: &str) -> Result<FlowConfig> {
             kind: None,
             gate_type: None,
             runner: None,
+            input: crate::config::StepInput::Snapshot,
         })
         .collect::<Vec<_>>();
     let required_steps = steps.iter().map(|step| step.id.clone()).collect();

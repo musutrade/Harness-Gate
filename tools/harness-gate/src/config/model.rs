@@ -392,6 +392,22 @@ pub struct StepConfig {
     /// Optional versioned test-runner contract. Omitted for legacy steps.
     #[serde(default)]
     pub runner: Option<RunnerConfig>,
+    /// Repository input required by this step. Snapshot is the default and is
+    /// the only source available to ordinary hook steps; `repository` is an
+    /// explicit compatibility capability for commands that must inspect Git.
+    #[serde(default)]
+    pub input: StepInput,
+}
+
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, JsonSchema, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum StepInput {
+    /// Read files from the invocation's immutable input root.
+    #[default]
+    #[serde(alias = "staged")]
+    Snapshot,
+    /// Read files from the original checkout. This is intentionally explicit.
+    Repository,
 }
 
 /// Declares how a test runner receives concurrency and result-contract inputs.
