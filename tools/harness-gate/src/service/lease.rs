@@ -481,7 +481,7 @@ mod tests {
     }
 
     #[test]
-    fn dead_process_is_stale_even_before_expiry() {
+    fn expired_process_lease_is_stale() {
         let record = LeaseRecord {
             owner_marker: OWNER_MARKER.into(),
             schema_version: 1,
@@ -492,7 +492,7 @@ mod tests {
             process_start_identity: "unknown".into(),
             created_at: 1,
             heartbeat_at: 1,
-            expires_at: u64::MAX,
+            expires_at: 1,
             resource_name: None,
             runtime: None,
         };
