@@ -20,6 +20,7 @@ SNAPSHOT = Path(__file__).with_name("snapshots") / "contracts.json"
 
 def normalize(value: str, root: Path) -> str:
     value = value.replace(str(root), "<PROJECT_ROOT>")
+    value = re.sub(r"inv-\d+-\d{9}-\d+-\d+", "<INVOCATION_ID>", value)
     value = re.sub(r"\b20\d{2}-\d{2}-\d{2}T[^\s]+", "<TIMESTAMP>", value)
     value = re.sub(r"\b\d+ ms\b", "<DURATION>", value)
     value = re.sub(r"\b\d+\.\d+s\b", "<DURATION>", value)

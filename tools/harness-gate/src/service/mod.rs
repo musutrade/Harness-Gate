@@ -1,4 +1,5 @@
 mod docker;
+mod lease;
 mod postgres;
 mod runtime;
 
@@ -15,6 +16,8 @@ use std::collections::BTreeMap;
 use std::path::PathBuf;
 use std::sync::{Arc, Condvar, Mutex};
 use std::time::{Duration, Instant};
+
+pub(crate) use lease::{cleanup as cleanup_resources, ResourceLease};
 
 const RESOURCE_LOCK_POLL: Duration = Duration::from_millis(25);
 const RESOURCE_LOCK_WAIT: Duration = Duration::from_secs(30);
@@ -130,7 +133,7 @@ enum ResourceState {
     Empty,
     Starting,
     Ready {
-        service: RunningService,
+        service: Box<RunningService>,
         users: usize,
     },
     /// A non-shareable service is being torn down after its final lease.
@@ -265,7 +268,10 @@ impl ServiceResource {
                         Ok(service) => {
                             let inject_env = service.inject_env.clone();
                             let value = service.value.clone();
-                            *state = ResourceState::Ready { service, users: 1 };
+                            *state = ResourceState::Ready {
+                                service: Box::new(service),
+                                users: 1,
+                            };
                             self.changed.notify_all();
                             return Ok(ServiceLease {
                                 resource: Arc::clone(self),
@@ -378,7 +384,10 @@ impl ServiceResource {
                         .map_err(|_| anyhow::anyhow!("service resource lock was poisoned"))?;
                     match result {
                         Ok(service) => {
-                            *state = ResourceState::Ready { service, users: 0 };
+                            *state = ResourceState::Ready {
+                                service: Box::new(service),
+                                users: 0,
+                            };
                             self.changed.notify_all();
                             return Ok(());
                         }
@@ -486,15 +495,18 @@ struct RunningService {
     container: Option<String>,
     project_root: PathBuf,
     cleanup_errors: Arc<Mutex<Vec<String>>>,
+    lease: Option<ResourceLease>,
 }
 
 impl Drop for RunningService {
     fn drop(&mut self) {
+        let mut cleanup_succeeded = true;
         if let Some(container) = &self.container {
             if let Err(error) =
                 self.runtime
                     .stop_container(&self.project_root, container, Duration::from_secs(5))
             {
+                cleanup_succeeded = false;
                 let detail = format!(
                     "failed to clean up {} container {container:?}: {error:#}",
                     self.runtime.executable()
@@ -504,6 +516,15 @@ impl Drop for RunningService {
                 }
                 eprintln!("warning: {detail}");
             }
+        }
+        if cleanup_succeeded {
+            if let Some(lease) = self.lease.take() {
+                let _ = lease.release();
+            }
+        } else if let Some(lease) = self.lease.take() {
+            // Keep the marker available to `harness-gate cleanup` when the
+            // adapter could not stop the resource during normal teardown.
+            std::mem::forget(lease);
         }
     }
 }
@@ -532,6 +553,7 @@ impl RunningService {
                     container: None,
                     project_root: project.root.clone(),
                     cleanup_errors,
+                    lease: None,
                 })
             }
             ServiceConfig::Docker {
@@ -560,6 +582,7 @@ impl RunningService {
                         container: None,
                         project_root: project.root.clone(),
                         cleanup_errors,
+                        lease: None,
                     });
                 }
                 let deadline = Instant::now() + Duration::from_secs(startup_timeout_secs);
@@ -580,6 +603,7 @@ impl RunningService {
                         connection,
                         deadline,
                         cleanup_errors,
+                        invocation_id: project.invocation_id(),
                     },
                 )
             }

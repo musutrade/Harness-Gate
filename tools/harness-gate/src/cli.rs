@@ -9,7 +9,7 @@ use std::path::PathBuf;
     version,
     about = "Configurable development workflow and architecture guard",
     arg_required_else_help = true,
-    after_help = "Examples:\n  harness-gate presets\n  harness-gate init --preset rust-api\n  harness-gate doctor\n  harness-gate verify --all"
+    after_help = "Examples:\n  harness-gate presets\n  harness-gate init --preset rust-api\n  harness-gate doctor\n  harness-gate cleanup --dry-run\n  harness-gate verify --all"
 )]
 pub(crate) struct Cli {
     /// Control colored terminal output.
@@ -38,6 +38,15 @@ pub(crate) enum Commands {
         /// Treat warnings as failures.
         #[arg(long)]
         strict: bool,
+    },
+    /// Inspect and reclaim stale Harness-Gate resource leases.
+    Cleanup {
+        /// Only report stale marked resources without reclaiming them.
+        #[arg(long)]
+        dry_run: bool,
+        /// Emit machine-readable JSON.
+        #[arg(long)]
+        json: bool,
     },
     /// Show changed files and the verification components they select.
     Scope {

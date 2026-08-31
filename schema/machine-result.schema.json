@@ -1,0 +1,151 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/musutrade/Harness-Gate/schema/machine-result.schema.json",
+  "title": "Harness-Gate Machine Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "invocation_id",
+    "executor_version",
+    "report_directory",
+    "timestamp",
+    "profile",
+    "scope",
+    "services",
+    "steps",
+    "skipped_steps",
+    "warnings",
+    "failures",
+    "artifacts",
+    "evidence_complete",
+    "passed",
+    "status"
+  ],
+  "properties": {
+    "schema_version": {"const": "1"},
+    "invocation_id": {"type": "string", "minLength": 1},
+    "executor_version": {"type": "string", "minLength": 1},
+    "report_directory": {"type": "string", "minLength": 1},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "profile": {"type": "string", "minLength": 1},
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "changed_files", "components", "unmatched_files"],
+      "properties": {
+        "mode": {"type": "string"},
+        "changed_files": {"type": "array", "items": {"type": "string"}},
+        "components": {"type": "array", "items": {"type": "string"}},
+        "unmatched_files": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "services": {"type": "array", "items": {"$ref": "#/definitions/service"}},
+    "steps": {"type": "array", "items": {"$ref": "#/definitions/step"}},
+    "skipped_steps": {"type": "array", "items": {"$ref": "#/definitions/skipped_step"}},
+    "warnings": {"type": "array", "items": {"$ref": "#/definitions/warning"}},
+    "failures": {"type": "array", "items": {"$ref": "#/definitions/failure"}},
+    "artifacts": {"type": "array", "items": {"$ref": "#/definitions/artifact"}},
+    "evidence_complete": {"type": "boolean"},
+    "passed": {"type": "boolean"},
+    "status": {"enum": ["PASS", "WAIVED", "FAIL", "SKIPPED", "CANCELLED"]}
+  },
+  "definitions": {
+    "step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "step_id",
+        "invocation_id",
+        "label",
+        "passed",
+        "status",
+        "timed_out",
+        "cancelled",
+        "duration_ms",
+        "log",
+        "detail",
+        "runner",
+        "attempts"
+      ],
+      "properties": {
+        "step_id": {"type": ["string", "null"]},
+        "invocation_id": {"type": ["string", "null"]},
+        "label": {"type": "string"},
+        "passed": {"type": "boolean"},
+        "status": {"enum": ["PASS", "FAIL", "CANCELLED"]},
+        "timed_out": {"type": "boolean"},
+        "cancelled": {"type": "boolean"},
+        "duration_ms": {"type": "integer", "minimum": 0},
+        "log": {"type": "string"},
+        "detail": {"type": ["string", "null"]},
+        "runner": {"type": ["object", "null"]},
+        "attempts": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/attempt"}}
+      }
+    },
+    "attempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["attempt", "status", "started_at", "finished_at", "duration_ms", "timed_out", "cancelled", "log", "detail"],
+      "properties": {
+        "attempt": {"type": "integer", "minimum": 1},
+        "status": {"enum": ["PASS", "FAIL", "CANCELLED"]},
+        "started_at": {"type": ["string", "null"]},
+        "finished_at": {"type": ["string", "null"]},
+        "duration_ms": {"type": "integer", "minimum": 0},
+        "timed_out": {"type": "boolean"},
+        "cancelled": {"type": "boolean"},
+        "log": {"type": "string"},
+        "detail": {"type": ["string", "null"]}
+      }
+    },
+    "skipped_step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "status", "reason"],
+      "properties": {
+        "id": {"type": "string"},
+        "label": {"type": "string"},
+        "status": {"const": "SKIPPED"},
+        "reason": {"type": "string"}
+      }
+    },
+    "warning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message"],
+      "properties": {
+        "code": {"type": "string"},
+        "message": {"type": "string"}
+      }
+    },
+    "failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["step_id", "code", "message"],
+      "properties": {
+        "step_id": {"type": ["string", "null"]},
+        "code": {"type": "string"},
+        "message": {"type": "string"}
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "kind"],
+      "properties": {
+        "path": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+        "kind": {"type": "string"}
+      }
+    },
+    "service": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status"],
+      "properties": {
+        "id": {"type": "string"},
+        "status": {"enum": ["READY", "FAILED", "CLEANED", "LEAKED"]}
+      }
+    }
+  }
+}

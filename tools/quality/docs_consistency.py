@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import shutil
 import subprocess
@@ -121,7 +122,41 @@ def run(output: Path) -> int:
         schema = subprocess.run(["cargo", "run", "--manifest-path", str(CRATE / "Cargo.toml"), "--locked", "--", "schema", "export", "--output", str(generated)], cwd=ROOT, capture_output=True, text=True)
         committed = ROOT / "schema" / "flow.schema.json"
         schema_synced = schema.returncode == 0 and generated.read_bytes() == committed.read_bytes()
-    result = {**metadata(tool="docs-consistency"), "link_failures": link_failures, "examples": examples, "migration": {"path": str(migration_fixture.relative_to(ROOT)), "status": "pass" if migration_checked else "fail"}, "schema_synced": schema_synced, "status": "pass" if not link_failures and schema_synced and migration_checked and all(item["status"] == "pass" for item in examples) else "fail"}
+    machine_schema = ROOT / "schema" / "machine-result.schema.json"
+    machine_schema_valid = False
+    try:
+        machine_data = json.loads(machine_schema.read_text())
+        required = set(machine_data.get("required", []))
+        machine_schema_valid = machine_data.get("properties", {}).get("schema_version", {}).get("const") == "1" and {
+            "schema_version",
+            "scope",
+            "services",
+            "steps",
+            "skipped_steps",
+            "warnings",
+            "failures",
+            "artifacts",
+            "evidence_complete",
+            "status",
+        } <= required
+    except (OSError, json.JSONDecodeError, TypeError):
+        machine_schema_valid = False
+    manifest_schema = ROOT / "schema" / "artifact-manifest.schema.json"
+    manifest_schema_valid = False
+    try:
+        manifest_data = json.loads(manifest_schema.read_text())
+        manifest_required = set(manifest_data.get("required", []))
+        artifact_required = set(
+            manifest_data.get("definitions", {}).get("artifact", {}).get("required", [])
+        )
+        manifest_schema_valid = (
+            manifest_data.get("properties", {}).get("schema_version", {}).get("const") == "1"
+            and {"schema_version", "invocation_id", "generated_at", "artifacts"} <= manifest_required
+            and {"path", "kind", "size_bytes", "sha256"} <= artifact_required
+        )
+    except (OSError, json.JSONDecodeError, TypeError):
+        manifest_schema_valid = False
+    result = {**metadata(tool="docs-consistency"), "link_failures": link_failures, "examples": examples, "migration": {"path": str(migration_fixture.relative_to(ROOT)), "status": "pass" if migration_checked else "fail"}, "schema_synced": schema_synced, "machine_schema_valid": machine_schema_valid, "manifest_schema_valid": manifest_schema_valid, "status": "pass" if not link_failures and schema_synced and machine_schema_valid and manifest_schema_valid and migration_checked and all(item["status"] == "pass" for item in examples) else "fail"}
     write_json(output, result)
     if result["status"] != "pass":
         fail("documentation, examples, or schema synchronization failed")
