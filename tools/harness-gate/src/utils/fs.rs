@@ -87,7 +87,7 @@ impl Drop for AtomicOutput {
 /// process output without exposing a partially written predictable path.
 pub(crate) fn create_atomic_output(path: &Path, replace_existing: bool) -> Result<AtomicOutput> {
     let parent = output_parent(path)?;
-    ensure_confined_parent(parent)?;
+    ensure_parent_components(parent)?;
     validate_target(path, replace_existing)?;
     let name = path
         .file_name()
@@ -131,7 +131,7 @@ pub(crate) fn publish_atomic_output(
     replace_existing: bool,
 ) -> Result<()> {
     let parent = output_parent(target)?;
-    ensure_confined_parent(parent)?;
+    ensure_parent_components(parent)?;
     let temporary_parent = temporary
         .parent()
         .ok_or_else(|| anyhow::anyhow!("temporary output has no parent directory"))?;
@@ -195,13 +195,7 @@ pub(crate) fn confined_atomic_write(
     contents: impl AsRef<[u8]>,
     replace_existing: bool,
 ) -> Result<PathBuf> {
-    ensure_confined_parent(root)?;
-    let root = root
-        .canonicalize()
-        .with_context(|| format!("resolve output root {}", root.display()))?;
-    if !root.is_dir() {
-        bail!("output root is not a directory: {}", root.display());
-    }
+    let root = canonical_output_root(root)?;
     if relative.as_os_str().is_empty()
         || relative.is_absolute()
         || relative.components().any(|component| {
@@ -234,22 +228,124 @@ pub(crate) fn confined_write_json<T: Serialize + ?Sized>(
     confined_atomic_write(root, relative, contents, replace_existing)
 }
 
-fn ensure_confined_parent(parent: &Path) -> Result<()> {
-    let mut components = parent.components();
-    let mut current = PathBuf::new();
-    if let Some(prefix) = components.next() {
-        current.push(prefix.as_os_str());
+pub(crate) fn ensure_parent_components(parent: &Path) -> Result<()> {
+    let mut missing = Vec::new();
+    let mut current = parent.to_path_buf();
+    loop {
+        if is_path_anchor(&current) {
+            break;
+        }
+        match fs::symlink_metadata(&current) {
+            Ok(metadata) => {
+                // Only the nearest existing component is an output-owned
+                // anchor. Ancestors such as macOS's `/var` alias or a
+                // Windows drive namespace are outside that boundary and are
+                // intentionally not inspected as repository entries.
+                validate_parent_metadata(&current, &metadata)?;
+                break;
+            }
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                missing.push(current.clone());
+                current = current.parent().map(Path::to_path_buf).ok_or_else(|| {
+                    anyhow::anyhow!(
+                        "output parent has no resolvable ancestor: {}",
+                        parent.display()
+                    )
+                })?;
+            }
+            Err(error) => {
+                return Err(error)
+                    .with_context(|| format!("inspect output directory {}", current.display()));
+            }
+        }
     }
-    for component in components {
+
+    for path in missing.into_iter().rev() {
+        match fs::symlink_metadata(&path) {
+            Ok(metadata) => validate_parent_metadata(&path, &metadata)?,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                fs::create_dir(&path)
+                    .with_context(|| format!("create output directory {}", path.display()))?;
+            }
+            Err(error) => {
+                return Err(error)
+                    .with_context(|| format!("inspect output directory {}", path.display()));
+            }
+        }
+    }
+    Ok(())
+}
+
+fn validate_parent_metadata(path: &Path, metadata: &fs::Metadata) -> Result<()> {
+    if metadata.file_type().is_symlink() {
+        bail!("output parent is a symbolic link: {}", path.display())
+    }
+    if !metadata.is_dir() {
+        bail!("output parent is not a directory: {}", path.display())
+    }
+    Ok(())
+}
+
+fn is_path_anchor(path: &Path) -> bool {
+    path.as_os_str().is_empty()
+        || path.components().all(|component| {
+            matches!(
+                component,
+                std::path::Component::Prefix(_)
+                    | std::path::Component::RootDir
+                    | std::path::Component::CurDir
+            )
+        })
+}
+
+fn canonical_output_root(root: &Path) -> Result<PathBuf> {
+    if root.as_os_str().is_empty() {
+        bail!("output root must not be empty");
+    }
+    let metadata = match fs::symlink_metadata(root) {
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+            // Build a missing output root from its nearest existing ancestor.
+            // This avoids probing platform namespace anchors such as
+            // `\\\\?\\C:` while still checking every newly-created component.
+            ensure_parent_components(root)?;
+            fs::symlink_metadata(root)
+                .with_context(|| format!("inspect output root {}", root.display()))?
+        }
+        Ok(metadata) => metadata,
+        Err(error) => {
+            return Err(error).with_context(|| format!("inspect output root {}", root.display()))
+        }
+    };
+    if metadata.file_type().is_symlink() {
+        bail!("output root is a symbolic link: {}", root.display())
+    }
+    if !metadata.is_dir() {
+        bail!("output root is not a directory: {}", root.display())
+    }
+    root.canonicalize()
+        .with_context(|| format!("resolve output root {}", root.display()))
+}
+
+fn ensure_confined_parent_below(root: &Path, parent: &Path) -> Result<()> {
+    if !parent.starts_with(root) {
+        bail!("output parent escapes the allowed root");
+    }
+    let relative = parent
+        .strip_prefix(root)
+        .map_err(|_| anyhow::anyhow!("output parent escapes the allowed root"))?;
+    let mut current = root.to_path_buf();
+    for component in relative.components() {
+        if matches!(
+            component,
+            std::path::Component::ParentDir
+                | std::path::Component::RootDir
+                | std::path::Component::Prefix(_)
+        ) {
+            bail!("output parent escapes the allowed root");
+        }
         current.push(component.as_os_str());
         match fs::symlink_metadata(&current) {
-            Ok(metadata) if metadata.file_type().is_symlink() => {
-                bail!("output parent is a symbolic link: {}", current.display())
-            }
-            Ok(metadata) if !metadata.is_dir() => {
-                bail!("output parent is not a directory: {}", current.display())
-            }
-            Ok(_) => {}
+            Ok(metadata) => validate_parent_metadata(&current, &metadata)?,
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
                 fs::create_dir(&current)
                     .with_context(|| format!("create output directory {}", current.display()))?;
@@ -259,20 +355,6 @@ fn ensure_confined_parent(parent: &Path) -> Result<()> {
                     .with_context(|| format!("inspect output directory {}", current.display()));
             }
         }
-    }
-    Ok(())
-}
-
-fn ensure_confined_parent_below(root: &Path, parent: &Path) -> Result<()> {
-    if !parent.starts_with(root) {
-        bail!("output parent escapes the allowed root");
-    }
-    ensure_confined_parent(parent)?;
-    let resolved = parent
-        .canonicalize()
-        .with_context(|| format!("resolve output parent {}", parent.display()))?;
-    if !resolved.starts_with(root) {
-        bail!("output parent escapes the allowed root");
     }
     Ok(())
 }
@@ -305,6 +387,21 @@ mod tests {
             false,
         )
         .expect("publish");
+        assert_eq!(std::fs::read_to_string(target).expect("read"), "complete");
+    }
+
+    #[test]
+    fn confined_writer_creates_a_missing_output_root() {
+        let directory = tempdir().expect("tempdir");
+        let root = directory.path().join("nested/reports");
+        let target = confined_atomic_write(
+            &root,
+            std::path::Path::new("result.json"),
+            b"complete",
+            false,
+        )
+        .expect("publish");
+
         assert_eq!(std::fs::read_to_string(target).expect("read"), "complete");
     }
 

@@ -80,7 +80,8 @@ fn validate_destination(path: &Path) -> Result<()> {
     let parent = path
         .parent()
         .ok_or_else(|| anyhow::anyhow!("path has no parent: {}", path.display()))?;
-    ensure_parent_components(parent)?;
+    crate::utils::fs::ensure_parent_components(parent)
+        .with_context(|| format!("inspect preset output parent {}", parent.display()))?;
     match fs::symlink_metadata(path) {
         Ok(metadata) if metadata.file_type().is_symlink() => {
             bail!(
@@ -100,39 +101,6 @@ fn validate_destination(path: &Path) -> Result<()> {
             Err(error).with_context(|| format!("inspect preset output {}", path.display()))
         }
     }
-}
-
-fn ensure_parent_components(parent: &Path) -> Result<()> {
-    let mut current = PathBuf::new();
-    for component in parent.components() {
-        current.push(component.as_os_str());
-        match fs::symlink_metadata(&current) {
-            Ok(metadata) if metadata.file_type().is_symlink() => {
-                bail!(
-                    "preset output parent is a symbolic link: {}",
-                    current.display()
-                )
-            }
-            Ok(metadata) if !metadata.is_dir() => {
-                bail!(
-                    "preset output parent is not a directory: {}",
-                    current.display()
-                )
-            }
-            Ok(_) => {}
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
-                fs::create_dir(&current).with_context(|| {
-                    format!("create preset output directory {}", current.display())
-                })?;
-            }
-            Err(error) => {
-                return Err(error).with_context(|| {
-                    format!("inspect preset output directory {}", current.display())
-                });
-            }
-        }
-    }
-    Ok(())
 }
 
 fn remove_regular_destination(path: &Path) {
