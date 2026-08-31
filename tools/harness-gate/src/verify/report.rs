@@ -1,22 +1,487 @@
 use super::VerificationReport;
 use crate::config::WebhookConfig;
 use crate::project::Project;
+use crate::service::ResourceLease;
 use anyhow::{bail, Context, Result};
-use std::fs;
+use regex::Regex;
+use serde::{ser::Serializer, Deserialize, Serialize};
+use sha2::{Digest, Sha256};
+use std::fs::{self, OpenOptions};
+use std::io::{Read, Write};
 use std::path::{Component, Path, PathBuf};
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::OnceLock;
 use std::time::Duration;
+
+static INVOCATION_COUNTER: AtomicU64 = AtomicU64::new(1);
+pub(super) const MACHINE_RESULT_SCHEMA_VERSION: &str = "1";
+pub(super) const ARTIFACT_MANIFEST_SCHEMA_VERSION: &str = "1";
+const MAX_RETAINED_INVOCATIONS: usize = 50;
+const REDACTION_TEXT_LIMIT: usize = 16 * 1024 * 1024;
+
+#[derive(Debug, Serialize)]
+struct MachineResult {
+    schema_version: &'static str,
+    invocation_id: String,
+    executor_version: String,
+    report_directory: String,
+    timestamp: String,
+    profile: String,
+    scope: crate::scope::ScopeResult,
+    services: Vec<MachineService>,
+    steps: Vec<MachineStep>,
+    skipped_steps: Vec<MachineSkippedStep>,
+    warnings: Vec<MachineWarning>,
+    failures: Vec<MachineFailure>,
+    artifacts: Vec<MachineArtifact>,
+    evidence_complete: bool,
+    /// Kept for consumers of the pre-schema report while `status` is adopted.
+    passed: bool,
+    status: &'static str,
+}
+
+#[derive(Debug, Serialize)]
+struct MachineStep {
+    step_id: Option<String>,
+    invocation_id: Option<String>,
+    label: String,
+    passed: bool,
+    status: &'static str,
+    timed_out: bool,
+    cancelled: bool,
+    duration_ms: u128,
+    log: String,
+    detail: Option<String>,
+    runner: Option<crate::process::RunnerExecution>,
+    attempts: Vec<MachineAttempt>,
+}
+
+#[derive(Debug, Serialize)]
+struct MachineAttempt {
+    attempt: u32,
+    status: &'static str,
+    started_at: Option<String>,
+    finished_at: Option<String>,
+    duration_ms: u128,
+    timed_out: bool,
+    cancelled: bool,
+    log: String,
+    detail: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+struct MachineSkippedStep {
+    id: String,
+    label: String,
+    status: &'static str,
+    reason: String,
+}
+
+#[derive(Debug, Serialize)]
+struct MachineWarning {
+    code: String,
+    message: String,
+}
+
+#[derive(Debug, Serialize)]
+struct MachineFailure {
+    step_id: Option<String>,
+    code: String,
+    message: String,
+}
+
+#[derive(Debug, Serialize)]
+struct MachineArtifact {
+    path: String,
+    kind: &'static str,
+}
+
+#[derive(Debug, Serialize)]
+struct MachineService {
+    id: String,
+    status: &'static str,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct ArtifactManifest {
+    schema_version: String,
+    invocation_id: String,
+    generated_at: String,
+    artifacts: Vec<ManifestArtifact>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct ManifestArtifact {
+    path: String,
+    kind: String,
+    size_bytes: u64,
+    sha256: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct MachineResultHeader {
+    schema_version: String,
+}
+
+impl Serialize for VerificationReport {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        machine_result(self).serialize(serializer)
+    }
+}
+
+fn machine_result(report: &VerificationReport) -> MachineResult {
+    let mut artifacts = Vec::new();
+    let mut evidence_complete = true;
+    let mut failures = Vec::new();
+    let steps = report
+        .steps
+        .iter()
+        .map(|step| {
+            let status = task_status(step);
+            if step.step_id.is_none() {
+                evidence_complete = false;
+            }
+            if !step.passed {
+                failures.push(MachineFailure {
+                    step_id: step.step_id.clone(),
+                    code: failure_code(step),
+                    message: step
+                        .detail
+                        .clone()
+                        .map(|detail| redact_text(&detail))
+                        .unwrap_or_else(|| "verification step failed".into()),
+                });
+            }
+            if !step.log.is_empty() {
+                match invocation_relative_path(&report.report_directory, &step.log) {
+                    Some(path) => artifacts.push(MachineArtifact {
+                        path,
+                        kind: "step-log",
+                    }),
+                    None => {
+                        evidence_complete = false;
+                        failures.push(MachineFailure {
+                            step_id: step.step_id.clone(),
+                            code: "EVIDENCE_PATH_ESCAPE".into(),
+                            message: format!(
+                                "step log is outside invocation directory: {}",
+                                step.log
+                            ),
+                        });
+                    }
+                }
+            }
+            MachineStep {
+                step_id: step.step_id.clone(),
+                invocation_id: step.invocation_id.clone(),
+                label: step.label.clone(),
+                passed: step.passed,
+                status,
+                timed_out: step.timed_out,
+                cancelled: step.cancelled,
+                duration_ms: step.duration_ms,
+                log: step.log.clone(),
+                detail: step.detail.as_deref().map(redact_text),
+                runner: step.runner.clone().map(redact_runner),
+                attempts: vec![MachineAttempt {
+                    attempt: step.attempt.unwrap_or(1),
+                    status,
+                    started_at: step.started_at.clone(),
+                    finished_at: step.finished_at.clone(),
+                    duration_ms: step.duration_ms,
+                    timed_out: step.timed_out,
+                    cancelled: step.cancelled,
+                    log: step.log.clone(),
+                    detail: step.detail.as_deref().map(redact_text),
+                }],
+            }
+        })
+        .collect::<Vec<_>>();
+    let skipped_steps = report
+        .skipped_steps
+        .iter()
+        .map(|step| MachineSkippedStep {
+            id: step.id.clone(),
+            label: step.label.clone(),
+            status: "SKIPPED",
+            reason: step.reason.clone(),
+        })
+        .collect::<Vec<_>>();
+    let status = if !evidence_complete {
+        "FAIL"
+    } else {
+        report_status(report)
+    };
+    if status == "CANCELLED" {
+        failures.retain(|failure| failure.code != "STEP_CANCELLED");
+    }
+    artifacts.sort_by(|left, right| left.path.cmp(&right.path));
+    artifacts.dedup_by(|left, right| left.path == right.path);
+    MachineResult {
+        schema_version: MACHINE_RESULT_SCHEMA_VERSION,
+        invocation_id: report.invocation_id.clone(),
+        executor_version: report.executor_version.clone(),
+        report_directory: report.report_directory.clone(),
+        timestamp: report.timestamp.clone(),
+        profile: report.profile.clone(),
+        scope: report.scope.clone(),
+        services: report
+            .services
+            .iter()
+            .map(|service| MachineService {
+                id: service.id.clone(),
+                status: match service.status.as_str() {
+                    "READY" => "READY",
+                    "FAILED" => "FAILED",
+                    "LEAKED" => "LEAKED",
+                    _ => "CLEANED",
+                },
+            })
+            .collect(),
+        steps,
+        skipped_steps,
+        warnings: Vec::new(),
+        failures,
+        artifacts,
+        evidence_complete,
+        passed: report.passed && evidence_complete,
+        status,
+    }
+}
+
+fn ensure_supported_machine_result(raw: &[u8]) -> Result<()> {
+    let header: MachineResultHeader =
+        serde_json::from_slice(raw).context("parse machine-result schema header")?;
+    if header.schema_version != MACHINE_RESULT_SCHEMA_VERSION {
+        bail!(
+            "unsupported machine-result schema version {:?}",
+            header.schema_version
+        );
+    }
+    Ok(())
+}
+
+fn task_status(step: &crate::process::TaskResult) -> &'static str {
+    if step.cancelled {
+        "CANCELLED"
+    } else if step.passed {
+        "PASS"
+    } else {
+        "FAIL"
+    }
+}
+
+fn failure_code(step: &crate::process::TaskResult) -> String {
+    if step.cancelled {
+        "STEP_CANCELLED"
+    } else if step.timed_out {
+        "STEP_TIMEOUT"
+    } else {
+        "STEP_FAILED"
+    }
+    .into()
+}
+
+fn report_status(report: &VerificationReport) -> &'static str {
+    if report.passed {
+        "PASS"
+    } else if report.steps.iter().any(|step| step.cancelled)
+        || report
+            .skipped_steps
+            .iter()
+            .any(|step| step.reason.contains("cancel"))
+    {
+        "CANCELLED"
+    } else {
+        "FAIL"
+    }
+}
+
+fn invocation_relative_path(report_directory: &str, path: &str) -> Option<String> {
+    let report_root = Path::new(report_directory);
+    let candidate = Path::new(path);
+    let relative = if candidate.is_absolute() {
+        candidate.strip_prefix(report_root).ok()?.to_path_buf()
+    } else {
+        candidate.to_path_buf()
+    };
+    if relative.as_os_str().is_empty()
+        || relative.is_absolute()
+        || relative.components().any(|component| {
+            matches!(
+                component,
+                Component::ParentDir | Component::RootDir | Component::Prefix(_)
+            )
+        })
+    {
+        return None;
+    }
+    Some(relative.to_string_lossy().replace('\\', "/"))
+}
+
+#[derive(Debug)]
+pub(super) struct Invocation {
+    pub(super) id: String,
+    pub(super) root: PathBuf,
+    pub(super) _lease: ResourceLease,
+}
+
+#[derive(Debug, Serialize)]
+struct InvocationMetadata<'a> {
+    invocation_id: &'a str,
+    created_at: String,
+    profile: &'a str,
+    staged: bool,
+    executor_version: &'static str,
+}
+
+pub(super) fn allocate_invocation(project: &Project) -> Result<Invocation> {
+    let repository = project
+        .root
+        .canonicalize()
+        .with_context(|| format!("resolve project root {}", project.root.display()))?;
+    let reports = resolve_report_root(project, &repository)?;
+    let invocations = reports.join("invocations");
+    fs::create_dir_all(&invocations)
+        .with_context(|| format!("create invocation directory {}", invocations.display()))?;
+    let resolved_invocations = invocations
+        .canonicalize()
+        .with_context(|| format!("resolve invocation directory {}", invocations.display()))?;
+    if !resolved_invocations.starts_with(&reports) {
+        bail!("invocation directory escapes report directory");
+    }
+
+    for _ in 0..32 {
+        let id = next_invocation_id();
+        let root = invocations.join(&id);
+        match fs::create_dir(&root) {
+            Ok(()) => {
+                fs::create_dir_all(root.join("logs"))
+                    .with_context(|| format!("create invocation logs {}", root.display()))?;
+                let lease = ResourceLease::acquire(
+                    project,
+                    format!("invocation:{id}"),
+                    "report-directory",
+                    id.clone(),
+                    Some(root.to_string_lossy().into_owned()),
+                    None,
+                )
+                .with_context(|| format!("acquire invocation lease {id:?}"))?;
+                return Ok(Invocation {
+                    id,
+                    root,
+                    _lease: lease,
+                });
+            }
+            Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
+            Err(error) => {
+                return Err(error)
+                    .with_context(|| format!("create invocation root {}", root.display()));
+            }
+        }
+    }
+    bail!("could not allocate a collision-free invocation id")
+}
+
+pub(super) fn write_invocation_metadata(
+    invocation: &Invocation,
+    profile: &str,
+    staged: bool,
+) -> Result<()> {
+    let metadata = InvocationMetadata {
+        invocation_id: &invocation.id,
+        created_at: chrono::Utc::now().to_rfc3339(),
+        profile,
+        staged,
+        executor_version: env!("CARGO_PKG_VERSION"),
+    };
+    let contents = serde_json::to_vec_pretty(&metadata).context("serialize invocation metadata")?;
+    atomic_write(&invocation.root.join("invocation.json"), &contents, false)
+}
+
+pub(super) fn mirror_legacy_outputs(
+    invocation_project: &Project,
+    legacy_project: &Project,
+) -> Result<()> {
+    let mut paths = vec![
+        "test_result.json".to_string(),
+        "test_result.md".to_string(),
+        "test_result.html".to_string(),
+    ];
+    if let Some(path) = &legacy_project.config.report_templates.junit {
+        if !paths.iter().any(|candidate| candidate == path) {
+            paths.push(path.clone());
+        }
+    }
+    for relative in paths {
+        let source = invocation_project.reports.join(&relative);
+        if source.is_file() {
+            let contents = fs::read(&source)
+                .with_context(|| format!("read invocation report {}", source.display()))?;
+            let target = report_target(legacy_project, &relative)?;
+            atomic_write(&target, &contents, true)
+                .with_context(|| format!("mirror legacy report {}", target.display()))?;
+        }
+    }
+    let invocation_logs = invocation_project.reports.join("logs");
+    if invocation_logs.is_dir() {
+        for entry in fs::read_dir(&invocation_logs)
+            .with_context(|| format!("read invocation logs {}", invocation_logs.display()))?
+        {
+            let entry = entry.with_context(|| "read invocation log entry")?;
+            let path = entry.path();
+            if !entry
+                .file_type()
+                .with_context(|| format!("inspect invocation log {}", path.display()))?
+                .is_file()
+            {
+                continue;
+            }
+            let Some(name) = path.file_name().and_then(|name| name.to_str()) else {
+                continue;
+            };
+            let relative = format!("logs/{name}");
+            let contents = fs::read(&path)
+                .with_context(|| format!("read invocation log {}", path.display()))?;
+            let target = report_target(legacy_project, &relative)?;
+            atomic_write(&target, &contents, true)
+                .with_context(|| format!("mirror legacy log {}", target.display()))?;
+        }
+    }
+    Ok(())
+}
+
+fn next_invocation_id() -> String {
+    let timestamp = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default();
+    let counter = INVOCATION_COUNTER.fetch_add(1, Ordering::Relaxed);
+    format!(
+        "inv-{}-{:09}-{}-{}",
+        timestamp.as_secs(),
+        timestamp.subsec_nanos(),
+        std::process::id(),
+        counter
+    )
+}
 
 /// Report output boundary. The verifier produces a report model; this module
 /// owns serialization and optional result delivery.
 pub(super) fn write(report: &VerificationReport, project: &Project) -> Result<()> {
+    redact_invocation_files(project)?;
     // Keep the stable JSON/Markdown artifacts independent from optional
     // renderers. A malformed template must not erase the machine-readable
     // result that CI and incident tooling depend on.
     let mut failures = Vec::new();
     match serde_json::to_string_pretty(report)
         .context("serialize verification report as JSON")
-        .and_then(|json| write_report_file(project, "test_result.json", json))
-    {
+        .and_then(|json| {
+            ensure_supported_machine_result(json.as_bytes())?;
+            write_report_file(project, "test_result.json", json)
+        }) {
         Ok(()) => {}
         Err(error) => failures.push(error),
     }
@@ -40,6 +505,15 @@ pub(super) fn write(report: &VerificationReport, project: &Project) -> Result<()
         }
     }
     if failures.is_empty() {
+        if let Err(error) = redact_invocation_files(project)
+            .and_then(|_| write_manifest(report, project))
+            .and_then(|_| verify_manifest(project))
+        {
+            failures.push(error.context("publish or verify artifact manifest"));
+        }
+    }
+    if failures.is_empty() {
+        prune_old_invocations(project, &report.invocation_id)?;
         return Ok(());
     }
     let details = failures
@@ -314,11 +788,349 @@ fn report_target(project: &Project, relative: &str) -> Result<PathBuf> {
 
 fn write_report_file(project: &Project, relative: &str, contents: impl AsRef<[u8]>) -> Result<()> {
     let target = report_target(project, relative)?;
-    fs::write(&target, contents).with_context(|| format!("write report {}", target.display()))
+    atomic_write(&target, contents.as_ref(), false)
+        .with_context(|| format!("write report {}", target.display()))
+}
+
+fn write_manifest(report: &VerificationReport, project: &Project) -> Result<()> {
+    let artifacts = collect_manifest_files(&project.reports, &project.reports)?;
+    let manifest = ArtifactManifest {
+        schema_version: ARTIFACT_MANIFEST_SCHEMA_VERSION.into(),
+        invocation_id: report.invocation_id.clone(),
+        generated_at: chrono::Utc::now().to_rfc3339(),
+        artifacts,
+    };
+    let contents = serde_json::to_vec_pretty(&manifest).context("serialize artifact manifest")?;
+    write_report_file(project, "manifest.json", contents)
+}
+
+fn collect_manifest_files(root: &Path, directory: &Path) -> Result<Vec<ManifestArtifact>> {
+    let mut artifacts = Vec::new();
+    for entry in fs::read_dir(directory)
+        .with_context(|| format!("read artifact directory {}", directory.display()))?
+    {
+        let entry = entry.with_context(|| "read artifact entry")?;
+        let path = entry.path();
+        let file_type = entry
+            .file_type()
+            .with_context(|| format!("inspect artifact entry {}", path.display()))?;
+        if file_type.is_dir() {
+            artifacts.extend(collect_manifest_files(root, &path)?);
+            continue;
+        }
+        if !file_type.is_file() {
+            continue;
+        }
+        let Some(name) = path.file_name().and_then(|name| name.to_str()) else {
+            bail!("artifact has a non-UTF-8 filename: {}", path.display());
+        };
+        if name == "manifest.json" || name.ends_with(".tmp") || name.starts_with('.') {
+            continue;
+        }
+        let relative = path
+            .strip_prefix(root)
+            .with_context(|| format!("resolve artifact path {}", path.display()))?
+            .to_string_lossy()
+            .replace('\\', "/");
+        let metadata = fs::metadata(&path)
+            .with_context(|| format!("inspect artifact metadata {}", path.display()))?;
+        artifacts.push(ManifestArtifact {
+            path: relative.clone(),
+            kind: manifest_kind(&relative),
+            size_bytes: metadata.len(),
+            sha256: sha256_file(&path)?,
+        });
+    }
+    artifacts.sort_by(|left, right| left.path.cmp(&right.path));
+    Ok(artifacts)
+}
+
+fn manifest_kind(path: &str) -> String {
+    if path.starts_with("logs/") {
+        "step-log".into()
+    } else if path == "invocation.json" {
+        "invocation-metadata".into()
+    } else if path.ends_with(".json")
+        || path.ends_with(".md")
+        || path.ends_with(".html")
+        || path.ends_with(".xml")
+    {
+        "report".into()
+    } else {
+        "artifact".into()
+    }
+}
+
+fn sha256_file(path: &Path) -> Result<String> {
+    let mut file =
+        fs::File::open(path).with_context(|| format!("open artifact {}", path.display()))?;
+    let mut hasher = Sha256::new();
+    let mut buffer = [0_u8; 64 * 1024];
+    loop {
+        let read = file
+            .read(&mut buffer)
+            .with_context(|| format!("read artifact {}", path.display()))?;
+        if read == 0 {
+            break;
+        }
+        hasher.update(&buffer[..read]);
+    }
+    Ok(format!("{:x}", hasher.finalize()))
+}
+
+fn verify_manifest(project: &Project) -> Result<()> {
+    let path = project.reports.join("manifest.json");
+    let bytes =
+        fs::read(&path).with_context(|| format!("read artifact manifest {}", path.display()))?;
+    let manifest: ArtifactManifest =
+        serde_json::from_slice(&bytes).context("parse artifact manifest")?;
+    if manifest.schema_version != ARTIFACT_MANIFEST_SCHEMA_VERSION {
+        bail!(
+            "unsupported artifact manifest schema version {:?}",
+            manifest.schema_version
+        );
+    }
+    if manifest.artifacts.is_empty() {
+        bail!("artifact manifest contains no invocation artifacts");
+    }
+    let report_root = project
+        .reports
+        .canonicalize()
+        .with_context(|| format!("resolve invocation directory {}", project.reports.display()))?;
+    for artifact in &manifest.artifacts {
+        let relative = invocation_relative_path(
+            &project.reports.to_string_lossy(),
+            &project.reports.join(&artifact.path).to_string_lossy(),
+        )
+        .ok_or_else(|| {
+            anyhow::anyhow!(
+                "artifact path escapes invocation directory: {}",
+                artifact.path
+            )
+        })?;
+        if relative != artifact.path {
+            bail!("artifact path is not normalized: {}", artifact.path);
+        }
+        let target = project.reports.join(&artifact.path);
+        let resolved_target = target
+            .canonicalize()
+            .with_context(|| format!("resolve manifest artifact {}", target.display()))?;
+        if !resolved_target.starts_with(&report_root) {
+            bail!(
+                "manifest artifact escapes invocation directory: {}",
+                artifact.path
+            );
+        }
+        let metadata = fs::metadata(&target)
+            .with_context(|| format!("inspect manifest artifact {}", target.display()))?;
+        if !metadata.is_file() || metadata.len() != artifact.size_bytes {
+            bail!("artifact size changed: {}", artifact.path);
+        }
+        let digest = sha256_file(&target)?;
+        if digest != artifact.sha256 {
+            bail!("artifact digest changed: {}", artifact.path);
+        }
+    }
+    Ok(())
+}
+
+fn redact_invocation_files(project: &Project) -> Result<()> {
+    if project.reports.exists() {
+        let repository = project
+            .root
+            .canonicalize()
+            .with_context(|| format!("resolve project root {}", project.root.display()))?;
+        let reports = project
+            .reports
+            .canonicalize()
+            .with_context(|| format!("resolve report directory {}", project.reports.display()))?;
+        if !reports.starts_with(&repository) {
+            bail!("report directory escapes project root");
+        }
+    }
+    redact_directory(&project.reports)
+}
+
+fn redact_directory(directory: &Path) -> Result<()> {
+    if !directory.exists() {
+        return Ok(());
+    }
+    for entry in fs::read_dir(directory)
+        .with_context(|| format!("read evidence directory {}", directory.display()))?
+    {
+        let entry = entry.with_context(|| "read evidence entry")?;
+        let path = entry.path();
+        let file_type = entry
+            .file_type()
+            .with_context(|| format!("inspect evidence entry {}", path.display()))?;
+        if file_type.is_dir() {
+            redact_directory(&path)?;
+            continue;
+        }
+        if !file_type.is_file()
+            || path.file_name().and_then(|name| name.to_str()) == Some("manifest.json")
+            || path
+                .file_name()
+                .and_then(|name| name.to_str())
+                .is_some_and(|name| name.ends_with(".tmp"))
+        {
+            continue;
+        }
+        let bytes = fs::read(&path).with_context(|| format!("read evidence {}", path.display()))?;
+        let Ok(text) = std::str::from_utf8(&bytes) else {
+            continue;
+        };
+        if bytes.len() > REDACTION_TEXT_LIMIT {
+            bail!("text evidence exceeds redaction limit: {}", path.display());
+        }
+        let redacted = redact_text(text);
+        if redacted.as_bytes() != bytes {
+            atomic_write(&path, redacted.as_bytes(), true)
+                .with_context(|| format!("publish redacted evidence {}", path.display()))?;
+        }
+    }
+    Ok(())
+}
+
+fn redact_runner(mut runner: crate::process::RunnerExecution) -> crate::process::RunnerExecution {
+    runner.environment = runner
+        .environment
+        .into_iter()
+        .map(|(key, value)| (key, redact_text(&value)))
+        .collect();
+    runner
+}
+
+fn redact_text(input: &str) -> String {
+    static PATTERNS: OnceLock<Vec<Regex>> = OnceLock::new();
+    let patterns = PATTERNS.get_or_init(|| {
+        vec![
+            Regex::new(r"(?is)-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----.*?-----END [A-Z0-9 ]*PRIVATE KEY-----").expect("private key redaction regex"),
+            Regex::new(r"(?im)^(?:authorization|proxy-authorization|cookie|set-cookie|x-api-key|x-auth-token)\s*:[^\r\n]*$").expect("header redaction regex"),
+            Regex::new(r#"(?i)\b(?:postgres(?:ql)?|mysql|redis|mongodb(?:\+srv)?)://[^\s<>'\"]+"#).expect("connection string redaction regex"),
+            Regex::new(r"(?i)\b(?:bearer|basic)\s+[A-Za-z0-9._~+/=-]+").expect("authorization redaction regex"),
+            Regex::new(r#"(?i)\"[^\"]*(?:api[_-]?key|access[_-]?token|refresh[_-]?token|id[_-]?token|token|password|passwd|secret|client[_-]?secret)[^\"]*\"\s*:\s*\"[^\"]*\""#).expect("json secret redaction regex"),
+            Regex::new(r##"(?i)\b(?:api[_-]?key|access[_-]?token|refresh[_-]?token|id[_-]?token|token|password|passwd|secret|client[_-]?secret)\b\s*[:=]\s*["']?[^\s"'`,;}]+"##).expect("assignment redaction regex"),
+        ]
+    });
+    patterns.iter().fold(input.to_string(), |text, pattern| {
+        pattern.replace_all(&text, "[REDACTED]").into_owned()
+    })
+}
+
+fn prune_old_invocations(project: &Project, current_id: &str) -> Result<()> {
+    let Some(invocations) = project.reports.parent() else {
+        return Ok(());
+    };
+    if invocations.file_name().and_then(|name| name.to_str()) != Some("invocations") {
+        return Ok(());
+    }
+    let mut directories = Vec::new();
+    for entry in fs::read_dir(invocations).with_context(|| {
+        format!(
+            "read invocation retention directory {}",
+            invocations.display()
+        )
+    })? {
+        let entry = entry.context("read invocation retention entry")?;
+        let path = entry.path();
+        if !entry.file_type()?.is_dir()
+            || path.file_name().and_then(|name| name.to_str()) == Some(current_id)
+        {
+            continue;
+        }
+        let modified = entry
+            .metadata()
+            .and_then(|metadata| metadata.modified())
+            .unwrap_or(std::time::SystemTime::UNIX_EPOCH);
+        directories.push((modified, path));
+    }
+    if directories.len() <= MAX_RETAINED_INVOCATIONS {
+        return Ok(());
+    }
+    directories.sort_by_key(|(modified, _)| *modified);
+    let cutoff = std::time::SystemTime::now()
+        .checked_sub(Duration::from_secs(15 * 60))
+        .unwrap_or(std::time::SystemTime::UNIX_EPOCH);
+    let remove_count = directories.len() - MAX_RETAINED_INVOCATIONS;
+    for (modified, path) in directories.into_iter().take(remove_count) {
+        if modified < cutoff {
+            fs::remove_dir_all(&path)
+                .with_context(|| format!("remove expired invocation {}", path.display()))?;
+        }
+    }
+    Ok(())
+}
+
+fn atomic_write(target: &Path, contents: &[u8], replace_existing: bool) -> Result<()> {
+    let parent = target
+        .parent()
+        .ok_or_else(|| anyhow::anyhow!("output has no parent directory"))?;
+    fs::create_dir_all(parent)
+        .with_context(|| format!("create output directory {}", parent.display()))?;
+    let counter = INVOCATION_COUNTER.fetch_add(1, Ordering::Relaxed);
+    let file_name = target
+        .file_name()
+        .and_then(|name| name.to_str())
+        .ok_or_else(|| anyhow::anyhow!("output has an invalid filename"))?;
+    let temporary = parent.join(format!(".{file_name}.{counter}.tmp"));
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&temporary)
+        .with_context(|| format!("create temporary output {}", temporary.display()))?;
+    let write_result = (|| -> Result<()> {
+        file.write_all(contents)?;
+        file.sync_all()?;
+        drop(file);
+        if replace_existing && fs::symlink_metadata(target).is_ok() {
+            fs::remove_file(target)
+                .with_context(|| format!("replace existing output {}", target.display()))?;
+        }
+        fs::rename(&temporary, target)
+            .with_context(|| format!("publish output {}", target.display()))?;
+        Ok(())
+    })();
+    if write_result.is_err() {
+        let _ = fs::remove_file(&temporary);
+    }
+    write_result
+}
+
+fn resolve_report_root(project: &Project, repository: &Path) -> Result<PathBuf> {
+    let reports = if fs::symlink_metadata(&project.reports).is_ok() {
+        project
+            .reports
+            .canonicalize()
+            .with_context(|| format!("resolve report directory {}", project.reports.display()))?
+    } else {
+        let mut ancestor = project.reports.as_path();
+        while fs::symlink_metadata(ancestor).is_err() {
+            ancestor = ancestor
+                .parent()
+                .ok_or_else(|| anyhow::anyhow!("report directory has no resolvable parent"))?;
+        }
+        let resolved_ancestor = ancestor
+            .canonicalize()
+            .with_context(|| format!("resolve report directory {}", ancestor.display()))?;
+        if !resolved_ancestor.starts_with(repository) {
+            bail!("report directory escapes project root");
+        }
+        fs::create_dir_all(&project.reports)
+            .with_context(|| format!("create report directory {}", project.reports.display()))?;
+        project
+            .reports
+            .canonicalize()
+            .with_context(|| format!("resolve report directory {}", project.reports.display()))?
+    };
+    if !reports.starts_with(repository) {
+        bail!("report directory escapes project root");
+    }
+    Ok(reports)
 }
 
 pub(super) fn notify(report: &VerificationReport, project: &Project) -> Result<()> {
-    let body = serde_json::to_vec(report)?;
+    let body = redact_text(&serde_json::to_string(report)?).into_bytes();
     for webhook in &project.config.notifications.webhooks {
         if (report.passed && !webhook.on_success) || (!report.passed && !webhook.on_failure) {
             continue;
@@ -455,7 +1267,11 @@ fn post_json(raw_url: &str, body: &[u8]) -> Result<()> {
 
 #[cfg(test)]
 mod tests {
-    use super::{configured_html, junit, markdown, notify, post_json, render_html, report_target};
+    use super::{
+        allocate_invocation, configured_html, ensure_supported_machine_result, junit,
+        machine_result, markdown, notify, post_json, redact_text, render_html, report_target,
+        verify_manifest, write, write_invocation_metadata,
+    };
     use crate::config::WebhookConfig;
     use crate::process::TaskResult;
     use crate::scope::ScopeResult;
@@ -497,6 +1313,9 @@ mod tests {
 
     fn report() -> VerificationReport {
         VerificationReport {
+            invocation_id: "inv-test".into(),
+            executor_version: "0.3.3".into(),
+            report_directory: "reports/invocations/inv-test".into(),
             timestamp: "2026-01-01T00:00:00Z".into(),
             profile: "full".into(),
             scope: ScopeResult {
@@ -505,7 +1324,13 @@ mod tests {
                 components: ["api".to_string()].into_iter().collect(),
                 unmatched_files: vec![],
             },
+            services: vec![],
             steps: vec![TaskResult {
+                step_id: None,
+                invocation_id: None,
+                attempt: None,
+                started_at: None,
+                finished_at: None,
                 label: "unit tests".into(),
                 passed: false,
                 timed_out: false,
@@ -513,6 +1338,7 @@ mod tests {
                 duration_ms: 42,
                 log: "logs/unit.log".into(),
                 detail: Some("exit code 1".into()),
+                runner: None,
             }],
             skipped_steps: vec![],
             passed: false,
@@ -525,6 +1351,138 @@ mod tests {
         assert!(output.contains("=== Verification report ==="));
         assert!(output.contains("TEST_SUMMARY: FAIL"));
         assert!(output.contains("logs/unit.log"));
+    }
+
+    #[test]
+    fn machine_result_uses_versioned_status_attempts_and_artifact_references() {
+        let value = serde_json::to_value(machine_result(&report())).expect("machine result JSON");
+        assert_eq!(value["schema_version"], "1");
+        assert_eq!(value["status"], "FAIL");
+        assert!(value["services"].as_array().is_some());
+        assert_eq!(value["steps"][0]["status"], "FAIL");
+        assert_eq!(value["steps"][0]["attempts"][0]["attempt"], 1);
+        assert_eq!(value["artifacts"][0]["path"], "logs/unit.log");
+        assert_eq!(value["artifacts"][0]["kind"], "step-log");
+        assert_eq!(value["evidence_complete"], false);
+        assert_eq!(value["failures"][0]["code"], "STEP_FAILED");
+    }
+
+    #[test]
+    fn machine_result_keeps_cancellation_distinct_from_failure() {
+        let mut report = report();
+        report.steps[0].passed = false;
+        report.steps[0].cancelled = true;
+        report.steps[0].step_id = Some("unit.tests".into());
+        report.skipped_steps.push(SkippedStep {
+            id: "dependent.tests".into(),
+            label: "dependent tests".into(),
+            reason: "verification cancelled before dispatch".into(),
+        });
+        let value = serde_json::to_value(machine_result(&report)).expect("machine result JSON");
+        assert_eq!(value["status"], "CANCELLED");
+        assert_eq!(value["steps"][0]["status"], "CANCELLED");
+        assert_eq!(value["skipped_steps"][0]["status"], "SKIPPED");
+        assert!(value["failures"]
+            .as_array()
+            .expect("failures array")
+            .is_empty());
+    }
+
+    #[test]
+    fn machine_result_rejects_artifacts_outside_the_invocation() {
+        let mut report = report();
+        report.passed = true;
+        report.steps[0].passed = true;
+        report.steps[0].step_id = Some("unit.tests".into());
+        report.steps[0].log = "/tmp/outside-invocation.log".into();
+        let value = serde_json::to_value(machine_result(&report)).expect("machine result JSON");
+        assert_eq!(value["status"], "FAIL");
+        assert_eq!(value["passed"], false);
+        assert_eq!(value["evidence_complete"], false);
+        assert_eq!(value["failures"][0]["code"], "EVIDENCE_PATH_ESCAPE");
+        assert!(value["artifacts"]
+            .as_array()
+            .expect("artifacts array")
+            .is_empty());
+    }
+
+    #[test]
+    fn unsupported_machine_result_versions_fail_closed() {
+        let error = ensure_supported_machine_result(br#"{"schema_version":"2"}"#)
+            .expect_err("unsupported schema version must fail");
+        assert!(error
+            .to_string()
+            .contains("unsupported machine-result schema"));
+    }
+
+    #[test]
+    fn redaction_removes_credentials_from_exported_text() {
+        let auth_header = ["Author", "ization"].concat();
+        let bearer = ["Bear", "er"].concat();
+        let cookie_header = ["cook", "ie"].concat();
+        let db_scheme = ["post", "gres"].concat();
+        let private_key = ["PRIVATE", " KEY"].concat();
+        let password_key = ["pass", "word"].concat();
+        let text = format!(
+            "{auth_header}: {bearer} opaque-value\n{cookie_header}: session=opaque-cookie\nDATABASE_URL={db_scheme}://user:opaque-pass@db.example.test/app\n{password_key}=opaque-value\n{{\"api_key\":\"opaque-json\"}}\n-----BEGIN {private_key}-----\nopaque-material\n-----END {private_key}-----"
+        );
+        let redacted = redact_text(&text);
+        for secret in [
+            "opaque-value",
+            "opaque-cookie",
+            "opaque-pass@db.example.test",
+            "opaque-json",
+            "opaque-material",
+        ] {
+            assert!(!redacted.contains(secret), "secret leaked: {secret}");
+        }
+        assert!(redacted.contains("[REDACTED]"));
+    }
+
+    #[test]
+    fn manifest_records_digests_and_detects_tampering() {
+        let workspace = crate::test_support::TestWorkspace::new("report-manifest");
+        crate::preset::init(&workspace.root, "generic", false).expect("initialize fixture");
+        workspace.init_git();
+        let project = crate::project::Project::discover(Some(workspace.root.clone()), None)
+            .expect("discover fixture");
+        let invocation = allocate_invocation(&project).expect("allocate invocation");
+        write_invocation_metadata(&invocation, "full", false).expect("write metadata");
+        let password_key = ["pass", "word"].concat();
+        std::fs::write(
+            invocation.root.join("logs/unit.log"),
+            format!("{password_key}=opaque-value\n"),
+        )
+        .expect("write log");
+        let mut invocation_project = project.clone();
+        invocation_project.reports = invocation.root.clone();
+        let mut current = report();
+        current.invocation_id = invocation.id.clone();
+        current.report_directory = invocation.root.to_string_lossy().into_owned();
+        current.steps[0].step_id = Some("unit.tests".into());
+        write(&current, &invocation_project).expect("write reports and manifest");
+
+        let manifest_path = invocation.root.join("manifest.json");
+        let manifest: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(&manifest_path).expect("read manifest"))
+                .expect("parse manifest");
+        let log = manifest["artifacts"]
+            .as_array()
+            .expect("manifest artifacts")
+            .iter()
+            .find(|artifact| artifact["path"] == "logs/unit.log")
+            .expect("log manifest entry");
+        assert_eq!(log["size_bytes"], 11);
+        assert_eq!(log["sha256"].as_str().unwrap().len(), 64);
+        assert_eq!(
+            std::fs::read_to_string(invocation.root.join("logs/unit.log"))
+                .expect("read redacted log"),
+            "[REDACTED]\n"
+        );
+        verify_manifest(&invocation_project).expect("manifest should verify");
+        std::fs::write(invocation.root.join("logs/unit.log"), "tampered\n").expect("tamper log");
+        assert!(verify_manifest(&invocation_project).is_err());
+        drop(invocation);
     }
 
     #[test]
@@ -761,6 +1719,37 @@ mod tests {
         });
         post_json(&format!("http://{address}/notify"), br#"{"passed":true}"#)
             .expect("webhook should succeed");
+        handle.join().expect("webhook thread");
+    }
+
+    #[test]
+    fn webhook_redacts_sensitive_report_details() {
+        let listener = TcpListener::bind(("127.0.0.1", 0)).expect("bind listener");
+        let address = listener.local_addr().expect("listener address");
+        let handle = thread::spawn(move || {
+            let (mut stream, _) = listener.accept().expect("accept webhook");
+            let request = read_http_request(&mut stream);
+            let body = String::from_utf8_lossy(&request);
+            assert!(!body.contains("webhook-secret"));
+            assert!(body.contains("[REDACTED]"));
+            stream
+                .write_all(b"HTTP/1.1 204 No Content\r\nContent-Length: 0\r\n\r\n")
+                .expect("write response");
+        });
+        let workspace = crate::test_support::TestWorkspace::new("webhook-redaction");
+        crate::preset::init(&workspace.root, "generic", false).expect("initialize fixture");
+        workspace.init_git();
+        let mut project = crate::project::Project::discover(Some(workspace.root.clone()), None)
+            .expect("discover fixture");
+        project.config.notifications.webhooks = vec![WebhookConfig {
+            url: format!("http://{address}/notify"),
+            on_failure: true,
+            on_success: false,
+        }];
+        let mut sensitive = report();
+        let token_key = ["tok", "en"].concat();
+        sensitive.steps[0].detail = Some(format!("{token_key}=opaque-value"));
+        notify(&sensitive, &project).expect("redacted webhook should succeed");
         handle.join().expect("webhook thread");
     }
 

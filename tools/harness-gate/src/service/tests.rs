@@ -1,3 +1,4 @@
+use super::lease::{cleanup, ResourceLease};
 use super::postgres::{validate_isolated_postgres_url, ALLOW_REMOTE_TEST_DATABASE_ENV};
 use super::{check_available, ServiceManager};
 use crate::config::ServiceConfig;
@@ -5,6 +6,121 @@ use crate::project::Project;
 use crate::test_support::TestWorkspace;
 use std::sync::atomic::AtomicBool;
 use std::time::Duration;
+
+#[test]
+fn cross_process_resource_lease_reports_a_conflict_and_can_be_reacquired() {
+    let (_workspace, project) = project();
+    let resource = format!("workspace:lease-conflict:{}", std::process::id());
+    let lease = ResourceLease::acquire(
+        &project,
+        resource.clone(),
+        "workspace",
+        "invocation-a",
+        None,
+        None,
+    )
+    .expect("first owner acquires lease");
+    let conflict = ResourceLease::acquire(
+        &project,
+        resource.clone(),
+        "workspace",
+        "invocation-b",
+        None,
+        None,
+    )
+    .expect_err("second owner must be rejected");
+    assert!(conflict.to_string().contains("resource lease conflict"));
+    drop(lease);
+    ResourceLease::acquire(&project, resource, "workspace", "invocation-b", None, None)
+        .expect("released lease can be acquired");
+}
+
+#[test]
+fn releasing_a_lease_leaves_no_marker_file() {
+    let (_workspace, project) = project();
+    let resource = format!("workspace:lease-no-leak:{}", std::process::id());
+    let lease = ResourceLease::acquire(
+        &project,
+        resource,
+        "workspace",
+        "invocation-no-leak",
+        None,
+        None,
+    )
+    .expect("lease");
+    let lease_path = std::fs::read_dir(&project.resource_leases)
+        .expect("lease directory")
+        .next()
+        .expect("lease entry")
+        .expect("lease entry result")
+        .path();
+    assert!(lease_path.is_file());
+    drop(lease);
+    assert!(
+        !lease_path.exists(),
+        "released lease marker must be removed"
+    );
+    let report = cleanup(&project, false).expect("cleanup after release");
+    assert_eq!(report.scanned, 0, "cleanup must find no released lease");
+}
+
+#[test]
+fn cleanup_dry_run_lists_active_marked_resources_without_removing_them() {
+    let (_workspace, project) = project();
+    let resource = format!("workspace:lease-dry-run:{}", std::process::id());
+    let lease = ResourceLease::acquire(
+        &project,
+        resource,
+        "workspace",
+        "invocation-dry-run",
+        None,
+        None,
+    )
+    .expect("lease");
+    let report = cleanup(&project, true).expect("cleanup dry run");
+    assert_eq!(report.scanned, 1);
+    assert_eq!(report.active, 1);
+    assert_eq!(report.reclaimed, 0);
+    assert!(report.failures.is_empty());
+    drop(lease);
+}
+
+#[test]
+fn cleanup_reclaims_a_stale_marked_lease() {
+    let (_workspace, project) = project();
+    let lease = ResourceLease::acquire(
+        &project,
+        format!("workspace:lease-stale:{}", std::process::id()),
+        "workspace",
+        "invocation-stale",
+        None,
+        None,
+    )
+    .expect("lease");
+    let path = std::fs::read_dir(&project.resource_leases)
+        .expect("lease directory")
+        .next()
+        .expect("lease entry")
+        .expect("lease entry result")
+        .path();
+    let mut record: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(&path).expect("lease contents")).expect("json");
+    record["pid"] = serde_json::json!(0);
+    record["process_start_identity"] = serde_json::json!("dead-process");
+    record["expires_at"] = serde_json::json!(0);
+    std::fs::write(
+        &path,
+        serde_json::to_vec_pretty(&record).expect("serialize"),
+    )
+    .expect("mark stale");
+    drop(lease);
+
+    let report = cleanup(&project, false).expect("cleanup stale lease");
+    assert_eq!(report.stale, 1);
+    assert_eq!(report.reclaimed, 1);
+    assert!(report.failures.is_empty());
+    assert!(!path.exists());
+}
 
 #[test]
 fn accepts_an_isolated_loopback_database() {
