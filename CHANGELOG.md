@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added the opt-in `harness-gate adapter run` command for signed, isolated
+  out-of-process adapters with Ed25519 and executable digest verification,
+  capability allowlists, timeout/cancellation cleanup, and artifact confinement.
+- Added release checksum, CycloneDX SBOM, Sigstore signature, and GitHub build
+  provenance generation and verification to the release workflow.
+
 ## [0.3.3] - 2026-08-30
 
 ### Fixed
