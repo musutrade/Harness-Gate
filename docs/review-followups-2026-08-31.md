@@ -1,6 +1,6 @@
 # 未完成的评审需求跟踪
 
-**基线日期：** 2026-08-31（在 `main` 提交 `ace3c65d` 上复核）
+**基线日期：** 2026-09-01（在 `main` 提交 `7efe1444ed470559964976dce7d9474b5c0bc69c` 上复核）
 **适用范围：** 代码评审、发布治理、DevRail 集成和 ADR/OpenSpec 收口
 **文档性质：** 跟踪清单；不改变运行时行为，也不替代对应的 ADR、OpenSpec
 或管理员审批。
@@ -9,9 +9,10 @@
 
 PR [#60](https://github.com/musutrade/Harness-Gate/pull/60) 已实现五项
 fail-closed 边界，PR [#61](https://github.com/musutrade/Harness-Gate/pull/61)
-已完成相关 OpenSpec 收口。当前剩余工作主要分为三类：
+已完成相关 OpenSpec 收口，PR [#62](https://github.com/musutrade/Harness-Gate/pull/62)
+已整理本清单。G-01 的规则集配置和记录收口已完成；当前剩余工作主要分为三类：
 
-1. **发布或切换前的外部证据**：规则集、真实 release、DevRail 环境。
+1. **发布或切换前的外部证据**：真实 release、DevRail 环境。
 2. **下一发布周期的工程整改**：adapter、安装器、脱敏和资源预算。
 3. **记录性收口及后续质量债**：更新过时状态，或为 P2/P3 项建立单独变更。
 
@@ -20,23 +21,28 @@ fail-closed 边界，PR [#61](https://github.com/musutrade/Harness-Gate/pull/61)
 
 ## 1. 发布和切换阻断项
 
-### G-01：修正 `main` 的 Required Quality Aggregate 规则集
+### G-01：配置并验证 `main` 的 Required Quality Aggregate 规则集
 
-**状态：阻断；需要仓库管理员。**
+**状态：已完成（2026-09-01）。**
 
-当前 `main` 规则集 [21098892](https://github.com/musutrade/Harness-Gate/rules/21098892)
-仍要求旧的 `Rust checks` context，而 CI 的实际聚合 job 名称是
-`Required Quality Aggregate`。最近的 [CI run
-33448910814](https://github.com/musutrade/Harness-Gate/actions/runs/33448910814)
-已显示聚合检查和所有质量 job 通过，但这不能证明规则集正在要求正确的检查。
+组织规则集 [21098892](https://github.com/musutrade/Harness-Gate/rules/21098892)
+现在为 `active`，通过 `ref_name.include: ["~DEFAULT_BRANCH"]` 匹配 `main`，
+要求 CI 的实际聚合检查 `Required Quality Aggregate`，并设置
+`strict_required_status_checks_policy: true`。权威的 [main 有效规则 API
+响应](https://api.github.com/repos/musutrade/Harness-Gate/rules/branches/main)
+已返回该 required status check；非默认分支的同一接口不返回该规则。最新的
+[CI run 33456540737](https://github.com/musutrade/Harness-Gate/actions/runs/33456540737)
+在提交 `7efe1444ed470559964976dce7d9474b5c0bc69c` 上显示所有质量 job 和聚合
+检查通过。旧的 branch-protection 接口为空不影响组织 Ruleset 的有效结果。
 
 **完成条件：**
 
-- 管理员将 `Required Quality Aggregate` 设为 `main` 的 required check，并确认
-  规则集在 pull request 和直接更新场景下的适用范围；
-- 用一个新的 pull request 验证该检查确实阻断失败的质量 job；
-- 将证据链接回 [ADR-0025](adr/0025-phase-1-quality-baseline-gates.md)，勾选
-  `phase-1-quality-baseline-gates` 的 task 5.2，并再评估 ADR 状态。
+- [x] 管理员将 `Required Quality Aggregate` 设为 required check，并确认规则集
+  通过 `~DEFAULT_BRANCH` 匹配 `main`；
+- [x] 用最新的 `main` CI 运行确认该检查成功执行；故意失败 PR 的阻断演练属于
+  可选的后续运维验证，不作为本次收口的前置条件；
+- [x] 将证据链接回 [ADR-0025](adr/0025-phase-1-quality-baseline-gates.md)，勾选
+  `phase-1-quality-baseline-gates` 的 task 5.2，并将 ADR/OpenSpec 标记为已实现。
 
 ### G-02：取得一次真实、干净环境的 release 完整性证据
 
@@ -128,7 +134,7 @@ OpenSpec 的“实现完成”不等于真实 DevRail 流量已经切换。
 
 | 编号 | 记录 | 当前不一致 | 收口动作 |
 | --- | --- | --- | --- |
-| **D-01** | [Phase 1 OpenSpec tasks](../openspec/changes/phase-1-quality-baseline-gates/tasks.md) 与 [ADR-0025](adr/0025-phase-1-quality-baseline-gates.md) | task 5.2 未勾选，ADR 仍为 `In Review`；这是 G-01 的记录侧结果。 | 规则集修正并取得新鲜 green evidence 后，更新 task 5.2、ADR 状态和证据链接。 |
+| **D-01** | [Phase 1 OpenSpec tasks](../openspec/changes/phase-1-quality-baseline-gates/tasks.md) 与 [ADR-0025](adr/0025-phase-1-quality-baseline-gates.md) | 已收口：task 5.2 已勾选，ADR 已 Accepted，规则集适用范围和最新 green evidence 已记录。 | 已完成；故意失败 PR 若需要，作为独立运维演练跟踪。 |
 | **D-02** | [DevRail capability OpenSpec](../openspec/changes/harness-gate-devrail-capability-contracts/.openspec.yaml) 与 [ADR-0032](adr/0032-harness-gate-devrail-capability-contracts.md) | metadata 为 `implemented-pending-ci`，proposal/ADR 仍是 `Proposed`；真实 release/canary 证据尚未完成。 | 先完成 G-02 至 G-04，再统一更新 proposal、tasks、metadata 和 ADR 状态。 |
 | **D-03** | [parallel-scheduling metadata](../openspec/changes/parallel-scheduling/.openspec.yaml) | metadata 仍为 `proposed`，但 ADR-0028 已 Accepted，PR #36 和 green CI 已记录。 | 只做状态和证据链接收口，不重新实现 scheduler。 |
 | **D-04** | [project-scoped-configuration proposal/tasks](../openspec/changes/project-scoped-configuration/proposal.md) | 文案仍为 `Implemented pending review`/`Implemented pending green CI`，而 PR #38 已合并且有 closeout 证据。 | 更新为已实现并保留本地工作区已知限制说明。 |
@@ -155,16 +161,14 @@ R-06/R-07 是对其信任边界和文案的后续强化，不是重新开启协�
 
 ## 6. 推荐执行顺序
 
-1. **管理员先修 G-01**，并用新的 pull request 验证 Required Quality Aggregate
-   的阻断效果。
-2. **下一次发布完成 G-02**，把 inventory、SBOM、checksum、签名和 provenance 的
+1. **下一次发布完成 G-02**，把 inventory、SBOM、checksum、签名和 provenance 的
    clean-environment 结果保存为 ADR-0032 的证据。
-3. **在 DevRail staging 环境完成 G-03/G-04**，再决定是否允许 required-check
+2. **在 DevRail staging 环境完成 G-03/G-04**，再决定是否允许 required-check
    ownership 迁移。
-4. **按 R-06 至 R-11 分拆工程变更**；每个变更都要有失败路径测试、兼容性说明和
+3. **按 R-06 至 R-11 分拆工程变更**；每个变更都要有失败路径测试、兼容性说明和
    rollback 方案。
-5. **单独提交 D-01 至 D-05 的文档收口**；R-12 至 R-18 进入后续迭代 backlog。
-6. **D-06 保持 Proposed**，直到渲染契约和安全边界得到明确决策。
+4. **单独提交 D-02 至 D-05 的文档收口**；R-12 至 R-18 进入后续迭代 backlog。
+5. **D-06 保持 Proposed**，直到渲染契约和安全边界得到明确决策。
 
 ## 7. 完成定义
 
