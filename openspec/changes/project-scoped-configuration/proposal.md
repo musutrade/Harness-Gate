@@ -1,6 +1,6 @@
 # Proposal: Keep Verification Configuration Project-Scoped
 
-**Status:** Implemented pending review
+**Status:** Implemented
 **Date:** 2026-08-28
 **Change type:** Configuration isolation and runtime safety
 
@@ -42,3 +42,9 @@ the risk of selecting an unintended policy.
 
 - [ADR-0029: Keep Workflow and Audit Configuration Project-Scoped](../../../docs/adr/0029-project-scoped-configuration.md)
 - [Configuration reference](../../../docs/configuration.md)
+
+## Implementation Evidence
+
+- Implementation: [PR #38](https://github.com/musutrade/Harness-Gate/pull/38)
+- Green cross-platform and quality CI: [run 33217867592](https://github.com/musutrade/Harness-Gate/actions/runs/33217867592)
+- Accepted decision: [ADR-0029](../../../docs/adr/0029-project-scoped-configuration.md)
