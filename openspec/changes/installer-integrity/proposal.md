@@ -1,6 +1,6 @@
 # Proposal: Harden Installer Artifact Verification
 
-**Status:** Proposed
+**Status:** Implemented
 **Date:** 2026-09-01
 
 ## Goals
@@ -38,6 +38,8 @@ when invoked by Bash on Linux, macOS, and MSYS2/Git Bash/Cygwin environments.
 It is not a POSIX `sh` or native Windows cmd/PowerShell script. Offline fixture
 tests cover the critical decisions; a future real release verifies the exact
 published asset set.
+
+Implementation and offline-contract acceptance are recorded in PRs [#67](https://github.com/musutrade/Harness-Gate/pull/67) and [#68](https://github.com/musutrade/Harness-Gate/pull/68), with the final merged-main CI run [33495394825](https://github.com/musutrade/Harness-Gate/actions/runs/33495394825). A future G-02 release remains required for published-metadata compatibility and clean-environment verification.
 
 ## Related Records
 
