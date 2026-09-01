@@ -21,10 +21,11 @@ installer's private temporary root and sibling.
 Source mode clones the exact tag and builds with `cargo install --locked` into
 a temporary Cargo root before using the same destination publisher.
 
-The test fixture replaces curl and cosign with deterministic local shims. It
-proves successful installation, checksum tampering, signature failure, target
-symlink rejection, parent symlink rejection, executable mode, and temporary
-file cleanup without network access.
+The test fixture replaces curl, cosign, git, cargo, uname, and cp with
+deterministic local shims. It proves successful installation, checksum
+tampering, signature and identity failure, target and parent symlink
+rejection, executable mode, Windows naming, atomic replacement, signal
+cleanup, and temporary file cleanup without network access.
 
 ## Compatibility and Rollback
 
