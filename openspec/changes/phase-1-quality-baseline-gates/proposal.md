@@ -122,8 +122,8 @@ the following reviewable evidence:
 ## Implementation And Governance Record
 
 The Phase 1 evidence package was accepted on `main` through the green
-[CI run 33456540737](https://github.com/musutrade/Harness-Gate/actions/runs/33456540737)
-for commit `7efe1444ed470559964976dce7d9474b5c0bc69c`. The organization ruleset
+[CI run 33466540997](https://github.com/musutrade/Harness-Gate/actions/runs/33466540997)
+for commit `6e17867cf42139a3ecd73d014dc566d21d08d562`. The organization ruleset
 [`21098892`](https://github.com/musutrade/Harness-Gate/rules/21098892) is active,
 targets the default branch with `~DEFAULT_BRANCH`, requires the
 `Required Quality Aggregate` check, and sets
@@ -162,7 +162,7 @@ incorrect assumptions in documentation or output consumers.
 ## Related Records
 
 - [ADR-0025: Establish Phase 1 Quality Baseline Gates](../../../docs/adr/0025-phase-1-quality-baseline-gates.md)
-- [Refactoring plan](../../../docs/refactoring-plan-2026-08-28.md)
+- [Review follow-ups](../../../docs/review-followups-2026-08-31.md)
 - [ADR-0003: Enhance CI pipeline](../../../docs/adr/0003-enhance-ci-pipeline.md)
 - [ADR-0004: Add integration tests](../../../docs/adr/0004-add-integration-tests.md)
 - [ADR-0023: Generate configuration schema](../../../docs/adr/0023-config-schema-and-interpolation.md)
