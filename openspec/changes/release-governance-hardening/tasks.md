@@ -4,8 +4,8 @@
 [release-governance specification](specs/release-governance/spec.md), and
 [ADR-0035](../../../docs/adr/0035-protect-release-eligibility.md)
 **Status:** Implemented; acceptance evidence reviewed against PR #66 and CI
-run `33478957797` on 2026-09-01. G-02 production release evidence remains a
-separate follow-up.
+run `33478957797` on 2026-09-01. G-02 production release evidence is now
+closed by the immutable `v0.3.5` release below.
 
 - [x] **1.1 (P0, M)** Implement strict tag, package version, tag/commit, and
   protected-main ancestry validation.
@@ -43,5 +43,19 @@ deployment policy `v*` (`58783819`).
 PR [#66](https://github.com/musutrade/Harness-Gate/pull/66) merged after 20
 required checks passed in CI run
 `33478957797`, including `Release Governance Contracts` and
-`Required Quality Aggregate`. This closes R-10 implementation; the next
-immutable version tag still supplies G-02 operational release evidence.
+`Required Quality Aggregate`. This closes R-10 implementation.
+
+## Production Evidence (G-02)
+
+The next immutable release requirement was exercised successfully:
+
+- PR [#71](https://github.com/musutrade/Harness-Gate/pull/71) merged as
+  `190cfa85699231591e3f74612e38156f6a102ef9`.
+- Exact merged-commit `main` CI run
+  [33524026442](https://github.com/musutrade/Harness-Gate/actions/runs/33524026442)
+  passed all jobs, including `Required Quality Aggregate`.
+- Tag [`v0.3.5`](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.5)
+  was created at that commit. Release run
+  [33525736285](https://github.com/musutrade/Harness-Gate/actions/runs/33525736285)
+  passed eligibility, builds, quality, signing, provenance, GitHub Release,
+  and crates.io publication after manual `release` environment approval.

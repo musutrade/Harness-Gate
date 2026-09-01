@@ -1,6 +1,6 @@
 # Proposal: Release Harness-Gate 0.3.5
 
-**Status:** Proposed
+**Status:** Implemented
 
 ## Why
 
@@ -40,6 +40,31 @@ the artifact boundary.
 - The GitHub Release contains exactly the inventory upload set; all subjects
   have valid checksums, signatures, certificates, and provenance.
 - The published crate and binaries report version `0.3.5`.
+
+## Acceptance Evidence
+
+- PR [#71](https://github.com/musutrade/Harness-Gate/pull/71) merged as
+  `190cfa85699231591e3f74612e38156f6a102ef9` after all 20 required checks
+  passed in [PR CI run 33522211580](https://github.com/musutrade/Harness-Gate/actions/runs/33522211580).
+  The exact merged commit then passed the protected `main` run
+  [33524026442](https://github.com/musutrade/Harness-Gate/actions/runs/33524026442).
+- The immutable tag [`v0.3.5`](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.5)
+  points to that commit. Release run
+  [33525736285](https://github.com/musutrade/Harness-Gate/actions/runs/33525736285)
+  completed successfully for eligibility, all four platform builds, quality
+  gates, Sigstore signing, provenance, GitHub Release creation, and crates.io
+  publication after the protected `release` environment approval.
+- The GitHub Release contains exactly the 21 names in `release-inventory.json`;
+  API asset digests match the downloaded files. Local inventory and
+  `SHA256SUMS` verification passed, and all seven integrity subjects passed
+  Sigstore certificate verification. The workflow's provenance attestation is
+  recorded at [attestation 44453594](https://github.com/musutrade/Harness-Gate/attestations/44453594).
+- [harness-gate 0.3.5 on crates.io](https://crates.io/crates/harness-gate/0.3.5)
+  is published and reports version `0.3.5`. The binary and source installer
+  flows were exercised in isolated temporary install directories and both
+  report `harness-gate 0.3.5`.
+- The earlier immutable `v0.3.4` tag remains unchanged and unpublished; its
+  failed-closed attempt is documented in the [0.3.4 release record](../release-0-3-4/proposal.md).
 
 ## Risk Assessment
 
