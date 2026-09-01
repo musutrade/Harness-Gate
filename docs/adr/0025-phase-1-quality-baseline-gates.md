@@ -2,7 +2,7 @@
 
 ## Status
 
-**In Review** (2026-08-29)
+**Accepted** (2026-09-01)
 
 ## Context
 
@@ -321,13 +321,21 @@ The documentation and acceptance-record closeout is reviewed in
 [PR #39](https://github.com/musutrade/Harness-Gate/pull/39), whose required
 quality aggregate and cross-platform checks are green.
 
-The repository token used for this closeout has admin repository permission but
-lacks the GitHub administration scope required to set branch protection. The
-`main` protection rule therefore remains an explicit governance follow-up: an
-administrator must require the `Required Quality Aggregate` check before this
-ADR and its OpenSpec change can be marked complete. The local-parity task also
-remains open because the developer worktree contains unrelated project audit
-rules; the clean-checkout CI evidence is unaffected.
+The organization ruleset [`21098892`](https://github.com/musutrade/Harness-Gate/rules/21098892)
+is active and targets the default branch through `ref_name.include: ["~DEFAULT_BRANCH"]`.
+The rules that apply to `main` include the `Required Quality Aggregate` status
+check with `strict_required_status_checks_policy: true`, as confirmed by the
+[rules-for-main API response](https://api.github.com/repos/musutrade/Harness-Gate/rules/branches/main).
+The latest `main` run
+[33456540737](https://github.com/musutrade/Harness-Gate/actions/runs/33456540737)
+for commit `7efe1444ed470559964976dce7d9474b5c0bc69c` passed all quality jobs
+and the aggregate. The legacy branch-protection endpoint is not the source of
+truth for this organization-level ruleset.
+
+This closes the Phase 1 required-check governance acceptance. The local
+documentation checker can still fail in the developer worktree on an unrelated
+pre-existing link in `docs/refactoring-plan-2026-08-28.md`; the clean-checkout
+CI evidence is unaffected.
 
 ## References
 

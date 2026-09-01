@@ -1,6 +1,6 @@
 # Proposal: Establish Phase 1 Quality Baseline Gates
 
-**Status:** Implemented with repository-governance closeout pending
+**Status:** Implemented
 **Date:** 2026-08-28
 **Change type:** Specification and delivery contract only
 
@@ -45,8 +45,7 @@ when cache state, toolchain, target, or fixture differs.
 - Defines the future evidence package, artifact fields, thresholds, comparison
   rules, platform applicability, and baseline update governance.
 - Provides the implementation plan and bounded task list for this delivery;
-  closeout tasks that require an accepted `main` baseline remain open until the
-  pull request and its CI evidence are reviewed.
+  the accepted `main` baseline and required-check governance are recorded below.
 - Records no capability delta and makes no runtime, configuration, report, or
   CLI change.
 
@@ -119,6 +118,21 @@ the following reviewable evidence:
 - CI uploads raw and summary artifacts even when a gate fails.
 - An exception does not make a result pass; it records why the gate is
   temporarily accepted and when it must be revisited.
+
+## Implementation And Governance Record
+
+The Phase 1 evidence package was accepted on `main` through the green
+[CI run 33456540737](https://github.com/musutrade/Harness-Gate/actions/runs/33456540737)
+for commit `7efe1444ed470559964976dce7d9474b5c0bc69c`. The organization ruleset
+[`21098892`](https://github.com/musutrade/Harness-Gate/rules/21098892) is active,
+targets the default branch with `~DEFAULT_BRANCH`, requires the
+`Required Quality Aggregate` check, and sets
+`strict_required_status_checks_policy: true`. The effective rules for `main`
+are exposed by the [rules-for-main API](https://api.github.com/repos/musutrade/Harness-Gate/rules/branches/main).
+
+The implementation and required-check governance are complete. A deliberately
+failing pull request is an optional operational exercise, not an unfulfilled
+acceptance criterion for this change.
 
 ## Impact and Risk Assessment
 

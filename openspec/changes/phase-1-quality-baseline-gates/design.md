@@ -231,8 +231,9 @@ supplementary.
 
 ## Implementation Plan And Delivery Status
 
-The following sequence tracks this delivery. The final baseline acceptance and
-owner review remain open until the pull request's required checks are green:
+The following sequence tracks this delivery. Baseline acceptance and owner
+review are complete; the evidence and governance records below are the source of
+truth for closeout:
 
 | Phase | Timebox | Deliverable |
 | --- | --- | --- |
@@ -240,11 +241,27 @@ owner review remain open until the pull request's required checks are green:
 | B. Contract definition | complete | Versioned matrix, artifact schemas, snapshot normalization rules, benchmark comparison key. |
 | C. Evidence runners | complete | Local/CI-parity runners for coverage, critical paths, benchmarks, contracts, and docs. |
 | D. Baseline capture | complete | Accepted `main` evidence package and initial history entry. |
-| E. Required checks | in review | Blocking CI mapping and failure artifact upload are present; branch protection and exception approval remain repository governance. |
-| F. Review | in review | Cross-platform confirmation is green; owner sign-off and branch-protection governance remain open. |
+| E. Required checks | complete | Blocking CI mapping and failure artifact upload are present; organization ruleset `21098892` requires `Required Quality Aggregate` with strict status checks on the default branch. |
+| F. Review | complete | Cross-platform confirmation and the accepted `main` evidence package are green; ruleset applicability is confirmed by the effective-rules API. |
 
 Each phase requires its own reviewable artifact and must stop if it would alter
 runtime behavior or a public contract without a separate decision record.
+
+## Accepted Governance Evidence
+
+The accepted `main` evidence is [CI run
+33456540737](https://github.com/musutrade/Harness-Gate/actions/runs/33456540737)
+for commit `7efe1444ed470559964976dce7d9474b5c0bc69c`. It passed the four
+quality jobs, all cross-platform structured jobs, and `Required Quality
+Aggregate`. Organization ruleset
+[`21098892`](https://github.com/musutrade/Harness-Gate/rules/21098892) is
+`active`, includes `~DEFAULT_BRANCH`, requires `Required Quality Aggregate`,
+and sets `strict_required_status_checks_policy: true`; the effective rules for
+`main` are returned by the [rules-for-main API](https://api.github.com/repos/musutrade/Harness-Gate/rules/branches/main).
+
+The required-check configuration is accepted. A deliberately failing pull
+request has not been run and remains an optional operational validation; no
+green run is described as that negative test.
 
 ## Alternatives Considered
 
@@ -295,4 +312,5 @@ reversion record.
 - No production Rust, test, CI, fixture, snapshot, schema, or generated-file
   implementation is included.
 - All local references resolve, and implementation/acceptance status is tracked
-  in `tasks.md` with external governance items left open until approved.
+  in `tasks.md`; accepted governance evidence and optional operational follow-up
+  are explicit.
