@@ -193,7 +193,9 @@ redaction, SHA-256 publication, and tamper detection. Link the PR CI run and
 redaction, SHA-256 publication, and tamper detection. Branch CI
 [run 33348751556](https://github.com/musutrade/Harness-Gate/actions/runs/33348751556)
 passed all required tests, Clippy, format, security, cross-platform quality,
-and Required Quality Aggregate checks. The release workflow is tag-triggered,
-so its clean-environment signature/provenance evidence must be linked from the
-next release run; shadow, canary, and rollback evidence remain required before
-this change and ADR-0032 can be marked **Implemented**.
+and Required Quality Aggregate checks. The immutable `v0.3.5` release run
+[33525736285](https://github.com/musutrade/Harness-Gate/actions/runs/33525736285)
+now supplies the clean-environment inventory, checksum, signature, provenance,
+and installer evidence for the release-integrity contract. Shadow, canary, and
+rollback evidence remain required before this change and ADR-0032 can be
+marked **Implemented**.

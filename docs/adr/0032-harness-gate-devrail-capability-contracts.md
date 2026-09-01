@@ -119,10 +119,16 @@ tasks, compatibility launcher, shadow/canary evidence, and rollback procedure.
 The invocation manifest, redaction, retention, checksum, SBOM, signature, and
 provenance implementation is covered by the green branch CI
 [run 33348751556](https://github.com/musutrade/Harness-Gate/actions/runs/33348751556).
-The tag-triggered release workflow still requires a real release run to attach
-clean-environment verification evidence.
+The first operational tag release supplied the previously pending
+clean-environment release evidence: immutable `v0.3.5` at commit
+`190cfa85699231591e3f74612e38156f6a102ef9`, release workflow run
+[33525736285](https://github.com/musutrade/Harness-Gate/actions/runs/33525736285),
+and the published [GitHub Release](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.5)
+and [crate](https://crates.io/crates/harness-gate/0.3.5) were verified.
 This ADR remains **Proposed** until the P0 contracts are implemented and the
-first canary has green cross-platform and evidence-integrity checks.
+first real DevRail shadow/canary has green cross-platform and evidence-integrity
+checks; release-integrity evidence is now complete but does not substitute for
+that migration evidence.
 
 ## Related
 
