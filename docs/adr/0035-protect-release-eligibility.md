@@ -132,3 +132,13 @@ and policy artifacts are retained for diagnosis.
   GitHub API with the expected active/no-bypass/tag-only settings.
 - A read-only policy run against `main` commit `0f3b4c8` selected the successful
   exact-commit CI run `33475502227` and aggregate job `99756631876`.
+- PR [#71](https://github.com/musutrade/Harness-Gate/pull/71) merged the
+  corrected publication workflow as `190cfa85699231591e3f74612e38156f6a102ef9`.
+  The exact-commit protected `main` run
+  [33524026442](https://github.com/musutrade/Harness-Gate/actions/runs/33524026442)
+  passed all jobs and `Required Quality Aggregate`.
+- The immutable [`v0.3.5` release](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.5)
+  completed in run
+  [33525736285](https://github.com/musutrade/Harness-Gate/actions/runs/33525736285)
+  after explicit `release` environment approval; no tag mutation or bypass was
+  used.
