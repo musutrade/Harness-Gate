@@ -157,7 +157,10 @@ jobs:
       - name: Download release assets
         uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
         with:
-          pattern: release-*
+          # Keep the policy evidence artifact out of the publication dist.
+          # Only artifacts whose names start with release-harness-gate- are
+          # platform binaries uploaded by the build matrix.
+          pattern: release-harness-gate-*
           path: dist
           merge-multiple: true
 
