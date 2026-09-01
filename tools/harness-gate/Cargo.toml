@@ -1,6 +1,6 @@
 [package]
 name = "harness-gate"
-version = "0.3.4"
+version = "0.3.5"
 edition = "2021"
 authors = ["Harness-Gate Contributors"]
 description = "Configurable development workflow and architecture guard CLI"

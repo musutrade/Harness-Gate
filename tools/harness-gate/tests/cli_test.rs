@@ -26,7 +26,7 @@ fn test_version_command() {
     assert_success(&output);
     let stdout = stdout_str(&output);
     assert!(stdout.contains("harness-gate"));
-    assert!(stdout.contains("0.3.4"));
+    assert!(stdout.contains("0.3.5"));
 }
 
 #[test]

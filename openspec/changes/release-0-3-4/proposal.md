@@ -1,6 +1,6 @@
 # Proposal: Release Harness-Gate 0.3.4
 
-**Status:** Proposed
+**Status:** Superseded by 0.3.5 after failed publication
 
 ## Why
 
@@ -44,6 +44,22 @@ the publication and clean-environment consumer paths can be verified together.
 - `release_inventory.py verify` and the documented offline consumer checks
   detect no modification, omission, or extra asset in a clean environment.
 - The published crate and binaries report version `0.3.4`.
+
+## Publication Attempt Evidence
+
+- Release PR [#70](https://github.com/musutrade/Harness-Gate/pull/70)
+  merged as `0684a8c41dda18c6b6db3a911ef62430e280eb53`; the exact protected
+  `main` [CI run 33503648828](https://github.com/musutrade/Harness-Gate/actions/runs/33503648828)
+  completed successfully.
+- The immutable `v0.3.4` tag passed release eligibility, all platform builds,
+  release quality gates, Sigstore signing, and GitHub provenance in
+  [release run 33504911061](https://github.com/musutrade/Harness-Gate/actions/runs/33504911061).
+- Publication stopped before creating a GitHub Release or crates.io version
+  because `pattern: release-*` also downloaded the retained
+  `release-policy.json` evidence into `dist`; exact inventory verification
+  rejected that unlisted file as designed.
+- The tag remains immutable and unpublished. Recovery is tracked by the
+  [0.3.5 release record](../release-0-3-5/proposal.md).
 
 ## Risk Assessment
 

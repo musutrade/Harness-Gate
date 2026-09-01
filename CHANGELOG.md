@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.5] - 2026-09-01
+
+### Fixed
+
+- Fixed the tag-triggered release workflow so the publication directory only
+  downloads platform release artifacts and excludes retained release-policy
+  evidence.
+- Re-ran the immutable release path under a new patch version after the
+  `v0.3.4` publication stopped at exact inventory verification.
+
 ## [0.3.4] - 2026-09-01
 
 ### Added

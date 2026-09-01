@@ -50,8 +50,8 @@ Example tag creation after the version change is on verified `main`:
 git fetch origin main
 git switch main
 git pull --ff-only origin main
-git tag -a v0.3.4 -m "Release v0.3.4" origin/main
-git push origin v0.3.4
+git tag -a v0.3.5 -m "Release v0.3.5" origin/main
+git push origin v0.3.5
 ```
 
 The literal version is an example. It must match the package version and must
