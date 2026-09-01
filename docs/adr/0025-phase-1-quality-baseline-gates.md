@@ -327,15 +327,14 @@ The rules that apply to `main` include the `Required Quality Aggregate` status
 check with `strict_required_status_checks_policy: true`, as confirmed by the
 [rules-for-main API response](https://api.github.com/repos/musutrade/Harness-Gate/rules/branches/main).
 The latest `main` run
-[33456540737](https://github.com/musutrade/Harness-Gate/actions/runs/33456540737)
-for commit `7efe1444ed470559964976dce7d9474b5c0bc69c` passed all quality jobs
+[33466540997](https://github.com/musutrade/Harness-Gate/actions/runs/33466540997)
+for commit `6e17867cf42139a3ecd73d014dc566d21d08d562` passed all quality jobs
 and the aggregate. The legacy branch-protection endpoint is not the source of
 truth for this organization-level ruleset.
 
-This closes the Phase 1 required-check governance acceptance. The local
-documentation checker can still fail in the developer worktree on an unrelated
-pre-existing link in `docs/refactoring-plan-2026-08-28.md`; the clean-checkout
-CI evidence is unaffected.
+This closes the Phase 1 required-check governance acceptance. The accepted
+baseline and CI evidence are defined by the clean-checkout artifacts above;
+developer-worktree-only files are not part of the baseline.
 
 ## References
 
