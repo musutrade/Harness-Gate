@@ -34,9 +34,10 @@
 ## Risk Assessment
 
 **Risk: Medium.** The script is a user-facing security boundary and must work
-on Linux, macOS, and MSYS/Cygwin environments. Offline fixture tests cover the
-critical decisions; a future real release verifies the exact published asset
-set.
+when invoked by Bash on Linux, macOS, and MSYS2/Git Bash/Cygwin environments.
+It is not a POSIX `sh` or native Windows cmd/PowerShell script. Offline fixture
+tests cover the critical decisions; a future real release verifies the exact
+published asset set.
 
 ## Related Records
 
