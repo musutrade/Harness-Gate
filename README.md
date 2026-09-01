@@ -54,28 +54,32 @@ cargo install harness-gate
 
 ### Install from GitHub Release (Pre-built Binaries)
 
-Download the binary for your platform from [GitHub Releases](https://github.com/musutrade/Harness-Gate/releases/latest):
+Download the binary for your platform from an immutable [GitHub Release
+tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.3):
 
 - **Linux (x86_64)**: `harness-gate-linux-amd64`
 - **macOS (Intel)**: `harness-gate-macos-amd64`
 - **macOS (Apple Silicon)**: `harness-gate-macos-arm64`
 - **Windows (x86_64)**: `harness-gate-windows-amd64.exe`
 
-Example installation on Linux/macOS:
+The checked installer verifies the checksum manifest and Sigstore certificate
+before changing the installation directory. Download the script from the same
+immutable tag, then pass that tag explicitly:
 
 ```bash
-# Download (replace with your platform)
-wget https://github.com/musutrade/Harness-Gate/releases/download/v0.3.3/harness-gate-linux-amd64
-
-# Make executable
-chmod +x harness-gate-linux-amd64
-
-# Move to PATH
-sudo mv harness-gate-linux-amd64 /usr/local/bin/harness-gate
-
-# Verify installation
+curl --fail --show-error --location --proto '=https' --tlsv1.2 \
+  -o /tmp/harness-gate-install.sh \
+  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.3.3/install.sh
+bash /tmp/harness-gate-install.sh --version v0.3.3
 harness-gate --version
 ```
+
+The script installs to `~/.local/bin` by default. Set `--install-dir` to an
+existing private directory when a different location is required. It never
+uses the mutable `releases/latest` API or a `raw/main` installation command.
+Binary installation requires the `cosign` CLI so the keyless Sigstore
+certificate can be checked locally; source installation additionally requires
+`git` and Rust `cargo`.
 
 Release assets include `SHA256SUMS`, a CycloneDX SBOM, and Sigstore bundles. For
 an offline integrity check, download the binary, `SHA256SUMS`, and the matching
@@ -86,7 +90,7 @@ sha256sum --check SHA256SUMS
 cosign verify-blob --signature harness-gate-linux-amd64.sig \
   --certificate harness-gate-linux-amd64.crt \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity-regexp 'https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v.*' \
+  --certificate-identity-regexp '^https://github.com/musutrade/Harness-Gate/.github/workflows/release\.yml@refs/tags/v0\.3\.3$' \
   harness-gate-linux-amd64
 ```
 
