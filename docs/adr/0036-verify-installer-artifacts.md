@@ -2,7 +2,7 @@
 
 ## Status
 
-**Proposed** (2026-09-01)
+**Accepted** (2026-09-01)
 
 ## Context
 
@@ -91,3 +91,20 @@ version whose metadata is still available.
 - [ADR-0034: Enforce Fail-Closed Trust Boundaries](0034-fail-closed-trust-boundaries.md)
 - [Installer integrity OpenSpec](../../openspec/changes/installer-integrity/proposal.md)
 - [Release governance operations](../release-governance.md)
+
+## Acceptance Evidence
+
+- PR [#67](https://github.com/musutrade/Harness-Gate/pull/67) introduced the
+  immutable-tag installer boundary and merged as `2976611`.
+- PR [#68](https://github.com/musutrade/Harness-Gate/pull/68) closed the
+  Windows asset, exact source-tag, identity-fixture, and signal-cleanup gaps;
+  its 20-check CI run
+  [33494073660](https://github.com/musutrade/Harness-Gate/actions/runs/33494073660)
+  passed and it merged as `ec65742`.
+- The merged `main` commit `ec65742c71f389ca6519ed34fdf7a736091356d2` passed
+  all 20 checks, including `Required Quality Aggregate`, in
+  [CI run 33495394825](https://github.com/musutrade/Harness-Gate/actions/runs/33495394825).
+
+These checks close the implementation and offline-contract acceptance. G-02
+still requires a future immutable tag's published SBOM, checksums, Sigstore,
+provenance, and clean-environment offline consumer verification.
