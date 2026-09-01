@@ -21,6 +21,30 @@ SNAPSHOT = Path(__file__).with_name("snapshots") / "contracts.json"
 def normalize(value: str, root: Path) -> str:
     value = value.replace(str(root), "<PROJECT_ROOT>")
     value = re.sub(r"inv-\d+-\d{9}-\d+-\d+", "<INVOCATION_ID>", value)
+    # These identities and evidence digests are intentionally derived from
+    # each temporary fixture, so they must not make the textual golden
+    # snapshot depend on the fixture name or commit timestamp.
+    value = re.sub(r"\b(?:working-tree|git-tree):[0-9a-f]{40}\b", "<SOURCE_IDENTITY>", value)
+    value = re.sub(
+        r'("configuration_digest"\s*:\s*)"sha256:[0-9a-f]{64}"',
+        r'\1"<CONFIGURATION_DIGEST>"',
+        value,
+    )
+    value = re.sub(
+        r'("commit"\s*:\s*)"[0-9a-f]{40}"',
+        r'\1"<COMMIT>"',
+        value,
+    )
+    value = re.sub(
+        r'("sha256"\s*:\s*)"[0-9a-f]{64}"',
+        r'\1"<SHA256>"',
+        value,
+    )
+    value = re.sub(
+        r'("size_bytes"\s*:\s*)\d+',
+        r'\1"<SIZE_BYTES>"',
+        value,
+    )
     value = re.sub(r"\b20\d{2}-\d{2}-\d{2}T[^\s]+", "<TIMESTAMP>", value)
     value = re.sub(r"\b\d+ ms\b", "<DURATION>", value)
     value = re.sub(r"\b\d+\.\d+s\b", "<DURATION>", value)
