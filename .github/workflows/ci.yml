@@ -286,10 +286,26 @@ jobs:
           path: target/quality/docs-consistency.json
           if-no-files-found: warn
 
+  release-contracts:
+    name: Release Governance Contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.x'
+
+      - name: Run release policy and inventory contracts
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python3 -m unittest discover -s tools/release/tests -v
+
   quality-required:
     name: Required Quality Aggregate
     if: ${{ always() }}
-    needs: [quality-coverage, quality-contracts, quality-baseline, docs-consistency]
+    needs: [quality-coverage, quality-contracts, quality-baseline, docs-consistency, release-contracts]
     runs-on: ubuntu-latest
     steps:
       - name: Require every quality gate
@@ -298,10 +314,11 @@ jobs:
           QUALITY_CONTRACTS: ${{ needs.quality-contracts.result }}
           QUALITY_BASELINE: ${{ needs.quality-baseline.result }}
           DOCS_CONSISTENCY: ${{ needs.docs-consistency.result }}
+          RELEASE_CONTRACTS: ${{ needs.release-contracts.result }}
         run: |
           set -eu
           failed=0
-          for result in "$QUALITY_COVERAGE" "$QUALITY_CONTRACTS" "$QUALITY_BASELINE" "$DOCS_CONSISTENCY"; do
+          for result in "$QUALITY_COVERAGE" "$QUALITY_CONTRACTS" "$QUALITY_BASELINE" "$DOCS_CONSISTENCY" "$RELEASE_CONTRACTS"; do
             echo "quality dependency result: $result"
             if [ "$result" != success ]; then
               failed=1
