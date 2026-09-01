@@ -2,7 +2,7 @@
 
 **Parent:** [proposal.md](proposal.md), [design.md], and
 [ADR-0029](../../../docs/adr/0029-project-scoped-configuration.md)
-**Status:** Implemented pending green CI
+**Status:** Implemented; PR #38 merged and all required checks passed.
 
 - [x] **1.1 (P0, S)** Remove process-environment project and workflow selectors.
   **Acceptance:** Discovery and config-path resolution use only explicit
@@ -21,3 +21,8 @@
   **Acceptance:** formatter, linter, focused tests, documentation consistency,
   and all required PR checks are green; known local fixture failures remain
   clearly identified as unrelated user working-tree changes.
+
+## Evidence
+
+- Implementation: [PR #38](https://github.com/musutrade/Harness-Gate/pull/38)
+- Green cross-platform and quality CI: [run 33217867592](https://github.com/musutrade/Harness-Gate/actions/runs/33217867592)

@@ -1,6 +1,8 @@
 # 未完成的评审需求跟踪
 
-**基线日期：** 2026-09-01（在 `main` 提交 `6e17867cf42139a3ecd73d014dc566d21d08d562` 上复核）
+**收口验收基线：** 2026-09-01，在 `main` 提交
+`6e17867cf42139a3ecd73d014dc566d21d08d562` 上复核；该历史证据不随之后的
+`main` 合并滚动更新。
 **适用范围：** 代码评审、发布治理、DevRail 集成和 ADR/OpenSpec 收口
 **文档性质：** 跟踪清单；不改变运行时行为，也不替代对应的 ADR、OpenSpec
 或管理员审批。
@@ -31,7 +33,8 @@ fail-closed 边界，PR [#61](https://github.com/musutrade/Harness-Gate/pull/61)
 要求 CI 的实际聚合检查 `Required Quality Aggregate`，并设置
 `strict_required_status_checks_policy: true`。权威的 [main 有效规则 API
 响应](https://api.github.com/repos/musutrade/Harness-Gate/rules/branches/main)
-已返回该 required status check；非默认分支的同一接口不返回该规则。最新的
+已返回该 required status check；非默认分支的同一接口不返回该规则。本次收口
+采用的验收证据为
 [CI run 33466540997](https://github.com/musutrade/Harness-Gate/actions/runs/33466540997)
 在提交 `6e17867cf42139a3ecd73d014dc566d21d08d562` 上显示所有质量 job 和聚合
 检查通过。旧的 branch-protection 接口为空不影响组织 Ruleset 的有效结果。
@@ -40,7 +43,7 @@ fail-closed 边界，PR [#61](https://github.com/musutrade/Harness-Gate/pull/61)
 
 - [x] 管理员将 `Required Quality Aggregate` 设为 required check，并确认规则集
   通过 `~DEFAULT_BRANCH` 匹配 `main`；
-- [x] 用最新的 `main` CI 运行确认该检查成功执行；故意失败 PR 的阻断演练属于
+- [x] 用收口时的 `main` CI 运行确认该检查成功执行；故意失败 PR 的阻断演练属于
   可选的后续运维验证，不作为本次收口的前置条件；
 - [x] 将证据链接回 [ADR-0025](adr/0025-phase-1-quality-baseline-gates.md)，勾选
   `phase-1-quality-baseline-gates` 的 task 5.2，并将 ADR/OpenSpec 标记为已实现。
@@ -130,16 +133,16 @@ OpenSpec 的“实现完成”不等于真实 DevRail 流量已经切换。
 
 ## 4. 记录性收口
 
-这些不是新的代码缺陷，而是现有实现与记录状态不一致；应在相应 closeout PR 中
-单独修正：
+这些不是新的代码缺陷，而是现有实现与记录状态不一致。D-03 至 D-05 已在
+2026-09-01 完成记录收口；D-02 仍需等待外部证据，D-06 有意保持 Proposed：
 
 | 编号 | 记录 | 当前不一致 | 收口动作 |
 | --- | --- | --- | --- |
-| **D-01** | [Phase 1 OpenSpec tasks](../openspec/changes/phase-1-quality-baseline-gates/tasks.md) 与 [ADR-0025](adr/0025-phase-1-quality-baseline-gates.md) | 已收口：task 5.2 已勾选，ADR 已 Accepted，规则集适用范围和最新 green evidence 已记录。 | 已完成；故意失败 PR 若需要，作为独立运维演练跟踪。 |
+| **D-01** | [Phase 1 OpenSpec tasks](../openspec/changes/phase-1-quality-baseline-gates/tasks.md) 与 [ADR-0025](adr/0025-phase-1-quality-baseline-gates.md) | 已收口：task 5.2 已勾选，ADR 已 Accepted，规则集适用范围和收口 green evidence 已记录。 | 已完成；故意失败 PR 若需要，作为独立运维演练跟踪。 |
 | **D-02** | [DevRail capability OpenSpec](../openspec/changes/harness-gate-devrail-capability-contracts/.openspec.yaml) 与 [ADR-0032](adr/0032-harness-gate-devrail-capability-contracts.md) | metadata 为 `implemented-pending-ci`，proposal/ADR 仍是 `Proposed`；真实 release/canary 证据尚未完成。 | 先完成 G-02 至 G-04，再统一更新 proposal、tasks、metadata 和 ADR 状态。 |
-| **D-03** | [parallel-scheduling metadata](../openspec/changes/parallel-scheduling/.openspec.yaml) | metadata 仍为 `proposed`，但 ADR-0028 已 Accepted，PR #36 和 green CI 已记录。 | 只做状态和证据链接收口，不重新实现 scheduler。 |
-| **D-04** | [project-scoped-configuration proposal/tasks](../openspec/changes/project-scoped-configuration/proposal.md) | 文案仍为 `Implemented pending review`/`Implemented pending green CI`，而 PR #38 已合并且有 closeout 证据。 | 更新为已实现并保留本地工作区已知限制说明。 |
-| **D-05** | [close-refactor-documentation README](../openspec/changes/close-refactor-documentation/README.md) 与 [ADR-0021](adr/0021-refactor-documentation-closeout.md) | README 仍写 `PR pending`，ADR 仍为 `Proposed`；PR #28/#32 已合并。 | 按 PR #28、#32 和 CI 证据更新记录；仍未满足的 Phase 2 观察任务继续保持未勾选。 |
+| **D-03** | [parallel-scheduling metadata](../openspec/changes/parallel-scheduling/.openspec.yaml) | 已收口：metadata 为 `implemented`，ADR-0028、PR #36 和 green CI 证据保持关联。 | 已完成；未重新实现 scheduler。 |
+| **D-04** | [project-scoped-configuration proposal/tasks](../openspec/changes/project-scoped-configuration/proposal.md) | 已收口：proposal/tasks 均标记为 Implemented，并记录 PR #38 与 green CI。 | 已完成；运行时行为未改变。 |
+| **D-05** | [close-refactor-documentation README](../openspec/changes/close-refactor-documentation/README.md) 与 [ADR-0021](adr/0021-refactor-documentation-closeout.md) | 已收口：README/OpenSpec 标记为 implemented，ADR-0021 为 Accepted，并记录 PR #28/#32、CI 及 PR #57 的 Phase 2 观察证据。 | 已完成。 |
 | **D-06** | [report-template-renderer proposal](../openspec/changes/report-template-renderer/proposal.md) | `Proposed` 是有意保留的设计状态，不应误标为完成。 | 由产品/维护者决定渲染模式、schema、兼容性和 sandbox 约束；决定前不扩大配置契约。 |
 
 ## 5. 已解决项
@@ -168,7 +171,8 @@ R-06/R-07 是对其信任边界和文案的后续强化，不是重新开启协�
    ownership 迁移。
 3. **按 R-06 至 R-11 分拆工程变更**；每个变更都要有失败路径测试、兼容性说明和
    rollback 方案。
-4. **单独提交 D-02 至 D-05 的文档收口**；R-12 至 R-18 进入后续迭代 backlog。
+4. **G-02 至 G-04 完成后收口 D-02**；D-03 至 D-05 已完成，R-12 至 R-18
+   进入后续迭代 backlog。
 5. **D-06 保持 Proposed**，直到渲染契约和安全边界得到明确决策。
 
 ## 7. 完成定义
@@ -180,7 +184,8 @@ R-06/R-07 是对其信任边界和文案的后续强化，不是重新开启协�
 - G-02 有真实 tag release 的完整 inventory 验证结果；
 - G-03/G-04 有 DevRail 真实环境的 mapping、shadow、canary 和 rollback 记录；
 - R-06 至 R-11 各自有明确 owner、目标版本和验收测试；以及
-- D-01 至 D-05 的状态不再与已合并事实矛盾，D-06 保持显式 Proposed。
+- D-01、D-03 至 D-05 的状态不再与已合并事实矛盾；D-02 在外部证据完成后
+  收口，D-06 保持显式 Proposed。
 
 ## 参考
 

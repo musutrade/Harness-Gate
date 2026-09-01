@@ -2,7 +2,7 @@
 
 ## Status
 
-**Proposed** - 2026-08-27
+**Accepted** (2026-09-01)
 
 ## Context
 
@@ -28,6 +28,14 @@ stated observation window and acceptance criteria have actually completed.
 - Documentation-only closeout changes introduce no runtime behavior or
   production-source changes.
 - Future refactors have an explicit, auditable final documentation step.
+
+## Implementation Evidence
+
+- Documentation closeout: [PR #28](https://github.com/musutrade/Harness-Gate/pull/28)
+- Task-record follow-up: [PR #32](https://github.com/musutrade/Harness-Gate/pull/32)
+- Accepted CI evidence: [run 33060206365](https://github.com/musutrade/Harness-Gate/actions/runs/33060206365)
+- Phase 2 observation tasks 9.1 through 9.3 were completed after their required
+  observation window in [PR #57](https://github.com/musutrade/Harness-Gate/pull/57).
 
 ## Related
 
