@@ -23,6 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Release publication now runs the locked quality, formatting, lint, dependency
   audit, schema, and offline inventory gates before credentials are available.
 - Privileged release workflow actions are pinned to reviewed commit identities.
+- The installer now requires an immutable version tag, verifies the release
+  checksum manifest and Sigstore certificate, and atomically replaces only a
+  regular destination file.
 
 ## [0.3.3] - 2026-08-30
 
