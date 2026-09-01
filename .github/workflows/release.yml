@@ -136,6 +136,9 @@ jobs:
       - name: Verify CLI contracts
         run: python3 tools/quality/contracts.py --structured
 
+      - name: Verify installer integrity contracts
+        run: bash tools/release/tests/test_install.sh
+
       - name: Verify documentation consistency
         run: python3 tools/quality/docs_consistency.py
 

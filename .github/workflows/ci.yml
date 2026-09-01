@@ -300,7 +300,9 @@ jobs:
       - name: Run release policy and inventory contracts
         env:
           PYTHONDONTWRITEBYTECODE: "1"
-        run: python3 -m unittest discover -s tools/release/tests -v
+        run: |
+          python3 -m unittest discover -s tools/release/tests -v
+          bash tools/release/tests/test_install.sh
 
   quality-required:
     name: Required Quality Aggregate

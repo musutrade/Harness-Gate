@@ -54,28 +54,28 @@ cargo install harness-gate
 
 ### 从 GitHub Release 安装（预编译二进制）
 
-从 [GitHub Releases](https://github.com/musutrade/Harness-Gate/releases/latest) 下载适合你平台的二进制文件：
+从不可变的 [GitHub Release tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.3) 下载适合你平台的二进制文件：
 
 - **Linux (x86_64)**: `harness-gate-linux-amd64`
 - **macOS (Intel)**: `harness-gate-macos-amd64`
 - **macOS (Apple Silicon)**: `harness-gate-macos-arm64`
 - **Windows (x86_64)**: `harness-gate-windows-amd64.exe`
 
-Linux/macOS 安装示例：
+安装脚本会先校验 checksum 清单和 Sigstore 证书，再原子替换目标文件。请从同一个不可变
+tag 下载脚本并显式传入版本：
 
 ```bash
-# 下载（替换为你的平台）
-wget https://github.com/musutrade/Harness-Gate/releases/download/v0.3.3/harness-gate-linux-amd64
-
-# 添加执行权限
-chmod +x harness-gate-linux-amd64
-
-# 移动到 PATH
-sudo mv harness-gate-linux-amd64 /usr/local/bin/harness-gate
-
-# 验证安装
+curl --fail --show-error --location --proto '=https' --tlsv1.2 \
+  -o /tmp/harness-gate-install.sh \
+  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.3.3/install.sh
+bash /tmp/harness-gate-install.sh --version v0.3.3
 harness-gate --version
 ```
+
+默认安装到 `~/.local/bin`，也可以用 `--install-dir` 指定私有目录。脚本不会调用可变的
+`releases/latest` API，也不再推荐执行 `raw/main` 安装命令。
+安装预编译二进制需要本机安装 `cosign`，用于校验 keyless Sigstore 证书；源码安装还需要
+`git` 和 Rust `cargo`。
 
 ### 从源码安装
 
@@ -112,12 +112,12 @@ sha256sum --check SHA256SUMS
 cosign verify-blob --signature harness-gate-linux-amd64.sig \
   --certificate harness-gate-linux-amd64.crt \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity-regexp 'https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v.*' \
+  --certificate-identity-regexp '^https://github.com/musutrade/Harness-Gate/.github/workflows/release\.yml@refs/tags/v0\.3\.3$' \
   harness-gate-linux-amd64
 cosign verify-blob --signature harness-gate.sbom.cdx.json.sig \
   --certificate harness-gate.sbom.cdx.json.crt \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity-regexp 'https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v.*' \
+  --certificate-identity-regexp '^https://github.com/musutrade/Harness-Gate/.github/workflows/release\.yml@refs/tags/v0\.3\.3$' \
   harness-gate.sbom.cdx.json
 ```
 

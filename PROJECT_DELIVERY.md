@@ -135,11 +135,14 @@ Harness-Gate/                    # 项目根目录
 ### 安装方式 1: 使用安装脚本
 
 ```bash
-# 下载并运行安装脚本
-curl -sSL https://raw.githubusercontent.com/musutrade/Harness-Gate/main/install.sh | bash
+# 从不可变 release tag 下载并运行安装脚本（版本必须与 tag 一致）
+curl --fail --show-error --location --proto '=https' --tlsv1.2 \
+  -o /tmp/harness-gate-install.sh \
+  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.3.3/install.sh
+bash /tmp/harness-gate-install.sh --version v0.3.3
 
-# 或从源码安装
-curl -sSL https://raw.githubusercontent.com/musutrade/Harness-Gate/main/install.sh | bash -s -- --from-source
+# 或从不可变源码 tag 安装
+bash /tmp/harness-gate-install.sh --version v0.3.3 --from-source
 ```
 
 ### 安装方式 2: 从源码手动安装
