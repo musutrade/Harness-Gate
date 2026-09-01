@@ -52,6 +52,7 @@ We use a simplified version of the Michael Nygard ADR template:
 - [ADR-0032](0032-harness-gate-devrail-capability-contracts.md) - Define Harness-Gate capability contracts and the DevRail boundary
 - [ADR-0033](0033-signed-out-of-process-adapter-protocol.md) - Define a signed out-of-process adapter protocol
 - [ADR-0034](0034-fail-closed-trust-boundaries.md) - Enforce fail-closed trust boundaries
+- [ADR-0035](0035-protect-release-eligibility.md) - Protect release eligibility and publication
 
 ## Creating New ADRs
 
