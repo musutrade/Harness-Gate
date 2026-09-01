@@ -1,9 +1,9 @@
 # Tasks: Phase 1 Quality Baseline Gates
 
 **Parent:** [proposal.md](proposal.md) and [design.md](design.md)
-**Status:** Local and CI-parity evidence closeout is complete. The four quality
-jobs and aggregate are green; GitHub branch-protection enforcement remains
-open only because the available token lacks administration scope.
+**Status:** Implemented. Local and CI-parity evidence closeout is complete; the
+four quality jobs and aggregate are green, and organization ruleset `21098892`
+requires the aggregate with strict status checks on the default branch.
 **Implementation restriction:** Tasks authorize evidence infrastructure only;
 they do not authorize business or production behavior changes.
 
@@ -101,10 +101,14 @@ the existing CLI, report, error-code, configuration, and runtime contracts.
   **Acceptance:** The package contains all required summaries, raw artifacts,
   environment metadata, reviewer approval, and a canonical baseline series key.
 
-- [ ] **5.2 (P0, M)** Wire the four logical quality jobs as required checks while
+- [x] **5.2 (P0, M)** Wire the four logical quality jobs as required checks while
   preserving existing checks and runtime behavior.
   **Acceptance:** Coverage, contracts, baseline, and documentation failures are
-  independently visible; artifacts upload on both success and failure.
+  independently visible; artifacts upload on both success and failure. The
+  active organization ruleset `21098892` includes `~DEFAULT_BRANCH`, requires
+  `Required Quality Aggregate`, and sets `strict_required_status_checks_policy:
+  true`; CI run [33456540737](https://github.com/musutrade/Harness-Gate/actions/runs/33456540737)
+  passed the aggregate and all four dependencies.
 
 - [x] **5.3 (P1, S)** Add scheduled and manual baseline refresh workflow rules.
   **Acceptance:** Refreshes produce a reviewable change, never rewrite the
@@ -132,14 +136,16 @@ the existing CLI, report, error-code, configuration, and runtime contracts.
 - [x] **6.3 (P0, S)** Review all evidence diffs and update related ADR/OpenSpec
   status only after acceptance.
   **Acceptance:** ADR-0025 links the accepted evidence package, this change is
-  marked implemented only in a later closeout, and no unchecked task is claimed
-  complete without its artifact. The current evidence diff updated the CLI
-  snapshot and this task record; ADR-0025 remains In Review until branch
-  protection is enabled.
+  marked implemented after the required-check evidence is accepted, and no
+  unchecked task is claimed complete without its artifact. The effective rules
+  for `main`, the organization ruleset, and the latest green aggregate are
+  recorded; an optional failing-PR exercise is not inferred from the green run.
 
 ## Evidence Review
 
 - First accepted package: [Phase 1 baseline record](../../../docs/benchmarks/phase-1/README.md)
 - Green implementation CI: [PR #33](https://github.com/musutrade/Harness-Gate/pull/33), closeout [PR #39](https://github.com/musutrade/Harness-Gate/pull/39), and [run 33223804928](https://github.com/musutrade/Harness-Gate/actions/runs/33223804928)
 - Cross-platform structured contracts: `quality-contracts-33223804928` artifacts from the linked run
-- Branch protection: repository API returned HTTP 403 because the current token lacks the required administration scope; task 5.2 remains open until an administrator enables `Required Quality Aggregate`.
+- Required-check governance: organization ruleset [`21098892`](https://github.com/musutrade/Harness-Gate/rules/21098892) is active, includes `~DEFAULT_BRANCH`, requires `Required Quality Aggregate`, and sets `strict_required_status_checks_policy: true`.
+- Effective rules for `main`: [rules-for-main API](https://api.github.com/repos/musutrade/Harness-Gate/rules/branches/main) returns the required status-check rule.
+- Latest accepted `main` run: [33456540737](https://github.com/musutrade/Harness-Gate/actions/runs/33456540737), with all quality jobs and the aggregate successful for commit `7efe1444ed470559964976dce7d9474b5c0bc69c`.
