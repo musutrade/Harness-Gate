@@ -2,7 +2,7 @@
 
 ## Status
 
-**Proposed** (2026-09-01)
+**Accepted** (2026-09-01)
 
 ## Context
 
@@ -117,3 +117,18 @@ and policy artifacts are retained for diagnosis.
 - [ADR-0032: Harness-Gate and DevRail Capability Contracts](0032-harness-gate-devrail-capability-contracts.md)
 - [Release governance OpenSpec](../../openspec/changes/release-governance-hardening/proposal.md)
 - [Release governance operations](../release-governance.md)
+
+## Acceptance Evidence
+
+- PR [#66](https://github.com/musutrade/Harness-Gate/pull/66) merged after all
+  required checks passed.
+- CI run
+  [33478957797](https://github.com/musutrade/Harness-Gate/actions/runs/33478957797)
+  passed 20 checks, including the release governance contract suite and
+  `Required Quality Aggregate`.
+- Repository tag ruleset
+  [21989651](https://github.com/musutrade/Harness-Gate/rules/21989651) and
+  protected `release` environment `20983060444` were read back from the
+  GitHub API with the expected active/no-bypass/tag-only settings.
+- A read-only policy run against `main` commit `0f3b4c8` selected the successful
+  exact-commit CI run `33475502227` and aggregate job `99756631876`.

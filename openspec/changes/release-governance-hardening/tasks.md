@@ -3,8 +3,9 @@
 **Parent:** [proposal.md](proposal.md), [design.md](design.md),
 [release-governance specification](specs/release-governance/spec.md), and
 [ADR-0035](../../../docs/adr/0035-protect-release-eligibility.md)
-**Status:** Implementation in progress; merge and protected-main CI evidence
-remain required before closeout.
+**Status:** Implemented; acceptance evidence reviewed against PR #66 and CI
+run `33478957797` on 2026-09-01. G-02 production release evidence remains a
+separate follow-up.
 
 - [x] **1.1 (P0, M)** Implement strict tag, package version, tag/commit, and
   protected-main ancestry validation.
@@ -25,7 +26,7 @@ remain required before closeout.
   cannot bypass the environment.
 - [x] **2.3 (P0, S)** Attach the environment to GitHub Release and crates.io jobs.
   **Acceptance:** Publication credentials are unavailable before environment approval.
-- [ ] **3.1 (P0, S)** Pass focused tests, strict OpenSpec validation,
+- [x] **3.1 (P0, S)** Pass focused tests, strict OpenSpec validation,
   documentation consistency, pull-request CI, and merged `main` CI.
   **Acceptance:** ADR/OpenSpec become Accepted/Implemented only after green evidence.
 
@@ -39,3 +40,8 @@ tag ruleset [21989651](https://github.com/musutrade/Harness-Gate/rules/21989651)
 is active with no bypass actors; environment `release` (`20983060444`) disables
 administrator bypass, requires reviewer `higoalespn`, and accepts only tag
 deployment policy `v*` (`58783819`).
+PR [#66](https://github.com/musutrade/Harness-Gate/pull/66) merged after 20
+required checks passed in CI run
+`33478957797`, including `Release Governance Contracts` and
+`Required Quality Aggregate`. This closes R-10 implementation; the next
+immutable version tag still supplies G-02 operational release evidence.

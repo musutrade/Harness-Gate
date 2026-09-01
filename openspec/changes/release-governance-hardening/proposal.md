@@ -1,6 +1,6 @@
 # Proposal: Harden Release Governance
 
-**Status:** Proposed
+**Status:** Implemented
 **Date:** 2026-09-01
 
 ## Goals
