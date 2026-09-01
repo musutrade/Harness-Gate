@@ -12,7 +12,8 @@ remain required before closeout.
 - [x] **1.2 (P0, M)** Bind eligibility to the exact successful `main` push CI
   run and `Required Quality Aggregate` job.
   **Acceptance:** Pull-request, wrong-commit, failed, missing, or ambiguous
-  evidence blocks publication.
+  evidence blocks publication; the aggregate itself includes release policy
+  and inventory contract tests.
 - [x] **1.3 (P0, S)** Make build and quality jobs depend on policy and retain the
   policy JSON artifact.
   **Acceptance:** No build or publication job starts after policy failure.

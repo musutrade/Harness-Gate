@@ -25,7 +25,8 @@ reachable from the protected default branch.
 The release workflow SHALL require a completed successful `push` run of the
 canonical CI workflow on protected `main` for the exact tagged commit. That run
 SHALL contain exactly one completed successful `Required Quality Aggregate`
-job.
+job, and the aggregate SHALL include the release policy and inventory contract
+suite.
 
 #### Scenario: Pull-request CI is not release authorization
 

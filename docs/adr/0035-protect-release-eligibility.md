@@ -38,7 +38,8 @@ The first release job will fail closed unless all of the following are true:
 - the commit is reachable from `refs/remotes/origin/main`; and
 - GitHub records a completed, successful `push` run of
   `.github/workflows/ci.yml` on `main` for that exact commit, including one
-  successful `Required Quality Aggregate` job.
+  successful `Required Quality Aggregate` job. The aggregate includes the
+  release policy and inventory contract suite.
 
 The job receives only `actions: read` and `contents: read`. It publishes a
 machine-readable policy artifact. Build and release-quality jobs depend on
