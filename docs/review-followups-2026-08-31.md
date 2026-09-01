@@ -113,7 +113,7 @@ OpenSpec 的“实现完成”不等于真实 DevRail 流量已经切换。
 | **R-07** | capability allowlist 是协议声明，不是 OS 网络、文件、资源或进程沙箱；`setsid`/进程组也不是完整后代隔离。 | 短期统一 README、配置文档、ADR-0033 和 OpenSpec 的承诺，并为 reader 增加独立 deadline；长期若保留沙箱宣传，再按平台实现并测试可验证的 OS policy。 |
 | **R-08** | `install.sh` 下载后没有 checksum/Sigstore 验证，文档仍有 mutable `raw/main \| bash` 建议。 | 固定版本或不可变 tag，下载到临时目录，使用失败即停的 curl，验证摘要、issuer、identity 和输出目标，再原子安装；移除 mutable remote script 推荐。 |
 | **R-09** | standalone audit 和 parse-logs 路径可能原样输出 violation 内容或提取日志；verify 的脱敏边界没有覆盖全部输出。 | 复用统一 redaction pipeline，默认只发布文件、行号、规则和脱敏摘要；token、Bearer、数据库 URL、Authorization header 和 private key fixture 不得出现在 JSON、Markdown、stdout 或错误上下文。 |
-| **R-10** | release 的质量依赖和 action pin 已大部分落地，但 tag/environment 保护和发布治理仍需由仓库配置保证；CI 工具安装和 coverage 选择也有维护债。 | 保护发布 tag 和 environment，使未通过完整质量链的 tag 不能 publish；继续审查 privileged actions 的 SHA、缓存 key、`--force` 安装和 coverage 工具，记录发布前检查结果。 |
+| **R-10** | 已完成：tag/source/版本/完整 `main` CI 的 eligibility 校验已接入 release workflow；tag ruleset [21989651](https://github.com/musutrade/Harness-Gate/rules/21989651) 与受保护 `release` environment 已配置。PR [#66](https://github.com/musutrade/Harness-Gate/pull/66) 的 20 项 CI 检查（含 `Required Quality Aggregate`）通过并合并。 | 下一次 immutable tag 的真实发布和 clean-environment 验收仍属于 G-02；CI 工具安装与 coverage 选择作为独立维护债，不扩大 R-10 发布阻断边界。 |
 | **R-11** | adapter/capture 使用无界 `read_to_end`，单步日志和磁盘使用没有统一 quota；逃逸后代可能让 reader 无界等待。 | 增加流式读取、单步/单 invocation 字节上限、磁盘预算、截断标记和 reader deadline；超限必须产生结构化失败且保留可审计的部分证据。 |
 
 ## 3. P2/P3 后续质量债
