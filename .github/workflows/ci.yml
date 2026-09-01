@@ -220,7 +220,13 @@ jobs:
           python-version: '3.x'
 
       - name: Run CLI contract snapshots
-        run: python tools/quality/contracts.py --output target/quality/contracts.json ${{ runner.os == 'Linux' && '' || '--structured' }}
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            python tools/quality/contracts.py --output target/quality/contracts.json
+          else
+            python tools/quality/contracts.py --output target/quality/contracts.json --structured
+          fi
 
       - name: Upload contract evidence
         if: ${{ always() }}
