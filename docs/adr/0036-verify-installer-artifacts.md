@@ -39,7 +39,9 @@ Source installation also clones the immutable tag, builds into a temporary
 Cargo root, and uses the same atomic destination publication boundary. It does
 not execute a mutable remote script or silently select the latest version.
 
-The installer is intentionally a POSIX shell boundary. Its path checks reject
+The installer is intentionally a Bash shell boundary (invoked as `bash
+install.sh`); on Windows it is supported through MSYS2, Git Bash, or Cygwin.
+Its path checks reject
 pre-existing symlink components and targets; protection against a same-user
 concurrent substitution remains dependent on the host filesystem's rename
 semantics and should be documented for deployments that need stronger claims.

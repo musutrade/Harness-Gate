@@ -12,6 +12,8 @@ INSTALL_DIR="${INSTALL_DIR:-${HOME}/.local/bin}"
 OS=""
 ARCH=""
 PLATFORM=""
+INSTALL_NAME="$BINARY_NAME"
+ATOMIC_TEMPORARY=""
 
 usage() {
     cat <<'EOF'
@@ -27,6 +29,19 @@ EOF
 die() {
     printf 'error: %s\n' "$*" >&2
     exit 1
+}
+
+cleanup_atomic_temporary() {
+    if [[ -n "${ATOMIC_TEMPORARY:-}" ]]; then
+        rm -f -- "$ATOMIC_TEMPORARY" 2>/dev/null || true
+        ATOMIC_TEMPORARY=""
+    fi
+}
+
+abort_on_signal() {
+    local status="$1"
+    cleanup_atomic_temporary
+    exit "$status"
 }
 
 validate_version() {
@@ -67,6 +82,10 @@ detect_platform() {
         die "no Windows arm64 release asset is published"
     fi
     PLATFORM="${OS}-${ARCH}"
+    INSTALL_NAME="$BINARY_NAME"
+    if [[ "$OS" == windows ]]; then
+        INSTALL_NAME="${BINARY_NAME}.exe"
+    fi
 }
 
 download() {
@@ -161,7 +180,7 @@ validate_install_dir() {
     local mode_number=$((8#$mode))
     (( (mode_number & 8#022) == 0 )) || die "install directory is group/other writable: $INSTALL_DIR"
 
-    local target="$INSTALL_DIR/$BINARY_NAME"
+    local target="$INSTALL_DIR/$INSTALL_NAME"
     [[ ! -L "$target" ]] || die "refusing to replace symlink target: $target"
     if [[ -e "$target" && ! -f "$target" ]]; then
         die "existing install target is not a regular file: $target"
@@ -172,23 +191,22 @@ atomic_install() {
     local source="$1"
     [[ ! -L "$source" && -f "$source" ]] || die "installation source is not a regular file: $source"
     validate_install_dir
-    local target="$INSTALL_DIR/$BINARY_NAME"
-    local temporary
-    temporary="$(mktemp "$INSTALL_DIR/.${BINARY_NAME}.XXXXXX")" \
+    local target="$INSTALL_DIR/$INSTALL_NAME"
+    ATOMIC_TEMPORARY="$(mktemp "$INSTALL_DIR/.${INSTALL_NAME}.XXXXXX")" \
         || die "cannot allocate an atomic install file in $INSTALL_DIR"
-    if ! cp "$source" "$temporary"; then
-        rm -f -- "$temporary"
+    if ! cp "$source" "$ATOMIC_TEMPORARY"; then
+        cleanup_atomic_temporary
         die "cannot stage binary in $INSTALL_DIR"
     fi
-    if ! chmod 0755 "$temporary"; then
-        rm -f -- "$temporary"
+    if ! chmod 0755 "$ATOMIC_TEMPORARY"; then
+        cleanup_atomic_temporary
         die "cannot set executable mode in $INSTALL_DIR"
     fi
-    if ! mv -f -- "$temporary" "$target"; then
-        rm -f -- "$temporary"
+    if ! mv -f -- "$ATOMIC_TEMPORARY" "$target"; then
+        cleanup_atomic_temporary
         die "cannot atomically install $target"
     fi
-    temporary=""
+    ATOMIC_TEMPORARY=""
     printf 'installed %s %s (SHA256 %s)\n' "$BINARY_NAME" "$VERSION" "$(file_sha256 "$target")"
 }
 
@@ -225,10 +243,23 @@ install_binary() {
 install_from_source() {
     command -v cargo >/dev/null 2>&1 || die "Rust cargo is required for source installation"
     command -v git >/dev/null 2>&1 || die "git is required for source installation"
+    detect_platform
     local source_root="$1/source"
-    git clone --depth 1 --branch "$VERSION" --single-branch --no-tags \
+    git clone --depth 1 --no-checkout --single-branch --no-tags \
         "https://github.com/${REPO}.git" "$source_root"
-    git -C "$source_root" diff --quiet || die "source checkout is unexpectedly modified"
+    git -C "$source_root" fetch --depth 1 origin \
+        "refs/tags/$VERSION:refs/tags/$VERSION"
+    git -C "$source_root" checkout --detach "refs/tags/$VERSION"
+    local tag_commit
+    local head_commit
+    tag_commit="$(git -C "$source_root" rev-parse --verify "refs/tags/$VERSION^{commit}")" \
+        || die "source tag is unavailable: $VERSION"
+    head_commit="$(git -C "$source_root" rev-parse --verify HEAD)" \
+        || die "source checkout has no commit"
+    [[ "$tag_commit" == "$head_commit" ]] \
+        || die "source checkout does not resolve the requested immutable tag: $VERSION"
+    [[ -z "$(git -C "$source_root" status --porcelain)" ]] \
+        || die "source checkout is unexpectedly modified"
     local cargo_root="$1/cargo-root"
     cargo install --locked --path "$source_root/tools/harness-gate" --root "$cargo_root"
     local built_binary="$cargo_root/bin/$BINARY_NAME"
@@ -274,7 +305,10 @@ main() {
     local temporary_root
     temporary_root="$(mktemp -d "${TMPDIR:-/tmp}/harness-gate-install.XXXXXXXX")" \
         || die "cannot create temporary installation directory"
-    trap 'rm -rf "${temporary_root:-}"' EXIT
+    trap 'cleanup_atomic_temporary; rm -rf "${temporary_root:-}"' EXIT
+    trap 'abort_on_signal 129' HUP
+    trap 'abort_on_signal 130' INT
+    trap 'abort_on_signal 143' TERM
     if ((from_source)); then
         install_from_source "$temporary_root"
     else
