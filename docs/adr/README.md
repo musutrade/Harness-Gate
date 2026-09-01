@@ -53,6 +53,7 @@ We use a simplified version of the Michael Nygard ADR template:
 - [ADR-0033](0033-signed-out-of-process-adapter-protocol.md) - Define a signed out-of-process adapter protocol
 - [ADR-0034](0034-fail-closed-trust-boundaries.md) - Enforce fail-closed trust boundaries
 - [ADR-0035](0035-protect-release-eligibility.md) - Protect release eligibility and publication
+- [ADR-0036](0036-verify-installer-artifacts.md) - Verify installer artifacts before atomic installation
 
 ## Creating New ADRs
 
