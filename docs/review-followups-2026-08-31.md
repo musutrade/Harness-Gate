@@ -1,6 +1,6 @@
 # 未完成的评审需求跟踪
 
-**基线日期：** 2026-09-01（在 `main` 提交 `7efe1444ed470559964976dce7d9474b5c0bc69c` 上复核）
+**基线日期：** 2026-09-01（在 `main` 提交 `6e17867cf42139a3ecd73d014dc566d21d08d562` 上复核）
 **适用范围：** 代码评审、发布治理、DevRail 集成和 ADR/OpenSpec 收口
 **文档性质：** 跟踪清单；不改变运行时行为，也不替代对应的 ADR、OpenSpec
 或管理员审批。
@@ -10,7 +10,8 @@
 PR [#60](https://github.com/musutrade/Harness-Gate/pull/60) 已实现五项
 fail-closed 边界，PR [#61](https://github.com/musutrade/Harness-Gate/pull/61)
 已完成相关 OpenSpec 收口，PR [#62](https://github.com/musutrade/Harness-Gate/pull/62)
-已整理本清单。G-01 的规则集配置和记录收口已完成；当前剩余工作主要分为三类：
+已整理本清单，PR [#63](https://github.com/musutrade/Harness-Gate/pull/63)
+已完成 Phase 1 required-check 治理收口。当前剩余工作主要分为三类：
 
 1. **发布或切换前的外部证据**：真实 release、DevRail 环境。
 2. **下一发布周期的工程整改**：adapter、安装器、脱敏和资源预算。
@@ -31,8 +32,8 @@ fail-closed 边界，PR [#61](https://github.com/musutrade/Harness-Gate/pull/61)
 `strict_required_status_checks_policy: true`。权威的 [main 有效规则 API
 响应](https://api.github.com/repos/musutrade/Harness-Gate/rules/branches/main)
 已返回该 required status check；非默认分支的同一接口不返回该规则。最新的
-[CI run 33456540737](https://github.com/musutrade/Harness-Gate/actions/runs/33456540737)
-在提交 `7efe1444ed470559964976dce7d9474b5c0bc69c` 上显示所有质量 job 和聚合
+[CI run 33466540997](https://github.com/musutrade/Harness-Gate/actions/runs/33466540997)
+在提交 `6e17867cf42139a3ecd73d014dc566d21d08d562` 上显示所有质量 job 和聚合
 检查通过。旧的 branch-protection 接口为空不影响组织 Ruleset 的有效结果。
 
 **完成条件：**

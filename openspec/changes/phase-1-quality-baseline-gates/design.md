@@ -250,8 +250,8 @@ runtime behavior or a public contract without a separate decision record.
 ## Accepted Governance Evidence
 
 The accepted `main` evidence is [CI run
-33456540737](https://github.com/musutrade/Harness-Gate/actions/runs/33456540737)
-for commit `7efe1444ed470559964976dce7d9474b5c0bc69c`. It passed the four
+33466540997](https://github.com/musutrade/Harness-Gate/actions/runs/33466540997)
+for commit `6e17867cf42139a3ecd73d014dc566d21d08d562`. It passed the four
 quality jobs, all cross-platform structured jobs, and `Required Quality
 Aggregate`. Organization ruleset
 [`21098892`](https://github.com/musutrade/Harness-Gate/rules/21098892) is

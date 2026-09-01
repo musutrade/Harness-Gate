@@ -107,7 +107,7 @@ the existing CLI, report, error-code, configuration, and runtime contracts.
   independently visible; artifacts upload on both success and failure. The
   active organization ruleset `21098892` includes `~DEFAULT_BRANCH`, requires
   `Required Quality Aggregate`, and sets `strict_required_status_checks_policy:
-  true`; CI run [33456540737](https://github.com/musutrade/Harness-Gate/actions/runs/33456540737)
+  true`; CI run [33466540997](https://github.com/musutrade/Harness-Gate/actions/runs/33466540997)
   passed the aggregate and all four dependencies.
 
 - [x] **5.3 (P1, S)** Add scheduled and manual baseline refresh workflow rules.
@@ -148,4 +148,4 @@ the existing CLI, report, error-code, configuration, and runtime contracts.
 - Cross-platform structured contracts: `quality-contracts-33223804928` artifacts from the linked run
 - Required-check governance: organization ruleset [`21098892`](https://github.com/musutrade/Harness-Gate/rules/21098892) is active, includes `~DEFAULT_BRANCH`, requires `Required Quality Aggregate`, and sets `strict_required_status_checks_policy: true`.
 - Effective rules for `main`: [rules-for-main API](https://api.github.com/repos/musutrade/Harness-Gate/rules/branches/main) returns the required status-check rule.
-- Latest accepted `main` run: [33456540737](https://github.com/musutrade/Harness-Gate/actions/runs/33456540737), with all quality jobs and the aggregate successful for commit `7efe1444ed470559964976dce7d9474b5c0bc69c`.
+- Latest accepted `main` run: [33466540997](https://github.com/musutrade/Harness-Gate/actions/runs/33466540997), with all quality jobs and the aggregate successful for commit `6e17867cf42139a3ecd73d014dc566d21d08d562`.
