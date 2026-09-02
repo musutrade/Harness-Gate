@@ -394,7 +394,9 @@ fields instead of parsing Markdown or log text.
 Runner results also record parser mode/version and completeness. JUnit, TRX, and
 JSON parsers are preferred over regex compatibility mode; malformed, zero, and
 partial result files map to `RESULT_PARSE_FAILURE`, `RESULT_ZERO`, and
-`RESULT_PARTIAL`. Bounded retries expose `retry_count` and `flaky`, while shard
+`RESULT_PARTIAL`. JUnit accepts one `testsuite` or `testsuites` root and TRX one
+`TestRun` root (namespace prefixes are supported); missing/multiple roots and
+non-whitespace content outside the root fail closed. Bounded retries expose `retry_count` and `flaky`, while shard
 results expose a merge identity and reject missing or duplicate test identities.
 An approved expiring waiver is machine-distinct as `WAIVED` and includes its
 approval and compensating-control evidence.
