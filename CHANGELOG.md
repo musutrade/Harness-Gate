@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- Versioned adapter requests now use protocol v2 complete-request signatures,
+  nonce/expiry replay checks, and pre-spawn environment validation.
+- Process output and adapter artifacts are bounded with truncation/deadline
+  failures, and audit/log/report/SBOM error paths share credential redaction.
+
 ## [0.3.5] - 2026-09-01
 
 ### Fixed

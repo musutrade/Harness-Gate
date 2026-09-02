@@ -506,16 +506,21 @@ harness-gate adapter run \
   --allow-resource test-database
 ```
 
-host 会在启动前校验 Ed25519 声明和可执行文件 SHA-256，清空继承环境，执行能力白名单，
-在超时或取消时尝试有界的进程树清理，并拒绝 malformed 结果或越过 invocation 根目录的产物。
-adapter 失败统一记录为 `ADAPTER_PROTOCOL_FAILURE`。
+host 使用协议 v2，在启动前校验覆盖完整请求的 Ed25519 签名（adapter 身份、invocation/step、
+参数、输入、环境、能力、超时、配置摘要、产物根目录、nonce 和有效期）以及可执行文件
+SHA-256；清空继承环境，执行协议级能力白名单，限制 stdout/stderr 和产物预算，并拒绝
+malformed 结果或越过 invocation 根目录的产物。nonce 在 host policy（CLI 另有持久化 sidecar）
+下只允许使用一次；超限、超时、取消、重放和其他协议错误统一记录为
+`ADAPTER_PROTOCOL_FAILURE`。
 
 请求是一个独立的 JSON 文档，不从 `flow.toml` 读取，也不会自动启用内置步骤的
 adapter。每个受信任的 Ed25519 公钥重复传入一次 `--trusted-key`；只传入本次调用
 允许的 `--allow-network`、`--allow-resource` 和 `--allow-environment` 能力。执行前应
 确认请求、可执行文件、产物根目录位于项目或明确受管控的部署目录内，并审核签名者。
 能力白名单只是协议层声明检查，不是操作系统级的网络、文件系统、资源或进程 sandbox；
-进程清理也不等于完整的 descendant containment 证明。
+进程组清理是有界的 best-effort 尝试，也不等于完整的 descendant containment 证明。每个
+输出流和单个证据文件默认最多保留 16 MiB、adapter 产物合计最多 64 MiB，单次 invocation
+证据合计最多 256 MiB，reader 有独立 deadline。
 
 JSON Lines 应用日志可提取同一 trace 的上下文：
 
@@ -527,7 +532,7 @@ harness-gate parse-logs \
 
 解析器优先选择第一条 `level = ERROR` 所在的 `trace_id`，支持从事件字段、`data`、当前 `span` 和 `spans` 中提取，再收集相同 trace 的结构化记录；没有 trace 时退化为原始日志最后 30 行。
 
-解析采用有界流式读取：错误前最多保留 20 条上下文，输出最多 30 条记录，不会把整份无限增长的 JSON Lines 日志载入内存。已启动 service 的清理失败也会使验证失败，并写入验证报告，避免把容器泄漏隐藏为成功。
+解析采用有界流式读取并在输出前脱敏：错误前最多保留 20 条上下文，输出最多 30 条记录，不会把整份无限增长的 JSON Lines 日志载入内存。已启动 service 的清理失败也会使验证失败，并写入验证报告，避免把容器泄漏隐藏为成功。
 
 ## Git Hook
 

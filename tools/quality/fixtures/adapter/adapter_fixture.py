@@ -18,6 +18,16 @@ def main() -> int:
         os._exit(17)
     if mode == "sleep":
         time.sleep(2)
+    if mode == "stdout-spam":
+        sys.stdout.write("x" * 4096)
+        sys.stdout.flush()
+        return 0
+    if mode == "stderr-spam":
+        sys.stderr.write("x" * 4096)
+        sys.stderr.flush()
+        return 0
+    if mode == "artifact-spam":
+        (root / "large.bin").write_bytes(b"x" * 4096)
     if mode == "malformed":
         print("not-json")
         return 0

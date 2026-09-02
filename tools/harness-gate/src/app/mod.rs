@@ -41,6 +41,7 @@ pub(crate) fn run() -> Result<bool, CliError> {
             },
     } = &cli.command
     {
+        let request_path = request.clone();
         let request = crate::process::read_adapter_request(request)
             .map_err(|error| anyhow::anyhow!(error.to_string()))?;
         let trusted_keys = trusted_keys
@@ -59,6 +60,9 @@ pub(crate) fn run() -> Result<bool, CliError> {
                 resources: allow_resources.iter().cloned().collect::<BTreeSet<_>>(),
                 environment: allow_environment.iter().cloned().collect::<BTreeSet<_>>(),
             },
+            replay_state_dir: request_path
+                .parent()
+                .map(|parent| parent.join(".harness-gate-adapter-replay")),
             ..crate::process::HostPolicy::default()
         };
         let outcome = crate::process::run_adapter(request, &policy)

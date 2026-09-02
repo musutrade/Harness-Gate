@@ -944,12 +944,15 @@ v2 版本号保持为 `2`，不会自动升级。若原本可加载的 v2 文件
 能力 allowlist 时才会启动。协议和结果约束见
 [ADR-0033](adr/0033-signed-out-of-process-adapter-protocol.md) 及
 [Adapter OpenSpec](../openspec/changes/harness-gate-adapter-protocol/proposal.md)。
+请求字段的机器校验见
+[adapter-request.schema.json](../schema/adapter-request.schema.json)。
 
-最小请求形状如下（`signature.value` 是对声明字段的 Ed25519 签名，均使用 base64）：
+最小请求形状如下（协议 v2；`signature.value` 是对下方完整规范化请求的
+Ed25519 签名，均使用 base64）：
 
 ```json
 {
-  "protocol_version": 1,
+  "protocol_version": 2,
   "result_schema_version": "1",
   "adapter": {
     "name": "org-scanner",
@@ -967,6 +970,9 @@ v2 版本号保持为 `2`，不会自动升级。若原本可加载的 v2 文件
   "timeout_ms": 120000,
   "config_digest": "<configuration digest>",
   "artifact_root": ".harness-gate/reports/invocations/inv-2026-08-31-0001",
+  "nonce": "<single-use random value>",
+  "issued_at_ms": 1788134400000,
+  "expires_at_ms": 1788134520000,
   "args": [],
   "environment": {},
   "capabilities": {
@@ -977,6 +983,18 @@ v2 版本号保持为 `2`，不会自动升级。若原本可加载的 v2 文件
   "input": {}
 }
 ```
+
+签名者必须对紧凑 UTF-8 JSON 载荷签名，而不是对请求文件中的
+`signature.value` 签名。载荷键顺序固定为
+`domain`、`protocol_version`、`result_schema_version`、`adapter`、
+`invocation_id`、`step_id`、`timeout_ms`、`config_digest`、`artifact_root`、
+`nonce`、`issued_at_ms`、`expires_at_ms`、`args`、`environment`、
+`capabilities`、`input`；`domain` 固定为
+`harness-gate/adapter-request/v2`。`adapter` 内顺序为
+`name`、`version`、`executable`、`source_digest`、`signature`，其中
+`signature` 只包含 `algorithm` 和 `key_id`，不包含签名值。集合按 JSON
+规范化后的键序列化（环境变量使用字典序），再将 Ed25519 结果 base64
+写入请求的 `signature.value`。
 
 每个受信任公钥是一个独立 JSON 文件：
 
@@ -998,12 +1016,16 @@ harness-gate adapter run \
 `--trusted-key`、`--allow-network`、`--allow-resource` 和 `--allow-environment` 都可以重复。
 请求中的能力必须分别出现在对应 allowlist 中；环境变量还必须同时列在
 `capabilities.environment`，否则在启动前失败。host 启动 adapter 前会校验协议/结果版本、
-可执行文件 SHA-256 和签名，清空继承环境，仅注入 Harness-Gate 的 invocation 元数据及请求中
-声明的环境变量。能力 allowlist 是协议级失败边界，不等同于操作系统级网络沙箱。
+可执行文件 SHA-256 和完整请求签名，清空继承环境，仅注入 Harness-Gate 的 invocation 元数据及请求中
+声明的环境变量。`nonce` 必须在有效期内且在同一 host policy 下只使用一次；默认有效期最长
+1 小时，并允许 30 秒时钟偏差。能力 allowlist 是协议级失败边界，不等同于操作系统级网络、
+文件、资源或进程沙箱。
 
 adapter 通过 stdin 接收一份 JSON，请在 stdout 只返回一份 JSON 对象，`schema_version` 必须为
 `"1"`，`status` 必须是 `PASS`、`FAIL`、`CANCELLED`、`SKIPPED` 或 `WAIVED` 之一。产物路径必须
 是相对于 `artifact_root` 的普通相对路径；绝对路径、Windows 前缀、`..` 越界路径、缺失文件和
-符号链接逃逸都会失败。超时、取消、崩溃、非零退出、malformed 响应和上述校验错误统一映射为
-`ADAPTER_PROTOCOL_FAILURE`，并清理 adapter 的整个进程树。该 host 当前是独立执行入口；若要把
-adapter 纳入验证 DAG，应先在上层编排器中显式安排 invocation 和结果映射。
+符号链接逃逸都会失败。stdout/stderr 默认各限 16 MiB，adapter 产物默认合计限 64 MiB；超限会
+保留已读取的部分长度并以 `truncated=true` 的结构化协议失败结束。超时、取消、崩溃、非零退出、
+malformed 响应和上述校验错误统一映射为 `ADAPTER_PROTOCOL_FAILURE`，并尝试清理 adapter 的进程组。
+reader 在独立 deadline 后不会阻塞调用方。该 host 当前是独立执行入口；若要把 adapter 纳入验证
+DAG，应先在上层编排器中显式安排 invocation 和结果映射。

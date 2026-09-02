@@ -1,8 +1,11 @@
-use anyhow::Result;
+use crate::utils::redaction::redact_text;
+use anyhow::{bail, Context, Result};
 use serde_json::Value;
 use std::collections::VecDeque;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+
+const MAX_LOG_LINE_BYTES: usize = 1024 * 1024;
 
 fn extract_trace_id(json: &Value) -> Option<String> {
     trace_id_field(json)
@@ -14,8 +17,8 @@ fn extract_trace_id(json: &Value) -> Option<String> {
                 .and_then(Value::as_array)
                 .and_then(|spans| spans.iter().rev().find_map(trace_id_field))
         })
-        .and_then(|v| v.as_str())
-        .map(|s| s.to_string())
+        .and_then(Value::as_str)
+        .map(str::to_string)
 }
 
 fn trace_id_field(json: &Value) -> Option<&Value> {
@@ -25,7 +28,7 @@ fn trace_id_field(json: &Value) -> Option<&Value> {
 fn level_of(json: &Value) -> String {
     json.get("level")
         .or_else(|| json.get("severity"))
-        .and_then(|v| v.as_str())
+        .and_then(Value::as_str)
         .unwrap_or("INFO")
         .to_uppercase()
 }
@@ -33,20 +36,19 @@ fn level_of(json: &Value) -> String {
 pub(super) fn extract_error_context(input_path: &str, output_path: &str) -> Result<()> {
     let mut error_trace_id = String::new();
     let mut last_trace_id = String::new();
-    let file = File::open(input_path)?;
-    for line in BufReader::new(file).lines() {
-        let line = line?;
-        let Ok(json) = serde_json::from_str::<Value>(&line) else {
-            continue;
+    for_each_bounded_line(input_path, |line| {
+        let Ok(json) = serde_json::from_str::<Value>(line) else {
+            return Ok(());
         };
         if let Some(tid) = extract_trace_id(&json) {
             last_trace_id = tid.clone();
-            // 优先取第一条 ERROR 日志所在的 trace_id（比"最后一条"可靠）
+            // Prefer the first ERROR trace over the last record in the file.
             if error_trace_id.is_empty() && level_of(&json) == "ERROR" {
                 error_trace_id = tid;
             }
         }
-    }
+        Ok(())
+    })?;
 
     let target_trace_id = if error_trace_id.is_empty() {
         last_trace_id
@@ -55,7 +57,7 @@ pub(super) fn extract_error_context(input_path: &str, output_path: &str) -> Resu
     };
 
     if target_trace_id.is_empty() {
-        eprintln!("⚠️ 未找到 trace_id，降级输出原始日志尾部 30 行");
+        eprintln!("未找到 trace_id，降级输出原始日志尾部 30 行");
         let last_lines = get_last_n_lines(input_path, 30)?;
         crate::utils::fs::atomic_write(std::path::Path::new(output_path), last_lines, true)?;
         return Ok(());
@@ -65,21 +67,19 @@ pub(super) fn extract_error_context(input_path: &str, output_path: &str) -> Resu
     let mut selected = Vec::with_capacity(30);
     let mut tail = VecDeque::with_capacity(30);
     let mut error_seen = false;
-    let file = File::open(input_path)?;
-    for line in BufReader::new(file).lines() {
-        let line = line?;
-        let Ok(log) = serde_json::from_str::<Value>(&line) else {
-            continue;
+    for_each_bounded_line(input_path, |line| {
+        let Ok(log) = serde_json::from_str::<Value>(line) else {
+            return Ok(());
         };
         if extract_trace_id(&log).as_deref() != Some(target_trace_id.as_str()) {
-            continue;
+            return Ok(());
         }
         let compact = compact_log(&log, &target_trace_id);
         if error_seen {
             if selected.len() < 30 {
                 selected.push(compact);
             }
-            continue;
+            return Ok(());
         }
         if level_of(&log) == "ERROR" {
             error_seen = true;
@@ -95,7 +95,8 @@ pub(super) fn extract_error_context(input_path: &str, output_path: &str) -> Resu
             }
             tail.push_back(compact);
         }
-    }
+        Ok(())
+    })?;
 
     let mut output = if error_seen {
         selected
@@ -107,10 +108,10 @@ pub(super) fn extract_error_context(input_path: &str, output_path: &str) -> Resu
     let json_output = serde_json::to_string_pretty(&output)?;
     crate::utils::fs::atomic_write(std::path::Path::new(output_path), json_output, true)?;
     eprintln!(
-        "✅ 结构化日志已提取: {} ({} 条, trace_id={})",
-        output_path,
+        "结构化日志已提取: {} ({} 条, trace_id={})",
+        redact_text(output_path),
         output.len(),
-        target_trace_id
+        redact_text(&target_trace_id)
     );
     Ok(())
 }
@@ -119,18 +120,18 @@ fn compact_log(log: &Value, trace_id: &str) -> Value {
     let timestamp = log
         .get("timestamp")
         .or_else(|| log.get("time"))
-        .and_then(|v| v.as_str())
+        .and_then(Value::as_str)
         .unwrap_or("");
     let level = level_of(log);
     let target = log
         .get("target")
         .or_else(|| log.get("module"))
-        .and_then(|v| v.as_str())
+        .and_then(Value::as_str)
         .unwrap_or("");
     let fields = log.get("fields").or_else(|| log.get("data"));
     let msg = fields
         .and_then(|f| f.get("message").or_else(|| f.get("msg")))
-        .and_then(|v| v.as_str())
+        .and_then(Value::as_str)
         .unwrap_or("");
     let error = fields
         .and_then(|f| f.get("error"))
@@ -142,24 +143,63 @@ fn compact_log(log: &Value, trace_id: &str) -> Value {
         })
         .unwrap_or_default();
     serde_json::json!({
-        "timestamp": timestamp,
-        "level": level,
-        "target": target,
-        "msg": msg,
-        "error": error,
-        "trace_id": trace_id,
+        "timestamp": redact_text(timestamp),
+        "level": redact_text(&level),
+        "target": redact_text(target),
+        "msg": redact_text(msg),
+        "error": redact_text(&error),
+        "trace_id": redact_text(trace_id),
     })
 }
 
 fn get_last_n_lines(path: &str, n: usize) -> Result<String> {
-    let file = File::open(path)?;
-    let reader = BufReader::new(file);
     let mut lines = VecDeque::with_capacity(n);
-    for line in reader.lines() {
+    for_each_bounded_line(path, |line| {
         if lines.len() == n {
             lines.pop_front();
         }
-        lines.push_back(line?);
-    }
+        lines.push_back(redact_text(line));
+        Ok(())
+    })?;
     Ok(lines.into_iter().collect::<Vec<_>>().join("\n"))
+}
+
+fn for_each_bounded_line<F>(path: &str, mut callback: F) -> Result<()>
+where
+    F: FnMut(&str) -> Result<()>,
+{
+    let file = File::open(path)?;
+    let mut reader = BufReader::new(file);
+    let mut line = Vec::with_capacity(MAX_LOG_LINE_BYTES.min(64 * 1024));
+    loop {
+        line.clear();
+        if !read_bounded_line(&mut reader, &mut line)? {
+            break;
+        }
+        let text = std::str::from_utf8(&line).context("log line is not UTF-8")?;
+        callback(text.trim_end_matches(['\r', '\n']))?;
+    }
+    Ok(())
+}
+
+fn read_bounded_line(reader: &mut BufReader<File>, line: &mut Vec<u8>) -> Result<bool> {
+    loop {
+        let chunk = reader.fill_buf()?;
+        if chunk.is_empty() {
+            return Ok(!line.is_empty());
+        }
+        let newline = chunk.iter().position(|byte| *byte == b'\n');
+        let take = newline.map_or(chunk.len(), |index| index + 1);
+        if line.len().saturating_add(take) > MAX_LOG_LINE_BYTES {
+            bail!(
+                "log line exceeds {} bytes; refusing unbounded parse",
+                MAX_LOG_LINE_BYTES
+            );
+        }
+        line.extend_from_slice(&chunk[..take]);
+        reader.consume(take);
+        if newline.is_some() {
+            return Ok(true);
+        }
+    }
 }
