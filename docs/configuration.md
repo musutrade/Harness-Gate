@@ -521,7 +521,9 @@ minimum = 1
 | `minimum`  | `1`    | 所有匹配计数之和的最低值      |
 
 每个正则都必须包含对应的 capture group。步骤成功后才解析日志；计数低于 `minimum` 时，该步骤改判为失败，
-并按 `RESULT_ZERO` 或 `RESULT_PARTIAL` 记录。XML/JSON malformed 输入记录 `RESULT_PARSE_FAILURE`。
+并按 `RESULT_ZERO` 或 `RESULT_PARTIAL` 记录。JUnit 只接受单个 `testsuite` 或 `testsuites` 根元素，
+TRX 只接受单个 `TestRun` 根元素；命名空间前缀按 local name 识别。缺根、多根、根元素外非空内容以及
+其他 XML/JSON malformed 输入均记录 `RESULT_PARSE_FAILURE`。
 
 ## 11. `[scope]` 和 `[[scope.rules]]`
 
