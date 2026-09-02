@@ -22,6 +22,9 @@ baseline remains unchanged in
   bounded to 256 MiB with a 16 MiB per-file limit; overflow and reader
   deadline outcomes are structured failures with partial-byte/truncation
   evidence.
+- **R-12:** JUnit/TRX ingestion now requires one recognized root, rejects
+  missing or multiple roots and non-whitespace trailing content, and retains
+  namespace-prefixed standard result compatibility.
 
 ## Still External
 
