@@ -1,4 +1,5 @@
 use super::*;
+use crate::failure::RetryClass;
 use crate::test_support::TestWorkspace;
 use std::collections::BTreeSet;
 use std::fs;
@@ -223,12 +224,14 @@ fn runner_contract_rejects_invalid_fields() {
 
     config.steps[step_index].remove_env.clear();
     config.steps[step_index].runner = None;
-    config.steps[step_index].kind = Some("future-step".into());
-    assert!(config
-        .validate()
+    let unknown_kind = format!(
+        "{}\n[[steps]]\nid = \"future.step\"\nlabel = \"future\"\nprofiles = [\"full\"]\nkind = \"future-step\"\n",
+        include_str!("../../presets/rust-api.flow.toml")
+    );
+    assert!(toml::from_str::<FlowConfig>(&unknown_kind)
         .expect_err("unknown step kind")
         .to_string()
-        .contains("unknown kind"));
+        .contains("unknown variant"));
 
     config.steps[step_index].kind = None;
     config.steps[step_index].cwd = "{unknown}".into();
@@ -361,7 +364,7 @@ fn runner_thread_environment_cannot_shadow_service_injection() {
         .into_iter()
         .find(|diagnostic| diagnostic.path == "steps[3].runner.threads_env")
         .expect("runner collision diagnostic");
-    assert_eq!(diagnostic.id, "HGCFG-INVALID-FIELD");
+    assert_eq!(diagnostic.id, "HGCFG-SERVICE-INJECT-COLLISION");
 }
 
 #[test]
@@ -442,11 +445,14 @@ fn unknown_built_in_gate_types_fail_closed() {
     gate.services.clear();
     gate.remove_env.clear();
     gate.depends_on.clear();
-    gate.kind = Some("builtin-gate".into());
-    gate.gate_type = Some("future-gate".into());
-    config.policy.required_steps.clear();
-    let error = config.validate().expect_err("unknown gate must fail");
-    assert!(error.to_string().contains("unknown gate_type"));
+    let unknown_gate = format!(
+        "{}\n[[steps]]\nid = \"builtin.future\"\nlabel = \"future gate\"\nprofiles = [\"full\"]\nkind = \"builtin-gate\"\ngate_type = \"future-gate\"\n",
+        include_str!("../../presets/rust-api.flow.toml")
+    );
+    assert!(toml::from_str::<FlowConfig>(&unknown_gate)
+        .expect_err("unknown gate must fail")
+        .to_string()
+        .contains("unknown variant"));
 }
 
 #[test]
@@ -757,6 +763,7 @@ fn diagnostics_truncate_at_the_documented_maximum() {
             path: format!("steps[{index}]"),
             message: "test diagnostic".into(),
             help: "test help".into(),
+            retry_class: None,
             location: None,
             related: Vec::new(),
         });
@@ -772,8 +779,31 @@ fn diagnostics_truncate_at_the_documented_maximum() {
 }
 
 #[test]
+fn diagnostics_serialize_typed_retry_class_without_message_inference() {
+    let mut diagnostics = ConfigDiagnostics::empty();
+    diagnostics.push(ConfigDiagnostic {
+        id: "HGCFG-TEST-RETRY".into(),
+        severity: DiagnosticSeverity::Error,
+        path: "steps[0]".into(),
+        message: "transient test diagnostic".into(),
+        help: "retry the validation command".into(),
+        retry_class: Some(RetryClass::Timeout),
+        location: None,
+        related: Vec::new(),
+    });
+
+    let value = serde_json::to_value(diagnostics.report()).expect("serialize diagnostics");
+    assert_eq!(value["diagnostics"][0]["retry_class"], "timeout");
+}
+
+#[test]
 fn discovery_errors_keep_configuration_field_paths_in_json_reports() {
-    let error = anyhow::anyhow!("required secret scan configuration is missing: /tmp/secrets.toml");
+    let error = anyhow::Error::new(ConfigDiagnostics::single(
+        "HGCFG-REQUIRED-FILE",
+        "paths.secrets_config",
+        "required secret scan configuration file is missing",
+        "create the configured secret scan configuration file or update paths.secrets_config",
+    ));
     let report = report_for_error(&error);
     assert!(!report.valid);
     assert_eq!(report.diagnostics[0].id, "HGCFG-REQUIRED-FILE");
@@ -883,14 +913,14 @@ fn junit_report_path_must_stay_relative_to_the_report_directory() {
 #[test]
 fn webhook_configuration_requires_http_url_and_an_enabled_result() {
     let invalid_scheme = format!(
-        "{}\n[[notifications.webhooks]]\nurl = \"ftp://example.test/hook\"\n",
+        "{}\n[[notifications.webhooks]]\nurl = \"ftp://example.test/hook\"\nallowed_hosts = [\"example.test\"]\n",
         include_str!("../../presets/rust-api.flow.toml")
     );
     let error = FlowConfig::from_source(&invalid_scheme).expect_err("FTP webhook must fail");
     assert!(error.to_string().contains("notifications"));
 
     let disabled = format!(
-        "{}\n[[notifications.webhooks]]\nurl = \"https://example.test/hook\"\non_failure = false\non_success = false\n",
+        "{}\n[[notifications.webhooks]]\nurl = \"https://example.test/hook\"\nallowed_hosts = [\"example.test\"]\non_failure = false\non_success = false\n",
         include_str!("../../presets/rust-api.flow.toml")
     );
     let error = FlowConfig::from_source(&disabled).expect_err("disabled webhook must fail");

@@ -106,7 +106,7 @@ fn cleanup_reclaims_a_stale_marked_lease() {
     let mut record: serde_json::Value =
         serde_json::from_slice(&std::fs::read(&path).expect("lease contents")).expect("json");
     record["pid"] = serde_json::json!(0);
-    record["process_start_identity"] = serde_json::json!("dead-process");
+    record["process_start_identity"] = serde_json::json!(proven_identity_fixture());
     record["expires_at"] = serde_json::json!(0);
     std::fs::write(
         &path,
@@ -120,6 +120,25 @@ fn cleanup_reclaims_a_stale_marked_lease() {
     assert_eq!(report.reclaimed, 1);
     assert!(report.failures.is_empty());
     assert!(!path.exists());
+}
+
+fn proven_identity_fixture() -> &'static str {
+    #[cfg(target_os = "linux")]
+    {
+        "linux:1"
+    }
+    #[cfg(target_os = "macos")]
+    {
+        "macos:1:0"
+    }
+    #[cfg(target_os = "windows")]
+    {
+        "windows:1"
+    }
+    #[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
+    {
+        "unavailable:test"
+    }
 }
 
 #[test]

@@ -96,14 +96,14 @@
         "duration_ms": {"type": "integer", "minimum": 0},
         "log": {"type": "string"},
         "detail": {"type": ["string", "null"]},
-        "failure_code": {"type": ["string", "null"]},
+        "failure_code": {"anyOf": [{"$ref": "#/definitions/failure_code"}, {"type": "null"}]},
         "waived": {"type": "boolean"},
         "waiver": {"anyOf": [{"$ref": "#/definitions/waiver"}, {"type": "null"}]},
         "runner": {"anyOf": [{"$ref": "#/definitions/runner"}, {"type": "null"}]},
         "attempts": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/attempt"}},
         "retry_count": {"type": "integer", "minimum": 0},
         "flaky": {"type": "boolean"},
-        "retry_class": {"type": ["string", "null"]},
+        "retry_class": {"anyOf": [{"$ref": "#/definitions/retry_class"}, {"type": "null"}]},
         "parser": {"anyOf": [{"$ref": "#/definitions/parser"}, {"type": "null"}]}
       }
     },
@@ -201,7 +201,7 @@
       "required": ["step_id", "code", "message"],
       "properties": {
         "step_id": {"type": ["string", "null"]},
-        "code": {"type": "string"},
+        "code": {"$ref": "#/definitions/failure_code"},
         "message": {"type": "string"}
       }
     },
@@ -226,6 +226,46 @@
         "id": {"type": "string"},
         "status": {"enum": ["READY", "FAILED", "CLEANED", "LEAKED"]}
       }
+    },
+    "failure_code": {
+      "type": "string",
+      "enum": [
+        "WEBHOOK_DESTINATION_DENIED",
+        "WEBHOOK_REDIRECT_DENIED",
+        "LEASE_OWNERSHIP_UNCERTAIN",
+        "SERVICE_SETUP_FAILURE",
+        "SERVICE_LEASE_FAILURE",
+        "RESULT_PARSE_FAILURE",
+        "RESULT_ZERO",
+        "RESULT_PARTIAL",
+        "SCHEDULER_FAILURE",
+        "SECRET_SCAN_FAILURE",
+        "ARCHITECTURE_AUDIT_FAILURE",
+        "STEP_EXECUTION_FAILURE",
+        "STEP_SKIPPED",
+        "OUTPUT_LIMIT_EXCEEDED",
+        "READER_DEADLINE_EXCEEDED",
+        "STEP_CANCELLED",
+        "STEP_TIMEOUT",
+        "STEP_FAILED",
+        "EVIDENCE_PATH_ESCAPE",
+        "EVIDENCE_PENDING",
+        "EVIDENCE_FINALIZATION_FAILURE",
+        "EVIDENCE_PUBLICATION_FAILURE",
+        "EVIDENCE_DUPLICATE_PATH",
+        "EVIDENCE_STEP_UNBOUND",
+        "EVIDENCE_INVOCATION_MISMATCH",
+        "EVIDENCE_MISSING",
+        "EVIDENCE_UNDECLARED_FILE",
+        "EVIDENCE_SYMLINK",
+        "EVIDENCE_INVALID_TYPE",
+        "EVIDENCE_READ_FAILURE",
+        "EVIDENCE_INVALID_METADATA"
+      ]
+    },
+    "retry_class": {
+      "type": "string",
+      "enum": ["cancelled", "timeout", "parser", "exit"]
     }
   }
 }

@@ -15,7 +15,7 @@ It handles changed paths, secret scanning, architecture auditing, environment va
 
 - Quick Start: see [Installation](#installation) and [Quick Start](#installation-and-quick-start)
 - New Project Integration: see [Installation and Quick Start](#installation-and-quick-start) and [Built-in Presets](#built-in-presets)
-- Add Commands, Components or CI Profiles: see [Command Overview](#command-overview) and [schema v2 configuration reference](https://github.com/musutrade/Harness-Gate/blob/main/docs/configuration.md)
+- Add Commands, Components or CI Profiles: see [Command Overview](#command-overview), the [English schema v2 configuration reference](https://github.com/musutrade/Harness-Gate/blob/main/docs/configuration.md), and the [JSON Schema catalog](https://github.com/musutrade/Harness-Gate/blob/main/schema/README.md)
 - Handle Failures: see [Reports and Notifications](#reports-and-notifications) and [Common Repair Paths](#common-repair-paths)
 - Extend Rust Engine: see [No Code Change Scope](#no-code-change-scope) and [Rust Change Boundary](#rust-change-boundary)
 
@@ -55,7 +55,7 @@ cargo install harness-gate
 ### Install from GitHub Release (Pre-built Binaries)
 
 Download the binary for your platform from an immutable [GitHub Release
-tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.5):
+tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.6):
 
 - **Linux (x86_64)**: `harness-gate-linux-amd64`
 - **macOS (Intel)**: `harness-gate-macos-amd64`
@@ -69,8 +69,8 @@ immutable tag, then pass that tag explicitly:
 ```bash
 curl --fail --show-error --location --proto '=https' --tlsv1.2 \
   -o /tmp/harness-gate-install.sh \
-  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.3.5/install.sh
-bash /tmp/harness-gate-install.sh --version v0.3.5
+  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.3.6/install.sh
+bash /tmp/harness-gate-install.sh --version v0.3.6
 harness-gate --version
 ```
 
@@ -90,7 +90,7 @@ sha256sum --check SHA256SUMS
 cosign verify-blob --signature harness-gate-linux-amd64.sig \
   --certificate harness-gate-linux-amd64.crt \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity-regexp '^https://github.com/musutrade/Harness-Gate/.github/workflows/release\.yml@refs/tags/v0\.3\.5$' \
+  --certificate-identity-regexp '^https://github.com/musutrade/Harness-Gate/.github/workflows/release\.yml@refs/tags/v0\.3\.6$' \
   harness-gate-linux-amd64
 ```
 
@@ -128,6 +128,13 @@ cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check
 cargo build --manifest-path tools/harness-gate/Cargo.toml --release
 cargo build --manifest-path tools/harness-gate/Cargo.toml --profile release-small
 ```
+
+Worker execution is wrapped at the scheduler boundary so a panic becomes a
+failed, published result. A poisoned service or lease lock also fails closed;
+it is never treated as an available resource. The `release-small` profile uses
+`panic = "abort"`, so callers must not rely on unwinding from that binary.
+The stable machine failure registry is documented in
+[docs/failure-codes.md](docs/failure-codes.md).
 
 ## Installation and Quick Start
 
@@ -183,7 +190,7 @@ Presets are starting points, not runtime branches. After initialization is compl
 | `harness-gate doctor [--strict] [--json]`                    | Execute environment checks declared in config |
 | `harness-gate cleanup [--dry-run] [--json]`                 | Inspect or reclaim stale resource leases  |
 | `harness-gate scope [--staged\|--base REF\|--all] [--json]`  | List changes and selected components      |
-| `harness-gate secrets [--staged] [--json]`                   | Scan high-confidence credential patterns, only output matched filenames |
+| `harness-gate secrets [--staged] [--json]`                   | Scan tracked file contents for high-confidence credential patterns; report filenames only |
 | `harness-gate audit [--json]`                                | Execute regex architecture rules and generate audit report |
 | `harness-gate verify`                                        | Execute default profile based on workspace changes |
 | `harness-gate verify --profile ci --all`                     | Execute specified profile for all components |
@@ -415,9 +422,11 @@ retention policy keeps the newest 50 invocation directories and only removes old
 lease window; active or recently modified invocations are retained.
 
 Optional `[[notifications.webhooks]]` entries send the serialized report to HTTP(S) endpoints after all report
-files are written. `on_failure` defaults to `true`, `on_success` defaults to `false`; a non-2xx response or
-connection error returns `E1404` while preserving the generated reports. Entries are sent in configuration order;
-the first failure stops notification delivery to later endpoints.
+files are written. Each URL must have an exact `allowed_hosts` entry; credentials, wildcards, local-only resolved
+addresses, and redirects are rejected at configuration or connection time. `on_failure` defaults to `true`,
+`on_success` defaults to `false`; a non-2xx response, connection error, or policy denial returns `E1404` while
+preserving the generated reports. Entries are sent in configuration order; the first failure stops notification
+delivery to later endpoints. Destination evidence is limited to scheme and normalized host.
 
 Service cleanup is part of verification success. If a started service cannot be stopped, verification remains
 failed and the cleanup error is included in `test_result.json`/`test_result.md` so a leaked container is not hidden.

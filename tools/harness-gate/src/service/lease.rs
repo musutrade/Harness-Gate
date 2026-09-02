@@ -8,7 +8,8 @@ use std::fs::{self, OpenOptions};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::sync::Mutex;
+use std::sync::{mpsc, Arc, Mutex};
+use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 pub(crate) const LEASE_SCHEMA_VERSION: u32 = 2;
@@ -24,6 +25,10 @@ pub(crate) const LABEL_KIND: &str = "harness-gate.kind";
 pub(crate) const LABEL_INVOCATION: &str = "harness-gate.invocation";
 const LEASE_TTL: Duration = Duration::from_secs(15 * 60);
 const RENEW_AFTER: Duration = Duration::from_secs(30);
+#[cfg(not(test))]
+const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(15);
+#[cfg(test)]
+const HEARTBEAT_INTERVAL: Duration = Duration::from_millis(25);
 static TEMP_COUNTER: AtomicU64 = AtomicU64::new(1);
 
 trait RuntimeOperations {
@@ -92,8 +97,12 @@ pub(crate) struct LeaseRecord {
 #[derive(Debug)]
 pub(crate) struct ResourceLease {
     path: PathBuf,
-    record: Mutex<LeaseRecord>,
-    last_renewed: Mutex<Instant>,
+    record: Arc<Mutex<LeaseRecord>>,
+    last_renewed: Arc<Mutex<Instant>>,
+    heartbeat_error: Arc<Mutex<Option<String>>>,
+    stop_heartbeat: Option<mpsc::Sender<()>>,
+    heartbeat: Option<JoinHandle<()>>,
+    release_on_drop: bool,
 }
 
 impl ResourceLease {
@@ -137,14 +146,50 @@ impl ResourceLease {
             runtime_labels,
             runtime_object_id: None,
         };
+        if !identity_is_proven(&record) {
+            bail!(
+                "LEASE_OWNERSHIP_UNCERTAIN: platform process identity is unavailable; resource allocation rejected"
+            );
+        }
 
         loop {
             match create_record(&path, &record) {
                 Ok(()) => {
+                    let record = Arc::new(Mutex::new(record));
+                    let last_renewed = Arc::new(Mutex::new(Instant::now()));
+                    let heartbeat_error = Arc::new(Mutex::new(None));
+                    let (stop_heartbeat, receiver) = mpsc::channel();
+                    let heartbeat_path = path.clone();
+                    let heartbeat_record = Arc::clone(&record);
+                    let heartbeat_last = Arc::clone(&last_renewed);
+                    let heartbeat_failure = Arc::clone(&heartbeat_error);
+                    let heartbeat = thread::spawn(move || loop {
+                        match receiver.recv_timeout(HEARTBEAT_INTERVAL) {
+                            Ok(()) | Err(mpsc::RecvTimeoutError::Disconnected) => break,
+                            Err(mpsc::RecvTimeoutError::Timeout) => {
+                                if let Err(error) = renew_parts(
+                                    &heartbeat_path,
+                                    &heartbeat_record,
+                                    &heartbeat_last,
+                                    true,
+                                ) {
+                                    if let Ok(mut failure) = heartbeat_failure.lock() {
+                                        if failure.is_none() {
+                                            *failure = Some(format!("{error:#}"));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
                     return Ok(Self {
                         path,
-                        record: Mutex::new(record),
-                        last_renewed: Mutex::new(Instant::now()),
+                        record,
+                        last_renewed,
+                        heartbeat_error,
+                        stop_heartbeat: Some(stop_heartbeat),
+                        heartbeat: Some(heartbeat),
+                        release_on_drop: true,
                     });
                 }
                 Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
@@ -159,6 +204,11 @@ impl ResourceLease {
                             existing.pid
                         );
                     }
+                    if !identity_is_proven(&existing) {
+                        bail!(
+                            "LEASE_OWNERSHIP_UNCERTAIN: stale lease identity cannot be proven; resource retained"
+                        );
+                    }
                     reclaim_resource(project, &path, &existing)?;
                 }
                 Err(error) => {
@@ -170,26 +220,25 @@ impl ResourceLease {
     }
 
     pub(crate) fn renew(&self) -> Result<()> {
-        let mut last = self
-            .last_renewed
-            .lock()
-            .map_err(|_| anyhow::anyhow!("lease renewal lock was poisoned"))?;
-        if last.elapsed() < RENEW_AFTER {
-            return Ok(());
-        }
-        let mut record = self
-            .record
-            .lock()
-            .map_err(|_| anyhow::anyhow!("lease record lock was poisoned"))?;
-        let current = read_record(&self.path)
-            .with_context(|| format!("read lease {}", self.path.display()))?;
-        ensure_owner(&current, &record)?;
-        let now = epoch_seconds();
-        record.heartbeat_at = now;
-        record.expires_at = now.saturating_add(LEASE_TTL.as_secs());
-        write_record(&self.path, &record)?;
-        *last = Instant::now();
-        Ok(())
+        renew_parts(&self.path, &self.record, &self.last_renewed, false)
+    }
+
+    /// Stop renewal while retaining the marker for operator cleanup. This is
+    /// used when an external resource may have been created but its ownership
+    /// or identity could not be proved.
+    pub(crate) fn retain(mut self) {
+        self.stop_heartbeat();
+        self.release_on_drop = false;
+    }
+
+    /// Stop the heartbeat before attempting an explicit release. If release
+    /// cannot prove current ownership, dropping this value keeps the marker so
+    /// an operator can inspect it instead of silently deleting it.
+    pub(crate) fn release_checked(mut self) -> Result<()> {
+        self.stop_heartbeat();
+        let result = self.release();
+        self.release_on_drop = false;
+        result
     }
 
     /// Bind a newly created runtime object to this lease. The object ID is
@@ -218,6 +267,7 @@ impl ResourceLease {
     }
 
     pub(crate) fn verify_runtime_ownership(&self, project: &Project) -> Result<()> {
+        self.ensure_heartbeat_healthy()?;
         let record = self
             .record
             .lock()
@@ -227,6 +277,7 @@ impl ResourceLease {
     }
 
     pub(crate) fn release(&self) -> Result<()> {
+        self.ensure_heartbeat_healthy()?;
         let record = self
             .record
             .lock()
@@ -247,12 +298,64 @@ impl ResourceLease {
             }
         }
     }
+
+    fn ensure_heartbeat_healthy(&self) -> Result<()> {
+        if let Some(error) = self
+            .heartbeat_error
+            .lock()
+            .map_err(|_| anyhow::anyhow!("lease heartbeat error lock was poisoned"))?
+            .as_ref()
+            .cloned()
+        {
+            bail!("LEASE_OWNERSHIP_UNCERTAIN: lease heartbeat failed: {error}");
+        }
+        Ok(())
+    }
 }
 
 impl Drop for ResourceLease {
     fn drop(&mut self) {
-        let _ = self.release();
+        self.stop_heartbeat();
+        if self.release_on_drop {
+            let _ = self.release();
+        }
     }
+}
+
+impl ResourceLease {
+    fn stop_heartbeat(&mut self) {
+        if let Some(stop) = self.stop_heartbeat.take() {
+            let _ = stop.send(());
+        }
+        if let Some(heartbeat) = self.heartbeat.take() {
+            let _ = heartbeat.join();
+        }
+    }
+}
+
+fn renew_parts(
+    path: &Path,
+    record: &Mutex<LeaseRecord>,
+    last_renewed: &Mutex<Instant>,
+    force: bool,
+) -> Result<()> {
+    let mut last = last_renewed
+        .lock()
+        .map_err(|_| anyhow::anyhow!("lease renewal lock was poisoned"))?;
+    if !force && last.elapsed() < RENEW_AFTER {
+        return Ok(());
+    }
+    let mut record = record
+        .lock()
+        .map_err(|_| anyhow::anyhow!("lease record lock was poisoned"))?;
+    let current = read_record(path).with_context(|| format!("read lease {}", path.display()))?;
+    ensure_owner(&current, &record)?;
+    let now = epoch_seconds();
+    record.heartbeat_at = now;
+    record.expires_at = now.saturating_add(LEASE_TTL.as_secs());
+    write_record(path, &record)?;
+    *last = Instant::now();
+    Ok(())
 }
 
 #[derive(Debug, Serialize)]
@@ -331,6 +434,26 @@ fn cleanup_with_runtime<O: RuntimeOperations + ?Sized>(
         }
         let stale = is_stale(&record, epoch_seconds());
         let lease_file = path.display().to_string();
+        if !identity_is_proven(&record) {
+            if stale {
+                report.stale += 1;
+            } else {
+                report.active += 1;
+            }
+            report.failures.push(format!(
+                "{}: LEASE_OWNERSHIP_UNCERTAIN: platform process identity is unavailable; resource retained",
+                record.resource_id
+            ));
+            report.resources.push(CleanupResource {
+                resource_id: record.resource_id,
+                resource_kind: record.resource_kind,
+                invocation_id: record.invocation_id,
+                state: "ownership-uncertain".into(),
+                action: "retained".into(),
+                lease_file,
+            });
+            continue;
+        }
         if !stale {
             report.active += 1;
             report.resources.push(CleanupResource {
@@ -554,6 +677,41 @@ fn is_stale(record: &LeaseRecord, now: u64) -> bool {
     }
 }
 
+fn identity_is_proven(record: &LeaseRecord) -> bool {
+    #[cfg(target_os = "linux")]
+    {
+        record
+            .process_start_identity
+            .strip_prefix("linux:")
+            .and_then(|value| value.parse::<u64>().ok())
+            .is_some_and(|value| value > 0)
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let mut fields = record.process_start_identity.split(':');
+        let prefix = fields.next();
+        let seconds = fields.next().and_then(|value| value.parse::<u64>().ok());
+        let micros = fields.next().and_then(|value| value.parse::<u64>().ok());
+        matches!(fields.next(), None)
+            && matches!(prefix, Some("macos"))
+            && seconds
+                .zip(micros)
+                .is_some_and(|(seconds, micros)| seconds > 0 || micros > 0)
+    }
+    #[cfg(target_os = "windows")]
+    {
+        record
+            .process_start_identity
+            .strip_prefix("windows:")
+            .and_then(|value| value.parse::<u64>().ok())
+            .is_some_and(|value| value > 0)
+    }
+    #[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
+    {
+        false
+    }
+}
+
 fn resource_key(resource_id: &str) -> String {
     let mut digest = Sha256::new();
     digest.update(resource_id.as_bytes());
@@ -687,7 +845,7 @@ fn epoch_seconds() -> u64 {
 }
 
 fn process_start_identity(pid: u32) -> String {
-    process_start_identity_checked(pid).unwrap_or_else(|| format!("pid:{pid}"))
+    process_start_identity_checked(pid).unwrap_or_else(|| format!("unavailable:{pid}"))
 }
 
 #[cfg(target_os = "linux")]
@@ -695,10 +853,73 @@ fn process_start_identity_checked(pid: u32) -> Option<String> {
     let contents = fs::read_to_string(format!("/proc/{pid}/stat")).ok()?;
     let (_, rest) = contents.rsplit_once(") ")?;
     let start_time = rest.split_whitespace().nth(19)?;
-    Some(format!("linux:{start_time}"))
+    let start_time = start_time.parse::<u64>().ok()?;
+    (start_time > 0).then(|| format!("linux:{start_time}"))
 }
 
-#[cfg(not(target_os = "linux"))]
+#[cfg(target_os = "macos")]
+fn process_start_identity_checked(pid: u32) -> Option<String> {
+    let mut info = unsafe { std::mem::zeroed::<libc::proc_bsdinfo>() };
+    let expected_size = std::mem::size_of::<libc::proc_bsdinfo>() as libc::c_int;
+    let observed = unsafe {
+        libc::proc_pidinfo(
+            pid as libc::c_int,
+            libc::PROC_PIDTBSDINFO,
+            0,
+            (&mut info as *mut libc::proc_bsdinfo).cast(),
+            expected_size,
+        )
+    };
+    if observed != expected_size {
+        return None;
+    }
+    (info.pbi_start_tvsec > 0 || info.pbi_start_tvusec > 0)
+        .then(|| format!("macos:{}:{}", info.pbi_start_tvsec, info.pbi_start_tvusec))
+}
+
+#[cfg(target_os = "windows")]
+fn process_start_identity_checked(pid: u32) -> Option<String> {
+    use windows_sys::Win32::Foundation::{CloseHandle, FILETIME};
+    use windows_sys::Win32::System::Threading::{
+        GetProcessTimes, OpenProcess, PROCESS_QUERY_LIMITED_INFORMATION,
+    };
+
+    if pid == 0 {
+        return None;
+    }
+    let handle = unsafe { OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 0, pid) };
+    if handle.is_null() {
+        return None;
+    }
+    let mut creation = FILETIME {
+        dwLowDateTime: 0,
+        dwHighDateTime: 0,
+    };
+    let mut exit = FILETIME {
+        dwLowDateTime: 0,
+        dwHighDateTime: 0,
+    };
+    let mut kernel = FILETIME {
+        dwLowDateTime: 0,
+        dwHighDateTime: 0,
+    };
+    let mut user = FILETIME {
+        dwLowDateTime: 0,
+        dwHighDateTime: 0,
+    };
+    let available =
+        unsafe { GetProcessTimes(handle, &mut creation, &mut exit, &mut kernel, &mut user) != 0 };
+    unsafe {
+        CloseHandle(handle);
+    }
+    if !available {
+        return None;
+    }
+    let ticks = (u64::from(creation.dwHighDateTime) << 32) | u64::from(creation.dwLowDateTime);
+    (ticks > 0).then(|| format!("windows:{ticks}"))
+}
+
+#[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
 fn process_start_identity_checked(_pid: u32) -> Option<String> {
     None
 }
@@ -735,7 +956,6 @@ fn process_alive(pid: u32) -> Option<bool> {
 
 #[cfg(test)]
 mod tests {
-    #[cfg(target_os = "linux")]
     use super::process_start_identity_checked;
     use super::{
         cleanup_with_runtime, is_stale, ownership_labels, read_record, resource_key, write_record,
@@ -831,15 +1051,34 @@ mod tests {
         record.runtime_labels = inspection.labels.clone();
         if stale {
             record.pid = 0;
-            record.process_start_identity = "dead-process".into();
+            record.process_start_identity = proven_identity_fixture();
             record.expires_at = 0;
         } else {
             record.expires_at = record.expires_at.saturating_add(3600);
         }
         write_record(&path, &record).expect("write fixture lease");
         // The fixture intentionally leaves the marker for cleanup to inspect.
-        std::mem::forget(lease);
+        lease.retain();
         (path, record, inspection)
+    }
+
+    fn proven_identity_fixture() -> String {
+        #[cfg(target_os = "linux")]
+        {
+            "linux:1".into()
+        }
+        #[cfg(target_os = "macos")]
+        {
+            "macos:1:0".into()
+        }
+        #[cfg(target_os = "windows")]
+        {
+            "windows:1".into()
+        }
+        #[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
+        {
+            "unavailable:test".into()
+        }
     }
 
     fn fake_runtime(
@@ -885,8 +1124,8 @@ mod tests {
     }
 
     #[test]
-    fn current_process_identity_is_available_on_linux() {
-        #[cfg(target_os = "linux")]
+    fn current_process_identity_is_available_on_supported_platforms() {
+        #[cfg(any(target_os = "linux", target_os = "macos", target_os = "windows"))]
         assert!(process_start_identity_checked(std::process::id()).is_some());
     }
 
@@ -910,6 +1149,124 @@ mod tests {
             runtime_object_id: None,
         };
         assert!(is_stale(&record, 2));
+    }
+
+    #[test]
+    fn lease_heartbeat_renews_marker_during_a_long_step() {
+        let (_workspace, project) = runtime_project("lease-heartbeat");
+        let lease = super::ResourceLease::acquire(
+            &project,
+            "step:long-running",
+            "workspace",
+            "invocation-heartbeat",
+            None,
+            None,
+        )
+        .expect("acquire heartbeat lease");
+        let path = lease.path.clone();
+        let mut stale = read_record(&path).expect("read heartbeat lease");
+        stale.heartbeat_at = 0;
+        stale.expires_at = 0;
+        write_record(&path, &stale).expect("write stale heartbeat fixture");
+
+        std::thread::sleep(Duration::from_millis(100));
+        let renewed = read_record(&path).expect("read renewed heartbeat lease");
+        assert!(renewed.heartbeat_at > 0);
+        assert!(renewed.expires_at > renewed.heartbeat_at);
+
+        drop(lease);
+        assert!(
+            !path.exists(),
+            "drop must stop heartbeat and release marker"
+        );
+    }
+
+    #[test]
+    fn heartbeat_failure_blocks_release_and_retains_the_marker() {
+        let (_workspace, project) = runtime_project("lease-heartbeat-failure");
+        let lease = super::ResourceLease::acquire(
+            &project,
+            "step:heartbeat-failure",
+            "workspace",
+            "invocation-heartbeat-failure",
+            None,
+            None,
+        )
+        .expect("acquire heartbeat lease");
+        let path = lease.path.clone();
+        *lease.heartbeat_error.lock().expect("heartbeat error lock") =
+            Some("simulated renewal failure".into());
+
+        let error = lease
+            .release_checked()
+            .expect_err("uncertain ownership must block release");
+        assert!(format!("{error:#}").contains("LEASE_OWNERSHIP_UNCERTAIN"));
+        assert!(path.exists(), "failed release must retain its marker");
+    }
+
+    #[test]
+    fn poisoned_lease_lock_fails_closed_and_retains_the_marker() {
+        let (_workspace, project) = runtime_project("lease-lock-poison");
+        let mut lease = super::ResourceLease::acquire(
+            &project,
+            "step:poisoned-lock",
+            "workspace",
+            "invocation-poisoned-lock",
+            None,
+            None,
+        )
+        .expect("acquire lease");
+        let path = lease.path.clone();
+        lease.stop_heartbeat();
+        let record = std::sync::Arc::clone(&lease.record);
+        let poisoned = std::thread::spawn(move || {
+            let _guard = record.lock().expect("lock lease record");
+            panic!("poison lease record fixture");
+        })
+        .join();
+        assert!(poisoned.is_err());
+
+        let error = lease
+            .release_checked()
+            .expect_err("poisoned ownership state must block release");
+        assert!(format!("{error:#}").contains("lease record lock was poisoned"));
+        assert!(path.exists(), "poisoned ownership marker must be retained");
+    }
+
+    #[test]
+    fn uncertain_process_identity_is_retained_without_reclaim() {
+        let (_workspace, project) = runtime_project("lease-identity-uncertain");
+        let lease = super::ResourceLease::acquire(
+            &project,
+            "step:uncertain",
+            "workspace",
+            "invocation-uncertain",
+            None,
+            None,
+        )
+        .expect("acquire uncertain identity lease");
+        let path = lease.path.clone();
+        let mut forged = read_record(&path).expect("read uncertain identity lease");
+        forged.pid = 0;
+        forged.process_start_identity = "unavailable:test".into();
+        forged.heartbeat_at = 0;
+        forged.expires_at = 0;
+        write_record(&path, &forged).expect("write uncertain identity fixture");
+        lease.retain();
+
+        let (fake, remove_calls) = fake_runtime(ContainerRuntimeKind::Docker, None);
+        let report = cleanup_with_runtime(&project, false, &fake).expect("cleanup report");
+        assert_eq!(report.reclaimed, 0);
+        assert_eq!(remove_calls.load(Ordering::SeqCst), 0);
+        assert!(path.exists(), "uncertain ownership must be retained");
+        assert!(report
+            .failures
+            .iter()
+            .any(|failure| failure.contains("LEASE_OWNERSHIP_UNCERTAIN")));
+        assert_eq!(
+            report.resources[0].state, "ownership-uncertain",
+            "cleanup evidence must expose the uncertain state"
+        );
     }
 
     #[test]
