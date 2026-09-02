@@ -35,13 +35,6 @@ pub(crate) struct AtomicOutput {
 }
 
 impl AtomicOutput {
-    pub(crate) fn try_clone(&self) -> io::Result<fs::File> {
-        self.file
-            .as_ref()
-            .ok_or_else(|| io::Error::other("atomic output is already published"))?
-            .try_clone()
-    }
-
     pub(crate) fn publish(mut self) -> Result<()> {
         if let Some(mut file) = self.file.take() {
             file.flush()?;

@@ -2,8 +2,8 @@ use super::VerificationReport;
 use crate::config::WebhookConfig;
 use crate::project::Project;
 use crate::service::ResourceLease;
+use crate::utils::redaction::{redact_text, REDACTION_TEXT_LIMIT};
 use anyhow::{bail, Context, Result};
-use regex::Regex;
 use serde::{ser::Serializer, Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
@@ -11,7 +11,6 @@ use std::fs;
 use std::io::Read;
 use std::path::{Component, Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::sync::OnceLock;
 use std::time::Duration;
 
 static INVOCATION_COUNTER: AtomicU64 = AtomicU64::new(1);
@@ -22,7 +21,7 @@ const ARTIFACT_REGISTRY_FILE: &str = "artifact-registry.json";
 const MANIFEST_FILE: &str = "manifest.json";
 const MACHINE_RESULT_FILE: &str = "test_result.json";
 const MAX_RETAINED_INVOCATIONS: usize = 50;
-const REDACTION_TEXT_LIMIT: usize = 16 * 1024 * 1024;
+const MAX_INVOCATION_EVIDENCE_BYTES: u64 = 256 * 1024 * 1024;
 
 #[derive(Debug, Serialize)]
 struct MachineResult {
@@ -321,7 +320,7 @@ fn machine_result(report: &VerificationReport) -> MachineResult {
                     .clone()
                     .or_else(|| (!step.passed).then(|| failure_code(step))),
                 waived: step.waived,
-                waiver: step.waiver.clone(),
+                waiver: step.waiver.clone().map(redact_waiver),
                 runner: step.runner.clone().map(redact_runner),
                 attempts,
                 retry_count: step.attempts.len().saturating_sub(1) as u32,
@@ -344,7 +343,7 @@ fn machine_result(report: &VerificationReport) -> MachineResult {
             id: step.id.clone(),
             label: step.label.clone(),
             status: "SKIPPED",
-            reason: step.reason.clone(),
+            reason: redact_text(&step.reason),
         })
         .collect::<Vec<_>>();
     let status = if !evidence_complete {
@@ -420,7 +419,12 @@ fn machine_result_with_assessment(
     } else {
         report_status(report)
     };
-    result.failures.extend(assessment.failures.clone());
+    result
+        .failures
+        .extend(assessment.failures.iter().cloned().map(|mut failure| {
+            failure.message = redact_text(&failure.message);
+            failure
+        }));
     result
 }
 
@@ -803,7 +807,7 @@ pub(super) fn write(report: &VerificationReport, project: &Project) -> Result<()
             failures: vec![MachineFailure {
                 step_id: None,
                 code: "EVIDENCE_FINALIZATION_FAILURE".into(),
-                message: format!("{error:#}"),
+                message: redact_text(&format!("{error:#}")),
             }],
         };
         let _ = write_machine_result(report, project, &failure, true);
@@ -820,7 +824,7 @@ fn finish_incomplete_report(
 ) -> Result<()> {
     let details = failures
         .iter()
-        .map(|error| format!("{error:#}"))
+        .map(|error| redact_text(&format!("{error:#}")))
         .collect::<Vec<_>>()
         .join("; ");
     let assessment = EvidenceAssessment {
@@ -1806,7 +1810,7 @@ fn verify_manifest(project: &Project) -> Result<()> {
 fn format_failures(failures: &[MachineFailure]) -> String {
     failures
         .iter()
-        .map(|failure| format!("{}: {}", failure.code, failure.message))
+        .map(|failure| format!("{}: {}", failure.code, redact_text(&failure.message)))
         .collect::<Vec<_>>()
         .join("; ")
 }
@@ -1827,10 +1831,11 @@ fn redact_invocation_files(project: &Project) -> Result<()> {
     if !reports.starts_with(&repository) {
         bail!("report directory escapes project root");
     }
-    redact_directory(&reports, &reports)
+    let mut total_bytes = 0_u64;
+    redact_directory(&reports, &reports, &mut total_bytes)
 }
 
-fn redact_directory(root: &Path, directory: &Path) -> Result<()> {
+fn redact_directory(root: &Path, directory: &Path, total_bytes: &mut u64) -> Result<()> {
     if !directory.exists() {
         return Ok(());
     }
@@ -1843,11 +1848,31 @@ fn redact_directory(root: &Path, directory: &Path) -> Result<()> {
             .file_type()
             .with_context(|| format!("inspect evidence entry {}", path.display()))?;
         if file_type.is_dir() {
-            redact_directory(root, &path)?;
+            redact_directory(root, &path, total_bytes)?;
             continue;
         }
-        if !file_type.is_file()
-            || path.file_name().and_then(|name| name.to_str()) == Some("manifest.json")
+        if !file_type.is_file() {
+            continue;
+        }
+        // Check the declared size before allocating a buffer. Report files
+        // are untrusted evidence and must not turn redaction into a memory
+        // amplification path.
+        let metadata = fs::symlink_metadata(&path)
+            .with_context(|| format!("inspect evidence {}", path.display()))?;
+        if metadata.len() > REDACTION_TEXT_LIMIT as u64 {
+            bail!("text evidence exceeds redaction limit: {}", path.display());
+        }
+        *total_bytes = total_bytes
+            .checked_add(metadata.len())
+            .ok_or_else(|| anyhow::anyhow!("invocation evidence byte budget overflow"))?;
+        if *total_bytes > MAX_INVOCATION_EVIDENCE_BYTES {
+            bail!(
+                "invocation evidence exceeds {} bytes (observed {})",
+                MAX_INVOCATION_EVIDENCE_BYTES,
+                *total_bytes
+            );
+        }
+        if path.file_name().and_then(|name| name.to_str()) == Some("manifest.json")
             || path
                 .file_name()
                 .and_then(|name| name.to_str())
@@ -1859,9 +1884,6 @@ fn redact_directory(root: &Path, directory: &Path) -> Result<()> {
         let Ok(text) = std::str::from_utf8(&bytes) else {
             continue;
         };
-        if bytes.len() > REDACTION_TEXT_LIMIT {
-            bail!("text evidence exceeds redaction limit: {}", path.display());
-        }
         let redacted = redact_text(text);
         if redacted.as_bytes() != bytes {
             let relative = path
@@ -1883,21 +1905,15 @@ fn redact_runner(mut runner: crate::process::RunnerExecution) -> crate::process:
     runner
 }
 
-fn redact_text(input: &str) -> String {
-    static PATTERNS: OnceLock<Vec<Regex>> = OnceLock::new();
-    let patterns = PATTERNS.get_or_init(|| {
-        vec![
-            Regex::new(r"(?is)-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----.*?-----END [A-Z0-9 ]*PRIVATE KEY-----").expect("private key redaction regex"),
-            Regex::new(r"(?im)^(?:authorization|proxy-authorization|cookie|set-cookie|x-api-key|x-auth-token)\s*:[^\r\n]*$").expect("header redaction regex"),
-            Regex::new(r#"(?i)\b(?:postgres(?:ql)?|mysql|redis|mongodb(?:\+srv)?)://[^\s<>'\"]+"#).expect("connection string redaction regex"),
-            Regex::new(r"(?i)\b(?:bearer|basic)\s+[A-Za-z0-9._~+/=-]+").expect("authorization redaction regex"),
-            Regex::new(r#"(?i)\"[^\"]*(?:api[_-]?key|access[_-]?token|refresh[_-]?token|id[_-]?token|token|password|passwd|secret|client[_-]?secret)[^\"]*\"\s*:\s*\"[^\"]*\""#).expect("json secret redaction regex"),
-            Regex::new(r##"(?i)\b(?:api[_-]?key|access[_-]?token|refresh[_-]?token|id[_-]?token|token|password|passwd|secret|client[_-]?secret)\b\s*[:=]\s*["']?[^\s"'`,;}]+"##).expect("assignment redaction regex"),
-        ]
-    });
-    patterns.iter().fold(input.to_string(), |text, pattern| {
-        pattern.replace_all(&text, "[REDACTED]").into_owned()
-    })
+fn redact_waiver(mut waiver: crate::process::WaiverEvidence) -> crate::process::WaiverEvidence {
+    waiver.id = redact_text(&waiver.id);
+    waiver.risk = redact_text(&waiver.risk);
+    waiver.owner = redact_text(&waiver.owner);
+    waiver.approved_by = redact_text(&waiver.approved_by);
+    waiver.created_at = redact_text(&waiver.created_at);
+    waiver.expires_at = redact_text(&waiver.expires_at);
+    waiver.compensating_control = redact_text(&waiver.compensating_control);
+    waiver
 }
 
 fn prune_old_invocations(project: &Project, current_id: &str) -> Result<()> {
@@ -2026,18 +2042,23 @@ fn markdown(report: &VerificationReport) -> String {
         };
         output.push_str(&format!(
             "- {status}: {} ({} ms)",
-            step.label, step.duration_ms
+            redact_text(&step.label),
+            step.duration_ms
         ));
         if let Some(detail) = &step.detail {
-            output.push_str(&format!(" - {detail}"));
+            output.push_str(&format!(" - {}", redact_text(detail)));
         }
         if !step.passed && !step.waived {
-            output.push_str(&format!("; log: {}", step.log));
+            output.push_str(&format!("; log: {}", redact_text(&step.log)));
         }
         output.push('\n');
     }
     for step in &report.skipped_steps {
-        output.push_str(&format!("- SKIPPED: {} - {}\n", step.label, step.reason));
+        output.push_str(&format!(
+            "- SKIPPED: {} - {}\n",
+            redact_text(&step.label),
+            redact_text(&step.reason)
+        ));
     }
     output.push_str(&format!(
         "\nTEST_SUMMARY: {}\n",
@@ -2086,13 +2107,13 @@ fn junit(report: &VerificationReport) -> String {
     for step in &report.steps {
         output.push_str(&format!(
             "  <testcase name=\"{}\" time=\"{:.3}\">",
-            escape(&step.label),
+            escape(&redact_text(&step.label)),
             step.duration_ms as f64 / 1000.0
         ));
         if !step.passed {
             output.push_str(&format!(
                 "<failure message=\"{}\"/>",
-                escape(step.detail.as_deref().unwrap_or("failed"))
+                escape(&redact_text(step.detail.as_deref().unwrap_or("failed")))
             ));
         } else if step.waived {
             output.push_str("<skipped message=\"WAIVED\"/>");
@@ -2102,8 +2123,8 @@ fn junit(report: &VerificationReport) -> String {
     for step in &report.skipped_steps {
         output.push_str(&format!(
             "  <testcase name=\"{}\" time=\"0.000\"><skipped message=\"{}\"/></testcase>\n",
-            escape(&step.label),
-            escape(&step.reason)
+            escape(&redact_text(&step.label)),
+            escape(&redact_text(&step.reason))
         ));
     }
     output.push_str("</testsuite>\n");
@@ -2136,9 +2157,9 @@ fn post_json(raw_url: &str, body: &[u8]) -> Result<()> {
 mod tests {
     use super::{
         allocate_invocation, configured_html, ensure_supported_machine_result, junit,
-        machine_result, markdown, notify, post_json, redact_text, render_html, report_target,
-        verify_manifest, write, write_invocation_metadata, ARTIFACT_REGISTRY_FILE,
-        MACHINE_RESULT_FILE, MANIFEST_FILE,
+        machine_result, markdown, notify, post_json, redact_invocation_files, redact_text,
+        render_html, report_target, verify_manifest, write, write_invocation_metadata,
+        ARTIFACT_REGISTRY_FILE, MACHINE_RESULT_FILE, MANIFEST_FILE, REDACTION_TEXT_LIMIT,
     };
     use crate::config::WebhookConfig;
     use crate::process::TaskResult;
@@ -2366,6 +2387,27 @@ mod tests {
             assert!(!redacted.contains(secret), "secret leaked: {secret}");
         }
         assert!(redacted.contains("[REDACTED]"));
+    }
+
+    #[test]
+    fn redaction_rejects_oversized_evidence_before_reading_it() {
+        let workspace = crate::test_support::TestWorkspace::new("report-size-limit");
+        crate::preset::init(&workspace.root, "generic", false).expect("initialize fixture");
+        workspace.init_git();
+        let project = crate::project::Project::discover(Some(workspace.root.clone()), None)
+            .expect("discover fixture");
+        let invocation = allocate_invocation(&project).expect("allocate invocation");
+        let oversized = invocation.root.join("large-evidence.bin");
+        std::fs::File::create(&oversized)
+            .expect("create sparse evidence")
+            .set_len(REDACTION_TEXT_LIMIT as u64 + 1)
+            .expect("set sparse evidence size");
+        let mut invocation_project = project;
+        invocation_project.reports = invocation.root.clone();
+
+        let error = redact_invocation_files(&invocation_project)
+            .expect_err("oversized evidence must fail before reading");
+        assert!(error.to_string().contains("redaction limit"));
     }
 
     #[test]

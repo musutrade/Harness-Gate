@@ -570,6 +570,36 @@ fn report_keeps_rule_names_with_shared_prefixes_separate() {
 }
 
 #[test]
+fn audit_reports_redact_violation_content_in_json_and_markdown() {
+    let mut config = configured_audit();
+    config.hard_rules = vec![HardRule {
+        name: "credential rule".into(),
+        severity: "error".into(),
+        paths: Vec::new(),
+        extensions: vec!["rs".into()],
+        patterns: vec!["token".into()],
+        exclude_patterns: Vec::new(),
+        allowlist: Vec::new(),
+    }];
+    config.arch_rules.clear();
+    let secret = "Authorization: Bearer audit-secret-token";
+    let violations = vec![Violation {
+        file: PathBuf::from("src/token.rs"),
+        line: 7,
+        content: secret.into(),
+        rule_name: "credential rule".into(),
+    }];
+
+    let report = super::report::generate_report(&config, &violations, &[]);
+    let json = serde_json::to_string(&report).expect("serialize redacted audit report");
+    let markdown = super::report::generate_markdown(&config, &violations, &[]);
+    assert!(!json.contains("audit-secret-token"));
+    assert!(!markdown.contains("audit-secret-token"));
+    assert!(json.contains("[REDACTED]"));
+    assert!(markdown.contains("[REDACTED]"));
+}
+
+#[test]
 #[cfg(unix)]
 fn audit_skips_file_symlinks() {
     use std::os::unix::fs::symlink;
@@ -729,4 +759,48 @@ fn log_parser_falls_back_to_the_last_thirty_raw_lines() {
     assert_eq!(lines.len(), 30);
     assert_eq!(lines.first(), Some(&"unstructured line 10"));
     assert_eq!(lines.last(), Some(&"unstructured line 39"));
+}
+
+#[test]
+fn log_parser_redacts_structured_and_fallback_output() {
+    let test_dir = TestDir::new("parse-redacted-logs");
+    let input = test_dir.0.join("input.jsonl");
+    let output = test_dir.0.join("output.json");
+    fs::write(
+        &input,
+        "{\"level\":\"ERROR\",\"trace_id\":\"secret-trace\",\"fields\":{\"error\":\"Authorization: Bearer log-secret-token\"}}\n",
+    )
+    .expect("write structured log fixture");
+    log_parser::extract_error_context(&input.to_string_lossy(), &output.to_string_lossy())
+        .expect("parse structured logs");
+    let structured = fs::read_to_string(&output).expect("read structured output");
+    assert!(!structured.contains("log-secret-token"));
+
+    let fallback_input = test_dir.0.join("fallback.log");
+    let fallback_output = test_dir.0.join("fallback.out");
+    fs::write(
+        &fallback_input,
+        "Authorization: Bearer fallback-secret-token\nplain line",
+    )
+    .expect("write fallback fixture");
+    log_parser::extract_error_context(
+        &fallback_input.to_string_lossy(),
+        &fallback_output.to_string_lossy(),
+    )
+    .expect("parse fallback logs");
+    let fallback = fs::read_to_string(fallback_output).expect("read fallback output");
+    assert!(!fallback.contains("fallback-secret-token"));
+}
+
+#[test]
+fn log_parser_rejects_an_oversized_line_before_retaining_it() {
+    let test_dir = TestDir::new("parse-oversized-line");
+    let input = test_dir.0.join("input.log");
+    let output = test_dir.0.join("output.log");
+    let line = "x".repeat(1024 * 1024 + 1);
+    fs::write(&input, line).expect("write oversized log fixture");
+    let error =
+        log_parser::extract_error_context(&input.to_string_lossy(), &output.to_string_lossy())
+            .expect_err("oversized log line must fail closed");
+    assert!(error.to_string().contains("exceeds 1048576 bytes"));
 }

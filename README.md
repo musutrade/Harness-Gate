@@ -441,12 +441,16 @@ harness-gate adapter run \
   --allow-resource test-database
 ```
 
-The host verifies the Ed25519 declaration and executable SHA-256 digest before
-starting the adapter, clears inherited environment variables, applies the
-declared capability allowlist, attempts bounded process-tree cleanup on timeout
-or cancellation, and rejects malformed results or artifacts outside the
-invocation root. Adapter failures are reported as
-`ADAPTER_PROTOCOL_FAILURE`.
+The v2 host verifies an Ed25519 signature over the canonical complete request
+(adapter identity, invocation/step, arguments, input, environment,
+capabilities, timeout, configuration digest, artifact root, nonce, and validity
+window) and the executable SHA-256 digest before starting the adapter. It
+clears inherited environment variables, applies the declared capability
+allowlist, enforces bounded stdout/stderr and artifact budgets, attempts bounded
+process-tree cleanup on timeout or cancellation, and rejects malformed results
+or artifacts outside the invocation root. Adapter failures are reported as
+`ADAPTER_PROTOCOL_FAILURE`. Nonces are single-use within the host policy; a
+long-lived orchestrator should persist its replay ledger across host restarts.
 
 The request is a single JSON document; it is not read from `flow.toml` and does
 not enable adapters in built-in steps. Repeat `--trusted-key` for every trusted
@@ -454,9 +458,11 @@ Ed25519 key and pass only the capabilities that the invocation is allowed to
 use (`--allow-network`, `--allow-resource`, or `--allow-environment`). Keep the
 request, executable, and artifact root inside the project or another explicitly
 managed deployment directory, and review the signer before execution. The
-capability allowlist is a protocol-level declaration check, not an operating-
-system network, filesystem, resource, or process sandbox; process cleanup is
-best effort and is not proof of complete descendant containment.
+capability allowlist is a protocol-level declaration check, not an
+operating-system network, filesystem, resource, or process sandbox; process
+cleanup is best effort and is not proof of complete descendant containment.
+The host retains at most 16 MiB per output stream by default and returns a
+structured truncation failure when a limit is exceeded.
 
 `parse-logs` reads JSON Lines in bounded streaming passes. It keeps at most 20 records before the first matching
 error and 30 records in the output; when no trace ID is available it emits only the last 30 raw lines. This avoids

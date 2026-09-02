@@ -1,13 +1,20 @@
 use super::command::{isolate_process_tree, terminate};
 use super::isolation;
+use super::reader::{
+    collect_limited_reader, spawn_limited_reader, LimitedOutput, DEFAULT_CAPTURE_BYTES,
+    DEFAULT_READER_DEADLINE,
+};
 use super::signal::cancelled;
 use crate::config::{RunnerResultFormat, TestIsolation};
 use anyhow::{Context, Result};
 use serde::Serialize;
 use std::collections::BTreeMap;
 use std::ffi::{OsStr, OsString};
+use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 #[derive(Debug)]
@@ -186,10 +193,8 @@ impl Task {
             .isolation_state
             .as_deref()
             .map(IsolationStateGuard::new);
-        let log_file = crate::utils::fs::create_atomic_output(&self.log, true)
+        let mut log_file = crate::utils::fs::create_atomic_output(&self.log, true)
             .with_context(|| format!("create log {}", self.log.display()))?;
-        let stdout = log_file.try_clone()?;
-        let stderr = log_file.try_clone()?;
         let started = Instant::now();
         let started_at = chrono::Utc::now().to_rfc3339();
         let mut command = Command::new(&self.program);
@@ -200,17 +205,44 @@ impl Task {
         for name in self.env_remove {
             command.env_remove(name);
         }
-        command
-            .stdout(Stdio::from(stdout))
-            .stderr(Stdio::from(stderr));
+        command.stdout(Stdio::piped()).stderr(Stdio::piped());
         isolate_process_tree(&mut command);
         let mut child = command
             .spawn()
             .with_context(|| format!("start {}", self.program.to_string_lossy()))?;
 
+        let stdout = child
+            .stdout
+            .take()
+            .context("task stdout was not captured")?;
+        let stderr = child
+            .stderr
+            .take()
+            .context("task stderr was not captured")?;
+        let stdout_overflow = Arc::new(AtomicBool::new(false));
+        let stderr_overflow = Arc::new(AtomicBool::new(false));
+        let (stdout_handle, stdout_receiver) =
+            spawn_limited_reader(stdout, DEFAULT_CAPTURE_BYTES, Arc::clone(&stdout_overflow));
+        let (stderr_handle, stderr_receiver) =
+            spawn_limited_reader(stderr, DEFAULT_CAPTURE_BYTES, Arc::clone(&stderr_overflow));
+
+        let mut output_limited = None;
         let (status, timed_out, was_cancelled) = loop {
             if let Some(status) = child.try_wait()? {
+                if stdout_overflow.load(Ordering::Acquire) {
+                    output_limited = Some("stdout");
+                } else if stderr_overflow.load(Ordering::Acquire) {
+                    output_limited = Some("stderr");
+                }
                 break (status, false, false);
+            }
+            if stdout_overflow.load(Ordering::Acquire) {
+                output_limited = Some("stdout");
+                break (terminate(&mut child)?, false, false);
+            }
+            if stderr_overflow.load(Ordering::Acquire) {
+                output_limited = Some("stderr");
+                break (terminate(&mut child)?, false, false);
             }
             if cancelled() {
                 break (terminate(&mut child)?, false, true);
@@ -221,9 +253,101 @@ impl Task {
             std::thread::sleep(Duration::from_millis(100));
         };
 
+        let reader_started = Instant::now();
+        let mut reader_error = None;
+        let stdout = match collect_limited_reader(
+            stdout_handle,
+            stdout_receiver,
+            DEFAULT_READER_DEADLINE,
+            "task stdout",
+        ) {
+            Ok(output) => output,
+            Err(error) => {
+                reader_error = Some(format!("task stdout reader deadline/error: {error}"));
+                LimitedOutput {
+                    bytes: Vec::new(),
+                    truncated: false,
+                }
+            }
+        };
+        let remaining_reader_deadline =
+            DEFAULT_READER_DEADLINE.saturating_sub(reader_started.elapsed());
+        let stderr = match collect_limited_reader(
+            stderr_handle,
+            stderr_receiver,
+            remaining_reader_deadline,
+            "task stderr",
+        ) {
+            Ok(output) => output,
+            Err(error) => {
+                reader_error
+                    .get_or_insert_with(|| format!("task stderr reader deadline/error: {error}"));
+                LimitedOutput {
+                    bytes: Vec::new(),
+                    truncated: false,
+                }
+            }
+        };
+
+        let mut failure_code = None;
+        let mut limit_detail = None;
+        let combined_bytes = stdout.bytes.len().saturating_add(stderr.bytes.len());
+        if let Some(stream) = output_limited
+            .or_else(|| {
+                stdout
+                    .truncated
+                    .then_some("stdout")
+                    .or_else(|| stderr.truncated.then_some("stderr"))
+            })
+            .or_else(|| {
+                (combined_bytes > DEFAULT_CAPTURE_BYTES.saturating_mul(2)).then_some("combined")
+            })
+        {
+            failure_code = Some("OUTPUT_LIMIT_EXCEEDED".to_string());
+            let captured = if stream == "stdout" {
+                stdout.bytes.len()
+            } else if stream == "stderr" {
+                stderr.bytes.len()
+            } else {
+                combined_bytes
+            };
+            limit_detail = Some(format!(
+                "{stream} output exceeded {} bytes (captured {captured} bytes; truncated=true)",
+                if stream == "combined" {
+                    DEFAULT_CAPTURE_BYTES.saturating_mul(2)
+                } else {
+                    DEFAULT_CAPTURE_BYTES
+                }
+            ));
+        } else if let Some(error) = reader_error {
+            failure_code = Some("READER_DEADLINE_EXCEEDED".to_string());
+            limit_detail = Some(error);
+        }
+
+        log_file.write_all(&stdout.bytes)?;
+        if !stdout.bytes.is_empty() && !stderr.bytes.is_empty() {
+            log_file.write_all(b"\n")?;
+        }
+        log_file.write_all(&stderr.bytes)?;
+        if let Some(detail) = &limit_detail {
+            log_file
+                .write_all(format!("\n[HARNESS_GATE_EVIDENCE_FAILURE] {detail}\n").as_bytes())?;
+        }
         log_file
             .publish()
             .with_context(|| format!("publish log {}", self.log.display()))?;
+
+        let detail = if let Some(detail) = limit_detail {
+            Some(detail)
+        } else if was_cancelled {
+            Some("cancelled".to_string())
+        } else if timed_out {
+            Some("timed out".to_string())
+        } else if status.success() {
+            None
+        } else {
+            status.code().map(|code| format!("exit code {code}"))
+        };
 
         Ok(TaskResult {
             step_id: None,
@@ -232,21 +356,13 @@ impl Task {
             started_at: Some(started_at),
             finished_at: Some(chrono::Utc::now().to_rfc3339()),
             label: self.label,
-            passed: status.success() && !timed_out && !was_cancelled,
+            passed: status.success() && !timed_out && !was_cancelled && failure_code.is_none(),
             timed_out,
             cancelled: was_cancelled,
             duration_ms: started.elapsed().as_millis(),
             log: self.log.to_string_lossy().to_string(),
-            detail: if was_cancelled {
-                Some("cancelled".to_string())
-            } else if timed_out {
-                Some("timed out".to_string())
-            } else if status.success() {
-                None
-            } else {
-                status.code().map(|code| format!("exit code {code}"))
-            },
-            failure_code: None,
+            detail,
+            failure_code,
             attempts: Vec::new(),
             flaky: false,
             retry_class: None,
