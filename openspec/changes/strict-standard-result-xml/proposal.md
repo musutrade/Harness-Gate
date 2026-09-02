@@ -1,6 +1,6 @@
 # Proposal: Strict Standard Result XML
 
-**Status:** Implemented pending CI
+**Status:** Implemented
 **Date:** 2026-09-02
 
 JUnit and TRX result ingestion previously checked tag balance but did not
