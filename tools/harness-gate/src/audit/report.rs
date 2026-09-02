@@ -1,4 +1,5 @@
 use super::{ArchViolation, Config, Violation};
+use crate::utils::redaction::redact_text;
 use serde::Serialize;
 
 pub(super) fn generate_markdown(
@@ -18,15 +19,19 @@ pub(super) fn generate_markdown(
             .collect();
 
         let count = rule_violations.len();
-        output.push_str(&format!(">> {}: 违规数量 {}\n", rule.name, count));
+        output.push_str(&format!(
+            ">> {}: 违规数量 {}\n",
+            redact_text(&rule.name),
+            count
+        ));
 
         if count > 0 {
             for v in rule_violations.iter().take(occurrence_limit) {
                 output.push_str(&format!(
                     "    {}:{}: {}\n",
-                    v.file.display(),
+                    redact_text(&v.file.to_string_lossy()),
                     v.line,
-                    v.content
+                    redact_text(&v.content)
                 ));
             }
             if count > occurrence_limit {
@@ -47,21 +52,25 @@ pub(super) fn generate_markdown(
             .collect();
         let count = violations.len();
 
-        output.push_str(&format!(">> {}: 违规数量 {}\n", rule.name, count));
+        output.push_str(&format!(
+            ">> {}: 违规数量 {}\n",
+            redact_text(&rule.name),
+            count
+        ));
 
         if count > 0 {
             for v in violations.iter().take(occurrence_limit) {
                 output.push_str(&format!(
                     "    {}:{}: {}\n",
-                    v.file.display(),
+                    redact_text(&v.file.to_string_lossy()),
                     v.line,
-                    v.content
+                    redact_text(&v.content)
                 ));
             }
             if count > occurrence_limit {
                 output.push_str(&format!("    ... 剩余 {} 处\n", count - occurrence_limit));
             }
-            output.push_str(&format!("  💡 建议: {}\n", rule.suggestion));
+            output.push_str(&format!("  💡 建议: {}\n", redact_text(&rule.suggestion)));
         } else {
             output.push_str("  ✅ 未发现违规\n");
         }
@@ -126,15 +135,15 @@ pub(super) fn generate_report(
         let occurrences: Vec<JsonOccurrence> = rule_violations
             .iter()
             .map(|v| JsonOccurrence {
-                file: v.file.to_string_lossy().to_string(),
+                file: redact_text(&v.file.to_string_lossy()),
                 line: v.line,
-                content: v.content.clone(),
+                content: redact_text(&v.content),
             })
             .collect();
 
         hard_json.push(JsonViolation {
-            rule: rule.name.clone(),
-            severity: rule.severity.clone(),
+            rule: redact_text(&rule.name),
+            severity: redact_text(&rule.severity),
             count: occurrences.len(),
             occurrences,
         });
@@ -150,17 +159,17 @@ pub(super) fn generate_report(
         let occurrences: Vec<JsonOccurrence> = rule_violations
             .iter()
             .map(|v| JsonOccurrence {
-                file: v.file.to_string_lossy().to_string(),
+                file: redact_text(&v.file.to_string_lossy()),
                 line: v.line,
-                content: v.content.clone(),
+                content: redact_text(&v.content),
             })
             .collect();
 
         arch_json.push(JsonArchViolation {
-            rule: rule.name.clone(),
-            layer: rule.layer.clone(),
+            rule: redact_text(&rule.name),
+            layer: redact_text(&rule.layer),
             count: occurrences.len(),
-            suggestion: rule.suggestion.clone(),
+            suggestion: redact_text(&rule.suggestion),
             occurrences,
         });
     }

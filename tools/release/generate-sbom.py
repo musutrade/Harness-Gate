@@ -5,8 +5,18 @@ import argparse
 import hashlib
 import json
 import os
+import re
 from datetime import datetime, timezone
 from pathlib import Path
+
+
+_SOURCE_USERINFO = re.compile(r"(?P<scheme>://)[^/?#\s@]+@")
+
+
+def redact_source_url(source: str) -> str:
+    """Remove URL userinfo so credentials cannot enter the published SBOM."""
+
+    return _SOURCE_USERINFO.sub(r"\g<scheme>", source)
 
 
 def sha256(path: Path) -> str:
@@ -28,7 +38,9 @@ def component(package: dict) -> dict:
         "purl": f"pkg:cargo/{name}@{version}",
     }
     if package.get("source"):
-        value["externalReferences"] = [{"type": "distribution", "url": package["source"]}]
+        value["externalReferences"] = [
+            {"type": "distribution", "url": redact_source_url(package["source"])}
+        ]
     return value
 
 

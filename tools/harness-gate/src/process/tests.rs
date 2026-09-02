@@ -1,4 +1,5 @@
-use super::{capture, Task};
+use super::capture::{capture, capture_with_limits, CaptureLimits};
+use super::Task;
 use std::env;
 use std::fs;
 use std::path::Path;
@@ -65,6 +66,27 @@ fn captured_command_has_a_hard_timeout() {
         .expect_err("capture must time out");
 
     assert!(error.to_string().contains("timed out"));
+}
+
+#[cfg(unix)]
+#[test]
+fn captured_command_enforces_output_budget() {
+    let args = vec!["-c".to_string(), "printf 1234567890".to_string()];
+    let error = capture_with_limits(
+        "sh",
+        &args,
+        Path::new("/tmp"),
+        Duration::from_secs(1),
+        CaptureLimits {
+            stdout_bytes: 4,
+            stderr_bytes: 4,
+            total_bytes: 8,
+            reader_deadline: Duration::from_secs(1),
+        },
+    )
+    .expect_err("capture must enforce stdout budget");
+    assert!(error.to_string().contains("stdout output exceeded 4 bytes"));
+    assert!(error.to_string().contains("truncated=true"));
 }
 
 /// The test binary doubles as a child-process fixture. Keeping the fixture in
