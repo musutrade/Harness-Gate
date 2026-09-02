@@ -7,6 +7,10 @@
 **文档性质：** 跟踪清单；不改变运行时行为，也不替代对应的 ADR、OpenSpec
 或管理员审批。
 
+**后续状态：**代码与记录的最新优先级收口见
+[2026-09-01 状态页](priority-followups-2026-09-01.md)；本页的历史验收基线
+和外部证据结论不回写。
+
 ## 当前结论
 
 PR [#60](https://github.com/musutrade/Harness-Gate/pull/60) 已实现五项

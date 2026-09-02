@@ -2,6 +2,7 @@ mod adapter;
 mod capture;
 mod command;
 mod isolation;
+mod reader;
 mod signal;
 mod task;
 #[cfg(test)]

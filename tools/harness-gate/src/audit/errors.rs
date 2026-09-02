@@ -1,4 +1,5 @@
 use crate::error::CodedError;
+use crate::utils::redaction::redact_text;
 
 /// Errors emitted by the architecture-audit boundary.
 #[derive(Debug, thiserror::Error)]
@@ -14,17 +15,17 @@ pub enum AuditError {
 impl AuditError {
     pub(super) fn configuration(error: anyhow::Error) -> Self {
         Self::Configuration {
-            message: format!("{error:#}"),
+            message: redact_text(&format!("{error:#}")),
         }
     }
     pub(super) fn execution(error: anyhow::Error) -> Self {
         Self::Execution {
-            message: format!("{error:#}"),
+            message: redact_text(&format!("{error:#}")),
         }
     }
     pub(super) fn log_parsing(error: anyhow::Error) -> Self {
         Self::LogParsing {
-            message: format!("{error:#}"),
+            message: redact_text(&format!("{error:#}")),
         }
     }
 }

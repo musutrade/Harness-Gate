@@ -14,6 +14,7 @@ use crate::project::Project;
 use crate::scope::ScopeResult;
 use crate::service::ServiceManager;
 use crate::ui::{self, Progress};
+use crate::utils::redaction::redact_text;
 use plan::VerificationPlan;
 use serde::Serialize;
 use std::collections::BTreeSet;
@@ -46,13 +47,13 @@ pub enum VerifyError {
 impl VerifyError {
     fn execution(error: anyhow::Error) -> Self {
         Self::Execution {
-            message: format!("{error:#}"),
+            message: redact_text(&format!("{error:#}")),
         }
     }
 
     fn report(error: anyhow::Error) -> Self {
         Self::Report {
-            message: format!("{error:#}"),
+            message: redact_text(&format!("{error:#}")),
         }
     }
 }
