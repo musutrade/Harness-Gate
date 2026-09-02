@@ -79,11 +79,15 @@ pub(super) fn parse_result_count(content: &str, parser: &ParserConfig) -> Result
             Ok((count, *minimum))
         }
         ParserConfig::Junit { minimum } => Ok((
-            count_xml_elements(normalized.as_ref(), b"testcase")?,
+            count_xml_elements(
+                normalized.as_ref(),
+                b"testcase",
+                &[b"testsuite", b"testsuites"],
+            )?,
             *minimum,
         )),
         ParserConfig::Trx { minimum } => Ok((
-            count_xml_elements(normalized.as_ref(), b"UnitTestResult")?,
+            count_xml_elements(normalized.as_ref(), b"UnitTestResult", &[b"TestRun"])?,
             *minimum,
         )),
         ParserConfig::Json {
@@ -98,21 +102,64 @@ pub(super) fn parse_result_count(content: &str, parser: &ParserConfig) -> Result
     }
 }
 
-fn count_xml_elements(content: &str, wanted: &[u8]) -> Result<usize> {
+fn count_xml_elements(content: &str, wanted: &[u8], allowed_roots: &[&[u8]]) -> Result<usize> {
     let mut reader = Reader::from_str(content);
     reader.config_mut().trim_text(true);
     let mut count = 0;
     let mut stack = Vec::<Vec<u8>>::new();
+    let mut seen_root = false;
+    let mut root_closed = false;
     loop {
         match reader.read_event() {
             Ok(Event::Start(event)) => {
-                if event.name().as_ref() == wanted {
+                let name = event.name();
+                let local_name = name.local_name();
+                if stack.is_empty() {
+                    if root_closed {
+                        return Err(anyhow::anyhow!(
+                            "parse XML test results: multiple root elements"
+                        ));
+                    }
+                    if !allowed_roots
+                        .iter()
+                        .any(|root| *root == local_name.as_ref())
+                    {
+                        return Err(anyhow::anyhow!(
+                            "parse XML test results: invalid root element {:?}",
+                            String::from_utf8_lossy(local_name.as_ref())
+                        ));
+                    }
+                    seen_root = true;
+                }
+                if local_name.as_ref() == wanted {
                     count += 1;
                 }
-                stack.push(event.name().as_ref().to_vec());
+                stack.push(name.as_ref().to_vec());
             }
-            Ok(Event::Empty(event)) if event.name().as_ref() == wanted => count += 1,
-            Ok(Event::Empty(_)) => {}
+            Ok(Event::Empty(event)) => {
+                let name = event.name();
+                let local_name = name.local_name();
+                if stack.is_empty() {
+                    if root_closed {
+                        return Err(anyhow::anyhow!(
+                            "parse XML test results: multiple root elements"
+                        ));
+                    }
+                    if !allowed_roots
+                        .iter()
+                        .any(|root| *root == local_name.as_ref())
+                    {
+                        return Err(anyhow::anyhow!(
+                            "parse XML test results: invalid root element {:?}",
+                            String::from_utf8_lossy(local_name.as_ref())
+                        ));
+                    }
+                    seen_root = true;
+                    root_closed = true;
+                } else if local_name.as_ref() == wanted {
+                    count += 1;
+                }
+            }
             Ok(Event::End(event)) => {
                 let Some(open) = stack.pop() else {
                     return Err(anyhow::anyhow!(
@@ -124,11 +171,48 @@ fn count_xml_elements(content: &str, wanted: &[u8]) -> Result<usize> {
                         "parse XML test results: mismatched closing tag"
                     ));
                 }
+                if stack.is_empty() {
+                    root_closed = true;
+                }
+            }
+            Ok(Event::Text(event)) => {
+                if stack.is_empty() && event.iter().any(|byte| !byte.is_ascii_whitespace()) {
+                    return Err(anyhow::anyhow!(
+                        "parse XML test results: non-whitespace content outside root"
+                    ));
+                }
+            }
+            Ok(Event::CData(_)) => {
+                if stack.is_empty() {
+                    return Err(anyhow::anyhow!(
+                        "parse XML test results: CDATA outside root"
+                    ));
+                }
+            }
+            Ok(Event::Decl(_)) if seen_root => {
+                return Err(anyhow::anyhow!(
+                    "parse XML test results: XML declaration outside prolog"
+                ));
+            }
+            Ok(Event::DocType(_)) if seen_root => {
+                return Err(anyhow::anyhow!(
+                    "parse XML test results: doctype outside prolog"
+                ));
+            }
+            Ok(Event::GeneralRef(_)) if stack.is_empty() => {
+                return Err(anyhow::anyhow!(
+                    "parse XML test results: entity reference outside root"
+                ));
             }
             Ok(Event::Eof) => break,
             Ok(_) => {}
             Err(error) => return Err(anyhow::anyhow!("parse XML test results: {error}")),
         }
+    }
+    if !seen_root {
+        return Err(anyhow::anyhow!(
+            "parse XML test results: missing root element"
+        ));
     }
     if !stack.is_empty() {
         return Err(anyhow::anyhow!("parse XML test results: unclosed tag"));
@@ -197,6 +281,19 @@ mod tests {
     }
 
     #[test]
+    fn parses_nested_junit_suites_and_namespaces() {
+        let parser = ParserConfig::Junit { minimum: 1 };
+        assert_eq!(
+            parse_result_count(
+                r#"<j:testsuites xmlns:j="urn:junit"><j:testsuite><j:testcase/></j:testsuite></j:testsuites>"#,
+                &parser,
+            )
+            .unwrap(),
+            (1, 1)
+        );
+    }
+
+    #[test]
     fn parses_trx_results() {
         let parser = ParserConfig::Trx { minimum: 1 };
         assert_eq!(
@@ -222,6 +319,20 @@ mod tests {
     fn malformed_standard_results_fail_closed() {
         let parser = ParserConfig::Junit { minimum: 1 };
         assert!(parse_result_count("<testsuite><testcase>", &parser).is_err());
+    }
+
+    #[test]
+    fn ambiguous_standard_results_fail_closed() {
+        let junit = ParserConfig::Junit { minimum: 1 };
+        assert!(parse_result_count("<testsuite/><testsuite/>", &junit).is_err());
+        assert!(parse_result_count("<not-a-suite><testcase/></not-a-suite>", &junit).is_err());
+        assert!(parse_result_count("<testsuite/>trailing", &junit).is_err());
+        assert!(parse_result_count("<testsuite/><![CDATA[trailing]]>", &junit).is_err());
+        assert!(parse_result_count("<testsuite/><?xml version=\"1.0\"?>", &junit).is_err());
+        assert!(parse_result_count("", &junit).is_err());
+
+        let trx = ParserConfig::Trx { minimum: 1 };
+        assert!(parse_result_count("<testsuite/>", &trx).is_err());
     }
 
     #[test]

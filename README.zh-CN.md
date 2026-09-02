@@ -482,7 +482,9 @@ harness-gate verify --all
 
 机器结果还记录 parser 模式/版本和完整性。优先使用 JUnit、TRX 或 JSON
 标准结果；malformed、零结果和部分结果分别映射为 `RESULT_PARSE_FAILURE`、
-`RESULT_ZERO` 和 `RESULT_PARTIAL`。有界重试记录 `retry_count` 与 `flaky`，
+`RESULT_ZERO` 和 `RESULT_PARTIAL`。JUnit 只接受单个 `testsuite` 或 `testsuites`
+根元素，TRX 只接受单个 `TestRun` 根元素（支持命名空间前缀）；缺根、多根或根元素外
+非空内容均 fail closed。有界重试记录 `retry_count` 与 `flaky`，
 分片记录 merge identity 并拒绝缺失或重复测试身份。有效的到期 waiver 使用
 机器可区分的 `WAIVED`，并包含审批和补偿控制证据。
 
