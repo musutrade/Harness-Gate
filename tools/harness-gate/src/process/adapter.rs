@@ -202,7 +202,8 @@ pub struct AdapterOutcome {
     pub stderr_bytes: usize,
 }
 
-/// Execute one signed adapter request with the process tree isolated from the host.
+/// Execute one signed adapter request in an independent process group with
+/// bounded host-side cleanup.
 pub fn run(request: AdapterRequest, policy: &HostPolicy) -> Result<AdapterOutcome, AdapterError> {
     run_with_cancel(request, policy, cancelled)
 }

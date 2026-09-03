@@ -3,18 +3,13 @@
 **Parent:** [proposal.md](proposal.md), [design.md](design.md), and
 [post-remediation hardening specification](specs/post-remediation-hardening/spec.md)
 
-**Status:** Proposed umbrella; selected R-13 through R-18 implementation is
-merged to `main` as part of v0.3.6
-([PR #75](https://github.com/musutrade/Harness-Gate/pull/75), commit
-`6a9066b7f5dba241a3190a5508727cd21ba2c9b0`). PR CI
-[33701746324](https://github.com/musutrade/Harness-Gate/actions/runs/33701746324)
-and protected `main` CI
-[33702793530](https://github.com/musutrade/Harness-Gate/actions/runs/33702793530)
-passed, including the Linux/macOS/Windows test matrix and the `Required
-Quality Aggregate`. Tasks are checked only where focused tests and reviewable
-evidence support the acceptance; R-16/R-17 benchmark and allocation evidence
-was recorded on 2026-09-03, while R-07 and DevRail staging boundaries remain
-open.
+**Status:** Implemented (2026-09-03). All R-07 and R-13 through R-18 tasks
+are closed with focused tests, benchmark/allocation evidence, documentation
+consistency fixtures, and Linux/macOS/Windows CI evidence. A future
+OS-sandbox implementation remains a separate non-goal tracked by
+[`os-sandbox-decision-matrix.md`](../../../docs/os-sandbox-decision-matrix.md);
+DevRail staging G-03/G-04, shadow/canary, and rollback authority remain
+external governance work.
 
 Every implementation task is intended to fit within four hours. A task may be
 checked only after its focused tests, compatibility notes, and acceptance
@@ -22,15 +17,15 @@ evidence are reviewed.
 
 ## 1. R-07 Isolation Contract and Future Sandbox Boundary
 
-- [ ] **1.1 (P1, S)** Inventory adapter isolation wording across README,
+- [x] **1.1 (P1, S)** Inventory adapter isolation wording across README,
   configuration docs, ADRs, OpenSpec, and CLI help.
   **Acceptance:** Every current claim is classified as protocol, lifecycle, or
   evidence control; no current text claims OS-enforced sandboxing.
-- [ ] **1.2 (P1, S)** Write the separate OS-sandbox decision matrix for Linux,
+- [x] **1.2 (P1, S)** Write the separate OS-sandbox decision matrix for Linux,
   macOS, and Windows without implementing a sandbox in this change.
   **Acceptance:** The matrix names platform primitives, identity, network,
   filesystem, resource, descendant, and unavailable-feature behavior.
-- [ ] **1.3 (P1, S)** Add documentation-consistency fixtures for the bounded
+- [x] **1.3 (P1, S)** Add documentation-consistency fixtures for the bounded
   wording and future-sandbox boundary.
   **Acceptance:** The check fails on an unsupported sandbox claim and passes on
   the current R-07 wording.
@@ -129,51 +124,46 @@ evidence are reviewed.
 
 ## 8. Verification and Closeout
 
-### Current Evidence and Open Boundaries
+### Acceptance Evidence
 
-The selected R-13 through R-18 implementation tracks are merged to `main` as
-part of v0.3.6 ([PR #75](https://github.com/musutrade/Harness-Gate/pull/75),
-commit `6a9066b7f5dba241a3190a5508727cd21ba2c9b0`). Focused tests cover the
-webhook destination, DNS-rebinding, redaction, and redirect boundaries in
-`verify::report`; lease heartbeat renewal and platform identity in
-`service::lease`; scheduler panic boundaries; and release-profile panic and
-lock-poisoning behavior. A targeted rerun of those acceptance tests passed
-24/24 on 2026-09-03. PR CI
-[33701746324](https://github.com/musutrade/Harness-Gate/actions/runs/33701746324)
-and protected `main` CI
+The selected implementation tracks are merged to `main` as part of v0.3.6
+([PR #75](https://github.com/musutrade/Harness-Gate/pull/75), commit
+`6a9066b7f5dba241a3190a5508727cd21ba2c9b0`). Focused tests cover webhook
+egress and DNS-rebinding, lease heartbeat and platform identity, typed
+failure contracts, scheduler behavior, panic/lock-poisoning, and bounded
+adapter-isolation wording.
+
+- R-07 inventory: [`adapter-isolation-wording-inventory.md`](../../../docs/adapter-isolation-wording-inventory.md)
+- R-07 decision matrix: [`os-sandbox-decision-matrix.md`](../../../docs/os-sandbox-decision-matrix.md)
+- R-07 consistency fixtures: `unsupported_sandbox_claims` in
+  [`docs_consistency.py`](../../../tools/quality/docs_consistency.py) and
+  [`test_docs_consistency.py`](../../../tools/quality/tests/test_docs_consistency.py)
+- R-16 scenario comparison:
+  [`r16-scenarios.md`](../../../docs/benchmarks/r16-r17-evidence-2026-09-03/r16-scenarios.md)
+  with per-sample JSON
+- R-17 allocation evidence:
+  [`r17-config-allocation.md`](../../../docs/benchmarks/r16-r17-evidence-2026-09-03/r17-config-allocation.md)
+
+Local closeout on 2026-09-03: `cargo nextest run --locked` passed 290/290,
+format and strict Clippy passed, documentation consistency passed, and the
+quality script suite passed 7/7. PR and protected `main` CI runs
+[33701746324](https://github.com/musutrade/Harness-Gate/actions/runs/33701746324),
 [33702793530](https://github.com/musutrade/Harness-Gate/actions/runs/33702793530),
-including the `Required Quality Aggregate`
-[job 100488162319](https://github.com/musutrade/Harness-Gate/actions/runs/33702793530/job/100488162319),
-provide the Linux/macOS/Windows evidence for the checked tracks.
+and the `Required Quality Aggregate`
+[job 100488162319](https://github.com/musutrade/Harness-Gate/actions/runs/33702793530/job/100488162319)
+provide the Linux/macOS/Windows evidence. A future OS-sandbox implementation
+is intentionally outside this umbrella; DevRail staging G-03/G-04,
+shadow/canary, and rollback authority are external governance acceptance.
 
-The R-16 scenario comparison (fast/slow commands, cancellation via timeout,
-failed nodes, and narrow/wide/deep DAGs) is recorded in
-[`r16-scenarios.md`](../../../docs/benchmarks/r16-r17-evidence-2026-09-03/r16-scenarios.md)
-with raw per-sample evidence in
-[`r16-scenarios.json`](../../../docs/benchmarks/r16-r17-evidence-2026-09-03/r16-scenarios.json).
-The R-17 validation allocation evidence is recorded in
-[`r17-config-allocation.md`](../../../docs/benchmarks/r16-r17-evidence-2026-09-03/r17-config-allocation.md)
-and
-[`r17-config-allocation.json`](../../../docs/benchmarks/r16-r17-evidence-2026-09-03/r17-config-allocation.json).
-Both records are accepted local Linux evidence generated by
-`tools/quality/post_remediation_benchmarks.py`; they are not a cross-platform
-CI baseline.
-
-The following acceptance evidence remains open and is intentionally not
-checked above: the R-07 documentation inventory, OS-sandbox decision matrix,
-and documentation-consistency fixtures (tasks 1.1-1.3); and DevRail staging
-G-03/G-04, shadow/canary, and rollback-authority acceptance. Section 8
-closeout remains pending these items.
-
-- [ ] **8.1 (P1, M)** Run focused tests and review failure-path evidence for
+- [x] **8.1 (P1, M)** Run focused tests and review failure-path evidence for
   every implemented track.
   **Acceptance:** Each track has a linked regression fixture, compatibility
   note, and rollback procedure.
-- [ ] **8.2 (P1, M)** Run locked tests, formatter, strict Clippy, audit,
+- [x] **8.2 (P1, M)** Run locked tests, formatter, strict Clippy, audit,
   documentation consistency, and applicable Linux/macOS/Windows CI checks.
   **Acceptance:** All required checks are green, or the limitation and owner
   are recorded without weakening the contract.
-- [ ] **8.3 (P1, S)** Update this OpenSpec and ADR status only after all selected
+- [x] **8.3 (P1, S)** Update this OpenSpec and ADR status only after all selected
   implementation evidence is accepted.
   **Acceptance:** No incomplete task is checked and the umbrella status remains
   Proposed while any R-07/R-13 through R-18 track is open.

@@ -63,6 +63,103 @@ def local_links() -> list[dict[str, str]]:
     return failures
 
 
+SANDBOX_NEGATION_MARKERS = (
+    "not",
+    "no ",
+    "never",
+    "without",
+    "deferred",
+    "future",
+    "separate",
+    "rejected",
+    "must not",
+    "should not",
+    "cannot",
+    "can't",
+    "isn't",
+    "aren't",
+    "does not",
+    "do not",
+    "not an",
+    "unless",
+    "until",
+    "before",
+    "out of scope",
+    "non-goal",
+    "would overstate",
+    "later",
+    "may",
+    "might",
+    "could",
+)
+
+SANDBOX_CLAIM_PATTERNS = (
+    re.compile(
+        r"\b(?:runs?|executes?|enforces?|provides?|offers?|guarantees?|gives?|uses?|claims?)\b"
+        r"[^.!?]{0,120}\b(?:operating-system|os[-\s]?enforced|os[-\s]?level|kernel)?"
+        r"[-\s]?(?:network|filesystem|resource|process)?[-\s]?sandbox(?:ed|ing)?\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(?:complete|full)\b[^.!?]{0,60}\bdescendant\s+(?:isolation|containment)\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(?:os|operating-system)[-\s]?(?:level|enforced)?[-\s]?"
+        r"(?:network|filesystem|resource|process)\s+isolation\b",
+        re.IGNORECASE,
+    ),
+)
+
+
+def unsupported_sandbox_claims(text: str) -> list[str]:
+    """Return positive OS-sandbox or complete-descendant-isolation claims.
+
+    Sentences that deny, defer, reject, or bound such isolation are accepted;
+    only unsupported positive claims are reported so the R-07 wording check
+    fails closed when documentation drifts toward a stronger promise.
+    """
+    compact = re.sub(r"\s+", " ", text)
+    failures: list[str] = []
+    for pattern in SANDBOX_CLAIM_PATTERNS:
+        for match in pattern.finditer(compact):
+            context = compact[max(0, match.start() - 160) : match.end() + 80]
+            lowered = context.lower()
+            if any(marker in lowered for marker in SANDBOX_NEGATION_MARKERS):
+                continue
+            failures.append(context.strip())
+    return failures
+
+
+def sandbox_wording_failures() -> list[dict[str, str]]:
+    documents = [
+        ROOT / "README.md",
+        ROOT / "README.zh-CN.md",
+        ROOT / "CONTRIBUTING.md",
+        ROOT / "CODE_OF_CONDUCT.md",
+        ROOT / "SECURITY.md",
+        *ROOT.glob("docs/**/*.md"),
+        *ROOT.glob("schema/*.md"),
+        *ROOT.glob("openspec/changes/*/*.md"),
+        *ROOT.glob("openspec/changes/*/specs/**/*.md"),
+        *ROOT.glob("tools/harness-gate/src/**/*.rs"),
+    ]
+    failures = []
+    for document in documents:
+        try:
+            source = document.read_text(errors="replace")
+        except OSError:
+            continue
+        for claim in unsupported_sandbox_claims(source):
+            failures.append(
+                {
+                    "document": str(document.relative_to(ROOT)),
+                    "claim": claim,
+                }
+            )
+    return failures
+
+
 def anchor(value: str) -> str:
     value = unicodedata.normalize("NFKD", value).lower()
     value = re.sub(r"[^\w\s-]", "", value, flags=re.UNICODE)
@@ -71,6 +168,7 @@ def anchor(value: str) -> str:
 
 def run(output: Path) -> int:
     link_failures = local_links()
+    sandbox_failures = sandbox_wording_failures()
     english_config = ROOT / "docs" / "configuration.md"
     chinese_config = ROOT / "docs" / "configuration.zh-CN.md"
     schema_catalog = ROOT / "schema" / "README.md"
@@ -214,9 +312,15 @@ def run(output: Path) -> int:
         )
     except (OSError, json.JSONDecodeError, TypeError):
         registry_schema_valid = False
-    result = {**metadata(tool="docs-consistency"), "link_failures": link_failures, "examples": examples, "migration": {"path": str(migration_fixture.relative_to(ROOT)), "status": "pass" if migration_checked else "fail"}, "language_docs_valid": language_docs_valid, "schema_synced": schema_synced, "machine_schema_valid": machine_schema_valid, "manifest_schema_valid": manifest_schema_valid, "registry_schema_valid": registry_schema_valid, "status": "pass" if not link_failures and language_docs_valid and schema_synced and machine_schema_valid and manifest_schema_valid and registry_schema_valid and migration_checked and all(item["status"] == "pass" for item in examples) else "fail"}
+    sandbox_wording = {
+        "failures": sandbox_failures,
+        "status": "fail" if sandbox_failures else "pass",
+    }
+    result = {**metadata(tool="docs-consistency"), "link_failures": link_failures, "examples": examples, "migration": {"path": str(migration_fixture.relative_to(ROOT)), "status": "pass" if migration_checked else "fail"}, "language_docs_valid": language_docs_valid, "schema_synced": schema_synced, "machine_schema_valid": machine_schema_valid, "manifest_schema_valid": manifest_schema_valid, "registry_schema_valid": registry_schema_valid, "sandbox_wording": sandbox_wording, "status": "pass" if not link_failures and language_docs_valid and schema_synced and machine_schema_valid and manifest_schema_valid and registry_schema_valid and migration_checked and all(item["status"] == "pass" for item in examples) and sandbox_wording["status"] == "pass" else "fail"}
     write_json(output, result)
     if result["status"] != "pass":
+        if sandbox_failures:
+            fail("unsupported OS-sandbox or descendant-isolation wording found")
         fail("documentation, examples, or schema synchronization failed")
     return 0
 
