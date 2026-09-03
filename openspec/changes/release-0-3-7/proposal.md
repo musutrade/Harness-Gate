@@ -1,6 +1,6 @@
 # Proposal: Release Harness-Gate 0.3.7
 
-**Status:** Proposed
+**Status:** Implemented (2026-09-03)
 **Date:** 2026-09-03
 
 ## Why
@@ -56,3 +56,28 @@ inventory, and crate URL here before marking this record Implemented.
 - [ADR-0038: Post-Remediation Hardening](../../../docs/adr/0038-post-remediation-hardening.md)
 - [Post-remediation hardening OpenSpec](../post-remediation-hardening/proposal.md)
 - [Release governance operations](../../../docs/release-governance.md)
+
+## Acceptance Evidence
+
+- Pull request [#81](https://github.com/musutrade/Harness-Gate/pull/81) merged
+  as `0491ecca098bfd6d48dfc17829f700a69734a996` after all 21 required checks
+  passed in [PR CI run 33749197449](https://github.com/musutrade/Harness-Gate/actions/runs/33749197449).
+- The exact merge commit passed protected `main` CI in
+  [run 33750527365](https://github.com/musutrade/Harness-Gate/actions/runs/33750527365),
+  including `Required Quality Aggregate`.
+- The immutable [`v0.3.7` tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.7)
+  resolves to that same commit. Release workflow
+  [33751905950](https://github.com/musutrade/Harness-Gate/actions/runs/33751905950)
+  passed eligibility, all four platform builds, release quality gates,
+  Sigstore signing, provenance, GitHub Release creation, and crates.io
+  publication after protected `release` environment approvals.
+- The published [GitHub Release](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.7)
+  contains the exact 21-file upload set declared by `release-inventory.json`.
+  A clean download was verified with `release_inventory.py verify` and
+  `sha256sum -c SHA256SUMS`.
+- The public [harness-gate 0.3.7 crate](https://crates.io/crates/harness-gate/0.3.7)
+  is available; the downloaded archive reports `version = "0.3.7"` and hashes
+  to `c1ab26480ee179c72370f9fd8c30860ca401fd0df54ccbcf7875496ba90df7cf`.
+- The release record does not expand the product boundary: R-07 OS-level
+  sandboxing, DevRail staging G-03/G-04, shadow/canary approval, and rollback
+  authority remain external or future work and are not claimed as accepted.
