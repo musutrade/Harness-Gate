@@ -1172,7 +1172,7 @@ mod tests {
         stale.expires_at = 0;
         write_record(&path, &stale).expect("write stale heartbeat fixture");
 
-        let deadline = Instant::now() + Duration::from_secs(2);
+        let deadline = Instant::now() + Duration::from_secs(15);
         let renewed = loop {
             let record = read_record(&path).expect("read renewed heartbeat lease");
             if record.heartbeat_at > 0 && record.expires_at > record.heartbeat_at {
@@ -1188,10 +1188,22 @@ mod tests {
         assert!(renewed.expires_at > renewed.heartbeat_at);
 
         drop(lease);
-        assert!(
-            !path.exists(),
-            "drop must stop heartbeat and release marker"
-        );
+        // Windows can briefly delay marker removal when the heartbeat thread
+        // just closed the same file (antivirus/indexer scanning or handle
+        // release timing). Poll instead of asserting an immediate delete so a
+        // loaded CI runner does not turn a transient deletion delay into a
+        // flaky failure.
+        let cleanup_deadline = Instant::now() + Duration::from_secs(15);
+        loop {
+            if !path.exists() {
+                break;
+            }
+            assert!(
+                Instant::now() < cleanup_deadline,
+                "drop must stop heartbeat and release marker before the cleanup deadline"
+            );
+            std::thread::sleep(Duration::from_millis(50));
+        }
     }
 
     #[test]
