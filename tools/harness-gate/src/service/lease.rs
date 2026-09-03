@@ -1174,15 +1174,23 @@ mod tests {
 
         let deadline = Instant::now() + Duration::from_secs(15);
         let renewed = loop {
-            let record = read_record(&path).expect("read renewed heartbeat lease");
-            if record.heartbeat_at > 0 && record.expires_at > record.heartbeat_at {
-                break record;
+            match read_record(&path) {
+                Ok(record)
+                    if record.heartbeat_at > 0 && record.expires_at > record.heartbeat_at =>
+                {
+                    break record;
+                }
+                Ok(_) | Err(_) => {
+                    // `write_record` replaces the marker by removing and
+                    // renaming on Windows, so a concurrent read can briefly
+                    // observe a missing file between the two operations.
+                    assert!(
+                        Instant::now() < deadline,
+                        "heartbeat did not renew the lease marker before the deadline"
+                    );
+                    std::thread::sleep(Duration::from_millis(10));
+                }
             }
-            assert!(
-                Instant::now() < deadline,
-                "heartbeat did not renew the lease marker before the deadline"
-            );
-            std::thread::sleep(Duration::from_millis(10));
         };
         assert!(renewed.heartbeat_at > 0);
         assert!(renewed.expires_at > renewed.heartbeat_at);
