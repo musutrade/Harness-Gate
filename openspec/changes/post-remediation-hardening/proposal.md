@@ -1,16 +1,15 @@
 # Proposal: Post-Remediation Security, Reliability, and Maintenance Hardening
 
-**Status:** Proposed
+**Status:** Implemented (2026-09-03)
 **Date:** 2026-09-02
 **Change type:** Security, platform reliability, machine contracts, performance, maintainability, and repository governance
 
 ## Scope Notice
 
 This change records the contracts and acceptance evidence for R-07 and R-13
-through R-18 from the remediation baseline. The umbrella remains Proposed:
-implementation may land incrementally, but no task is complete without its
-focused evidence. It does not modify DevRail traffic or staging authority;
-the deferred environment acceptance is tracked separately.
+through R-18 from the remediation baseline. All tasks are implemented and
+accepted; the umbrella does not modify DevRail traffic or staging authority,
+and the deferred environment acceptance is tracked separately.
 
 R-07's short-term documentation and reader-deadline work is already recorded
 as complete elsewhere. This proposal preserves that wording and defines the
@@ -18,10 +17,10 @@ separate decision required before any operating-system sandbox claim.
 Selected R-13 through R-18 implementation and focused tests are merged to
 `main` as part of v0.3.6
 ([PR #75](https://github.com/musutrade/Harness-Gate/pull/75)); `tasks.md`
-reflects which items carry recorded acceptance evidence. This proposal
-remains Proposed because R-07 documentation/sandbox work and DevRail staging
-acceptance are still open; R-16/R-17 benchmark and allocation evidence is
-recorded in `tasks.md`.
+records the accepted evidence, including the R-07 wording inventory, OS
+sandbox decision matrix, R-16/R-17 benchmark and allocation evidence, and the
+8.x closeout. A future OS-sandbox implementation remains a separate non-goal;
+DevRail staging acceptance remains external governance.
 
 ## Why
 
