@@ -1239,7 +1239,7 @@ mod tests {
     #[test]
     fn uncertain_process_identity_is_retained_without_reclaim() {
         let (_workspace, project) = runtime_project("lease-identity-uncertain");
-        let lease = super::ResourceLease::acquire(
+        let mut lease = super::ResourceLease::acquire(
             &project,
             "step:uncertain",
             "workspace",
@@ -1249,6 +1249,9 @@ mod tests {
         )
         .expect("acquire uncertain identity lease");
         let path = lease.path.clone();
+        // Stop renewal before forging an expired/uncertain fixture. Otherwise
+        // the heartbeat can race this test and restore the live identity.
+        lease.stop_heartbeat();
         let mut forged = read_record(&path).expect("read uncertain identity lease");
         forged.pid = 0;
         forged.process_start_identity = "unavailable:test".into();
