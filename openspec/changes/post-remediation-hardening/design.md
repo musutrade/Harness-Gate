@@ -69,6 +69,15 @@ or renew liveness, cleanup retains the resource and emits a structured
 ownership-uncertain failure. It must never infer ownership from a reused PID,
 name, or stale filename.
 
+Implementation record (2026-09-03, v0.3.6): Linux reads the process start
+time from `/proc/<pid>/stat`; macOS reads `pbi_start_tvsec`/`pbi_start_tvusec`
+through `proc_pidinfo(PROC_PIDTBSDINFO)`; Windows reads the process creation
+`FILETIME` through `GetProcessTimes`. Lease records store `heartbeat_at` and
+`expires_at`; renewal runs on a 15-second heartbeat interval with a 30-second
+renewal threshold and a 15-minute TTL. When identity or renewal cannot be
+proven, cleanup retains the resource and emits structured
+`LEASE_OWNERSHIP_UNCERTAIN` evidence.
+
 Fixtures cover a step longer than the TTL, renewal failure, process restart,
 identity reuse, cancellation during renewal, and cleanup after a successful
 heartbeat on every supported CI platform.
