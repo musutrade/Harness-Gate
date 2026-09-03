@@ -97,6 +97,11 @@ fn cleanup_reclaims_a_stale_marked_lease() {
         None,
     )
     .expect("lease");
+    // Freeze the owner before forging an expired marker. Otherwise the
+    // background heartbeat can race the fixture and make the result depend
+    // on the CI scheduler. `retain` consumes the lease and leaves its marker
+    // for cleanup to inspect.
+    lease.retain();
     let path = std::fs::read_dir(&project.resource_leases)
         .expect("lease directory")
         .next()
@@ -113,8 +118,6 @@ fn cleanup_reclaims_a_stale_marked_lease() {
         serde_json::to_vec_pretty(&record).expect("serialize"),
     )
     .expect("mark stale");
-    drop(lease);
-
     let report = cleanup(&project, false).expect("cleanup stale lease");
     assert_eq!(report.stale, 1);
     assert_eq!(report.reclaimed, 1);

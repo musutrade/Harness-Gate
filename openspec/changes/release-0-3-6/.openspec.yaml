@@ -2,4 +2,4 @@ schema: spec-driven
 status: proposed
 created: 2026-09-02
 goal: Publish Harness-Gate 0.3.6 with post-remediation hardening and English schema documentation
-  skip_specs: true
+skip_specs: true

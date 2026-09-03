@@ -1026,7 +1026,7 @@ mod tests {
         let resource_id = "service:database";
         let invocation_id = "invocation-runtime-fixture";
         let resource_name = "harness-gate-fixture-container";
-        let lease = super::ResourceLease::acquire(
+        let mut lease = super::ResourceLease::acquire(
             project,
             resource_id,
             "container",
@@ -1036,6 +1036,9 @@ mod tests {
         )
         .expect("acquire container lease");
         let path = lease.path.clone();
+        // Freeze the owner before writing the synthetic runtime identity and
+        // stale/active state so heartbeat writes cannot overwrite the fixture.
+        lease.stop_heartbeat();
         let mut record = read_record(&path).expect("read fixture lease");
         let inspection = RuntimeInspection {
             object_id: "runtime-object-1".into(),
