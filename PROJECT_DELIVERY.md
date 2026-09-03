@@ -157,7 +157,7 @@ cargo install --locked --path tools/harness-gate
 
 # 验证安装
 harness-gate --version
-# 输出: harness-gate 1.0.0
+# 输出: harness-gate 0.3.6
 ```
 
 ### 基本使用
@@ -296,5 +296,5 @@ harness-gate hook
 ---
 
 **项目状态**: ✅ 生产就绪  
-**版本**: 1.0.0  
-**最后更新**: 2026-08-26
+**版本**: 0.3.6
+**最后更新**: 2026-09-03
