@@ -2,7 +2,7 @@
 
 ## Status
 
-**Proposed** (2026-09-02)
+**Proposed** (2026-09-02; implementation evidence updated 2026-09-03)
 
 ## Context
 
@@ -144,7 +144,13 @@ undocumented compatibility shortcut.
 ## Acceptance Evidence
 
 This ADR remains a proposal and acceptance boundary for the umbrella change.
-The current branch contains local implementation for portions of R-13 and
-R-14 through R-18, with focused tests; the companion task list records exactly
-which items have evidence. Cross-platform CI, staging, and the R-07 OS sandbox
-remain open and are not claimed here.
+Selected R-13 through R-18 implementation merged to `main` as part of v0.3.6
+([PR #75](https://github.com/musutrade/Harness-Gate/pull/75)); PR CI
+[33701746324](https://github.com/musutrade/Harness-Gate/actions/runs/33701746324)
+and protected `main` CI
+[33702793530](https://github.com/musutrade/Harness-Gate/actions/runs/33702793530)
+passed, including the Linux/macOS/Windows test matrix and `Required Quality
+Aggregate`. The companion task list records exactly which items have
+evidence. R-07 documentation/sandbox work, R-16 benchmark coverage,
+allocation measurement, and DevRail staging G-03/G-04 acceptance remain open
+and are not claimed here.
