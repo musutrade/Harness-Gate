@@ -2,7 +2,7 @@
 
 ## Status
 
-**Proposed** (2026-09-02; implementation evidence updated 2026-09-03)
+**Accepted** (2026-09-02; acceptance recorded 2026-09-03)
 
 ## Context
 
@@ -77,11 +77,11 @@ wording until a future OS-sandbox decision is accepted. No track may change
 DevRail required-check ownership, production traffic, shadow/canary approval,
 or rollback authority; those remain G-03/G-04 external governance work.
 
-The ADR and OpenSpec SHALL remain `Proposed` until implementation evidence,
+The ADR and OpenSpec remained `Proposed` until implementation evidence,
 cross-platform checks where applicable, documentation consistency, and
-rollback instructions are reviewed. Individual implementation work may land
-while these records remain Proposed; checked tasks must link to that evidence
-and must not imply that the umbrella or the deferred R-07 sandbox is complete.
+rollback instructions were reviewed. Checked tasks link to that evidence and
+must not imply that the deferred R-07 OS sandbox implementation is complete;
+the bounded R-07 wording remains the compatibility contract.
 
 ## Consequences
 
@@ -139,18 +139,21 @@ undocumented compatibility shortcut.
 - [ADR-0037: Bind Adapter Requests and Bound Evidence](0037-adapter-request-integrity-and-evidence-budgets.md)
 - [Remediation baseline](../code-remediation-2026-08-31-final.md)
 - [Review follow-up status](../review-followups-2026-08-31.md)
+- [Adapter isolation wording inventory](../adapter-isolation-wording-inventory.md)
+- [OS sandbox decision matrix](../os-sandbox-decision-matrix.md)
 - [OpenSpec: Post-remediation hardening](../../openspec/changes/post-remediation-hardening/proposal.md)
 
 ## Acceptance Evidence
 
-This ADR remains a proposal and acceptance boundary for the umbrella change.
-Selected R-13 through R-18 implementation merged to `main` as part of v0.3.6
-([PR #75](https://github.com/musutrade/Harness-Gate/pull/75)); PR CI
+This ADR is accepted for the R-07 wording boundary and the R-13 through R-18
+implementation tracks. Selected implementation merged to `main` as part of
+v0.3.6 ([PR #75](https://github.com/musutrade/Harness-Gate/pull/75)); PR CI
 [33701746324](https://github.com/musutrade/Harness-Gate/actions/runs/33701746324)
 and protected `main` CI
 [33702793530](https://github.com/musutrade/Harness-Gate/actions/runs/33702793530)
 passed, including the Linux/macOS/Windows test matrix and `Required Quality
-Aggregate`. The companion task list records exactly which items have
-evidence; R-16/R-17 local benchmark and allocation evidence is recorded with
-that list. R-07 documentation/sandbox work and DevRail staging G-03/G-04
-acceptance remain open and are not claimed here.
+Aggregate`. R-07 wording inventory and the OS-sandbox decision matrix are
+recorded above; R-16/R-17 evidence and the 8.x closeout are recorded in the
+companion OpenSpec. A future OS-sandbox implementation is explicitly outside
+this accepted record, and DevRail staging G-03/G-04 acceptance is external
+governance.
