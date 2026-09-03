@@ -15,10 +15,10 @@ pub(crate) use diagnostic::{ConfigDiagnostic, DiagnosticSeverity};
 pub use loader::schema_json;
 pub use migration::migrate_v1;
 pub(crate) use model::{
-    ContainerRuntimeKind, DoctorCheck, DoctorCheckKind, ExternalValuePolicy, FlowConfig,
-    ParserConfig, PathType, RunnerConfig, RunnerResultFormat, ServiceConfig, StepConfig, StepInput,
-    TestIsolation, UnmatchedScope, WaiverConfig, WebhookConfig, CONFIG_VERSION,
-    DEFAULT_CONFIG_PATH,
+    BuiltinGateType, ContainerRuntimeKind, DoctorCheck, DoctorCheckKind, ExternalValuePolicy,
+    FlowConfig, ParserConfig, PathType, RunnerConfig, RunnerResultFormat, ServiceConfig,
+    StepConfig, StepInput, StepKind, TestIsolation, UnmatchedScope, WaiverConfig, WebhookConfig,
+    CONFIG_VERSION, DEFAULT_CONFIG_PATH,
 };
 pub use path::resolve_config_path;
 

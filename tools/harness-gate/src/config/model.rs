@@ -1,3 +1,4 @@
+use crate::failure::RetryClass;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
@@ -82,6 +83,9 @@ pub struct NotificationsConfig {
 #[serde(deny_unknown_fields)]
 pub struct WebhookConfig {
     pub url: String,
+    /// Exact host names authorized for this destination. Wildcards are not
+    /// accepted; address classification is still enforced at connection time.
+    pub allowed_hosts: Vec<String>,
     #[serde(default = "default_true")]
     pub on_failure: bool,
     #[serde(default)]
@@ -157,7 +161,7 @@ pub struct RetryConfig {
     #[serde(default)]
     pub backoff_ms: u64,
     #[serde(default)]
-    pub retryable: BTreeSet<String>,
+    pub retryable: BTreeSet<RetryClass>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
@@ -385,10 +389,10 @@ pub struct StepConfig {
     pub depends_on: Vec<String>,
     /// Optional discriminator. When absent, this entry is a legacy external step.
     #[serde(default)]
-    pub kind: Option<String>,
+    pub kind: Option<StepKind>,
     /// Closed vocabulary for built-in gate declarations.
     #[serde(default)]
-    pub gate_type: Option<String>,
+    pub gate_type: Option<BuiltinGateType>,
     /// Optional versioned test-runner contract. Omitted for legacy steps.
     #[serde(default)]
     pub runner: Option<RunnerConfig>,
@@ -397,6 +401,49 @@ pub struct StepConfig {
     /// explicit compatibility capability for commands that must inspect Git.
     #[serde(default)]
     pub input: StepInput,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, JsonSchema, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum StepKind {
+    ExternalStep,
+    BuiltinGate,
+}
+
+impl From<&str> for StepKind {
+    fn from(value: &str) -> Self {
+        match value {
+            "external-step" => Self::ExternalStep,
+            "builtin-gate" => Self::BuiltinGate,
+            _ => panic!("unknown step kind {value:?}; deserialize configuration instead"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, JsonSchema, PartialEq, Eq, Hash)]
+#[serde(rename_all = "kebab-case")]
+pub enum BuiltinGateType {
+    SecretScan,
+    ArchitectureAudit,
+}
+
+impl From<&str> for BuiltinGateType {
+    fn from(value: &str) -> Self {
+        match value {
+            "secret-scan" => Self::SecretScan,
+            "architecture-audit" => Self::ArchitectureAudit,
+            _ => panic!("unknown built-in gate type {value:?}; deserialize configuration instead"),
+        }
+    }
+}
+
+impl BuiltinGateType {
+    pub(crate) const fn as_str(self) -> &'static str {
+        match self {
+            Self::SecretScan => "secret-scan",
+            Self::ArchitectureAudit => "architecture-audit",
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, JsonSchema, PartialEq, Eq)]

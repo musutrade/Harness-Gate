@@ -103,6 +103,13 @@
   },
   "additionalProperties": false,
   "definitions": {
+    "BuiltinGateType": {
+      "type": "string",
+      "enum": [
+        "secret-scan",
+        "architecture-audit"
+      ]
+    },
     "ContainerRuntimeKind": {
       "description": "Supported container runtimes for managed services.",
       "type": "string",
@@ -658,6 +665,16 @@
       },
       "additionalProperties": false
     },
+    "RetryClass": {
+      "description": "Retry classes are a closed configuration vocabulary. Serde keeps the existing lowercase TOML/JSON spelling while rejecting unknown classes.",
+      "type": "string",
+      "enum": [
+        "cancelled",
+        "timeout",
+        "parser",
+        "exit"
+      ]
+    },
     "RetryConfig": {
       "type": "object",
       "properties": {
@@ -678,7 +695,7 @@
           "default": [],
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/RetryClass"
           },
           "uniqueItems": true
         }
@@ -975,9 +992,13 @@
         "gate_type": {
           "description": "Closed vocabulary for built-in gate declarations.",
           "default": null,
-          "type": [
-            "string",
-            "null"
+          "anyOf": [
+            {
+              "$ref": "#/definitions/BuiltinGateType"
+            },
+            {
+              "type": "null"
+            }
           ]
         },
         "id": {
@@ -995,9 +1016,13 @@
         "kind": {
           "description": "Optional discriminator. When absent, this entry is a legacy external step.",
           "default": null,
-          "type": [
-            "string",
-            "null"
+          "anyOf": [
+            {
+              "$ref": "#/definitions/StepKind"
+            },
+            {
+              "type": "null"
+            }
           ]
         },
         "label": {
@@ -1086,6 +1111,13 @@
         }
       ]
     },
+    "StepKind": {
+      "type": "string",
+      "enum": [
+        "external-step",
+        "builtin-gate"
+      ]
+    },
     "TestIsolation": {
       "type": "string",
       "enum": [
@@ -1160,9 +1192,17 @@
     "WebhookConfig": {
       "type": "object",
       "required": [
+        "allowed_hosts",
         "url"
       ],
       "properties": {
+        "allowed_hosts": {
+          "description": "Exact host names authorized for this destination. Wildcards are not accepted; address classification is still enforced at connection time.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "on_failure": {
           "default": true,
           "type": "boolean"

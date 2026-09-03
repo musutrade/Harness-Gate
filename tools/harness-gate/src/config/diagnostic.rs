@@ -1,3 +1,4 @@
+use crate::failure::RetryClass;
 use serde::Serialize;
 use std::collections::BTreeMap;
 use std::error::Error;
@@ -66,6 +67,11 @@ pub struct ConfigDiagnostic {
     pub path: String,
     pub message: String,
     pub help: String,
+    /// Configuration diagnostics are normally not retryable. The optional
+    /// typed field lets future diagnostics express a retry class without
+    /// making consumers parse human wording.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub retry_class: Option<RetryClass>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub location: Option<SourceLocation>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -109,6 +115,7 @@ impl ConfigDiagnostics {
             path: path.into(),
             message: message.into(),
             help: help.into(),
+            retry_class: None,
             location: None,
             related: Vec::new(),
         });
@@ -143,6 +150,7 @@ impl ConfigDiagnostics {
             path: "$".into(),
             message: format!("configuration has more than {MAX_DIAGNOSTICS} independent errors"),
             help: "fix the reported errors and run `harness-gate config check` again".into(),
+            retry_class: None,
             location: None,
             related: Vec::new(),
         });
@@ -227,51 +235,15 @@ pub fn report_for_error(error: &anyhow::Error) -> ConfigCheckReport {
     if let Some(diagnostics) = error.downcast_ref::<ConfigDiagnostics>() {
         return diagnostics.report();
     }
-    let text = error.to_string();
-    let (id, path, message, help) = if text.contains("required audit configuration is missing") {
-        (
-            "HGCFG-REQUIRED-FILE",
-            "paths.audit_config",
-            "required audit configuration file is missing",
-            "create the configured audit configuration file or update paths.audit_config",
-        )
-    } else if text.contains("required secret scan configuration is missing") {
-        (
-            "HGCFG-REQUIRED-FILE",
-            "paths.secrets_config",
-            "required secret scan configuration file is missing",
-            "create the configured secret scan configuration file or update paths.secrets_config",
-        )
-    } else if text.contains("report directory") {
-        (
-            "HGCFG-INVALID-PATH",
-            "paths.reports",
-            "report directory path could not be resolved safely",
-            "use a repository-relative report directory without symlink escape",
-        )
-    } else if text.contains("audit configuration") {
-        (
-            "HGCFG-INVALID-PATH",
-            "paths.audit_config",
-            "audit configuration path could not be resolved safely",
-            "use a repository-relative audit configuration path inside the repository",
-        )
-    } else if text.contains("secret scan configuration") {
-        (
-            "HGCFG-INVALID-PATH",
-            "paths.secrets_config",
-            "secret scan configuration path could not be resolved safely",
-            "use a repository-relative secret configuration path inside the repository",
-        )
-    } else {
-        (
-            "HGCFG-CHECK",
-            "$",
-            "configuration could not be checked",
-            "verify the project root, configuration path, and required security configuration files",
-        )
-    };
-    ConfigDiagnostics::single(id, path, message, help).report()
+    // Unknown errors intentionally receive one bounded generic report. The
+    // machine contract must never classify an error by searching its prose.
+    ConfigDiagnostics::single(
+        "HGCFG-CHECK",
+        "$",
+        "configuration could not be checked",
+        "verify the project root, configuration path, and required security configuration files",
+    )
+    .report()
 }
 
 impl fmt::Display for ConfigDiagnostics {
@@ -413,6 +385,7 @@ pub(super) fn parse_diagnostic(
         path: "$".into(),
         message: "configuration is not valid TOML".into(),
         help: "fix the TOML syntax or unknown field reported by the parser".into(),
+        retry_class: None,
         location,
         related: Vec::new(),
     };
@@ -441,6 +414,7 @@ pub(super) fn interpolation_diagnostic(
         path: "$".into(),
         message: message.into(),
         help: help.into(),
+        retry_class: None,
         location: Some(location_for_offset(source, range.start)),
         related: Vec::new(),
     });

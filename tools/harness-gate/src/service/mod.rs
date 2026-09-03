@@ -522,13 +522,25 @@ impl Drop for RunningService {
             }
         }
         if cleanup_succeeded {
+            // Stop the heartbeat before release so an ownership uncertainty
+            // is surfaced to the verification report and the marker remains.
             if let Some(lease) = self.lease.take() {
-                let _ = lease.release();
+                if let Err(error) = lease.release_checked() {
+                    let container = self.container.as_deref().unwrap_or("<unknown>");
+                    let detail = format!(
+                        "failed to release {} lease for container {container:?}: {error:#}",
+                        self.runtime.executable()
+                    );
+                    if let Ok(mut errors) = self.cleanup_errors.lock() {
+                        errors.push(detail.clone());
+                    }
+                    eprintln!("warning: {detail}");
+                }
             }
         } else if let Some(lease) = self.lease.take() {
             // Keep the marker available to `harness-gate cleanup` when the
             // adapter could not stop the resource during normal teardown.
-            std::mem::forget(lease);
+            lease.retain();
         }
     }
 }

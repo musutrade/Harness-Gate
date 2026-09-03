@@ -1,5 +1,6 @@
 use super::parser::parse_result_count;
 use crate::config::{ParserConfig, StepConfig, TestIsolation};
+use crate::failure::{FailureCode, RetryClass};
 use crate::process::{
     allocate_isolation, ParserEvidence, RunnerExecution, Task, TaskAttempt, TaskResult,
 };
@@ -38,7 +39,7 @@ pub(super) fn run_configured_step<'a>(
                     duration_ms: 0,
                     log: String::new(),
                     detail: Some(format!("{error:#}")),
-                    failure_code: Some("SERVICE_SETUP_FAILURE".into()),
+                    failure_code: Some(FailureCode::ServiceSetupFailure),
                     attempts: Vec::new(),
                     flaky: false,
                     retry_class: None,
@@ -66,7 +67,7 @@ pub(super) fn run_configured_step<'a>(
                     duration_ms: 0,
                     log: String::new(),
                     detail: Some(format!("{error:#}")),
-                    failure_code: Some("SERVICE_LEASE_FAILURE".into()),
+                    failure_code: Some(FailureCode::ServiceLeaseFailure),
                     attempts: Vec::new(),
                     flaky: false,
                     retry_class: None,
@@ -102,7 +103,7 @@ pub(super) fn run_configured_step<'a>(
         let mut result = execute(task, parser)?;
         result.attempt = Some(attempt);
         if !result.passed {
-            result.retry_class = Some(retry_class(&result).into());
+            result.retry_class = Some(retry_class(&result));
         }
         attempts.push(TaskAttempt {
             attempt,
@@ -118,7 +119,7 @@ pub(super) fn run_configured_step<'a>(
         let should_retry = !result.passed
             && !result.cancelled
             && attempt < max_attempts
-            && retry.is_some_and(|policy| policy.retryable.contains(retry_class(&result)));
+            && retry.is_some_and(|policy| policy.retryable.contains(&retry_class(&result)));
         result.attempts = attempts.clone();
         if !should_retry {
             result.flaky = result.passed && attempts.iter().any(|attempt| attempt.status == "FAIL");
@@ -152,22 +153,20 @@ fn task_status(result: &TaskResult) -> &'static str {
     }
 }
 
-fn retry_class(result: &TaskResult) -> &'static str {
+fn retry_class(result: &TaskResult) -> RetryClass {
     if result.cancelled {
-        "cancelled"
+        RetryClass::Cancelled
     } else if result.timed_out {
-        "timeout"
-    } else if result.failure_code.as_deref() == Some("RESULT_PARSE_FAILURE")
-        || result.failure_code.as_deref() == Some("RESULT_ZERO")
-        || result.failure_code.as_deref() == Some("RESULT_PARTIAL")
-        || result
-            .detail
-            .as_deref()
-            .is_some_and(|detail| detail.starts_with("parsed "))
-    {
-        "parser"
+        RetryClass::Timeout
+    } else if matches!(
+        result.failure_code,
+        Some(
+            FailureCode::ResultParseFailure | FailureCode::ResultZero | FailureCode::ResultPartial
+        )
+    ) {
+        RetryClass::Parser
     } else {
-        "exit"
+        RetryClass::Exit
     }
 }
 
@@ -364,7 +363,7 @@ fn execute(task: Task, parser: Option<&ParserConfig>) -> Result<TaskResult> {
                 Ok(content) => content,
                 Err(error) => {
                     result.passed = false;
-                    result.failure_code = Some("RESULT_PARSE_FAILURE".into());
+                    result.failure_code = Some(FailureCode::ResultParseFailure);
                     result.detail = Some(format!("parser failure: read result log: {error}"));
                     result.parser = Some(ParserEvidence {
                         mode: parser_mode(parser).into(),
@@ -380,7 +379,7 @@ fn execute(task: Task, parser: Option<&ParserConfig>) -> Result<TaskResult> {
                 Ok(value) => value,
                 Err(error) => {
                     result.passed = false;
-                    result.failure_code = Some("RESULT_PARSE_FAILURE".into());
+                    result.failure_code = Some(FailureCode::ResultParseFailure);
                     result.detail = Some(format!("parser failure: {error:#}"));
                     result.parser = Some(ParserEvidence {
                         mode: parser_mode(parser).into(),
@@ -402,14 +401,11 @@ fn execute(task: Task, parser: Option<&ParserConfig>) -> Result<TaskResult> {
             });
             if count < minimum {
                 result.passed = false;
-                result.failure_code = Some(
-                    if count == 0 {
-                        "RESULT_ZERO"
-                    } else {
-                        "RESULT_PARTIAL"
-                    }
-                    .into(),
-                );
+                result.failure_code = Some(if count == 0 {
+                    FailureCode::ResultZero
+                } else {
+                    FailureCode::ResultPartial
+                });
                 result.detail = Some(format!(
                     "{}: parsed {count} result(s), expected at least {minimum}",
                     if count == 0 {

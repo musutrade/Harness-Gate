@@ -7,8 +7,14 @@ use anyhow::{Context, Result};
 use schemars::schema_for;
 use std::collections::BTreeSet;
 use std::env;
+use std::error::Error;
+use std::fmt;
 use std::fs;
 use std::path::Path;
+
+const LEGACY_REPORT_DIR_ALIAS: &str = "REPORT_DIR";
+const REPORT_DIR_ALIAS_REPLACEMENT: &str = "HARNESS_GATE_REPORTS";
+const REPORT_DIR_ALIAS_COMPATIBILITY_UNTIL: &str = "2027-03-01";
 
 impl FlowConfig {
     pub fn load_with_diagnostics(
@@ -42,11 +48,7 @@ impl FlowConfig {
         let mut config: Self = toml::from_str(&source)
             .map_err(|error| parse_diagnostic(&source, error, source_path))?;
         config.apply_environment().map_err(|error| {
-            let path = if error.to_string().contains("integer") {
-                "steps[*].timeout_env"
-            } else {
-                "$"
-            };
+            let path = environment_override_path(&config, &error.name);
             ConfigDiagnostics::single(
                 "HGCFG-ENVIRONMENT-OVERRIDE",
                 path,
@@ -88,9 +90,14 @@ impl FlowConfig {
             || self.paths.aliases.contains_key(name)
     }
 
-    fn apply_environment(&mut self) -> Result<()> {
-        override_string("REPORT_DIR", &mut self.paths.reports);
-        override_string("HARNESS_GATE_REPORTS", &mut self.paths.reports);
+    fn apply_environment(&mut self) -> std::result::Result<(), EnvironmentOverrideError> {
+        if env::var_os(LEGACY_REPORT_DIR_ALIAS).is_some() {
+            eprintln!(
+                "warning: {LEGACY_REPORT_DIR_ALIAS} is deprecated; use {REPORT_DIR_ALIAS_REPLACEMENT} (compatibility through {REPORT_DIR_ALIAS_COMPATIBILITY_UNTIL})"
+            );
+        }
+        override_string(LEGACY_REPORT_DIR_ALIAS, &mut self.paths.reports);
+        override_string(REPORT_DIR_ALIAS_REPLACEMENT, &mut self.paths.reports);
         override_string(
             "HARNESS_GATE_SECRETS_CONFIG",
             &mut self.paths.secrets_config,
@@ -302,11 +309,49 @@ fn override_string(name: &str, target: &mut String) {
     }
 }
 
-fn override_u64(name: &str, target: &mut u64) -> Result<()> {
+#[derive(Debug, Clone)]
+struct EnvironmentOverrideError {
+    name: String,
+}
+
+impl fmt::Display for EnvironmentOverrideError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            formatter,
+            "environment variable {} must be an integer",
+            self.name
+        )
+    }
+}
+
+impl Error for EnvironmentOverrideError {}
+
+fn environment_override_path(config: &FlowConfig, name: &str) -> String {
+    for (index, step) in config.steps.iter().enumerate() {
+        if step.timeout_env.as_deref() == Some(name) {
+            return format!("steps[{index}].timeout_env");
+        }
+    }
+    for (id, service) in &config.services {
+        if let ServiceConfig::Docker { timeout_env, .. } = service {
+            if timeout_env.as_deref() == Some(name) {
+                return format!("services[\"{id}\"].timeout_env");
+            }
+        }
+    }
+    for (id, alias) in &config.paths.aliases {
+        if alias.env.as_deref() == Some(name) {
+            return format!("paths.aliases[\"{id}\"].env");
+        }
+    }
+    "$".into()
+}
+
+fn override_u64(name: &str, target: &mut u64) -> std::result::Result<(), EnvironmentOverrideError> {
     if let Ok(value) = env::var(name) {
         *target = value
             .parse()
-            .with_context(|| format!("environment variable {name} must be an integer"))?;
+            .map_err(|_| EnvironmentOverrideError { name: name.into() })?;
     }
     Ok(())
 }

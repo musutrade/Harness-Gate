@@ -77,7 +77,7 @@ pub(super) fn start_docker(
     ) {
         // A failed CLI call may have created the object before reporting an
         // error. Retain the lease so cleanup cannot silently lose the marker.
-        std::mem::forget(lease);
+        lease.retain();
         return Err(anyhow::anyhow!(
             "start {executable} service {id:?}: {error:#}"
         ));
@@ -90,12 +90,12 @@ pub(super) fn start_docker(
         Err(error) => {
             // The object may exist, but ownership could not be proved. Retain
             // the lease for explicit operator investigation.
-            std::mem::forget(lease);
+            lease.retain();
             return Err(error);
         }
     };
     if let Err(error) = lease.bind_runtime_identity(project, &inspection) {
-        std::mem::forget(lease);
+        lease.retain();
         return Err(error);
     }
 

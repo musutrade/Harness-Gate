@@ -1,0 +1,5 @@
+schema: spec-driven
+status: proposed
+created: 2026-09-02
+goal: Define the remaining R-07 and R-13 through R-18 security, reliability, performance, maintainability, and repository-governance contracts without implementing them
+skip_specs: false

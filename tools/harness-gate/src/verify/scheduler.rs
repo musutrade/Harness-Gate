@@ -1,12 +1,13 @@
 use super::plan::{BuiltinGate, NodeResult, NodeStatus, PlanNode, PlanNodeKind, VerificationPlan};
 use super::steps::run_configured_step;
 use crate::audit;
+use crate::failure::FailureCode;
 use crate::process::TaskResult;
 use crate::project::Project;
 use crate::scope::ScopeResult;
 use crate::secrets::{self, SecretMode};
 use crate::service::ServiceManager;
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeSet, HashMap, HashSet};
 use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::sync::{atomic::AtomicBool, mpsc, Arc, Mutex};
 use std::time::Instant;
@@ -77,6 +78,12 @@ pub(super) fn run_plan<'a>(
         .map(|node| node.id.clone())
         .collect::<HashSet<_>>();
     let mut running = HashSet::<String>::new();
+    let mut readiness = ReadinessIndex::new(nodes);
+    let node_positions = nodes
+        .iter()
+        .enumerate()
+        .map(|(index, node)| (node.id.clone(), index))
+        .collect::<HashMap<_, _>>();
     let mut results = Vec::with_capacity(nodes.len());
     let mut failures = Vec::new();
     let (sender, receiver) = mpsc::channel::<(String, WorkerResult)>();
@@ -117,26 +124,20 @@ pub(super) fn run_plan<'a>(
                     "verification cancelled before dispatch",
                 );
             }
-            mark_blocked(nodes, &mut pending, &mut statuses, &mut results);
-
             if !cancellation_observed {
-                let ready = ready_nodes(nodes, &pending, &statuses, running.len(), limit);
-                for node in ready {
+                let ready = readiness.take_ready(running.len(), limit, &pending);
+                for node_id in ready {
                     if crate::process::cancelled() {
                         break;
                     }
+                    let node = &nodes[node_positions[&node_id]];
                     pending.remove(&node.id);
                     running.insert(node.id.clone());
                     let sender = sender.clone();
                     let node_id = node.id.clone();
                     scope.spawn(move || {
-                        let result = catch_unwind(AssertUnwindSafe(|| {
+                        let result = worker_boundary(&node_id, || {
                             execute_node(project, node, staged, services)
-                        }))
-                        .unwrap_or_else(|_| {
-                            WorkerResult::Failed(SchedulerError::Execution(anyhow::anyhow!(
-                                "verification worker panicked while executing node {node_id:?}"
-                            )))
                         });
                         let _ = sender.send((node_id, result));
                     });
@@ -159,10 +160,7 @@ pub(super) fn run_plan<'a>(
                 ))
             })?;
             running.remove(&node_id);
-            let node = nodes
-                .iter()
-                .find(|candidate| candidate.id == node_id)
-                .expect("worker node remains in plan");
+            let node = &nodes[node_positions[&node_id]];
             let mut task_result = match worker_result {
                 WorkerResult::Completed(result) => *result,
                 WorkerResult::Failed(error) => {
@@ -187,6 +185,14 @@ pub(super) fn run_plan<'a>(
                 warmup_cancelled.store(true, std::sync::atomic::Ordering::Release);
             }
             statuses.insert(node_id.clone(), status);
+            let blocked = readiness.complete(&node_id, status, &pending);
+            for blocked_id in blocked {
+                if pending.remove(&blocked_id) {
+                    let blocked_node = &nodes[node_positions[&blocked_id]];
+                    statuses.insert(blocked_id, NodeStatus::Skipped);
+                    results.push(skipped(blocked_node, "blocked by a failed prerequisite"));
+                }
+            }
             let node_cancelled = status == NodeStatus::Cancelled;
             results.push(ScheduledResult {
                 node_id,
@@ -217,9 +223,21 @@ pub(super) fn run_plan<'a>(
     })
 }
 
+fn worker_boundary<F>(node_id: &str, operation: F) -> WorkerResult
+where
+    F: FnOnce() -> WorkerResult,
+{
+    catch_unwind(AssertUnwindSafe(operation)).unwrap_or_else(|_| {
+        WorkerResult::Failed(SchedulerError::Execution(anyhow::anyhow!(
+            "verification worker panicked while executing node {node_id:?}"
+        )))
+    })
+}
+
 /// Return the earliest ready nodes that fit in the remaining worker slots.
 /// `nodes` is already in stable plan order, so retaining that iteration order
 /// makes dispatch deterministic regardless of worker completion timing.
+#[cfg(test)]
 fn ready_nodes<'a>(
     nodes: &'a [PlanNode<'a>],
     pending: &HashSet<String>,
@@ -241,6 +259,105 @@ fn ready_nodes<'a>(
         })
         .take(slots)
         .collect()
+}
+
+struct ReadinessIndex {
+    remaining: HashMap<String, usize>,
+    dependents: HashMap<String, Vec<String>>,
+    ready: BTreeSet<(usize, String)>,
+    order: HashMap<String, usize>,
+}
+
+impl ReadinessIndex {
+    fn new(nodes: &[PlanNode<'_>]) -> Self {
+        let mut remaining = HashMap::with_capacity(nodes.len());
+        let mut dependents: HashMap<String, Vec<String>> = HashMap::with_capacity(nodes.len());
+        let mut ready = BTreeSet::new();
+        let mut order = HashMap::with_capacity(nodes.len());
+        for (index, node) in nodes.iter().enumerate() {
+            order.insert(node.id.clone(), index);
+            remaining.insert(node.id.clone(), node.depends_on.len());
+            if node.depends_on.is_empty() {
+                ready.insert((index, node.id.clone()));
+            }
+            for dependency in &node.depends_on {
+                dependents
+                    .entry(dependency.clone())
+                    .or_default()
+                    .push(node.id.clone());
+            }
+        }
+        for children in dependents.values_mut() {
+            children.sort_by_key(|id| order[id]);
+        }
+        Self {
+            remaining,
+            dependents,
+            ready,
+            order,
+        }
+    }
+
+    fn take_ready(
+        &mut self,
+        running: usize,
+        limit: usize,
+        pending: &HashSet<String>,
+    ) -> Vec<String> {
+        let count = limit.saturating_sub(running);
+        let ids = self
+            .ready
+            .iter()
+            .filter(|(_, id)| pending.contains(id))
+            .take(count)
+            .map(|(_, id)| id.clone())
+            .collect::<Vec<_>>();
+        for id in &ids {
+            if let Some(index) = self.order.get(id) {
+                self.ready.remove(&(*index, id.clone()));
+            }
+        }
+        ids
+    }
+
+    fn complete(
+        &mut self,
+        node_id: &str,
+        status: NodeStatus,
+        pending: &HashSet<String>,
+    ) -> Vec<String> {
+        let Some(children) = self.dependents.get(node_id).cloned() else {
+            return Vec::new();
+        };
+        if status == NodeStatus::Passed {
+            for child in &children {
+                if let Some(remaining) = self.remaining.get_mut(child) {
+                    *remaining = remaining.saturating_sub(1);
+                    if *remaining == 0 && pending.contains(child) {
+                        self.ready.insert((self.order[child], child.clone()));
+                    }
+                }
+            }
+            return Vec::new();
+        }
+
+        let mut blocked = Vec::new();
+        let mut queue = children;
+        while let Some(id) = queue.pop() {
+            if pending.contains(&id) {
+                blocked.push(id.clone());
+                if let Some(grandchildren) = self.dependents.get(&id) {
+                    queue.extend(grandchildren.iter().cloned());
+                }
+            }
+            if let Some(index) = self.order.get(&id) {
+                self.ready.remove(&(*index, id.clone()));
+            }
+        }
+        blocked.sort_by_key(|id| self.order[id]);
+        blocked.dedup();
+        blocked
+    }
 }
 
 fn execute_node<'a>(
@@ -295,7 +412,7 @@ fn failed_task_result(
         duration_ms: 0,
         log,
         detail: Some(format!("{error:#}")),
-        failure_code: Some("SCHEDULER_FAILURE".into()),
+        failure_code: Some(FailureCode::SchedulerFailure),
         attempts: Vec::new(),
         flaky: false,
         retry_class: None,
@@ -338,7 +455,7 @@ fn run_secret_scan(
             .to_string_lossy()
             .into(),
         detail: (!passed).then(|| format!("{} file(s) require review", findings.len())),
-        failure_code: (!passed).then(|| "SECRET_SCAN_FAILURE".into()),
+        failure_code: (!passed).then_some(FailureCode::SecretScanFailure),
         attempts: Vec::new(),
         flaky: false,
         retry_class: None,
@@ -380,7 +497,7 @@ fn run_architecture_audit(
             outcome.error_count,
             outcome.warning_count
         )),
-        failure_code: (!passed).then(|| "ARCHITECTURE_AUDIT_FAILURE".into()),
+        failure_code: (!passed).then_some(FailureCode::ArchitectureAuditFailure),
         attempts: Vec::new(),
         flaky: false,
         retry_class: None,
@@ -413,7 +530,7 @@ fn run_external_step<'a>(
             duration_ms: 0,
             log: step.log.clone(),
             detail: Some(format!("{error:#}")),
-            failure_code: Some("STEP_EXECUTION_FAILURE".into()),
+            failure_code: Some(FailureCode::StepExecutionFailure),
             attempts: Vec::new(),
             flaky: false,
             retry_class: None,
@@ -425,6 +542,7 @@ fn run_external_step<'a>(
     )
 }
 
+#[cfg(test)]
 fn mark_blocked<'a>(
     nodes: &[PlanNode<'a>],
     pending: &mut HashSet<String>,
@@ -481,7 +599,7 @@ fn skipped<'a>(node: &PlanNode<'a>, reason: &str) -> ScheduledResult {
             duration_ms: 0,
             log: node.step.map(|step| step.log.clone()).unwrap_or_default(),
             detail: Some(reason.into()),
-            failure_code: Some("STEP_SKIPPED".into()),
+            failure_code: Some(FailureCode::StepSkipped),
             attempts: Vec::new(),
             flaky: false,
             retry_class: None,
@@ -601,5 +719,64 @@ mod tests {
         assert_eq!(statuses.get("b"), Some(&NodeStatus::Skipped));
         assert!(pending.contains("c"));
         assert_eq!(results.len(), 1);
+    }
+
+    #[test]
+    fn indexed_readiness_preserves_plan_order_and_unblocks_once() {
+        let nodes = vec![
+            node("slow", &[]),
+            node("first-child", &["slow"]),
+            node("independent", &[]),
+            node("second-child", &["slow"]),
+        ];
+        let mut index = ReadinessIndex::new(&nodes);
+        let pending = nodes.iter().map(|node| node.id.clone()).collect();
+
+        assert_eq!(
+            index.take_ready(0, 2, &pending),
+            vec!["slow".to_string(), "independent".to_string()]
+        );
+
+        let pending = HashSet::from(["first-child".into(), "second-child".into()]);
+        assert!(index
+            .complete("slow", NodeStatus::Passed, &pending)
+            .is_empty());
+        assert_eq!(
+            index.take_ready(0, 2, &pending),
+            vec!["first-child".to_string(), "second-child".to_string()]
+        );
+    }
+
+    #[test]
+    fn indexed_readiness_skips_all_pending_descendants_after_failure() {
+        let nodes = vec![
+            node("root", &[]),
+            node("child", &["root"]),
+            node("grandchild", &["child"]),
+            node("other", &[]),
+        ];
+        let mut index = ReadinessIndex::new(&nodes);
+        let pending = HashSet::from([
+            "child".to_string(),
+            "grandchild".to_string(),
+            "other".to_string(),
+        ]);
+
+        assert_eq!(
+            index.complete("root", NodeStatus::Failed, &pending),
+            vec!["child".to_string(), "grandchild".to_string()]
+        );
+        assert_eq!(index.take_ready(0, 4, &pending), vec!["other".to_string()]);
+    }
+
+    #[test]
+    fn worker_panics_become_scheduler_failures_in_unwind_profiles() {
+        let result = super::worker_boundary("panic-fixture", || {
+            panic!("worker panic fixture");
+        });
+        let super::WorkerResult::Failed(super::SchedulerError::Execution(error)) = result else {
+            panic!("worker panic must become an execution failure");
+        };
+        assert!(error.to_string().contains("panic-fixture"));
     }
 }

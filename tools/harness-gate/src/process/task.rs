@@ -6,6 +6,7 @@ use super::reader::{
 };
 use super::signal::cancelled;
 use crate::config::{RunnerResultFormat, TestIsolation};
+use crate::failure::{FailureCode, RetryClass};
 use anyhow::{Context, Result};
 use serde::Serialize;
 use std::collections::BTreeMap;
@@ -81,13 +82,13 @@ pub struct TaskResult {
     pub log: String,
     pub detail: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub failure_code: Option<String>,
+    pub failure_code: Option<FailureCode>,
     #[serde(default)]
     pub attempts: Vec<TaskAttempt>,
     #[serde(default)]
     pub flaky: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub retry_class: Option<String>,
+    pub retry_class: Option<RetryClass>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub parser: Option<ParserEvidence>,
     #[serde(default)]
@@ -227,6 +228,7 @@ impl Task {
             spawn_limited_reader(stderr, DEFAULT_CAPTURE_BYTES, Arc::clone(&stderr_overflow));
 
         let mut output_limited = None;
+        let mut wait_round = 0_u32;
         let (status, timed_out, was_cancelled) = loop {
             if let Some(status) = child.try_wait()? {
                 if stdout_overflow.load(Ordering::Acquire) {
@@ -250,7 +252,11 @@ impl Task {
             if started.elapsed() >= self.timeout {
                 break (terminate(&mut child)?, true, false);
             }
-            std::thread::sleep(Duration::from_millis(100));
+            // `Child::try_wait` is the portable API available on all supported
+            // platforms. Keep the initial delay short for fast commands, then
+            // back off to cap wakeups while preserving timeout/cancellation checks.
+            std::thread::sleep(wait_backoff(wait_round));
+            wait_round = wait_round.saturating_add(1);
         };
 
         let reader_started = Instant::now();
@@ -303,7 +309,7 @@ impl Task {
                 (combined_bytes > DEFAULT_CAPTURE_BYTES.saturating_mul(2)).then_some("combined")
             })
         {
-            failure_code = Some("OUTPUT_LIMIT_EXCEEDED".to_string());
+            failure_code = Some(FailureCode::OutputLimitExceeded);
             let captured = if stream == "stdout" {
                 stdout.bytes.len()
             } else if stream == "stderr" {
@@ -320,7 +326,7 @@ impl Task {
                 }
             ));
         } else if let Some(error) = reader_error {
-            failure_code = Some("READER_DEADLINE_EXCEEDED".to_string());
+            failure_code = Some(FailureCode::ReaderDeadlineExceeded);
             limit_detail = Some(error);
         }
 
@@ -374,6 +380,11 @@ impl Task {
     }
 }
 
+fn wait_backoff(round: u32) -> Duration {
+    let shift = round.min(4);
+    Duration::from_millis((5_u64 << shift).min(80))
+}
+
 struct IsolationStateGuard<'a> {
     path: &'a Path,
 }
@@ -388,5 +399,19 @@ impl Drop for IsolationStateGuard<'_> {
     fn drop(&mut self) {
         let _ = isolation::mark_terminal(self.path, "worker exited");
         let _ = isolation::remove(self.path);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::wait_backoff;
+    use std::time::Duration;
+
+    #[test]
+    fn wait_backoff_is_bounded_and_starts_short() {
+        assert_eq!(wait_backoff(0), Duration::from_millis(5));
+        assert_eq!(wait_backoff(1), Duration::from_millis(10));
+        assert_eq!(wait_backoff(4), Duration::from_millis(80));
+        assert_eq!(wait_backoff(u32::MAX), Duration::from_millis(80));
     }
 }

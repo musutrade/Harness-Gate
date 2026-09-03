@@ -1,8 +1,9 @@
 use super::super::model::{
-    RunnerConfig, ServiceConfig, StepConfig, TestIsolation, RUNNER_CONFIG_VERSION,
+    RunnerConfig, ServiceConfig, StepConfig, StepKind, TestIsolation, RUNNER_CONFIG_VERSION,
 };
 use super::primitives::{validate_env_name, validate_id, validate_program};
 use super::FlowConfig;
+use super::{ConfigIssueKind, ValidationIssue};
 use anyhow::{bail, Result};
 use std::collections::HashSet;
 use std::path::Path;
@@ -19,9 +20,9 @@ pub(super) fn validate_step(config: &FlowConfig, step: &StepConfig) -> Result<()
         validate_id("step profile", profile)?;
     }
 
-    match step.kind.as_deref().unwrap_or("external-step") {
-        "builtin-gate" => return validate_builtin_gate(step),
-        "external-step" => {
+    match step.kind.unwrap_or(StepKind::ExternalStep) {
+        StepKind::BuiltinGate => return validate_builtin_gate(step),
+        StepKind::ExternalStep => {
             if step.gate_type.is_some() {
                 bail!("external step {:?} may not declare gate_type", step.id);
             }
@@ -35,7 +36,6 @@ pub(super) fn validate_step(config: &FlowConfig, step: &StepConfig) -> Result<()
                 );
             }
         }
-        other => bail!("step {:?} has unknown kind {other:?}", step.id),
     }
 
     validate_id("step component", &step.component)?;
@@ -118,6 +118,336 @@ pub(super) fn validate_step(config: &FlowConfig, step: &StepConfig) -> Result<()
     Ok(())
 }
 
+/// Validate a step for the machine-readable diagnostic path. This mirrors the
+/// execution validator's order, but carries the field path and closed issue
+/// kind at the point where the invariant is checked. Human `anyhow` errors
+/// remain available through `validate_step` for existing CLI callers.
+pub(super) fn validate_step_diagnostic(
+    config: &FlowConfig,
+    step: &StepConfig,
+    index: usize,
+) -> std::result::Result<(), ValidationIssue> {
+    let base = format!("steps[{index}]");
+    let check = |result: Result<()>, kind: ConfigIssueKind, path: String| {
+        result.map_err(|error| ValidationIssue::new(kind, path, error.to_string()))
+    };
+
+    check(
+        validate_id("verification step id", &step.id),
+        ConfigIssueKind::InvalidField,
+        format!("{base}.id"),
+    )?;
+    if step.label.trim().is_empty() || step.profiles.is_empty() {
+        return Err(ValidationIssue::new(
+            ConfigIssueKind::InvalidField,
+            base.clone(),
+            "step requires a label and at least one profile",
+        ));
+    }
+    for profile in &step.profiles {
+        check(
+            validate_id("step profile", profile),
+            ConfigIssueKind::InvalidField,
+            format!("{base}.profiles"),
+        )?;
+    }
+
+    match step.kind.unwrap_or(StepKind::ExternalStep) {
+        StepKind::BuiltinGate => {
+            if step.gate_type.is_none() {
+                return Err(ValidationIssue::new(
+                    ConfigIssueKind::InvalidField,
+                    format!("{base}.gate_type"),
+                    "built-in gate requires gate_type",
+                ));
+            }
+            let expected = format!("builtin.{}", step.gate_type.expect("checked").as_str());
+            if step.id != expected {
+                return Err(ValidationIssue::new(
+                    ConfigIssueKind::InvalidField,
+                    format!("{base}.id"),
+                    "built-in gate id is reserved",
+                ));
+            }
+            if !step.depends_on.is_empty() {
+                return Err(ValidationIssue::new(
+                    ConfigIssueKind::Dependency,
+                    format!("{base}.depends_on"),
+                    "built-in gate may not declare external dependencies",
+                ));
+            }
+            if !step.component.is_empty()
+                || !step.program.is_empty()
+                || !step.args.is_empty()
+                || !step.cwd.is_empty()
+                || !step.log.is_empty()
+                || step.timeout_secs != 0
+                || step.timeout_env.is_some()
+                || step.parser.is_some()
+                || !step.services.is_empty()
+                || !step.remove_env.is_empty()
+                || step.runner.is_some()
+            {
+                return Err(ValidationIssue::new(
+                    ConfigIssueKind::InvalidField,
+                    base,
+                    "built-in gate contains external-step fields",
+                ));
+            }
+            return Ok(());
+        }
+        StepKind::ExternalStep => {
+            if step.gate_type.is_some() {
+                return Err(ValidationIssue::new(
+                    ConfigIssueKind::InvalidField,
+                    format!("{base}.gate_type"),
+                    "external step may not declare gate_type",
+                ));
+            }
+            if matches!(
+                step.id.as_str(),
+                "builtin.secret-scan" | "builtin.architecture-audit"
+            ) {
+                return Err(ValidationIssue::new(
+                    ConfigIssueKind::InvalidField,
+                    format!("{base}.id"),
+                    "external step uses a reserved built-in gate id",
+                ));
+            }
+        }
+    }
+
+    check(
+        validate_id("step component", &step.component),
+        ConfigIssueKind::InvalidField,
+        format!("{base}.component"),
+    )?;
+    check(
+        validate_program(&format!("step {} program", step.id), &step.program),
+        ConfigIssueKind::InvalidField,
+        format!("{base}.program"),
+    )?;
+    if is_shell(&step.program)
+        && step
+            .args
+            .iter()
+            .any(|argument| is_shell_command_argument(argument))
+    {
+        return Err(ValidationIssue::new(
+            ConfigIssueKind::InvalidField,
+            format!("{base}.args"),
+            "step may not execute a shell command string",
+        ));
+    }
+    check(
+        validate_arguments(config, &step.id, &step.args),
+        ConfigIssueKind::InvalidField,
+        format!("{base}.args"),
+    )?;
+    if let Some(runner) = &step.runner {
+        validate_runner_diagnostic(config, step, runner, &base)?;
+    }
+    let Some(cwd_name) = exact_placeholder(&step.cwd) else {
+        return Err(ValidationIssue::new(
+            ConfigIssueKind::InvalidField,
+            format!("{base}.cwd"),
+            "cwd must be one path placeholder",
+        ));
+    };
+    if cwd_name != "root" && !config.paths.aliases.contains_key(cwd_name) {
+        return Err(ValidationIssue::new(
+            ConfigIssueKind::UnknownReference,
+            format!("{base}.cwd"),
+            "cwd references an unknown path",
+        ));
+    }
+    check(
+        validate_log_name(&step.log),
+        ConfigIssueKind::InvalidLog,
+        format!("{base}.log"),
+    )?;
+    if step.timeout_secs == 0 || step.timeout_secs > 3600 {
+        return Err(ValidationIssue::new(
+            ConfigIssueKind::InvalidField,
+            format!("{base}.timeout_secs"),
+            "timeout_secs is outside the accepted range",
+        ));
+    }
+    if let Some(name) = &step.timeout_env {
+        check(
+            validate_env_name("step timeout_env", name),
+            ConfigIssueKind::InvalidEnvironment,
+            format!("{base}.timeout_env"),
+        )?;
+    }
+    if let Some(parser) = &step.parser {
+        if !config.parsers.contains_key(parser) {
+            return Err(ValidationIssue::new(
+                ConfigIssueKind::UnknownReference,
+                format!("{base}.parser"),
+                "step references an unknown parser",
+            ));
+        }
+    }
+    let mut step_services = HashSet::new();
+    let mut service_envs = HashSet::new();
+    let mut service_inject_collision: Option<usize> = None;
+    for (service_index, service) in step.services.iter().enumerate() {
+        if !step_services.insert(service) {
+            return Err(ValidationIssue::new(
+                ConfigIssueKind::DuplicateField,
+                format!("{base}.services[{service_index}]"),
+                "step contains a duplicate service",
+            ));
+        }
+        let Some(service_config) = config.services.get(service) else {
+            return Err(ValidationIssue::new(
+                ConfigIssueKind::UnknownReference,
+                format!("{base}.services[{service_index}]"),
+                "step references an unknown service",
+            ));
+        };
+        let inject_env = match service_config {
+            ServiceConfig::Docker { inject_env, .. }
+            | ServiceConfig::Environment { inject_env, .. } => inject_env,
+        };
+        if !service_envs.insert(inject_env) {
+            service_inject_collision = Some(service_index);
+        }
+        if step.remove_env.contains(inject_env) {
+            return Err(ValidationIssue::new(
+                ConfigIssueKind::InvalidField,
+                format!("{base}.remove_env"),
+                "step may not remove a service injection variable",
+            ));
+        }
+    }
+    if let Some(runner) = &step.runner {
+        if let Some(name) = &runner.threads_env {
+            if service_envs.contains(name) {
+                return Err(ValidationIssue::new(
+                    ConfigIssueKind::ServiceInjectCollision,
+                    format!("{base}.runner.threads_env"),
+                    "runner threads_env collides with a service injection variable",
+                ));
+            }
+        }
+    }
+    if let Some(service_index) = service_inject_collision {
+        return Err(ValidationIssue::new(
+            ConfigIssueKind::ServiceInjectCollision,
+            format!("{base}.services[{service_index}]"),
+            "multiple services inject the same environment variable",
+        ));
+    }
+    for name in &step.remove_env {
+        check(
+            validate_env_name("step remove_env", name),
+            ConfigIssueKind::InvalidEnvironment,
+            format!("{base}.remove_env"),
+        )?;
+    }
+    Ok(())
+}
+
+fn validate_runner_diagnostic(
+    config: &FlowConfig,
+    step: &StepConfig,
+    runner: &RunnerConfig,
+    base: &str,
+) -> std::result::Result<(), ValidationIssue> {
+    let check = |result: Result<()>, kind: ConfigIssueKind, path: String| {
+        result.map_err(|error| ValidationIssue::new(kind, path, error.to_string()))
+    };
+    if runner.version != RUNNER_CONFIG_VERSION {
+        return Err(ValidationIssue::new(
+            ConfigIssueKind::RunnerVersion,
+            format!("{base}.runner.version"),
+            "runner version is unsupported",
+        ));
+    }
+    check(
+        validate_id("runner kind", &runner.kind),
+        ConfigIssueKind::InvalidField,
+        format!("{base}.runner.kind"),
+    )?;
+    if runner.kind == "cargo-test" && step.program != "cargo" {
+        return Err(ValidationIssue::new(
+            ConfigIssueKind::InvalidField,
+            format!("{base}.runner.kind"),
+            "cargo-test runner requires program cargo",
+        ));
+    }
+    if let Some(threads) = runner.threads {
+        if threads == 0 || threads > 256 {
+            return Err(ValidationIssue::new(
+                ConfigIssueKind::InvalidField,
+                format!("{base}.runner.threads"),
+                "runner threads are outside the accepted range",
+            ));
+        }
+    }
+    if let Some(name) = &runner.threads_env {
+        check(
+            validate_env_name("runner threads_env", name),
+            ConfigIssueKind::InvalidEnvironment,
+            format!("{base}.runner.threads_env"),
+        )?;
+        if runner.threads.is_none() {
+            return Err(ValidationIssue::new(
+                ConfigIssueKind::InvalidField,
+                format!("{base}.runner.threads"),
+                "runner threads_env requires threads",
+            ));
+        }
+        if step.remove_env.iter().any(|removed| removed == name) {
+            return Err(ValidationIssue::new(
+                ConfigIssueKind::InvalidField,
+                format!("{base}.remove_env"),
+                "runner threads_env may not be removed",
+            ));
+        }
+    }
+    if runner.threads.is_some_and(|threads| threads > 1)
+        && runner.kind != "cargo-test"
+        && runner.threads_env.is_none()
+    {
+        return Err(ValidationIssue::new(
+            ConfigIssueKind::InvalidField,
+            format!("{base}.runner.threads_env"),
+            "runner threads requires threads_env",
+        ));
+    }
+    if runner.threads.is_some_and(|threads| threads > 1)
+        && matches!(runner.isolation, TestIsolation::Shared)
+    {
+        return Err(ValidationIssue::new(
+            ConfigIssueKind::InvalidField,
+            format!("{base}.runner.isolation"),
+            "runner shared isolation is not allowed with multiple workers",
+        ));
+    }
+    if runner
+        .args_position
+        .is_some_and(|position| position > step.args.len())
+    {
+        return Err(ValidationIssue::new(
+            ConfigIssueKind::InvalidField,
+            format!("{base}.runner.args_position"),
+            "runner args_position exceeds the step argument count",
+        ));
+    }
+    check(
+        validate_arguments(
+            config,
+            &format!("step {} runner args", step.id),
+            &runner.args,
+        ),
+        ConfigIssueKind::InvalidField,
+        format!("{base}.runner.args"),
+    )
+}
+
 /// Validate a log as a filename rather than relying only on the host platform's
 /// `Path` parser. Configuration can be checked on Unix and later executed on
 /// Windows, so both separator styles and Windows prefixes are rejected here.
@@ -160,15 +490,8 @@ pub(super) fn normalize_log_identity(value: &str) -> String {
 fn validate_builtin_gate(step: &StepConfig) -> Result<()> {
     let gate_type = step
         .gate_type
-        .as_deref()
         .ok_or_else(|| anyhow::anyhow!("built-in gate {:?} requires gate_type", step.id))?;
-    let expected_id = format!("builtin.{gate_type}");
-    if !matches!(gate_type, "secret-scan" | "architecture-audit") {
-        bail!(
-            "built-in gate {:?} has unknown gate_type {gate_type:?}",
-            step.id
-        );
-    }
+    let expected_id = format!("builtin.{}", gate_type.as_str());
     if step.id != expected_id {
         bail!(
             "built-in gate {:?} must use reserved id {expected_id:?}",

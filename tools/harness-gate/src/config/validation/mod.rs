@@ -2,13 +2,123 @@ use super::diagnostic::{
     ConfigDiagnostic, ConfigDiagnostics, DiagnosticSeverity, RelatedDiagnostic, SourceMap,
 };
 use super::model::{
-    DoctorCheckKind, ExternalValuePolicy, FlowConfig, ParserConfig, ServiceConfig, CONFIG_VERSION,
+    DoctorCheck, DoctorCheckKind, ExternalValuePolicy, FlowConfig, ParserConfig, ScopeRule,
+    ServiceConfig, CONFIG_VERSION,
 };
 use anyhow::{bail, Context, Result};
 use globset::Glob;
 use regex::Regex;
 use std::collections::{BTreeSet, HashSet};
+use std::error::Error;
+use std::fmt;
 use std::path::Path;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(super) enum ConfigIssueKind {
+    Version,
+    RunnerVersion,
+    DependencyCycle,
+    Dependency,
+    ServiceInjectCollision,
+    UnknownReference,
+    InvalidPath,
+    InvalidEnvironment,
+    DuplicateField,
+    InvalidLog,
+    InvalidField,
+}
+
+impl ConfigIssueKind {
+    const fn id(self) -> &'static str {
+        match self {
+            Self::Version => "HGCFG-VERSION",
+            Self::RunnerVersion => "HGCFG-RUNNER-VERSION",
+            Self::DependencyCycle => "HGCFG-DEPENDENCY-CYCLE",
+            Self::Dependency => "HGCFG-DEPENDENCY",
+            Self::ServiceInjectCollision => "HGCFG-SERVICE-INJECT-COLLISION",
+            Self::UnknownReference => "HGCFG-UNKNOWN-REFERENCE",
+            Self::InvalidPath => "HGCFG-INVALID-PATH",
+            Self::InvalidEnvironment => "HGCFG-INVALID-ENVIRONMENT",
+            Self::DuplicateField => "HGCFG-DUPLICATE-FIELD",
+            Self::InvalidLog => "HGCFG-INVALID-LOG",
+            Self::InvalidField => "HGCFG-INVALID-FIELD",
+        }
+    }
+
+    const fn message(self) -> &'static str {
+        match self {
+            Self::Version => "workflow configuration version is unsupported",
+            Self::RunnerVersion => "runner contract version is unsupported",
+            Self::DependencyCycle => "dependencies contain a cycle",
+            Self::Dependency => "dependency declaration is invalid",
+            Self::ServiceInjectCollision => {
+                "multiple services claim the same injected environment variable"
+            }
+            Self::UnknownReference => "reference does not name a declared configuration entry",
+            Self::InvalidPath => "path is not a safe repository-relative path",
+            Self::InvalidEnvironment => "environment variable name is invalid",
+            Self::DuplicateField => "configuration declares the same identifier more than once",
+            Self::InvalidLog => "log path is not a valid single .log filename",
+            Self::InvalidField => "field violates a documented configuration constraint",
+        }
+    }
+
+    const fn help(self) -> &'static str {
+        match self {
+            Self::Version => {
+                "migrate a v1 file with `harness-gate config migrate` or use version 2"
+            }
+            Self::RunnerVersion => "use the supported runner contract version",
+            Self::DependencyCycle | Self::Dependency => {
+                "remove the invalid dependency or add an explicit acyclic prerequisite"
+            }
+            Self::ServiceInjectCollision => "use one service or distinct inject_env names",
+            Self::UnknownReference => "use an identifier declared in the configuration",
+            Self::InvalidPath => {
+                "use a non-empty path below the repository without a prefix or parent traversal"
+            }
+            Self::InvalidEnvironment => {
+                "use an uppercase environment-variable name containing only letters, digits, and underscores"
+            }
+            Self::DuplicateField => {
+                "keep one declaration or give each declaration a unique identifier"
+            }
+            Self::InvalidLog => "choose a unique single .log filename",
+            Self::InvalidField => {
+                "update the field to satisfy the documented configuration constraints"
+            }
+        }
+    }
+}
+
+#[derive(Debug)]
+pub(super) struct ValidationIssue {
+    pub(super) kind: ConfigIssueKind,
+    pub(super) path: String,
+    detail: String,
+}
+
+impl ValidationIssue {
+    pub(super) fn new(
+        kind: ConfigIssueKind,
+        path: impl Into<String>,
+        detail: impl Into<String>,
+    ) -> Self {
+        Self {
+            kind,
+            path: path.into(),
+            detail: detail.into(),
+        }
+    }
+}
+
+impl fmt::Display for ValidationIssue {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str(&self.detail)
+    }
+}
+
+impl Error for ValidationIssue {}
 
 impl FlowConfig {
     pub(super) fn validate_with_diagnostics(
@@ -44,9 +154,9 @@ impl FlowConfig {
         diagnostics: &mut ConfigDiagnostics,
     ) {
         collect_result(
-            self,
             source_map,
             diagnostics,
+            ConfigIssueKind::Version,
             "version",
             validate_version(self.version),
         );
@@ -56,9 +166,9 @@ impl FlowConfig {
             ("project.hook_profile", &self.project.hook_profile),
         ] {
             collect_result(
-                self,
                 source_map,
                 diagnostics,
+                ConfigIssueKind::InvalidField,
                 path,
                 validate_id(path, value),
             );
@@ -69,9 +179,9 @@ impl FlowConfig {
             ("paths.secrets_config", &self.paths.secrets_config),
         ] {
             collect_result(
-                self,
                 source_map,
                 diagnostics,
+                ConfigIssueKind::InvalidPath,
                 path,
                 validate_repo_path(path, value),
             );
@@ -79,48 +189,41 @@ impl FlowConfig {
         for (alias, entry) in &self.paths.aliases {
             let path = format!("paths.aliases[\"{alias}\"]");
             collect_result(
-                self,
                 source_map,
                 diagnostics,
+                ConfigIssueKind::InvalidField,
                 &path,
                 validate_path_alias(alias, entry),
             );
         }
         for (id, service) in &self.services {
-            let mut candidate = self.clone();
-            candidate.services.clear();
-            candidate.services.insert(id.clone(), service.clone());
             let path = format!("services[\"{id}\"]");
             collect_result(
-                self,
                 source_map,
                 diagnostics,
+                ConfigIssueKind::InvalidField,
                 &path,
-                candidate.validate_services(),
+                validate_service_entry(id, service),
             );
         }
         for (id, parser) in &self.parsers {
-            let mut candidate = self.clone();
-            candidate.parsers.clear();
-            candidate.parsers.insert(id.clone(), parser.clone());
             let path = format!("parsers[\"{id}\"]");
             collect_result(
-                self,
                 source_map,
                 diagnostics,
+                ConfigIssueKind::InvalidField,
                 &path,
-                candidate.validate_parsers(),
+                validate_parser_entry(id, parser),
             );
         }
         for (index, check) in self.doctor.checks.iter().enumerate() {
-            let mut candidate = self.clone();
-            candidate.doctor.checks = vec![check.clone()];
+            let path = format!("doctor.checks[{index}]");
             collect_result(
-                self,
                 source_map,
                 diagnostics,
-                &format!("doctor.checks[{index}]"),
-                candidate.validate_doctor(),
+                ConfigIssueKind::InvalidField,
+                &path,
+                validate_doctor_check(self, check),
             );
         }
         collect_duplicate_doctor_ids(self, source_map, diagnostics);
@@ -130,47 +233,36 @@ impl FlowConfig {
                 source_map,
                 diagnostics,
                 "scope.rules",
+                ConfigIssueKind::InvalidField,
                 "scope.rules must not be empty",
             );
         } else {
+            let components = self.components();
             for (index, rule) in self.scope.rules.iter().enumerate() {
-                let mut candidate = self.clone();
-                candidate.scope.rules = vec![rule.clone()];
+                let path = format!("scope.rules[{index}]");
                 collect_result(
-                    self,
                     source_map,
                     diagnostics,
-                    &format!("scope.rules[{index}]"),
-                    candidate.validate_scope(),
+                    ConfigIssueKind::InvalidField,
+                    &path,
+                    validate_scope_rule_with_components(&components, index, rule),
                 );
             }
         }
         self.collect_step_diagnostics(source_map, diagnostics);
+        collect_report_template_diagnostics(self, source_map, diagnostics);
+        collect_execution_diagnostics(self, source_map, diagnostics);
         collect_result(
-            self,
             source_map,
             diagnostics,
-            "report_templates",
-            self.validate_report_templates(),
-        );
-        collect_result(
-            self,
-            source_map,
-            diagnostics,
-            "execution",
-            self.validate_execution(),
-        );
-        collect_result(
-            self,
-            source_map,
-            diagnostics,
+            ConfigIssueKind::InvalidField,
             "notifications",
             self.validate_notifications(),
         );
         collect_result(
-            self,
             source_map,
             diagnostics,
+            ConfigIssueKind::InvalidField,
             "policy",
             self.validate_policy(),
         );
@@ -187,6 +279,7 @@ impl FlowConfig {
                 source_map,
                 diagnostics,
                 "steps",
+                ConfigIssueKind::InvalidField,
                 "steps must not be empty",
             );
             return;
@@ -203,6 +296,7 @@ impl FlowConfig {
                     source_map,
                     diagnostics,
                     &format!("{path}.id"),
+                    ConfigIssueKind::DuplicateField,
                     "duplicate verification step id",
                 );
             }
@@ -219,6 +313,7 @@ impl FlowConfig {
                         source_map,
                         diagnostics,
                         &path,
+                        ConfigIssueKind::Dependency,
                         "a step may not depend on itself",
                     );
                 } else if !ids.contains(dependency.as_str()) {
@@ -228,6 +323,7 @@ impl FlowConfig {
                         source_map,
                         diagnostics,
                         &path,
+                        ConfigIssueKind::Dependency,
                         "a dependency references a missing step",
                     );
                 }
@@ -235,9 +331,9 @@ impl FlowConfig {
         }
         if dependencies_are_valid {
             collect_result(
-                self,
                 source_map,
                 diagnostics,
+                ConfigIssueKind::DependencyCycle,
                 "steps",
                 validate_step_dependencies(self),
             );
@@ -252,6 +348,7 @@ impl FlowConfig {
                     source_map,
                     diagnostics,
                     path,
+                    ConfigIssueKind::InvalidField,
                     "configured profile is not used by any step",
                 );
             }
@@ -264,6 +361,7 @@ impl FlowConfig {
                     source_map,
                     diagnostics,
                     "policy.required_steps",
+                    ConfigIssueKind::DuplicateField,
                     "policy.required_steps contains a duplicate step id",
                 );
             } else if !ids.contains(id.as_str()) {
@@ -272,6 +370,7 @@ impl FlowConfig {
                     source_map,
                     diagnostics,
                     "policy.required_steps",
+                    ConfigIssueKind::UnknownReference,
                     "policy requires a missing verification step",
                 );
             }
@@ -326,6 +425,29 @@ impl FlowConfig {
             if !matches!(parsed.scheme(), "http" | "https") || parsed.host_str().is_none() {
                 bail!("notifications.webhooks[{index}].url must be an http(s) URL");
             }
+            if !parsed.username().is_empty() || parsed.password().is_some() {
+                bail!("notifications.webhooks[{index}].url may not contain credentials");
+            }
+            let host = parsed.host_str().expect("validated webhook host");
+            if webhook.allowed_hosts.is_empty() {
+                bail!("notifications.webhooks[{index}] requires an explicit allowed_hosts list");
+            }
+            if !webhook
+                .allowed_hosts
+                .iter()
+                .all(|allowed| crate::net_policy::valid_allowlist_host(allowed))
+            {
+                bail!("notifications.webhooks[{index}].allowed_hosts contains an invalid host");
+            }
+            let normalized_host = crate::net_policy::normalize_host(host);
+            if !webhook
+                .allowed_hosts
+                .iter()
+                .map(|allowed| crate::net_policy::normalize_host(allowed))
+                .any(|allowed| allowed == normalized_host)
+            {
+                bail!("notifications.webhooks[{index}].url host is not in allowed_hosts");
+            }
             if !webhook.on_failure && !webhook.on_success {
                 bail!("notifications.webhooks[{index}] must enable on_failure or on_success");
             }
@@ -354,9 +476,6 @@ impl FlowConfig {
             }
             if retry.backoff_ms > 60_000 {
                 bail!("execution.retries[{step_id:?}].backoff_ms must not exceed 60000");
-            }
-            for class in &retry.retryable {
-                validate_id("retryable failure class", class)?;
             }
         }
         for (step_id, shard) in &self.execution.shards {
@@ -470,110 +589,14 @@ impl FlowConfig {
     }
     fn validate_services(&self) -> Result<()> {
         for (id, service) in &self.services {
-            validate_id("service id", id)?;
-            match service {
-                ServiceConfig::Environment {
-                    source_env,
-                    inject_env,
-                } => {
-                    validate_env_name("service.source_env", source_env)?;
-                    validate_env_name("service.inject_env", inject_env)?;
-                }
-                ServiceConfig::Docker {
-                    runtime: _,
-                    image,
-                    image_env,
-                    external_env,
-                    inject_env,
-                    external_value_policy,
-                    startup_timeout_secs,
-                    timeout_env,
-                    container_port,
-                    environment,
-                    healthcheck,
-                    connection,
-                } => {
-                    validate_image(image)?;
-                    if *startup_timeout_secs == 0 || *startup_timeout_secs > 300 {
-                        bail!("service {id:?} startup_timeout_secs must be between 1 and 300");
-                    }
-                    if *container_port == 0 {
-                        bail!("service {id:?} container_port must not be zero");
-                    }
-                    if let Some(name) = image_env {
-                        validate_env_name("service.image_env", name)?;
-                    }
-                    if let Some(name) = timeout_env {
-                        validate_env_name("service.timeout_env", name)?;
-                    }
-                    if let Some(name) = external_env {
-                        validate_env_name("service.external_env", name)?;
-                    }
-                    if *external_value_policy != ExternalValuePolicy::None && external_env.is_none()
-                    {
-                        bail!("Docker service {id:?} external_value_policy requires external_env");
-                    }
-                    validate_env_name("service.inject_env", inject_env)?;
-                    if healthcheck.is_empty() {
-                        bail!("Docker service {id:?} requires a healthcheck command");
-                    }
-                    if !connection.contains("{host_port}") {
-                        bail!("Docker service {id:?} connection must contain {{host_port}}");
-                    }
-                    for key in environment.keys() {
-                        validate_env_name("service.environment key", key)?;
-                    }
-                    for value in environment.values().chain(healthcheck.iter()) {
-                        if value.contains('\0') {
-                            bail!("Docker service {id:?} contains a NUL value");
-                        }
-                    }
-                }
-            }
+            validate_service_entry(id, service)?;
         }
         Ok(())
     }
 
     fn validate_parsers(&self) -> Result<()> {
         for (id, parser) in &self.parsers {
-            validate_id("parser id", id)?;
-            match parser {
-                ParserConfig::Regex {
-                    patterns,
-                    capture,
-                    minimum,
-                } => {
-                    if patterns.is_empty() || *minimum == 0 {
-                        bail!("parser {id:?} requires patterns and minimum greater than zero");
-                    }
-                    for pattern in patterns {
-                        let regex = Regex::new(pattern)
-                            .with_context(|| format!("parser {id:?} has invalid regex"))?;
-                        if *capture >= regex.captures_len() {
-                            bail!("parser {id:?} regex has no capture group {capture}");
-                        }
-                    }
-                }
-                ParserConfig::Junit { minimum } | ParserConfig::Trx { minimum } => {
-                    if *minimum == 0 {
-                        bail!("parser {id:?} minimum must be greater than zero");
-                    }
-                }
-                ParserConfig::Json {
-                    count_path,
-                    minimum,
-                } => {
-                    if *minimum == 0 {
-                        bail!("parser {id:?} minimum must be greater than zero");
-                    }
-                    if count_path
-                        .as_deref()
-                        .is_some_and(|path| path.trim().is_empty() || path.starts_with('.'))
-                    {
-                        bail!("parser {id:?} count_path must be a non-empty dot path");
-                    }
-                }
-            }
+            validate_parser_entry(id, parser)?;
         }
         Ok(())
     }
@@ -581,67 +604,10 @@ impl FlowConfig {
     fn validate_doctor(&self) -> Result<()> {
         let mut ids = HashSet::new();
         for check in &self.doctor.checks {
-            validate_id("doctor check id", &check.id)?;
             if !ids.insert(check.id.as_str()) {
                 bail!("duplicate doctor check id {:?}", check.id);
             }
-            if check.label.trim().is_empty() {
-                bail!("doctor check {:?} requires a label", check.id);
-            }
-            if check.timeout_secs == 0 || check.timeout_secs > 300 {
-                bail!(
-                    "doctor check {:?} timeout_secs must be between 1 and 300",
-                    check.id
-                );
-            }
-            match &check.kind {
-                DoctorCheckKind::Command { program, args } => {
-                    validate_program("doctor command", program)?;
-                    validate_arguments(self, &check.id, args)?;
-                }
-                DoctorCheckKind::Path { path, .. } | DoctorCheckKind::Glob { pattern: path } => {
-                    validate_template(self, &check.id, path)?;
-                }
-                DoctorCheckKind::Env { name } => validate_env_name("doctor env", name)?,
-                DoctorCheckKind::EnvOrFile {
-                    env,
-                    path,
-                    contains,
-                } => {
-                    validate_env_name("doctor env", env)?;
-                    validate_template(self, &check.id, path)?;
-                    if contains.is_empty() {
-                        bail!("doctor check {:?} requires non-empty contains", check.id);
-                    }
-                }
-                DoctorCheckKind::GitConfig { key, expected } => {
-                    if key.is_empty() || expected.is_empty() {
-                        bail!(
-                            "doctor Git config check {:?} requires key and expected",
-                            check.id
-                        );
-                    }
-                }
-                DoctorCheckKind::GitRemotes => {}
-                DoctorCheckKind::Version {
-                    program,
-                    args,
-                    path,
-                    ..
-                } => {
-                    validate_program("doctor version program", program)?;
-                    validate_arguments(self, &check.id, args)?;
-                    validate_template(self, &check.id, path)?;
-                }
-                DoctorCheckKind::Service { service } => {
-                    if !self.services.contains_key(service) {
-                        bail!(
-                            "doctor check {:?} references unknown service {service:?}",
-                            check.id
-                        );
-                    }
-                }
-            }
+            validate_doctor_check(self, check)?;
         }
         Ok(())
     }
@@ -652,23 +618,7 @@ impl FlowConfig {
         }
         let components = self.components();
         for (index, rule) in self.scope.rules.iter().enumerate() {
-            if rule.patterns.is_empty() || rule.components.is_empty() {
-                bail!("scope.rules[{index}] requires patterns and components");
-            }
-            for component in &rule.components {
-                validate_id("scope component", component)?;
-                if !components.contains(component) {
-                    bail!("scope.rules[{index}] references component {component:?} with no steps");
-                }
-            }
-            for pattern in &rule.patterns {
-                if pattern.contains("..") || Path::new(pattern).is_absolute() {
-                    bail!("scope.rules[{index}] contains unsafe pattern {pattern:?}");
-                }
-                Glob::new(pattern).with_context(|| {
-                    format!("scope.rules[{index}] contains invalid pattern {pattern:?}")
-                })?;
-            }
+            validate_scope_rule_with_components(&components, index, rule)?;
         }
         Ok(())
     }
@@ -719,140 +669,196 @@ impl FlowConfig {
     }
 }
 
-fn infer_error_path(config: &FlowConfig, error: &str) -> String {
-    for field in [
-        "paths.reports",
-        "paths.audit_config",
-        "paths.secrets_config",
-        "project.name",
-        "project.default_profile",
-        "project.hook_profile",
-        "report_templates.root",
-        "report_templates.template",
-        "report_templates.junit",
-        "execution.max_parallel",
-        "notifications.webhooks",
-    ] {
-        if error.contains(field) {
-            return field.into();
+fn validate_service_entry(id: &str, service: &ServiceConfig) -> Result<()> {
+    validate_id("service id", id)?;
+    match service {
+        ServiceConfig::Environment {
+            source_env,
+            inject_env,
+        } => {
+            validate_env_name("service.source_env", source_env)?;
+            validate_env_name("service.inject_env", inject_env)?;
+        }
+        ServiceConfig::Docker {
+            runtime: _,
+            image,
+            image_env,
+            external_env,
+            inject_env,
+            external_value_policy,
+            startup_timeout_secs,
+            timeout_env,
+            container_port,
+            environment,
+            healthcheck,
+            connection,
+        } => {
+            validate_image(image)?;
+            if *startup_timeout_secs == 0 || *startup_timeout_secs > 300 {
+                bail!("service {id:?} startup_timeout_secs must be between 1 and 300");
+            }
+            if *container_port == 0 {
+                bail!("service {id:?} container_port must not be zero");
+            }
+            if let Some(name) = image_env {
+                validate_env_name("service.image_env", name)?;
+            }
+            if let Some(name) = timeout_env {
+                validate_env_name("service.timeout_env", name)?;
+            }
+            if let Some(name) = external_env {
+                validate_env_name("service.external_env", name)?;
+            }
+            if *external_value_policy != ExternalValuePolicy::None && external_env.is_none() {
+                bail!("Docker service {id:?} external_value_policy requires external_env");
+            }
+            validate_env_name("service.inject_env", inject_env)?;
+            if healthcheck.is_empty() {
+                bail!("Docker service {id:?} requires a healthcheck command");
+            }
+            if !connection.contains("{host_port}") {
+                bail!("Docker service {id:?} connection must contain {{host_port}}");
+            }
+            for key in environment.keys() {
+                validate_env_name("service.environment key", key)?;
+            }
+            for value in environment.values().chain(healthcheck.iter()) {
+                if value.contains('\0') {
+                    bail!("Docker service {id:?} contains a NUL value");
+                }
+            }
         }
     }
-    let quoted = error
-        .split_once('"')
-        .and_then(|(_, rest)| rest.split_once('"').map(|(value, _)| value));
-    if error.starts_with("step ") {
-        let index = quoted.and_then(|id| config.steps.iter().position(|step| step.id == id));
-        let base = index.map_or_else(|| "steps[*]".into(), |index| format!("steps[{index}]"));
-        if error.contains("timeout") {
-            format!("{base}.timeout_secs")
-        } else if error.contains("parser") {
-            format!("{base}.parser")
-        } else if error.contains("log") {
-            format!("{base}.log")
-        } else if error.contains("depend") {
-            format!("{base}.depends_on")
-        } else {
-            base
+    Ok(())
+}
+
+fn validate_parser_entry(id: &str, parser: &ParserConfig) -> Result<()> {
+    validate_id("parser id", id)?;
+    match parser {
+        ParserConfig::Regex {
+            patterns,
+            capture,
+            minimum,
+        } => {
+            if patterns.is_empty() || *minimum == 0 {
+                bail!("parser {id:?} requires patterns and minimum greater than zero");
+            }
+            for pattern in patterns {
+                let regex = Regex::new(pattern)
+                    .with_context(|| format!("parser {id:?} has invalid regex"))?;
+                if *capture >= regex.captures_len() {
+                    bail!("parser {id:?} regex has no capture group {capture}");
+                }
+            }
         }
-    } else if error.starts_with("service ") {
-        let base = quoted.map_or_else(|| "services[*]".into(), |id| format!("services[\"{id}\"]"));
-        if error.contains("inject_env") {
-            format!("{base}.inject_env")
-        } else {
-            base
+        ParserConfig::Junit { minimum } | ParserConfig::Trx { minimum } => {
+            if *minimum == 0 {
+                bail!("parser {id:?} minimum must be greater than zero");
+            }
         }
-    } else if error.starts_with("parser ") {
-        quoted.map_or_else(|| "parsers[*]".into(), |id| format!("parsers[\"{id}\"]"))
-    } else if error.contains("timeout_secs") {
-        "steps[*].timeout_secs".into()
-    } else if error.contains("log") {
-        "steps[*].log".into()
-    } else if error.contains("scope") {
-        "scope".into()
-    } else {
-        "$".into()
+        ParserConfig::Json {
+            count_path,
+            minimum,
+        } => {
+            if *minimum == 0 {
+                bail!("parser {id:?} minimum must be greater than zero");
+            }
+            if count_path
+                .as_deref()
+                .is_some_and(|path| path.trim().is_empty() || path.starts_with('.'))
+            {
+                bail!("parser {id:?} count_path must be a non-empty dot path");
+            }
+        }
     }
+    Ok(())
 }
 
-fn diagnostic_id(error: &str) -> &'static str {
-    if error.contains("unsupported workflow config version") {
-        "HGCFG-VERSION"
-    } else if error.contains("runner version") {
-        "HGCFG-RUNNER-VERSION"
-    } else if error.contains("cycle") {
-        "HGCFG-DEPENDENCY-CYCLE"
-    } else if error.contains("dependenc") {
-        "HGCFG-DEPENDENCY"
-    } else if error.contains("multiple services injecting") {
-        "HGCFG-SERVICE-INJECT-COLLISION"
-    } else if error.contains("unknown service") || error.contains("unknown parser") {
-        "HGCFG-UNKNOWN-REFERENCE"
-    } else if error.contains("repository-relative") || error.contains("escape the repository") {
-        "HGCFG-INVALID-PATH"
-    } else if error.contains("environment variable name") {
-        "HGCFG-INVALID-ENVIRONMENT"
-    } else if error.contains("duplicate") {
-        "HGCFG-DUPLICATE-FIELD"
-    } else if error.contains("log") {
-        "HGCFG-INVALID-LOG"
-    } else {
-        "HGCFG-INVALID-FIELD"
+fn validate_doctor_check(config: &FlowConfig, check: &DoctorCheck) -> Result<()> {
+    validate_id("doctor check id", &check.id)?;
+    if check.label.trim().is_empty() {
+        bail!("doctor check {:?} requires a label", check.id);
     }
+    if check.timeout_secs == 0 || check.timeout_secs > 300 {
+        bail!(
+            "doctor check {:?} timeout_secs must be between 1 and 300",
+            check.id
+        );
+    }
+    match &check.kind {
+        DoctorCheckKind::Command { program, args } => {
+            validate_program("doctor command", program)?;
+            validate_arguments(config, &check.id, args)?;
+        }
+        DoctorCheckKind::Path { path, .. } | DoctorCheckKind::Glob { pattern: path } => {
+            validate_template(config, &check.id, path)?;
+        }
+        DoctorCheckKind::Env { name } => validate_env_name("doctor env", name)?,
+        DoctorCheckKind::EnvOrFile {
+            env,
+            path,
+            contains,
+        } => {
+            validate_env_name("doctor env", env)?;
+            validate_template(config, &check.id, path)?;
+            if contains.is_empty() {
+                bail!("doctor check {:?} requires non-empty contains", check.id);
+            }
+        }
+        DoctorCheckKind::GitConfig { key, expected } => {
+            if key.is_empty() || expected.is_empty() {
+                bail!(
+                    "doctor Git config check {:?} requires key and expected",
+                    check.id
+                );
+            }
+        }
+        DoctorCheckKind::GitRemotes => {}
+        DoctorCheckKind::Version {
+            program,
+            args,
+            path,
+            ..
+        } => {
+            validate_program("doctor version program", program)?;
+            validate_arguments(config, &check.id, args)?;
+            validate_template(config, &check.id, path)?;
+        }
+        DoctorCheckKind::Service { service } => {
+            if !config.services.contains_key(service) {
+                bail!(
+                    "doctor check {:?} references unknown service {service:?}",
+                    check.id
+                );
+            }
+        }
+    }
+    Ok(())
 }
 
-fn redact_error(error: &str) -> String {
-    if error.contains("unsupported workflow config version") {
-        "workflow configuration version is unsupported".into()
-    } else if error.contains("timeout") {
-        "timeout is outside the accepted range".into()
-    } else if error.contains("unknown parser") || error.contains("unknown service") {
-        "reference does not name a declared configuration entry".into()
-    } else if error.contains("repository-relative") || error.contains("escape the repository") {
-        "path is not a safe repository-relative path".into()
-    } else if error.contains("environment variable name") {
-        "environment variable name is invalid".into()
-    } else if error.contains("duplicate") {
-        "configuration declares the same identifier more than once".into()
-    } else if error.contains("must be") || error.contains("requires") {
-        "field violates a documented configuration constraint".into()
-    } else if error.contains("cycle") {
-        "dependencies contain a cycle".into()
-    } else if error.contains("depend") {
-        "dependency reference is invalid".into()
-    } else {
-        "configuration validation failed".into()
+fn validate_scope_rule_with_components(
+    components: &std::collections::BTreeSet<String>,
+    index: usize,
+    rule: &ScopeRule,
+) -> Result<()> {
+    if rule.patterns.is_empty() || rule.components.is_empty() {
+        bail!("scope.rules[{index}] requires patterns and components");
     }
-}
-
-fn repair_help(error: &str) -> String {
-    if error.contains("unsupported workflow config version") {
-        "migrate a v1 file with `harness-gate config migrate` or use version 2".into()
-    } else if error.contains("remove runner threads_env") {
-        "remove the runner's threads_env name from remove_env".into()
-    } else if error.contains("runner") && error.contains("isolation") {
-        "declare schema-per-worker or database-per-worker isolation for concurrent tests".into()
-    } else if error.contains("runner") && error.contains("threads_env") {
-        "declare threads_env with threads, or use the cargo-test runner kind".into()
-    } else if error.contains("runner version") {
-        "use the supported runner contract version".into()
-    } else if error.contains("cycle") || error.contains("dependenc") {
-        "remove the invalid dependency or add an explicit acyclic prerequisite".into()
-    } else if error.contains("multiple services injecting") {
-        "use one service or distinct inject_env names".into()
-    } else if error.contains("log") {
-        "choose a unique single .log filename".into()
-    } else if error.contains("repository-relative") || error.contains("escape the repository") {
-        "use a non-empty path below the repository without a prefix or parent traversal".into()
-    } else if error.contains("environment variable name") {
-        "use an uppercase environment-variable name containing only letters, digits, and underscores"
-            .into()
-    } else if error.contains("duplicate") {
-        "keep one declaration or give each declaration a unique identifier".into()
-    } else if error.contains("unknown") {
-        "use an identifier declared in the configuration".into()
-    } else {
-        "update the field to satisfy the documented configuration constraints".into()
+    for component in &rule.components {
+        validate_id("scope component", component)?;
+        if !components.contains(component) {
+            bail!("scope.rules[{index}] references component {component:?} with no steps");
+        }
     }
+    for pattern in &rule.patterns {
+        if pattern.contains("..") || Path::new(pattern).is_absolute() {
+            bail!("scope.rules[{index}] contains unsafe pattern {pattern:?}");
+        }
+        Glob::new(pattern).with_context(|| {
+            format!("scope.rules[{index}] contains invalid pattern {pattern:?}")
+        })?;
+    }
+    Ok(())
 }
 
 fn validate_resource_conflicts(
@@ -864,7 +870,7 @@ fn validate_resource_conflicts(
     for (index, step) in config.steps.iter().enumerate() {
         // Built-in gates do not own external log files. Their empty `log`
         // field is intentional and must not collide with another gate.
-        if step.kind.as_deref() == Some("builtin-gate") {
+        if step.kind == Some(super::model::StepKind::BuiltinGate) {
             continue;
         }
         let identity = steps::normalize_log_identity(&step.log);
@@ -877,6 +883,7 @@ fn validate_resource_conflicts(
                 path: path.clone(),
                 message: format!("log filename is also used by step {previous}"),
                 help: "choose a unique .log filename for each verification step".into(),
+                retry_class: None,
                 location: source_map.location(&path),
                 related: vec![RelatedDiagnostic {
                     path: related_path.clone(),
@@ -959,6 +966,7 @@ fn validate_resource_conflicts(
                     path: path.clone(),
                     message: format!("steps use shared service {service_id:?} without ordering"),
                     help: "add a dependency or define separate service resources".into(),
+                    retry_class: None,
                     location: source_map.location(&path),
                     related: vec![
                         RelatedDiagnostic {
@@ -1001,6 +1009,7 @@ fn validate_resource_conflicts(
                         help:
                             "add a dependency, use distinct inject_env names, or split the workflow"
                                 .into(),
+                        retry_class: None,
                         location: source_map.location(&path),
                         related: vec![
                             RelatedDiagnostic {
@@ -1062,6 +1071,7 @@ fn validate_report_template_paths(
             path: path.into(),
             message,
             help: help.into(),
+            retry_class: None,
             location: source_map.location(path),
             related,
         });
@@ -1200,43 +1210,147 @@ fn push_diagnostic(
     source_map: &SourceMap,
     diagnostics: &mut ConfigDiagnostics,
     path: &str,
+    kind: ConfigIssueKind,
     message: &str,
 ) {
     diagnostics.push(ConfigDiagnostic {
-        id: "HGCFG-INVALID-FIELD".into(),
+        id: kind.id().into(),
         severity: DiagnosticSeverity::Error,
         path: path.into(),
-        message: message.into(),
-        help: repair_help(message),
+        message: if message.is_empty() {
+            kind.message().into()
+        } else {
+            message.into()
+        },
+        help: kind.help().into(),
+        retry_class: None,
         location: source_map.location(path),
         related: Vec::new(),
     });
 }
 
-fn collect_result(
+fn collect_result<E: fmt::Display>(
+    source_map: &SourceMap,
+    diagnostics: &mut ConfigDiagnostics,
+    kind: ConfigIssueKind,
+    path: &str,
+    result: std::result::Result<(), E>,
+) {
+    if result.is_err() {
+        diagnostics.push(ConfigDiagnostic {
+            id: kind.id().into(),
+            severity: DiagnosticSeverity::Error,
+            path: path.into(),
+            message: kind.message().into(),
+            help: kind.help().into(),
+            retry_class: None,
+            location: source_map.location(path),
+            related: Vec::new(),
+        });
+    }
+}
+
+fn collect_report_template_diagnostics(
     config: &FlowConfig,
     source_map: &SourceMap,
     diagnostics: &mut ConfigDiagnostics,
-    path: &str,
-    result: Result<()>,
 ) {
-    if let Err(error) = result {
-        let text = error.to_string();
-        let inferred = infer_error_path(config, &text);
-        let path = if inferred == "$" || inferred.contains('*') || inferred == "scope" {
-            path.to_string()
-        } else {
-            inferred
-        };
+    let add = |diagnostics: &mut ConfigDiagnostics, path: &str, kind: ConfigIssueKind| {
         diagnostics.push(ConfigDiagnostic {
-            id: diagnostic_id(&text).into(),
+            id: kind.id().into(),
             severity: DiagnosticSeverity::Error,
-            path: path.clone(),
-            message: redact_error(&text),
-            help: repair_help(&text),
-            location: source_map.location(&path),
+            path: path.into(),
+            message: kind.message().into(),
+            help: kind.help().into(),
+            retry_class: None,
+            location: source_map.location(path),
             related: Vec::new(),
         });
+    };
+    let templates = &config.report_templates;
+    match (&templates.root, &templates.template) {
+        (None, None) => {}
+        (Some(root), Some(template)) => {
+            if validate_repo_path("report_templates.root", root).is_err() {
+                add(
+                    diagnostics,
+                    "report_templates.root",
+                    ConfigIssueKind::InvalidPath,
+                );
+            }
+            if validate_repo_path("report_templates.template", template).is_err() {
+                add(
+                    diagnostics,
+                    "report_templates.template",
+                    ConfigIssueKind::InvalidPath,
+                );
+            }
+            if !template.ends_with(".html") && !template.ends_with(".tera") {
+                add(
+                    diagnostics,
+                    "report_templates.template",
+                    ConfigIssueKind::InvalidField,
+                );
+            }
+        }
+        (Some(_), None) | (None, Some(_)) => {
+            add(
+                diagnostics,
+                "report_templates",
+                ConfigIssueKind::InvalidField,
+            );
+        }
+    }
+    if let Some(junit) = &templates.junit {
+        if validate_repo_path("report_templates.junit", junit).is_err() {
+            add(
+                diagnostics,
+                "report_templates.junit",
+                ConfigIssueKind::InvalidPath,
+            );
+        } else if !junit.ends_with(".xml") {
+            add(
+                diagnostics,
+                "report_templates.junit",
+                ConfigIssueKind::InvalidField,
+            );
+        }
+    }
+}
+
+fn collect_execution_diagnostics(
+    config: &FlowConfig,
+    source_map: &SourceMap,
+    diagnostics: &mut ConfigDiagnostics,
+) {
+    if let Some(max_parallel) = config.execution.max_parallel {
+        if max_parallel == 0 || max_parallel > 64 {
+            diagnostics.push(ConfigDiagnostic {
+                id: ConfigIssueKind::InvalidField.id().into(),
+                severity: DiagnosticSeverity::Error,
+                path: "execution.max_parallel".into(),
+                message: ConfigIssueKind::InvalidField.message().into(),
+                help: ConfigIssueKind::InvalidField.help().into(),
+                retry_class: None,
+                location: source_map.location("execution.max_parallel"),
+                related: Vec::new(),
+            });
+        }
+    }
+    for (step_id, retry) in &config.execution.retries {
+        let base = format!("execution.retries[\"{step_id}\"]");
+        if retry.max_attempts == 0 || retry.max_attempts > 5 {
+            diagnostics.push(ConfigDiagnostic {
+                id: ConfigIssueKind::InvalidField.id().into(),
+                severity: DiagnosticSeverity::Error,
+                path: format!("{base}.max_attempts"),
+                message: ConfigIssueKind::InvalidField.message().into(),
+                help: ConfigIssueKind::InvalidField.help().into(),
+                retry_class: None,
+                location: source_map.location(&format!("{base}.max_attempts")),
+                related: Vec::new(),
+            });
+        }
     }
 }
 
@@ -1253,6 +1367,7 @@ fn collect_duplicate_doctor_ids(
                 source_map,
                 diagnostics,
                 &format!("doctor.checks[{index}].id"),
+                ConfigIssueKind::DuplicateField,
                 "duplicate doctor check id",
             );
         }
@@ -1266,117 +1381,17 @@ fn collect_step_field_diagnostics(
     source_map: &SourceMap,
     diagnostics: &mut ConfigDiagnostics,
 ) {
-    let base = format!("steps[{index}]");
-    if let Err(error) = validate_step(config, step) {
-        let text = error.to_string();
-        let inferred = infer_step_error_path(config, step, index, &text);
-        let path = if inferred == "$" || inferred.contains('*') {
-            base
-        } else {
-            inferred
-        };
+    if let Err(issue) = steps::validate_step_diagnostic(config, step, index) {
         diagnostics.push(ConfigDiagnostic {
-            id: diagnostic_id(&text).into(),
+            id: issue.kind.id().into(),
             severity: DiagnosticSeverity::Error,
-            path: path.clone(),
-            message: redact_error(&text),
-            help: repair_help(&text),
-            location: source_map.location(&path),
+            path: issue.path.clone(),
+            message: issue.kind.message().into(),
+            help: issue.kind.help().into(),
+            retry_class: None,
+            location: source_map.location(&issue.path),
             related: Vec::new(),
         });
-    }
-}
-
-fn infer_step_error_path(
-    config: &FlowConfig,
-    step: &super::model::StepConfig,
-    index: usize,
-    error: &str,
-) -> String {
-    let base = format!("steps[{index}]");
-    if error.contains("multiple services injecting") {
-        let injected = error
-            .split_once("injecting ")
-            .map(|(_, value)| value.trim());
-        if let Some(injected) = injected {
-            let mut seen = HashSet::new();
-            for (service_index, service_id) in step.services.iter().enumerate() {
-                if let Some(service) = config.services.get(service_id) {
-                    let name = service_inject_env(service);
-                    if name == injected && !seen.insert(name) {
-                        return format!("{base}.services[{service_index}]");
-                    }
-                    seen.insert(name);
-                }
-            }
-        }
-    }
-    if error.contains("duplicate service") {
-        if let Some(id) = error
-            .split_once("duplicate service ")
-            .and_then(|(_, value)| {
-                value
-                    .strip_prefix('"')
-                    .and_then(|rest| rest.split_once('"').map(|(id, _)| id))
-            })
-        {
-            let mut duplicate_seen = false;
-            for (service_index, service) in step.services.iter().enumerate() {
-                if service == id {
-                    if duplicate_seen {
-                        return format!("{base}.services[{service_index}]");
-                    }
-                    duplicate_seen = true;
-                }
-            }
-        }
-    }
-    if error.contains("unknown service") {
-        if let Some(id) = error.split_once("unknown service ").and_then(|(_, value)| {
-            value
-                .strip_prefix('"')
-                .and_then(|rest| rest.split_once('"').map(|(id, _)| id))
-        }) {
-            if let Some(service_index) = step.services.iter().position(|service| service == id) {
-                return format!("{base}.services[{service_index}]");
-            }
-        }
-    }
-    if error.contains("remove service injection") {
-        return format!("{base}.remove_env");
-    }
-    if error.contains("runner version") {
-        return format!("{base}.runner.version");
-    }
-    if error.contains("runner kind") {
-        return format!("{base}.runner.kind");
-    }
-    if error.contains("requires threads_env") || error.contains("runner threads_env") {
-        return format!("{base}.runner.threads_env");
-    }
-    if error.contains("runner threads") {
-        return format!("{base}.runner.threads");
-    }
-    if error.contains("runner args_position") {
-        return format!("{base}.runner.args_position");
-    }
-    if error.contains("runner shared isolation") {
-        return format!("{base}.runner.isolation");
-    }
-    if error.contains("cargo-test runner") {
-        return format!("{base}.runner.kind");
-    }
-    if error.contains("gate_type") {
-        return format!("{base}.gate_type");
-    }
-    if error.contains("unknown kind") {
-        return format!("{base}.kind");
-    }
-    let inferred = infer_error_path(config, error);
-    if inferred == "$" || inferred.contains('*') {
-        base
-    } else {
-        inferred
     }
 }
 
