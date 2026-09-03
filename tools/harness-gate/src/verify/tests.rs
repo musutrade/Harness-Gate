@@ -97,14 +97,21 @@ fn independent_steps_run_in_parallel_and_publish_in_plan_order() {
         step.profiles.insert("full".into());
         step.program = "sh".into();
     }
-    project.config.steps[0].args = vec!["-c".into(), "sleep 2".into()];
-    project.config.steps[1].args = vec!["-c".into(), "sleep 1".into()];
+    project.config.steps[0].args = vec![
+        "-c".into(),
+        "touch parallel-a.started; i=0; while [ ! -f parallel-b.started ] && [ \"$i\" -lt 200 ]; do i=$((i + 1)); sleep 0.01; done; [ -f parallel-b.started ]".into(),
+    ];
+    project.config.steps[1].args = vec![
+        "-c".into(),
+        "touch parallel-b.started; i=0; while [ ! -f parallel-a.started ] && [ \"$i\" -lt 200 ]; do i=$((i + 1)); sleep 0.01; done; [ -f parallel-a.started ]".into(),
+    ];
 
-    let started = std::time::Instant::now();
     let report = run(&project, ScopeResult::all(&project), "full", false)
         .expect("parallel verification should pass");
 
-    assert!(started.elapsed() < std::time::Duration::from_millis(3500));
+    assert!(report.passed, "both concurrent handshakes must complete");
+    assert!(project.root.join("parallel-a.started").is_file());
+    assert!(project.root.join("parallel-b.started").is_file());
     let labels = report
         .steps
         .iter()
@@ -357,7 +364,10 @@ fn parser_failure_marks_step_failed() {
         .find(|step| step.label == project.config.steps[0].label)
         .expect("parsed step");
     assert!(!step.passed);
-    assert_eq!(step.failure_code.as_deref(), Some("RESULT_ZERO"));
+    assert_eq!(
+        step.failure_code.map(|code| code.to_string()).as_deref(),
+        Some("RESULT_ZERO")
+    );
     assert_eq!(
         step.parser.as_ref().map(|parser| parser.mode.as_str()),
         Some("regex")
@@ -441,6 +451,7 @@ fn webhook_connection_failure_maps_to_e1404() {
     drop(listener);
     project.config.notifications.webhooks = vec![crate::config::WebhookConfig {
         url: format!("http://{address}/notify"),
+        allowed_hosts: vec![address.ip().to_string()],
         on_failure: true,
         on_success: true,
     }];

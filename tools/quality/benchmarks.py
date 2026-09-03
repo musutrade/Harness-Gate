@@ -223,18 +223,45 @@ def run(output: Path, samples: int, raw_dir: Path | None = None) -> int:
     if samples < 1:
         fail("at least one warm sample is required")
     subprocess.run(["cargo", "build", "--manifest-path", str(CRATE / "Cargo.toml"), "--locked", "--profile", "release-small"], check=True, cwd=CRATE.parent.parent)
-    binary = CRATE / "target" / "release-small" / ("harness-gate.exe" if os.name == "nt" else "harness-gate")
+    target_metadata = subprocess.check_output(
+        [
+            "cargo",
+            "metadata",
+            "--manifest-path",
+            str(CRATE / "Cargo.toml"),
+            "--locked",
+            "--format-version",
+            "1",
+            "--no-deps",
+        ],
+        cwd=CRATE.parent.parent,
+        text=True,
+    )
+    # Cargo target directories may be redirected by the host or CI cache.
+    # Resolve the actual directory instead of assuming crate/target.
+    target_directory = Path(json.loads(target_metadata)["target_directory"])
+    binary = target_directory / "release-small" / (
+        "harness-gate.exe" if os.name == "nt" else "harness-gate"
+    )
     if not binary.is_file():
         fail(f"release-small binary missing: {binary}")
 
     cold_seconds, cold_result = timed(["cargo", "nextest", "run", "--manifest-path", str(CRATE / "Cargo.toml"), "--locked"], CRATE.parent.parent)
     if cold_result.returncode != 0:
-        fail("cold nextest sample failed")
+        fail(
+            "cold nextest sample failed\n"
+            f"stdout:\n{cold_result.stdout[-4000:]}\n"
+            f"stderr:\n{cold_result.stderr[-4000:]}"
+        )
     warm_seconds = []
     for _ in range(samples):
         seconds, result = timed(["cargo", "nextest", "run", "--manifest-path", str(CRATE / "Cargo.toml"), "--locked"], CRATE.parent.parent)
         if result.returncode != 0:
-            fail("warm nextest sample failed")
+            fail(
+                "warm nextest sample failed\n"
+                f"stdout:\n{result.stdout[-4000:]}\n"
+                f"stderr:\n{result.stderr[-4000:]}"
+            )
         warm_seconds.append(seconds)
 
     raw_root = raw_dir or output.parent / "benchmark-runs"

@@ -55,6 +55,7 @@ We use a simplified version of the Michael Nygard ADR template:
 - [ADR-0035](0035-protect-release-eligibility.md) - Protect release eligibility and publication
 - [ADR-0036](0036-verify-installer-artifacts.md) - Verify installer artifacts before atomic installation
 - [ADR-0037](0037-adapter-request-integrity-and-evidence-budgets.md) - Bind adapter requests and bound evidence
+- [ADR-0038](0038-post-remediation-hardening.md) - Plan post-remediation security, reliability, and maintenance follow-ups
 
 ## Creating New ADRs
 

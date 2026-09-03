@@ -310,10 +310,28 @@ jobs:
           python3 -m unittest discover -s tools/release/tests -v
           bash tools/release/tests/test_install.sh
 
+  quality-scripts:
+    name: Quality Script Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.x'
+
+      - name: Test and compile quality scripts
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          python3 -m unittest discover -s tools/quality/tests -v
+          python3 -m py_compile tools/quality/*.py tools/quality/tests/*.py
+
   quality-required:
     name: Required Quality Aggregate
     if: ${{ always() }}
-    needs: [quality-coverage, quality-contracts, quality-baseline, docs-consistency, release-contracts]
+    needs: [quality-coverage, quality-contracts, quality-baseline, docs-consistency, release-contracts, quality-scripts]
     runs-on: ubuntu-latest
     steps:
       - name: Require every quality gate
@@ -323,10 +341,11 @@ jobs:
           QUALITY_BASELINE: ${{ needs.quality-baseline.result }}
           DOCS_CONSISTENCY: ${{ needs.docs-consistency.result }}
           RELEASE_CONTRACTS: ${{ needs.release-contracts.result }}
+          QUALITY_SCRIPTS: ${{ needs.quality-scripts.result }}
         run: |
           set -eu
           failed=0
-          for result in "$QUALITY_COVERAGE" "$QUALITY_CONTRACTS" "$QUALITY_BASELINE" "$DOCS_CONSISTENCY" "$RELEASE_CONTRACTS"; do
+          for result in "$QUALITY_COVERAGE" "$QUALITY_CONTRACTS" "$QUALITY_BASELINE" "$DOCS_CONSISTENCY" "$RELEASE_CONTRACTS" "$QUALITY_SCRIPTS"; do
             echo "quality dependency result: $result"
             if [ "$result" != success ]; then
               failed=1

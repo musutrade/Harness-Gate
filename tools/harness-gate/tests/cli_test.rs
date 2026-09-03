@@ -26,7 +26,7 @@ fn test_version_command() {
     assert_success(&output);
     let stdout = stdout_str(&output);
     assert!(stdout.contains("harness-gate"));
-    assert!(stdout.contains("0.3.5"));
+    assert!(stdout.contains("0.3.6"));
 }
 
 #[test]
@@ -102,6 +102,35 @@ fn test_config_check_without_config() {
     let stderr = stderr_str(&output);
     assert!(stderr.contains("harness-gate init --preset generic"));
     assert!(stderr.contains("version = 2"));
+}
+
+#[test]
+fn test_legacy_report_dir_alias_warns_and_new_namespace_wins() {
+    let ctx = TestContext::new();
+    ctx.init_preset("generic");
+
+    let legacy = Command::new(env!("CARGO_BIN_EXE_harness-gate"))
+        .args(["--color", "never", "config", "print", "--resolved"])
+        .arg("--project-root")
+        .arg(&ctx.project_root)
+        .env("REPORT_DIR", ".harness-gate/legacy-reports")
+        .env_remove("HARNESS_GATE_REPORTS")
+        .output()
+        .expect("run config print with legacy report alias");
+    assert_success(&legacy);
+    assert!(stdout_str(&legacy).contains(".harness-gate/legacy-reports"));
+    assert!(stderr_str(&legacy).contains("REPORT_DIR is deprecated"));
+
+    let current = Command::new(env!("CARGO_BIN_EXE_harness-gate"))
+        .args(["--color", "never", "config", "print", "--resolved"])
+        .arg("--project-root")
+        .arg(&ctx.project_root)
+        .env("REPORT_DIR", ".harness-gate/legacy-reports")
+        .env("HARNESS_GATE_REPORTS", ".harness-gate/current-reports")
+        .output()
+        .expect("run config print with both report aliases");
+    assert_success(&current);
+    assert!(stdout_str(&current).contains(".harness-gate/current-reports"));
 }
 
 #[test]

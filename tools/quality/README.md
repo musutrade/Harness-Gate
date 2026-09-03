@@ -19,7 +19,14 @@ python3 tools/quality/critical_paths.py \
 python3 tools/quality/contracts.py
 python3 tools/quality/benchmarks.py
 python3 tools/quality/docs_consistency.py
+python3 -m unittest discover -s tools/quality/tests -v
+python3 -m py_compile tools/quality/*.py tools/quality/tests/*.py
 ```
+
+The helper tests and bytecode compilation run in the `Quality Script Tests`
+CI job and are included in `Required Quality Aggregate`. Quality scripts are
+reviewed as production-like policy code: a failing or untestable script cannot
+silently approve a release.
 
 The benchmark runner executes the checked-in no-network fixture in both serial
 and opt-in parallel modes. Its JSON keeps per-mode raw samples, the configured

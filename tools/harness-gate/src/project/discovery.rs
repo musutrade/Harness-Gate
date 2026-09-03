@@ -1,5 +1,5 @@
 use super::{resolve_repo_path, InvocationInput, Project};
-use crate::config::{resolve_config_path, FlowConfig, DEFAULT_CONFIG_PATH};
+use crate::config::{resolve_config_path, ConfigDiagnostics, FlowConfig, DEFAULT_CONFIG_PATH};
 use anyhow::{bail, Context, Result};
 use std::collections::BTreeMap;
 use std::env;
@@ -61,19 +61,52 @@ impl Project {
             Path::new(&config.paths.reports),
             "report directory",
             false,
-        )?;
+        )
+        .map_err(|_| {
+            anyhow::Error::new(
+                ConfigDiagnostics::single(
+                    "HGCFG-INVALID-PATH",
+                    "paths.reports",
+                    "report directory path could not be resolved safely",
+                    "use a repository-relative report directory without symlink escape",
+                )
+                .with_source(config_path.clone()),
+            )
+        })?;
         let audit_config = resolve_repo_path(
             &execution_root,
             Path::new(&config.paths.audit_config),
             "audit configuration",
             true,
-        )?;
+        )
+        .map_err(|_| {
+            anyhow::Error::new(
+                ConfigDiagnostics::single(
+                    "HGCFG-INVALID-PATH",
+                    "paths.audit_config",
+                    "audit configuration path could not be resolved safely",
+                    "use a repository-relative audit configuration path inside the repository",
+                )
+                .with_source(config_path.clone()),
+            )
+        })?;
         let secrets_config = resolve_repo_path(
             &execution_root,
             Path::new(&config.paths.secrets_config),
             "secret scan configuration",
             true,
-        )?;
+        )
+        .map_err(|_| {
+            anyhow::Error::new(
+                ConfigDiagnostics::single(
+                    "HGCFG-INVALID-PATH",
+                    "paths.secrets_config",
+                    "secret scan configuration path could not be resolved safely",
+                    "use a repository-relative secret configuration path inside the repository",
+                )
+                .with_source(config_path.clone()),
+            )
+        })?;
         let aliases = config
             .paths
             .aliases
@@ -86,6 +119,17 @@ impl Project {
                     false,
                 )
                 .map(|path| (name.clone(), path))
+                .map_err(|_| {
+                    anyhow::Error::new(
+                        ConfigDiagnostics::single(
+                            "HGCFG-INVALID-PATH",
+                            format!("paths.aliases[\"{name}\"]"),
+                            "path alias could not be resolved safely",
+                            "use a repository-relative alias path without symlink escape",
+                        )
+                        .with_source(config_path.clone()),
+                    )
+                })
             })
             .collect::<Result<BTreeMap<_, _>>>()?;
 
@@ -108,16 +152,26 @@ impl Project {
 
     fn validate(&self) -> Result<()> {
         if !self.audit_config.is_file() {
-            bail!(
-                "required audit configuration is missing: {}",
-                self.audit_config.display()
-            );
+            return Err(anyhow::Error::new(
+                ConfigDiagnostics::single(
+                    "HGCFG-REQUIRED-FILE",
+                    "paths.audit_config",
+                    "required audit configuration file is missing",
+                    "create the configured audit configuration file or update paths.audit_config",
+                )
+                .with_source(self.audit_config.clone()),
+            ));
         }
         if !self.secrets_config.is_file() {
-            bail!(
-                "required secret scan configuration is missing: {}",
-                self.secrets_config.display()
-            );
+            return Err(anyhow::Error::new(
+                ConfigDiagnostics::single(
+                    "HGCFG-REQUIRED-FILE",
+                    "paths.secrets_config",
+                    "required secret scan configuration file is missing",
+                    "create the configured secret scan configuration file or update paths.secrets_config",
+                )
+                .with_source(self.secrets_config.clone()),
+            ));
         }
         Ok(())
     }

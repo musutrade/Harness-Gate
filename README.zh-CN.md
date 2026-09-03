@@ -15,7 +15,7 @@
 
 - 快速开始：看[安装](#安装)和[快速开始](#安装与快速开始)；
 - 接入新项目：看[安装与快速开始](#安装与快速开始)和[内置预设](#内置预设)；
-- 增加命令、组件或 CI profile：看[选择模型](#选择模型)和 [schema v2 配置参考](https://github.com/musutrade/Harness-Gate/blob/main/docs/configuration.md)；
+- 增加命令、组件或 CI profile：看[选择模型](#选择模型)、[schema v2 配置参考（中文）](https://github.com/musutrade/Harness-Gate/blob/main/docs/configuration.zh-CN.md)和 [JSON Schema 目录（英文）](https://github.com/musutrade/Harness-Gate/blob/main/schema/README.md)；
 - 处理失败：看[验证与报告](#验证与报告)和[故障排查](#故障排查)；
 - 扩展 Rust 引擎：看[无需改代码的范围](#无需改代码的范围)和[需要改-rust-的边界](#需要改-rust-的边界)。
 
@@ -54,7 +54,7 @@ cargo install harness-gate
 
 ### 从 GitHub Release 安装（预编译二进制）
 
-从不可变的 [GitHub Release tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.5) 下载适合你平台的二进制文件：
+从不可变的 [GitHub Release tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.6) 下载适合你平台的二进制文件：
 
 - **Linux (x86_64)**: `harness-gate-linux-amd64`
 - **macOS (Intel)**: `harness-gate-macos-amd64`
@@ -67,8 +67,8 @@ tag 下载脚本并显式传入版本：
 ```bash
 curl --fail --show-error --location --proto '=https' --tlsv1.2 \
   -o /tmp/harness-gate-install.sh \
-  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.3.5/install.sh
-bash /tmp/harness-gate-install.sh --version v0.3.5
+  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.3.6/install.sh
+bash /tmp/harness-gate-install.sh --version v0.3.6
 harness-gate --version
 ```
 
@@ -103,6 +103,11 @@ cargo build --manifest-path tools/harness-gate/Cargo.toml --release
 cargo build --manifest-path tools/harness-gate/Cargo.toml --profile release-small
 ```
 
+worker 在 scheduler 边界由 `catch_unwind` 转换为可发布的失败结果；service 或 lease
+锁被 poison 时也会 fail closed，不能被当作可用资源。`release-small` 使用
+`panic = "abort"`，调用方不能依赖该二进制的 unwind。稳定的 machine failure 注册表见
+[docs/failure-codes.md](docs/failure-codes.md)。
+
 Release 资产同时提供 `SHA256SUMS`、CycloneDX SBOM 和 Sigstore 签名 bundle。
 安装前下载二进制、清单以及对应的 `.sig`/`.crt` 文件，先校验摘要，再校验
 二进制和 SBOM 的签名：
@@ -112,12 +117,12 @@ sha256sum --check SHA256SUMS
 cosign verify-blob --signature harness-gate-linux-amd64.sig \
   --certificate harness-gate-linux-amd64.crt \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity-regexp '^https://github.com/musutrade/Harness-Gate/.github/workflows/release\.yml@refs/tags/v0\.3\.5$' \
+  --certificate-identity-regexp '^https://github.com/musutrade/Harness-Gate/.github/workflows/release\.yml@refs/tags/v0\.3\.6$' \
   harness-gate-linux-amd64
 cosign verify-blob --signature harness-gate.sbom.cdx.json.sig \
   --certificate harness-gate.sbom.cdx.json.crt \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity-regexp '^https://github.com/musutrade/Harness-Gate/.github/workflows/release\.yml@refs/tags/v0\.3\.5$' \
+  --certificate-identity-regexp '^https://github.com/musutrade/Harness-Gate/.github/workflows/release\.yml@refs/tags/v0\.3\.6$' \
   harness-gate.sbom.cdx.json
 ```
 
@@ -180,7 +185,7 @@ harness-gate --project-root /path/to/new-project verify --all
 | `harness-gate doctor [--strict] [--json]`                    | 执行配置声明的环境检查                |
 | `harness-gate cleanup [--dry-run] [--json]`                 | 检查或回收过期的 Harness-Gate 资源租约 |
 | `harness-gate scope [--staged\|--base REF\|--all] [--json]`  | 列出变更和选择的 components           |
-| `harness-gate secrets [--staged] [--json]`                   | 扫描高置信凭据模式，只输出命中文件名  |
+| `harness-gate secrets [--staged] [--json]`                   | 扫描已追踪文件内容中的高置信凭据模式，只输出文件名  |
 | `harness-gate audit [--json]`                                | 执行正则架构规则并生成审计报告        |
 | `harness-gate verify`                                        | 按工作区变更执行默认 profile          |
 | `harness-gate verify --profile ci --all`                     | 对全部 components 执行指定 profile    |
@@ -342,7 +347,7 @@ timeout_secs = 180
 
 `REPORT_DIR` / `HARNESS_GATE_REPORTS`、`HARNESS_GATE_SECRETS_CONFIG` 和步骤或服务声明的 `*_env` 字段可覆盖相应配置值。审核配置始终由当前项目 `flow.toml` 中字面量、仓库相对的 `paths.audit_config` 决定，不接受进程级审核配置覆写或环境插值；切换项目或工作流文件时显式传入 `--project-root` 和 `--config`。
 
-完整字段、默认值、限制和示例见 [schema v2 配置参考](https://github.com/musutrade/Harness-Gate/blob/main/docs/configuration.md)。修改配置后先运行：
+完整字段、默认值、限制和示例见 [schema v2 配置参考](https://github.com/musutrade/Harness-Gate/blob/main/docs/configuration.zh-CN.md)。英文参考和全部 JSON Schema 见 [English configuration reference](https://github.com/musutrade/Harness-Gate/blob/main/docs/configuration.md) 与 [schema catalog](https://github.com/musutrade/Harness-Gate/blob/main/schema/README.md)。修改配置后先运行：
 
 ```bash
 harness-gate config check
@@ -427,7 +432,7 @@ profile 由步骤的 `profiles = [...]` 隐式声明。`verify` 使用 `[project
 7. 审计扫描根必须存在且位于项目内，`..` 和逃出项目的符号链接会被拒绝；
 8. Doctor、Git 探测和 Docker 生命周期命令都有硬超时，超时时终止整个子进程组。
 
-secret scan 检查 Git 已追踪文件和未忽略的未跟踪文件。具体规则由 `[paths].secrets_config` 指向的 TOML 文件提供，默认覆盖 GitHub/GitLab/npm Token、AWS access key、JWT、命名签名密钥、PostgreSQL 凭据 URL、Webhook、企业微信/钉钉密钥、HTTP Basic Auth 和 PEM 私钥头。捕获值会经过占位符与低信息值过滤；报告只记录文件名，不把凭据内容复制到终端或 JSON。
+secret scan 检查 Git 已追踪文件和未忽略的未跟踪文件内容。具体规则由 `[paths].secrets_config` 指向的 TOML 文件提供，默认覆盖 GitHub/GitLab/npm Token、AWS access key、JWT、命名签名密钥、PostgreSQL 凭据 URL、Webhook、企业微信/钉钉密钥、HTTP Basic Auth 和 PEM 私钥头。捕获值会经过占位符与低信息值过滤；报告只记录文件名和规则 ID，不把凭据内容复制到终端或 JSON。这是快速前置检查，不替代 gitleaks、TruffleHog 等专用扫描器。
 
 为限制扫描过程的内存使用，secret scan 和 architecture audit 都拒绝超过 16 MiB 的单个输入文件，并将该错误作为门禁失败返回。
 
@@ -574,10 +579,11 @@ harness-gate verify --all
 
 无论成功或失败，都建议上传 `[paths].reports` 目录作为 artifact。这样可以保留审计行号、步骤耗时和完整日志。
 
-可选的 `[[notifications.webhooks]]` 会在报告文件写入后发送 JSON。`on_failure` 默认开启，`on_success`
-默认关闭；非 2xx 响应或连接错误返回报告错误 `E1404`，但不会删除已生成的报告。完整字段、模板路径
-约束和 JUnit 示例见[配置参考](https://github.com/musutrade/Harness-Gate/blob/main/docs/configuration.md#报告模板junit-和通知)。多个 webhook 按配置顺序发送，
-首个失败会停止后续通知。
+可选的 `[[notifications.webhooks]]` 会在报告文件写入后发送 JSON。每个 URL 必须配置精确匹配的
+`allowed_hosts`；凭据、通配符、解析后的 loopback/private/link-local/unspecified/multicast 地址和重定向都会
+在配置或连接时拒绝。`on_failure` 默认开启，`on_success` 默认关闭；非 2xx 响应、连接错误或策略拒绝返回
+报告错误 `E1404`，但不会删除已生成的报告。目的地证据只保留 scheme 和规范化主机。完整字段、模板路径
+约束和 JUnit 示例见[配置参考](https://github.com/musutrade/Harness-Gate/blob/main/docs/configuration.zh-CN.md#报告模板junit-和通知)。多个 webhook 按配置顺序发送，首个失败会停止后续通知。
 
 ## 故障排查
 
@@ -638,7 +644,7 @@ component 来自 `[[steps]].component`，profile 来自 `[[steps]].profiles`。�
 
 ## 当前审计规则
 
-`.harness-gate/audit.toml` 保存项目自己的 SQL、分层和模板约束。audit 配置当前 schema 为 v2，必须显式声明 `version = 2` 和 `[engine]`；规则扩展名没有对应 `comment_syntax` 时会 fail closed。旧版字符串 allowlist、缺失 engine 和版本升级方法见[配置迁移参考](https://github.com/musutrade/Harness-Gate/blob/main/docs/configuration.md#audit-v2-migration)。`arch_rules.allowed_patterns` 可声明逐行例外，不存在写死的 model trait 放行逻辑。
+`.harness-gate/audit.toml` 保存项目自己的 SQL、分层和模板约束。audit 配置当前 schema 为 v2，必须显式声明 `version = 2` 和 `[engine]`；规则扩展名没有对应 `comment_syntax` 时会 fail closed。旧版字符串 allowlist、缺失 engine 和版本升级方法见[配置迁移参考](https://github.com/musutrade/Harness-Gate/blob/main/docs/configuration.zh-CN.md#audit-v2-migration)。`arch_rules.allowed_patterns` 可声明逐行例外，不存在写死的 model trait 放行逻辑。
 
 auditor 以整文件为单位执行正则检查并把命中映射回起始代码行：支持跨行规则、扩展名过滤、路径排除、显式类型的路径 allowlist 和起始行 allowed pattern。行注释、块注释及字符串定界符按扩展名配置，扫描时跟踪词法状态；正则默认启用 multi-line 模式。需要抽象语法树级判断时，应把 Clippy、ESLint 或其他语言 lint 工具配置为 step。
 
