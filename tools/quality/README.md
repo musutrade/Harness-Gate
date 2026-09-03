@@ -35,6 +35,14 @@ timings, scheduler overhead, and the shareable-service startup/reuse counts.
 A median comparison is under
 `verification.serial`, `verification.parallel`, and `verification.comparison`.
 
+`post_remediation_benchmarks.py` is a local evidence generator for the R-16
+wait/backoff and scheduler scenarios and the R-17 validation-allocation
+change. It alternates samples between a pre-change binary (for example the
+v0.3.5 or pre-hardening commit) and the post-change v0.3.6 binary, then writes
+per-sample JSON and reviewable Markdown under `docs/benchmarks`. It is a
+manual review tool; the periodic quality-baseline workflow intentionally does
+not run it.
+
 `contracts.py --accept` writes the Linux textual golden snapshot and is a
 reviewed local operation; CI never passes that flag. `contracts.py --structured`
 is used for macOS and Windows to assert exit status, error code, reports, and

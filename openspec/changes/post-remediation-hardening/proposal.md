@@ -19,8 +19,9 @@ Selected R-13 through R-18 implementation and focused tests are merged to
 `main` as part of v0.3.6
 ([PR #75](https://github.com/musutrade/Harness-Gate/pull/75)); `tasks.md`
 reflects which items carry recorded acceptance evidence. This proposal
-remains Proposed because R-07, R-16 benchmark, allocation, and DevRail
-staging acceptance are still open.
+remains Proposed because R-07 documentation/sandbox work and DevRail staging
+acceptance are still open; R-16/R-17 benchmark and allocation evidence is
+recorded in `tasks.md`.
 
 ## Why
 
