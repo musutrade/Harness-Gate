@@ -1,4 +1,4 @@
-use crate::config::StepConfig;
+use crate::config::{BuiltinGateType, StepConfig, StepKind};
 use crate::project::Project;
 use crate::scope::ScopeResult;
 use anyhow::{bail, Result};
@@ -68,7 +68,7 @@ impl<'a> VerificationPlan<'a> {
         let mut nodes = BTreeMap::<String, PlanNode<'a>>::new();
         let mut node_order = Vec::new();
         for step in &project.config.steps {
-            if selected.contains(&step.id) && step.kind.as_deref() != Some("builtin-gate") {
+            if selected.contains(&step.id) && step.kind != Some(StepKind::BuiltinGate) {
                 node_order.push(step.id.clone());
                 nodes.insert(
                     step.id.clone(),
@@ -84,12 +84,12 @@ impl<'a> VerificationPlan<'a> {
         }
 
         let explicit_secret = project.config.steps.iter().find(|step| {
-            step.kind.as_deref() == Some("builtin-gate")
-                && step.gate_type.as_deref() == Some("secret-scan")
+            step.kind == Some(StepKind::BuiltinGate)
+                && step.gate_type == Some(BuiltinGateType::SecretScan)
         });
         let explicit_audit = project.config.steps.iter().find(|step| {
-            step.kind.as_deref() == Some("builtin-gate")
-                && step.gate_type.as_deref() == Some("architecture-audit")
+            step.kind == Some(StepKind::BuiltinGate)
+                && step.gate_type == Some(BuiltinGateType::ArchitectureAudit)
         });
 
         let secret_id = "builtin.secret-scan".to_string();
@@ -176,8 +176,8 @@ fn validate_plan_configuration(project: &Project) -> Result<()> {
         if !ids.insert(step.id.as_str()) {
             bail!("verification plan contains duplicate node id {:?}", step.id);
         }
-        match step.kind.as_deref().unwrap_or("external-step") {
-            "external-step" => {
+        match step.kind.unwrap_or(StepKind::ExternalStep) {
+            StepKind::ExternalStep => {
                 if matches!(
                     step.id.as_str(),
                     "builtin.secret-scan" | "builtin.architecture-audit"
@@ -193,17 +193,11 @@ fn validate_plan_configuration(project: &Project) -> Result<()> {
                     bail!("verification plan contains duplicate log {:?}", step.log);
                 }
             }
-            "builtin-gate" => {
-                let gate_type = step.gate_type.as_deref().ok_or_else(|| {
+            StepKind::BuiltinGate => {
+                let gate_type = step.gate_type.ok_or_else(|| {
                     anyhow::anyhow!("built-in gate {:?} requires gate_type", step.id)
                 })?;
-                if !matches!(gate_type, "secret-scan" | "architecture-audit") {
-                    bail!(
-                        "built-in gate {:?} has unknown gate_type {gate_type:?}",
-                        step.id
-                    );
-                }
-                let expected = format!("builtin.{gate_type}");
+                let expected = format!("builtin.{}", gate_type.as_str());
                 if step.id != expected {
                     bail!(
                         "built-in gate {:?} must use reserved id {expected:?}",
@@ -217,7 +211,6 @@ fn validate_plan_configuration(project: &Project) -> Result<()> {
                     bail!("duplicate built-in gate type {gate_type:?}");
                 }
             }
-            other => bail!("step {:?} has unknown kind {other:?}", step.id),
         }
     }
     for step in &project.config.steps {
@@ -245,7 +238,7 @@ fn selected_step_ids(
         .steps
         .iter()
         .filter(|step| {
-            step.kind.as_deref() != Some("builtin-gate")
+            step.kind != Some(StepKind::BuiltinGate)
                 && scope.components.contains(&step.component)
                 && only_step
                     .map(|id| step.id == id)

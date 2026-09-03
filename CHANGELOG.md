@@ -14,6 +14,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Process output and adapter artifacts are bounded with truncation/deadline
   failures, and audit/log/report/SBOM error paths share credential redaction.
 
+## [0.3.6] - 2026-09-02
+
+### Added
+
+- Added explicit webhook host and resolved-address egress policy with
+  structured destination failures and credential-safe diagnostics.
+- Added stable failure-code and retry-class documentation, bounded process
+  output handling, and structured configuration diagnostics.
+- Added English configuration/schema references and an English JSON Schema
+  catalog alongside the Chinese configuration guide.
+
+### Changed
+
+- Added staged snapshot input contracts, dependency-aware scheduling indexes,
+  bounded retry backoff, runner isolation validation, and lease ownership
+  evidence for managed services.
+- Added repository security, contributor, quality-script, and release metadata
+  governance checks.
+
+### Scope boundary
+
+- This release does not claim an OS-level adapter sandbox, DevRail staging
+  acceptance, shadow/canary approval, or rollback authority. Those remain
+  separately governed follow-up work.
+
 ## [0.3.5] - 2026-09-01
 
 ### Fixed

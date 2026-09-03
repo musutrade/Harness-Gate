@@ -17,7 +17,16 @@ from quality_common import CRATE, ROOT, QUALITY_ROOT, fail, metadata, write_json
 
 def local_links() -> list[dict[str, str]]:
     failures = []
-    documents = [ROOT / "README.md", ROOT / "README.zh-CN.md", ROOT / "CONTRIBUTING.md", ROOT / "CHANGELOG.md", *ROOT.glob("docs/**/*.md")]
+    documents = [
+        ROOT / "README.md",
+        ROOT / "README.zh-CN.md",
+        ROOT / "CONTRIBUTING.md",
+        ROOT / "CODE_OF_CONDUCT.md",
+        ROOT / "CHANGELOG.md",
+        ROOT / "SECURITY.md",
+        *ROOT.glob("docs/**/*.md"),
+        *ROOT.glob("schema/*.md"),
+    ]
     pattern = re.compile(r"\]\(([^)\s]+)")
     for document in documents:
         source = document.read_text(errors="replace")
@@ -62,6 +71,15 @@ def anchor(value: str) -> str:
 
 def run(output: Path) -> int:
     link_failures = local_links()
+    english_config = ROOT / "docs" / "configuration.md"
+    chinese_config = ROOT / "docs" / "configuration.zh-CN.md"
+    schema_catalog = ROOT / "schema" / "README.md"
+    language_docs_valid = (
+        english_config.is_file()
+        and chinese_config.is_file()
+        and schema_catalog.is_file()
+        and "# harness-gate schema v2 configuration reference" in english_config.read_text(errors="replace").lower()
+    )
     examples = []
     for preset in sorted((CRATE / "presets").glob("*.flow.toml")):
         with tempfile.TemporaryDirectory(prefix="harness-gate-example-") as directory:
@@ -196,7 +214,7 @@ def run(output: Path) -> int:
         )
     except (OSError, json.JSONDecodeError, TypeError):
         registry_schema_valid = False
-    result = {**metadata(tool="docs-consistency"), "link_failures": link_failures, "examples": examples, "migration": {"path": str(migration_fixture.relative_to(ROOT)), "status": "pass" if migration_checked else "fail"}, "schema_synced": schema_synced, "machine_schema_valid": machine_schema_valid, "manifest_schema_valid": manifest_schema_valid, "registry_schema_valid": registry_schema_valid, "status": "pass" if not link_failures and schema_synced and machine_schema_valid and manifest_schema_valid and registry_schema_valid and migration_checked and all(item["status"] == "pass" for item in examples) else "fail"}
+    result = {**metadata(tool="docs-consistency"), "link_failures": link_failures, "examples": examples, "migration": {"path": str(migration_fixture.relative_to(ROOT)), "status": "pass" if migration_checked else "fail"}, "language_docs_valid": language_docs_valid, "schema_synced": schema_synced, "machine_schema_valid": machine_schema_valid, "manifest_schema_valid": manifest_schema_valid, "registry_schema_valid": registry_schema_valid, "status": "pass" if not link_failures and language_docs_valid and schema_synced and machine_schema_valid and manifest_schema_valid and registry_schema_valid and migration_checked and all(item["status"] == "pass" for item in examples) else "fail"}
     write_json(output, result)
     if result["status"] != "pass":
         fail("documentation, examples, or schema synchronization failed")

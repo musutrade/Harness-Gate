@@ -9,6 +9,7 @@ mod waiver;
 mod tests;
 
 use crate::error::CodedError;
+use crate::failure::FailureCode;
 use crate::process::TaskResult;
 use crate::project::Project;
 use crate::scope::ScopeResult;
@@ -105,6 +106,11 @@ pub struct SkippedStep {
     pub id: String,
     pub label: String,
     pub reason: String,
+    /// Whether dispatch was stopped by cancellation rather than a failed
+    /// prerequisite. This remains an internal field so schema version 1 keeps
+    /// its existing skipped-step shape.
+    #[serde(skip)]
+    pub cancelled: bool,
 }
 
 pub fn run(
@@ -205,15 +211,8 @@ fn run_selected(
         }
     );
 
-    let plan = VerificationPlan::build(project, &scope, profile, only_step).map_err(|error| {
-        if error.to_string().contains("unknown verification step") {
-            VerifyError::UnknownStep {
-                id: only_step.unwrap_or_default().to_string(),
-            }
-        } else {
-            VerifyError::execution(error)
-        }
-    })?;
+    let plan = VerificationPlan::build(project, &scope, profile, only_step)
+        .map_err(VerifyError::execution)?;
     waiver::validate_plan_waivers(project, &plan, &scope).map_err(VerifyError::execution)?;
     let invocation = report::allocate_invocation(project).map_err(VerifyError::report)?;
     if let Some(request_id) = request_id {
@@ -306,6 +305,7 @@ fn run_selected(
                     .node_result
                     .reason
                     .unwrap_or_else(|| "blocked by a failed prerequisite".into()),
+                cancelled: result.node_result.cancelled,
             });
         } else {
             let mut task_result = result.task_result;
@@ -353,7 +353,7 @@ fn run_selected(
             duration_ms: 0,
             log: String::new(),
             detail: Some(format!("{error:#}")),
-            failure_code: Some("SCHEDULER_FAILURE".into()),
+            failure_code: Some(FailureCode::SchedulerFailure),
             attempts: Vec::new(),
             flaky: false,
             retry_class: None,

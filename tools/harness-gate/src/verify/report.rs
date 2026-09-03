@@ -1,10 +1,13 @@
 use super::VerificationReport;
 use crate::config::WebhookConfig;
+use crate::failure::FailureCode;
+use crate::net_policy::{is_local_only, normalize_host};
 use crate::project::Project;
 use crate::service::ResourceLease;
 use crate::utils::redaction::{redact_text, REDACTION_TEXT_LIMIT};
 use anyhow::{bail, Context, Result};
 use serde::{ser::Serializer, Deserialize, Serialize};
+use serde_json::Value;
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
@@ -12,6 +15,8 @@ use std::io::Read;
 use std::path::{Component, Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
+use ureq::unversioned::resolver::{DefaultResolver, ResolvedSocketAddrs, Resolver};
+use ureq::unversioned::transport::NextTimeout;
 
 static INVOCATION_COUNTER: AtomicU64 = AtomicU64::new(1);
 pub(super) const MACHINE_RESULT_SCHEMA_VERSION: &str = "1";
@@ -239,7 +244,7 @@ fn machine_result(report: &VerificationReport) -> MachineResult {
             if !step.passed {
                 failures.push(MachineFailure {
                     step_id: step.step_id.clone(),
-                    code: failure_code(step),
+                    code: failure_code(step).to_string(),
                     message: step
                         .detail
                         .clone()
@@ -261,7 +266,7 @@ fn machine_result(report: &VerificationReport) -> MachineResult {
                         evidence_complete = false;
                         failures.push(MachineFailure {
                             step_id: step.step_id.clone(),
-                            code: "EVIDENCE_PATH_ESCAPE".into(),
+                            code: FailureCode::EvidencePathEscape.to_string(),
                             message: format!(
                                 "step log is outside invocation directory: {}",
                                 step.log
@@ -317,15 +322,15 @@ fn machine_result(report: &VerificationReport) -> MachineResult {
                 detail: step.detail.as_deref().map(redact_text),
                 failure_code: step
                     .failure_code
-                    .clone()
-                    .or_else(|| (!step.passed).then(|| failure_code(step))),
+                    .map(|code| code.to_string())
+                    .or_else(|| (!step.passed).then(|| failure_code(step).to_string())),
                 waived: step.waived,
                 waiver: step.waiver.clone().map(redact_waiver),
                 runner: step.runner.clone().map(redact_runner),
                 attempts,
                 retry_count: step.attempts.len().saturating_sub(1) as u32,
                 flaky: step.flaky,
-                retry_class: step.retry_class.clone(),
+                retry_class: step.retry_class.map(|class| class.to_string()),
                 parser: step.parser.as_ref().map(|parser| MachineParser {
                     mode: parser.mode.clone(),
                     version: parser.version,
@@ -429,15 +434,55 @@ fn machine_result_with_assessment(
 }
 
 fn ensure_supported_machine_result(raw: &[u8]) -> Result<()> {
+    let value: Value = serde_json::from_slice(raw).context("parse machine-result schema")?;
     let header: MachineResultHeader =
-        serde_json::from_slice(raw).context("parse machine-result schema header")?;
+        serde_json::from_value(value.clone()).context("parse machine-result schema header")?;
     if header.schema_version != MACHINE_RESULT_SCHEMA_VERSION {
         bail!(
             "unsupported machine-result schema version {:?}",
             header.schema_version
         );
     }
+    if let Some(steps) = value.get("steps").and_then(Value::as_array) {
+        for (index, step) in steps.iter().enumerate() {
+            validate_wire_failure_code(
+                step.get("failure_code"),
+                &format!("steps[{index}].failure_code"),
+            )?;
+            validate_wire_retry_class(
+                step.get("retry_class"),
+                &format!("steps[{index}].retry_class"),
+            )?;
+        }
+    }
+    if let Some(failures) = value.get("failures").and_then(Value::as_array) {
+        for (index, failure) in failures.iter().enumerate() {
+            validate_wire_failure_code(failure.get("code"), &format!("failures[{index}].code"))?;
+        }
+    }
     Ok(())
+}
+
+fn validate_wire_failure_code(value: Option<&Value>, path: &str) -> Result<()> {
+    match value {
+        None | Some(Value::Null) => Ok(()),
+        Some(Value::String(code)) if FailureCode::try_from(code.as_str()).is_ok() => Ok(()),
+        Some(Value::String(code)) => bail!("unknown failure code at {path}: {code:?}"),
+        Some(_) => bail!("failure code at {path} must be a string or null"),
+    }
+}
+
+fn validate_wire_retry_class(value: Option<&Value>, path: &str) -> Result<()> {
+    match value {
+        None | Some(Value::Null) => Ok(()),
+        Some(Value::String(class))
+            if crate::failure::RetryClass::try_from(class.as_str()).is_ok() =>
+        {
+            Ok(())
+        }
+        Some(Value::String(class)) => bail!("unknown retry class at {path}: {class:?}"),
+        Some(_) => bail!("retry class at {path} must be a string or null"),
+    }
 }
 
 fn task_status(step: &crate::process::TaskResult) -> &'static str {
@@ -452,29 +497,17 @@ fn task_status(step: &crate::process::TaskResult) -> &'static str {
     }
 }
 
-fn failure_code(step: &crate::process::TaskResult) -> String {
-    if let Some(code) = &step.failure_code {
-        return code.clone();
-    }
-    if let Some(detail) = &step.detail {
-        if detail.starts_with("parser failure:") {
-            return "RESULT_PARSE_FAILURE".into();
-        }
-        if detail.starts_with("zero test results:") {
-            return "RESULT_ZERO".into();
-        }
-        if detail.starts_with("partial test results:") {
-            return "RESULT_PARTIAL".into();
-        }
+fn failure_code(step: &crate::process::TaskResult) -> FailureCode {
+    if let Some(code) = step.failure_code {
+        return code;
     }
     if step.cancelled {
-        "STEP_CANCELLED"
+        FailureCode::StepCancelled
     } else if step.timed_out {
-        "STEP_TIMEOUT"
+        FailureCode::StepTimeout
     } else {
-        "STEP_FAILED"
+        FailureCode::StepFailed
     }
-    .into()
 }
 
 fn report_status(report: &VerificationReport) -> &'static str {
@@ -483,10 +516,7 @@ fn report_status(report: &VerificationReport) -> &'static str {
     } else if report.passed {
         "PASS"
     } else if report.steps.iter().any(|step| step.cancelled)
-        || report
-            .skipped_steps
-            .iter()
-            .any(|step| step.reason.contains("cancel"))
+        || report.skipped_steps.iter().any(|step| step.cancelled)
     {
         "CANCELLED"
     } else {
@@ -744,7 +774,7 @@ pub(super) fn write(report: &VerificationReport, project: &Project) -> Result<()
         bindings: Vec::new(),
         failures: vec![MachineFailure {
             step_id: None,
-            code: "EVIDENCE_PENDING".into(),
+            code: FailureCode::EvidencePending.to_string(),
             message: "invocation evidence has not been finalized".into(),
         }],
     };
@@ -806,7 +836,7 @@ pub(super) fn write(report: &VerificationReport, project: &Project) -> Result<()
             bindings: assessment.bindings.clone(),
             failures: vec![MachineFailure {
                 step_id: None,
-                code: "EVIDENCE_FINALIZATION_FAILURE".into(),
+                code: FailureCode::EvidenceFinalizationFailure.to_string(),
                 message: redact_text(&format!("{error:#}")),
             }],
         };
@@ -831,7 +861,7 @@ fn finish_incomplete_report(
         bindings: Vec::new(),
         failures: vec![MachineFailure {
             step_id: None,
-            code: "EVIDENCE_PUBLICATION_FAILURE".into(),
+            code: FailureCode::EvidencePublicationFailure.to_string(),
             message: details.clone(),
         }],
     };
@@ -1194,7 +1224,7 @@ fn declare_artifact(
                 if old_kind != kind && old_kind != "step-log" && kind != "step-log" {
                     failures.push(MachineFailure {
                         step_id: step_id.clone(),
-                        code: "EVIDENCE_DUPLICATE_PATH".into(),
+                        code: FailureCode::EvidenceDuplicatePath.to_string(),
                         message: format!("artifact path has conflicting declarations: {relative}"),
                     });
                 } else if kind == "step-log" && old_kind != "step-log" {
@@ -1208,7 +1238,7 @@ fn declare_artifact(
                 } else if old_step.is_some() && step_id.is_some() && old_step != &step_id {
                     failures.push(MachineFailure {
                         step_id: step_id.clone(),
-                        code: "EVIDENCE_DUPLICATE_PATH".into(),
+                        code: FailureCode::EvidenceDuplicatePath.to_string(),
                         message: format!("artifact path has conflicting step bindings: {relative}"),
                     });
                 }
@@ -1218,7 +1248,7 @@ fn declare_artifact(
         }
         None => failures.push(MachineFailure {
             step_id,
-            code: "EVIDENCE_PATH_ESCAPE".into(),
+            code: FailureCode::EvidencePathEscape.to_string(),
             message: format!("artifact path is outside invocation directory: {path}"),
         }),
     }
@@ -1247,7 +1277,7 @@ fn assess_evidence(report: &VerificationReport, project: &Project) -> Result<Evi
         let Some(step_id) = step.step_id.clone() else {
             failures.push(MachineFailure {
                 step_id: None,
-                code: "EVIDENCE_STEP_UNBOUND".into(),
+                code: FailureCode::EvidenceStepUnbound.to_string(),
                 message: format!("step {:?} has no invocation-bound step id", step.label),
             });
             continue;
@@ -1255,7 +1285,7 @@ fn assess_evidence(report: &VerificationReport, project: &Project) -> Result<Evi
         if step.invocation_id.as_deref() != Some(report.invocation_id.as_str()) {
             failures.push(MachineFailure {
                 step_id: Some(step_id.clone()),
-                code: "EVIDENCE_INVOCATION_MISMATCH".into(),
+                code: FailureCode::EvidenceInvocationMismatch.to_string(),
                 message: format!(
                     "step {:?} is not bound to invocation {}",
                     step.label, report.invocation_id
@@ -1356,7 +1386,7 @@ fn assess_evidence(report: &VerificationReport, project: &Project) -> Result<Evi
         {
             failures.push(MachineFailure {
                 step_id: declarations.get(path).and_then(|(_, step, _)| step.clone()),
-                code: "EVIDENCE_MISSING".into(),
+                code: FailureCode::EvidenceMissing.to_string(),
                 message: format!("declared artifact is missing: {path}"),
             });
         }
@@ -1364,7 +1394,7 @@ fn assess_evidence(report: &VerificationReport, project: &Project) -> Result<Evi
     for path in disk.difference(&declared_paths) {
         failures.push(MachineFailure {
             step_id: None,
-            code: "EVIDENCE_UNDECLARED_FILE".into(),
+            code: FailureCode::EvidenceUndeclaredFile.to_string(),
             message: format!("publishable file has no declaration: {path}"),
         });
     }
@@ -1410,7 +1440,7 @@ fn validate_invocation_metadata(
         Ok(metadata) if metadata.file_type().is_symlink() => {
             failures.push(MachineFailure {
                 step_id: None,
-                code: "EVIDENCE_SYMLINK".into(),
+                code: FailureCode::EvidenceSymlink.to_string(),
                 message: "invocation metadata is a symbolic link".into(),
             });
             return;
@@ -1418,7 +1448,7 @@ fn validate_invocation_metadata(
         Ok(metadata) if !metadata.is_file() => {
             failures.push(MachineFailure {
                 step_id: None,
-                code: "EVIDENCE_INVALID_TYPE".into(),
+                code: FailureCode::EvidenceInvalidType.to_string(),
                 message: "invocation metadata is not a regular file".into(),
             });
             return;
@@ -1428,7 +1458,7 @@ fn validate_invocation_metadata(
         Err(error) => {
             failures.push(MachineFailure {
                 step_id: None,
-                code: "EVIDENCE_READ_FAILURE".into(),
+                code: FailureCode::EvidenceReadFailure.to_string(),
                 message: format!("inspect invocation metadata: {error}"),
             });
             return;
@@ -1439,7 +1469,7 @@ fn validate_invocation_metadata(
         Err(error) => {
             failures.push(MachineFailure {
                 step_id: None,
-                code: "EVIDENCE_READ_FAILURE".into(),
+                code: FailureCode::EvidenceReadFailure.to_string(),
                 message: format!("read invocation metadata: {error}"),
             });
             return;
@@ -1450,7 +1480,7 @@ fn validate_invocation_metadata(
         Err(error) => {
             failures.push(MachineFailure {
                 step_id: None,
-                code: "EVIDENCE_INVALID_METADATA".into(),
+                code: FailureCode::EvidenceInvalidMetadata.to_string(),
                 message: format!("parse invocation metadata: {error}"),
             });
             return;
@@ -1492,7 +1522,7 @@ fn validate_invocation_metadata(
         if actual != expected {
             failures.push(MachineFailure {
                 step_id: None,
-                code: "EVIDENCE_INVOCATION_MISMATCH".into(),
+                code: FailureCode::EvidenceInvocationMismatch.to_string(),
                 message: format!("invocation metadata field {field} does not match the report"),
             });
         }
@@ -1515,7 +1545,7 @@ fn collect_publishable_files(
         if metadata.file_type().is_symlink() {
             failures.push(MachineFailure {
                 step_id: None,
-                code: "EVIDENCE_SYMLINK".into(),
+                code: FailureCode::EvidenceSymlink.to_string(),
                 message: format!(
                     "invocation evidence contains a symbolic link: {}",
                     path.display()
@@ -1542,7 +1572,7 @@ fn collect_publishable_files(
         if !metadata.is_file() {
             failures.push(MachineFailure {
                 step_id: None,
-                code: "EVIDENCE_INVALID_TYPE".into(),
+                code: FailureCode::EvidenceInvalidType.to_string(),
                 message: format!(
                     "invocation evidence is not a regular file: {}",
                     path.display()
@@ -1593,39 +1623,39 @@ fn binding_for(
         current.push(component);
         let metadata = fs::symlink_metadata(&current).map_err(|error| MachineFailure {
             step_id: step_id.clone(),
-            code: "EVIDENCE_MISSING".into(),
+            code: FailureCode::EvidenceMissing.to_string(),
             message: format!("inspect declared artifact {relative}: {error}"),
         })?;
         if metadata.file_type().is_symlink() {
             return Err(MachineFailure {
                 step_id: step_id.clone(),
-                code: "EVIDENCE_SYMLINK".into(),
+                code: FailureCode::EvidenceSymlink.to_string(),
                 message: format!("declared artifact crosses a symbolic link: {relative}"),
             });
         }
         if current != target && !metadata.is_dir() {
             return Err(MachineFailure {
                 step_id: step_id.clone(),
-                code: "EVIDENCE_INVALID_TYPE".into(),
+                code: FailureCode::EvidenceInvalidType.to_string(),
                 message: format!("declared artifact parent is not a directory: {relative}"),
             });
         }
         if current == target && !metadata.is_file() {
             return Err(MachineFailure {
                 step_id: step_id.clone(),
-                code: "EVIDENCE_INVALID_TYPE".into(),
+                code: FailureCode::EvidenceInvalidType.to_string(),
                 message: format!("declared artifact is not a regular file: {relative}"),
             });
         }
     }
     let metadata = fs::metadata(&target).map_err(|error| MachineFailure {
         step_id: step_id.clone(),
-        code: "EVIDENCE_MISSING".into(),
+        code: FailureCode::EvidenceMissing.to_string(),
         message: format!("inspect declared artifact {relative}: {error}"),
     })?;
     let sha256 = sha256_file(&target).map_err(|error| MachineFailure {
         step_id: step_id.clone(),
-        code: "EVIDENCE_READ_FAILURE".into(),
+        code: FailureCode::EvidenceReadFailure.to_string(),
         message: format!("digest declared artifact {relative}: {error:#}"),
     })?;
     Ok(ArtifactBinding {
@@ -1993,28 +2023,130 @@ fn resolve_report_root(project: &Project, repository: &Path) -> Result<PathBuf> 
 }
 
 pub(super) fn notify(report: &VerificationReport, project: &Project) -> Result<()> {
+    notify_with(report, project, &PolicyWebhookTransport)
+}
+
+trait WebhookTransport {
+    fn send(&self, config: &WebhookConfig, body: &[u8]) -> Result<()>;
+}
+
+struct PolicyWebhookTransport;
+
+impl WebhookTransport for PolicyWebhookTransport {
+    fn send(&self, config: &WebhookConfig, body: &[u8]) -> Result<()> {
+        post_json_with_policy(&config.url, &config.allowed_hosts, body).with_context(|| {
+            format!(
+                "send verification report to {}",
+                destination_summary(config)
+            )
+        })
+    }
+}
+
+fn notify_with<T: WebhookTransport>(
+    report: &VerificationReport,
+    project: &Project,
+    transport: &T,
+) -> Result<()> {
     let body = redact_text(&serde_json::to_string(report)?).into_bytes();
     for webhook in &project.config.notifications.webhooks {
         if (report.passed && !webhook.on_success) || (!report.passed && !webhook.on_failure) {
             continue;
         }
-        WebhookNotifier { config: webhook }.notify(&body)?;
+        transport.send(webhook, &body)?;
     }
     Ok(())
 }
 
-trait Notifier {
-    fn notify(&self, body: &[u8]) -> Result<()>;
+fn destination_summary(config: &WebhookConfig) -> String {
+    url::Url::parse(&config.url)
+        .ok()
+        .and_then(|url| {
+            url.host_str()
+                .map(|host| format!("{}://{}", url.scheme(), normalize_host(host)))
+        })
+        .unwrap_or_else(|| "webhook destination".into())
 }
 
-struct WebhookNotifier<'a> {
-    config: &'a WebhookConfig,
+#[derive(Debug)]
+struct WebhookPolicyError {
+    code: FailureCode,
+    host: String,
+    reason: &'static str,
 }
 
-impl Notifier for WebhookNotifier<'_> {
-    fn notify(&self, body: &[u8]) -> Result<()> {
-        post_json(&self.config.url, body)
-            .with_context(|| format!("send verification report to webhook {}", self.config.url))
+impl std::fmt::Display for WebhookPolicyError {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            formatter,
+            "{} (host {:?}: {})",
+            self.code, self.host, self.reason
+        )
+    }
+}
+
+impl std::error::Error for WebhookPolicyError {}
+
+#[derive(Debug)]
+struct PolicyResolver {
+    allowed_hosts: Vec<String>,
+}
+
+impl PolicyResolver {
+    fn allows_host(&self, host: &str) -> bool {
+        let host = normalize_host(host);
+        self.allowed_hosts
+            .iter()
+            .map(|allowed| normalize_host(allowed))
+            .any(|allowed| allowed == host)
+    }
+
+    fn check_addresses(
+        &self,
+        host: &str,
+        addresses: &ResolvedSocketAddrs,
+    ) -> Result<ResolvedSocketAddrs, ureq::Error> {
+        if !self.allows_host(host) {
+            return Err(ureq::Error::Other(Box::new(WebhookPolicyError {
+                code: FailureCode::WebhookDestinationDenied,
+                host: normalize_host(host),
+                reason: "host is not in the explicit allowlist",
+            })));
+        }
+        let mut permitted = <Self as Resolver>::empty(self);
+        for address in addresses {
+            if is_local_only(address.ip()) {
+                return Err(ureq::Error::Other(Box::new(WebhookPolicyError {
+                    code: FailureCode::WebhookDestinationDenied,
+                    host: normalize_host(host),
+                    reason: "resolved address is local-only",
+                })));
+            }
+            permitted.push(*address);
+        }
+        if permitted.is_empty() {
+            return Err(ureq::Error::HostNotFound);
+        }
+        Ok(permitted)
+    }
+}
+
+impl Resolver for PolicyResolver {
+    fn resolve(
+        &self,
+        uri: &ureq::http::Uri,
+        config: &ureq::config::Config,
+        timeout: NextTimeout,
+    ) -> Result<ResolvedSocketAddrs, ureq::Error> {
+        let host = uri.host().ok_or_else(|| {
+            ureq::Error::Other(Box::new(WebhookPolicyError {
+                code: FailureCode::WebhookDestinationDenied,
+                host: "<missing>".into(),
+                reason: "URL has no host",
+            }))
+        })?;
+        let resolved = DefaultResolver::default().resolve(uri, config, timeout)?;
+        self.check_addresses(host, &resolved)
     }
 }
 
@@ -2139,6 +2271,7 @@ fn escape(value: &str) -> String {
         .replace('"', "&quot;")
 }
 
+#[cfg(test)]
 fn post_json(raw_url: &str, body: &[u8]) -> Result<()> {
     let response = ureq::post(raw_url)
         .config()
@@ -2153,22 +2286,86 @@ fn post_json(raw_url: &str, body: &[u8]) -> Result<()> {
     Ok(())
 }
 
+fn post_json_with_policy(raw_url: &str, allowed_hosts: &[String], body: &[u8]) -> Result<()> {
+    let parsed = url::Url::parse(raw_url).context("parse webhook URL")?;
+    let host = parsed
+        .host_str()
+        .ok_or_else(|| anyhow::anyhow!("WEBHOOK_DESTINATION_DENIED: webhook URL has no host"))?;
+    if !matches!(parsed.scheme(), "http" | "https")
+        || !parsed.username().is_empty()
+        || parsed.password().is_some()
+    {
+        bail!("WEBHOOK_DESTINATION_DENIED: webhook URL must be credential-free HTTP(S)");
+    }
+    let resolver = PolicyResolver {
+        allowed_hosts: allowed_hosts.to_vec(),
+    };
+    if !resolver.allows_host(host) {
+        return Err(anyhow::Error::new(WebhookPolicyError {
+            code: FailureCode::WebhookDestinationDenied,
+            host: normalize_host(host),
+            reason: "host is not in the explicit allowlist",
+        }));
+    }
+    let config = ureq::Agent::config_builder()
+        .timeout_global(Some(Duration::from_secs(10)))
+        .timeout_resolve(Some(Duration::from_secs(5)))
+        .max_redirects(0)
+        .proxy(None)
+        .build();
+    let agent = ureq::Agent::with_parts(
+        config,
+        ureq::unversioned::transport::DefaultConnector::default(),
+        resolver,
+    );
+    let response = agent
+        .post(raw_url)
+        .content_type("application/json")
+        .send(body)
+        .context("send webhook request")?;
+    validate_webhook_status(response.status(), host)
+}
+
+fn validate_webhook_status(status: ureq::http::StatusCode, host: &str) -> Result<()> {
+    if status.is_redirection() {
+        return Err(anyhow::Error::new(WebhookPolicyError {
+            code: FailureCode::WebhookRedirectDenied,
+            host: normalize_host(host),
+            reason: "redirects are disabled for webhook delivery",
+        }));
+    }
+    if !status.is_success() {
+        bail!("webhook returned HTTP status {status}");
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::{
         allocate_invocation, configured_html, ensure_supported_machine_result, junit,
-        machine_result, markdown, notify, post_json, redact_invocation_files, redact_text,
-        render_html, report_target, verify_manifest, write, write_invocation_metadata,
-        ARTIFACT_REGISTRY_FILE, MACHINE_RESULT_FILE, MANIFEST_FILE, REDACTION_TEXT_LIMIT,
+        machine_result, markdown, notify, notify_with, post_json, redact_invocation_files,
+        redact_text, render_html, report_target, validate_webhook_status, verify_manifest, write,
+        write_invocation_metadata, PolicyResolver, ARTIFACT_REGISTRY_FILE, MACHINE_RESULT_FILE,
+        MANIFEST_FILE, REDACTION_TEXT_LIMIT,
     };
     use crate::config::WebhookConfig;
     use crate::process::TaskResult;
     use crate::scope::ScopeResult;
     use crate::verify::{SkippedStep, VerificationReport};
     use std::io::{Read, Write};
-    use std::net::TcpListener;
+    use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, TcpListener};
     use std::thread;
     use std::time::Duration;
+    use ureq::unversioned::resolver::Resolver;
+
+    struct LocalWebhookTransport;
+
+    impl super::WebhookTransport for LocalWebhookTransport {
+        fn send(&self, config: &WebhookConfig, body: &[u8]) -> anyhow::Result<()> {
+            super::post_json(&config.url, body)
+        }
+    }
 
     fn read_http_request(stream: &mut std::net::TcpStream) -> Vec<u8> {
         stream
@@ -2327,6 +2524,7 @@ mod tests {
             id: "dependent.tests".into(),
             label: "dependent tests".into(),
             reason: "verification cancelled before dispatch".into(),
+            cancelled: true,
         });
         let value = serde_json::to_value(machine_result(&report)).expect("machine result JSON");
         assert_eq!(value["status"], "CANCELLED");
@@ -2336,6 +2534,19 @@ mod tests {
             .as_array()
             .expect("failures array")
             .is_empty());
+    }
+
+    #[test]
+    fn machine_status_does_not_infer_cancellation_from_skip_wording() {
+        let mut report = report();
+        report.skipped_steps.push(SkippedStep {
+            id: "dependent.tests".into(),
+            label: "dependent tests".into(),
+            reason: "wording mentions cancellation but was blocked by a failed prerequisite".into(),
+            cancelled: false,
+        });
+        let value = serde_json::to_value(machine_result(&report)).expect("machine result JSON");
+        assert_eq!(value["status"], "FAIL");
     }
 
     #[test]
@@ -2363,6 +2574,21 @@ mod tests {
         assert!(error
             .to_string()
             .contains("unsupported machine-result schema"));
+    }
+
+    #[test]
+    fn unknown_machine_failure_contracts_fail_closed() {
+        let error = ensure_supported_machine_result(
+            br#"{"schema_version":"1","steps":[{"failure_code":"FUTURE_CODE","retry_class":"timeout"}]}"#,
+        )
+        .expect_err("unknown failure code must fail");
+        assert!(error.to_string().contains("unknown failure code"));
+
+        let error = ensure_supported_machine_result(
+            br#"{"schema_version":"1","steps":[{"failure_code":null,"retry_class":"future"}]}"#,
+        )
+        .expect_err("unknown retry class must fail");
+        assert!(error.to_string().contains("unknown retry class"));
     }
 
     #[test]
@@ -2593,6 +2819,7 @@ mod tests {
             id: "dependent.tests".into(),
             label: "dependent tests".into(),
             reason: "blocked by a failed prerequisite".into(),
+            cancelled: false,
         });
         let markdown_output = markdown(&report);
         assert!(markdown_output.contains("SKIPPED: dependent tests"));
@@ -2824,6 +3051,106 @@ mod tests {
     }
 
     #[test]
+    fn webhook_policy_rejects_local_address_before_connecting() {
+        let listener = TcpListener::bind(("127.0.0.1", 0)).expect("bind listener");
+        listener
+            .set_nonblocking(true)
+            .expect("set listener nonblocking");
+        let address = listener.local_addr().expect("listener address");
+        let error = super::post_json_with_policy(
+            &format!("http://{address}/notify"),
+            &[address.ip().to_string()],
+            br#"{"passed":true}"#,
+        )
+        .expect_err("loopback webhook must be denied");
+        assert!(format!("{error:#}").contains("WEBHOOK_DESTINATION_DENIED"));
+        assert!(matches!(
+            listener.accept(),
+            Err(error) if error.kind() == std::io::ErrorKind::WouldBlock
+        ));
+    }
+
+    #[test]
+    fn webhook_policy_rechecks_every_resolution_and_fails_closed_on_rebinding() {
+        let resolver = PolicyResolver {
+            allowed_hosts: vec!["hooks.example.test".into()],
+        };
+        let mut public = <PolicyResolver as Resolver>::empty(&resolver);
+        public.push(SocketAddr::new(
+            IpAddr::V4(Ipv4Addr::new(93, 184, 216, 34)),
+            443,
+        ));
+        public.push(SocketAddr::new(
+            "2001:4860:4860::8888"
+                .parse::<IpAddr>()
+                .expect("public IPv6 fixture"),
+            443,
+        ));
+        let permitted = resolver
+            .check_addresses("hooks.example.test", &public)
+            .expect("public resolution is permitted");
+        assert_eq!(permitted.iter().count(), 2);
+
+        for address in [
+            IpAddr::V4(Ipv4Addr::UNSPECIFIED),
+            IpAddr::V4(Ipv4Addr::LOCALHOST),
+            IpAddr::V4(Ipv4Addr::new(10, 0, 0, 1)),
+            IpAddr::V4(Ipv4Addr::new(169, 254, 1, 1)),
+            IpAddr::V4(Ipv4Addr::new(224, 0, 0, 1)),
+            IpAddr::V6(Ipv6Addr::UNSPECIFIED),
+            IpAddr::V6(Ipv6Addr::LOCALHOST),
+            IpAddr::V6("fc00::1".parse().expect("unique-local fixture")),
+            IpAddr::V6("fe80::1".parse().expect("link-local fixture")),
+            IpAddr::V6("ff00::1".parse().expect("multicast fixture")),
+        ] {
+            let mut rebound = <PolicyResolver as Resolver>::empty(&resolver);
+            rebound.push(SocketAddr::new(address, 443));
+            let error = resolver
+                .check_addresses("hooks.example.test", &rebound)
+                .expect_err("rebound local address must be denied");
+            assert!(
+                error.to_string().contains("WEBHOOK_DESTINATION_DENIED"),
+                "unexpected error for {address}: {error}"
+            );
+        }
+    }
+
+    #[test]
+    fn webhook_policy_rejects_unlisted_hosts_without_exposing_secrets() {
+        let resolver = PolicyResolver {
+            allowed_hosts: vec!["hooks.example.test".into()],
+        };
+        let mut addresses = <PolicyResolver as Resolver>::empty(&resolver);
+        addresses.push(SocketAddr::new(
+            IpAddr::V4(Ipv4Addr::new(93, 184, 216, 34)),
+            443,
+        ));
+        let error = resolver
+            .check_addresses("other.example.test", &addresses)
+            .expect_err("unlisted host must be denied");
+        assert!(error.to_string().contains("WEBHOOK_DESTINATION_DENIED"));
+
+        let body_secret = "body-secret-must-not-appear";
+        let error = super::post_json_with_policy(
+            "https://operator:url-secret@example.test/hook?token=query-secret",
+            &["example.test".into()],
+            body_secret.as_bytes(),
+        )
+        .expect_err("credential-bearing URL must be denied");
+        let rendered = format!("{error:#}");
+        for secret in ["operator", "url-secret", "query-secret", body_secret] {
+            assert!(!rendered.contains(secret), "policy error leaked {secret}");
+        }
+    }
+
+    #[test]
+    fn webhook_redirects_are_a_typed_policy_failure() {
+        let error = validate_webhook_status(ureq::http::StatusCode::FOUND, "hooks.example.test")
+            .expect_err("redirect must be denied");
+        assert!(format!("{error:#}").contains("WEBHOOK_REDIRECT_DENIED"));
+    }
+
+    #[test]
     fn webhook_redacts_sensitive_report_details() {
         let listener = TcpListener::bind(("127.0.0.1", 0)).expect("bind listener");
         let address = listener.local_addr().expect("listener address");
@@ -2844,13 +3171,15 @@ mod tests {
             .expect("discover fixture");
         project.config.notifications.webhooks = vec![WebhookConfig {
             url: format!("http://{address}/notify"),
+            allowed_hosts: vec![address.ip().to_string()],
             on_failure: true,
             on_success: false,
         }];
         let mut sensitive = report();
         let token_key = ["tok", "en"].concat();
         sensitive.steps[0].detail = Some(format!("{token_key}=opaque-value"));
-        notify(&sensitive, &project).expect("redacted webhook should succeed");
+        notify_with(&sensitive, &project, &LocalWebhookTransport)
+            .expect("redacted webhook should succeed");
         handle.join().expect("webhook thread");
     }
 
@@ -2883,6 +3212,7 @@ mod tests {
             .expect("discover fixture");
         project.config.notifications.webhooks = vec![WebhookConfig {
             url: format!("http://{address}/notify"),
+            allowed_hosts: vec![address.ip().to_string()],
             on_failure: true,
             on_success: false,
         }];
@@ -2915,16 +3245,19 @@ mod tests {
         project.config.notifications.webhooks = vec![
             WebhookConfig {
                 url: format!("http://{first_address}/first"),
+                allowed_hosts: vec![first_address.ip().to_string()],
                 on_failure: true,
                 on_success: false,
             },
             WebhookConfig {
                 url: format!("http://{second_address}/second"),
+                allowed_hosts: vec![second_address.ip().to_string()],
                 on_failure: true,
                 on_success: false,
             },
         ];
-        let error = notify(&report(), &project).expect_err("first webhook should fail");
+        let error = notify_with(&report(), &project, &LocalWebhookTransport)
+            .expect_err("first webhook should fail");
         assert!(format!("{error:#}").contains("503"), "{error:#}");
         first_handle.join().expect("first webhook thread");
         assert!(
@@ -2941,6 +3274,7 @@ mod tests {
             .expect("discover fixture");
         project.config.notifications.webhooks = vec![WebhookConfig {
             url: "http://127.0.0.1:1/should-not-be-called".into(),
+            allowed_hosts: vec!["127.0.0.1".into()],
             on_failure: true,
             on_success: false,
         }];

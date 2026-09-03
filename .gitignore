@@ -10,3 +10,7 @@ dist/
 .env
 .env.local
 *.local.toml
+
+# Python quality/release tooling caches
+__pycache__/
+*.py[cod]

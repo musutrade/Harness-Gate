@@ -1,10 +1,32 @@
+use super::model::{
+    DoctorCheck, DoctorCheckKind, PathAlias, ReportTemplatesConfig, RetryConfig, ShardConfig,
+};
 use super::*;
+use crate::failure::RetryClass;
 use crate::test_support::TestWorkspace;
 use std::collections::BTreeSet;
 use std::fs;
 
 fn repository_config() -> FlowConfig {
     toml::from_str(include_str!("../../presets/rust-api.flow.toml")).expect("parse fixture")
+}
+
+fn diagnostics_for(config: &FlowConfig) -> Vec<ConfigDiagnostic> {
+    let source = toml::to_string_pretty(config).expect("serialize configuration");
+    FlowConfig::from_source_with_diagnostics(&source, None, None)
+        .expect_err("fixture should produce diagnostics")
+        .report()
+        .diagnostics
+}
+
+fn assert_diagnostic(config: &FlowConfig, path: &str, id: &str) {
+    let diagnostics = diagnostics_for(config);
+    assert!(
+        diagnostics
+            .iter()
+            .any(|diagnostic| diagnostic.path == path && diagnostic.id == id),
+        "missing {id} diagnostic at {path}; got {diagnostics:?}"
+    );
 }
 
 #[test]
@@ -223,12 +245,14 @@ fn runner_contract_rejects_invalid_fields() {
 
     config.steps[step_index].remove_env.clear();
     config.steps[step_index].runner = None;
-    config.steps[step_index].kind = Some("future-step".into());
-    assert!(config
-        .validate()
+    let unknown_kind = format!(
+        "{}\n[[steps]]\nid = \"future.step\"\nlabel = \"future\"\nprofiles = [\"full\"]\nkind = \"future-step\"\n",
+        include_str!("../../presets/rust-api.flow.toml")
+    );
+    assert!(toml::from_str::<FlowConfig>(&unknown_kind)
         .expect_err("unknown step kind")
         .to_string()
-        .contains("unknown kind"));
+        .contains("unknown variant"));
 
     config.steps[step_index].kind = None;
     config.steps[step_index].cwd = "{unknown}".into();
@@ -361,7 +385,7 @@ fn runner_thread_environment_cannot_shadow_service_injection() {
         .into_iter()
         .find(|diagnostic| diagnostic.path == "steps[3].runner.threads_env")
         .expect("runner collision diagnostic");
-    assert_eq!(diagnostic.id, "HGCFG-INVALID-FIELD");
+    assert_eq!(diagnostic.id, "HGCFG-SERVICE-INJECT-COLLISION");
 }
 
 #[test]
@@ -442,11 +466,14 @@ fn unknown_built_in_gate_types_fail_closed() {
     gate.services.clear();
     gate.remove_env.clear();
     gate.depends_on.clear();
-    gate.kind = Some("builtin-gate".into());
-    gate.gate_type = Some("future-gate".into());
-    config.policy.required_steps.clear();
-    let error = config.validate().expect_err("unknown gate must fail");
-    assert!(error.to_string().contains("unknown gate_type"));
+    let unknown_gate = format!(
+        "{}\n[[steps]]\nid = \"builtin.future\"\nlabel = \"future gate\"\nprofiles = [\"full\"]\nkind = \"builtin-gate\"\ngate_type = \"future-gate\"\n",
+        include_str!("../../presets/rust-api.flow.toml")
+    );
+    assert!(toml::from_str::<FlowConfig>(&unknown_gate)
+        .expect_err("unknown gate must fail")
+        .to_string()
+        .contains("unknown variant"));
 }
 
 #[test]
@@ -757,6 +784,7 @@ fn diagnostics_truncate_at_the_documented_maximum() {
             path: format!("steps[{index}]"),
             message: "test diagnostic".into(),
             help: "test help".into(),
+            retry_class: None,
             location: None,
             related: Vec::new(),
         });
@@ -772,8 +800,31 @@ fn diagnostics_truncate_at_the_documented_maximum() {
 }
 
 #[test]
+fn diagnostics_serialize_typed_retry_class_without_message_inference() {
+    let mut diagnostics = ConfigDiagnostics::empty();
+    diagnostics.push(ConfigDiagnostic {
+        id: "HGCFG-TEST-RETRY".into(),
+        severity: DiagnosticSeverity::Error,
+        path: "steps[0]".into(),
+        message: "transient test diagnostic".into(),
+        help: "retry the validation command".into(),
+        retry_class: Some(RetryClass::Timeout),
+        location: None,
+        related: Vec::new(),
+    });
+
+    let value = serde_json::to_value(diagnostics.report()).expect("serialize diagnostics");
+    assert_eq!(value["diagnostics"][0]["retry_class"], "timeout");
+}
+
+#[test]
 fn discovery_errors_keep_configuration_field_paths_in_json_reports() {
-    let error = anyhow::anyhow!("required secret scan configuration is missing: /tmp/secrets.toml");
+    let error = anyhow::Error::new(ConfigDiagnostics::single(
+        "HGCFG-REQUIRED-FILE",
+        "paths.secrets_config",
+        "required secret scan configuration file is missing",
+        "create the configured secret scan configuration file or update paths.secrets_config",
+    ));
     let report = report_for_error(&error);
     assert!(!report.valid);
     assert_eq!(report.diagnostics[0].id, "HGCFG-REQUIRED-FILE");
@@ -883,16 +934,479 @@ fn junit_report_path_must_stay_relative_to_the_report_directory() {
 #[test]
 fn webhook_configuration_requires_http_url_and_an_enabled_result() {
     let invalid_scheme = format!(
-        "{}\n[[notifications.webhooks]]\nurl = \"ftp://example.test/hook\"\n",
+        "{}\n[[notifications.webhooks]]\nurl = \"ftp://example.test/hook\"\nallowed_hosts = [\"example.test\"]\n",
         include_str!("../../presets/rust-api.flow.toml")
     );
     let error = FlowConfig::from_source(&invalid_scheme).expect_err("FTP webhook must fail");
     assert!(error.to_string().contains("notifications"));
 
     let disabled = format!(
-        "{}\n[[notifications.webhooks]]\nurl = \"https://example.test/hook\"\non_failure = false\non_success = false\n",
+        "{}\n[[notifications.webhooks]]\nurl = \"https://example.test/hook\"\nallowed_hosts = [\"example.test\"]\non_failure = false\non_success = false\n",
         include_str!("../../presets/rust-api.flow.toml")
     );
     let error = FlowConfig::from_source(&disabled).expect_err("disabled webhook must fail");
     assert!(error.to_string().contains("notifications"));
+}
+
+#[test]
+fn report_template_diagnostics_cover_pair_paths_and_extensions() {
+    let mut config = repository_config();
+    config.report_templates = ReportTemplatesConfig {
+        root: Some("../templates".into()),
+        template: Some("../report.txt".into()),
+        junit: Some("../junit.txt".into()),
+    };
+    let diagnostics = diagnostics_for(&config);
+    for (path, id) in [
+        ("report_templates.root", "HGCFG-INVALID-PATH"),
+        ("report_templates.template", "HGCFG-INVALID-PATH"),
+        ("report_templates.template", "HGCFG-INVALID-FIELD"),
+        ("report_templates.junit", "HGCFG-INVALID-PATH"),
+    ] {
+        assert!(
+            diagnostics
+                .iter()
+                .any(|diagnostic| diagnostic.path == path && diagnostic.id == id),
+            "missing {id} diagnostic at {path}: {diagnostics:?}"
+        );
+    }
+
+    config.report_templates = ReportTemplatesConfig {
+        root: Some("templates".into()),
+        template: None,
+        junit: Some("junit.txt".into()),
+    };
+    let diagnostics = diagnostics_for(&config);
+    assert!(diagnostics.iter().any(|diagnostic| {
+        diagnostic.path == "report_templates" && diagnostic.id == "HGCFG-INVALID-FIELD"
+    }));
+    assert!(diagnostics.iter().any(|diagnostic| {
+        diagnostic.path == "report_templates.junit" && diagnostic.id == "HGCFG-INVALID-FIELD"
+    }));
+}
+
+#[test]
+fn execution_retry_diagnostic_points_to_the_attempt_limit() {
+    let mut config = repository_config();
+    config.execution.retries.insert(
+        "rust.tests".into(),
+        RetryConfig {
+            max_attempts: 0,
+            backoff_ms: 0,
+            retryable: BTreeSet::new(),
+        },
+    );
+
+    assert_diagnostic(
+        &config,
+        "execution.retries[\"rust.tests\"].max_attempts",
+        "HGCFG-INVALID-FIELD",
+    );
+}
+
+#[test]
+fn builtin_gate_diagnostics_preserve_typed_field_paths() {
+    fn builtin_fixture() -> (FlowConfig, usize) {
+        let mut config = repository_config();
+        let index = config.steps.len();
+        let mut gate = config.steps[0].clone();
+        gate.id = "builtin.secret-scan".into();
+        gate.label = "secret scan".into();
+        gate.component.clear();
+        gate.program.clear();
+        gate.args.clear();
+        gate.cwd.clear();
+        gate.log.clear();
+        gate.timeout_secs = 0;
+        gate.timeout_env = None;
+        gate.parser = None;
+        gate.services.clear();
+        gate.remove_env.clear();
+        gate.depends_on.clear();
+        gate.kind = Some(StepKind::BuiltinGate);
+        gate.gate_type = Some(BuiltinGateType::SecretScan);
+        config.steps.push(gate);
+        (config, index)
+    }
+
+    let (mut config, index) = builtin_fixture();
+    config.steps[index].gate_type = None;
+    assert_diagnostic(
+        &config,
+        &format!("steps[{index}].gate_type"),
+        "HGCFG-INVALID-FIELD",
+    );
+
+    let (mut config, index) = builtin_fixture();
+    config.steps[index].id = "builtin.wrong".into();
+    assert_diagnostic(
+        &config,
+        &format!("steps[{index}].id"),
+        "HGCFG-INVALID-FIELD",
+    );
+
+    let (mut config, index) = builtin_fixture();
+    config.steps[index].depends_on = vec!["rust.format".into()];
+    assert_diagnostic(
+        &config,
+        &format!("steps[{index}].depends_on"),
+        "HGCFG-DEPENDENCY",
+    );
+
+    let (mut config, index) = builtin_fixture();
+    config.steps[index].program = "cargo".into();
+    assert_diagnostic(&config, &format!("steps[{index}]"), "HGCFG-INVALID-FIELD");
+}
+
+#[test]
+fn external_step_diagnostics_cover_closed_field_contract() {
+    let mut config = repository_config();
+    config.steps[0].kind = Some(StepKind::ExternalStep);
+    config.steps[0].gate_type = Some(BuiltinGateType::SecretScan);
+    assert_diagnostic(&config, "steps[0].gate_type", "HGCFG-INVALID-FIELD");
+
+    let mut config = repository_config();
+    config.steps[0].id = "builtin.secret-scan".into();
+    assert_diagnostic(&config, "steps[0].id", "HGCFG-INVALID-FIELD");
+
+    let mut config = repository_config();
+    config.steps[0].profiles = BTreeSet::from(["Invalid Profile".into()]);
+    assert_diagnostic(&config, "steps[0].profiles", "HGCFG-INVALID-FIELD");
+
+    let mut config = repository_config();
+    config.steps[0].program = "sh".into();
+    config.steps[0].args = vec!["-lc".into(), "cargo fmt".into()];
+    assert_diagnostic(&config, "steps[0].args", "HGCFG-INVALID-FIELD");
+}
+
+#[test]
+fn external_step_diagnostics_cover_paths_logs_timeouts_and_references() {
+    let mut config = repository_config();
+    config.steps[0].cwd = "root".into();
+    assert_diagnostic(&config, "steps[0].cwd", "HGCFG-INVALID-FIELD");
+
+    let mut config = repository_config();
+    config.steps[0].cwd = "{missing}".into();
+    assert_diagnostic(&config, "steps[0].cwd", "HGCFG-UNKNOWN-REFERENCE");
+
+    let mut config = repository_config();
+    config.steps[0].log = "nested/output.log".into();
+    assert_diagnostic(&config, "steps[0].log", "HGCFG-INVALID-LOG");
+
+    let mut config = repository_config();
+    config.steps[0].timeout_secs = 0;
+    assert_diagnostic(&config, "steps[0].timeout_secs", "HGCFG-INVALID-FIELD");
+
+    let mut config = repository_config();
+    config.steps[0].timeout_env = Some("lowercase".into());
+    assert_diagnostic(&config, "steps[0].timeout_env", "HGCFG-INVALID-ENVIRONMENT");
+
+    let mut config = repository_config();
+    config.steps[0].parser = Some("missing".into());
+    assert_diagnostic(&config, "steps[0].parser", "HGCFG-UNKNOWN-REFERENCE");
+}
+
+fn runner_fixture() -> RunnerConfig {
+    RunnerConfig {
+        version: 1,
+        kind: "generic".into(),
+        threads: Some(1),
+        threads_env: None,
+        args: Vec::new(),
+        args_position: None,
+        result_format: RunnerResultFormat::Regex,
+        isolation: TestIsolation::SchemaPerWorker,
+    }
+}
+
+#[test]
+fn runner_diagnostics_cover_version_kind_program_and_thread_contracts() {
+    let mut config = repository_config();
+    config.steps[0].runner = Some(RunnerConfig {
+        version: 2,
+        ..runner_fixture()
+    });
+    assert_diagnostic(&config, "steps[0].runner.version", "HGCFG-RUNNER-VERSION");
+
+    let mut config = repository_config();
+    config.steps[0].runner = Some(RunnerConfig {
+        kind: "Invalid Kind".into(),
+        ..runner_fixture()
+    });
+    assert_diagnostic(&config, "steps[0].runner.kind", "HGCFG-INVALID-FIELD");
+
+    let mut config = repository_config();
+    config.steps[0].runner = Some(RunnerConfig {
+        kind: "cargo-test".into(),
+        ..runner_fixture()
+    });
+    config.steps[0].program = "git".into();
+    assert_diagnostic(&config, "steps[0].runner.kind", "HGCFG-INVALID-FIELD");
+
+    let mut config = repository_config();
+    config.steps[0].runner = Some(RunnerConfig {
+        threads: Some(0),
+        ..runner_fixture()
+    });
+    assert_diagnostic(&config, "steps[0].runner.threads", "HGCFG-INVALID-FIELD");
+
+    let mut config = repository_config();
+    config.steps[0].runner = Some(RunnerConfig {
+        threads: None,
+        threads_env: Some("TEST_THREADS".into()),
+        ..runner_fixture()
+    });
+    assert_diagnostic(&config, "steps[0].runner.threads", "HGCFG-INVALID-FIELD");
+}
+
+#[test]
+fn runner_diagnostics_cover_environment_isolation_and_arguments() {
+    let mut config = repository_config();
+    config.steps[0].runner = Some(RunnerConfig {
+        threads_env: Some("lowercase".into()),
+        ..runner_fixture()
+    });
+    assert_diagnostic(
+        &config,
+        "steps[0].runner.threads_env",
+        "HGCFG-INVALID-ENVIRONMENT",
+    );
+
+    let mut config = repository_config();
+    config.steps[0].remove_env = vec!["TEST_THREADS".into()];
+    config.steps[0].runner = Some(RunnerConfig {
+        threads_env: Some("TEST_THREADS".into()),
+        ..runner_fixture()
+    });
+    assert_diagnostic(&config, "steps[0].remove_env", "HGCFG-INVALID-FIELD");
+
+    let mut config = repository_config();
+    config.steps[0].runner = Some(RunnerConfig {
+        threads: Some(2),
+        ..runner_fixture()
+    });
+    assert_diagnostic(
+        &config,
+        "steps[0].runner.threads_env",
+        "HGCFG-INVALID-FIELD",
+    );
+
+    let mut config = repository_config();
+    config.steps[0].runner = Some(RunnerConfig {
+        threads: Some(2),
+        threads_env: Some("TEST_THREADS".into()),
+        isolation: TestIsolation::Shared,
+        ..runner_fixture()
+    });
+    assert_diagnostic(&config, "steps[0].runner.isolation", "HGCFG-INVALID-FIELD");
+
+    let mut config = repository_config();
+    config.steps[0].runner = Some(RunnerConfig {
+        args_position: Some(config.steps[0].args.len() + 1),
+        ..runner_fixture()
+    });
+    assert_diagnostic(
+        &config,
+        "steps[0].runner.args_position",
+        "HGCFG-INVALID-FIELD",
+    );
+
+    let mut config = repository_config();
+    config.steps[0].runner = Some(RunnerConfig {
+        args: vec!["{missing}".into()],
+        ..runner_fixture()
+    });
+    assert_diagnostic(&config, "steps[0].runner.args", "HGCFG-INVALID-FIELD");
+}
+
+#[test]
+fn service_diagnostics_cover_duplicates_references_and_environment_collisions() {
+    let mut config = repository_config();
+    config.services.insert(
+        "database".into(),
+        ServiceConfig::Environment {
+            source_env: "DATABASE_URL".into(),
+            inject_env: "TEST_DATABASE_URL".into(),
+        },
+    );
+    config.steps[0].services = vec!["database".into(), "database".into()];
+    assert_diagnostic(&config, "steps[0].services[1]", "HGCFG-DUPLICATE-FIELD");
+
+    let mut config = repository_config();
+    config.steps[0].services = vec!["missing".into()];
+    assert_diagnostic(&config, "steps[0].services[0]", "HGCFG-UNKNOWN-REFERENCE");
+
+    let mut config = repository_config();
+    config.services.insert(
+        "database".into(),
+        ServiceConfig::Environment {
+            source_env: "DATABASE_URL".into(),
+            inject_env: "TEST_DATABASE_URL".into(),
+        },
+    );
+    config.steps[0].services = vec!["database".into()];
+    config.steps[0].remove_env = vec!["TEST_DATABASE_URL".into()];
+    assert_diagnostic(&config, "steps[0].remove_env", "HGCFG-INVALID-FIELD");
+}
+
+#[test]
+fn service_diagnostics_cover_runner_and_multi_service_injection_collisions() {
+    let mut config = repository_config();
+    config.services.insert(
+        "database".into(),
+        ServiceConfig::Environment {
+            source_env: "DATABASE_URL".into(),
+            inject_env: "TEST_THREADS".into(),
+        },
+    );
+    config.steps[0].services = vec!["database".into()];
+    config.steps[0].runner = Some(RunnerConfig {
+        threads_env: Some("TEST_THREADS".into()),
+        ..runner_fixture()
+    });
+    assert_diagnostic(
+        &config,
+        "steps[0].runner.threads_env",
+        "HGCFG-SERVICE-INJECT-COLLISION",
+    );
+
+    let mut config = repository_config();
+    for id in ["database", "cache"] {
+        config.services.insert(
+            id.into(),
+            ServiceConfig::Environment {
+                source_env: format!("{}_URL", id.to_ascii_uppercase()),
+                inject_env: "TEST_SERVICE_URL".into(),
+            },
+        );
+    }
+    config.steps[0].services = vec!["database".into(), "cache".into()];
+    assert_diagnostic(
+        &config,
+        "steps[0].services[1]",
+        "HGCFG-SERVICE-INJECT-COLLISION",
+    );
+}
+
+#[test]
+fn doctor_parser_alias_and_scope_diagnostics_keep_configuration_paths() {
+    let mut config = repository_config();
+    config.doctor.checks.push(config.doctor.checks[0].clone());
+    let duplicate_index = config.doctor.checks.len() - 1;
+    assert_diagnostic(
+        &config,
+        &format!("doctor.checks[{duplicate_index}].id"),
+        "HGCFG-DUPLICATE-FIELD",
+    );
+
+    let mut config = repository_config();
+    config.doctor.checks.push(DoctorCheck {
+        id: "service.database".into(),
+        label: "database".into(),
+        required: true,
+        help: None,
+        timeout_secs: 15,
+        kind: DoctorCheckKind::Service {
+            service: "missing".into(),
+        },
+    });
+    let index = config.doctor.checks.len() - 1;
+    assert_diagnostic(
+        &config,
+        &format!("doctor.checks[{index}]"),
+        "HGCFG-INVALID-FIELD",
+    );
+
+    let mut config = repository_config();
+    config.parsers.insert(
+        "invalid".into(),
+        ParserConfig::Json {
+            count_path: Some(".tests".into()),
+            minimum: 1,
+        },
+    );
+    assert_diagnostic(&config, "parsers[\"invalid\"]", "HGCFG-INVALID-FIELD");
+
+    let mut config = repository_config();
+    config.paths.aliases.insert(
+        "root".into(),
+        PathAlias {
+            path: "src".into(),
+            env: None,
+        },
+    );
+    assert_diagnostic(&config, "paths.aliases[\"root\"]", "HGCFG-INVALID-FIELD");
+
+    let mut config = repository_config();
+    config.scope.rules.clear();
+    assert_diagnostic(&config, "scope.rules", "HGCFG-INVALID-FIELD");
+}
+
+#[test]
+fn execution_and_webhook_contracts_reject_unknown_or_unsafe_inputs() {
+    let mut config = repository_config();
+    config.execution.retries.insert(
+        "missing".into(),
+        RetryConfig {
+            max_attempts: 1,
+            backoff_ms: 0,
+            retryable: BTreeSet::new(),
+        },
+    );
+    assert!(config
+        .validate()
+        .expect_err("unknown retry step")
+        .to_string()
+        .contains("missing step"));
+
+    let mut config = repository_config();
+    config
+        .execution
+        .shards
+        .insert("rust.tests".into(), ShardConfig { index: 0, total: 2 });
+    assert!(config
+        .validate()
+        .expect_err("shards require a runner")
+        .to_string()
+        .contains("requires a runner"));
+
+    for (url, allowed_hosts) in [
+        (
+            "https://user:secret@example.test/hook",
+            vec!["example.test"],
+        ),
+        ("https://example.test/hook", Vec::new()),
+        ("https://example.test/hook", vec!["*.example.test"]),
+        ("https://example.test/hook", vec!["other.test"]),
+    ] {
+        let mut config = repository_config();
+        config.notifications.webhooks.push(WebhookConfig {
+            url: url.into(),
+            allowed_hosts: allowed_hosts.into_iter().map(str::to_owned).collect(),
+            on_failure: true,
+            on_success: false,
+        });
+        assert!(
+            config.validate().is_err(),
+            "webhook fixture should fail: {url}"
+        );
+    }
+}
+
+#[test]
+fn flow_config_accessors_and_schema_cover_the_public_configuration_surface() {
+    let mut config = repository_config();
+    config.services.insert(
+        "database".into(),
+        ServiceConfig::Environment {
+            source_env: "DATABASE_URL".into(),
+            inject_env: "TEST_DATABASE_URL".into(),
+        },
+    );
+    assert!(config.step("rust.tests").is_some());
+    assert!(config.parser("rust").is_some());
+    assert!(config.service("database").is_some());
+    assert!(config.allowed_placeholder("reports"));
+    assert!(config.diagnostics_report().valid);
+    assert!(schema_json().expect("schema JSON").contains("FlowConfig"));
 }
