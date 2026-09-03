@@ -29,6 +29,27 @@ Current configuration evidence (2026-09-01):
   and required-reviewer rule `64256604` names `higoalespn`; and
 - deployment policy `58783819` is type `tag` with pattern `v*`.
 
+Latest release evidence (2026-09-03):
+
+- PR [#75](https://github.com/musutrade/Harness-Gate/pull/75) merged as
+  `6a9066b7f5dba241a3190a5508727cd21ba2c9b0`; the PR CI run
+  [33701746324](https://github.com/musutrade/Harness-Gate/actions/runs/33701746324)
+  passed all 21 required checks.
+- Protected `main` CI run
+  [33702793530](https://github.com/musutrade/Harness-Gate/actions/runs/33702793530)
+  passed for that exact commit, including `Required Quality Aggregate`.
+- Immutable tag and published release [`v0.3.6`](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.6)
+  point to the same commit. Release workflow
+  [33704014615](https://github.com/musutrade/Harness-Gate/actions/runs/33704014615)
+  passed eligibility, multi-platform builds, quality gates, signing,
+  provenance, GitHub Release creation, and crates.io publication.
+- The release inventory and checksum manifest were downloaded and verified;
+  the public crate is [harness-gate 0.3.6](https://crates.io/crates/harness-gate/0.3.6).
+  Binary and source installer paths were exercised in isolated temporary
+  directories. These checks close the v0.3.6 publication record only; they do
+  not constitute DevRail staging, shadow/canary, rollback-authority, or R-07
+  OS-sandbox acceptance.
+
 ## Release Procedure
 
 1. Merge the version, changelog, and release-record change through a pull

@@ -142,3 +142,11 @@ and policy artifacts are retained for diagnosis.
   [33525736285](https://github.com/musutrade/Harness-Gate/actions/runs/33525736285)
   after explicit `release` environment approval; no tag mutation or bypass was
   used.
+- The subsequent immutable [`v0.3.6` release](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.6)
+  points to merge commit `6a9066b7f5dba241a3190a5508727cd21ba2c9b0`. Protected
+  `main` CI run
+  [33702793530](https://github.com/musutrade/Harness-Gate/actions/runs/33702793530)
+  and release workflow
+  [33704014615](https://github.com/musutrade/Harness-Gate/actions/runs/33704014615)
+  passed all eligibility, quality, signing, provenance, and publication jobs;
+  no tag mutation or bypass was used.
