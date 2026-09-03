@@ -4,9 +4,16 @@
 [post-remediation hardening specification](specs/post-remediation-hardening/spec.md)
 
 **Status:** Proposed umbrella; selected R-13 through R-18 implementation is
-present on this branch. Tasks are checked only where focused tests and
-reviewable evidence support the acceptance; cross-platform, staging, and
-deferred R-07 sandbox work remain open.
+merged to `main` as part of v0.3.6
+([PR #75](https://github.com/musutrade/Harness-Gate/pull/75), commit
+`6a9066b7f5dba241a3190a5508727cd21ba2c9b0`). PR CI
+[33701746324](https://github.com/musutrade/Harness-Gate/actions/runs/33701746324)
+and protected `main` CI
+[33702793530](https://github.com/musutrade/Harness-Gate/actions/runs/33702793530)
+passed, including the Linux/macOS/Windows test matrix and the `Required
+Quality Aggregate`. Tasks are checked only where focused tests and reviewable
+evidence support the acceptance; R-07, R-16 benchmark, allocation-measurement,
+and DevRail staging boundaries remain open.
 
 Every implementation task is intended to fit within four hours. A task may be
 checked only after its focused tests, compatibility notes, and acceptance
@@ -33,26 +40,26 @@ evidence are reviewed.
   contract.
   **Acceptance:** Public, loopback, RFC1918/private, link-local, unspecified,
   multicast, and malformed-host cases have deterministic outcomes.
-- [ ] **2.2 (P2, M)** Implement connection-time resolution and address
+- [x] **2.2 (P2, M)** Implement connection-time resolution and address
   re-checking with explicit redirect behavior.
   **Acceptance:** A DNS-rebinding fixture and every denied address class fail
   closed before connection; no policy decision logs credentials or body data.
-- [ ] **2.3 (P2, S)** Add allowlist, redaction, and cross-platform webhook
+- [x] **2.3 (P2, S)** Add allowlist, redaction, and cross-platform webhook
   regression tests.
   **Acceptance:** An allowlisted public destination succeeds in the test
   double; denied destinations produce one structured failure and no request.
 
 ## 3. R-14 Cross-Platform Lease Liveness
 
-- [ ] **3.1 (P2, S)** Specify platform identity and lease-renewal timing for the
+- [x] **3.1 (P2, S)** Specify platform identity and lease-renewal timing for the
   complete allocation-to-cleanup lifecycle.
   **Acceptance:** Linux, macOS, and Windows behavior records the identity source,
   renewal deadline, and uncertain-identity outcome.
-- [ ] **3.2 (P2, M)** Implement a host-owned heartbeat or equivalent renewal
+- [x] **3.2 (P2, M)** Implement a host-owned heartbeat or equivalent renewal
   mechanism and structured ownership-uncertain failures.
   **Acceptance:** A step longer than the TTL remains owned; renewal failure or
   identity reuse performs zero destructive removals.
-- [ ] **3.3 (P2, M)** Add lifecycle, restart, cancellation, and cross-platform
+- [x] **3.3 (P2, M)** Add lifecycle, restart, cancellation, and cross-platform
   lease tests.
   **Acceptance:** Allocation, execution, cleanup, and failure evidence cover
   the same immutable identity on every supported CI platform.
@@ -100,7 +107,7 @@ evidence are reviewed.
   define the environment-variable namespace migration.
   **Acceptance:** Unknown values fail before external work; aliases have explicit
   warnings, expiry, and compatibility tests.
-- [ ] **6.3 (P2, S)** Document and test release-profile panic behavior,
+- [x] **6.3 (P2, S)** Document and test release-profile panic behavior,
   `catch_unwind`, and lock poisoning.
   **Acceptance:** Linux and applicable cross-platform checks exercise the chosen
   failure behavior without relying on implicit profile assumptions.
@@ -123,19 +130,33 @@ evidence are reviewed.
 
 ### Current Evidence and Open Boundaries
 
-The selected implementation tracks have focused Rust and CLI coverage. The
-latest local `cargo nextest` run passed 278/278 tests; formatter, locked check,
-strict Clippy, dependency audit, documentation consistency, and quality-script
-tests are required closeout checks. The repeatable three-sample Linux benchmark
-is recorded in [the candidate evidence report](../../../docs/benchmarks/post-remediation-hardening-2026-09-02.md).
+The selected R-13 through R-18 implementation tracks are merged to `main` as
+part of v0.3.6 ([PR #75](https://github.com/musutrade/Harness-Gate/pull/75),
+commit `6a9066b7f5dba241a3190a5508727cd21ba2c9b0`). Focused tests cover the
+webhook destination, DNS-rebinding, redaction, and redirect boundaries in
+`verify::report`; lease heartbeat renewal and platform identity in
+`service::lease`; scheduler panic boundaries; and release-profile panic and
+lock-poisoning behavior. A targeted rerun of those acceptance tests passed
+24/24 on 2026-09-03. PR CI
+[33701746324](https://github.com/musutrade/Harness-Gate/actions/runs/33701746324)
+and protected `main` CI
+[33702793530](https://github.com/musutrade/Harness-Gate/actions/runs/33702793530),
+including the `Required Quality Aggregate`
+[job 100488162319](https://github.com/musutrade/Harness-Gate/actions/runs/33702793530/job/100488162319),
+provide the Linux/macOS/Windows evidence for the checked tracks.
+
+The repeatable three-sample Linux benchmark is recorded in [the candidate
+evidence report](../../../docs/benchmarks/post-remediation-hardening-2026-09-02.md)
+and remains a local candidate, not an accepted baseline.
 
 The following acceptance evidence remains open and is intentionally not
-checked above: DNS-rebinding and cross-platform webhook fixtures; macOS and
-Windows lease CI evidence; representative cancellation, failed-node, and
-wide/deep-DAG benchmark coverage; allocation measurements for large
-configurations; explicit lock-poisoning profile tests; the R-07 OS-level
-sandbox; and DevRail staging G-03/G-04, shadow/canary, and rollback-authority
-acceptance.
+checked above: the R-07 documentation inventory, OS-sandbox decision matrix,
+and documentation-consistency fixtures (tasks 1.1-1.3); R-16 representative
+cancellation, failed-node, and narrow/wide/deep-DAG benchmark coverage plus
+the post-change comparison (tasks 5.1 and 5.4); allocation measurements for
+large configurations (task 6.1); and DevRail staging G-03/G-04,
+shadow/canary, and rollback-authority acceptance. Section 8 closeout remains
+pending these items.
 
 - [ ] **8.1 (P1, M)** Run focused tests and review failure-path evidence for
   every implemented track.

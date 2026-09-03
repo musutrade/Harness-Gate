@@ -14,8 +14,13 @@ the deferred environment acceptance is tracked separately.
 
 R-07's short-term documentation and reader-deadline work is already recorded
 as complete elsewhere. This proposal preserves that wording and defines the
-separate decision required before any operating-system sandbox claim. R-13
-through R-18 are not represented as implemented by this proposal.
+separate decision required before any operating-system sandbox claim.
+Selected R-13 through R-18 implementation and focused tests are merged to
+`main` as part of v0.3.6
+([PR #75](https://github.com/musutrade/Harness-Gate/pull/75)); `tasks.md`
+reflects which items carry recorded acceptance evidence. This proposal
+remains Proposed because R-07, R-16 benchmark, allocation, and DevRail
+staging acceptance are still open.
 
 ## Why
 
