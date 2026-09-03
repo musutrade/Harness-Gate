@@ -28,7 +28,7 @@ const RENEW_AFTER: Duration = Duration::from_secs(30);
 #[cfg(not(test))]
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(15);
 #[cfg(test)]
-const HEARTBEAT_INTERVAL: Duration = Duration::from_millis(25);
+const HEARTBEAT_INTERVAL: Duration = Duration::from_millis(250);
 static TEMP_COUNTER: AtomicU64 = AtomicU64::new(1);
 
 trait RuntimeOperations {
