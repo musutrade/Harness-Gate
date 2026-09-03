@@ -54,7 +54,7 @@ cargo install harness-gate
 
 ### 从 GitHub Release 安装（预编译二进制）
 
-从不可变的 [GitHub Release tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.6) 下载适合你平台的二进制文件：
+从不可变的 [GitHub Release tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.7) 下载适合你平台的二进制文件：
 
 - **Linux (x86_64)**: `harness-gate-linux-amd64`
 - **macOS (Intel)**: `harness-gate-macos-amd64`
@@ -67,8 +67,8 @@ tag 下载脚本并显式传入版本：
 ```bash
 curl --fail --show-error --location --proto '=https' --tlsv1.2 \
   -o /tmp/harness-gate-install.sh \
-  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.3.6/install.sh
-bash /tmp/harness-gate-install.sh --version v0.3.6
+  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.3.7/install.sh
+bash /tmp/harness-gate-install.sh --version v0.3.7
 harness-gate --version
 ```
 
@@ -117,12 +117,12 @@ sha256sum --check SHA256SUMS
 cosign verify-blob --signature harness-gate-linux-amd64.sig \
   --certificate harness-gate-linux-amd64.crt \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity-regexp '^https://github.com/musutrade/Harness-Gate/.github/workflows/release\.yml@refs/tags/v0\.3\.6$' \
+  --certificate-identity-regexp '^https://github.com/musutrade/Harness-Gate/.github/workflows/release\.yml@refs/tags/v0\.3\.7$' \
   harness-gate-linux-amd64
 cosign verify-blob --signature harness-gate.sbom.cdx.json.sig \
   --certificate harness-gate.sbom.cdx.json.crt \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity-regexp '^https://github.com/musutrade/Harness-Gate/.github/workflows/release\.yml@refs/tags/v0\.3\.6$' \
+  --certificate-identity-regexp '^https://github.com/musutrade/Harness-Gate/.github/workflows/release\.yml@refs/tags/v0\.3\.7$' \
   harness-gate.sbom.cdx.json
 ```
 

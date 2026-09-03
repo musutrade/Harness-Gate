@@ -138,11 +138,11 @@ Harness-Gate/                    # 项目根目录
 # 从不可变 release tag 下载并运行安装脚本（版本必须与 tag 一致）
 curl --fail --show-error --location --proto '=https' --tlsv1.2 \
   -o /tmp/harness-gate-install.sh \
-  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.3.6/install.sh
-bash /tmp/harness-gate-install.sh --version v0.3.6
+  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.3.7/install.sh
+bash /tmp/harness-gate-install.sh --version v0.3.7
 
 # 或从不可变源码 tag 安装
-bash /tmp/harness-gate-install.sh --version v0.3.6 --from-source
+bash /tmp/harness-gate-install.sh --version v0.3.7 --from-source
 ```
 
 ### 安装方式 2: 从源码手动安装
@@ -157,7 +157,7 @@ cargo install --locked --path tools/harness-gate
 
 # 验证安装
 harness-gate --version
-# 输出: harness-gate 0.3.6
+# 输出: harness-gate 0.3.7
 ```
 
 ### 基本使用
@@ -296,5 +296,5 @@ harness-gate hook
 ---
 
 **项目状态**: ✅ 生产就绪  
-**版本**: 0.3.6
+**版本**: 0.3.7
 **最后更新**: 2026-09-03
