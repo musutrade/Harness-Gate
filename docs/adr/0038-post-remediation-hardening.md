@@ -151,6 +151,6 @@ and protected `main` CI
 [33702793530](https://github.com/musutrade/Harness-Gate/actions/runs/33702793530)
 passed, including the Linux/macOS/Windows test matrix and `Required Quality
 Aggregate`. The companion task list records exactly which items have
-evidence. R-07 documentation/sandbox work, R-16 benchmark coverage,
-allocation measurement, and DevRail staging G-03/G-04 acceptance remain open
-and are not claimed here.
+evidence; R-16/R-17 local benchmark and allocation evidence is recorded with
+that list. R-07 documentation/sandbox work and DevRail staging G-03/G-04
+acceptance remain open and are not claimed here.
