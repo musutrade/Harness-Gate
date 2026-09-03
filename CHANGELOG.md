@@ -14,6 +14,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Process output and adapter artifacts are bounded with truncation/deadline
   failures, and audit/log/report/SBOM error paths share credential redaction.
 
+## [0.3.7] - 2026-09-03
+
+### Added
+
+- Added the R-07 adapter isolation wording inventory and Linux/macOS/Windows
+  OS-sandbox decision matrix, plus a documentation consistency fixture that
+  fails closed on unsupported sandbox claims.
+- Added reproducible R-16 scheduler/wait scenario evidence and R-17
+  configuration-validation allocation evidence under `docs/benchmarks`.
+
+### Changed
+
+- Synchronized the post-remediation hardening OpenSpec and ADR-0038 acceptance
+  records with the v0.3.6 implementation and closed the umbrella.
+
+### Fixed
+
+- Stabilized the Windows lease heartbeat lifecycle test so transient marker
+  replacement and real-time file scanning no longer cause flaky CI failures.
+
 ## [0.3.6] - 2026-09-02
 
 ### Added
