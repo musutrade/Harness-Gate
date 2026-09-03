@@ -969,7 +969,7 @@ mod tests {
     use std::path::{Path, PathBuf};
     use std::sync::atomic::{AtomicUsize, Ordering};
     use std::sync::Arc;
-    use std::time::Duration;
+    use std::time::{Duration, Instant};
 
     #[derive(Clone)]
     struct FakeRuntime {
@@ -1172,8 +1172,18 @@ mod tests {
         stale.expires_at = 0;
         write_record(&path, &stale).expect("write stale heartbeat fixture");
 
-        std::thread::sleep(Duration::from_millis(100));
-        let renewed = read_record(&path).expect("read renewed heartbeat lease");
+        let deadline = Instant::now() + Duration::from_secs(2);
+        let renewed = loop {
+            let record = read_record(&path).expect("read renewed heartbeat lease");
+            if record.heartbeat_at > 0 && record.expires_at > record.heartbeat_at {
+                break record;
+            }
+            assert!(
+                Instant::now() < deadline,
+                "heartbeat did not renew the lease marker before the deadline"
+            );
+            std::thread::sleep(Duration::from_millis(10));
+        };
         assert!(renewed.heartbeat_at > 0);
         assert!(renewed.expires_at > renewed.heartbeat_at);
 
