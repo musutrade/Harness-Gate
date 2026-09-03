@@ -31,23 +31,22 @@ Current configuration evidence (2026-09-01):
 
 Latest release evidence (2026-09-03):
 
-- PR [#75](https://github.com/musutrade/Harness-Gate/pull/75) merged as
-  `6a9066b7f5dba241a3190a5508727cd21ba2c9b0`; the PR CI run
-  [33701746324](https://github.com/musutrade/Harness-Gate/actions/runs/33701746324)
+- PR [#81](https://github.com/musutrade/Harness-Gate/pull/81) merged as
+  `0491ecca098bfd6d48dfc17829f700a69734a996`; the PR CI run
+  [33749197449](https://github.com/musutrade/Harness-Gate/actions/runs/33749197449)
   passed all 21 required checks.
 - Protected `main` CI run
-  [33702793530](https://github.com/musutrade/Harness-Gate/actions/runs/33702793530)
+  [33750527365](https://github.com/musutrade/Harness-Gate/actions/runs/33750527365)
   passed for that exact commit, including `Required Quality Aggregate`.
-- Immutable tag and published release [`v0.3.6`](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.6)
+- Immutable tag and published release [`v0.3.7`](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.7)
   point to the same commit. Release workflow
-  [33704014615](https://github.com/musutrade/Harness-Gate/actions/runs/33704014615)
+  [33751905950](https://github.com/musutrade/Harness-Gate/actions/runs/33751905950)
   passed eligibility, multi-platform builds, quality gates, signing,
   provenance, GitHub Release creation, and crates.io publication.
 - The release inventory and checksum manifest were downloaded and verified;
-  the public crate is [harness-gate 0.3.6](https://crates.io/crates/harness-gate/0.3.6).
-  Binary and source installer paths were exercised in isolated temporary
-  directories. These checks close the v0.3.6 publication record only; they do
-  not constitute DevRail staging, shadow/canary, rollback-authority, or R-07
+  the public crate is [harness-gate 0.3.7](https://crates.io/crates/harness-gate/0.3.7).
+  These checks close the v0.3.7 publication record only; they do not
+  constitute DevRail staging, shadow/canary, rollback-authority, or R-07
   OS-sandbox acceptance.
 
 ## Release Procedure
