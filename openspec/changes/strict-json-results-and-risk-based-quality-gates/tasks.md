@@ -6,7 +6,7 @@ S = 小于 1 小时，M = 1–2 小时，L = 2–不足 4 小时；超出估算�
 
 ## 1. Freeze evidence and measurement contracts
 
-- [ ] 1.1 [P1][M] 核对评审基线、测试二进制来源及子进程插桩；验收：保留提交/target/工具版本与 profile 关联证据，解释文件级/模块级口径差异。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
+- [x] 1.1 [P1][M] 核对评审基线、测试二进制来源及子进程插桩；验收：保留提交/target/工具版本与 profile 关联证据，解释文件级/模块级口径差异。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。Added `tools/quality/measurement_contract.py` and [measurement contract](../../../docs/quality/measurement-contract.md); the generator records review/candidate SHAs, target directory/triple, dev/release-small profiles, Rust/Cargo/nextest/llvm-cov/OpenSpec versions, nextest binary paths/digests, LLVM instrumentation flags/profile pattern, child-process instrumentation requirements, unsupported branch status, and file/module/aggregate coverage interpretation. The review SHA is not present in this shallow checkout and remains explicitly unaccepted; candidate evidence is reproducible with the documented commands.
 - [ ] 1.2 [P2][M] 选择并锁定开发用复杂度分析器，记录许可与语法限制；验收：固定 `if/match/guard/loop/short-circuit/?/closure/macro` 样例具有可重建 CC 期望值。关联：[design](design.md#decisions)。
 - [ ] 1.3 [P2][S] 定义质量证据 schema、series identity 和源符号身份；验收：示例 JSON 含原始计数、源码摘要、工具/规则版本，并能区分不兼容 series。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
 
