@@ -9,6 +9,7 @@ Run the gates from the repository root:
 
 ```bash
 python3 tools/quality/coverage.py
+python3 tools/quality/measurement_contract.py
 NEXTEST_EXPERIMENTAL_LIBTEST_JSON=1 cargo nextest run \
   --manifest-path tools/harness-gate/Cargo.toml --locked --no-fail-fast \
   --message-format libtest-json-plus --message-format-version 0.1 \
@@ -27,6 +28,15 @@ The helper tests and bytecode compilation run in the `Quality Script Tests`
 CI job and are included in `Required Quality Aggregate`. Quality scripts are
 reviewed as production-like policy code: a failing or untestable script cannot
 silently approve a release.
+
+`measurement_contract.py` records the commit, target directory/triple, Cargo
+profile, tool versions, exact nextest test-binary paths and digests, and the
+`cargo-llvm-cov` instrumentation environment. Its child-process rule is
+explicit: `LLVM_PROFILE_FILE` is inherited, but a child executable contributes
+coverage only when that executable was built with `-C instrument-coverage`.
+The command reports branch coverage as `unsupported` unless the baseline command
+is explicitly changed to request branch instrumentation. The output is
+candidate evidence, not an automatic baseline acceptance.
 
 The benchmark runner executes the checked-in no-network fixture in both serial
 and opt-in parallel modes. Its JSON keeps per-mode raw samples, the configured
