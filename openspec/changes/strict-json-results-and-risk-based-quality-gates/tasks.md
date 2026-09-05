@@ -15,8 +15,8 @@ S = 小于 1 小时，M = 1–2 小时，L = 2–不足 4 小时；超出估算�
 - [x] 2.1 [P1][M] 新增错误对象、无关嵌套数组、数字候选和多候选的 parser 回归；验收：修复前断言能抓住假通过，包含等长候选和零结果优先于无关数字的场景。关联：[JSON spec](specs/strict-json-result-counting/spec.md)。
 - [x] 2.2 [P1][M] 实施显式路径/受支持自动发现规则，删除任意值回退；验收：正反单元测试通过，根数组及对象包装兼容，非法显式路径不会退回自动模式。关联：[JSON spec](specs/strict-json-result-counting/spec.md)。
 - [x] 2.3 [P1][M] 添加跨平台 CLI fixture，进程退出 0 但输出 `duration_ms: 5000` 错误对象；验收：CLI 非零、失败报告和 `RESULT_PARSE_FAILURE`/incomplete evidence 均被断言。关联：[JSON spec](specs/strict-json-result-counting/spec.md)。Structured CLI contracts and the Linux snapshot both pass.
-- [ ] 2.4 [P1][M] 验证成功、零结果、partial、命令自身失败及显式数值路径；验收：现有 failure codes、minimum、结果 schema 与 CLI contracts 保持兼容。关联：[JSON spec](specs/strict-json-result-counting/spec.md)。
-- [ ] 2.5 [P1][S] 更新中英文 parser 文档和迁移示例；验收：示例 config check 通过，清楚说明哪些旧自动发现输入现在拒绝。关联：[JSON spec](specs/strict-json-result-counting/spec.md)。
+- [x] 2.4 [P1][M] 验证成功、零结果、partial、命令自身失败及显式数值路径；验收：现有 failure codes、minimum、结果 schema 与 CLI contracts 保持兼容。关联：[JSON spec](specs/strict-json-result-counting/spec.md)。`verify::tests::json_parser_compatibility_preserves_success_zero_partial_and_command_failures` and `json_parser_explicit_numeric_path_preserves_count_and_minimum` pass under locked nextest; the existing structured CLI parse-failure contract also passes.
+- [x] 2.5 [P1][S] 更新中英文 parser 文档和迁移示例；验收：示例 config check 通过，清楚说明哪些旧自动发现输入现在拒绝。关联：[JSON spec](specs/strict-json-result-counting/spec.md)。Updated `docs/configuration.md`, `docs/configuration.zh-CN.md`, `README.md`, and `README.zh-CN.md` with recognized fields, explicit `count_path` migration, and rejected legacy inputs; `openspec validate strict-json-results-and-risk-based-quality-gates --strict` passes.
 
 ## 3. Expand production coverage boundaries
 
