@@ -370,9 +370,33 @@ variables or remove_env.
     minimum = 1
 
 regex counts a capture group; junit reads JUnit XML; trx reads Visual Studio
-TRX XML; and json reads an array or numeric field at count_path (or discovers
-common result arrays when omitted). minimum defaults to 1. Empty, malformed,
-partial, or ambiguous results fail closed.
+TRX XML; and json reads an array or non-negative integer at `count_path`.
+`count_path` is a non-empty dot-separated object path; it does not support
+JSONPath expressions, array indexes, or wildcards. When `count_path` is omitted,
+JSON keeps compatibility with a bare root array or exactly one recognized result
+array. Recognized field names are `testcases`, `testCases`, `test_results`,
+`testResults`, and `results`; object wrappers may surround the field, but result
+arrays are not searched recursively.
+
+Automatic discovery rejects arbitrary numbers (including `duration_ms`), unrelated
+arrays such as metadata or attachments, non-array recognized fields, and documents
+with multiple recognized candidates—even when their lengths are equal. These
+inputs now fail with `RESULT_PARSE_FAILURE`; they are not counted as tests.
+Producers that previously relied on implicit numeric discovery must add an explicit
+path, for example:
+
+```toml
+[parsers.json-results]
+kind = "json"
+count_path = "summary.total"
+minimum = 1
+```
+
+An explicit path is never retried through automatic discovery. Missing paths,
+negative or fractional numbers, and values that are not arrays or non-negative
+integers are parse failures. `minimum` defaults to 1. Empty, malformed, or
+partial results fail closed as `RESULT_ZERO`, `RESULT_PARSE_FAILURE`, or
+`RESULT_PARTIAL` respectively.
 
 ## 11. Scope rules
 
