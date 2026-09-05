@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
@@ -13,11 +20,7 @@ env:
 jobs:
   test:
     name: Test
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
 
@@ -45,6 +48,37 @@ jobs:
         run: |
           cargo run --manifest-path tools/harness-gate/Cargo.toml -- schema export
           git diff --exit-code -- schema/flow.schema.json
+
+  test-cross-platform:
+    name: Test (${{ matrix.os }})
+    if: ${{ github.event_name == 'push' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            tools/harness-gate/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install cargo-nextest
+        uses: taiki-e/install-action@cargo-nextest
+
+      - name: Run tests
+        run: cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked
 
   security-audit:
     name: Security Audit
@@ -104,10 +138,7 @@ jobs:
 
   build:
     name: Build
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
 
@@ -120,14 +151,32 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v6
         with:
-          name: harness-gate-${{ matrix.os }}
+          name: harness-gate-ubuntu-latest
           path: |
             tools/harness-gate/target/release/harness-gate
             tools/harness-gate/target/release/harness-gate.exe
           if-no-files-found: ignore
 
+  build-cross-platform:
+    name: Build (${{ matrix.os }})
+    if: ${{ github.event_name == 'push' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build
+        run: cargo build --manifest-path tools/harness-gate/Cargo.toml --locked --release
+
   coverage:
     name: Code Coverage
+    if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -160,6 +209,7 @@ jobs:
 
   quality-coverage:
     name: Quality Coverage and Critical Paths
+    if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -203,11 +253,7 @@ jobs:
 
   quality-contracts:
     name: Quality CLI Contracts
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
 
@@ -232,6 +278,39 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v6
         with:
+          name: quality-contracts-ubuntu-latest-${{ github.run_id }}
+          path: |
+            target/quality/contracts.json
+            tools/quality/snapshots/contracts.json
+          if-no-files-found: warn
+
+  quality-contracts-cross-platform:
+    name: Quality CLI Contracts (${{ matrix.os }})
+    if: ${{ github.event_name == 'push' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.x'
+
+      - name: Run CLI contract snapshots
+        shell: bash
+        run: python tools/quality/contracts.py --output target/quality/contracts.json --structured
+
+      - name: Upload contract evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v6
+        with:
           name: quality-contracts-${{ matrix.os }}-${{ github.run_id }}
           path: |
             target/quality/contracts.json
@@ -240,6 +319,7 @@ jobs:
 
   quality-baseline:
     name: Quality Performance Baseline
+    if: ${{ github.event_name == 'push' }}
     strategy:
       fail-fast: false
       matrix:
@@ -331,13 +411,29 @@ jobs:
   quality-required:
     name: Required Quality Aggregate
     if: ${{ always() }}
-    needs: [quality-coverage, quality-contracts, quality-baseline, docs-consistency, release-contracts, quality-scripts]
+    # Keep this check name stable because it is required by the main ruleset.
+    # Pull requests use the fast, deterministic gate; pushes to main additionally
+    # require cross-platform and measurement-heavy evidence jobs.
+    needs:
+      [test, test-cross-platform, security-audit, fmt, clippy, build, build-cross-platform,
+       coverage, quality-coverage, quality-contracts, quality-contracts-cross-platform,
+       quality-baseline, docs-consistency, release-contracts, quality-scripts]
     runs-on: ubuntu-latest
     steps:
       - name: Require every quality gate
         env:
+          EVENT_NAME: ${{ github.event_name }}
+          TEST: ${{ needs.test.result }}
+          TEST_CROSS_PLATFORM: ${{ needs.test-cross-platform.result }}
+          SECURITY_AUDIT: ${{ needs.security-audit.result }}
+          FMT: ${{ needs.fmt.result }}
+          CLIPPY: ${{ needs.clippy.result }}
+          BUILD: ${{ needs.build.result }}
+          BUILD_CROSS_PLATFORM: ${{ needs.build-cross-platform.result }}
+          COVERAGE: ${{ needs.coverage.result }}
           QUALITY_COVERAGE: ${{ needs.quality-coverage.result }}
           QUALITY_CONTRACTS: ${{ needs.quality-contracts.result }}
+          QUALITY_CONTRACTS_CROSS_PLATFORM: ${{ needs.quality-contracts-cross-platform.result }}
           QUALITY_BASELINE: ${{ needs.quality-baseline.result }}
           DOCS_CONSISTENCY: ${{ needs.docs-consistency.result }}
           RELEASE_CONTRACTS: ${{ needs.release-contracts.result }}
@@ -345,8 +441,14 @@ jobs:
         run: |
           set -eu
           failed=0
-          for result in "$QUALITY_COVERAGE" "$QUALITY_CONTRACTS" "$QUALITY_BASELINE" "$DOCS_CONSISTENCY" "$RELEASE_CONTRACTS" "$QUALITY_SCRIPTS"; do
-            echo "quality dependency result: $result"
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            required_names="TEST SECURITY_AUDIT FMT CLIPPY BUILD QUALITY_CONTRACTS DOCS_CONSISTENCY RELEASE_CONTRACTS QUALITY_SCRIPTS"
+          else
+            required_names="TEST TEST_CROSS_PLATFORM SECURITY_AUDIT FMT CLIPPY BUILD BUILD_CROSS_PLATFORM COVERAGE QUALITY_COVERAGE QUALITY_CONTRACTS QUALITY_CONTRACTS_CROSS_PLATFORM QUALITY_BASELINE DOCS_CONSISTENCY RELEASE_CONTRACTS QUALITY_SCRIPTS"
+          fi
+          for name in $required_names; do
+            result="${!name}"
+            echo "quality dependency result: $name=$result"
             if [ "$result" != success ]; then
               failed=1
             fi
