@@ -493,6 +493,21 @@ harness-gate verify --all
 分片记录 merge identity 并拒绝缺失或重复测试身份。有效的到期 waiver 使用
 机器可区分的 `WAIVED`，并包含审批和补偿控制证据。
 
+JSON producer 如果输出嵌套数组或数字摘要，应显式声明 `count_path`：
+
+```toml
+[parsers.json-results]
+kind = "json"
+count_path = "summary.total"
+minimum = 1
+```
+
+未配置时只自动发现裸顶层数组，或对象包装层中的一个受支持结果数组
+（`testcases`、`testCases`、`test_results`、`testResults`、`results`）。
+`duration_ms` 等任意数字、metadata/attachments 等无关数组、非数组字段和多个
+候选（即使长度相同）都会以 `RESULT_PARSE_FAILURE` 拒绝；显式路径无效时也不会
+回退自动发现。
+
 迁移时可重放串行请求、比较归一化结果并记录金丝雀/回滚：
 
 ```bash

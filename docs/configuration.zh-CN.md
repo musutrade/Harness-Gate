@@ -526,6 +526,28 @@ minimum = 1
 TRX 只接受单个 `TestRun` 根元素；命名空间前缀按 local name 识别。缺根、多根、根元素外非空内容以及
 其他 XML/JSON malformed 输入均记录 `RESULT_PARSE_FAILURE`。
 
+JSON 的 `count_path` 是非空的点分对象路径，只能指向数组或非负整数；不支持
+JSONPath、数组索引或通配符。例如：
+
+```toml
+[parsers.json-results]
+kind = "json"
+count_path = "summary.total"
+minimum = 1
+```
+
+未配置 `count_path` 时，为兼容现有 producer，自动发现只接受裸顶层数组，
+或对象（可有对象包装层）中恰好一个受支持字段的直接数组。字段名区分大小写，
+仅包括 `testcases`、`testCases`、`test_results`、`testResults` 和 `results`。
+不会进入结果数组元素继续查找。
+
+以下旧的宽松输入现在明确拒绝并记录 `RESULT_PARSE_FAILURE`：只有
+`duration_ms` 等任意数字、metadata/attachments 等无关数组、受支持字段却不是
+数组、以及多个候选字段（即使数组长度相同）。显式 `count_path` 缺失、指向
+负数/小数/布尔值/null/对象，或路径无效时也只会解析失败，不会回退自动发现。
+因此，依赖旧隐式数字计数的 producer 必须声明真实字段路径；合法数组和数字仍
+按 `minimum` 产生 `RESULT_ZERO`、`RESULT_PARTIAL` 或成功结果。
+
 ## 11. `[scope]` 和 `[[scope.rules]]`
 
 ```toml
