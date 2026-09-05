@@ -7,7 +7,9 @@ import argparse
 import json
 import os
 import re
+import shutil
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -16,6 +18,9 @@ from quality_common import CRATE, QUALITY_ROOT, fail, metadata, write_json
 
 
 SNAPSHOT = Path(__file__).with_name("snapshots") / "contracts.json"
+JSON_PARSE_FAILURE_FIXTURE = (
+    Path(__file__).with_name("fixtures") / "json-results" / "error_object.py"
+)
 
 
 def normalize(value: str, root: Path) -> str:
@@ -133,6 +138,33 @@ def scenario(
                 "[execution]\nparallel = true\nmax_parallel = 2\n",
             )
             flow.write_text(source)
+        elif setup == "verify-json-parse-failure":
+            init(root, binary, git=True)
+            (root / "fixtures").mkdir()
+            shutil.copy2(JSON_PARSE_FAILURE_FIXTURE, root / "fixtures" / "error_object.py")
+            flow = root / ".harness-gate" / "flow.toml"
+            interpreter = Path(sys.executable).name
+            flow.write_text(
+                flow.read_text()
+                + f"""
+
+[parsers.json-results]
+kind = "json"
+minimum = 1
+
+[[steps]]
+id = "fixture.json-parse-failure"
+label = "JSON parse failure fixture"
+component = "project"
+profiles = ["full"]
+program = {json.dumps(interpreter)}
+args = ["fixtures/error_object.py"]
+cwd = "{{root}}"
+log = "json_parse_failure.log"
+timeout_secs = 60
+parser = "json-results"
+"""
+            )
         result = command(binary, root, args)
         stdout = normalize(result.stdout, root)
         stderr = normalize(result.stderr, root)
@@ -151,6 +183,44 @@ def scenario(
                     result.stdout,
                     result.stderr,
                 )
+        contract_error = None
+        if name == "verify-json-parse-failure":
+            if result.returncode == 0:
+                contract_error = "fixture unexpectedly passed"
+            elif not report_path.is_file():
+                contract_error = "verification report was not written"
+            else:
+                report = json.loads(report_path.read_text())
+                raw_log = root / ".harness-gate" / "reports" / "logs" / "json_parse_failure.log"
+                if not raw_log.is_file() or raw_log.read_text().strip() != (
+                    '{"duration_ms":5000,"status":"error"}'
+                ):
+                    contract_error = "fixture did not emit the expected JSON error object"
+                fixture_steps = [
+                    step
+                    for step in report.get("steps", [])
+                    if step.get("label") == "JSON parse failure fixture"
+                ]
+                if contract_error is not None:
+                    pass
+                elif len(fixture_steps) != 1:
+                    contract_error = "fixture step missing or duplicated in report"
+                else:
+                    fixture_step = fixture_steps[0]
+                    parser = fixture_step.get("parser")
+                    if report.get("status") != "FAIL" or report.get("passed") is not False:
+                        contract_error = "verification report did not record failure"
+                    elif not any(
+                        failure.get("code") == "RESULT_PARSE_FAILURE"
+                        for failure in report.get("failures", [])
+                    ):
+                        contract_error = "verification report failures omitted RESULT_PARSE_FAILURE"
+                    elif fixture_step.get("failure_code") != "RESULT_PARSE_FAILURE":
+                        contract_error = "fixture did not report RESULT_PARSE_FAILURE"
+                    elif not isinstance(parser, dict) or parser.get("complete") is not False:
+                        contract_error = "fixture parser evidence was not incomplete"
+                    elif fixture_step.get("passed") is not False:
+                        contract_error = "fixture step unexpectedly passed"
         record = {
             "name": name,
             "args": args,
@@ -161,8 +231,12 @@ def scenario(
             "error_codes": error_codes,
             "ansi": "\x1b[" in combined,
             "reports": report_snapshot(root, selected_reports),
-            "status": "pass" if result.returncode == expected else "fail",
+            "status": "pass"
+            if result.returncode == expected and contract_error is None
+            else "fail",
         }
+        if contract_error is not None:
+            record["contract_error"] = contract_error
         if expected_order is not None:
             record["publication_order"] = publication_order
         return record
@@ -201,6 +275,14 @@ def collect(binary: Path, staged_secrets: bool = True) -> list[dict[str, Any]]:
             ["secret scan", "architecture audit", "Git whitespace check", "staged Git whitespace check"],
         ),
         scenario(binary, "verify-failure", ["verify", "--all"], 1, "verify-failure", ["test_result.json", "test_result.md"]),
+        scenario(
+            binary,
+            "verify-json-parse-failure",
+            ["verify", "--all"],
+            1,
+            "verify-json-parse-failure",
+            ["test_result.json", "test_result.md"],
+        ),
         scenario(binary, "verify-one-step", ["step", "project.diff-check"], 0, "git", ["test_result.json", "test_result.md"]),
         scenario(binary, "unknown-profile", ["verify", "--all", "--profile", "missing"], 1, "init"),
         scenario(binary, "unknown-step", ["step", "missing.step"], 1, "init"),
