@@ -408,6 +408,23 @@ results expose a merge identity and reject missing or duplicate test identities.
 An approved expiring waiver is machine-distinct as `WAIVED` and includes its
 approval and compensating-control evidence.
 
+For JSON parsers, configure `count_path` when the producer exposes a numeric
+summary or a nested result array:
+
+```toml
+[parsers.json-results]
+kind = "json"
+count_path = "summary.total"
+minimum = 1
+```
+
+Without `count_path`, only a bare root array or one recognized result array
+(`testcases`, `testCases`, `test_results`, `testResults`, or `results`) is
+discovered, including through object wrappers. Arbitrary numbers such as
+`duration_ms`, unrelated arrays, non-array recognized fields, and ambiguous
+multiple candidates are rejected with `RESULT_PARSE_FAILURE`; explicit invalid
+paths never fall back to discovery.
+
 Each invocation also publishes `artifact-registry.json` and `manifest.json`, described by the
 [artifact registry schema](https://github.com/musutrade/Harness-Gate/blob/main/schema/artifact-registry.schema.json)
 and [artifact manifest schema](https://github.com/musutrade/Harness-Gate/blob/main/schema/artifact-manifest.schema.json).

@@ -379,6 +379,175 @@ fn parser_failure_marks_step_failed() {
         .contains("expected at least 1"));
 }
 
+#[cfg(unix)]
+#[test]
+fn json_parser_compatibility_preserves_success_zero_partial_and_command_failures() {
+    fn run_json_fixture(
+        name: &str,
+        output: &str,
+        parser: ParserConfig,
+        exit_status: i32,
+    ) -> crate::verify::VerificationReport {
+        let (_workspace, mut project) = generic_project(name);
+        project.config.steps[0].program = "sh".into();
+        project.config.steps[0].args = vec![
+            "-c".into(),
+            format!("printf '%s' '{output}'; exit {exit_status}"),
+        ];
+        project.config.parsers.insert("json-results".into(), parser);
+        project.config.steps[0].parser = Some("json-results".into());
+        run(&project, ScopeResult::all(&project), "full", false).expect("verify fixture")
+    }
+
+    let success = run_json_fixture(
+        "verify-json-success",
+        r#"{"results":[{},{}]}"#,
+        ParserConfig::Json {
+            count_path: None,
+            minimum: 2,
+        },
+        0,
+    );
+    let success_step = success
+        .steps
+        .iter()
+        .find(|step| step.label == "Git whitespace check")
+        .expect("success fixture step");
+    assert!(success.passed);
+    assert!(success_step.passed);
+    assert_eq!(success_step.failure_code, None);
+    assert_eq!(
+        success_step.parser.as_ref().map(|parser| (
+            parser.observed,
+            parser.minimum,
+            parser.complete
+        )),
+        Some((2, 2, true))
+    );
+
+    let zero = run_json_fixture(
+        "verify-json-zero",
+        r#"{"results":[]}"#,
+        ParserConfig::Json {
+            count_path: None,
+            minimum: 1,
+        },
+        0,
+    );
+    let zero_step = zero
+        .steps
+        .iter()
+        .find(|step| step.label == "Git whitespace check")
+        .expect("zero fixture step");
+    assert!(!zero.passed);
+    assert_eq!(
+        zero_step
+            .failure_code
+            .map(|code| code.to_string())
+            .as_deref(),
+        Some("RESULT_ZERO")
+    );
+    assert_eq!(
+        zero_step
+            .parser
+            .as_ref()
+            .map(|parser| (parser.observed, parser.minimum, parser.complete)),
+        Some((0, 1, false))
+    );
+
+    let partial = run_json_fixture(
+        "verify-json-partial",
+        r#"{"results":[{}]}"#,
+        ParserConfig::Json {
+            count_path: None,
+            minimum: 2,
+        },
+        0,
+    );
+    let partial_step = partial
+        .steps
+        .iter()
+        .find(|step| step.label == "Git whitespace check")
+        .expect("partial fixture step");
+    assert!(!partial.passed);
+    assert_eq!(
+        partial_step
+            .failure_code
+            .map(|code| code.to_string())
+            .as_deref(),
+        Some("RESULT_PARTIAL")
+    );
+    assert_eq!(
+        partial_step.parser.as_ref().map(|parser| (
+            parser.observed,
+            parser.minimum,
+            parser.complete
+        )),
+        Some((1, 2, false))
+    );
+
+    let command_failure = run_json_fixture(
+        "verify-json-command-failure",
+        r#"{"results":[{},{}]}"#,
+        ParserConfig::Json {
+            count_path: None,
+            minimum: 1,
+        },
+        7,
+    );
+    let command_failure_step = command_failure
+        .steps
+        .iter()
+        .find(|step| step.label == "Git whitespace check")
+        .expect("command failure fixture step");
+    assert!(!command_failure.passed);
+    assert!(!command_failure_step.passed);
+    assert_eq!(command_failure_step.failure_code, None);
+    assert!(command_failure_step
+        .detail
+        .as_deref()
+        .is_some_and(|detail| detail.contains("exit code 7")));
+    assert!(
+        command_failure_step.parser.is_none(),
+        "a command failure must not be masked by parser success"
+    );
+}
+
+#[cfg(unix)]
+#[test]
+fn json_parser_explicit_numeric_path_preserves_count_and_minimum() {
+    let (_workspace, mut project) = generic_project("verify-json-explicit-number");
+    project.config.steps[0].program = "sh".into();
+    project.config.steps[0].args = vec![
+        "-c".into(),
+        r#"printf '%s' '{"summary":{"total":3},"results":[]}'"#.into(),
+    ];
+    project.config.parsers.insert(
+        "json-results".into(),
+        ParserConfig::Json {
+            count_path: Some("summary.total".into()),
+            minimum: 3,
+        },
+    );
+    project.config.steps[0].parser = Some("json-results".into());
+
+    let report = run(&project, ScopeResult::all(&project), "full", false)
+        .expect("explicit numeric JSON fixture");
+    let step = report
+        .steps
+        .iter()
+        .find(|step| step.label == "Git whitespace check")
+        .expect("explicit numeric fixture step");
+    assert!(report.passed);
+    assert!(step.passed);
+    assert_eq!(
+        step.parser
+            .as_ref()
+            .map(|parser| (parser.observed, parser.minimum, parser.complete)),
+        Some((3, 3, true))
+    );
+}
+
 #[test]
 fn gate_failure_writes_compatible_report() {
     let (workspace, project) = generic_project("verify-gate-failure");
