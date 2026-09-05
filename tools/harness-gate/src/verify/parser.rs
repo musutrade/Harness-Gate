@@ -222,6 +222,11 @@ fn count_xml_elements(content: &str, wanted: &[u8], allowed_roots: &[&[u8]]) -> 
 
 fn count_json_results(value: &Value, path: Option<&str>) -> Result<usize> {
     if let Some(path) = path {
+        if path.split('.').any(|segment| segment.is_empty()) {
+            return Err(anyhow::anyhow!(
+                "JSON result path {path:?} must be a non-empty dot path"
+            ));
+        }
         let mut current = value;
         for segment in path.split('.') {
             current = current
@@ -230,41 +235,93 @@ fn count_json_results(value: &Value, path: Option<&str>) -> Result<usize> {
         }
         return match current {
             Value::Array(items) => Ok(items.len()),
-            Value::Number(number) => number
-                .as_u64()
-                .map(|count| count as usize)
-                .ok_or_else(|| anyhow::anyhow!("JSON result count at {path:?} is not an integer")),
+            Value::Number(number) => {
+                let count = number.as_u64().ok_or_else(|| {
+                    anyhow::anyhow!("JSON result count at {path:?} is not a non-negative integer")
+                })?;
+                usize::try_from(count).map_err(|_| {
+                    anyhow::anyhow!("JSON result count at {path:?} does not fit in usize")
+                })
+            }
             _ => Err(anyhow::anyhow!(
                 "JSON result path {path:?} must be an array or integer"
             )),
         };
     }
 
-    fn discover(value: &Value) -> Option<usize> {
-        match value {
-            Value::Object(map) => {
-                for key in [
-                    "testcases",
-                    "testCases",
-                    "test_results",
-                    "testResults",
-                    "results",
-                ] {
-                    if let Some(candidate) = map.get(key) {
-                        if let Some(count) = discover(candidate) {
-                            return Some(count);
-                        }
-                    }
-                }
-                map.values().find_map(discover)
-            }
-            Value::Array(items) => Some(items.len()),
-            Value::Number(number) => number.as_u64().map(|count| count as usize),
-            _ => None,
+    const SUPPORTED_FIELDS: [&str; 5] = [
+        "testcases",
+        "testCases",
+        "test_results",
+        "testResults",
+        "results",
+    ];
+
+    fn discover(value: &Value, path: &str, candidates: &mut Vec<(String, usize)>) -> Result<()> {
+        let Value::Object(map) = value else {
+            return Ok(());
+        };
+
+        for field in SUPPORTED_FIELDS {
+            let Some(candidate) = map.get(field) else {
+                continue;
+            };
+            let candidate_path = if path.is_empty() {
+                field.to_owned()
+            } else {
+                format!("{path}.{field}")
+            };
+            let Value::Array(items) = candidate else {
+                return Err(anyhow::anyhow!(
+                    "JSON result field {candidate_path:?} must be an array"
+                ));
+            };
+            candidates.push((candidate_path, items.len()));
         }
+
+        // Only object wrappers may be traversed. In particular, arrays are
+        // result containers, not search roots for unrelated nested values.
+        for (field, child) in map {
+            if SUPPORTED_FIELDS.contains(&field.as_str()) {
+                continue;
+            }
+            if child.is_object() {
+                let child_path = if path.is_empty() {
+                    field.to_owned()
+                } else {
+                    format!("{path}.{field}")
+                };
+                discover(child, &child_path, candidates)?;
+            }
+        }
+        Ok(())
     }
 
-    discover(value).ok_or_else(|| anyhow::anyhow!("JSON test results contain no countable results"))
+    if let Value::Array(items) = value {
+        return Ok(items.len());
+    }
+
+    let mut candidates = Vec::new();
+    discover(value, "", &mut candidates)?;
+    match candidates.as_slice() {
+        [] => Err(anyhow::anyhow!(
+            "JSON test results contain no supported result array"
+        )),
+        [(path, count)] => {
+            let _ = path;
+            Ok(*count)
+        }
+        _ => {
+            let paths = candidates
+                .iter()
+                .map(|(path, _)| path.as_str())
+                .collect::<Vec<_>>()
+                .join(", ");
+            Err(anyhow::anyhow!(
+                "JSON test results contain ambiguous result arrays at {paths}"
+            ))
+        }
+    }
 }
 
 #[cfg(test)]
@@ -313,6 +370,120 @@ mod tests {
             parse_result_count(r#"{"summary":{"total":3}}"#, &parser).unwrap(),
             (3, 3)
         );
+    }
+
+    #[test]
+    fn parses_json_explicit_array_path() {
+        let parser = ParserConfig::Json {
+            count_path: Some("summary.results".into()),
+            minimum: 1,
+        };
+        assert_eq!(
+            parse_result_count(r#"{"summary":{"results":[{},{}]}}"#, &parser).unwrap(),
+            (2, 1)
+        );
+    }
+
+    #[test]
+    fn parses_json_explicit_non_negative_integer_path() {
+        let parser = ParserConfig::Json {
+            count_path: Some("summary.total".into()),
+            minimum: 1,
+        };
+        assert_eq!(
+            parse_result_count(r#"{"summary":{"total":2}}"#, &parser).unwrap(),
+            (2, 1)
+        );
+    }
+
+    #[test]
+    fn rejects_invalid_explicit_path_without_auto_discovery_fallback() {
+        let parser = ParserConfig::Json {
+            count_path: Some("summary.missing".into()),
+            minimum: 1,
+        };
+        assert!(parse_result_count(r#"{"results":[{},{}]}"#, &parser).is_err());
+        let parser = ParserConfig::Json {
+            count_path: Some("results.".into()),
+            minimum: 1,
+        };
+        assert!(parse_result_count(r#"{"results":[{}]}"#, &parser).is_err());
+
+        let parser = ParserConfig::Json {
+            count_path: Some("summary.total".into()),
+            minimum: 1,
+        };
+        assert!(parse_result_count(r#"{"summary":{"total":-1},"results":[{}]}"#, &parser).is_err());
+        assert!(
+            parse_result_count(r#"{"summary":{"total":1.5},"results":[{}]}"#, &parser).is_err()
+        );
+        assert!(
+            parse_result_count(r#"{"summary":{"total":true},"results":[{}]}"#, &parser).is_err()
+        );
+    }
+
+    #[test]
+    fn auto_discovers_root_and_wrapped_supported_result_arrays() {
+        let parser = ParserConfig::Json {
+            count_path: None,
+            minimum: 1,
+        };
+        assert_eq!(parse_result_count(r#"[{},{}]"#, &parser).unwrap(), (2, 1));
+        assert_eq!(
+            parse_result_count(r#"{"suite":{"results":[{},{}]}}"#, &parser).unwrap(),
+            (2, 1)
+        );
+        assert_eq!(
+            parse_result_count(r#"{"testCases":[{}]}"#, &parser).unwrap(),
+            (1, 1)
+        );
+    }
+
+    #[test]
+    fn auto_discovery_rejects_error_objects_and_unrelated_nested_arrays() {
+        let parser = ParserConfig::Json {
+            count_path: None,
+            minimum: 1,
+        };
+        assert!(parse_result_count(
+            r#"{"duration_ms":5000,"status":"error","message":"failed"}"#,
+            &parser
+        )
+        .is_err());
+        assert!(parse_result_count(r#"{"metadata":{"attachments":[{},{}]}}"#, &parser).is_err());
+        assert!(parse_result_count(
+            r#"{"results":[{}],"metadata":{"attachments":[{},{}]}}"#,
+            &parser
+        )
+        .is_ok());
+        assert_eq!(
+            parse_result_count(r#"{"duration_ms":5000,"results":[]}"#, &parser).unwrap(),
+            (0, 1)
+        );
+    }
+
+    #[test]
+    fn auto_discovery_rejects_ambiguous_candidates_even_when_lengths_match() {
+        let parser = ParserConfig::Json {
+            count_path: None,
+            minimum: 1,
+        };
+        assert!(parse_result_count(r#"{"results":[{}],"testcases":[{}]}"#, &parser).is_err());
+        assert!(
+            parse_result_count(r#"{"results":[{}],"suite":{"testResults":[{}]}}"#, &parser)
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn auto_discovery_rejects_non_array_supported_fields() {
+        let parser = ParserConfig::Json {
+            count_path: None,
+            minimum: 1,
+        };
+        assert!(parse_result_count(r#"{"results":2}"#, &parser).is_err());
+        assert!(parse_result_count(r#"{"results":{}}"#, &parser).is_err());
+        assert!(parse_result_count(r#"{"results":null}"#, &parser).is_err());
     }
 
     #[test]
