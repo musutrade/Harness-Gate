@@ -5,7 +5,7 @@ quality evidence. They invoke the Rust CLI and Cargo tooling, retain their raw
 output, and turn it into reviewable JSON/Markdown summaries. They are not
 linked into, packaged with, or executed by the `harness-gate` release binary.
 
-Run from the repository root with Python >=3.11, stable Rust plus
+Run from the repository root with Python >=3.12, stable Rust plus
 `llvm-tools-preview`, cargo-nextest and cargo-llvm-cov **0.9.0** installed.
 The collector uses a fresh workspace-local target; standalone commands should
 also override an ambient shared/read-only Cargo target:
