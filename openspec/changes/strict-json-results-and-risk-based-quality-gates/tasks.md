@@ -28,11 +28,16 @@ S = 小于 1 小时，M = 1–2 小时，L = 2–不足 4 小时；超出估算�
 
 ## 4. Add reproducible function risk evidence
 
-- [ ] 4.1 [P2][L] 实现复杂度输出与 LLVM 源函数/区域映射及实例去重；验收：同名函数、泛型实例、闭包、未命中函数和源移动 fixture 不会错配或漏报。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
-- [ ] 4.2 [P2][M] 输出 `risk.json/risk.md` 和版本化 `crap_line`；验收：`CC=10,cov=0.8` 得到 10.8，阈值比较不用舍入值且每项链接原始证据。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
-- [ ] 4.3 [P2][M] 增加 line/function/region 分项和 branch supported/unsupported 状态；验收：无分支插桩不会被呈现为 0%/100%，关键 line/region 门禁不被禁用。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
-- [ ] 4.4 [P2][L] 实现 base/head 增量函数集合与 CRAP/high-risk 规则；验收：新增/修改超阈值失败，移动/拆分不能逃逸，未修改历史债务单列不伪称达标。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
-- [ ] 4.5 [P2][M] 校验例外记录、series 和证据完整性；验收：缺 base、不兼容工具、陈旧 profile、缺字段/过期例外失败，有效例外不把失败变绿。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
+Validation: [GH-92 implementation evidence](../../../docs/quality/gh-92-validation.md)
+(301 Rust tests, 85 Python tests, fmt/clippy, docs consistency and strict OpenSpec
+validation; project-local config/ci checks not applicable). This covers 4.1–4.5
+only and does not accept the remaining change or a production baseline.
+
+- [x] 4.1 [P2][L] 实现复杂度输出与 LLVM 源函数/区域映射及实例去重；验收：同名函数、泛型实例、闭包、未命中函数和源移动 fixture 不会错配或漏报。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
+- [x] 4.2 [P2][M] 输出 `risk.json/risk.md` 和版本化 `crap_line`；验收：`CC=10,cov=0.8` 得到 10.8，阈值比较不用舍入值且每项链接原始证据。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
+- [x] 4.3 [P2][M] 增加 line/function/region 分项和 branch supported/unsupported 状态；验收：无分支插桩不会被呈现为 0%/100%，关键 line/region 门禁不被禁用。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
+- [x] 4.4 [P2][L] 实现 base/head 增量函数集合与 CRAP/high-risk 规则；验收：新增/修改超阈值失败，移动/拆分不能逃逸，未修改历史债务单列不伪称达标。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
+- [x] 4.5 [P2][M] 校验例外记录、series 和证据完整性；验收：缺 base、不兼容工具、陈旧 profile、缺字段/过期例外失败，有效例外不把失败变绿。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
 
 ## 5. Cover orchestration and lifecycle failures
 
