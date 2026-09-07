@@ -50,8 +50,9 @@ frozen syntax subset (braced closures only)`.
 
 Other failures include `expected an item, found 'const'` in task construction
 and adapter code, and `unterminated item` in verification orchestration. These
-failures precede the refactor. A temporary, uncommitted expression-closure probe
-still failed on production syntax; its output is not accepted evidence.
+failures precede the refactor. A temporary analyzer probe was extended to parse all six selected base/head
+files. Its unversioned output is not accepted evidence, and the frozen analyzer
+is unchanged. Parsing support alone does not resolve the mapping failures below.
 
 The [frozen analyzer contract](complexity-analyzer.md) and
 [function mapping contract](function-risk.md) prohibit silently dropping
@@ -67,6 +68,48 @@ must then be measured with that same series, all extracted functions must be
 checked individually, and historical debt must be reported separately. The
 frozen risk tooling and its thresholds are unchanged by this draft.
 
+## Follow-up: independently reproduced coverage gap
+
+A standalone Rust program now reproduces a second blocker independently of the
+analyzer. The [complete source, exact commands, toolchain and raw LLVM export](gh-94-coverage-gap.json)
+are retained together. All four commands exited 0; the executable asserts both
+true and false outcomes for each of these closures:
+
+```rust
+fn field_only(steps: &[Step]) -> bool { steps.iter().all(|step| step.passed) }
+fn method_call(steps: &[String]) -> bool { steps.iter().all(|step| step.is_empty()) }
+```
+
+With `rustc -C instrument-coverage -C opt-level=0`, LLVM exports four functions:
+`main`, both named functions, and the `method_call` closure. It exports **no
+function record for the `field_only` closure**, despite executing it. The same
+absence occurs in the retained production exports for
+`verify/mod.rs::run_selected` (`|step| step.passed`, base line 270/head line 282)
+and `verify/steps.rs::run_configured_step` (`|policy| policy.backoff_ms`, line 93).
+This record reports absence, without inferring an optimizer cause or assigning
+coverage to the missing function.
+
+The probe also encounters LLVM closures inside macros in `app/commands.rs`
+(`println!`, base line 247/head line 270) and `process/adapter.rs` (`format!`,
+base line 450/head line 574), whose token bodies the frozen analyzer explicitly
+skips. Expression-closure region endpoints can also precede closing call
+parentheses, so the frozen exact-end source join cannot accept them. These are
+separate mapping requirements, not merely missing lexer syntax.
+
+The probe was not promoted: accepting it would require a versioned, fixture-tested
+syntax/mapping contract and explicit review of unmeasurable ranges. The current
+contract requires missing production functions to fail closed. No closure was
+silently dropped, no missing counter was synthesized, and no baseline or
+threshold was changed. GH-92's own validation record explicitly deferred
+production hotspot evidence; its closed tracker state supplies no such evidence.
+
+Reproduce the standalone program by writing the artifact's `source.text` to its
+`source.path`, then running its four recorded commands. The raw profiles and
+binary remain under `target/quality/gh-94/closure-reproducer/`. This is diagnostic
+evidence for the blocker, not a passing function-risk report. Tasks 6.1–6.6 and
+final handoff remain incomplete until the production measurement contract can
+represent these cases and both revisions pass the unchanged thresholds.
+
 ## Validation
 
 Complete local logs and raw exports are retained under `target/quality/gh-94/`.
@@ -78,8 +121,8 @@ Complete local logs and raw exports are retained under `target/quality/gh-94/`.
 | `cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check` | PASS (`fmt.log`) |
 | `CARGO_TARGET_DIR=target/gh-94-cargo cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings` | PASS (`clippy.log`) after removing two redundant borrows introduced by extraction |
 | `python3 -m unittest discover -s tools/quality/tests -v` | PASS: 85 tests (`quality-tests.log`) |
-| `CARGO_TARGET_DIR=target/gh-94-cargo python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json` | PASS: examples, migration, links and schemas (`docs-consistency-final.log`) |
-| `openspec validate strict-json-results-and-risk-based-quality-gates --strict` | PASS (`openspec.log`) |
+| `CARGO_TARGET_DIR=target/gh-94-cargo python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json` | PASS: examples, migration, links and schemas (`docs-consistency-final.log`); follow-up diagnostic documentation also passes (`docs-consistency-followup.log`) |
+| `openspec validate strict-json-results-and-risk-based-quality-gates --strict` | PASS (`openspec.log`); follow-up also valid (`openspec-followup.log`) |
 | `CARGO_TARGET_DIR=target/gh-94-coverage cargo llvm-cov nextest --manifest-path tools/harness-gate/Cargo.toml --locked --json --output-path target/quality/gh-94/base-coverage.json` | PASS: baseline instrumented suite, 308 tests, 0 skipped (`base-coverage.log`); 467 raw profiles retained in `base-profiles/` |
 | `CARGO_TARGET_DIR=target/gh-94-coverage cargo llvm-cov nextest --manifest-path tools/harness-gate/Cargo.toml --locked --json --output-path target/quality/gh-94/head-coverage.json` | PASS: final instrumented suite, 308 tests, 0 skipped (`head-coverage.log`); raw LLVM export retained, not accepted function-risk evidence |
 | `harness-gate config check` | NOT APPLICABLE: `.harness-gate/flow.toml` is absent |
