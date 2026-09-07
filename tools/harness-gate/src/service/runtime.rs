@@ -5,6 +5,12 @@ use std::collections::BTreeMap;
 use std::path::Path;
 use std::time::Duration;
 
+use super::commands::{
+    healthcheck_args, inspect_container_args, mapped_port_args, runtime_info_args,
+    start_container_args, stop_container_args,
+};
+use super::inspection::{parse_mapped_port, parse_runtime_inspection, RuntimeInspection};
+
 /// Small runtime boundary shared by Docker-compatible container engines.
 /// Keeping command execution behind this trait makes service orchestration
 /// independent of the selected CLI while preserving the existing adapter.
@@ -50,11 +56,7 @@ pub(crate) trait ContainerRuntime {
         if !output.status.success() {
             return Ok(None);
         }
-        Ok(String::from_utf8_lossy(&output.stdout)
-            .lines()
-            .next()
-            .and_then(|line| line.rsplit(':').next())
-            .map(str::to_string))
+        Ok(parse_mapped_port(&output.stdout))
     }
 
     fn run_healthcheck(
@@ -135,13 +137,6 @@ pub(crate) struct ContainerStartOptions<'a> {
     pub(crate) container_port: u16,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct RuntimeInspection {
-    pub(crate) object_id: String,
-    pub(crate) name: String,
-    pub(crate) labels: BTreeMap<String, String>,
-}
-
 pub(crate) fn stop_owned_container(
     runtime: ContainerRuntimeKind,
     cwd: &Path,
@@ -166,194 +161,5 @@ impl ContainerRuntime for ContainerRuntimeKind {
             ContainerRuntimeKind::Docker => "docker",
             ContainerRuntimeKind::Podman => "podman",
         }
-    }
-}
-
-fn start_container_args(
-    name: &str,
-    image: &str,
-    environment: &BTreeMap<String, String>,
-    labels: &BTreeMap<String, String>,
-    container_port: u16,
-) -> Vec<String> {
-    let mut args = vec![
-        "run".to_string(),
-        "--rm".into(),
-        "--detach".into(),
-        "--pull=never".into(),
-        "--name".into(),
-        name.to_string(),
-    ];
-    for (key, value) in environment {
-        args.extend(["--env".into(), format!("{key}={value}")]);
-    }
-    for (key, value) in labels {
-        args.extend(["--label".into(), format!("{key}={value}")]);
-    }
-    args.extend([
-        "--publish".into(),
-        format!("127.0.0.1::{container_port}"),
-        image.to_string(),
-    ]);
-    args
-}
-
-fn mapped_port_args(name: &str, container_port: u16) -> Vec<String> {
-    vec!["port".into(), name.into(), format!("{container_port}/tcp")]
-}
-
-fn healthcheck_args(name: &str, command: &[String]) -> Vec<String> {
-    let mut args = vec!["exec".into(), name.into()];
-    args.extend(command.iter().cloned());
-    args
-}
-
-fn stop_container_args(name: &str) -> Vec<String> {
-    vec!["rm".into(), "--force".into(), name.into()]
-}
-
-fn inspect_container_args(name: &str) -> Vec<String> {
-    vec![
-        "container".into(),
-        "inspect".into(),
-        "--format".into(),
-        "{{json .}}".into(),
-        name.into(),
-    ]
-}
-
-fn runtime_info_args() -> Vec<String> {
-    vec!["info".into()]
-}
-
-fn parse_runtime_inspection(raw: &[u8]) -> Result<RuntimeInspection> {
-    let value: serde_json::Value =
-        serde_json::from_slice(raw).context("runtime inspection is not valid JSON")?;
-    let object = value
-        .as_array()
-        .and_then(|items| items.first())
-        .unwrap_or(&value);
-    let object_id = object
-        .get("Id")
-        .or_else(|| object.get("ID"))
-        .and_then(serde_json::Value::as_str)
-        .filter(|id| !id.trim().is_empty())
-        .ok_or_else(|| anyhow::anyhow!("runtime inspection has no immutable object ID"))?
-        .to_string();
-    let name = object
-        .get("Name")
-        .or_else(|| {
-            object
-                .get("Names")
-                .and_then(serde_json::Value::as_array)
-                .and_then(|names| names.first())
-        })
-        .and_then(serde_json::Value::as_str)
-        .unwrap_or_default()
-        .trim_start_matches('/')
-        .to_string();
-    let labels_value = object
-        .get("Config")
-        .and_then(|config| config.get("Labels"))
-        .or_else(|| object.get("Labels"));
-    let mut labels = BTreeMap::new();
-    if let Some(map) = labels_value.and_then(serde_json::Value::as_object) {
-        for (key, value) in map {
-            let value = value
-                .as_str()
-                .ok_or_else(|| anyhow::anyhow!("runtime label {key:?} is not a string"))?;
-            labels.insert(key.clone(), value.to_string());
-        }
-    }
-    Ok(RuntimeInspection {
-        object_id,
-        name,
-        labels,
-    })
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{
-        healthcheck_args, inspect_container_args, mapped_port_args, runtime_info_args,
-        start_container_args, stop_container_args,
-    };
-    use crate::config::ContainerRuntimeKind;
-    use std::collections::BTreeMap;
-
-    #[test]
-    fn selects_the_expected_docker_compatible_executable() {
-        assert_eq!(ContainerRuntimeKind::Docker.executable(), "docker");
-        assert_eq!(ContainerRuntimeKind::Podman.executable(), "podman");
-    }
-
-    #[test]
-    fn builds_deterministic_start_arguments() {
-        let environment = BTreeMap::from([
-            ("ZED".to_string(), "last".to_string()),
-            ("ALPHA".to_string(), "first".to_string()),
-        ]);
-        assert_eq!(
-            start_container_args(
-                "fixture",
-                "postgres:16",
-                &environment,
-                &BTreeMap::new(),
-                5432
-            ),
-            vec![
-                "run",
-                "--rm",
-                "--detach",
-                "--pull=never",
-                "--name",
-                "fixture",
-                "--env",
-                "ALPHA=first",
-                "--env",
-                "ZED=last",
-                "--publish",
-                "127.0.0.1::5432",
-                "postgres:16",
-            ]
-        );
-    }
-
-    #[test]
-    fn builds_port_healthcheck_cleanup_and_info_arguments() {
-        assert_eq!(
-            mapped_port_args("fixture", 5432),
-            vec!["port", "fixture", "5432/tcp"]
-        );
-        assert_eq!(
-            healthcheck_args(
-                "fixture",
-                &["pg_isready".into(), "-U".into(), "test".into()]
-            ),
-            vec!["exec", "fixture", "pg_isready", "-U", "test"]
-        );
-        assert_eq!(
-            stop_container_args("fixture"),
-            vec!["rm", "--force", "fixture"]
-        );
-        assert_eq!(runtime_info_args(), vec!["info"]);
-        assert_eq!(
-            inspect_container_args("fixture"),
-            vec!["container", "inspect", "--format", "{{json .}}", "fixture"]
-        );
-    }
-
-    #[test]
-    fn parses_docker_style_inspection() {
-        let value = super::parse_runtime_inspection(
-            br#"[{"Id":"sha256:abc","Name":"/fixture","Config":{"Labels":{"harness-gate.owner":"harness-gate"}}}]"#,
-        )
-        .expect("inspection");
-        assert_eq!(value.object_id, "sha256:abc");
-        assert_eq!(value.name, "fixture");
-        assert_eq!(
-            value.labels.get("harness-gate.owner"),
-            Some(&"harness-gate".into())
-        );
     }
 }
