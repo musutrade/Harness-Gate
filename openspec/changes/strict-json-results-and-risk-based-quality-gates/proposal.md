@@ -1,6 +1,6 @@
 # Proposal: Strict JSON Results and Risk-Based Quality Gates
 
-**Status:** Proposed — planning only; implementation has not started  
+**Status:** Partially implemented — GH-93 tasks 5.1–5.6 locally validated; CI and acceptance pending. See [validation evidence](validation-gh-93.md). Other tasks are not certified by this record.
 **Date:** 2026-09-05  
 **Review baseline:** `c9101c3191be7a5fd639c64c3781ccb154e0ce34` / v0.3.7
 
@@ -58,7 +58,7 @@ Phase 1 baseline 和安全修复记录。
 
 ## Non-goals
 
-- 本轮只创建规划文档，不修改 Rust/Python/CI 实现，不提交、推送或创建 PR。
+- 初始规划阶段只创建文档；后续按 Issue 授权实施。GH-93 仅实施任务 5.1–5.6，不代表整个提案已接受。
 - 不修复未纳入本提案的 scope、调度性能或其他待评审问题。
 - 不重新设计 JUnit/TRX，不把“测试数量”扩展为通用测试结果成败解释器。
 - 不改变 CLI 参数、flow schema 版本、机器结果 schema 或 DevRail 权限。

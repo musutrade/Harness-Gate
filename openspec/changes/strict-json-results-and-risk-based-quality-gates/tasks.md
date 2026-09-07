@@ -1,8 +1,8 @@
 # Implementation Tasks
 
-本清单对应 [proposal](proposal.md) 和 [design](design.md)，全部任务尚未实施。
+本清单对应 [proposal](proposal.md) 和 [design](design.md)，实施进度以逐项验证证据为准。
 S = 小于 1 小时，M = 1–2 小时，L = 2–不足 4 小时；超出估算时继续拆分，
-不能把多个未验收步骤合并勾选。实现、提交/PR、远端 CI 和基线接受需后续授权。
+不能把多个未验收步骤合并勾选。实现与交付按 Issue 授权；本地验证不代表远端 CI 或基线接受。
 
 ## 1. Freeze evidence and measurement contracts
 
@@ -41,12 +41,14 @@ only and does not accept the remaining change or a production baseline.
 
 ## 5. Cover orchestration and lifecycle failures
 
-- [ ] 5.1 [P2][L] 补齐 doctor 各 check kind 的成功和失败测试；验收：调用真实 doctor 边界，覆盖 required/optional 结果而不是只构造报告。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
-- [ ] 5.2 [P2][L] 补齐 CLI 路由、selection/profile 及错误退出测试；验收：插桩 `app` 路径被执行，stdout/stderr/退出语义被断言。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
-- [ ] 5.3 [P2][L] 补齐 project discovery 和 staged snapshot 回归；验收：暂存有错/工作树无错与反向场景均按 snapshot 判定，失败时快照清理可观察。关联：[traceability spec](specs/critical-path-source-traceability/spec.md)。
-- [ ] 5.4 [P2][L] 补齐 service-core 续期、清理失败和所有权不确定测试；验收：fake runtime 记录未授权 remove 从未调用，失败保留租约/资源证据。关联：[traceability spec](specs/critical-path-source-traceability/spec.md)。
-- [ ] 5.5 [P2][L] 固化 verification 的 gate/取消/cleanup/report 错误优先顺序；验收：失败后仍发布应保留证据，取消与失败分类保持独立。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
-- [ ] 5.6 [P2][L] 补齐 configured task 的 runner、service env、isolation 和 shard 组合测试；验收：有效参数/环境及报告元数据一致，碰撞/错误配置不能执行。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
+GH-93 本地验收：[逐项证据与命令结果](validation-gh-93.md)；远端 CI 与整体提案接受仍待完成。
+
+- [x] 5.1 [P2][L] 补齐 doctor 各 check kind 的成功和失败测试；验收：调用真实 doctor 边界，覆盖 required/optional 结果而不是只构造报告。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
+- [x] 5.2 [P2][L] 补齐 CLI 路由、selection/profile 及错误退出测试；验收：插桩 `app` 路径被执行，stdout/stderr/退出语义被断言。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
+- [x] 5.3 [P2][L] 补齐 project discovery 和 staged snapshot 回归；验收：暂存有错/工作树无错与反向场景均按 snapshot 判定，失败时快照清理可观察。关联：[traceability spec](specs/critical-path-source-traceability/spec.md)。
+- [x] 5.4 [P2][L] 补齐 service-core 续期、清理失败和所有权不确定测试；验收：fake runtime 记录未授权 remove 从未调用，失败保留租约/资源证据。关联：[traceability spec](specs/critical-path-source-traceability/spec.md)。
+- [x] 5.5 [P2][L] 固化 verification 的 gate/取消/cleanup/report 错误优先顺序；验收：失败后仍发布应保留证据，取消与失败分类保持独立。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
+- [x] 5.6 [P2][L] 补齐 configured task 的 runner、service env、isolation 和 shard 组合测试；验收：有效参数/环境及报告元数据一致，碰撞/错误配置不能执行。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
 
 ## 6. Decompose selected high-risk functions
 
