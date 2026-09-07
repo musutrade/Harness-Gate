@@ -38,7 +38,7 @@ trait RuntimeOperations {
         project: &Project,
         name: &str,
         timeout: Duration,
-    ) -> Result<super::runtime::RuntimeInspection>;
+    ) -> Result<super::inspection::RuntimeInspection>;
 
     fn stop(
         &self,
@@ -58,7 +58,7 @@ impl RuntimeOperations for CliRuntimeOperations {
         project: &Project,
         name: &str,
         timeout: Duration,
-    ) -> Result<super::runtime::RuntimeInspection> {
+    ) -> Result<super::inspection::RuntimeInspection> {
         super::runtime::inspect_owned_container(runtime, project, name, timeout)
     }
 
@@ -247,7 +247,7 @@ impl ResourceLease {
     pub(crate) fn bind_runtime_identity(
         &self,
         project: &Project,
-        inspection: &super::runtime::RuntimeInspection,
+        inspection: &super::inspection::RuntimeInspection,
     ) -> Result<()> {
         let mut record = self
             .record
@@ -739,7 +739,7 @@ fn validate_runtime_ownership(
     project: &Project,
     path: &Path,
     record: &LeaseRecord,
-    inspection: &super::runtime::RuntimeInspection,
+    inspection: &super::inspection::RuntimeInspection,
 ) -> Result<()> {
     let expected_name = record.resource_name.as_deref().unwrap_or_default();
     if expected_name.trim().is_empty() {
@@ -963,7 +963,7 @@ mod tests {
     };
     use crate::config::ContainerRuntimeKind;
     use crate::project::Project;
-    use crate::service::runtime::RuntimeInspection;
+    use crate::service::inspection::RuntimeInspection;
     use crate::test_support::TestWorkspace;
     use std::collections::BTreeMap;
     use std::path::{Path, PathBuf};
