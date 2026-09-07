@@ -1,0 +1,51 @@
+{
+  "1": {
+    "commit": "c0e612351c2efd515fde96bcefad80c1365534a2",
+    "base_sha": "c0e612351c2efd515fde96bcefad80c1365534a2",
+    "run_id": "gh96-local-1",
+    "stages": {
+      "legacy": {
+        "seconds": 72.5195138229974,
+        "status": "success"
+      },
+      "matrix": {
+        "seconds": 231.25642567099567,
+        "status": "success"
+      },
+      "production": {
+        "error": "production exited 1; see production.log",
+        "seconds": 2.100776646999293,
+        "status": "failure"
+      },
+      "risk": {
+        "error": "base-coverage exited 100; see base-coverage.log",
+        "seconds": 34.16028006999841,
+        "status": "failure"
+      }
+    }
+  },
+  "2": {
+    "commit": "7753d02f99e83b290cf9fe2c9081bbaaa58480d6",
+    "base_sha": "c0e612351c2efd515fde96bcefad80c1365534a2",
+    "run_id": "gh96-local-2",
+    "stages": {
+      "legacy": {
+        "seconds": 72.50931806199515,
+        "status": "success"
+      },
+      "matrix": {
+        "error": "matrix exited 1; see matrix.log",
+        "seconds": 0.19103867599915247,
+        "status": "failure"
+      },
+      "production": {
+        "seconds": 2.166679240996018,
+        "status": "success"
+      },
+      "risk": {
+        "seconds": 70.3695460960007,
+        "status": "success"
+      }
+    }
+  }
+}
