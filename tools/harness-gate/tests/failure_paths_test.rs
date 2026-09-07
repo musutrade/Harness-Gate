@@ -727,6 +727,24 @@ fn extracted_cli_handlers_preserve_text_json_and_hook_snapshot_contracts() {
     assert_eq!(evidence["passed"], true);
     assert!(serde_json::to_string(&evidence).unwrap().contains("hook"));
     assert_sealed_evidence(&evidence);
+    // Reject an unusable temporary parent without leaving snapshot debris.
+    let not_directory = temporary.path().join("not-directory");
+    fs::write(&not_directory, "not a directory").unwrap();
+    let rejected = command(root.path())
+        .env("TMPDIR", &not_directory)
+        .args(["hook"])
+        .output()
+        .unwrap();
+    assert!(!rejected.status.success());
+    assert!(String::from_utf8_lossy(&rejected.stderr).contains("create staged snapshot"));
+    let rejected = command(root.path())
+        .env("TMPDIR", temporary.path().join("missing"))
+        .args(["hook"])
+        .output()
+        .unwrap();
+    assert!(!rejected.status.success());
+    assert!(String::from_utf8_lossy(&rejected.stderr)
+        .contains("resolve staged snapshot temporary directory"));
 }
 
 #[test]
