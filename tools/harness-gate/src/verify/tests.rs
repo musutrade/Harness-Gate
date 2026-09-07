@@ -613,6 +613,33 @@ fn report_write_failure_returns_error() {
 }
 
 #[test]
+fn report_publication_error_precedes_gate_adapter_error_and_preserves_invocation_evidence() {
+    let (workspace, mut project) = generic_project("verify-gate-report-precedence");
+    project.audit_config = workspace.root.join("unreadable-audit");
+    fs::create_dir(&project.audit_config).unwrap();
+    fs::create_dir_all(project.reports.join("test_result.json")).unwrap();
+    let error = run(&project, ScopeResult::all(&project), "full", false).unwrap_err();
+    assert!(matches!(error, VerifyError::Report { .. }));
+    assert_eq!(error.code(), "E1404");
+    let invocations = fs::read_dir(project.reports.join("invocations")).unwrap();
+    let paths = invocations
+        .map(|entry| entry.unwrap().path())
+        .collect::<Vec<_>>();
+    assert_eq!(paths.len(), 1);
+    let json: serde_json::Value =
+        serde_json::from_slice(&fs::read(paths[0].join("test_result.json")).unwrap()).unwrap();
+    assert_eq!(json["passed"], false);
+    let steps = json["steps"].as_array().unwrap();
+    assert!(steps
+        .iter()
+        .any(|step| step["label"] == "architecture audit" && step["passed"] == false));
+    assert!(steps.iter().all(|step| step["cancelled"] == false));
+    assert_eq!(json["evidence_complete"], false);
+    assert!(!json["failures"].as_array().unwrap().is_empty());
+    assert!(!paths[0].join("manifest.json").exists());
+}
+
+#[test]
 fn webhook_connection_failure_maps_to_e1404() {
     let (workspace, mut project) = generic_project("verify-webhook-failure");
     let listener = std::net::TcpListener::bind(("127.0.0.1", 0)).expect("bind listener");
