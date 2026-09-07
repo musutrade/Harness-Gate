@@ -1,0 +1,319 @@
+{
+  "schema_version": 1,
+  "version": "production-source-1",
+  "source_root": "src",
+  "threshold": 80,
+  "metrics_version": "production-location-1",
+  "boundaries": {
+    "app": {
+      "blocking": true,
+      "files": [
+        "src/app/commands.rs",
+        "src/app/mod.rs",
+        "src/app/output.rs"
+      ]
+    },
+    "audit": {
+      "blocking": true,
+      "files": [
+        "src/audit/config.rs",
+        "src/audit/errors.rs",
+        "src/audit/log_parser.rs",
+        "src/audit/mod.rs",
+        "src/audit/model.rs",
+        "src/audit/report.rs",
+        "src/audit/runner.rs",
+        "src/audit/scanner/architecture.rs",
+        "src/audit/scanner/filter.rs",
+        "src/audit/scanner/hard_rules.rs",
+        "src/audit/scanner/lexical.rs",
+        "src/audit/scanner.rs"
+      ]
+    },
+    "cli": {
+      "blocking": false,
+      "files": [
+        "src/cli.rs"
+      ]
+    },
+    "compat": {
+      "blocking": false,
+      "files": [
+        "src/compat.rs"
+      ]
+    },
+    "config": {
+      "blocking": true,
+      "files": [
+        "src/config/diagnostic.rs",
+        "src/config/loader.rs",
+        "src/config/migration.rs",
+        "src/config/mod.rs",
+        "src/config/model.rs",
+        "src/config/path.rs",
+        "src/config/scope.rs",
+        "src/config/validation/mod.rs",
+        "src/config/validation/primitives.rs",
+        "src/config/validation/steps.rs"
+      ]
+    },
+    "doctor": {
+      "blocking": true,
+      "files": [
+        "src/doctor/checks.rs",
+        "src/doctor/mod.rs",
+        "src/doctor/report.rs"
+      ]
+    },
+    "error": {
+      "blocking": false,
+      "files": [
+        "src/error.rs"
+      ]
+    },
+    "failure": {
+      "blocking": false,
+      "files": [
+        "src/failure.rs"
+      ]
+    },
+    "lib": {
+      "blocking": false,
+      "files": [
+        "src/lib.rs"
+      ]
+    },
+    "main": {
+      "blocking": false,
+      "files": [
+        "src/main.rs"
+      ]
+    },
+    "net_policy": {
+      "blocking": false,
+      "files": [
+        "src/net_policy.rs"
+      ]
+    },
+    "preset": {
+      "blocking": false,
+      "files": [
+        "src/preset/catalog.rs",
+        "src/preset/filesystem.rs",
+        "src/preset/initialize.rs",
+        "src/preset/migration.rs",
+        "src/preset/mod.rs"
+      ]
+    },
+    "process": {
+      "blocking": true,
+      "files": [
+        "src/process/adapter.rs",
+        "src/process/capture.rs",
+        "src/process/command.rs",
+        "src/process/isolation.rs",
+        "src/process/mod.rs",
+        "src/process/reader.rs",
+        "src/process/signal.rs",
+        "src/process/task.rs"
+      ]
+    },
+    "project": {
+      "blocking": true,
+      "files": [
+        "src/project/discovery.rs",
+        "src/project/input.rs",
+        "src/project/mod.rs",
+        "src/project/paths.rs",
+        "src/project/runtime.rs"
+      ]
+    },
+    "scope": {
+      "blocking": true,
+      "files": [
+        "src/scope/detection.rs",
+        "src/scope/errors.rs",
+        "src/scope/mod.rs",
+        "src/scope/model.rs",
+        "src/scope/report.rs"
+      ]
+    },
+    "secrets": {
+      "blocking": true,
+      "files": [
+        "src/secrets/config.rs",
+        "src/secrets/matcher.rs",
+        "src/secrets/mod.rs"
+      ]
+    },
+    "service-core": {
+      "blocking": true,
+      "files": [
+        "src/service/commands.rs",
+        "src/service/docker.rs",
+        "src/service/inspection.rs",
+        "src/service/lease.rs",
+        "src/service/mod.rs",
+        "src/service/postgres.rs"
+      ]
+    },
+    "service-adapters": {
+      "blocking": false,
+      "files": [
+        "src/service/runtime.rs"
+      ]
+    },
+    "ui": {
+      "blocking": false,
+      "files": [
+        "src/ui.rs"
+      ]
+    },
+    "utils": {
+      "blocking": false,
+      "files": [
+        "src/utils/fs.rs",
+        "src/utils/git.rs",
+        "src/utils/mod.rs",
+        "src/utils/redaction.rs"
+      ]
+    },
+    "verify": {
+      "blocking": true,
+      "files": [
+        "src/verify/mod.rs",
+        "src/verify/parser.rs",
+        "src/verify/plan.rs",
+        "src/verify/report.rs",
+        "src/verify/scheduler.rs",
+        "src/verify/steps.rs",
+        "src/verify/waiver.rs"
+      ]
+    }
+  },
+  "exclusions": [
+    {
+      "path": "src/audit/tests.rs",
+      "kind": "test",
+      "reason": "Test-only module compiled under cfg(test)."
+    },
+    {
+      "path": "src/config/tests.rs",
+      "kind": "test",
+      "reason": "Test-only module compiled under cfg(test)."
+    },
+    {
+      "path": "src/doctor/tests.rs",
+      "kind": "test",
+      "reason": "Test-only module compiled under cfg(test)."
+    },
+    {
+      "path": "src/preset/tests.rs",
+      "kind": "test",
+      "reason": "Test-only module compiled under cfg(test)."
+    },
+    {
+      "path": "src/process/tests.rs",
+      "kind": "test",
+      "reason": "Test-only module compiled under cfg(test)."
+    },
+    {
+      "path": "src/project/tests.rs",
+      "kind": "test",
+      "reason": "Test-only module compiled under cfg(test)."
+    },
+    {
+      "path": "src/scope/benchmark.rs",
+      "kind": "benchmark-only",
+      "reason": "Performance fixture driver, not the production scope engine."
+    },
+    {
+      "path": "src/scope/tests.rs",
+      "kind": "test",
+      "reason": "Test-only module compiled under cfg(test)."
+    },
+    {
+      "path": "src/secrets/tests.rs",
+      "kind": "test",
+      "reason": "Test-only module compiled under cfg(test)."
+    },
+    {
+      "path": "src/service/tests.rs",
+      "kind": "test",
+      "reason": "Test-only module compiled under cfg(test)."
+    },
+    {
+      "path": "src/test_support.rs",
+      "kind": "test",
+      "reason": "Test-only module compiled under cfg(test)."
+    },
+    {
+      "path": "src/verify/tests.rs",
+      "kind": "test",
+      "reason": "Test-only module compiled under cfg(test)."
+    }
+  ],
+  "external_exclusions": [
+    {
+      "prefix": "tests/",
+      "kind": "test",
+      "reason": "Integration test drivers and fixtures are not production code."
+    }
+  ],
+  "inline_exclusions": {
+    "rule": "cfg-test-items-1",
+    "reason": "Items guarded by cfg(test), including nested helpers and inline modules; standalone test functions."
+  },
+  "unmapped_sources": [
+    {
+      "path": "src/audit/mod.rs",
+      "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
+      "sha256": "04d59fe4054e6be18c7a49b4b3eb9b7460627122fa76da7a0bacf1a3e1b04763"
+    },
+    {
+      "path": "src/audit/model.rs",
+      "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
+      "sha256": "bea0152d48729add7f29b057529bcb05c0be510f06f1c54822dc4f36e6b2027b"
+    },
+    {
+      "path": "src/audit/scanner.rs",
+      "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
+      "sha256": "86b43720c374320f98080c57ea5d525a516a186a2c18a4c8b4357863564f8986"
+    },
+    {
+      "path": "src/config/mod.rs",
+      "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
+      "sha256": "dace8de2f19e6744c2fe5ca63fb875988578d648f48914c34ac1426414f9242f"
+    },
+    {
+      "path": "src/doctor/mod.rs",
+      "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
+      "sha256": "c0b505800b8893d42e67a89027df0b7cee72f15d8ddfdce9d02d530da836c8fd"
+    },
+    {
+      "path": "src/lib.rs",
+      "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
+      "sha256": "e19a0df5524cb2fe7c5128312a5a0e58aff13468efc15be8a90ca4df2c8b4e06"
+    },
+    {
+      "path": "src/preset/mod.rs",
+      "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
+      "sha256": "531faf071925e5cdbe7eca8bb6519fcde371e56fb41b425878c9aa2c6a5d9caf"
+    },
+    {
+      "path": "src/process/mod.rs",
+      "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
+      "sha256": "31515d1f7356ab3ce2d0981c2eeec588c3181972d8610735a283ad3769d3b669"
+    },
+    {
+      "path": "src/scope/mod.rs",
+      "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
+      "sha256": "15907f6c2103a0d8f67718a8ff1221e04b5852519dec6f6d3d812e29add4cc28"
+    },
+    {
+      "path": "src/utils/mod.rs",
+      "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
+      "sha256": "c93da3bb9222a3893fafdefa65e2e455bb720e0b0b84d05b244bd061e3d58877"
+    }
+  ]
+}
