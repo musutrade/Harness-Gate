@@ -1,0 +1,225 @@
+{
+  "status": "measurement-error",
+  "base_commit": "764482ca64c754cdb56e3a3f97bc267023497736",
+  "analyzer": "harness-gate-complexity 0.1.1",
+  "rule": "mccabe-rust-1 version 1",
+  "head_identity": "SHA-256 of source bytes in this draft; no accepted function measurements",
+  "records": [
+    {
+      "revision": "base",
+      "source": "doctor/checks.rs",
+      "source_sha256": "c116936df9531e71a13a97711ea4de5c645b235f39fb575a5ecc66f079c61bb5",
+      "command": [
+        "python3",
+        "tools/quality/complexity_analyzer.py",
+        "--source",
+        "target/quality/gh-94/base-src/doctor/checks.rs",
+        "--source-root",
+        "target/quality/gh-94",
+        "--output",
+        "target/quality/gh-94/base-doctor-checks.rs.complexity.json"
+      ],
+      "exit_code": 1,
+      "error": "complexity analyzer failed: base-src/doctor/checks.rs:34:28: non-braced closure body is outside the frozen syntax subset (braced closures only)",
+      "log": "target/quality/gh-94/base-doctor-checks.rs.analyzer.log"
+    },
+    {
+      "revision": "base",
+      "source": "app/commands.rs",
+      "source_sha256": "976e635a17e959c2f22391890e8b5c20dbe393de51c86c20d38bad199ee1432a",
+      "command": [
+        "python3",
+        "tools/quality/complexity_analyzer.py",
+        "--source",
+        "target/quality/gh-94/base-src/app/commands.rs",
+        "--source-root",
+        "target/quality/gh-94",
+        "--output",
+        "target/quality/gh-94/base-app-commands.rs.complexity.json"
+      ],
+      "exit_code": 1,
+      "error": "complexity analyzer failed: base-src/app/commands.rs:32:42: non-braced closure body is outside the frozen syntax subset (braced closures only)",
+      "log": "target/quality/gh-94/base-app-commands.rs.analyzer.log"
+    },
+    {
+      "revision": "base",
+      "source": "verify/mod.rs",
+      "source_sha256": "c898a7787be3cd1368b66109a2496eaf2f067cbaba968f474741ca9c4c8bce7f",
+      "command": [
+        "python3",
+        "tools/quality/complexity_analyzer.py",
+        "--source",
+        "target/quality/gh-94/base-src/verify/mod.rs",
+        "--source-root",
+        "target/quality/gh-94",
+        "--output",
+        "target/quality/gh-94/base-verify-mod.rs.complexity.json"
+      ],
+      "exit_code": 1,
+      "error": "complexity analyzer failed: base-src/verify/mod.rs:end of input: unterminated item",
+      "log": "target/quality/gh-94/base-verify-mod.rs.analyzer.log"
+    },
+    {
+      "revision": "base",
+      "source": "verify/steps.rs",
+      "source_sha256": "662ada9a4724006e1e3a9e1ee9cb03e74c086c357867324baa2c84b2e9200cb9",
+      "command": [
+        "python3",
+        "tools/quality/complexity_analyzer.py",
+        "--source",
+        "target/quality/gh-94/base-src/verify/steps.rs",
+        "--source-root",
+        "target/quality/gh-94",
+        "--output",
+        "target/quality/gh-94/base-verify-steps.rs.complexity.json"
+      ],
+      "exit_code": 1,
+      "error": "complexity analyzer failed: base-src/verify/steps.rs:15:1: expected an item, found 'const'",
+      "log": "target/quality/gh-94/base-verify-steps.rs.analyzer.log"
+    },
+    {
+      "revision": "base",
+      "source": "process/adapter.rs",
+      "source_sha256": "67dd4999de14625fb3c349bbc0d5e0f8782e78234acf06dc3e03e29f626db135",
+      "command": [
+        "python3",
+        "tools/quality/complexity_analyzer.py",
+        "--source",
+        "target/quality/gh-94/base-src/process/adapter.rs",
+        "--source-root",
+        "target/quality/gh-94",
+        "--output",
+        "target/quality/gh-94/base-process-adapter.rs.complexity.json"
+      ],
+      "exit_code": 1,
+      "error": "complexity analyzer failed: base-src/process/adapter.rs:31:5: expected an item, found 'const'",
+      "log": "target/quality/gh-94/base-process-adapter.rs.analyzer.log"
+    },
+    {
+      "revision": "base",
+      "source": "verify/parser.rs",
+      "source_sha256": "d77b6bfdc5a23251517b1fdfc4d0107abea8776b9596542585f87661c4285d7c",
+      "command": [
+        "python3",
+        "tools/quality/complexity_analyzer.py",
+        "--source",
+        "target/quality/gh-94/base-src/verify/parser.rs",
+        "--source-root",
+        "target/quality/gh-94",
+        "--output",
+        "target/quality/gh-94/base-verify-parser.rs.complexity.json"
+      ],
+      "exit_code": 1,
+      "error": "complexity analyzer failed: base-src/verify/parser.rs:end of input: unterminated item",
+      "log": "target/quality/gh-94/base-verify-parser.rs.analyzer.log"
+    },
+    {
+      "revision": "head",
+      "source": "doctor/checks.rs",
+      "source_sha256": "3288b94edd6eba576cb325f64544ecff346ac6c733b810498d53a135124a74c4",
+      "command": [
+        "python3",
+        "tools/quality/complexity_analyzer.py",
+        "--source",
+        "tools/harness-gate/src/doctor/checks.rs",
+        "--source-root",
+        "tools/harness-gate",
+        "--output",
+        "target/quality/gh-94/head-doctor-checks.rs.complexity.json"
+      ],
+      "exit_code": 1,
+      "error": "complexity analyzer failed: src/doctor/checks.rs:34:28: non-braced closure body is outside the frozen syntax subset (braced closures only)",
+      "log": "target/quality/gh-94/head-doctor-checks.rs.analyzer.log"
+    },
+    {
+      "revision": "head",
+      "source": "app/commands.rs",
+      "source_sha256": "382a6b13001aa15c9217ba8e183d40351ff7deef0b87de7e62e09f00450b726c",
+      "command": [
+        "python3",
+        "tools/quality/complexity_analyzer.py",
+        "--source",
+        "tools/harness-gate/src/app/commands.rs",
+        "--source-root",
+        "tools/harness-gate",
+        "--output",
+        "target/quality/gh-94/head-app-commands.rs.complexity.json"
+      ],
+      "exit_code": 1,
+      "error": "complexity analyzer failed: src/app/commands.rs:32:42: non-braced closure body is outside the frozen syntax subset (braced closures only)",
+      "log": "target/quality/gh-94/head-app-commands.rs.analyzer.log"
+    },
+    {
+      "revision": "head",
+      "source": "verify/mod.rs",
+      "source_sha256": "eaa204963ef62a0eb8029dbc5141ce4cadd337f3218069b3ac53c7c9d00af29b",
+      "command": [
+        "python3",
+        "tools/quality/complexity_analyzer.py",
+        "--source",
+        "tools/harness-gate/src/verify/mod.rs",
+        "--source-root",
+        "tools/harness-gate",
+        "--output",
+        "target/quality/gh-94/head-verify-mod.rs.complexity.json"
+      ],
+      "exit_code": 1,
+      "error": "complexity analyzer failed: src/verify/mod.rs:end of input: unterminated item",
+      "log": "target/quality/gh-94/head-verify-mod.rs.analyzer.log"
+    },
+    {
+      "revision": "head",
+      "source": "verify/steps.rs",
+      "source_sha256": "7d97f5fc813e6e77253a32c0374446f64b520096bd28425f3ef45f31bc3320f4",
+      "command": [
+        "python3",
+        "tools/quality/complexity_analyzer.py",
+        "--source",
+        "tools/harness-gate/src/verify/steps.rs",
+        "--source-root",
+        "tools/harness-gate",
+        "--output",
+        "target/quality/gh-94/head-verify-steps.rs.complexity.json"
+      ],
+      "exit_code": 1,
+      "error": "complexity analyzer failed: src/verify/steps.rs:15:1: expected an item, found 'const'",
+      "log": "target/quality/gh-94/head-verify-steps.rs.analyzer.log"
+    },
+    {
+      "revision": "head",
+      "source": "process/adapter.rs",
+      "source_sha256": "ee7c61d9e41c703744734af4dca5e941583cd50670bfd96c53ab662690cb511f",
+      "command": [
+        "python3",
+        "tools/quality/complexity_analyzer.py",
+        "--source",
+        "tools/harness-gate/src/process/adapter.rs",
+        "--source-root",
+        "tools/harness-gate",
+        "--output",
+        "target/quality/gh-94/head-process-adapter.rs.complexity.json"
+      ],
+      "exit_code": 1,
+      "error": "complexity analyzer failed: src/process/adapter.rs:31:5: expected an item, found 'const'",
+      "log": "target/quality/gh-94/head-process-adapter.rs.analyzer.log"
+    },
+    {
+      "revision": "head",
+      "source": "verify/parser.rs",
+      "source_sha256": "75ae046db0b72a7c2d984283c5145e5e8a6e323412745046065de75ed3c2dc9b",
+      "command": [
+        "python3",
+        "tools/quality/complexity_analyzer.py",
+        "--source",
+        "tools/harness-gate/src/verify/parser.rs",
+        "--source-root",
+        "tools/harness-gate",
+        "--output",
+        "target/quality/gh-94/head-verify-parser.rs.complexity.json"
+      ],
+      "exit_code": 1,
+      "error": "complexity analyzer failed: src/verify/parser.rs:264:22: unsupported expression token ';'",
+      "log": "target/quality/gh-94/head-verify-parser.rs.analyzer.log"
+    }
+  ]
+}
