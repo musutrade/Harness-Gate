@@ -471,7 +471,9 @@ fn wait_for_adapter(
             None
         };
         if let Some(reason) = termination {
-            break terminate_adapter(child, reason)?;
+            break terminate(child).map_err(|error| {
+                AdapterError::Protocol(format!("terminate {reason} adapter: {error}"))
+            })?;
         }
         std::thread::sleep(Duration::from_millis(20));
     };
@@ -483,18 +485,6 @@ fn wait_for_adapter(
         request_write_error,
         request_write_done,
     })
-}
-
-fn terminate_adapter(
-    child: &mut std::process::Child,
-    reason: &str,
-) -> Result<std::process::ExitStatus, AdapterError> {
-    terminate(child)
-        .map_err(|error| AdapterError::Protocol(format!("terminate {reason} adapter: {error}")))?;
-    child
-        .try_wait()
-        .map_err(|error| AdapterError::Protocol(format!("reap {reason} adapter: {error}")))?
-        .ok_or_else(|| AdapterError::Protocol(format!("{reason} adapter did not exit")))
 }
 
 fn validate_process_output(
@@ -1342,6 +1332,110 @@ mod tests {
         let outcome = run(request, &policy).expect("fixture succeeds");
         assert_eq!(outcome.response["status"], "PASS");
         assert!(directory.path().join("adapter-result.txt").is_file());
+    }
+
+    #[test]
+    fn waiter_terminates_on_writer_failure_and_observed_output_limits() {
+        let root = tempdir().unwrap();
+        let (request, policy) = fixture_request(root.path(), "stable");
+        for cause in ["write-error", "disconnect", "stdout", "stderr"] {
+            let mut command = Command::new(&request.adapter.executable);
+            command.args(["-c", "import time; time.sleep(30)"]);
+            isolate_process_tree(&mut command);
+            let mut child = command.spawn().unwrap();
+            let (sender, receiver) = mpsc::sync_channel(1);
+            if cause == "write-error" {
+                sender
+                    .send(Err(io::Error::new(
+                        io::ErrorKind::BrokenPipe,
+                        "fixture writer failure",
+                    )))
+                    .unwrap();
+            } else if cause != "disconnect" {
+                sender.send(Ok(())).unwrap();
+            }
+            drop(sender);
+            let stdout = AtomicBool::new(cause == "stdout");
+            let stderr = AtomicBool::new(cause == "stderr");
+            let exit = wait_for_adapter(
+                &mut child,
+                &receiver,
+                [&stdout, &stderr],
+                &policy,
+                5_000,
+                Instant::now(),
+                &|| false,
+            )
+            .unwrap();
+            assert!(!exit.status.success());
+            assert!(!exit.timed_out && !exit.was_cancelled);
+            assert!(child.try_wait().unwrap().is_some(), "child must be reaped");
+            match cause {
+                "write-error" => assert!(exit
+                    .request_write_error
+                    .unwrap()
+                    .to_string()
+                    .contains("fixture writer failure")),
+                "disconnect" => assert!(exit
+                    .request_write_error
+                    .unwrap()
+                    .to_string()
+                    .contains("writer disconnected")),
+                stream => assert_eq!(exit.output_limited.unwrap().0, stream),
+            }
+        }
+    }
+
+    #[test]
+    fn output_validation_retains_stream_precedence_and_combined_budget() {
+        let root = tempdir().unwrap();
+        let (request, mut policy) = fixture_request(root.path(), "stable");
+        let status = Command::new(&request.adapter.executable)
+            .args(["-c", "pass"])
+            .status()
+            .unwrap();
+        policy.max_stdout_bytes = 4;
+        policy.max_stderr_bytes = 5;
+        policy.max_output_bytes = 6;
+        for (observed, truncated, expected) in [
+            (Some(("stdout", 4)), (false, false), "stdout"),
+            (Some(("stderr", 5)), (true, false), "stderr"),
+            (None, (true, true), "stdout"),
+            (None, (false, true), "stderr"),
+            (None, (false, false), "combined"),
+        ] {
+            let output = ProcessOutput {
+                status,
+                timed_out: false,
+                was_cancelled: false,
+                output_limited: observed,
+                request_write_error: None,
+                stdout: super::super::reader::LimitedOutput {
+                    bytes: vec![0; 4],
+                    truncated: truncated.0,
+                },
+                stderr: super::super::reader::LimitedOutput {
+                    bytes: vec![0; 5],
+                    truncated: truncated.1,
+                },
+            };
+            match validate_process_output(&output, &policy).unwrap_err() {
+                AdapterError::OutputLimit {
+                    stream,
+                    limit,
+                    captured,
+                } => {
+                    assert_eq!(stream, expected);
+                    let (expected_limit, expected_captured) = match expected {
+                        "stdout" => (4, 4),
+                        "stderr" => (5, 5),
+                        _ => (6, 9),
+                    };
+                    assert_eq!((limit, captured), (expected_limit, expected_captured));
+                }
+                error => panic!("unexpected error: {error}"),
+            }
+        }
     }
 
     #[test]

@@ -1,0 +1,295 @@
+#!/usr/bin/env python3
+"""Version 2 AST inventory, distinguishing closure instrumentation and LLVM join.
+
+This opt-in development series leaves the version 1 analyzer reproducible.
+Only inserted bytes are removed from the coverage denominator. Every original
+production function must have its own LLVM record; every LLVM record must join.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import re
+import subprocess
+from collections import defaultdict
+from pathlib import Path
+
+from function_risk import contains, crap_line, own_lines
+from production_coverage import counts, require
+
+SERIES = {"analyzer": "harness-gate-rust-measure/0.2.0", "rule": "mccabe-rust-2/1",
+          "instrumentation": "closure-black-box/1", "mapping": "insertions-utf8/1"}
+PREFIX = "{ ::std::hint::black_box(()); "
+SUFFIX = " }"
+HOTSPOTS = {
+    "doctor/checks.rs": ["run_check", "check_path", "check_env", "check_env_or_file", "check_git_config", "check_version"],
+    "app/commands.rs": ["run", "run_doctor", "run_cleanup", "run_scope", "run_secrets", "run_audit", "run_verify", "run_hook"],
+    "verify/mod.rs": ["run_selected", "service_results", "merge_results", "publish_report"],
+    "verify/steps.rs": ["configured_task", "configure_runner", "configure_isolation", "configure_shard", "inject_task_environment"],
+    "verify/parser.rs": ["count_json_results", "count_json_path", "discover_json_results"],
+    "process/adapter.rs": ["run_with_cancel", "prepare_request", "run_process", "wait_for_adapter",
+                           "validate_process_output", "finish_response"],
+}
+
+
+def digest(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def ast(source: Path, binary: Path) -> dict:
+    result = json.loads(subprocess.check_output([str(binary.resolve()), str(source)], text=True))
+    require((result.get("analyzer"), result.get("version"), result.get("rule")) ==
+            ("harness-gate-rust-measure", "0.2.0", "mccabe-rust-2"), "incompatible AST analyzer")
+    return result
+
+
+def provenance(binary: Path) -> dict:
+    root = Path(__file__).resolve().parent
+    files = ["source_measure.py", "function_risk.py", "production_coverage.py",
+             "rust-measure/Cargo.toml", "rust-measure/Cargo.lock", "rust-measure/src/main.rs"]
+    return {"sources": {p: digest((root / p).read_bytes()) for p in files},
+            "binary_sha256": digest(binary.read_bytes()),
+            "rustc": subprocess.check_output(["rustc", "-vV"], text=True).strip()}
+
+
+def char_offset(source: str, point: list[int]) -> int:
+    lines = source.splitlines(keepends=True)
+    return sum(map(len, lines[:point[0] - 1])) + point[1] - 1
+
+
+def byte_point(source: str, point: list[int]) -> tuple[int, int]:
+    line, column = point
+    return line, len(source.splitlines(keepends=True)[line - 1][:column - 1].encode()) + 1
+
+
+def byte_span(source: str, span: list[int]) -> tuple:
+    return (*byte_point(source, span[:2]), *byte_point(source, span[2:]))
+
+
+def instrument(source: str, inventory: dict) -> tuple[str, list[dict]]:
+    edits = []
+    for symbol in inventory["symbols"]:
+        if symbol["kind"] == "closure" and not symbol["test"]:
+            body = symbol["body"]
+            edits.extend([(char_offset(source, body[:2]), PREFIX),
+                          (char_offset(source, body[2:]), SUFFIX)])
+    # Multiple nested closures can end at the same point. Closing insertions
+    # are identical; stable order handles adjacent closing/opening boundaries.
+    result, previous, insertions = [], 0, []
+    for offset, text in sorted(edits, key=lambda e: (e[0], e[1] != SUFFIX)):
+        result.extend([source[previous:offset], text])
+        line = source[:offset].count("\n") + 1
+        column = len(source[:offset].rsplit("\n", 1)[-1].encode()) + 1
+        insertions.append({"line": line, "column": column, "text": text})
+        previous = offset
+    result.append(source[previous:])
+    return "".join(result), insertions
+
+
+def original_point(point: list[int], edits: list[dict]) -> tuple[int, int]:
+    line, column = point
+    shift = 0
+    for edit in edits:
+        if edit["line"] != line:
+            continue
+        start = edit["column"] + shift
+        width = len(edit["text"].encode())
+        if column < start:
+            break
+        if column <= start + width:
+            return line, edit["column"]
+        shift += width
+    return line, column - shift
+
+
+def prepare(crate: Path, binary: Path) -> dict:
+    manifest = {"series": SERIES, "files": {}}
+    for path in HOTSPOTS:
+        file = crate / "src" / path
+        source = file.read_text()
+        inventory = ast(file, binary)
+        transformed, edits = instrument(source, inventory)
+        manifest["files"][path] = {"original": source, "original_sha256": digest(source.encode()),
+            "instrumented_sha256": digest(transformed.encode()), "inventory": inventory, "edits": edits}
+        file.write_text(transformed)
+    return manifest
+
+
+def complexity(raw: dict) -> int:
+    return 1 + sum(raw.get(k, 0) for k in ("if", "guards", "while", "for", "loop",
+        "and_and", "or_or", "question_mark", "match_decisions"))
+
+
+def closure_name(name: str) -> bool:
+    # Closure types in a function's generic arguments do not make the
+    # instantiated function itself a closure. Inspect the terminal component.
+    return re.search(r"::(?:\{closure#\d+\}|\{\{closure\}\})$", name) is not None
+
+
+def measure(manifest: dict, llvm: dict, crate: Path, binary: Path) -> list[dict]:
+    require(manifest["series"] == SERIES, "incompatible measurement series")
+    require(llvm["type"] == "llvm.coverage.json.export" and len(llvm["data"]) == 1, "invalid LLVM dataset")
+    symbols, excluded = {}, {}
+    for path, file in manifest["files"].items():
+        source = file["original"]
+        require(digest(source.encode()) == file["original_sha256"], "original digest mismatch")
+        transformed, edits = instrument(source, file["inventory"])
+        require(edits == file["edits"] and digest(transformed.encode()) == file["instrumented_sha256"],
+                "instrumentation does not reproduce")
+        require((crate / "src" / path).read_bytes() == transformed.encode(), "instrumented source mismatch")
+        # Reparse original source without changing the measured source file.
+        import tempfile
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".rs") as tmp:
+            tmp.write(source)
+            tmp.flush()
+            require(ast(Path(tmp.name), binary) == file["inventory"], "AST inventory does not reproduce")
+        excluded[path] = []
+        for symbol in file["inventory"]["symbols"]:
+            span = byte_span(source, symbol["span"])
+            if symbol["test"]:
+                excluded[path].append(span)
+                continue
+            key = (path, *span)
+            require(key not in symbols, "duplicate AST symbol")
+            symbols[key] = {**symbol, "instances": [], "regions": {}}
+    names = json.loads(subprocess.check_output([str(binary.resolve()), "--demangle"],
+        input=json.dumps([f["name"] for f in llvm["data"][0]["functions"]]), text=True))
+    for index, function in enumerate(llvm["data"][0]["functions"]):
+        require(function["regions"], "LLVM function without regions")
+        first = function["regions"][0]
+        try:
+            path = Path(function["filenames"][first[5]]).resolve().relative_to((crate / "src").resolve()).as_posix()
+        except ValueError:
+            continue
+        if path not in manifest["files"]:
+            continue
+        file = manifest["files"][path]
+        mapped = []
+        for region in function["regions"]:
+            require(len(region) == 8 and all(type(v) is int and v >= 0 for v in region), "invalid LLVM region")
+            require(region[7] in (0, 2, 3), "unsupported macro expansion region")
+            require(Path(function["filenames"][region[5]]).resolve() == (crate / "src" / path).resolve(),
+                    "cross-source LLVM region")
+            location = (*original_point(region[:2], file["edits"]), *original_point(region[2:4], file["edits"]))
+            if location[:2] != location[2:]:
+                mapped.append((*location, region[7], region[4]))
+        require(mapped, "function has only synthetic coverage")
+        envelope = (*min(r[:2] for r in mapped), *max(r[2:4] for r in mapped))
+        if any(contains(s, envelope) for s in excluded[path]):
+            continue
+        candidates = [k for k in symbols if k[0] == path and contains(k[1:], envelope)]
+        inner = [k for k in candidates if not any(k != c and contains(k[1:], c[1:]) for c in candidates)]
+        require(len(inner) == 1, f"unmapped/ambiguous LLVM function {path}:{envelope}: {function['name']}")
+        key = inner[0]
+        symbol = symbols[key]
+        # A closure may never borrow its parent's record or counters.
+        is_closure = closure_name(names[index])
+        require(is_closure == (symbol["kind"] == "closure"), f"function kind mismatch: {path}:{symbol['name']}")
+        require(type(function["count"]) is int and function["count"] >= 0, "invalid function counter")
+        symbol["instances"].append({"index": index, "name": names[index], "count": function["count"]})
+        for *location, kind, hits in mapped:
+            region = (*location, kind)
+            symbol["regions"][region] = max(symbol["regions"].get(region, 0), hits)
+    result = []
+    for key, symbol in symbols.items():
+        path, *span = key
+        require(symbol["instances"], f"missing LLVM function: {path}:{symbol['name']}:{span}")
+        children = [k[1:] for k in symbols if k != key and k[0] == path and contains(tuple(span), k[1:])]
+        regions = {r: n for r, n in symbol["regions"].items() if not any(contains(c, r[:4]) for c in children)}
+        lines = counts(own_lines(regions, children))
+        code = counts({r: n for r, n in regions.items() if r[4] == 0})
+        require(code["count"] > 0, "no executable original regions")
+        cc = complexity(symbol["raw"])
+        score = crap_line(cc, lines["covered"], lines["count"])
+        passed = lines["covered"] * 5 >= lines["count"] * 4 and code["covered"] * 5 >= code["count"] * 4 and score <= 30
+        result.append({"source": path, **{k: symbol[k] for k in ("name", "kind", "span", "raw", "instances")},
+            "syntax_sha256": digest(symbol["syntax"].encode()),
+            "source_sha256": manifest["files"][path]["original_sha256"], "cc": cc, "lines": lines, "regions": code,
+            "crap_line": float(score), "crap_exact": [score.numerator, score.denominator], "passed": passed,
+            "raw_regions": [{"span": list(r[:4]), "kind": r[4], "count": n} for r, n in sorted(regions.items())]})
+    return result
+
+
+def compare(base: dict, head: dict) -> dict:
+    """Apply the documented incremental ratchet without losing closure debt."""
+    require(base["series"] == head["series"] == SERIES, "incompatible base/head series")
+    require(base["tools"] == head["tools"], "incompatible base/head measurement tools")
+    for report in (base, head):
+        require({r["source"] for r in report["functions"]} == set(HOTSPOTS), "incomplete selected source inventory")
+        for source, names in HOTSPOTS.items():
+            require(any(r["source"] == source and r["name"] == names[0] for r in report["functions"]),
+                    f"missing original hotspot: {source}")
+    for source, names in HOTSPOTS.items():
+        require(all(any(r["source"] == source and r["name"] == name for r in head["functions"])
+                    for name in names), f"missing extracted hotspot: {source}")
+    old = defaultdict(list)
+    for row in base["functions"]:
+        old[(row["source"], row["kind"], row["syntax_sha256"])].append(row)
+    decisions, failures = [], []
+    for row in head["functions"]:
+        matches = old[(row["source"], row["kind"], row["syntax_sha256"])]
+        previous = matches.pop(0) if matches else None
+        changed = previous is None
+        selected = row["name"] in HOTSPOTS[row["source"]]
+        high_risk = selected or (changed and row["cc"] > 10)
+        from fractions import Fraction
+        passed = row["passed"] if high_risk else (Fraction(*row["crap_exact"]) <= 30 if changed else True)
+        identity = {"source": row["source"], "name": row["name"], "span": row["span"],
+            "syntax_sha256": row["syntax_sha256"], "changed": changed, "selected": selected,
+            "high_risk": high_risk, "accepted": passed,
+            "base": None if previous is None else {k: previous[k] for k in ("name", "span", "source_sha256")},
+            "head_source_sha256": row["source_sha256"],
+            "coverage_debt": not row["passed"]}
+        decisions.append(identity)
+        if not passed:
+            failures.append(f"{row['source']}::{row['name']}")
+    return {"series": SERIES, "identities": decisions, "failures": failures,
+            "decompositions": HOTSPOTS,
+            "retired_or_changed_base": [{k: r[k] for k in ("source", "name", "span", "syntax_sha256")}
+                for rows in old.values() for r in rows]}
+
+
+def main() -> None:
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("operation", choices=("prepare", "measure", "compare"))
+    parser.add_argument("--crate", type=Path, help="disposable workspace-local source snapshot")
+    parser.add_argument("--binary", type=Path)
+    parser.add_argument("--manifest", type=Path)
+    parser.add_argument("--llvm", type=Path)
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--base", type=Path)
+    parser.add_argument("--head", type=Path)
+    args = parser.parse_args()
+    if args.operation == "compare":
+        require(all((args.base, args.head, args.output)), "compare needs --base, --head and --output")
+        report = compare(json.loads(args.base.read_text()), json.loads(args.head.read_text()))
+        args.output.write_text(json.dumps(report, indent=2) + "\n")
+        print(json.dumps({"failures": report["failures"], "identities": len(report["identities"])}))
+        raise SystemExit(bool(report["failures"]))
+    require(all((args.crate, args.binary, args.manifest)), "prepare/measure need --crate, --binary and --manifest")
+    if args.operation == "prepare":
+        require(not args.manifest.exists(), "refusing to overwrite an instrumentation manifest")
+        manifest = prepare(args.crate, args.binary)
+        args.manifest.write_text(json.dumps(manifest, indent=2) + "\n")
+    else:
+        require(args.llvm is not None and args.output is not None, "measure needs --llvm and --output")
+        manifest = json.loads(args.manifest.read_text())
+        require(set(manifest["files"]) == set(HOTSPOTS), "incomplete selected source manifest")
+        rows = measure(manifest, json.loads(args.llvm.read_text()), args.crate, args.binary)
+        for row in rows:
+            row["selected"] = row["name"] in HOTSPOTS[row["source"]]
+        report = {"series": SERIES, "tools": provenance(args.binary), "functions": rows,
+                  "manifest_sha256": digest(args.manifest.read_bytes()),
+                  "llvm_sha256": digest(args.llvm.read_bytes()),
+                  "selected_failures": [f"{r['source']}::{r['name']}" for r in rows if r["selected"] and not r["passed"]],
+                  "nonselected_debt": [f"{r['source']}::{r['name']}" for r in rows if not r["selected"] and not r["passed"]]}
+        args.output.write_text(json.dumps(report, indent=2) + "\n")
+        print(json.dumps({"functions": len(rows), "selected_failures": report["selected_failures"],
+                          "nonselected_debt_count": len(report["nonselected_debt"])}))
+        if report["selected_failures"]:
+            raise SystemExit(1)
+
+
+if __name__ == "__main__":
+    main()
