@@ -1,0 +1,27 @@
+[
+  {
+    "file": "linux-historical-contracts.zip",
+    "artifact_id": 10014047792,
+    "run_id": 34110236230,
+    "sha256": "f928157c13e19d3f9e0a67269cb92b73587497703eed5242582c5c44a4046e38"
+  },
+  {
+    "file": "macos-contracts.zip",
+    "artifact_id": 10014068242,
+    "run_id": 34110236230,
+    "sha256": "2fe9339f57f4b0321a7c2a0b7f139674d18d02820cc0c9005e6e68d2e7efbc0f"
+  },
+  {
+    "file": "windows-contracts.zip",
+    "artifact_id": 10014087173,
+    "run_id": 34110236230,
+    "sha256": "630cebaa62e7509b42e8b830547757a8ba057ff544d677135324895858993025"
+  },
+  {
+    "file": "gh96-hosted-candidate.zip",
+    "artifact_id": 10015346346,
+    "run_id": 34112797811,
+    "sha256": "33b7e774e078da30aa278832ddf414dfefc058148012a72ae7db8eb9afdd3c13",
+    "retention": "GitHub artifact; manifest retained here; prior hosted raw archive not duplicated"
+  }
+]

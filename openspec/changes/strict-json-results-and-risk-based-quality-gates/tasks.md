@@ -86,7 +86,9 @@ GH-96 validation: [raw candidate, local commands, timings and benchmark evidence
 
 ## 9. Verify and hand off implementation evidence
 
-- [ ] 9.1 [P1][M] 运行 locked nextest、Clippy 和 fmt；验收：原有及新增 Rust 测试无失败，lint/format 通过，保留精确提交与命令结果。关联：[proposal](proposal.md)。
-- [ ] 9.2 [P2][M] 运行质量工具/发布工具测试、CLI contracts、文档/schema 一致性与扩展门禁；验收：全部必需结果通过，失败 fixture 均返回非零。关联：[proposal](proposal.md)。
+- [x] 9.1 [P1][M] 运行 locked nextest、Clippy 和 fmt；验收：原有及新增 Rust 测试无失败，lint/format 通过，保留精确提交与命令结果。关联：[proposal](proposal.md)。
+- [x] 9.2 [P2][M] 运行质量工具/发布工具测试、CLI contracts、文档/schema 一致性与扩展门禁；验收：全部必需结果通过，失败 fixture 均返回非零。关联：[proposal](proposal.md)。
 - [ ] 9.3 [P2][M] 收集 Linux/macOS/Windows 契约证据并审查平台适用性；验收：没有把本地或 fake runtime 测试当成跨平台/真实容器成功证据。关联：[traceability spec](specs/critical-path-source-traceability/spec.md)。
-- [ ] 9.4 [P2][S] 更新此 change 的实施状态和验收索引；验收：仅凭实际测试/指标证据勾选任务，运行 `openspec validate strict-json-results-and-risk-based-quality-gates --strict` 通过，未验收项保持未完成。关联：[proposal](proposal.md)。
+- [x] 9.4 [P2][S] 更新此 change 的实施状态和验收索引；验收：仅凭实际测试/指标证据勾选任务，运行 `openspec validate strict-json-results-and-risk-based-quality-gates --strict` 通过，未验收项保持未完成。关联：[proposal](proposal.md)。
+
+GH-97 validation: [acceptance index](validation-gh-97.md) and [exact commands, raw evidence, hosted provenance and platform review](../../../docs/quality/gh-97-validation.md). Tasks 9.1/9.2 certify local Linux results at `381d5f418655969d29b81f89069845e6667f35c9`; 9.4 certifies evidence bookkeeping and strict specification validation. Task 9.3 remains unchecked: retained macOS/Windows contracts are from an older SHA, and that run failed macOS tests/benchmarks. No baseline or full-change acceptance is declared.

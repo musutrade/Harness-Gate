@@ -1,0 +1,98 @@
+{
+  "aggregate": {
+    "covered": 9749,
+    "executable": 11309,
+    "percent": 86.2056768945088,
+    "status": "pass"
+  },
+  "blocking_boundaries": [
+    "config",
+    "verify",
+    "process",
+    "audit",
+    "scope",
+    "secrets"
+  ],
+  "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+  "command": "cargo llvm-cov --manifest-path tools/harness-gate/Cargo.toml --locked --json",
+  "commit": "381d5f418655969d29b81f89069845e6667f35c9",
+  "exclusion_list_version": "quality-1",
+  "informational_boundaries": [
+    "service"
+  ],
+  "logical_cpus": 8,
+  "machine": "x86_64",
+  "modules": {
+    "audit": {
+      "covered": 886,
+      "executable": 1075,
+      "percent": 82.41860465116278,
+      "source": "src/audit/",
+      "status": "pass"
+    },
+    "config": {
+      "covered": 2405,
+      "executable": 2758,
+      "percent": 87.20087019579405,
+      "source": "src/config/",
+      "status": "pass"
+    },
+    "process": {
+      "covered": 1652,
+      "executable": 1930,
+      "percent": 85.59585492227978,
+      "source": "src/process/",
+      "status": "pass"
+    },
+    "scope": {
+      "covered": 97,
+      "executable": 113,
+      "percent": 85.84070796460178,
+      "source": "src/scope/",
+      "status": "pass"
+    },
+    "secrets": {
+      "covered": 427,
+      "executable": 470,
+      "percent": 90.85106382978724,
+      "source": "src/secrets/",
+      "status": "pass"
+    },
+    "service": {
+      "covered": 1702,
+      "executable": 1997,
+      "percent": 85.22784176264396,
+      "source": "src/service/",
+      "status": "informational"
+    },
+    "verify": {
+      "covered": 4282,
+      "executable": 4963,
+      "percent": 86.27846060850293,
+      "source": "src/verify/",
+      "status": "pass"
+    }
+  },
+  "os": "Linux-7.0.0-31-generic-x86_64-with-glibc2.43",
+  "processor": "",
+  "python": "3.14.4",
+  "raw_artifacts": [
+    "/home/gem/symphony-workspaces/GH-97/target/quality/gh97-candidate/coverage.raw.json",
+    "/home/gem/symphony-workspaces/GH-97/target/quality/gh97-candidate/coverage.lcov",
+    "/home/gem/symphony-workspaces/GH-97/target/quality/gh97-candidate/coverage.cobertura.xml"
+  ],
+  "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+  "source_boundaries": {
+    "audit": "src/audit/",
+    "config": "src/config/",
+    "process": "src/process/",
+    "scope": "src/scope/",
+    "secrets": "src/secrets/",
+    "service": "src/service/",
+    "verify": "src/verify/"
+  },
+  "target": "x86_64-unknown-linux-gnu",
+  "threshold": 80.0,
+  "timestamp_utc": "2026-09-07T10:57:43.198642+00:00",
+  "tool": "cargo-llvm-cov"
+}
