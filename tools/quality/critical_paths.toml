@@ -53,7 +53,7 @@ path = "tests/failure_paths_test.rs"
 symbol = "verification_cleanup_cancel_and_report_precedence_retains_resource_evidence"
 start = 493
 end = 640
-sha256 = "822a25b6b3c68384c110bbfb83dfb9ef6189e76e9417ea5c5576a61e2577c300"
+sha256 = "72492cf2d8bb7a27f8ed58682c588acbfdbfafea903b73dcb031ef4dd6c8b44d"
 [[paths.probes]]
 line = 250
 column = 24
