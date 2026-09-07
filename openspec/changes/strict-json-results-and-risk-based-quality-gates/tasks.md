@@ -53,7 +53,8 @@ GH-93 本地验收：[逐项证据与命令结果](validation-gh-93.md)；远端
 ## 6. Decompose selected high-risk functions
 
 GH-94 draft: decomposition regressions pass, but all tasks below remain
-unaccepted because the frozen analyzer rejects the selected production sources.
+unaccepted because the frozen analyzer rejects the selected production sources
+and LLVM omits function records for some executed expression closures.
 See [validation and blocking evidence](../../../docs/quality/gh-94-validation.md).
 
 - [ ] 6.1 [P2][L] 按 check kind 拆分 doctor 分发与校验职责；验收：5.1 全部通过，热点及新函数满足 CRAP 和 line/region 标准。关联：[design 热点清单](design.md#decisions)。
