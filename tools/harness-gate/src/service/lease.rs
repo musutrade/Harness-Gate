@@ -976,6 +976,7 @@ mod tests {
         expected_kind: ContainerRuntimeKind,
         inspection: Option<RuntimeInspection>,
         remove_calls: Arc<AtomicUsize>,
+        stop_fails: bool,
     }
 
     impl RuntimeOperations for FakeRuntime {
@@ -1005,6 +1006,9 @@ mod tests {
                 anyhow::bail!("fake runtime kind mismatch");
             }
             self.remove_calls.fetch_add(1, Ordering::SeqCst);
+            if self.stop_fails {
+                anyhow::bail!("injected runtime removal failure");
+            }
             Ok(())
         }
     }
@@ -1094,6 +1098,7 @@ mod tests {
                 expected_kind: kind,
                 inspection,
                 remove_calls: Arc::clone(&remove_calls),
+                stop_fails: false,
             },
             remove_calls,
         )
@@ -1227,14 +1232,71 @@ mod tests {
         )
         .expect("acquire heartbeat lease");
         let path = lease.path.clone();
-        *lease.heartbeat_error.lock().expect("heartbeat error lock") =
-            Some("simulated renewal failure".into());
+        let original = std::fs::read(&path).expect("read ownership evidence");
+        // Make the real heartbeat's filesystem read fail, without racing an
+        // in-flight renewal or replacing its error field with a mock result.
+        {
+            let _record = lease.record.lock().expect("lock renewal");
+            std::fs::remove_file(&path).expect("remove marker");
+            std::fs::create_dir(&path).expect("obstruct marker read");
+        }
+        let deadline = Instant::now() + Duration::from_secs(10);
+        while lease
+            .heartbeat_error
+            .lock()
+            .expect("heartbeat error lock")
+            .is_none()
+        {
+            assert!(
+                Instant::now() < deadline,
+                "heartbeat failed to observe filesystem fault"
+            );
+            std::thread::sleep(Duration::from_millis(20));
+        }
+        std::fs::remove_dir(&path).expect("remove obstruction");
+        std::fs::write(&path, &original).expect("restore ownership evidence");
 
         let error = lease
             .release_checked()
             .expect_err("uncertain ownership must block release");
         assert!(format!("{error:#}").contains("LEASE_OWNERSHIP_UNCERTAIN"));
         assert!(path.exists(), "failed release must retain its marker");
+        assert_eq!(std::fs::read(path).unwrap(), original);
+    }
+
+    #[test]
+    fn runtime_removal_failure_retains_evidence_and_allows_a_proven_retry() {
+        for kind in [ContainerRuntimeKind::Docker, ContainerRuntimeKind::Podman] {
+            let (_workspace, project) = runtime_project("lease-removal-fault");
+            let (path, _, inspection) = container_lease(&project, kind, true);
+            let original = std::fs::read(&path).unwrap();
+            let (mut runtime, calls) = fake_runtime(kind, Some(inspection));
+            runtime.stop_fails = true;
+            let report = cleanup_with_runtime(&project, false, &runtime).unwrap();
+            assert_eq!(calls.load(Ordering::SeqCst), 1);
+            assert_eq!(report.reclaimed, 0);
+            assert!(report
+                .failures
+                .iter()
+                .any(|failure| failure.contains("injected runtime removal failure")));
+            assert_eq!(std::fs::read(&path).unwrap(), original);
+            // Loss of inspection certainty must not trigger a second remove.
+            let inspection = runtime.inspection.take();
+            assert_failed_without_remove(
+                &project,
+                &path,
+                &fake_runtime(kind, None).0,
+                "fake inspection failed",
+            );
+            assert_eq!(calls.load(Ordering::SeqCst), 1);
+            runtime.inspection = inspection;
+            runtime.stop_fails = false;
+            let report = cleanup_with_runtime(&project, false, &runtime).unwrap();
+            assert_eq!(calls.load(Ordering::SeqCst), 2);
+            assert_eq!(report.reclaimed, 1);
+            assert!(report.failures.is_empty());
+            assert!(!path.exists());
+        }
     }
 
     #[test]
