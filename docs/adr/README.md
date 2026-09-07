@@ -57,6 +57,8 @@ We use a simplified version of the Michael Nygard ADR template:
 - [ADR-0037](0037-adapter-request-integrity-and-evidence-budgets.md) - Bind adapter requests and bound evidence
 - [ADR-0038](0038-post-remediation-hardening.md) - Plan post-remediation security, reliability, and maintenance follow-ups
 
+- [ADR-0039](0039-required-risk-and-traceability-gates.md) - Require coverage, risk and traceability evidence in CI
+
 ## Creating New ADRs
 
 When making a significant architectural decision:

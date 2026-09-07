@@ -209,45 +209,46 @@ jobs:
 
   quality-coverage:
     name: Quality Coverage and Critical Paths
-    if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
           components: llvm-tools-preview
 
+      - name: Install Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.x'
+
       - name: Install cargo-nextest and cargo-llvm-cov
         run: |
           cargo install cargo-nextest --locked --force
           cargo install cargo-llvm-cov --locked --version 0.9.0 --force
 
-      - name: Generate coverage evidence
-        run: python3 tools/quality/coverage.py --output target/quality/coverage.json
-
-      - name: Capture structured test evidence
+      - name: Collect and require fresh coverage, risk and matrix evidence
         env:
-          NEXTEST_EXPERIMENTAL_LIBTEST_JSON: "1"
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+          RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
         run: |
-          mkdir -p target/quality
-          cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked --no-fail-fast \
-            --message-format libtest-json-plus --message-format-version 0.1 \
-            > target/quality/nextest.jsonl
-
-      - name: Evaluate critical-path matrix
-        run: |
-          python3 tools/quality/critical_paths.py \
-            --collect --evidence target/quality/critical-path-runs/bundle.json \
-            --output target/quality/critical-paths.json
+          python3 tools/quality/ci_quality.py collect \
+            --base-sha "$BASE_SHA" --head-sha "$HEAD_SHA" --run-id "$RUN_ID" \
+            --output target/quality/candidate
 
       - name: Upload quality evidence
         if: ${{ always() }}
         uses: actions/upload-artifact@v6
         with:
-          name: quality-coverage-${{ github.run_id }}
-          path: target/quality
+          name: quality-coverage-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            target/quality/candidate
+            !target/quality/candidate/build
+            !target/quality/candidate/snapshots
           if-no-files-found: warn
 
   quality-contracts:
@@ -416,48 +417,23 @@ jobs:
     name: Required Quality Aggregate
     if: ${{ always() }}
     # Keep this check name stable because it is required by the main ruleset.
-    # Pull requests use the fast, deterministic gate; pushes to main additionally
-    # require cross-platform and measurement-heavy evidence jobs.
+    # PRs and pushes require coverage, risk and isolated traceability evidence.
+    # Cross-platform and performance collection remain additional push checks.
     needs:
       [test, test-cross-platform, security-audit, fmt, clippy, build, build-cross-platform,
        coverage, quality-coverage, quality-contracts, quality-contracts-cross-platform,
        quality-baseline, docs-consistency, release-contracts, quality-scripts]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.x'
+
       - name: Require every quality gate
         env:
           EVENT_NAME: ${{ github.event_name }}
-          TEST: ${{ needs.test.result }}
-          TEST_CROSS_PLATFORM: ${{ needs.test-cross-platform.result }}
-          SECURITY_AUDIT: ${{ needs.security-audit.result }}
-          FMT: ${{ needs.fmt.result }}
-          CLIPPY: ${{ needs.clippy.result }}
-          BUILD: ${{ needs.build.result }}
-          BUILD_CROSS_PLATFORM: ${{ needs.build-cross-platform.result }}
-          COVERAGE: ${{ needs.coverage.result }}
-          QUALITY_COVERAGE: ${{ needs.quality-coverage.result }}
-          QUALITY_CONTRACTS: ${{ needs.quality-contracts.result }}
-          QUALITY_CONTRACTS_CROSS_PLATFORM: ${{ needs.quality-contracts-cross-platform.result }}
-          QUALITY_BASELINE: ${{ needs.quality-baseline.result }}
-          DOCS_CONSISTENCY: ${{ needs.docs-consistency.result }}
-          RELEASE_CONTRACTS: ${{ needs.release-contracts.result }}
-          QUALITY_SCRIPTS: ${{ needs.quality-scripts.result }}
-        run: |
-          set -eu
-          failed=0
-          if [ "$EVENT_NAME" = "pull_request" ]; then
-            required_names="TEST SECURITY_AUDIT FMT CLIPPY BUILD QUALITY_CONTRACTS DOCS_CONSISTENCY RELEASE_CONTRACTS QUALITY_SCRIPTS"
-          else
-            required_names="TEST TEST_CROSS_PLATFORM SECURITY_AUDIT FMT CLIPPY BUILD BUILD_CROSS_PLATFORM COVERAGE QUALITY_COVERAGE QUALITY_CONTRACTS QUALITY_CONTRACTS_CROSS_PLATFORM QUALITY_BASELINE DOCS_CONSISTENCY RELEASE_CONTRACTS QUALITY_SCRIPTS"
-          fi
-          for name in $required_names; do
-            result="${!name}"
-            echo "quality dependency result: $name=$result"
-            if [ "$result" != success ]; then
-              failed=1
-            fi
-          done
-          if [ "$failed" -ne 0 ]; then
-            echo "one or more required quality jobs did not succeed" >&2
-            exit 1
-          fi
+          NEEDS_JSON: ${{ toJSON(needs) }}
+        run: python3 tools/quality/ci_quality.py aggregate
