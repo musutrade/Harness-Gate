@@ -68,10 +68,12 @@ retains the prior blocked draft. CI and controller acceptance remain pending.
 
 ## 7. Bind critical paths to source evidence
 
-- [ ] 7.1 [P2][M] 升级 inventory，补齐 source/symbol/observable/平台条件和独立 mandatory ID 清单；验收：删除任一强制 row 的 fixture 失败。关联：[traceability spec](specs/critical-path-source-traceability/spec.md)。
-- [ ] 7.2 [P2][L] 关联隔离关键测试运行与实际源函数/区域；验收：测试 A 不能借测试 B 的覆盖通过，所有证据必须匹配提交与 target。关联：[traceability spec](specs/critical-path-source-traceability/spec.md)。
-- [ ] 7.3 [P2][M] 将 JSON 假通过、报告完整性和租约所有权场景纳入 mandatory；验收：这些路径及取消/进程树/gate 失败全部通过，适用 matrix 至少 95.0%。关联：[traceability spec](specs/critical-path-source-traceability/spec.md)。
-- [ ] 7.4 [P2][M] 增加 matrix 负向和故障注入测试；验收：测试跳过/取消、符号移动、混用提交、缺覆盖和 observable 退化均被阻止。关联：[traceability spec](specs/critical-path-source-traceability/spec.md)。
+- [x] 7.1 [P2][M] 升级 inventory，补齐 source/symbol/observable/平台条件和独立 mandatory ID 清单；验收：删除任一强制 row 的 fixture 失败。关联：[traceability spec](specs/critical-path-source-traceability/spec.md)。
+- [x] 7.2 [P2][L] 关联隔离关键测试运行与实际源函数/区域；验收：测试 A 不能借测试 B 的覆盖通过，所有证据必须匹配提交与 target。关联：[traceability spec](specs/critical-path-source-traceability/spec.md)。
+- [x] 7.3 [P2][M] 将 JSON 假通过、报告完整性和租约所有权场景纳入 mandatory；验收：这些路径及取消/进程树/gate 失败全部通过，适用 matrix 至少 95.0%。关联：[traceability spec](specs/critical-path-source-traceability/spec.md)。
+- [x] 7.4 [P2][M] 增加 matrix 负向和故障注入测试；验收：测试跳过/取消、符号移动、混用提交、缺覆盖和 observable 退化均被阻止。关联：[traceability spec](specs/critical-path-source-traceability/spec.md)。
+
+Validation evidence for 7.1–7.4: [GH-95 validation](../../../docs/quality/gh-95-validation.md).
 
 ## 8. Integrate gates and document adoption
 
