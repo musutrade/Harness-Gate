@@ -3034,5 +3034,1442 @@
       },
       "finding": "All four commands succeeded; the field_only closure still has no function record."
     }
-  ]
+  ],
+  "indistinguishable_execution_probe": {
+    "status": "measurement-error",
+    "accepted_function_risk_evidence": false,
+    "finding": "Identical field_only LLVM counters with zero closure invocations (empty input) and one invocation returning false (nonempty input). Parent counters cannot establish closure coverage.",
+    "source": {
+      "path": "target/quality/gh-94/closure-distinguish/main.rs",
+      "sha256": "8e6fa49cae489c651fcdda105d9a354bc58e46bbd17f9d4266b1566c7a59d2c1",
+      "text": "struct Step { passed: bool }\n#[inline(never)]\nfn field_only(steps: &[Step]) -> bool { steps.iter().all(|step| step.passed) }\nfn main() {\n    let empty = std::env::args().nth(1).unwrap() == \"empty\";\n    let steps: &[Step] = if empty { &[] } else { &[Step { passed: false }] };\n    let result = field_only(std::hint::black_box(steps));\n    assert_eq!(result, empty);\n    println!(\"{result}\");\n}\n"
+    },
+    "commands": [
+      {
+        "argv": [
+          "rustc",
+          "--print",
+          "sysroot"
+        ],
+        "environment": {},
+        "exit_code": 0,
+        "stderr": "",
+        "stdout": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu\n"
+      },
+      {
+        "argv": [
+          "rustc",
+          "-vV"
+        ],
+        "environment": {},
+        "exit_code": 0,
+        "stderr": "",
+        "stdout": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+      },
+      {
+        "argv": [
+          "rustc",
+          "-C",
+          "instrument-coverage",
+          "-C",
+          "opt-level=0",
+          "target/quality/gh-94/closure-distinguish/main.rs",
+          "-o",
+          "target/quality/gh-94/closure-distinguish/main"
+        ],
+        "environment": {},
+        "exit_code": 0,
+        "stderr": "",
+        "stdout": ""
+      },
+      {
+        "argv": [
+          "target/quality/gh-94/closure-distinguish/main",
+          "empty"
+        ],
+        "environment": {
+          "LLVM_PROFILE_FILE": "target/quality/gh-94/closure-distinguish/empty.profraw"
+        },
+        "exit_code": 0,
+        "stderr": "",
+        "stdout": "true\n"
+      },
+      {
+        "argv": [
+          "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "merge",
+          "-sparse",
+          "target/quality/gh-94/closure-distinguish/empty.profraw",
+          "-o",
+          "target/quality/gh-94/closure-distinguish/empty.profdata"
+        ],
+        "environment": {},
+        "exit_code": 0,
+        "stderr": "",
+        "stdout": ""
+      },
+      {
+        "argv": [
+          "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "export",
+          "target/quality/gh-94/closure-distinguish/main",
+          "-instr-profile=target/quality/gh-94/closure-distinguish/empty.profdata"
+        ],
+        "environment": {},
+        "exit_code": 0,
+        "stderr": "",
+        "stdout": "<retained in export>"
+      },
+      {
+        "argv": [
+          "target/quality/gh-94/closure-distinguish/main",
+          "false"
+        ],
+        "environment": {
+          "LLVM_PROFILE_FILE": "target/quality/gh-94/closure-distinguish/false.profraw"
+        },
+        "exit_code": 0,
+        "stderr": "",
+        "stdout": "false\n"
+      },
+      {
+        "argv": [
+          "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "merge",
+          "-sparse",
+          "target/quality/gh-94/closure-distinguish/false.profraw",
+          "-o",
+          "target/quality/gh-94/closure-distinguish/false.profdata"
+        ],
+        "environment": {},
+        "exit_code": 0,
+        "stderr": "",
+        "stdout": ""
+      },
+      {
+        "argv": [
+          "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "export",
+          "target/quality/gh-94/closure-distinguish/main",
+          "-instr-profile=target/quality/gh-94/closure-distinguish/false.profdata"
+        ],
+        "environment": {},
+        "exit_code": 0,
+        "stderr": "",
+        "stdout": "<retained in export>"
+      }
+    ],
+    "selected_functions": {
+      "empty": [
+        {
+          "branches": [],
+          "count": 1,
+          "filenames": [
+            "/home/gem/symphony-workspaces/GH-94/target/quality/gh-94/closure-distinguish/main.rs"
+          ],
+          "mcdc_records": [],
+          "name": "_RNvCshXqY3UYjyfD_4main10field_only",
+          "regions": [
+            [
+              3,
+              1,
+              3,
+              38,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              41,
+              3,
+              53,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              54,
+              3,
+              57,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              78,
+              3,
+              79,
+              1,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      ],
+      "false": [
+        {
+          "branches": [],
+          "count": 1,
+          "filenames": [
+            "/home/gem/symphony-workspaces/GH-94/target/quality/gh-94/closure-distinguish/main.rs"
+          ],
+          "mcdc_records": [],
+          "name": "_RNvCshXqY3UYjyfD_4main10field_only",
+          "regions": [
+            [
+              3,
+              1,
+              3,
+              38,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              41,
+              3,
+              53,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              54,
+              3,
+              57,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              78,
+              3,
+              79,
+              1,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "exports": {
+      "empty": {
+        "sha256": "f23ce76314e6253a5c721aff719bd22aea02cb525e1e9d7d3a2b6cc4fc4036f3",
+        "llvm_export": {
+          "data": [
+            {
+              "files": [
+                {
+                  "branches": [],
+                  "expansions": [],
+                  "filename": "/home/gem/symphony-workspaces/GH-94/target/quality/gh-94/closure-distinguish/main.rs",
+                  "mcdc_records": [],
+                  "segments": [
+                    [
+                      3,
+                      1,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      3,
+                      38,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      3,
+                      41,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      3,
+                      53,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      3,
+                      54,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      3,
+                      57,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      3,
+                      78,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      3,
+                      79,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      4,
+                      1,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      4,
+                      10,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      5,
+                      9,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      5,
+                      14,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      5,
+                      17,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      5,
+                      33,
+                      1,
+                      true,
+                      false,
+                      false
+                    ],
+                    [
+                      5,
+                      60,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      6,
+                      9,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      6,
+                      14,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      6,
+                      16,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      6,
+                      23,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      6,
+                      29,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      6,
+                      34,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      6,
+                      37,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      6,
+                      40,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      6,
+                      50,
+                      0,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      6,
+                      75,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      7,
+                      9,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      7,
+                      15,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      7,
+                      18,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      7,
+                      28,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      7,
+                      29,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      7,
+                      56,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      8,
+                      5,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      8,
+                      15,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      9,
+                      5,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      9,
+                      13,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      10,
+                      1,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      10,
+                      2,
+                      0,
+                      false,
+                      false,
+                      false
+                    ]
+                  ],
+                  "summary": {
+                    "branches": {
+                      "count": 0,
+                      "covered": 0,
+                      "notcovered": 0,
+                      "percent": 0
+                    },
+                    "functions": {
+                      "count": 2,
+                      "covered": 2,
+                      "percent": 100
+                    },
+                    "instantiations": {
+                      "count": 2,
+                      "covered": 2,
+                      "percent": 100
+                    },
+                    "lines": {
+                      "count": 8,
+                      "covered": 8,
+                      "percent": 100
+                    },
+                    "mcdc": {
+                      "count": 0,
+                      "covered": 0,
+                      "notcovered": 0,
+                      "percent": 0
+                    },
+                    "regions": {
+                      "count": 19,
+                      "covered": 18,
+                      "notcovered": 1,
+                      "percent": 94.73684210526315
+                    }
+                  }
+                }
+              ],
+              "functions": [
+                {
+                  "branches": [],
+                  "count": 1,
+                  "filenames": [
+                    "/home/gem/symphony-workspaces/GH-94/target/quality/gh-94/closure-distinguish/main.rs"
+                  ],
+                  "mcdc_records": [],
+                  "name": "_RNvCshXqY3UYjyfD_4main10field_only",
+                  "regions": [
+                    [
+                      3,
+                      1,
+                      3,
+                      38,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      3,
+                      41,
+                      3,
+                      53,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      3,
+                      54,
+                      3,
+                      57,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      3,
+                      78,
+                      3,
+                      79,
+                      1,
+                      0,
+                      0,
+                      0
+                    ]
+                  ]
+                },
+                {
+                  "branches": [],
+                  "count": 1,
+                  "filenames": [
+                    "/home/gem/symphony-workspaces/GH-94/target/quality/gh-94/closure-distinguish/main.rs"
+                  ],
+                  "mcdc_records": [],
+                  "name": "_RNvCshXqY3UYjyfD_4main4main",
+                  "regions": [
+                    [
+                      4,
+                      1,
+                      4,
+                      10,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      5,
+                      9,
+                      5,
+                      14,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      5,
+                      17,
+                      5,
+                      33,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      5,
+                      17,
+                      5,
+                      60,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      6,
+                      9,
+                      6,
+                      14,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      6,
+                      16,
+                      6,
+                      23,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      6,
+                      29,
+                      6,
+                      34,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      6,
+                      37,
+                      6,
+                      40,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      6,
+                      50,
+                      6,
+                      75,
+                      0,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      7,
+                      9,
+                      7,
+                      15,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      7,
+                      18,
+                      7,
+                      28,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      7,
+                      29,
+                      7,
+                      56,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      8,
+                      5,
+                      8,
+                      15,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      9,
+                      5,
+                      9,
+                      13,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      10,
+                      1,
+                      10,
+                      2,
+                      1,
+                      0,
+                      0,
+                      0
+                    ]
+                  ]
+                }
+              ],
+              "totals": {
+                "branches": {
+                  "count": 0,
+                  "covered": 0,
+                  "notcovered": 0,
+                  "percent": 0
+                },
+                "functions": {
+                  "count": 2,
+                  "covered": 2,
+                  "percent": 100
+                },
+                "instantiations": {
+                  "count": 2,
+                  "covered": 2,
+                  "percent": 100
+                },
+                "lines": {
+                  "count": 8,
+                  "covered": 8,
+                  "percent": 100
+                },
+                "mcdc": {
+                  "count": 0,
+                  "covered": 0,
+                  "notcovered": 0,
+                  "percent": 0
+                },
+                "regions": {
+                  "count": 19,
+                  "covered": 18,
+                  "notcovered": 1,
+                  "percent": 94.73684210526315
+                }
+              }
+            }
+          ],
+          "type": "llvm.coverage.json.export",
+          "version": "3.1.0"
+        }
+      },
+      "false": {
+        "sha256": "4c2ee7404cacb48fa7d5a84f07bc435ff26b61cf306749ae30019545de8fa230",
+        "llvm_export": {
+          "data": [
+            {
+              "files": [
+                {
+                  "branches": [],
+                  "expansions": [],
+                  "filename": "/home/gem/symphony-workspaces/GH-94/target/quality/gh-94/closure-distinguish/main.rs",
+                  "mcdc_records": [],
+                  "segments": [
+                    [
+                      3,
+                      1,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      3,
+                      38,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      3,
+                      41,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      3,
+                      53,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      3,
+                      54,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      3,
+                      57,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      3,
+                      78,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      3,
+                      79,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      4,
+                      1,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      4,
+                      10,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      5,
+                      9,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      5,
+                      14,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      5,
+                      17,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      5,
+                      33,
+                      1,
+                      true,
+                      false,
+                      false
+                    ],
+                    [
+                      5,
+                      60,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      6,
+                      9,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      6,
+                      14,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      6,
+                      16,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      6,
+                      23,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      6,
+                      29,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      6,
+                      34,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      6,
+                      37,
+                      0,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      6,
+                      40,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      6,
+                      50,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      6,
+                      75,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      7,
+                      9,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      7,
+                      15,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      7,
+                      18,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      7,
+                      28,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      7,
+                      29,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      7,
+                      56,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      8,
+                      5,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      8,
+                      15,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      9,
+                      5,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      9,
+                      13,
+                      0,
+                      false,
+                      false,
+                      false
+                    ],
+                    [
+                      10,
+                      1,
+                      1,
+                      true,
+                      true,
+                      false
+                    ],
+                    [
+                      10,
+                      2,
+                      0,
+                      false,
+                      false,
+                      false
+                    ]
+                  ],
+                  "summary": {
+                    "branches": {
+                      "count": 0,
+                      "covered": 0,
+                      "notcovered": 0,
+                      "percent": 0
+                    },
+                    "functions": {
+                      "count": 2,
+                      "covered": 2,
+                      "percent": 100
+                    },
+                    "instantiations": {
+                      "count": 2,
+                      "covered": 2,
+                      "percent": 100
+                    },
+                    "lines": {
+                      "count": 8,
+                      "covered": 8,
+                      "percent": 100
+                    },
+                    "mcdc": {
+                      "count": 0,
+                      "covered": 0,
+                      "notcovered": 0,
+                      "percent": 0
+                    },
+                    "regions": {
+                      "count": 19,
+                      "covered": 18,
+                      "notcovered": 1,
+                      "percent": 94.73684210526315
+                    }
+                  }
+                }
+              ],
+              "functions": [
+                {
+                  "branches": [],
+                  "count": 1,
+                  "filenames": [
+                    "/home/gem/symphony-workspaces/GH-94/target/quality/gh-94/closure-distinguish/main.rs"
+                  ],
+                  "mcdc_records": [],
+                  "name": "_RNvCshXqY3UYjyfD_4main10field_only",
+                  "regions": [
+                    [
+                      3,
+                      1,
+                      3,
+                      38,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      3,
+                      41,
+                      3,
+                      53,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      3,
+                      54,
+                      3,
+                      57,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      3,
+                      78,
+                      3,
+                      79,
+                      1,
+                      0,
+                      0,
+                      0
+                    ]
+                  ]
+                },
+                {
+                  "branches": [],
+                  "count": 1,
+                  "filenames": [
+                    "/home/gem/symphony-workspaces/GH-94/target/quality/gh-94/closure-distinguish/main.rs"
+                  ],
+                  "mcdc_records": [],
+                  "name": "_RNvCshXqY3UYjyfD_4main4main",
+                  "regions": [
+                    [
+                      4,
+                      1,
+                      4,
+                      10,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      5,
+                      9,
+                      5,
+                      14,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      5,
+                      17,
+                      5,
+                      33,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      5,
+                      17,
+                      5,
+                      60,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      6,
+                      9,
+                      6,
+                      14,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      6,
+                      16,
+                      6,
+                      23,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      6,
+                      29,
+                      6,
+                      34,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      6,
+                      37,
+                      6,
+                      40,
+                      0,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      6,
+                      50,
+                      6,
+                      75,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      7,
+                      9,
+                      7,
+                      15,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      7,
+                      18,
+                      7,
+                      28,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      7,
+                      29,
+                      7,
+                      56,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      8,
+                      5,
+                      8,
+                      15,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      9,
+                      5,
+                      9,
+                      13,
+                      1,
+                      0,
+                      0,
+                      0
+                    ],
+                    [
+                      10,
+                      1,
+                      10,
+                      2,
+                      1,
+                      0,
+                      0,
+                      0
+                    ]
+                  ]
+                }
+              ],
+              "totals": {
+                "branches": {
+                  "count": 0,
+                  "covered": 0,
+                  "notcovered": 0,
+                  "percent": 0
+                },
+                "functions": {
+                  "count": 2,
+                  "covered": 2,
+                  "percent": 100
+                },
+                "instantiations": {
+                  "count": 2,
+                  "covered": 2,
+                  "percent": 100
+                },
+                "lines": {
+                  "count": 8,
+                  "covered": 8,
+                  "percent": 100
+                },
+                "mcdc": {
+                  "count": 0,
+                  "covered": 0,
+                  "notcovered": 0,
+                  "percent": 0
+                },
+                "regions": {
+                  "count": 19,
+                  "covered": 18,
+                  "notcovered": 1,
+                  "percent": 94.73684210526315
+                }
+              }
+            }
+          ],
+          "type": "llvm.coverage.json.export",
+          "version": "3.1.0"
+        }
+      }
+    }
+  }
 }
