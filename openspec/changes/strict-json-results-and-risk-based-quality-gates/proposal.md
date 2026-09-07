@@ -1,6 +1,6 @@
 # Proposal: Strict JSON Results and Risk-Based Quality Gates
 
-**Status:** Partially implemented — GH-96 tasks 8.1–8.4 locally validated after dependencies GH-91–GH-95 completed. GH-96 hosted CI and acceptance remain pending; tasks 9.1–9.4 and full-change acceptance are not certified. See [GH-93 validation](validation-gh-93.md), [GH-94 evidence](../../../docs/quality/gh-94-validation.md), and [GH-96 evidence](../../../docs/quality/gh-96-validation.md). No replacement baseline has been accepted by this integration.
+**Status:** Implementation issues GH-88–GH-96 completed; GH-97 final Linux verification passes at `381d5f418655969d29b81f89069845e6667f35c9`. Tasks 9.1, 9.2 and 9.4 are supported by retained evidence. Task 9.3 and full-change acceptance remain open: historical macOS/Windows contracts do not certify the final implementation, and the retained macOS run has an unresolved test/benchmark failure. GH-96 required PR CI passed at its recorded merge SHA. See the [GH-97 acceptance index](validation-gh-97.md) and [validation evidence](../../../docs/quality/gh-97-validation.md). No replacement baseline has been accepted.
 **Date:** 2026-09-05  
 **Review baseline:** `c9101c3191be7a5fd639c64c3781ccb154e0ce34` / v0.3.7
 
