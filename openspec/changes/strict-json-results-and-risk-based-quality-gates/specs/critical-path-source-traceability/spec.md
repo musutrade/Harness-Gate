@@ -53,6 +53,21 @@
 质量 job SHALL 上传原始测试证据、覆盖产物、CRAP 报告和 matrix 摘要；
 任何依赖失败、取消或跳过 SHALL 使 Required Quality Aggregate 失败。
 
+#### Scenario: Required PR evidence is cancelled or skipped
+
+- **WHEN** any applicable required job is failed, cancelled, skipped or missing
+- **THEN** Required Quality Aggregate SHALL fail, and the evidence job SHALL
+  attempt to upload available raw artifacts with `always()`
+- **AND** only explicitly push-only jobs SHALL be non-applicable to PRs;
+  coverage, risk and matrix collection SHALL be required on both events
+
+#### Scenario: A candidate combines stale or incomplete artifacts
+
+- **WHEN** candidate commit, base or run identity differs from the requested
+  collection, a required raw artifact is missing or has a different digest,
+  or any collection stage is unsuccessful or incomplete
+- **THEN** candidate verification SHALL exit non-zero without accepting a baseline
+
 #### Scenario: Coverage command fails after tests pass
 
 - **WHEN** coverage process exits non-zero
