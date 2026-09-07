@@ -223,77 +223,110 @@ fn configured_task(
         .collect::<Vec<_>>();
     let mut task = Task::new(&step.label, &step.program, &cwd, log(project, &step.log)?)
         .timeout(step.timeout_secs);
-    if let Some(runner) = &step.runner {
-        let (effective_args, mut execution) = runner_inputs(runner, &args)?;
-        execution.program = step.program.clone();
-        let mut isolation_state = None;
-        execution.migration_decision = if runner.isolation == TestIsolation::Shared {
-            "legacy-serial".into()
-        } else {
-            "explicit-runner-isolation".into()
-        };
-        execution.lock_decision = if runner.isolation == TestIsolation::Shared {
-            "not-required".into()
-        } else {
-            "invocation-scoped".into()
-        };
-        if runner.isolation != TestIsolation::Shared {
-            let worker_count = runner.threads.unwrap_or(1);
-            let (allocation, state_file) = allocate_isolation(
-                &project.reports,
-                &project.invocation_id(),
-                &step.id,
-                runner.isolation,
-                worker_count,
-            )?;
-            execution.isolation_id = Some(format!(
-                "{}:{}",
-                allocation.invocation_id, allocation.step_id
-            ));
-            execution.worker_ids = allocation.workers.clone();
-            execution.isolation_root = state_file
-                .parent()
-                .map(|path| path.to_string_lossy().into_owned());
-            execution.environment.insert(
-                crate::process::ISOLATION_MODE_ENV.into(),
-                isolation_mode_name(runner.isolation).into(),
-            );
-            execution.environment.insert(
-                crate::process::ISOLATION_IDS_ENV.into(),
-                allocation.workers.join(","),
-            );
-            execution.environment.insert(
-                crate::process::ISOLATION_ROOT_ENV.into(),
-                state_file
-                    .parent()
-                    .map(|path| path.to_string_lossy().into_owned())
-                    .unwrap_or_default(),
-            );
-            isolation_state = Some(state_file);
-        }
-        if let Some(shard) = project.config.execution.shards.get(&step.id) {
-            execution.shard_index = Some(shard.index);
-            execution.shard_total = Some(shard.total);
-            execution
-                .environment
-                .insert("HARNESS_GATE_SHARD_INDEX".into(), shard.index.to_string());
-            execution
-                .environment
-                .insert("HARNESS_GATE_SHARD_TOTAL".into(), shard.total.to_string());
-            execution.merge_identity =
-                Some(format!("{}:shard-{}/{}", step.id, shard.index, shard.total));
-        }
-        let runner_environment = execution.environment.clone();
-        task = task.args(effective_args).runner(execution);
-        if let Some(state_file) = isolation_state {
-            task = task.isolation_state(state_file);
-        }
-        for (name, value) in runner_environment {
-            task = task.env(name, value);
-        }
-    } else {
-        task = task.args(args);
+    task = match &step.runner {
+        Some(runner) => configure_runner(project, step, runner, task, &args)?,
+        None => task.args(args),
+    };
+    Ok(inject_task_environment(task, step, service_leases))
+}
+
+fn configure_runner(
+    project: &Project,
+    step: &StepConfig,
+    runner: &crate::config::RunnerConfig,
+    mut task: Task,
+    args: &[String],
+) -> Result<Task> {
+    let (effective_args, mut execution) = runner_inputs(runner, args)?;
+    execution.program = step.program.clone();
+    let isolation_state = configure_isolation(project, step, runner, &mut execution)?;
+    configure_shard(project, step, &mut execution);
+    let runner_environment = execution.environment.clone();
+    task = task.args(effective_args).runner(execution);
+    if let Some(state_file) = isolation_state {
+        task = task.isolation_state(state_file);
     }
+    for (name, value) in runner_environment {
+        task = task.env(name, value);
+    }
+
+    Ok(task)
+}
+
+fn configure_isolation(
+    project: &Project,
+    step: &StepConfig,
+    runner: &crate::config::RunnerConfig,
+    execution: &mut RunnerExecution,
+) -> Result<Option<std::path::PathBuf>> {
+    let mut isolation_state = None;
+    execution.migration_decision = if runner.isolation == TestIsolation::Shared {
+        "legacy-serial".into()
+    } else {
+        "explicit-runner-isolation".into()
+    };
+    execution.lock_decision = if runner.isolation == TestIsolation::Shared {
+        "not-required".into()
+    } else {
+        "invocation-scoped".into()
+    };
+    if runner.isolation != TestIsolation::Shared {
+        let worker_count = runner.threads.unwrap_or(1);
+        let (allocation, state_file) = allocate_isolation(
+            &project.reports,
+            &project.invocation_id(),
+            &step.id,
+            runner.isolation,
+            worker_count,
+        )?;
+        execution.isolation_id = Some(format!(
+            "{}:{}",
+            allocation.invocation_id, allocation.step_id
+        ));
+        execution.worker_ids = allocation.workers.clone();
+        execution.isolation_root = state_file
+            .parent()
+            .map(|path| path.to_string_lossy().into_owned());
+        execution.environment.insert(
+            crate::process::ISOLATION_MODE_ENV.into(),
+            isolation_mode_name(runner.isolation).into(),
+        );
+        execution.environment.insert(
+            crate::process::ISOLATION_IDS_ENV.into(),
+            allocation.workers.join(","),
+        );
+        execution.environment.insert(
+            crate::process::ISOLATION_ROOT_ENV.into(),
+            state_file
+                .parent()
+                .map(|path| path.to_string_lossy().into_owned())
+                .unwrap_or_default(),
+        );
+        isolation_state = Some(state_file);
+    }
+    Ok(isolation_state)
+}
+
+fn configure_shard(project: &Project, step: &StepConfig, execution: &mut RunnerExecution) {
+    if let Some(shard) = project.config.execution.shards.get(&step.id) {
+        execution.shard_index = Some(shard.index);
+        execution.shard_total = Some(shard.total);
+        execution
+            .environment
+            .insert("HARNESS_GATE_SHARD_INDEX".into(), shard.index.to_string());
+        execution
+            .environment
+            .insert("HARNESS_GATE_SHARD_TOTAL".into(), shard.total.to_string());
+        execution.merge_identity =
+            Some(format!("{}:shard-{}/{}", step.id, shard.index, shard.total));
+    }
+}
+
+fn inject_task_environment(
+    mut task: Task,
+    step: &StepConfig,
+    service_leases: &[ServiceLease],
+) -> Task {
     for lease in service_leases {
         let (name, value) = lease.environment();
         task = task.env(name, value);
@@ -301,7 +334,8 @@ fn configured_task(
     for name in &step.remove_env {
         task = task.env_remove(name);
     }
-    Ok(task)
+
+    task
 }
 
 fn runner_inputs(

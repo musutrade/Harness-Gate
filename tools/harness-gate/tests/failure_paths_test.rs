@@ -527,7 +527,7 @@ connection = 'fixture:{host_port}'
             fs::create_dir_all(root.path().join(".harness-gate/reports/test_result.json")).unwrap();
         }
         let mut child = command(root.path())
-            .env("PATH", path)
+            .env("PATH", &path)
             .args(["verify", "--all"])
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
@@ -621,9 +621,145 @@ connection = 'fixture:{host_port}'
         assert!(root.path().join("runtime-object.json").is_file());
         let leases = root.path().join(".harness-gate/reports/leases");
         assert_eq!(
-            fs::read_dir(leases).unwrap().count(),
+            fs::read_dir(&leases).unwrap().count(),
             1,
             "failed cleanup must retain lease"
         );
+        let cleanup = command(root.path())
+            .args(["cleanup", "--dry-run"])
+            .output()
+            .unwrap();
+        let cleanup = success(cleanup);
+        assert!(String::from_utf8_lossy(&cleanup.stdout).contains("Cleanup (dry-run): scanned 1"));
+        fs::write(leases.join("invalid.json"), "not JSON").unwrap();
+        let cleanup = command(root.path()).args(["cleanup"]).output().unwrap();
+        assert!(!cleanup.status.success());
+        assert!(String::from_utf8_lossy(&cleanup.stderr).contains("cleanup failure:"));
+        assert!(leases.join("invalid.json").is_file());
     }
+}
+
+#[test]
+fn extracted_cli_handlers_preserve_text_json_and_hook_snapshot_contracts() {
+    let root = fixture();
+    let doctor = success(command(root.path()).args(["doctor"]).output().unwrap());
+    assert!(String::from_utf8_lossy(&doctor.stdout).contains("harness-gate doctor"));
+    let scope = success(
+        command(root.path())
+            .args(["scope", "--all", "--benchmark-repeat", "2"])
+            .output()
+            .unwrap(),
+    );
+    let benchmark: Value = serde_json::from_slice(&scope.stdout).unwrap();
+    assert!(benchmark.is_object());
+    let scope = success(
+        command(root.path())
+            .args(["scope", "--all", "--json"])
+            .output()
+            .unwrap(),
+    );
+    let scope: Value = serde_json::from_slice(&scope.stdout).unwrap();
+    assert_eq!(scope["mode"], "all");
+    assert!(scope["components"]
+        .as_array()
+        .unwrap()
+        .contains(&Value::String("project".into())));
+    let secrets = success(
+        command(root.path())
+            .args(["secrets", "--json"])
+            .output()
+            .unwrap(),
+    );
+    let clean: Value = serde_json::from_slice(&secrets.stdout).unwrap();
+    assert_eq!(clean["passed"], true);
+    // A deterministic rule avoids placing real credentials in fixtures.
+    let config_path = root.path().join(".harness-gate/secrets.toml");
+    let config = fs::read_to_string(&config_path).unwrap();
+    fs::write(
+        config_path,
+        format!(
+            "{config}\n[[rules]]\nid = 'fixture'\nkind = 'direct'\npattern = 'GH94_SENTINEL'\n"
+        ),
+    )
+    .unwrap();
+    fs::write(root.path().join("credential.txt"), "GH94_SENTINEL").unwrap();
+    let rejected = command(root.path()).args(["secrets"]).output().unwrap();
+    assert!(!rejected.status.success());
+    assert!(String::from_utf8_lossy(&rejected.stderr).contains("credential.txt"));
+    fs::remove_file(root.path().join("credential.txt")).unwrap();
+    // The rule itself contains the sentinel, so restore it before snapshotting.
+    fs::write(root.path().join(".harness-gate/secrets.toml"), config).unwrap();
+    git(root.path(), &["add", "."]);
+    git(
+        root.path(),
+        &[
+            "-c",
+            "user.name=Fixture",
+            "-c",
+            "user.email=fixture@example.invalid",
+            "commit",
+            "-m",
+            "fixture",
+        ],
+    );
+    fs::write(root.path().join("probe.sh"), "echo staged-hook\n").unwrap();
+    git(root.path(), &["add", "probe.sh"]);
+    fs::write(
+        root.path().join("probe.sh"),
+        "echo unstaged-hook >&2\nexit 9\n",
+    )
+    .unwrap();
+    success(command(root.path()).args(["hook"]).output().unwrap());
+    let evidence = report(root.path());
+    assert_eq!(evidence["passed"], true);
+    assert!(serde_json::to_string(&evidence).unwrap().contains("hook"));
+    assert_sealed_evidence(&evidence);
+}
+
+#[test]
+fn compatibility_dispatch_retains_request_identity_and_shadow_failure() {
+    let root = fixture();
+    let input = root.path().join("request.json");
+    let output = root.path().join("result.json");
+    fs::write(
+        &input,
+        r#"{"schema_version":1,"all":true,"request_id":"GH94-compat"}"#,
+    )
+    .unwrap();
+    let mut args = vec![
+        "compat",
+        "run",
+        "--input",
+        input.to_str().unwrap(),
+        "--output",
+        output.to_str().unwrap(),
+    ];
+    let first = success(command(root.path()).args(&args).output().unwrap());
+    assert!(String::from_utf8_lossy(&first.stdout).contains("GH94-compat"));
+    let old = root.path().join("old.json");
+    fs::write(&old, "{}").unwrap();
+    args.extend(["--old-result", old.to_str().unwrap()]);
+    let shadow = command(root.path()).args(&args).output().unwrap();
+    assert!(!shadow.status.success());
+    assert!(String::from_utf8_lossy(&shadow.stdout).contains("\"equivalent\": false"));
+    let input = root.path().join("events.jsonl");
+    let output = root.path().join("errors.md");
+    fs::write(
+        &input,
+        "{\"level\":\"ERROR\",\"trace_id\":\"fixture\",\"fields\":{\"error\":\"root cause\"}}\n",
+    )
+    .unwrap();
+    success(
+        command(root.path())
+            .args([
+                "parse-logs",
+                "--input",
+                input.to_str().unwrap(),
+                "--output",
+                output.to_str().unwrap(),
+            ])
+            .output()
+            .unwrap(),
+    );
+    assert!(fs::read_to_string(output).unwrap().contains("root cause"));
 }

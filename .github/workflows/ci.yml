@@ -396,6 +396,11 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Install Rust coverage tools for measurement contract tests
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+
       - name: Install Python
         uses: actions/setup-python@v7
         with:

@@ -217,7 +217,36 @@ pub fn run_with_cancel<F>(
 where
     F: Fn() -> bool,
 {
-    validate_request(&request, policy)?;
+    let PreparedRequest {
+        artifact_root,
+        executable,
+        request_json,
+    } = prepare_request(&request, policy)?;
+    let started = Instant::now();
+    let output = run_process(
+        &request,
+        policy,
+        &artifact_root,
+        &executable,
+        request_json,
+        started,
+        &is_cancelled,
+    )?;
+    validate_process_output(&output, policy)?;
+    finish_response(&request, policy, &artifact_root, output, started)
+}
+
+struct PreparedRequest {
+    artifact_root: PathBuf,
+    executable: PathBuf,
+    request_json: Vec<u8>,
+}
+
+fn prepare_request(
+    request: &AdapterRequest,
+    policy: &HostPolicy,
+) -> Result<PreparedRequest, AdapterError> {
+    validate_request(request, policy)?;
     let artifact_root = canonical_directory(&request.artifact_root, "artifact root")?;
     let executable = canonical_file(&request.adapter.executable, "adapter executable")?;
     let request_json = serde_json::to_vec(&request)
@@ -229,15 +258,49 @@ where
         )));
     }
 
-    let started = Instant::now();
-    let mut command = Command::new(&executable);
+    Ok(PreparedRequest {
+        artifact_root,
+        executable,
+        request_json,
+    })
+}
+
+struct ProcessExit {
+    status: std::process::ExitStatus,
+    timed_out: bool,
+    was_cancelled: bool,
+    output_limited: Option<(&'static str, usize)>,
+    request_write_error: Option<AdapterError>,
+    request_write_done: bool,
+}
+
+struct ProcessOutput {
+    status: std::process::ExitStatus,
+    timed_out: bool,
+    was_cancelled: bool,
+    output_limited: Option<(&'static str, usize)>,
+    request_write_error: Option<AdapterError>,
+    stdout: super::reader::LimitedOutput,
+    stderr: super::reader::LimitedOutput,
+}
+
+fn run_process(
+    request: &AdapterRequest,
+    policy: &HostPolicy,
+    artifact_root: &Path,
+    executable: &Path,
+    request_json: Vec<u8>,
+    started: Instant,
+    is_cancelled: &impl Fn() -> bool,
+) -> Result<ProcessOutput, AdapterError> {
+    let mut command = Command::new(executable);
     command
         .args(&request.args)
-        .current_dir(&artifact_root)
+        .current_dir(artifact_root)
         .env_clear()
         .env("HARNESS_GATE_INVOCATION_ID", &request.invocation_id)
         .env("HARNESS_GATE_STEP_ID", &request.step_id)
-        .env("HARNESS_GATE_ARTIFACT_ROOT", &artifact_root)
+        .env("HARNESS_GATE_ARTIFACT_ROOT", artifact_root)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
@@ -286,91 +349,22 @@ where
         Arc::clone(&stderr_overflow),
     );
     let (stdin_handle, stdin_receiver) = spawn_request_writer(stdin, request_json);
-    let timeout = Duration::from_millis(request.timeout_ms);
-    let mut timed_out = false;
-    let mut was_cancelled = false;
-    let mut output_limited = None;
-    let mut request_write_error: Option<AdapterError> = None;
-    let mut request_write_done = false;
-    let status = loop {
-        if let Some(status) = child
-            .try_wait()
-            .map_err(|error| AdapterError::Protocol(format!("wait for adapter: {error}")))?
-        {
-            break status;
-        }
-        if !request_write_done {
-            match stdin_receiver.try_recv() {
-                Ok(Ok(())) => request_write_done = true,
-                Ok(Err(error)) => {
-                    request_write_error = Some(AdapterError::Protocol(format!(
-                        "write adapter request: {error}"
-                    )));
-                    break terminate(&mut child).map_err(|error| {
-                        AdapterError::Protocol(format!(
-                            "terminate adapter after stdin error: {error}"
-                        ))
-                    })?;
-                }
-                Err(TryRecvError::Disconnected) => {
-                    request_write_error = Some(AdapterError::Protocol(
-                        "adapter stdin writer disconnected".into(),
-                    ));
-                    break terminate(&mut child).map_err(|error| {
-                        AdapterError::Protocol(format!(
-                            "terminate adapter after stdin error: {error}"
-                        ))
-                    })?;
-                }
-                Err(TryRecvError::Empty) => {}
-            }
-        }
-        if stdout_overflow.load(Ordering::Acquire) {
-            output_limited = Some(("stdout", policy.max_stdout_bytes));
-            terminate(&mut child).map_err(|error| {
-                AdapterError::Protocol(format!("terminate noisy adapter: {error}"))
-            })?;
-            break child
-                .try_wait()
-                .map_err(|error| AdapterError::Protocol(format!("reap noisy adapter: {error}")))?
-                .ok_or_else(|| AdapterError::Protocol("noisy adapter did not exit".into()))?;
-        }
-        if stderr_overflow.load(Ordering::Acquire) {
-            output_limited = Some(("stderr", policy.max_stderr_bytes));
-            terminate(&mut child).map_err(|error| {
-                AdapterError::Protocol(format!("terminate noisy adapter: {error}"))
-            })?;
-            break child
-                .try_wait()
-                .map_err(|error| AdapterError::Protocol(format!("reap noisy adapter: {error}")))?
-                .ok_or_else(|| AdapterError::Protocol("noisy adapter did not exit".into()))?;
-        }
-        if is_cancelled() {
-            was_cancelled = true;
-            terminate(&mut child).map_err(|error| {
-                AdapterError::Protocol(format!("terminate cancelled adapter: {error}"))
-            })?;
-            break child
-                .try_wait()
-                .map_err(|error| {
-                    AdapterError::Protocol(format!("reap cancelled adapter: {error}"))
-                })?
-                .ok_or_else(|| AdapterError::Protocol("cancelled adapter did not exit".into()))?;
-        }
-        if started.elapsed() >= timeout {
-            timed_out = true;
-            terminate(&mut child).map_err(|error| {
-                AdapterError::Protocol(format!("terminate timed out adapter: {error}"))
-            })?;
-            break child
-                .try_wait()
-                .map_err(|error| {
-                    AdapterError::Protocol(format!("reap timed out adapter: {error}"))
-                })?
-                .ok_or_else(|| AdapterError::Protocol("timed out adapter did not exit".into()))?;
-        }
-        std::thread::sleep(Duration::from_millis(20));
-    };
+    let ProcessExit {
+        status,
+        timed_out,
+        was_cancelled,
+        output_limited,
+        mut request_write_error,
+        request_write_done,
+    } = wait_for_adapter(
+        &mut child,
+        &stdin_receiver,
+        [&stdout_overflow, &stderr_overflow],
+        policy,
+        request.timeout_ms,
+        started,
+        is_cancelled,
+    )?;
     let reader_started = Instant::now();
     let stdout = collect_limited_reader(
         stdout_handle,
@@ -402,7 +396,108 @@ where
         request_write_error =
             collect_request_writer(stdin_handle, stdin_receiver, writer_deadline).err();
     }
-    if let Some((stream, limit)) = output_limited {
+    Ok(ProcessOutput {
+        status,
+        timed_out,
+        was_cancelled,
+        output_limited,
+        request_write_error,
+        stdout,
+        stderr,
+    })
+}
+
+fn wait_for_adapter(
+    child: &mut std::process::Child,
+    stdin_receiver: &Receiver<io::Result<()>>,
+    overflow: [&AtomicBool; 2],
+    policy: &HostPolicy,
+    timeout_ms: u64,
+    started: Instant,
+    is_cancelled: &impl Fn() -> bool,
+) -> Result<ProcessExit, AdapterError> {
+    let timeout = Duration::from_millis(timeout_ms);
+    let mut timed_out = false;
+    let mut was_cancelled = false;
+    let mut output_limited = None;
+    let mut request_write_error: Option<AdapterError> = None;
+    let mut request_write_done = false;
+    let status = loop {
+        if let Some(status) = child
+            .try_wait()
+            .map_err(|error| AdapterError::Protocol(format!("wait for adapter: {error}")))?
+        {
+            break status;
+        }
+        if !request_write_done {
+            match stdin_receiver.try_recv() {
+                Ok(Ok(())) => request_write_done = true,
+                Ok(Err(error)) => {
+                    request_write_error = Some(AdapterError::Protocol(format!(
+                        "write adapter request: {error}"
+                    )));
+                    break terminate(child).map_err(|error| {
+                        AdapterError::Protocol(format!(
+                            "terminate adapter after stdin error: {error}"
+                        ))
+                    })?;
+                }
+                Err(TryRecvError::Disconnected) => {
+                    request_write_error = Some(AdapterError::Protocol(
+                        "adapter stdin writer disconnected".into(),
+                    ));
+                    break terminate(child).map_err(|error| {
+                        AdapterError::Protocol(format!(
+                            "terminate adapter after stdin error: {error}"
+                        ))
+                    })?;
+                }
+                Err(TryRecvError::Empty) => {}
+            }
+        }
+        let termination = if overflow[0].load(Ordering::Acquire) {
+            output_limited = Some(("stdout", policy.max_stdout_bytes));
+            Some("noisy")
+        } else if overflow[1].load(Ordering::Acquire) {
+            output_limited = Some(("stderr", policy.max_stderr_bytes));
+            Some("noisy")
+        } else if is_cancelled() {
+            was_cancelled = true;
+            Some("cancelled")
+        } else if started.elapsed() >= timeout {
+            timed_out = true;
+            Some("timed out")
+        } else {
+            None
+        };
+        if let Some(reason) = termination {
+            break terminate(child).map_err(|error| {
+                AdapterError::Protocol(format!("terminate {reason} adapter: {error}"))
+            })?;
+        }
+        std::thread::sleep(Duration::from_millis(20));
+    };
+    Ok(ProcessExit {
+        status,
+        timed_out,
+        was_cancelled,
+        output_limited,
+        request_write_error,
+        request_write_done,
+    })
+}
+
+fn validate_process_output(
+    output: &ProcessOutput,
+    policy: &HostPolicy,
+) -> Result<(), AdapterError> {
+    let ProcessOutput {
+        output_limited,
+        stdout,
+        stderr,
+        ..
+    } = output;
+    if let Some((stream, limit)) = *output_limited {
         let captured = if stream == "stdout" {
             stdout.bytes.len()
         } else {
@@ -429,6 +524,25 @@ where
             captured,
         });
     }
+    Ok(())
+}
+
+fn finish_response(
+    request: &AdapterRequest,
+    policy: &HostPolicy,
+    artifact_root: &Path,
+    output: ProcessOutput,
+    started: Instant,
+) -> Result<AdapterOutcome, AdapterError> {
+    let ProcessOutput {
+        status,
+        timed_out,
+        was_cancelled,
+        request_write_error,
+        stdout,
+        stderr,
+        ..
+    } = output;
     let duration_ms = started.elapsed().as_millis();
     if timed_out {
         return Err(AdapterError::Protocol(format!(
@@ -451,13 +565,8 @@ where
         )));
     }
     let response = parse_response(&stdout.bytes)?;
-    validate_artifact_root_budget(&artifact_root, policy.max_artifact_bytes)?;
-    validate_artifacts_with_budget(
-        &response,
-        &artifact_root,
-        &request,
-        policy.max_artifact_bytes,
-    )?;
+    validate_artifact_root_budget(artifact_root, policy.max_artifact_bytes)?;
+    validate_artifacts_with_budget(&response, artifact_root, request, policy.max_artifact_bytes)?;
     Ok(AdapterOutcome {
         response,
         status_code: status.code(),
@@ -1223,6 +1332,110 @@ mod tests {
         let outcome = run(request, &policy).expect("fixture succeeds");
         assert_eq!(outcome.response["status"], "PASS");
         assert!(directory.path().join("adapter-result.txt").is_file());
+    }
+
+    #[test]
+    fn waiter_terminates_on_writer_failure_and_observed_output_limits() {
+        let root = tempdir().unwrap();
+        let (request, policy) = fixture_request(root.path(), "stable");
+        for cause in ["write-error", "disconnect", "stdout", "stderr"] {
+            let mut command = Command::new(&request.adapter.executable);
+            command.args(["-c", "import time; time.sleep(30)"]);
+            isolate_process_tree(&mut command);
+            let mut child = command.spawn().unwrap();
+            let (sender, receiver) = mpsc::sync_channel(1);
+            if cause == "write-error" {
+                sender
+                    .send(Err(io::Error::new(
+                        io::ErrorKind::BrokenPipe,
+                        "fixture writer failure",
+                    )))
+                    .unwrap();
+            } else if cause != "disconnect" {
+                sender.send(Ok(())).unwrap();
+            }
+            drop(sender);
+            let stdout = AtomicBool::new(cause == "stdout");
+            let stderr = AtomicBool::new(cause == "stderr");
+            let exit = wait_for_adapter(
+                &mut child,
+                &receiver,
+                [&stdout, &stderr],
+                &policy,
+                5_000,
+                Instant::now(),
+                &|| false,
+            )
+            .unwrap();
+            assert!(!exit.status.success());
+            assert!(!exit.timed_out && !exit.was_cancelled);
+            assert!(child.try_wait().unwrap().is_some(), "child must be reaped");
+            match cause {
+                "write-error" => assert!(exit
+                    .request_write_error
+                    .unwrap()
+                    .to_string()
+                    .contains("fixture writer failure")),
+                "disconnect" => assert!(exit
+                    .request_write_error
+                    .unwrap()
+                    .to_string()
+                    .contains("writer disconnected")),
+                stream => assert_eq!(exit.output_limited.unwrap().0, stream),
+            }
+        }
+    }
+
+    #[test]
+    fn output_validation_retains_stream_precedence_and_combined_budget() {
+        let root = tempdir().unwrap();
+        let (request, mut policy) = fixture_request(root.path(), "stable");
+        let status = Command::new(&request.adapter.executable)
+            .args(["-c", "pass"])
+            .status()
+            .unwrap();
+        policy.max_stdout_bytes = 4;
+        policy.max_stderr_bytes = 5;
+        policy.max_output_bytes = 6;
+        for (observed, truncated, expected) in [
+            (Some(("stdout", 4)), (false, false), "stdout"),
+            (Some(("stderr", 5)), (true, false), "stderr"),
+            (None, (true, true), "stdout"),
+            (None, (false, true), "stderr"),
+            (None, (false, false), "combined"),
+        ] {
+            let output = ProcessOutput {
+                status,
+                timed_out: false,
+                was_cancelled: false,
+                output_limited: observed,
+                request_write_error: None,
+                stdout: super::super::reader::LimitedOutput {
+                    bytes: vec![0; 4],
+                    truncated: truncated.0,
+                },
+                stderr: super::super::reader::LimitedOutput {
+                    bytes: vec![0; 5],
+                    truncated: truncated.1,
+                },
+            };
+            match validate_process_output(&output, &policy).unwrap_err() {
+                AdapterError::OutputLimit {
+                    stream,
+                    limit,
+                    captured,
+                } => {
+                    assert_eq!(stream, expected);
+                    let (expected_limit, expected_captured) = match expected {
+                        "stdout" => (4, 4),
+                        "stderr" => (5, 5),
+                        _ => (6, 9),
+                    };
+                    assert_eq!((limit, captured), (expected_limit, expected_captured));
+                }
+                error => panic!("unexpected error: {error}"),
+            }
+        }
     }
 
     #[test]

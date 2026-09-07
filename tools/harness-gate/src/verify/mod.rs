@@ -264,28 +264,94 @@ fn run_selected(
         }
     };
     let cleanup_error = cleanup_result.err();
+    let services = service_results(&plan, cleanup_error.is_some());
+    let scheduler::SchedulerOutcome {
+        results,
+        cancelled,
+        failures,
+    } = outcome;
+    let (steps, skipped_steps) = merge_results(
+        &plan,
+        results,
+        &invocation,
+        &invocation_project,
+        &mut progress,
+        cleanup_error.as_ref(),
+    );
+    let passed = cleanup_error.is_none()
+        && steps.iter().all(|step| step.passed)
+        && steps.len() == plan.nodes.len();
+    let report = VerificationReport {
+        invocation_id: invocation.id.clone(),
+        executor_version: env!("CARGO_PKG_VERSION").into(),
+        report_directory: invocation.root.to_string_lossy().into_owned(),
+        timestamp: chrono::Utc::now().to_rfc3339(),
+        profile: only_step
+            .map(|id| format!("step:{id}"))
+            .unwrap_or_else(|| profile.to_string()),
+        input_mode: invocation_project.input().mode.as_str().into(),
+        project_identity: invocation_project.input().project_identity.clone(),
+        source_identity: invocation_project.input().source_identity.clone(),
+        execution_root: invocation_project
+            .input()
+            .execution_root
+            .to_string_lossy()
+            .into_owned(),
+        configuration_digest: invocation_project.input().configuration_digest.clone(),
+        scope,
+        services,
+        steps,
+        skipped_steps,
+        passed,
+    };
+    publish_report(&report, &invocation_project, project, &mut progress)?;
+
+    // Publication happens before returning cancellation or adapter failures so
+    // callers retain the same report and log evidence as a normal run.
+    if cancelled {
+        return Err(VerifyError::Cancelled);
+    }
+    if let Some(failure) = scheduler::primary_failure(&plan, failures) {
+        return Err(match failure.error {
+            scheduler::SchedulerError::Secrets(error) => VerifyError::Secrets(error),
+            scheduler::SchedulerError::Audit(error) => VerifyError::Audit(error),
+            scheduler::SchedulerError::Execution(error) => VerifyError::execution(error),
+        });
+    }
+    if let Some(error) = cleanup_error {
+        return Err(VerifyError::execution(error));
+    }
+    Ok(report)
+}
+
+fn service_results(plan: &VerificationPlan<'_>, cleanup_failed: bool) -> Vec<ServiceResult> {
     let service_ids = plan
         .nodes
         .iter()
         .filter_map(|node| node.step)
         .flat_map(|step| step.services.iter().cloned())
         .collect::<BTreeSet<_>>();
-    let services = service_ids
+    service_ids
         .into_iter()
         .map(|id| ServiceResult {
             id,
-            status: if cleanup_error.is_some() {
+            status: if cleanup_failed {
                 "LEAKED".into()
             } else {
                 "CLEANED".into()
             },
         })
-        .collect();
-    let scheduler::SchedulerOutcome {
-        results,
-        cancelled,
-        failures,
-    } = outcome;
+        .collect()
+}
+
+fn merge_results(
+    plan: &VerificationPlan<'_>,
+    results: Vec<scheduler::ScheduledResult>,
+    invocation: &report::Invocation,
+    invocation_project: &Project,
+    progress: &mut Progress,
+    cleanup_error: Option<&anyhow::Error>,
+) -> (Vec<TaskResult>, Vec<SkippedStep>) {
     let mut ordered = results;
     ordered.sort_by_key(|result| {
         plan.nodes
@@ -339,7 +405,7 @@ fn run_selected(
         }
         progress.complete();
     }
-    if let Some(error) = &cleanup_error {
+    if let Some(error) = cleanup_error {
         steps.push(TaskResult {
             step_id: Some("service.cleanup".into()),
             invocation_id: Some(invocation.id.clone()),
@@ -363,35 +429,18 @@ fn run_selected(
             runner: None,
         });
     }
-    let passed = cleanup_error.is_none()
-        && steps.iter().all(|step| step.passed)
-        && steps.len() == plan.nodes.len();
-    let report = VerificationReport {
-        invocation_id: invocation.id.clone(),
-        executor_version: env!("CARGO_PKG_VERSION").into(),
-        report_directory: invocation.root.to_string_lossy().into_owned(),
-        timestamp: chrono::Utc::now().to_rfc3339(),
-        profile: only_step
-            .map(|id| format!("step:{id}"))
-            .unwrap_or_else(|| profile.to_string()),
-        input_mode: invocation_project.input().mode.as_str().into(),
-        project_identity: invocation_project.input().project_identity.clone(),
-        source_identity: invocation_project.input().source_identity.clone(),
-        execution_root: invocation_project
-            .input()
-            .execution_root
-            .to_string_lossy()
-            .into_owned(),
-        configuration_digest: invocation_project.input().configuration_digest.clone(),
-        scope,
-        services,
-        steps,
-        skipped_steps,
-        passed,
-    };
-    report::write(&report, &invocation_project).map_err(VerifyError::report)?;
-    report::mirror_legacy_outputs(&invocation_project, project).map_err(VerifyError::report)?;
-    report::notify(&report, &invocation_project).map_err(VerifyError::report)?;
+    (steps, skipped_steps)
+}
+
+fn publish_report(
+    report: &VerificationReport,
+    invocation_project: &Project,
+    project: &Project,
+    progress: &mut Progress,
+) -> Result<(), VerifyError> {
+    report::write(report, invocation_project).map_err(VerifyError::report)?;
+    report::mirror_legacy_outputs(invocation_project, project).map_err(VerifyError::report)?;
+    report::notify(report, invocation_project).map_err(VerifyError::report)?;
     progress.finish();
     println!(
         "\nVerification report: {}",
@@ -402,22 +451,7 @@ fn run_selected(
         if report.passed { "PASS" } else { "FAIL" }
     );
 
-    // Publication happens before returning cancellation or adapter failures so
-    // callers retain the same report and log evidence as a normal run.
-    if cancelled {
-        return Err(VerifyError::Cancelled);
-    }
-    if let Some(failure) = scheduler::primary_failure(&plan, failures) {
-        return Err(match failure.error {
-            scheduler::SchedulerError::Secrets(error) => VerifyError::Secrets(error),
-            scheduler::SchedulerError::Audit(error) => VerifyError::Audit(error),
-            scheduler::SchedulerError::Execution(error) => VerifyError::execution(error),
-        });
-    }
-    if let Some(error) = cleanup_error {
-        return Err(VerifyError::execution(error));
-    }
-    Ok(report)
+    Ok(())
 }
 
 pub fn explicit_scope(components: &[String]) -> ScopeResult {

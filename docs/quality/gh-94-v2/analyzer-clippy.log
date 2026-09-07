@@ -1,0 +1,12 @@
+    Checking unicode-ident v1.0.24
+    Checking itoa v1.0.18
+    Checking memchr v2.8.3
+    Checking rustc-demangle v0.1.27
+    Checking serde_core v1.0.229
+    Checking zmij v1.0.23
+    Checking proc-macro2 v1.0.106
+    Checking quote v1.0.45
+    Checking syn v2.0.119
+    Checking serde_json v1.0.151
+    Checking harness-gate-rust-measure v0.2.0 (/home/gem/symphony-workspaces/GH-94/tools/quality/rust-measure)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 6.73s
