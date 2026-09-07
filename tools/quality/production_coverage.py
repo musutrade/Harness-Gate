@@ -201,7 +201,8 @@ def meets_threshold(covered: int, count: int, threshold: Decimal = Decimal(80)) 
 
 
 def summarize(raw: Path, lcov: Path, inventory_path: Path = INVENTORY,
-              crate: Path = CRATE, threshold: Decimal = Decimal(80)) -> dict:
+              crate: Path = CRATE, threshold: Decimal = Decimal(80), *,
+              coverage_root: Path | None = None) -> dict:
     meets_threshold(0, 1, threshold)
     inventory, owners, excluded = load_inventory(inventory_path, crate)
     report = read_json(raw)
@@ -217,7 +218,7 @@ def summarize(raw: Path, lcov: Path, inventory_path: Path = INVENTORY,
         path = Path(filename.replace("\\", "/"))
         require(path.is_absolute(), f"coverage path must be absolute: {filename}")
         try:
-            relative = path.resolve().relative_to(crate.resolve()).as_posix()
+            relative = path.resolve().relative_to((coverage_root or crate).resolve()).as_posix()
         except ValueError as error:
             raise ValueError(f"unknown coverage path: {filename}") from error
         require(relative in owners or relative in excluded or any(

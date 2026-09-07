@@ -2,7 +2,7 @@
 """Deterministic development complexity analyzer for the frozen fixture subset.
 
 This is the locked in-repository analyzer (identity ``harness-gate-complexity``
-0.1.0, MIT).  It deliberately uses only the Python standard library so the
+0.1.1, MIT).  It deliberately uses only the Python standard library so the
 quality-script CI job can rebuild every fixture without installing a third
 party analyzer.  It is a development/CI tool and is never linked into the
 Harness-Gate release binary.
@@ -47,7 +47,7 @@ from quality_evidence import (
 
 
 ANALYZER_NAME = "harness-gate-complexity"
-ANALYZER_VERSION = "0.1.0"
+ANALYZER_VERSION = "0.1.1"
 RULE_NAME = "mccabe-rust-1"
 RULE_VERSION = "1"
 LICENSE = "MIT"
@@ -418,7 +418,6 @@ class ComplexityAnalyzer:
     def _skip_attributes(self) -> None:
         while self.current is not None and self.current.text == "#":
             self._consume()
-            self._expect("[")
             self._skip_balanced("[", "]")
 
     # -- counting ----------------------------------------------------------
@@ -507,12 +506,12 @@ class ComplexityAnalyzer:
                 index += 1
                 if index >= len(self.tokens):
                     return None
-                self._skip_balanced_from(index, "[", "]")
+                index = self._skip_balanced_from(index, "[", "]")
                 continue
             if token.text == "pub":
                 index += 1
                 if index < len(self.tokens) and self.tokens[index].text == "(":
-                    self._skip_balanced_from(index, "(", ")")
+                    index = self._skip_balanced_from(index, "(", ")")
                 continue
             if token.text in FN_MODIFIERS:
                 index += 1
@@ -542,14 +541,26 @@ class ComplexityAnalyzer:
         while self.current is not None:
             self._parse_item()
 
-    def _parse_item(self) -> None:
+    def _parse_item(self, prefix: Token | None = None) -> None:
         self._skip_attributes()
         token = self.current
         if token is None:
             return
         text = token.text
+        if text == "pub":
+            self._consume()
+            if self.current is not None and self.current.text == "(":
+                self._skip_balanced("(", ")")
+            self._parse_item(prefix or token)
+            return
+        if text in FN_MODIFIERS and self._looks_like_fn_item():
+            self._consume()
+            if text == "extern" and self.current is not None and self.current.kind == "literal":
+                self._consume()
+            self._parse_item(prefix or token)
+            return
         if text == "fn":
-            self._parse_function()
+            self._parse_function(prefix=prefix)
             return
         if text == "mod":
             self._parse_module()
@@ -593,6 +604,7 @@ class ComplexityAnalyzer:
                     candidate = text
                 if text == "for":
                     after_for = True
+                index += 1
                 continue
             if depth == 0 and text in ("(", "[", "<"):
                 depth += 1
@@ -660,8 +672,9 @@ class ComplexityAnalyzer:
         self._error("unterminated item")
 
     # -- functions ---------------------------------------------------------
-    def _parse_function(self, *, nested: bool = False) -> None:
-        start = self._expect("fn")
+    def _parse_function(self, *, nested: bool = False, prefix: Token | None = None) -> None:
+        start = prefix or self.current
+        self._expect("fn")
         name = self._expect_name().text
         if self.current is not None and self.current.text == "<":
             self._skip_balanced("<", ">")
@@ -859,12 +872,10 @@ class ComplexityAnalyzer:
         if token is None:
             self._error("expected an expression")
         text = token.text
-        if text in ("!", "-", "*", "&", "&&", "||"):
+        if text in ("!", "-", "*", "&", "&&"):
             self._consume()
             if text == "&&":
                 self._count("and_and")
-            elif text == "||":
-                self._count("or_or")
             self._parse_prefix_or_atom(allow_block_after_path=allow_block_after_path)
             return
         if text in ("move", "async"):
