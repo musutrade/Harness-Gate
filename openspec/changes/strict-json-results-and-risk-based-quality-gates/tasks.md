@@ -20,11 +20,11 @@ S = 小于 1 小时，M = 1–2 小时，L = 2–不足 4 小时；超出估算�
 
 ## 3. Expand production coverage boundaries
 
-- [ ] 3.1 [P2][M] 建立版本化源清单，新增 `app/project/doctor/service-core` 并显式列出其他模块；验收：每个生产范围有唯一归属，不同边界不能互相提高聚合。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
-- [ ] 3.2 [P2][L] 划分 service-core 和 daemon adapter，保留所有权/清理/heartbeat 决策在 core；验收：混合源范围有审查映射，fake runtime 测试执行实际核心逻辑。关联：[design](design.md#decisions)。
-- [ ] 3.3 [P2][M] 处理独立与内联测试、生成及 benchmark-only 范围排除；验收：仅增加测试函数不会提高生产代码 coverage，未命中生产代码仍在分母。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
-- [ ] 3.4 [P2][M] 聚合扩展边界的 line/function/region 证据并保留原始计数；验收：边界各自及聚合不足 80.0% 均非零，service adapter 单独 informational。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
-- [ ] 3.5 [P2][M] 为边界统计增加负向单元测试；验收：空边界、未知路径、重复归属、缺少原始报告和阈值临界值都能正确失败。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
+- [x] 3.1 [P2][M] 建立版本化源清单，新增 `app/project/doctor/service-core` 并显式列出其他模块；验收：每个生产范围有唯一归属，不同边界不能互相提高聚合。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。 Versioned exhaustive inventory validates unique ownership of every source, with ten blocking boundaries and explicit informational modules. Evidence: [production coverage candidate](../../../docs/quality/production-coverage.md).
+- [x] 3.2 [P2][L] 划分 service-core 和 daemon adapter，保留所有权/清理/heartbeat 决策在 core；验收：混合源范围有审查映射，fake runtime 测试执行实际核心逻辑。关联：[design](design.md#decisions)。 Extracted deterministic command construction and inspection parsing into service-core; reviewed mixed-source mapping keeps lease, cleanup, heartbeat and orchestration blocking. All 301 Rust tests pass, including actual core execution through fake runtimes. Evidence: [production coverage candidate](../../../docs/quality/production-coverage.md).
+- [x] 3.3 [P2][M] 处理独立与内联测试、生成及 benchmark-only 范围排除；验收：仅增加测试函数不会提高生产代码 coverage，未命中生产代码仍在分母。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。 Reasoned file and lexed inline exclusions preserve unhit production denominators; test-only additions and generated/benchmark exclusion fixtures do not inflate production counts. Evidence: [production coverage candidate](../../../docs/quality/production-coverage.md).
+- [x] 3.4 [P2][M] 聚合扩展边界的 line/function/region 证据并保留原始计数；验收：边界各自及聚合不足 80.0% 均非零，service adapter 单独 informational。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。 Generated JSON/LCOV/Cobertura and separate raw line/function/region counts; candidate correctly returns 1 at 8,856/11,273 blocking lines (78.56%), with adapters informational. Existing CI adoption remains task 8.1; no baseline acceptance. Evidence: [production coverage candidate](../../../docs/quality/production-coverage.md).
+- [x] 3.5 [P2][M] 为边界统计增加负向单元测试；验收：空边界、未知路径、重复归属、缺少原始报告和阈值临界值都能正确失败。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。 All 52 quality tests pass, including 13 production coverage tests for empty/unknown/duplicate/missing evidence and exact unrounded threshold boundaries. Rust fmt, Clippy, docs consistency and strict OpenSpec validation pass; project-local config/CI verification is not applicable. Evidence: [production coverage candidate](../../../docs/quality/production-coverage.md).
 
 ## 4. Add reproducible function risk evidence
 
