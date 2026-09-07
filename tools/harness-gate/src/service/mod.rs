@@ -1,4 +1,6 @@
+mod commands;
 mod docker;
+mod inspection;
 mod lease;
 mod postgres;
 mod runtime;
