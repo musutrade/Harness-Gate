@@ -1323,8 +1323,10 @@ fn collect_execution_diagnostics(
     source_map: &SourceMap,
     diagnostics: &mut ConfigDiagnostics,
 ) {
+    let mut has_field_error = false;
     if let Some(max_parallel) = config.execution.max_parallel {
         if max_parallel == 0 || max_parallel > 64 {
+            has_field_error = true;
             diagnostics.push(ConfigDiagnostic {
                 id: ConfigIssueKind::InvalidField.id().into(),
                 severity: DiagnosticSeverity::Error,
@@ -1340,6 +1342,7 @@ fn collect_execution_diagnostics(
     for (step_id, retry) in &config.execution.retries {
         let base = format!("execution.retries[\"{step_id}\"]");
         if retry.max_attempts == 0 || retry.max_attempts > 5 {
+            has_field_error = true;
             diagnostics.push(ConfigDiagnostic {
                 id: ConfigIssueKind::InvalidField.id().into(),
                 severity: DiagnosticSeverity::Error,
@@ -1351,6 +1354,17 @@ fn collect_execution_diagnostics(
                 related: Vec::new(),
             });
         }
+    }
+    // Preserve field-specific diagnostics above while applying the same
+    // execution constraints as validate(), including shard bounds/references.
+    if !has_field_error {
+        collect_result(
+            source_map,
+            diagnostics,
+            ConfigIssueKind::InvalidField,
+            "execution",
+            config.validate_execution(),
+        );
     }
 }
 
