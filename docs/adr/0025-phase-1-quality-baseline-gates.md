@@ -338,6 +338,11 @@ developer-worktree-only files are not part of the baseline.
 
 ## References
 
+- [Function risk evidence](../quality/function-risk.md) implements OpenSpec tasks
+  4.1–4.5 with versioned LLVM source mapping, exact incremental CRAP decisions,
+  separate historical debt and non-waiving exceptions. Its
+  [GH-92 validation record](../quality/gh-92-validation.md) validates the tooling;
+  it does not replace the accepted baseline or accept the remaining OpenSpec work.
 - [ADR-0003: Enhance CI pipeline](0003-enhance-ci-pipeline.md)
 - [ADR-0004: Add integration tests](0004-add-integration-tests.md)
 - [ADR-0006: Test fixtures and internal boundaries](0006-test-fixtures-and-internal-boundaries.md)

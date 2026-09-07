@@ -14,7 +14,7 @@ runtime behavior.
 | Field | Frozen value |
 | --- | --- |
 | Name | `harness-gate-complexity` |
-| Version | `0.1.0` |
+| Version | `0.1.1` |
 | License | MIT |
 | Runtime | Python standard library only |
 | Use | Development/CI quality evidence; never linked into the release binary |
@@ -31,6 +31,14 @@ the quality CI job already has.
 
 The analyzer reads UTF-8 Rust fixture text lexically and never compiles or
 executes the fixture; Rust does not need to be installed for reproduction.
+
+Version 0.1.1 fixes attribute/restricted-visibility scanning, type-qualifier
+progress, zero-argument closure recognition, and function spans that include
+visibility/modifier prefixes. The counting rule remains `mccabe-rust-1` version
+1. These fixes create a new analyzer series: retained 0.1.0 baselines must not
+be rewritten or compared as compatible evidence. The frozen controls retain
+their previous counts. [Function risk evidence](function-risk.md) joins this
+output to LLVM source locations and rejects unsupported or missing mappings.
 
 ## Locked rule and cyclomatic complexity formula
 
