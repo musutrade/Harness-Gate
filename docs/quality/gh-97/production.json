@@ -1,0 +1,2302 @@
+{
+  "aggregate": {
+    "functions": {
+      "count": 1114,
+      "covered": 830,
+      "percent": 74.50628366247756
+    },
+    "lines": {
+      "count": 11470,
+      "covered": 9844,
+      "percent": 85.82388840453356
+    },
+    "regions": {
+      "count": 17037,
+      "covered": 14039,
+      "percent": 82.4030052239244
+    },
+    "status": "pass"
+  },
+  "boundaries": {
+    "app": {
+      "blocking": true,
+      "functions": {
+        "count": 24,
+        "covered": 14,
+        "percent": 58.333333333333336
+      },
+      "lines": {
+        "count": 390,
+        "covered": 317,
+        "percent": 81.28205128205128
+      },
+      "regions": {
+        "count": 619,
+        "covered": 462,
+        "percent": 74.63651050080776
+      },
+      "status": "pass"
+    },
+    "audit": {
+      "blocking": true,
+      "functions": {
+        "count": 120,
+        "covered": 98,
+        "percent": 81.66666666666667
+      },
+      "lines": {
+        "count": 975,
+        "covered": 811,
+        "percent": 83.17948717948718
+      },
+      "regions": {
+        "count": 1630,
+        "covered": 1312,
+        "percent": 80.49079754601227
+      },
+      "status": "pass"
+    },
+    "cli": {
+      "blocking": false,
+      "functions": {
+        "count": 1,
+        "covered": 1,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 9,
+        "covered": 8,
+        "percent": 88.88888888888889
+      },
+      "regions": {
+        "count": 10,
+        "covered": 8,
+        "percent": 80.0
+      },
+      "status": "informational"
+    },
+    "compat": {
+      "blocking": false,
+      "functions": {
+        "count": 21,
+        "covered": 12,
+        "percent": 57.142857142857146
+      },
+      "lines": {
+        "count": 196,
+        "covered": 176,
+        "percent": 89.79591836734694
+      },
+      "regions": {
+        "count": 351,
+        "covered": 279,
+        "percent": 79.48717948717949
+      },
+      "status": "informational"
+    },
+    "config": {
+      "blocking": true,
+      "functions": {
+        "count": 195,
+        "covered": 175,
+        "percent": 89.74358974358974
+      },
+      "lines": {
+        "count": 2667,
+        "covered": 2348,
+        "percent": 88.0389951256093
+      },
+      "regions": {
+        "count": 3682,
+        "covered": 3174,
+        "percent": 86.20315046170559
+      },
+      "status": "pass"
+    },
+    "doctor": {
+      "blocking": true,
+      "functions": {
+        "count": 33,
+        "covered": 28,
+        "percent": 84.84848484848484
+      },
+      "lines": {
+        "count": 252,
+        "covered": 239,
+        "percent": 94.84126984126983
+      },
+      "regions": {
+        "count": 416,
+        "covered": 381,
+        "percent": 91.58653846153847
+      },
+      "status": "pass"
+    },
+    "error": {
+      "blocking": false,
+      "functions": {
+        "count": 2,
+        "covered": 2,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 13,
+        "covered": 13,
+        "percent": 100.0
+      },
+      "regions": {
+        "count": 19,
+        "covered": 19,
+        "percent": 100.0
+      },
+      "status": "informational"
+    },
+    "failure": {
+      "blocking": false,
+      "functions": {
+        "count": 4,
+        "covered": 4,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 84,
+        "covered": 72,
+        "percent": 85.71428571428571
+      },
+      "regions": {
+        "count": 123,
+        "covered": 96,
+        "percent": 78.04878048780488
+      },
+      "status": "informational"
+    },
+    "lib": {
+      "blocking": false,
+      "functions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "lines": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "regions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "status": "informational"
+    },
+    "main": {
+      "blocking": false,
+      "functions": {
+        "count": 1,
+        "covered": 1,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 10,
+        "covered": 10,
+        "percent": 100.0
+      },
+      "regions": {
+        "count": 13,
+        "covered": 13,
+        "percent": 100.0
+      },
+      "status": "informational"
+    },
+    "net_policy": {
+      "blocking": false,
+      "functions": {
+        "count": 8,
+        "covered": 8,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 43,
+        "covered": 43,
+        "percent": 100.0
+      },
+      "regions": {
+        "count": 76,
+        "covered": 74,
+        "percent": 97.36842105263158
+      },
+      "status": "informational"
+    },
+    "preset": {
+      "blocking": false,
+      "functions": {
+        "count": 30,
+        "covered": 13,
+        "percent": 43.333333333333336
+      },
+      "lines": {
+        "count": 196,
+        "covered": 129,
+        "percent": 65.81632653061224
+      },
+      "regions": {
+        "count": 426,
+        "covered": 252,
+        "percent": 59.15492957746479
+      },
+      "status": "informational"
+    },
+    "process": {
+      "blocking": true,
+      "functions": {
+        "count": 134,
+        "covered": 87,
+        "percent": 64.92537313432835
+      },
+      "lines": {
+        "count": 1382,
+        "covered": 1182,
+        "percent": 85.52821997105644
+      },
+      "regions": {
+        "count": 1877,
+        "covered": 1575,
+        "percent": 83.91049547149707
+      },
+      "status": "pass"
+    },
+    "project": {
+      "blocking": true,
+      "functions": {
+        "count": 57,
+        "covered": 38,
+        "percent": 66.66666666666667
+      },
+      "lines": {
+        "count": 422,
+        "covered": 341,
+        "percent": 80.80568720379146
+      },
+      "regions": {
+        "count": 692,
+        "covered": 519,
+        "percent": 75.0
+      },
+      "status": "pass"
+    },
+    "scope": {
+      "blocking": true,
+      "functions": {
+        "count": 8,
+        "covered": 6,
+        "percent": 75.0
+      },
+      "lines": {
+        "count": 113,
+        "covered": 98,
+        "percent": 86.72566371681415
+      },
+      "regions": {
+        "count": 157,
+        "covered": 137,
+        "percent": 87.26114649681529
+      },
+      "status": "pass"
+    },
+    "secrets": {
+      "blocking": true,
+      "functions": {
+        "count": 54,
+        "covered": 47,
+        "percent": 87.03703703703704
+      },
+      "lines": {
+        "count": 433,
+        "covered": 400,
+        "percent": 92.37875288683603
+      },
+      "regions": {
+        "count": 692,
+        "covered": 605,
+        "percent": 87.42774566473989
+      },
+      "status": "pass"
+    },
+    "service-adapters": {
+      "blocking": false,
+      "functions": {
+        "count": 13,
+        "covered": 9,
+        "percent": 69.23076923076923
+      },
+      "lines": {
+        "count": 110,
+        "covered": 94,
+        "percent": 85.45454545454545
+      },
+      "regions": {
+        "count": 143,
+        "covered": 111,
+        "percent": 77.62237762237763
+      },
+      "status": "informational"
+    },
+    "service-core": {
+      "blocking": true,
+      "functions": {
+        "count": 147,
+        "covered": 98,
+        "percent": 66.66666666666667
+      },
+      "lines": {
+        "count": 1367,
+        "covered": 1163,
+        "percent": 85.07681053401609
+      },
+      "regions": {
+        "count": 2093,
+        "covered": 1645,
+        "percent": 78.59531772575251
+      },
+      "status": "pass"
+    },
+    "ui": {
+      "blocking": false,
+      "functions": {
+        "count": 15,
+        "covered": 13,
+        "percent": 86.66666666666667
+      },
+      "lines": {
+        "count": 74,
+        "covered": 54,
+        "percent": 72.97297297297297
+      },
+      "regions": {
+        "count": 107,
+        "covered": 67,
+        "percent": 62.61682242990654
+      },
+      "status": "informational"
+    },
+    "utils": {
+      "blocking": false,
+      "functions": {
+        "count": 60,
+        "covered": 33,
+        "percent": 55.0
+      },
+      "lines": {
+        "count": 335,
+        "covered": 286,
+        "percent": 85.3731343283582
+      },
+      "regions": {
+        "count": 615,
+        "covered": 462,
+        "percent": 75.1219512195122
+      },
+      "status": "informational"
+    },
+    "verify": {
+      "blocking": true,
+      "functions": {
+        "count": 342,
+        "covered": 239,
+        "percent": 69.88304093567251
+      },
+      "lines": {
+        "count": 3469,
+        "covered": 2945,
+        "percent": 84.89478235802825
+      },
+      "regions": {
+        "count": 5179,
+        "covered": 4229,
+        "percent": 81.6566904807878
+      },
+      "status": "pass"
+    }
+  },
+  "candidate": true,
+  "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+  "command": "coverage.py --production",
+  "commit": "381d5f418655969d29b81f89069845e6667f35c9",
+  "exclusions": [
+    {
+      "kind": "test",
+      "path": "src/audit/tests.rs",
+      "reason": "Test-only module compiled under cfg(test)."
+    },
+    {
+      "kind": "test",
+      "path": "src/config/tests.rs",
+      "reason": "Test-only module compiled under cfg(test)."
+    },
+    {
+      "kind": "test",
+      "path": "src/doctor/tests.rs",
+      "reason": "Test-only module compiled under cfg(test)."
+    },
+    {
+      "kind": "test",
+      "path": "src/preset/tests.rs",
+      "reason": "Test-only module compiled under cfg(test)."
+    },
+    {
+      "kind": "test",
+      "path": "src/process/tests.rs",
+      "reason": "Test-only module compiled under cfg(test)."
+    },
+    {
+      "kind": "test",
+      "path": "src/project/tests.rs",
+      "reason": "Test-only module compiled under cfg(test)."
+    },
+    {
+      "kind": "benchmark-only",
+      "path": "src/scope/benchmark.rs",
+      "reason": "Performance fixture driver, not the production scope engine."
+    },
+    {
+      "kind": "test",
+      "path": "src/scope/tests.rs",
+      "reason": "Test-only module compiled under cfg(test)."
+    },
+    {
+      "kind": "test",
+      "path": "src/secrets/tests.rs",
+      "reason": "Test-only module compiled under cfg(test)."
+    },
+    {
+      "kind": "test",
+      "path": "src/service/tests.rs",
+      "reason": "Test-only module compiled under cfg(test)."
+    },
+    {
+      "kind": "test",
+      "path": "src/test_support.rs",
+      "reason": "Test-only module compiled under cfg(test)."
+    },
+    {
+      "kind": "test",
+      "path": "src/verify/tests.rs",
+      "reason": "Test-only module compiled under cfg(test)."
+    }
+  ],
+  "external_exclusions": [
+    {
+      "kind": "test",
+      "prefix": "tests/",
+      "reason": "Integration test drivers and fixtures are not production code."
+    }
+  ],
+  "failures": [],
+  "files": {
+    "src/app/commands.rs": {
+      "functions": {
+        "count": 12,
+        "covered": 11,
+        "percent": 91.66666666666667
+      },
+      "lines": {
+        "count": 208,
+        "covered": 192,
+        "percent": 92.3076923076923
+      },
+      "regions": {
+        "count": 334,
+        "covered": 290,
+        "percent": 86.82634730538922
+      }
+    },
+    "src/app/mod.rs": {
+      "functions": {
+        "count": 11,
+        "covered": 2,
+        "percent": 18.181818181818183
+      },
+      "lines": {
+        "count": 159,
+        "covered": 109,
+        "percent": 68.55345911949685
+      },
+      "regions": {
+        "count": 258,
+        "covered": 154,
+        "percent": 59.689922480620154
+      }
+    },
+    "src/app/output.rs": {
+      "functions": {
+        "count": 1,
+        "covered": 1,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 23,
+        "covered": 16,
+        "percent": 69.56521739130434
+      },
+      "regions": {
+        "count": 27,
+        "covered": 18,
+        "percent": 66.66666666666667
+      }
+    },
+    "src/audit/config.rs": {
+      "functions": {
+        "count": 17,
+        "covered": 16,
+        "percent": 94.11764705882354
+      },
+      "lines": {
+        "count": 164,
+        "covered": 117,
+        "percent": 71.34146341463415
+      },
+      "regions": {
+        "count": 277,
+        "covered": 189,
+        "percent": 68.23104693140795
+      }
+    },
+    "src/audit/errors.rs": {
+      "functions": {
+        "count": 4,
+        "covered": 2,
+        "percent": 50.0
+      },
+      "lines": {
+        "count": 21,
+        "covered": 9,
+        "percent": 42.857142857142854
+      },
+      "regions": {
+        "count": 15,
+        "covered": 7,
+        "percent": 46.666666666666664
+      }
+    },
+    "src/audit/log_parser.rs": {
+      "functions": {
+        "count": 29,
+        "covered": 24,
+        "percent": 82.75862068965517
+      },
+      "lines": {
+        "count": 165,
+        "covered": 158,
+        "percent": 95.75757575757575
+      },
+      "regions": {
+        "count": 332,
+        "covered": 303,
+        "percent": 91.26506024096386
+      }
+    },
+    "src/audit/mod.rs": {
+      "functions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "lines": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "regions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      }
+    },
+    "src/audit/model.rs": {
+      "functions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "lines": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "regions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      }
+    },
+    "src/audit/report.rs": {
+      "functions": {
+        "count": 11,
+        "covered": 8,
+        "percent": 72.72727272727273
+      },
+      "lines": {
+        "count": 141,
+        "covered": 94,
+        "percent": 66.66666666666667
+      },
+      "regions": {
+        "count": 198,
+        "covered": 123,
+        "percent": 62.121212121212125
+      }
+    },
+    "src/audit/runner.rs": {
+      "functions": {
+        "count": 6,
+        "covered": 5,
+        "percent": 83.33333333333333
+      },
+      "lines": {
+        "count": 76,
+        "covered": 61,
+        "percent": 80.26315789473684
+      },
+      "regions": {
+        "count": 122,
+        "covered": 97,
+        "percent": 79.50819672131148
+      }
+    },
+    "src/audit/scanner.rs": {
+      "functions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "lines": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "regions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      }
+    },
+    "src/audit/scanner/architecture.rs": {
+      "functions": {
+        "count": 9,
+        "covered": 7,
+        "percent": 77.77777777777777
+      },
+      "lines": {
+        "count": 96,
+        "covered": 86,
+        "percent": 89.58333333333333
+      },
+      "regions": {
+        "count": 206,
+        "covered": 179,
+        "percent": 86.89320388349515
+      }
+    },
+    "src/audit/scanner/filter.rs": {
+      "functions": {
+        "count": 20,
+        "covered": 13,
+        "percent": 65.0
+      },
+      "lines": {
+        "count": 94,
+        "covered": 80,
+        "percent": 85.1063829787234
+      },
+      "regions": {
+        "count": 145,
+        "covered": 104,
+        "percent": 71.72413793103448
+      }
+    },
+    "src/audit/scanner/hard_rules.rs": {
+      "functions": {
+        "count": 8,
+        "covered": 7,
+        "percent": 87.5
+      },
+      "lines": {
+        "count": 86,
+        "covered": 79,
+        "percent": 91.86046511627907
+      },
+      "regions": {
+        "count": 171,
+        "covered": 157,
+        "percent": 91.81286549707602
+      }
+    },
+    "src/audit/scanner/lexical.rs": {
+      "functions": {
+        "count": 16,
+        "covered": 16,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 132,
+        "covered": 127,
+        "percent": 96.21212121212122
+      },
+      "regions": {
+        "count": 164,
+        "covered": 153,
+        "percent": 93.29268292682927
+      }
+    },
+    "src/cli.rs": {
+      "functions": {
+        "count": 1,
+        "covered": 1,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 9,
+        "covered": 8,
+        "percent": 88.88888888888889
+      },
+      "regions": {
+        "count": 10,
+        "covered": 8,
+        "percent": 80.0
+      }
+    },
+    "src/compat.rs": {
+      "functions": {
+        "count": 21,
+        "covered": 12,
+        "percent": 57.142857142857146
+      },
+      "lines": {
+        "count": 196,
+        "covered": 176,
+        "percent": 89.79591836734694
+      },
+      "regions": {
+        "count": 351,
+        "covered": 279,
+        "percent": 79.48717948717949
+      }
+    },
+    "src/config/diagnostic.rs": {
+      "functions": {
+        "count": 33,
+        "covered": 31,
+        "percent": 93.93939393939394
+      },
+      "lines": {
+        "count": 324,
+        "covered": 311,
+        "percent": 95.98765432098766
+      },
+      "regions": {
+        "count": 444,
+        "covered": 420,
+        "percent": 94.5945945945946
+      }
+    },
+    "src/config/loader.rs": {
+      "functions": {
+        "count": 32,
+        "covered": 25,
+        "percent": 78.125
+      },
+      "lines": {
+        "count": 262,
+        "covered": 197,
+        "percent": 75.19083969465649
+      },
+      "regions": {
+        "count": 429,
+        "covered": 313,
+        "percent": 72.96037296037296
+      }
+    },
+    "src/config/migration.rs": {
+      "functions": {
+        "count": 6,
+        "covered": 4,
+        "percent": 66.66666666666667
+      },
+      "lines": {
+        "count": 227,
+        "covered": 226,
+        "percent": 99.55947136563877
+      },
+      "regions": {
+        "count": 222,
+        "covered": 215,
+        "percent": 96.84684684684684
+      }
+    },
+    "src/config/mod.rs": {
+      "functions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "lines": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "regions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      }
+    },
+    "src/config/model.rs": {
+      "functions": {
+        "count": 13,
+        "covered": 13,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 51,
+        "covered": 49,
+        "percent": 96.07843137254902
+      },
+      "regions": {
+        "count": 56,
+        "covered": 54,
+        "percent": 96.42857142857143
+      }
+    },
+    "src/config/path.rs": {
+      "functions": {
+        "count": 3,
+        "covered": 3,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 14,
+        "covered": 12,
+        "percent": 85.71428571428571
+      },
+      "regions": {
+        "count": 24,
+        "covered": 22,
+        "percent": 91.66666666666667
+      }
+    },
+    "src/config/scope.rs": {
+      "functions": {
+        "count": 6,
+        "covered": 6,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 43,
+        "covered": 43,
+        "percent": 100.0
+      },
+      "regions": {
+        "count": 71,
+        "covered": 67,
+        "percent": 94.36619718309859
+      }
+    },
+    "src/config/validation/mod.rs": {
+      "functions": {
+        "count": 60,
+        "covered": 53,
+        "percent": 88.33333333333333
+      },
+      "lines": {
+        "count": 1170,
+        "covered": 978,
+        "percent": 83.58974358974359
+      },
+      "regions": {
+        "count": 1669,
+        "covered": 1392,
+        "percent": 83.40323547034153
+      }
+    },
+    "src/config/validation/primitives.rs": {
+      "functions": {
+        "count": 12,
+        "covered": 12,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 65,
+        "covered": 62,
+        "percent": 95.38461538461539
+      },
+      "regions": {
+        "count": 110,
+        "covered": 104,
+        "percent": 94.54545454545455
+      }
+    },
+    "src/config/validation/steps.rs": {
+      "functions": {
+        "count": 30,
+        "covered": 28,
+        "percent": 93.33333333333333
+      },
+      "lines": {
+        "count": 511,
+        "covered": 470,
+        "percent": 91.97651663405088
+      },
+      "regions": {
+        "count": 657,
+        "covered": 587,
+        "percent": 89.3455098934551
+      }
+    },
+    "src/doctor/checks.rs": {
+      "functions": {
+        "count": 29,
+        "covered": 24,
+        "percent": 82.75862068965517
+      },
+      "lines": {
+        "count": 209,
+        "covered": 202,
+        "percent": 96.65071770334929
+      },
+      "regions": {
+        "count": 374,
+        "covered": 347,
+        "percent": 92.7807486631016
+      }
+    },
+    "src/doctor/mod.rs": {
+      "functions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "lines": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "regions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      }
+    },
+    "src/doctor/report.rs": {
+      "functions": {
+        "count": 4,
+        "covered": 4,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 43,
+        "covered": 37,
+        "percent": 86.04651162790698
+      },
+      "regions": {
+        "count": 42,
+        "covered": 34,
+        "percent": 80.95238095238095
+      }
+    },
+    "src/error.rs": {
+      "functions": {
+        "count": 2,
+        "covered": 2,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 13,
+        "covered": 13,
+        "percent": 100.0
+      },
+      "regions": {
+        "count": 19,
+        "covered": 19,
+        "percent": 100.0
+      }
+    },
+    "src/failure.rs": {
+      "functions": {
+        "count": 4,
+        "covered": 4,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 84,
+        "covered": 72,
+        "percent": 85.71428571428571
+      },
+      "regions": {
+        "count": 123,
+        "covered": 96,
+        "percent": 78.04878048780488
+      }
+    },
+    "src/lib.rs": {
+      "functions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "lines": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "regions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      }
+    },
+    "src/main.rs": {
+      "functions": {
+        "count": 1,
+        "covered": 1,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 10,
+        "covered": 10,
+        "percent": 100.0
+      },
+      "regions": {
+        "count": 13,
+        "covered": 13,
+        "percent": 100.0
+      }
+    },
+    "src/net_policy.rs": {
+      "functions": {
+        "count": 8,
+        "covered": 8,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 43,
+        "covered": 43,
+        "percent": 100.0
+      },
+      "regions": {
+        "count": 76,
+        "covered": 74,
+        "percent": 97.36842105263158
+      }
+    },
+    "src/preset/catalog.rs": {
+      "functions": {
+        "count": 3,
+        "covered": 3,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 8,
+        "covered": 8,
+        "percent": 100.0
+      },
+      "regions": {
+        "count": 10,
+        "covered": 10,
+        "percent": 100.0
+      }
+    },
+    "src/preset/filesystem.rs": {
+      "functions": {
+        "count": 16,
+        "covered": 6,
+        "percent": 37.5
+      },
+      "lines": {
+        "count": 104,
+        "covered": 72,
+        "percent": 69.23076923076923
+      },
+      "regions": {
+        "count": 213,
+        "covered": 136,
+        "percent": 63.84976525821596
+      }
+    },
+    "src/preset/initialize.rs": {
+      "functions": {
+        "count": 6,
+        "covered": 4,
+        "percent": 66.66666666666667
+      },
+      "lines": {
+        "count": 50,
+        "covered": 49,
+        "percent": 98.0
+      },
+      "regions": {
+        "count": 129,
+        "covered": 106,
+        "percent": 82.17054263565892
+      }
+    },
+    "src/preset/migration.rs": {
+      "functions": {
+        "count": 5,
+        "covered": 0,
+        "percent": 0.0
+      },
+      "lines": {
+        "count": 34,
+        "covered": 0,
+        "percent": 0.0
+      },
+      "regions": {
+        "count": 74,
+        "covered": 0,
+        "percent": 0.0
+      }
+    },
+    "src/preset/mod.rs": {
+      "functions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "lines": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "regions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      }
+    },
+    "src/process/adapter.rs": {
+      "functions": {
+        "count": 87,
+        "covered": 52,
+        "percent": 59.770114942528735
+      },
+      "lines": {
+        "count": 892,
+        "covered": 757,
+        "percent": 84.86547085201794
+      },
+      "regions": {
+        "count": 1155,
+        "covered": 989,
+        "percent": 85.62770562770562
+      }
+    },
+    "src/process/capture.rs": {
+      "functions": {
+        "count": 7,
+        "covered": 4,
+        "percent": 57.142857142857146
+      },
+      "lines": {
+        "count": 113,
+        "covered": 108,
+        "percent": 95.57522123893806
+      },
+      "regions": {
+        "count": 166,
+        "covered": 143,
+        "percent": 86.144578313253
+      }
+    },
+    "src/process/command.rs": {
+      "functions": {
+        "count": 4,
+        "covered": 3,
+        "percent": 75.0
+      },
+      "lines": {
+        "count": 29,
+        "covered": 18,
+        "percent": 62.06896551724138
+      },
+      "regions": {
+        "count": 46,
+        "covered": 28,
+        "percent": 60.869565217391305
+      }
+    },
+    "src/process/isolation.rs": {
+      "functions": {
+        "count": 9,
+        "covered": 5,
+        "percent": 55.55555555555556
+      },
+      "lines": {
+        "count": 52,
+        "covered": 49,
+        "percent": 94.23076923076923
+      },
+      "regions": {
+        "count": 93,
+        "covered": 72,
+        "percent": 77.41935483870968
+      }
+    },
+    "src/process/mod.rs": {
+      "functions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "lines": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "regions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      }
+    },
+    "src/process/reader.rs": {
+      "functions": {
+        "count": 4,
+        "covered": 4,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 62,
+        "covered": 51,
+        "percent": 82.25806451612904
+      },
+      "regions": {
+        "count": 70,
+        "covered": 60,
+        "percent": 85.71428571428571
+      }
+    },
+    "src/process/signal.rs": {
+      "functions": {
+        "count": 3,
+        "covered": 3,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 14,
+        "covered": 14,
+        "percent": 100.0
+      },
+      "regions": {
+        "count": 17,
+        "covered": 17,
+        "percent": 100.0
+      }
+    },
+    "src/process/task.rs": {
+      "functions": {
+        "count": 20,
+        "covered": 16,
+        "percent": 80.0
+      },
+      "lines": {
+        "count": 220,
+        "covered": 185,
+        "percent": 84.0909090909091
+      },
+      "regions": {
+        "count": 330,
+        "covered": 266,
+        "percent": 80.60606060606061
+      }
+    },
+    "src/project/discovery.rs": {
+      "functions": {
+        "count": 21,
+        "covered": 11,
+        "percent": 52.38095238095238
+      },
+      "lines": {
+        "count": 165,
+        "covered": 119,
+        "percent": 72.12121212121212
+      },
+      "regions": {
+        "count": 261,
+        "covered": 184,
+        "percent": 70.49808429118774
+      }
+    },
+    "src/project/input.rs": {
+      "functions": {
+        "count": 20,
+        "covered": 14,
+        "percent": 70.0
+      },
+      "lines": {
+        "count": 136,
+        "covered": 114,
+        "percent": 83.82352941176471
+      },
+      "regions": {
+        "count": 228,
+        "covered": 177,
+        "percent": 77.63157894736842
+      }
+    },
+    "src/project/mod.rs": {
+      "functions": {
+        "count": 8,
+        "covered": 8,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 48,
+        "covered": 43,
+        "percent": 89.58333333333333
+      },
+      "regions": {
+        "count": 76,
+        "covered": 62,
+        "percent": 81.57894736842105
+      }
+    },
+    "src/project/paths.rs": {
+      "functions": {
+        "count": 5,
+        "covered": 2,
+        "percent": 40.0
+      },
+      "lines": {
+        "count": 41,
+        "covered": 39,
+        "percent": 95.1219512195122
+      },
+      "regions": {
+        "count": 66,
+        "covered": 53,
+        "percent": 80.3030303030303
+      }
+    },
+    "src/project/runtime.rs": {
+      "functions": {
+        "count": 3,
+        "covered": 3,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 32,
+        "covered": 26,
+        "percent": 81.25
+      },
+      "regions": {
+        "count": 61,
+        "covered": 43,
+        "percent": 70.49180327868852
+      }
+    },
+    "src/scope/detection.rs": {
+      "functions": {
+        "count": 2,
+        "covered": 2,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 70,
+        "covered": 68,
+        "percent": 97.14285714285714
+      },
+      "regions": {
+        "count": 112,
+        "covered": 103,
+        "percent": 91.96428571428571
+      }
+    },
+    "src/scope/errors.rs": {
+      "functions": {
+        "count": 4,
+        "covered": 2,
+        "percent": 50.0
+      },
+      "lines": {
+        "count": 22,
+        "covered": 9,
+        "percent": 40.90909090909091
+      },
+      "regions": {
+        "count": 16,
+        "covered": 7,
+        "percent": 43.75
+      }
+    },
+    "src/scope/mod.rs": {
+      "functions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "lines": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "regions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      }
+    },
+    "src/scope/model.rs": {
+      "functions": {
+        "count": 1,
+        "covered": 1,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 8,
+        "covered": 8,
+        "percent": 100.0
+      },
+      "regions": {
+        "count": 7,
+        "covered": 7,
+        "percent": 100.0
+      }
+    },
+    "src/scope/report.rs": {
+      "functions": {
+        "count": 1,
+        "covered": 1,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 13,
+        "covered": 13,
+        "percent": 100.0
+      },
+      "regions": {
+        "count": 22,
+        "covered": 20,
+        "percent": 90.9090909090909
+      }
+    },
+    "src/secrets/config.rs": {
+      "functions": {
+        "count": 14,
+        "covered": 12,
+        "percent": 85.71428571428571
+      },
+      "lines": {
+        "count": 124,
+        "covered": 119,
+        "percent": 95.96774193548387
+      },
+      "regions": {
+        "count": 195,
+        "covered": 176,
+        "percent": 90.25641025641026
+      }
+    },
+    "src/secrets/matcher.rs": {
+      "functions": {
+        "count": 28,
+        "covered": 28,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 164,
+        "covered": 159,
+        "percent": 96.95121951219512
+      },
+      "regions": {
+        "count": 239,
+        "covered": 234,
+        "percent": 97.90794979079497
+      }
+    },
+    "src/secrets/mod.rs": {
+      "functions": {
+        "count": 12,
+        "covered": 7,
+        "percent": 58.333333333333336
+      },
+      "lines": {
+        "count": 145,
+        "covered": 122,
+        "percent": 84.13793103448276
+      },
+      "regions": {
+        "count": 258,
+        "covered": 195,
+        "percent": 75.5813953488372
+      }
+    },
+    "src/service/commands.rs": {
+      "functions": {
+        "count": 6,
+        "covered": 6,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 49,
+        "covered": 49,
+        "percent": 100.0
+      },
+      "regions": {
+        "count": 86,
+        "covered": 86,
+        "percent": 100.0
+      }
+    },
+    "src/service/docker.rs": {
+      "functions": {
+        "count": 1,
+        "covered": 1,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 94,
+        "covered": 76,
+        "percent": 80.85106382978724
+      },
+      "regions": {
+        "count": 124,
+        "covered": 96,
+        "percent": 77.41935483870968
+      }
+    },
+    "src/service/inspection.rs": {
+      "functions": {
+        "count": 12,
+        "covered": 8,
+        "percent": 66.66666666666667
+      },
+      "lines": {
+        "count": 51,
+        "covered": 45,
+        "percent": 88.23529411764706
+      },
+      "regions": {
+        "count": 85,
+        "covered": 72,
+        "percent": 84.70588235294117
+      }
+    },
+    "src/service/lease.rs": {
+      "functions": {
+        "count": 74,
+        "covered": 47,
+        "percent": 63.513513513513516
+      },
+      "lines": {
+        "count": 620,
+        "covered": 558,
+        "percent": 90.0
+      },
+      "regions": {
+        "count": 974,
+        "covered": 801,
+        "percent": 82.23819301848049
+      }
+    },
+    "src/service/mod.rs": {
+      "functions": {
+        "count": 47,
+        "covered": 31,
+        "percent": 65.95744680851064
+      },
+      "lines": {
+        "count": 484,
+        "covered": 372,
+        "percent": 76.85950413223141
+      },
+      "regions": {
+        "count": 707,
+        "covered": 492,
+        "percent": 69.58981612446959
+      }
+    },
+    "src/service/postgres.rs": {
+      "functions": {
+        "count": 7,
+        "covered": 5,
+        "percent": 71.42857142857143
+      },
+      "lines": {
+        "count": 69,
+        "covered": 63,
+        "percent": 91.30434782608695
+      },
+      "regions": {
+        "count": 117,
+        "covered": 98,
+        "percent": 83.76068376068376
+      }
+    },
+    "src/service/runtime.rs": {
+      "functions": {
+        "count": 13,
+        "covered": 9,
+        "percent": 69.23076923076923
+      },
+      "lines": {
+        "count": 110,
+        "covered": 94,
+        "percent": 85.45454545454545
+      },
+      "regions": {
+        "count": 143,
+        "covered": 111,
+        "percent": 77.62237762237763
+      }
+    },
+    "src/ui.rs": {
+      "functions": {
+        "count": 15,
+        "covered": 13,
+        "percent": 86.66666666666667
+      },
+      "lines": {
+        "count": 74,
+        "covered": 54,
+        "percent": 72.97297297297297
+      },
+      "regions": {
+        "count": 107,
+        "covered": 67,
+        "percent": 62.61682242990654
+      }
+    },
+    "src/utils/fs.rs": {
+      "functions": {
+        "count": 42,
+        "covered": 19,
+        "percent": 45.23809523809524
+      },
+      "lines": {
+        "count": 244,
+        "covered": 199,
+        "percent": 81.55737704918033
+      },
+      "regions": {
+        "count": 446,
+        "covered": 311,
+        "percent": 69.73094170403587
+      }
+    },
+    "src/utils/git.rs": {
+      "functions": {
+        "count": 15,
+        "covered": 11,
+        "percent": 73.33333333333333
+      },
+      "lines": {
+        "count": 71,
+        "covered": 67,
+        "percent": 94.36619718309859
+      },
+      "regions": {
+        "count": 127,
+        "covered": 109,
+        "percent": 85.8267716535433
+      }
+    },
+    "src/utils/mod.rs": {
+      "functions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "lines": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "regions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      }
+    },
+    "src/utils/redaction.rs": {
+      "functions": {
+        "count": 3,
+        "covered": 3,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 20,
+        "covered": 20,
+        "percent": 100.0
+      },
+      "regions": {
+        "count": 42,
+        "covered": 42,
+        "percent": 100.0
+      }
+    },
+    "src/verify/mod.rs": {
+      "functions": {
+        "count": 25,
+        "covered": 22,
+        "percent": 88.0
+      },
+      "lines": {
+        "count": 319,
+        "covered": 288,
+        "percent": 90.28213166144201
+      },
+      "regions": {
+        "count": 414,
+        "covered": 362,
+        "percent": 87.43961352657004
+      }
+    },
+    "src/verify/parser.rs": {
+      "functions": {
+        "count": 17,
+        "covered": 15,
+        "percent": 88.23529411764706
+      },
+      "lines": {
+        "count": 252,
+        "covered": 218,
+        "percent": 86.5079365079365
+      },
+      "regions": {
+        "count": 337,
+        "covered": 309,
+        "percent": 91.69139465875371
+      }
+    },
+    "src/verify/plan.rs": {
+      "functions": {
+        "count": 18,
+        "covered": 16,
+        "percent": 88.88888888888889
+      },
+      "lines": {
+        "count": 163,
+        "covered": 151,
+        "percent": 92.63803680981596
+      },
+      "regions": {
+        "count": 283,
+        "covered": 265,
+        "percent": 93.63957597173145
+      }
+    },
+    "src/verify/report.rs": {
+      "functions": {
+        "count": 201,
+        "covered": 125,
+        "percent": 62.18905472636816
+      },
+      "lines": {
+        "count": 1733,
+        "covered": 1469,
+        "percent": 84.76630121177149
+      },
+      "regions": {
+        "count": 2748,
+        "covered": 2148,
+        "percent": 78.16593886462883
+      }
+    },
+    "src/verify/scheduler.rs": {
+      "functions": {
+        "count": 36,
+        "covered": 31,
+        "percent": 86.11111111111111
+      },
+      "lines": {
+        "count": 453,
+        "covered": 405,
+        "percent": 89.40397350993378
+      },
+      "regions": {
+        "count": 638,
+        "covered": 580,
+        "percent": 90.9090909090909
+      }
+    },
+    "src/verify/steps.rs": {
+      "functions": {
+        "count": 38,
+        "covered": 28,
+        "percent": 73.6842105263158
+      },
+      "lines": {
+        "count": 480,
+        "covered": 386,
+        "percent": 80.41666666666667
+      },
+      "regions": {
+        "count": 672,
+        "covered": 545,
+        "percent": 81.10119047619048
+      }
+    },
+    "src/verify/waiver.rs": {
+      "functions": {
+        "count": 7,
+        "covered": 2,
+        "percent": 28.571428571428573
+      },
+      "lines": {
+        "count": 69,
+        "covered": 28,
+        "percent": 40.57971014492754
+      },
+      "regions": {
+        "count": 87,
+        "covered": 20,
+        "percent": 22.988505747126435
+      }
+    }
+  },
+  "gate_metric": "lines",
+  "inline_exclusions": {
+    "ranges": {
+      "src/app/commands.rs": [],
+      "src/app/mod.rs": [],
+      "src/app/output.rs": [],
+      "src/audit/config.rs": [],
+      "src/audit/errors.rs": [],
+      "src/audit/log_parser.rs": [],
+      "src/audit/mod.rs": [
+        [
+          8,
+          9
+        ],
+        [
+          20,
+          23
+        ],
+        [
+          24,
+          25
+        ],
+        [
+          26,
+          27
+        ]
+      ],
+      "src/audit/model.rs": [],
+      "src/audit/report.rs": [],
+      "src/audit/runner.rs": [],
+      "src/audit/scanner.rs": [
+        [
+          7,
+          8
+        ]
+      ],
+      "src/audit/scanner/architecture.rs": [],
+      "src/audit/scanner/filter.rs": [
+        [
+          56,
+          70
+        ]
+      ],
+      "src/audit/scanner/hard_rules.rs": [],
+      "src/audit/scanner/lexical.rs": [],
+      "src/cli.rs": [],
+      "src/compat.rs": [
+        [
+          310,
+          368
+        ]
+      ],
+      "src/config/diagnostic.rs": [],
+      "src/config/loader.rs": [],
+      "src/config/migration.rs": [],
+      "src/config/mod.rs": [
+        [
+          9,
+          10
+        ],
+        [
+          13,
+          14
+        ]
+      ],
+      "src/config/model.rs": [],
+      "src/config/path.rs": [],
+      "src/config/scope.rs": [],
+      "src/config/validation/mod.rs": [],
+      "src/config/validation/primitives.rs": [],
+      "src/config/validation/steps.rs": [],
+      "src/doctor/checks.rs": [],
+      "src/doctor/mod.rs": [
+        [
+          3,
+          4
+        ]
+      ],
+      "src/doctor/report.rs": [],
+      "src/error.rs": [],
+      "src/failure.rs": [
+        [
+          161,
+          178
+        ]
+      ],
+      "src/lib.rs": [],
+      "src/main.rs": [
+        [
+          16,
+          17
+        ]
+      ],
+      "src/net_policy.rs": [
+        [
+          57,
+          99
+        ]
+      ],
+      "src/preset/catalog.rs": [],
+      "src/preset/filesystem.rs": [],
+      "src/preset/initialize.rs": [],
+      "src/preset/migration.rs": [],
+      "src/preset/mod.rs": [
+        [
+          5,
+          6
+        ]
+      ],
+      "src/process/adapter.rs": [
+        [
+          1226,
+          1730
+        ]
+      ],
+      "src/process/capture.rs": [
+        [
+          57,
+          66
+        ]
+      ],
+      "src/process/command.rs": [],
+      "src/process/isolation.rs": [
+        [
+          86,
+          115
+        ]
+      ],
+      "src/process/mod.rs": [
+        [
+          8,
+          9
+        ]
+      ],
+      "src/process/reader.rs": [],
+      "src/process/signal.rs": [],
+      "src/process/task.rs": [
+        [
+          405,
+          417
+        ]
+      ],
+      "src/project/discovery.rs": [],
+      "src/project/input.rs": [],
+      "src/project/mod.rs": [
+        [
+          5,
+          6
+        ]
+      ],
+      "src/project/paths.rs": [],
+      "src/project/runtime.rs": [],
+      "src/scope/detection.rs": [],
+      "src/scope/errors.rs": [],
+      "src/scope/mod.rs": [
+        [
+          6,
+          7
+        ]
+      ],
+      "src/scope/model.rs": [],
+      "src/scope/report.rs": [],
+      "src/secrets/config.rs": [],
+      "src/secrets/matcher.rs": [],
+      "src/secrets/mod.rs": [
+        [
+          4,
+          5
+        ]
+      ],
+      "src/service/commands.rs": [
+        [
+          61,
+          131
+        ]
+      ],
+      "src/service/docker.rs": [],
+      "src/service/inspection.rs": [
+        [
+          71,
+          100
+        ]
+      ],
+      "src/service/lease.rs": [
+        [
+          30,
+          31
+        ],
+        [
+          957,
+          1459
+        ]
+      ],
+      "src/service/mod.rs": [
+        [
+          8,
+          9
+        ],
+        [
+          39,
+          43
+        ]
+      ],
+      "src/service/postgres.rs": [],
+      "src/service/runtime.rs": [],
+      "src/ui.rs": [],
+      "src/utils/fs.rs": [
+        [
+          368,
+          436
+        ]
+      ],
+      "src/utils/git.rs": [
+        [
+          106,
+          142
+        ]
+      ],
+      "src/utils/mod.rs": [],
+      "src/utils/redaction.rs": [
+        [
+          33,
+          60
+        ]
+      ],
+      "src/verify/mod.rs": [
+        [
+          8,
+          9
+        ]
+      ],
+      "src/verify/parser.rs": [
+        [
+          334,
+          554
+        ]
+      ],
+      "src/verify/plan.rs": [
+        [
+          5,
+          6
+        ],
+        [
+          263,
+          300
+        ],
+        [
+          302,
+          379
+        ]
+      ],
+      "src/verify/report.rs": [
+        [
+          2208,
+          2233
+        ],
+        [
+          2274,
+          2287
+        ],
+        [
+          2343,
+          3285
+        ]
+      ],
+      "src/verify/scheduler.rs": [
+        [
+          240,
+          262
+        ],
+        [
+          545,
+          565
+        ],
+        [
+          634,
+          782
+        ]
+      ],
+      "src/verify/steps.rs": [
+        [
+          576,
+          619
+        ]
+      ],
+      "src/verify/waiver.rs": []
+    },
+    "rule": {
+      "reason": "Items guarded by cfg(test), including nested helpers and inline modules; standalone test functions.",
+      "rule": "cfg-test-items-1"
+    }
+  },
+  "inventory_version": "production-source-1",
+  "logical_cpus": 8,
+  "machine": "x86_64",
+  "metrics_version": "production-location-1",
+  "os": "Linux-7.0.0-31-generic-x86_64-with-glibc2.43",
+  "processor": "",
+  "python": "3.14.4",
+  "raw_artifacts": {
+    "/home/gem/symphony-workspaces/GH-97/target/quality/gh97-candidate/coverage.lcov": "8a7e4db41740b4f497f3cf70d87503a98ae1c1e66d086899c871e3bf1d0a101b",
+    "/home/gem/symphony-workspaces/GH-97/target/quality/gh97-candidate/coverage.raw.json": "b3c59172fc8995b448b7ae4d1d94069b75a7c2c31edfc2a58e6c96f064159fff",
+    "/home/gem/symphony-workspaces/GH-97/tools/quality/production-source.json": "8e0000bd038875e15cbc4ef5d957c789d63dd5c1590e25757a650a3b9aec89ac"
+  },
+  "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+  "schema_version": 1,
+  "source_sha256": {
+    "src/app/commands.rs": "382a6b13001aa15c9217ba8e183d40351ff7deef0b87de7e62e09f00450b726c",
+    "src/app/mod.rs": "e93caa2ee733162584016e1bb8c841dabe9af84233f0f75a03df4a00a8d916f9",
+    "src/app/output.rs": "ea2e422d5c7dd64e4bb2d9ee245ab1072006cb6c6101e2edaa606577c1983ea3",
+    "src/audit/config.rs": "ca207f22a8f6bc4a5f2c19057241f99dbffc51ccec1b823a043077e2057c5995",
+    "src/audit/errors.rs": "ffbfd664cdc21bac46a7db4498048f00a360253012d9fdf7757ba79858912a67",
+    "src/audit/log_parser.rs": "906bb08e28f03255aa1dd60d1328cd1813ee6d26daca3560f2de89e8b09e3c48",
+    "src/audit/mod.rs": "04d59fe4054e6be18c7a49b4b3eb9b7460627122fa76da7a0bacf1a3e1b04763",
+    "src/audit/model.rs": "bea0152d48729add7f29b057529bcb05c0be510f06f1c54822dc4f36e6b2027b",
+    "src/audit/report.rs": "eb017ee9d8159714b525ce0bb650e093305dc4afbc9e7a2ad1b2ec63c45a96ff",
+    "src/audit/runner.rs": "7c40715154dbf874ac3f746ad4407856372d67799aaa29133a11bda0570f2166",
+    "src/audit/scanner.rs": "86b43720c374320f98080c57ea5d525a516a186a2c18a4c8b4357863564f8986",
+    "src/audit/scanner/architecture.rs": "2a240c8ce6f8a15c94c1cd2cfe0b6230524c072136a443774309050995620443",
+    "src/audit/scanner/filter.rs": "d23374d63c1450dbc1e0046754049e2b06649bdf906c645bbfd94378178ab379",
+    "src/audit/scanner/hard_rules.rs": "2c11609af3be04ac5034dbb6fe8b122c3a9eec8fb1859d89c4cde86a30aa36a3",
+    "src/audit/scanner/lexical.rs": "25a60dc56b865f68160e061bbbe91ffd687d02ef942eb78435cc8682536963bf",
+    "src/cli.rs": "8865774ab2e6c0e8345285559e7f867d0de66b28425d5b5da1ce927b1e55475b",
+    "src/compat.rs": "b273782db091c3c8677aa8cf787c6c88d96fc920ddf451c2290b72df0247b88d",
+    "src/config/diagnostic.rs": "3f8a99359cf5f7728d5d2b60738a39f6188d2896b676b3399f48b88b4e80c0e9",
+    "src/config/loader.rs": "3f733ab8a6ffc1e5cb1fdfa8f65b3f10d3029f57eb59bfe60403844a6729af26",
+    "src/config/migration.rs": "830fcbd2bb3fa72ee736a44f155484ed5ed195260bfa3c6b8a56c67a74aa1d7a",
+    "src/config/mod.rs": "dace8de2f19e6744c2fe5ca63fb875988578d648f48914c34ac1426414f9242f",
+    "src/config/model.rs": "5c86dd6ca1b0d3d89d297788865a2dd4e96dbdd1e52d8e29f1c8623125ba3902",
+    "src/config/path.rs": "13399100a9f50559a17fe4486f6cc6175c83fab1b0a52586726f08c8a66d57dc",
+    "src/config/scope.rs": "a12dba96178a688fabd7dbeb0aae5360cfed35ac76b39288d70d973f90885e7a",
+    "src/config/validation/mod.rs": "6842cb0699380ea777ff9d06111a8276009989af4d5ba2f2a6de0f5440fbfe4b",
+    "src/config/validation/primitives.rs": "7ac6d16ae0d918666ffd70a412c5540320d2ef053c69fc4586bf8b9f252b3e90",
+    "src/config/validation/steps.rs": "eac56c669570fada50c4b3675945db86db8eccd7afedcc714ee2a29f0e197ce8",
+    "src/doctor/checks.rs": "3288b94edd6eba576cb325f64544ecff346ac6c733b810498d53a135124a74c4",
+    "src/doctor/mod.rs": "c0b505800b8893d42e67a89027df0b7cee72f15d8ddfdce9d02d530da836c8fd",
+    "src/doctor/report.rs": "39cbfd848185fd7cb877556c9b55c5ea0ee920f8ff74002fa4412edcef0f754d",
+    "src/error.rs": "b577cae145fed7860e096d5b040e72b9d96d4ba2b7475ef7e2cc9009f6bc1b64",
+    "src/failure.rs": "70ef1baa1826186639a31447e37e27417b0101d24cddaeb6e2ca1eddc5cdad34",
+    "src/lib.rs": "e19a0df5524cb2fe7c5128312a5a0e58aff13468efc15be8a90ca4df2c8b4e06",
+    "src/main.rs": "a5cf9c64287a7a9e1a726b9f547143199447e759fe4b3302466b9f0c323afe97",
+    "src/net_policy.rs": "ce62df999c156f199990197d9c9016c7e3e38914f2d770eeaec8cf0e7856f732",
+    "src/preset/catalog.rs": "13630ed20572cbc9fdbfd310bee8f010c70014efacbdbaf9b67f98c331151d5f",
+    "src/preset/filesystem.rs": "88146b811d8e50b7a141187d6d937da36ae550dfb003ded2c06df4e052261226",
+    "src/preset/initialize.rs": "6a0b5b6ebe5f597c60b186071db9fa4a3afdff6a0ca63bc195362d9162fe010d",
+    "src/preset/migration.rs": "a23809f35828e85c1e345fb198c4af724eb9fe7d228320a0390b26160ca7d0a5",
+    "src/preset/mod.rs": "531faf071925e5cdbe7eca8bb6519fcde371e56fb41b425878c9aa2c6a5d9caf",
+    "src/process/adapter.rs": "ece2f41f4cffedf46a1c8c1bfc4df9248c911deada50eec8c6c7539d2cb9ee2e",
+    "src/process/capture.rs": "20fa2d5056c62d9765c9c89dd30a60c84554f35f61935b0050c9c4cb721d277f",
+    "src/process/command.rs": "80118e08ebab122498013269a47a12c6b3dca80107ead21a3fbd81d4856aff61",
+    "src/process/isolation.rs": "4e4e61092cff95ddc50819ccd995319e2c9c13c5e95345c569baaac135fd2376",
+    "src/process/mod.rs": "31515d1f7356ab3ce2d0981c2eeec588c3181972d8610735a283ad3769d3b669",
+    "src/process/reader.rs": "6e08afcd2b6429b0bb3e7c59d0276f9899b9ae456c1315769e8b79016ca23f91",
+    "src/process/signal.rs": "dfbbc5be42341e3b7fe4eeb102c9300432b236acaa387d1b86ef8e2d7740f963",
+    "src/process/task.rs": "bbb7f1d90d741f41c6cb761f1433f4cb7c8ca168fac0082bd366a9377ae149a8",
+    "src/project/discovery.rs": "788070643b9347b5162c662e401e17640b1862efe5dfb36bc1da29a813f5d866",
+    "src/project/input.rs": "fdff99252e7be2ae41676263da267ff5c4e5b13a5d3bba20ef7bca868ca91fa3",
+    "src/project/mod.rs": "b82a7d9910e6c49042ecef44fafc980cb51f08fa24dbffa977a82360d7cd32b3",
+    "src/project/paths.rs": "a8c7ff3b04f2f7ea1cac40ead3101c0a86964b51e5d89dcd3e5e9bf3a979beb1",
+    "src/project/runtime.rs": "60516fa830140834515d505125ed3aa5ef9d50b720ece611167017df248a66d4",
+    "src/scope/detection.rs": "540262ced2506ff0d7b6e9458e8f2dd0898d9e8da60358579b8bb14272765906",
+    "src/scope/errors.rs": "708c7a4d3d8f445e686d47384a530efc8e637aa5d6cb1f3f390b43438d441dcd",
+    "src/scope/mod.rs": "15907f6c2103a0d8f67718a8ff1221e04b5852519dec6f6d3d812e29add4cc28",
+    "src/scope/model.rs": "3d0ce45277cfa3c90e646d0d6261d816b21c345ed635ca319fd0bcd9994f1b4b",
+    "src/scope/report.rs": "1f3b987d53ac892a111cc613adb0d02ea008d9f34c02ce11da1bc58a72d07a96",
+    "src/secrets/config.rs": "b57545196d0234eb7f4b4b282ba568e6e1f1610f96f68389518a3b06035bd096",
+    "src/secrets/matcher.rs": "5e706a07954dcb0576eda59683da4b60581a7826b96f523277f451d2600fdae3",
+    "src/secrets/mod.rs": "dd1cffe46385465437a5e1cbe5c31673e8853d0fd39d8d7b386c034eb0474653",
+    "src/service/commands.rs": "4d5fbd802b5c0fe5415b3b2136ba8ca7cf274974f2ab4ce7bdb512b0ad3fe09c",
+    "src/service/docker.rs": "eed2d0709932f11b82ede7e532a192f700dfd90bdc8da9e9a9e5976af3b88ede",
+    "src/service/inspection.rs": "5722acaf5b0f21f4c10a9777ceef11aba685a5e6e4bd3cb70f84435f512f98b6",
+    "src/service/lease.rs": "21192d57f52741f9eb8fd5477b595c960cb8e21881cbedecdd742b7b9ecff021",
+    "src/service/mod.rs": "650d1bed6bc268e8cdd4ccc5910482d25a9d1e6fe9825b2bb86db2d68e8e024e",
+    "src/service/postgres.rs": "45c6a861f1405a35dad68071f378fdae7df68c366b4048cde46f2253ec669356",
+    "src/service/runtime.rs": "71282fabc6aba15fd13eed316bb88bb4955448cd7fe4c03106ddd138e14a3086",
+    "src/ui.rs": "1c6ad7f15b86368107c0bffa99229167a7dc5eef8efd2dca8b9ad4d0da05fb96",
+    "src/utils/fs.rs": "4bb6b47e2b6d47c48ab506f77d368e735c5f44060ec7eb6c6467123c4757c827",
+    "src/utils/git.rs": "14e287a708dcb33fdc702d3ede8027bb22f5dc923cdfc238b58505c538ecb879",
+    "src/utils/mod.rs": "c93da3bb9222a3893fafdefa65e2e455bb720e0b0b84d05b244bd061e3d58877",
+    "src/utils/redaction.rs": "82e39df44e05e801ad4a5414320119817c8f761fb7735d2685b961d71f35b83e",
+    "src/verify/mod.rs": "eaa204963ef62a0eb8029dbc5141ce4cadd337f3218069b3ac53c7c9d00af29b",
+    "src/verify/parser.rs": "75ae046db0b72a7c2d984283c5145e5e8a6e323412745046065de75ed3c2dc9b",
+    "src/verify/plan.rs": "f53208b52ee227a04444a8b3d488178acadbcc49022a2a566893e5dc3a638828",
+    "src/verify/report.rs": "294f00ea6a36825fa1df8cd73ee53b80afd3d11032abac943f4a7ef093af6ccb",
+    "src/verify/scheduler.rs": "625aed0daff04b3c2b67970ad729670543f1b89c69c49bb19fc43c5c2e803a10",
+    "src/verify/steps.rs": "7d97f5fc813e6e77253a32c0374446f64b520096bd28425f3ef45f31bc3320f4",
+    "src/verify/waiver.rs": "9c7b58d3a04e7eb11cf81f2123c25e27ed750a5d7df5da5489eb10d63c83f201"
+  },
+  "status": "pass",
+  "target": "x86_64-unknown-linux-gnu",
+  "threshold": "80.0",
+  "timestamp_utc": "2026-09-07T10:57:43.358696+00:00",
+  "tool": "production-coverage",
+  "unmapped_sources": [
+    {
+      "path": "src/audit/mod.rs",
+      "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
+      "sha256": "04d59fe4054e6be18c7a49b4b3eb9b7460627122fa76da7a0bacf1a3e1b04763"
+    },
+    {
+      "path": "src/audit/model.rs",
+      "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
+      "sha256": "bea0152d48729add7f29b057529bcb05c0be510f06f1c54822dc4f36e6b2027b"
+    },
+    {
+      "path": "src/audit/scanner.rs",
+      "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
+      "sha256": "86b43720c374320f98080c57ea5d525a516a186a2c18a4c8b4357863564f8986"
+    },
+    {
+      "path": "src/config/mod.rs",
+      "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
+      "sha256": "dace8de2f19e6744c2fe5ca63fb875988578d648f48914c34ac1426414f9242f"
+    },
+    {
+      "path": "src/doctor/mod.rs",
+      "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
+      "sha256": "c0b505800b8893d42e67a89027df0b7cee72f15d8ddfdce9d02d530da836c8fd"
+    },
+    {
+      "path": "src/lib.rs",
+      "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
+      "sha256": "e19a0df5524cb2fe7c5128312a5a0e58aff13468efc15be8a90ca4df2c8b4e06"
+    },
+    {
+      "path": "src/preset/mod.rs",
+      "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
+      "sha256": "531faf071925e5cdbe7eca8bb6519fcde371e56fb41b425878c9aa2c6a5d9caf"
+    },
+    {
+      "path": "src/process/mod.rs",
+      "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
+      "sha256": "31515d1f7356ab3ce2d0981c2eeec588c3181972d8610735a283ad3769d3b669"
+    },
+    {
+      "path": "src/scope/mod.rs",
+      "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
+      "sha256": "15907f6c2103a0d8f67718a8ff1221e04b5852519dec6f6d3d812e29add4cc28"
+    },
+    {
+      "path": "src/utils/mod.rs",
+      "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
+      "sha256": "c93da3bb9222a3893fafdefa65e2e455bb720e0b0b84d05b244bd061e3d58877"
+    }
+  ]
+}

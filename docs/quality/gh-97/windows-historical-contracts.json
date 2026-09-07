@@ -1,0 +1,424 @@
+{
+  "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "commit": "c0e612351c2efd515fde96bcefad80c1365534a2",
+  "logical_cpus": 4,
+  "machine": "AMD64",
+  "os": "Windows-2025Server-10.0.26100-SP0",
+  "processor": "AMD64 Family 25 Model 1 Stepping 1, AuthenticAMD",
+  "python": "3.14.7",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "scenarios": [
+    {
+      "ansi": false,
+      "args": [
+        "--help"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "help",
+      "reports": {},
+      "status": "pass",
+      "stderr": "",
+      "stdout": "Configurable development workflow and architecture guard\n\nUsage: harness-gate.exe [OPTIONS] <COMMAND>\n\nCommands:\n  compat      Run the versioned serial compatibility launcher and migration tools\n  adapter     Execute a signed out-of-process adapter request\n  doctor      Check local tools, configuration, Git, and test database access\n  cleanup     Inspect and reclaim stale Harness-Gate resource leases\n  scope       Show changed files and the verification components they select\n  secrets     Scan file names for high-confidence credential patterns\n  audit       Run deterministic architecture rules and write review_context reports\n  verify      Run gates and configured steps for the selected profile and components [alias: check]\n  hook        Run the staged, fast verification profile used by pre-commit\n  parse-logs  Extract one trace's error context from JSON Lines logs\n  config      Validate or inspect the repository workflow configuration\n  schema      Generate artifacts for the workflow configuration model\n  step        Run one configured full-profile step after secrets and audit gates\n  init        Initialize .harness-gate configuration from an embedded preset\n  presets     List embedded project presets\n  help        Print this message or the help of the given subcommand(s)\n\nOptions:\n      --color <COLOR>        Control colored terminal output [default: auto] [possible values: auto, always, never]\n      --project-root <PATH>  Override automatic project root discovery\n      --config <PATH>        Override the repository workflow configuration file\n  -h, --help                 Print help\n  -V, --version              Print version\n\nExamples:\n  harness-gate presets\n  harness-gate init --preset rust-api\n  harness-gate doctor\n  harness-gate cleanup --dry-run\n  harness-gate verify --all\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "--version"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "version",
+      "reports": {},
+      "status": "pass",
+      "stderr": "",
+      "stdout": "harness-gate 0.3.7\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "presets"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "presets",
+      "reports": {},
+      "status": "pass",
+      "stderr": "",
+      "stdout": "generic                  Git-based project with a minimal diff check\nrust-api                 Single Rust crate with fmt, Clippy, check, and tests\nangular-only             Angular/npm project with lint, tests, and build\nangular-rust-postgres    Angular frontend, Rust backend, and temporary PostgreSQL\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "init",
+        "--preset",
+        "generic"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "init",
+      "reports": {},
+      "status": "pass",
+      "stderr": "",
+      "stdout": "Initialized preset \"generic\" in \\\\?\\C:\\Users\\runneradmin\\AppData\\Local\\Temp\\harness-gate-contract-init-b5aicm__\\.harness-gate\nNext: harness-gate --project-root \\\\?\\C:\\Users\\runneradmin\\AppData\\Local\\Temp\\harness-gate-contract-init-b5aicm__ config check\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "schema",
+        "export",
+        "--output",
+        "schema/flow.schema.json"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "schema",
+      "reports": {},
+      "status": "pass",
+      "stderr": "",
+      "stdout": "Schema written: \\\\?\\C:\\Users\\runneradmin\\AppData\\Local\\Temp\\harness-gate-contract-schema-eplgshu7\\schema\\flow.schema.json\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "config",
+        "check"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "config-valid",
+      "reports": {},
+      "status": "pass",
+      "stderr": "",
+      "stdout": "Configuration valid: \\\\?\\C:\\Users\\runneradmin\\AppData\\Local\\Temp\\harness-gate-contract-config-valid-3vv09x_w\\.harness-gate\\flow.toml\nSchema version: 2\nComponents: project\nProfiles: full, hook\nVerification steps: 2\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "config",
+        "check",
+        "--format",
+        "json"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "config-json-valid",
+      "reports": {},
+      "status": "pass",
+      "stderr": "",
+      "stdout": "{\n  \"schema_version\": 1,\n  \"valid\": true,\n  \"truncated\": false,\n  \"diagnostics\": []\n}\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "config",
+        "check"
+      ],
+      "error_codes": [
+        "E1000"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "name": "config-invalid",
+      "reports": {},
+      "status": "pass",
+      "stderr": "ERROR [E1000]: configuration check failed\n\\\\?\\C:\\Users\\runneradmin\\AppData\\Local\\Temp\\harness-gate-contract-config-invalid-5binniet\\.harness-gate\\flow.toml: error [HGCFG-TOML-PARSE] at $: configuration is not valid TOML (line 2, column 1)\n  help: fix the TOML syntax or unknown field reported by the parser\nNext: harness-gate init --preset generic\nMinimal flow.toml shape:\nversion = 2\n\n[project]\nname = \"my-project\"\ndefault_profile = \"full\"\nhook_profile = \"hook\"\n\n[paths]\nreports = \".harness-gate/reports\"\naudit_config = \".harness-gate/audit.toml\"\nsecrets_config = \".harness-gate/secrets.toml\"\n\n[scope]\nunmatched = \"all\"\nrules = [{ patterns = [\"**\"], components = [\"project\"] }]\n\n[[steps]]\nid = \"project.diff-check\"\nlabel = \"Git whitespace check\"\ncomponent = \"project\"\nprofiles = [\"full\"]\nprogram = \"git\"\nargs = [\"diff\", \"--check\"]\ncwd = \"{root}\"\nlog = \"git_diff_check.log\"\ntimeout_secs = 60\n\nThen run: harness-gate config check\n",
+      "stdout": ""
+    },
+    {
+      "ansi": false,
+      "args": [
+        "config",
+        "check",
+        "--format",
+        "json"
+      ],
+      "error_codes": [],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "name": "config-json-invalid",
+      "reports": {},
+      "status": "pass",
+      "stderr": "",
+      "stdout": "{\n  \"schema_version\": 1,\n  \"valid\": false,\n  \"truncated\": false,\n  \"diagnostics\": [\n    {\n      \"id\": \"HGCFG-TOML-PARSE\",\n      \"severity\": \"error\",\n      \"path\": \"$\",\n      \"message\": \"configuration is not valid TOML\",\n      \"help\": \"fix the TOML syntax or unknown field reported by the parser\",\n      \"location\": {\n        \"line\": 2,\n        \"column\": 1\n      }\n    }\n  ]\n}\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "scope",
+        "--all"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "scope",
+      "reports": {
+        "logs": {},
+        "scope.json": {
+          "content": "{\n  \"mode\": \"all\",\n  \"changed_files\": [],\n  \"components\": [\n    \"project\"\n  ],\n  \"unmatched_files\": []\n}",
+          "exists": true
+        }
+      },
+      "status": "pass",
+      "stderr": "",
+      "stdout": "Scope: all\nChanged files: 0\nComponents: project\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "secrets"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "secrets",
+      "reports": {
+        "logs": {},
+        "secret_scan.json": {
+          "content": "{\n  \"timestamp\": \"<TIMESTAMP>\n  \"mode\": \"working-tree\",\n  \"findings\": []\n}",
+          "exists": true
+        }
+      },
+      "status": "pass",
+      "stderr": "",
+      "stdout": "Secret scan passed\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "audit"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "audit",
+      "reports": {
+        "logs": {},
+        "review_context.json": {
+          "content": "{\n  \"timestamp\": \"<TIMESTAMP>\n  \"hard_violations\": [],\n  \"arch_violations\": [],\n  \"summary\": {\n    \"total_violations\": 0,\n    \"blocker_count\": 0,\n    \"error_count\": 0,\n    \"warning_count\": 0\n  }\n}",
+          "exists": true
+        },
+        "review_context.md": {
+          "content": "=== \u00e3\u20ac\ufffd\u00e8\u2021\u00aa\u00e5\u0160\u00a8\u00e5\u0152\u2013\u00e7\u00a1\u00ac\u00e6\u20ac\u00a7\u00e7\u00ba\u00a6\u00e6\ufffd\u0178\u00e6\u2030\u00ab\u00e6\ufffd\ufffd\u00e7\u00bb\u201c\u00e6\u017e\u0153\u00e3\u20ac\u2018 ===\n\n=== \u00e3\u20ac\ufffd\u00e6\u017e\u00b6\u00e6\u017e\u201e\u00e5\u02c6\u2020\u00e5\u00b1\u201a\u00e8\u00bf\ufffd\u00e8\u00a7\u201e\u00e9\u00a2\u201e\u00e6\u2030\u00ab\u00e6\ufffd\ufffd\u00e3\u20ac\u2018 ===\n\n",
+          "exists": true
+        }
+      },
+      "status": "pass",
+      "stderr": "",
+      "stdout": "Audit: 0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\nReport: \\\\?\\C:\\Users\\runneradmin\\AppData\\Local\\Temp\\harness-gate-contract-audit-k1x6dq9a\\.harness-gate\\reports\\review_context.json\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "verify",
+        "--all"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "verify-success",
+      "publication_order": [
+        "secret scan",
+        "architecture audit",
+        "Git whitespace check"
+      ],
+      "reports": {
+        "logs": {
+          "logs\\git_diff_check.log": ""
+        },
+        "test_result.json": {
+          "content": "{\n  \"schema_version\": \"1\",\n  \"invocation_id\": \"<INVOCATION_ID>\",\n  \"executor_version\": \"0.3.7\",\n  \"report_directory\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-success-savs06f6\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\",\n  \"timestamp\": \"<TIMESTAMP>\n  \"profile\": \"full\",\n  \"input_mode\": \"all\",\n  \"project_identity\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-success-savs06f6\",\n  \"source_identity\": \"<SOURCE_IDENTITY>\",\n  \"execution_root\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-success-savs06f6\",\n  \"configuration_digest\": \"<CONFIGURATION_DIGEST>\",\n  \"scope\": {\n    \"mode\": \"all\",\n    \"changed_files\": [],\n    \"components\": [\n      \"project\"\n    ],\n    \"unmatched_files\": []\n  },\n  \"services\": [],\n  \"steps\": [\n    {\n      \"step_id\": \"builtin.secret-scan\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"label\": \"secret scan\",\n      \"passed\": true,\n      \"status\": \"PASS\",\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-success-savs06f6\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\secret_scan.json\",\n      \"detail\": null,\n      \"failure_code\": null,\n      \"waived\": false,\n      \"waiver\": null,\n      \"runner\": null,\n      \"attempts\": [\n        {\n          \"attempt\": 1,\n          \"status\": \"PASS\",\n          \"started_at\": null,\n          \"finished_at\": null,\n          \"duration_ms\": \"<DURATION_MS>\",\n          \"timed_out\": false,\n          \"cancelled\": false,\n          \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-success-savs06f6\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\secret_scan.json\",\n          \"detail\": null\n        }\n      ],\n      \"retry_count\": 0,\n      \"flaky\": false,\n      \"retry_class\": null,\n      \"parser\": null\n    },\n    {\n      \"step_id\": \"builtin.architecture-audit\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"label\": \"architecture audit\",\n      \"passed\": true,\n      \"status\": \"PASS\",\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-success-savs06f6\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\review_context.json\",\n      \"detail\": \"0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\",\n      \"failure_code\": null,\n      \"waived\": false,\n      \"waiver\": null,\n      \"runner\": null,\n      \"attempts\": [\n        {\n          \"attempt\": 1,\n          \"status\": \"PASS\",\n          \"started_at\": null,\n          \"finished_at\": null,\n          \"duration_ms\": \"<DURATION_MS>\",\n          \"timed_out\": false,\n          \"cancelled\": false,\n          \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-success-savs06f6\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\review_context.json\",\n          \"detail\": \"0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\"\n        }\n      ],\n      \"retry_count\": 0,\n      \"flaky\": false,\n      \"retry_class\": null,\n      \"parser\": null\n    },\n    {\n      \"step_id\": \"project.diff-check\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"label\": \"Git whitespace check\",\n      \"passed\": true,\n      \"status\": \"PASS\",\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-success-savs06f6\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\logs\\\\git_diff_check.log\",\n      \"detail\": null,\n      \"failure_code\": null,\n      \"waived\": false,\n      \"waiver\": null,\n      \"runner\": null,\n      \"attempts\": [\n        {\n          \"attempt\": 1,\n          \"status\": \"PASS\",\n          \"started_at\": \"<TIMESTAMP>\n          \"finished_at\": \"<TIMESTAMP>\n          \"duration_ms\": \"<DURATION_MS>\",\n          \"timed_out\": false,\n          \"cancelled\": false,\n          \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-success-savs06f6\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\logs\\\\git_diff_check.log\",\n          \"detail\": null\n        }\n      ],\n      \"retry_count\": 0,\n      \"flaky\": false,\n      \"retry_class\": null,\n      \"parser\": null\n    }\n  ],\n  \"skipped_steps\": [],\n  \"warnings\": [],\n  \"failures\": [],\n  \"artifacts\": [\n    {\n      \"path\": \"changed_files.txt\",\n      \"kind\": \"artifact\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"invocation.json\",\n      \"kind\": \"invocation-metadata\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"logs/git_diff_check.log\",\n      \"kind\": \"step-log\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"step_id\": \"project.diff-check\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"review_context.json\",\n      \"kind\": \"step-log\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"step_id\": \"builtin.architecture-audit\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"review_context.md\",\n      \"kind\": \"report\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"scope.json\",\n      \"kind\": \"report\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"secret_scan.json\",\n      \"kind\": \"step-log\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"step_id\": \"builtin.secret-scan\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"test_result.md\",\n      \"kind\": \"report\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    }\n  ],\n  \"evidence_complete\": true,\n  \"passed\": true,\n  \"status\": \"PASS\"\n}",
+          "exists": true
+        },
+        "test_result.md": {
+          "content": "=== Verification report ===\nTimestamp: <TIMESTAMP>\nProfile: full\nComponents: project\n\n- PASS: secret scan (<DURATION>)\n- PASS: architecture audit (<DURATION>) - 0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\n- PASS: Git whitespace check (<DURATION>)\n\nTEST_SUMMARY: PASS\n",
+          "exists": true
+        }
+      },
+      "status": "pass",
+      "stderr": "",
+      "stdout": "harness-gate verify\nScope: all\nComponents: project\n\n[PASS] secret scan (<DURATION>)\n[PASS] architecture audit (<DURATION>)\n[RUN ] Git whitespace check ... PASS (<DURATION>)\n\nVerification report: \\\\?\\C:\\Users\\runneradmin\\AppData\\Local\\Temp\\harness-gate-contract-verify-success-savs06f6\\.harness-gate\\reports\\test_result.md\nTEST_SUMMARY: PASS\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "verify",
+        "--all"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "verify-parallel-success",
+      "publication_order": [
+        "secret scan",
+        "architecture audit",
+        "Git whitespace check",
+        "staged Git whitespace check"
+      ],
+      "reports": {
+        "logs": {
+          "logs\\git_diff_check.log": "",
+          "logs\\git_staged_diff_check.log": ""
+        },
+        "test_result.json": {
+          "content": "{\n  \"schema_version\": \"1\",\n  \"invocation_id\": \"<INVOCATION_ID>\",\n  \"executor_version\": \"0.3.7\",\n  \"report_directory\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-parallel-success-y3vvkmox\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\",\n  \"timestamp\": \"<TIMESTAMP>\n  \"profile\": \"full\",\n  \"input_mode\": \"all\",\n  \"project_identity\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-parallel-success-y3vvkmox\",\n  \"source_identity\": \"<SOURCE_IDENTITY>\",\n  \"execution_root\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-parallel-success-y3vvkmox\",\n  \"configuration_digest\": \"<CONFIGURATION_DIGEST>\",\n  \"scope\": {\n    \"mode\": \"all\",\n    \"changed_files\": [],\n    \"components\": [\n      \"project\"\n    ],\n    \"unmatched_files\": []\n  },\n  \"services\": [],\n  \"steps\": [\n    {\n      \"step_id\": \"builtin.secret-scan\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"label\": \"secret scan\",\n      \"passed\": true,\n      \"status\": \"PASS\",\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-parallel-success-y3vvkmox\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\secret_scan.json\",\n      \"detail\": null,\n      \"failure_code\": null,\n      \"waived\": false,\n      \"waiver\": null,\n      \"runner\": null,\n      \"attempts\": [\n        {\n          \"attempt\": 1,\n          \"status\": \"PASS\",\n          \"started_at\": null,\n          \"finished_at\": null,\n          \"duration_ms\": \"<DURATION_MS>\",\n          \"timed_out\": false,\n          \"cancelled\": false,\n          \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-parallel-success-y3vvkmox\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\secret_scan.json\",\n          \"detail\": null\n        }\n      ],\n      \"retry_count\": 0,\n      \"flaky\": false,\n      \"retry_class\": null,\n      \"parser\": null\n    },\n    {\n      \"step_id\": \"builtin.architecture-audit\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"label\": \"architecture audit\",\n      \"passed\": true,\n      \"status\": \"PASS\",\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-parallel-success-y3vvkmox\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\review_context.json\",\n      \"detail\": \"0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\",\n      \"failure_code\": null,\n      \"waived\": false,\n      \"waiver\": null,\n      \"runner\": null,\n      \"attempts\": [\n        {\n          \"attempt\": 1,\n          \"status\": \"PASS\",\n          \"started_at\": null,\n          \"finished_at\": null,\n          \"duration_ms\": \"<DURATION_MS>\",\n          \"timed_out\": false,\n          \"cancelled\": false,\n          \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-parallel-success-y3vvkmox\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\review_context.json\",\n          \"detail\": \"0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\"\n        }\n      ],\n      \"retry_count\": 0,\n      \"flaky\": false,\n      \"retry_class\": null,\n      \"parser\": null\n    },\n    {\n      \"step_id\": \"project.diff-check\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"label\": \"Git whitespace check\",\n      \"passed\": true,\n      \"status\": \"PASS\",\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-parallel-success-y3vvkmox\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\logs\\\\git_diff_check.log\",\n      \"detail\": null,\n      \"failure_code\": null,\n      \"waived\": false,\n      \"waiver\": null,\n      \"runner\": null,\n      \"attempts\": [\n        {\n          \"attempt\": 1,\n          \"status\": \"PASS\",\n          \"started_at\": \"<TIMESTAMP>\n          \"finished_at\": \"<TIMESTAMP>\n          \"duration_ms\": \"<DURATION_MS>\",\n          \"timed_out\": false,\n          \"cancelled\": false,\n          \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-parallel-success-y3vvkmox\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\logs\\\\git_diff_check.log\",\n          \"detail\": null\n        }\n      ],\n      \"retry_count\": 0,\n      \"flaky\": false,\n      \"retry_class\": null,\n      \"parser\": null\n    },\n    {\n      \"step_id\": \"project.staged-diff-check\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"label\": \"staged Git whitespace check\",\n      \"passed\": true,\n      \"status\": \"PASS\",\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-parallel-success-y3vvkmox\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\logs\\\\git_staged_diff_check.log\",\n      \"detail\": null,\n      \"failure_code\": null,\n      \"waived\": false,\n      \"waiver\": null,\n      \"runner\": null,\n      \"attempts\": [\n        {\n          \"attempt\": 1,\n          \"status\": \"PASS\",\n          \"started_at\": \"<TIMESTAMP>\n          \"finished_at\": \"<TIMESTAMP>\n          \"duration_ms\": \"<DURATION_MS>\",\n          \"timed_out\": false,\n          \"cancelled\": false,\n          \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-parallel-success-y3vvkmox\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\logs\\\\git_staged_diff_check.log\",\n          \"detail\": null\n        }\n      ],\n      \"retry_count\": 0,\n      \"flaky\": false,\n      \"retry_class\": null,\n      \"parser\": null\n    }\n  ],\n  \"skipped_steps\": [],\n  \"warnings\": [],\n  \"failures\": [],\n  \"artifacts\": [\n    {\n      \"path\": \"changed_files.txt\",\n      \"kind\": \"artifact\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"invocation.json\",\n      \"kind\": \"invocation-metadata\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"logs/git_diff_check.log\",\n      \"kind\": \"step-log\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"step_id\": \"project.diff-check\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"logs/git_staged_diff_check.log\",\n      \"kind\": \"step-log\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"step_id\": \"project.staged-diff-check\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"review_context.json\",\n      \"kind\": \"step-log\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"step_id\": \"builtin.architecture-audit\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"review_context.md\",\n      \"kind\": \"report\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"scope.json\",\n      \"kind\": \"report\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"secret_scan.json\",\n      \"kind\": \"step-log\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"step_id\": \"builtin.secret-scan\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"test_result.md\",\n      \"kind\": \"report\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    }\n  ],\n  \"evidence_complete\": true,\n  \"passed\": true,\n  \"status\": \"PASS\"\n}",
+          "exists": true
+        },
+        "test_result.md": {
+          "content": "=== Verification report ===\nTimestamp: <TIMESTAMP>\nProfile: full\nComponents: project\n\n- PASS: secret scan (<DURATION>)\n- PASS: architecture audit (<DURATION>) - 0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\n- PASS: Git whitespace check (<DURATION>)\n- PASS: staged Git whitespace check (<DURATION>)\n\nTEST_SUMMARY: PASS\n",
+          "exists": true
+        }
+      },
+      "status": "pass",
+      "stderr": "",
+      "stdout": "harness-gate verify\nScope: all\nComponents: project\n\n[PASS] secret scan (<DURATION>)\n[PASS] architecture audit (<DURATION>)\n[RUN ] Git whitespace check ... PASS (<DURATION>)\n[RUN ] staged Git whitespace check ... PASS (<DURATION>)\n\nVerification report: \\\\?\\C:\\Users\\runneradmin\\AppData\\Local\\Temp\\harness-gate-contract-verify-parallel-success-y3vvkmox\\.harness-gate\\reports\\test_result.md\nTEST_SUMMARY: PASS\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "verify",
+        "--all"
+      ],
+      "error_codes": [],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "name": "verify-failure",
+      "reports": {
+        "logs": {
+          "logs\\git_diff_check.log": ""
+        },
+        "test_result.json": {
+          "content": "{\n  \"schema_version\": \"1\",\n  \"invocation_id\": \"<INVOCATION_ID>\",\n  \"executor_version\": \"0.3.7\",\n  \"report_directory\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-failure-i21_hz8c\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\",\n  \"timestamp\": \"<TIMESTAMP>\n  \"profile\": \"full\",\n  \"input_mode\": \"all\",\n  \"project_identity\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-failure-i21_hz8c\",\n  \"source_identity\": \"<SOURCE_IDENTITY>\",\n  \"execution_root\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-failure-i21_hz8c\",\n  \"configuration_digest\": \"<CONFIGURATION_DIGEST>\",\n  \"scope\": {\n    \"mode\": \"all\",\n    \"changed_files\": [],\n    \"components\": [\n      \"project\"\n    ],\n    \"unmatched_files\": []\n  },\n  \"services\": [],\n  \"steps\": [\n    {\n      \"step_id\": \"builtin.secret-scan\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"label\": \"secret scan\",\n      \"passed\": true,\n      \"status\": \"PASS\",\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-failure-i21_hz8c\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\secret_scan.json\",\n      \"detail\": null,\n      \"failure_code\": null,\n      \"waived\": false,\n      \"waiver\": null,\n      \"runner\": null,\n      \"attempts\": [\n        {\n          \"attempt\": 1,\n          \"status\": \"PASS\",\n          \"started_at\": null,\n          \"finished_at\": null,\n          \"duration_ms\": \"<DURATION_MS>\",\n          \"timed_out\": false,\n          \"cancelled\": false,\n          \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-failure-i21_hz8c\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\secret_scan.json\",\n          \"detail\": null\n        }\n      ],\n      \"retry_count\": 0,\n      \"flaky\": false,\n      \"retry_class\": null,\n      \"parser\": null\n    },\n    {\n      \"step_id\": \"builtin.architecture-audit\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"label\": \"architecture audit\",\n      \"passed\": true,\n      \"status\": \"PASS\",\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-failure-i21_hz8c\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\review_context.json\",\n      \"detail\": \"0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\",\n      \"failure_code\": null,\n      \"waived\": false,\n      \"waiver\": null,\n      \"runner\": null,\n      \"attempts\": [\n        {\n          \"attempt\": 1,\n          \"status\": \"PASS\",\n          \"started_at\": null,\n          \"finished_at\": null,\n          \"duration_ms\": \"<DURATION_MS>\",\n          \"timed_out\": false,\n          \"cancelled\": false,\n          \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-failure-i21_hz8c\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\review_context.json\",\n          \"detail\": \"0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\"\n        }\n      ],\n      \"retry_count\": 0,\n      \"flaky\": false,\n      \"retry_class\": null,\n      \"parser\": null\n    },\n    {\n      \"step_id\": \"project.diff-check\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"label\": \"Git whitespace check\",\n      \"passed\": false,\n      \"status\": \"FAIL\",\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-failure-i21_hz8c\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\logs\\\\git_diff_check.log\",\n      \"detail\": \"exit code 1\",\n      \"failure_code\": \"STEP_FAILED\",\n      \"waived\": false,\n      \"waiver\": null,\n      \"runner\": null,\n      \"attempts\": [\n        {\n          \"attempt\": 1,\n          \"status\": \"FAIL\",\n          \"started_at\": \"<TIMESTAMP>\n          \"finished_at\": \"<TIMESTAMP>\n          \"duration_ms\": \"<DURATION_MS>\",\n          \"timed_out\": false,\n          \"cancelled\": false,\n          \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-failure-i21_hz8c\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\logs\\\\git_diff_check.log\",\n          \"detail\": \"exit code 1\"\n        }\n      ],\n      \"retry_count\": 0,\n      \"flaky\": false,\n      \"retry_class\": \"exit\",\n      \"parser\": null\n    }\n  ],\n  \"skipped_steps\": [],\n  \"warnings\": [],\n  \"failures\": [\n    {\n      \"step_id\": \"project.diff-check\",\n      \"code\": \"STEP_FAILED\",\n      \"message\": \"exit code 1\"\n    }\n  ],\n  \"artifacts\": [\n    {\n      \"path\": \"changed_files.txt\",\n      \"kind\": \"artifact\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"invocation.json\",\n      \"kind\": \"invocation-metadata\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"logs/git_diff_check.log\",\n      \"kind\": \"step-log\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"step_id\": \"project.diff-check\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"review_context.json\",\n      \"kind\": \"step-log\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"step_id\": \"builtin.architecture-audit\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"review_context.md\",\n      \"kind\": \"report\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"scope.json\",\n      \"kind\": \"report\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"secret_scan.json\",\n      \"kind\": \"step-log\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"step_id\": \"builtin.secret-scan\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"test_result.md\",\n      \"kind\": \"report\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    }\n  ],\n  \"evidence_complete\": true,\n  \"passed\": false,\n  \"status\": \"FAIL\"\n}",
+          "exists": true
+        },
+        "test_result.md": {
+          "content": "=== Verification report ===\nTimestamp: <TIMESTAMP>\nProfile: full\nComponents: project\n\n- PASS: secret scan (<DURATION>)\n- PASS: architecture audit (<DURATION>) - 0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\n- FAIL: Git whitespace check (<DURATION>) - exit code 1; log: \\\\?\\C:\\Users\\runneradmin\\AppData\\Local\\Temp\\harness-gate-contract-verify-failure-i21_hz8c\\.harness-gate\\reports\\invocations\\<INVOCATION_ID>\\logs\\git_diff_check.log\n\nTEST_SUMMARY: FAIL\n",
+          "exists": true
+        }
+      },
+      "status": "pass",
+      "stderr": "",
+      "stdout": "harness-gate verify\nScope: all\nComponents: project\n\n[PASS] secret scan (<DURATION>)\n[PASS] architecture audit (<DURATION>)\n[RUN ] Git whitespace check ... FAIL (<DURATION>)\n       log: \\\\?\\C:\\Users\\runneradmin\\AppData\\Local\\Temp\\harness-gate-contract-verify-failure-i21_hz8c\\.harness-gate\\reports\\invocations\\<INVOCATION_ID>\\logs\\git_diff_check.log\n\nVerification report: \\\\?\\C:\\Users\\runneradmin\\AppData\\Local\\Temp\\harness-gate-contract-verify-failure-i21_hz8c\\.harness-gate\\reports\\test_result.md\nTEST_SUMMARY: FAIL\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "verify",
+        "--all"
+      ],
+      "error_codes": [],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "name": "verify-json-parse-failure",
+      "reports": {
+        "logs": {
+          "logs\\git_diff_check.log": "",
+          "logs\\json_parse_failure.log": "{\"duration_ms\":\"<DURATION_MS>\",\"status\":\"error\"}\n"
+        },
+        "test_result.json": {
+          "content": "{\n  \"schema_version\": \"1\",\n  \"invocation_id\": \"<INVOCATION_ID>\",\n  \"executor_version\": \"0.3.7\",\n  \"report_directory\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-json-parse-failure-zo1_ygkg\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\",\n  \"timestamp\": \"<TIMESTAMP>\n  \"profile\": \"full\",\n  \"input_mode\": \"all\",\n  \"project_identity\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-json-parse-failure-zo1_ygkg\",\n  \"source_identity\": \"<SOURCE_IDENTITY>\",\n  \"execution_root\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-json-parse-failure-zo1_ygkg\",\n  \"configuration_digest\": \"<CONFIGURATION_DIGEST>\",\n  \"scope\": {\n    \"mode\": \"all\",\n    \"changed_files\": [],\n    \"components\": [\n      \"project\"\n    ],\n    \"unmatched_files\": []\n  },\n  \"services\": [],\n  \"steps\": [\n    {\n      \"step_id\": \"builtin.secret-scan\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"label\": \"secret scan\",\n      \"passed\": true,\n      \"status\": \"PASS\",\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-json-parse-failure-zo1_ygkg\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\secret_scan.json\",\n      \"detail\": null,\n      \"failure_code\": null,\n      \"waived\": false,\n      \"waiver\": null,\n      \"runner\": null,\n      \"attempts\": [\n        {\n          \"attempt\": 1,\n          \"status\": \"PASS\",\n          \"started_at\": null,\n          \"finished_at\": null,\n          \"duration_ms\": \"<DURATION_MS>\",\n          \"timed_out\": false,\n          \"cancelled\": false,\n          \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-json-parse-failure-zo1_ygkg\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\secret_scan.json\",\n          \"detail\": null\n        }\n      ],\n      \"retry_count\": 0,\n      \"flaky\": false,\n      \"retry_class\": null,\n      \"parser\": null\n    },\n    {\n      \"step_id\": \"builtin.architecture-audit\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"label\": \"architecture audit\",\n      \"passed\": true,\n      \"status\": \"PASS\",\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-json-parse-failure-zo1_ygkg\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\review_context.json\",\n      \"detail\": \"0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\",\n      \"failure_code\": null,\n      \"waived\": false,\n      \"waiver\": null,\n      \"runner\": null,\n      \"attempts\": [\n        {\n          \"attempt\": 1,\n          \"status\": \"PASS\",\n          \"started_at\": null,\n          \"finished_at\": null,\n          \"duration_ms\": \"<DURATION_MS>\",\n          \"timed_out\": false,\n          \"cancelled\": false,\n          \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-json-parse-failure-zo1_ygkg\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\review_context.json\",\n          \"detail\": \"0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\"\n        }\n      ],\n      \"retry_count\": 0,\n      \"flaky\": false,\n      \"retry_class\": null,\n      \"parser\": null\n    },\n    {\n      \"step_id\": \"project.diff-check\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"label\": \"Git whitespace check\",\n      \"passed\": true,\n      \"status\": \"PASS\",\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-json-parse-failure-zo1_ygkg\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\logs\\\\git_diff_check.log\",\n      \"detail\": null,\n      \"failure_code\": null,\n      \"waived\": false,\n      \"waiver\": null,\n      \"runner\": null,\n      \"attempts\": [\n        {\n          \"attempt\": 1,\n          \"status\": \"PASS\",\n          \"started_at\": \"<TIMESTAMP>\n          \"finished_at\": \"<TIMESTAMP>\n          \"duration_ms\": \"<DURATION_MS>\",\n          \"timed_out\": false,\n          \"cancelled\": false,\n          \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-json-parse-failure-zo1_ygkg\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\logs\\\\git_diff_check.log\",\n          \"detail\": null\n        }\n      ],\n      \"retry_count\": 0,\n      \"flaky\": false,\n      \"retry_class\": null,\n      \"parser\": null\n    },\n    {\n      \"step_id\": \"fixture.json-parse-failure\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"label\": \"JSON parse failure fixture\",\n      \"passed\": false,\n      \"status\": \"FAIL\",\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-json-parse-failure-zo1_ygkg\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\logs\\\\json_parse_failure.log\",\n      \"detail\": \"parser failure: JSON test results contain no supported result array\",\n      \"failure_code\": \"RESULT_PARSE_FAILURE\",\n      \"waived\": false,\n      \"waiver\": null,\n      \"runner\": null,\n      \"attempts\": [\n        {\n          \"attempt\": 1,\n          \"status\": \"FAIL\",\n          \"started_at\": \"<TIMESTAMP>\n          \"finished_at\": \"<TIMESTAMP>\n          \"duration_ms\": \"<DURATION_MS>\",\n          \"timed_out\": false,\n          \"cancelled\": false,\n          \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-json-parse-failure-zo1_ygkg\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\logs\\\\json_parse_failure.log\",\n          \"detail\": \"parser failure: JSON test results contain no supported result array\"\n        }\n      ],\n      \"retry_count\": 0,\n      \"flaky\": false,\n      \"retry_class\": \"parser\",\n      \"parser\": {\n        \"mode\": \"json\",\n        \"version\": 1,\n        \"observed\": 0,\n        \"minimum\": 1,\n        \"complete\": false\n      }\n    }\n  ],\n  \"skipped_steps\": [],\n  \"warnings\": [],\n  \"failures\": [\n    {\n      \"step_id\": \"fixture.json-parse-failure\",\n      \"code\": \"RESULT_PARSE_FAILURE\",\n      \"message\": \"parser failure: JSON test results contain no supported result array\"\n    }\n  ],\n  \"artifacts\": [\n    {\n      \"path\": \"changed_files.txt\",\n      \"kind\": \"artifact\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"invocation.json\",\n      \"kind\": \"invocation-metadata\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"logs/git_diff_check.log\",\n      \"kind\": \"step-log\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"step_id\": \"project.diff-check\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"logs/json_parse_failure.log\",\n      \"kind\": \"step-log\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"step_id\": \"fixture.json-parse-failure\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"review_context.json\",\n      \"kind\": \"step-log\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"step_id\": \"builtin.architecture-audit\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"review_context.md\",\n      \"kind\": \"report\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"scope.json\",\n      \"kind\": \"report\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"secret_scan.json\",\n      \"kind\": \"step-log\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"step_id\": \"builtin.secret-scan\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"test_result.md\",\n      \"kind\": \"report\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    }\n  ],\n  \"evidence_complete\": true,\n  \"passed\": false,\n  \"status\": \"FAIL\"\n}",
+          "exists": true
+        },
+        "test_result.md": {
+          "content": "=== Verification report ===\nTimestamp: <TIMESTAMP>\nProfile: full\nComponents: project\n\n- PASS: secret scan (<DURATION>)\n- PASS: architecture audit (<DURATION>) - 0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\n- PASS: Git whitespace check (<DURATION>)\n- FAIL: JSON parse failure fixture (<DURATION>) - parser failure: JSON test results contain no supported result array; log: \\\\?\\C:\\Users\\runneradmin\\AppData\\Local\\Temp\\harness-gate-contract-verify-json-parse-failure-zo1_ygkg\\.harness-gate\\reports\\invocations\\<INVOCATION_ID>\\logs\\json_parse_failure.log\n\nTEST_SUMMARY: FAIL\n",
+          "exists": true
+        }
+      },
+      "status": "pass",
+      "stderr": "",
+      "stdout": "harness-gate verify\nScope: all\nComponents: project\n\n[PASS] secret scan (<DURATION>)\n[PASS] architecture audit (<DURATION>)\n[RUN ] Git whitespace check ... PASS (<DURATION>)\n[RUN ] JSON parse failure fixture ... FAIL (<DURATION>)\n       log: \\\\?\\C:\\Users\\runneradmin\\AppData\\Local\\Temp\\harness-gate-contract-verify-json-parse-failure-zo1_ygkg\\.harness-gate\\reports\\invocations\\<INVOCATION_ID>\\logs\\json_parse_failure.log\n\nVerification report: \\\\?\\C:\\Users\\runneradmin\\AppData\\Local\\Temp\\harness-gate-contract-verify-json-parse-failure-zo1_ygkg\\.harness-gate\\reports\\test_result.md\nTEST_SUMMARY: FAIL\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "step",
+        "project.diff-check"
+      ],
+      "error_codes": [],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "name": "verify-one-step",
+      "reports": {
+        "logs": {
+          "logs\\git_diff_check.log": ""
+        },
+        "test_result.json": {
+          "content": "{\n  \"schema_version\": \"1\",\n  \"invocation_id\": \"<INVOCATION_ID>\",\n  \"executor_version\": \"0.3.7\",\n  \"report_directory\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-one-step-0he94f2z\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\",\n  \"timestamp\": \"<TIMESTAMP>\n  \"profile\": \"step:project.diff-check\",\n  \"input_mode\": \"working-tree\",\n  \"project_identity\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-one-step-0he94f2z\",\n  \"source_identity\": \"<SOURCE_IDENTITY>\",\n  \"execution_root\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-one-step-0he94f2z\",\n  \"configuration_digest\": \"<CONFIGURATION_DIGEST>\",\n  \"scope\": {\n    \"mode\": \"components\",\n    \"changed_files\": [],\n    \"components\": [\n      \"project\"\n    ],\n    \"unmatched_files\": []\n  },\n  \"services\": [],\n  \"steps\": [\n    {\n      \"step_id\": \"builtin.secret-scan\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"label\": \"secret scan\",\n      \"passed\": true,\n      \"status\": \"PASS\",\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-one-step-0he94f2z\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\secret_scan.json\",\n      \"detail\": null,\n      \"failure_code\": null,\n      \"waived\": false,\n      \"waiver\": null,\n      \"runner\": null,\n      \"attempts\": [\n        {\n          \"attempt\": 1,\n          \"status\": \"PASS\",\n          \"started_at\": null,\n          \"finished_at\": null,\n          \"duration_ms\": \"<DURATION_MS>\",\n          \"timed_out\": false,\n          \"cancelled\": false,\n          \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-one-step-0he94f2z\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\secret_scan.json\",\n          \"detail\": null\n        }\n      ],\n      \"retry_count\": 0,\n      \"flaky\": false,\n      \"retry_class\": null,\n      \"parser\": null\n    },\n    {\n      \"step_id\": \"builtin.architecture-audit\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"label\": \"architecture audit\",\n      \"passed\": true,\n      \"status\": \"PASS\",\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-one-step-0he94f2z\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\review_context.json\",\n      \"detail\": \"0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\",\n      \"failure_code\": null,\n      \"waived\": false,\n      \"waiver\": null,\n      \"runner\": null,\n      \"attempts\": [\n        {\n          \"attempt\": 1,\n          \"status\": \"PASS\",\n          \"started_at\": null,\n          \"finished_at\": null,\n          \"duration_ms\": \"<DURATION_MS>\",\n          \"timed_out\": false,\n          \"cancelled\": false,\n          \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-one-step-0he94f2z\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\review_context.json\",\n          \"detail\": \"0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\"\n        }\n      ],\n      \"retry_count\": 0,\n      \"flaky\": false,\n      \"retry_class\": null,\n      \"parser\": null\n    },\n    {\n      \"step_id\": \"project.diff-check\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"label\": \"Git whitespace check\",\n      \"passed\": true,\n      \"status\": \"PASS\",\n      \"timed_out\": false,\n      \"cancelled\": false,\n      \"duration_ms\": \"<DURATION_MS>\",\n      \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-one-step-0he94f2z\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\logs\\\\git_diff_check.log\",\n      \"detail\": null,\n      \"failure_code\": null,\n      \"waived\": false,\n      \"waiver\": null,\n      \"runner\": null,\n      \"attempts\": [\n        {\n          \"attempt\": 1,\n          \"status\": \"PASS\",\n          \"started_at\": \"<TIMESTAMP>\n          \"finished_at\": \"<TIMESTAMP>\n          \"duration_ms\": \"<DURATION_MS>\",\n          \"timed_out\": false,\n          \"cancelled\": false,\n          \"log\": \"\\\\\\\\?\\\\C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\harness-gate-contract-verify-one-step-0he94f2z\\\\.harness-gate\\\\reports\\\\invocations\\\\<INVOCATION_ID>\\\\logs\\\\git_diff_check.log\",\n          \"detail\": null\n        }\n      ],\n      \"retry_count\": 0,\n      \"flaky\": false,\n      \"retry_class\": null,\n      \"parser\": null\n    }\n  ],\n  \"skipped_steps\": [],\n  \"warnings\": [],\n  \"failures\": [],\n  \"artifacts\": [\n    {\n      \"path\": \"changed_files.txt\",\n      \"kind\": \"artifact\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"invocation.json\",\n      \"kind\": \"invocation-metadata\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"logs/git_diff_check.log\",\n      \"kind\": \"step-log\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"step_id\": \"project.diff-check\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"review_context.json\",\n      \"kind\": \"step-log\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"step_id\": \"builtin.architecture-audit\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"review_context.md\",\n      \"kind\": \"report\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"scope.json\",\n      \"kind\": \"report\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"secret_scan.json\",\n      \"kind\": \"step-log\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"step_id\": \"builtin.secret-scan\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    },\n    {\n      \"path\": \"test_result.md\",\n      \"kind\": \"report\",\n      \"invocation_id\": \"<INVOCATION_ID>\",\n      \"size_bytes\": \"<SIZE_BYTES>\",\n      \"sha256\": \"<SHA256>\"\n    }\n  ],\n  \"evidence_complete\": true,\n  \"passed\": true,\n  \"status\": \"PASS\"\n}",
+          "exists": true
+        },
+        "test_result.md": {
+          "content": "=== Verification report ===\nTimestamp: <TIMESTAMP>\nProfile: step:project.diff-check\nComponents: project\n\n- PASS: secret scan (<DURATION>)\n- PASS: architecture audit (<DURATION>) - 0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)\n- PASS: Git whitespace check (<DURATION>)\n\nTEST_SUMMARY: PASS\n",
+          "exists": true
+        }
+      },
+      "status": "pass",
+      "stderr": "",
+      "stdout": "harness-gate verify\nScope: components\nComponents: project\n\n[PASS] secret scan (<DURATION>)\n[PASS] architecture audit (<DURATION>)\n[RUN ] Git whitespace check ... PASS (<DURATION>)\n\nVerification report: \\\\?\\C:\\Users\\runneradmin\\AppData\\Local\\Temp\\harness-gate-contract-verify-one-step-0he94f2z\\.harness-gate\\reports\\test_result.md\nTEST_SUMMARY: PASS\n"
+    },
+    {
+      "ansi": false,
+      "args": [
+        "verify",
+        "--all",
+        "--profile",
+        "missing"
+      ],
+      "error_codes": [
+        "E1401"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "name": "unknown-profile",
+      "reports": {
+        "logs": {}
+      },
+      "status": "pass",
+      "stderr": "ERROR [E1401]: unknown or empty verification profile \"missing\"\n",
+      "stdout": ""
+    },
+    {
+      "ansi": false,
+      "args": [
+        "step",
+        "missing.step"
+      ],
+      "error_codes": [
+        "E1401"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "name": "unknown-step",
+      "reports": {
+        "logs": {}
+      },
+      "status": "pass",
+      "stderr": "ERROR [E1401]: unknown verification step \"missing.step\"\n",
+      "stdout": ""
+    },
+    {
+      "ansi": false,
+      "args": [
+        "missing-command"
+      ],
+      "error_codes": [],
+      "exit_code": 2,
+      "expected_exit_code": 2,
+      "name": "unknown-command",
+      "reports": {},
+      "status": "pass",
+      "stderr": "error: unrecognized subcommand 'missing-command'\n\nUsage: harness-gate.exe [OPTIONS] <COMMAND>\n\nFor more information, try '--help'.\n",
+      "stdout": ""
+    }
+  ],
+  "snapshot_version": 1,
+  "target": "x86_64-pc-windows-msvc",
+  "timestamp_utc": "2026-09-07T10:14:38.119466+00:00",
+  "tool": "cli-contracts"
+}
