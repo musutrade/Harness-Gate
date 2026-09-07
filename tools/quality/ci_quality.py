@@ -140,7 +140,7 @@ class Collector:
         (self.directory / 'risk.md').write_text('# Candidate function risk\n\n'
             f'Base: `{base}`\n\nHead: `{head}`\n\n'
             f"Identities: {len(comparison['identities'])}; failures: {len(comparison['failures'])}.\n\n"
-            'Scope: six GH-94 files. Raw counters, exact rational CRAP and historical debt are retained in head-risk.json. '
+            'Scope: GH-94 files and staged snapshot input. Raw counters, exact rational CRAP and historical debt are retained in head-risk.json. '
             'Branch coverage is unsupported. This candidate is not an accepted baseline.\n')
 
     def matrix(self):
