@@ -142,7 +142,11 @@ impl InvocationInput {
 }
 
 fn allocate_snapshot_root() -> Result<PathBuf> {
-    let base = std::env::temp_dir();
+    // Configuration containment checks compare canonical paths. Resolve the
+    // temporary parent too (for example, /var -> /private/var on macOS).
+    let base = std::env::temp_dir()
+        .canonicalize()
+        .context("resolve staged snapshot temporary directory")?;
     for _ in 0..64 {
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
