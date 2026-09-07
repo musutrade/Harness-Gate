@@ -110,6 +110,18 @@ evidence for the blocker, not a passing function-risk report. Tasks 6.1–6.6 an
 final handoff remain incomplete until the production measurement contract can
 represent these cases and both revisions pass the unchanged thresholds.
 
+The continuation also tested three compiler settings against the same retained
+reproducer: `-C instrument-coverage=all`, `-C instrument-coverage -C
+link-dead-code=yes`, and `-C instrument-coverage -C no-prepopulate-passes`, each
+with `-C opt-level=0`. All twelve compile/run/merge/export commands succeeded,
+but every export still contains the same four function identities and omits the
+field-only closure. The diagnostic JSON now retains each exact command, profile
+environment, exit status, export digest and complete raw export under
+`instrumentation_probes`. These options do not unblock the frozen mapper.
+Rust's [instrumentation documentation](https://doc.rust-lang.org/rustc/instrument-coverage.html)
+also describes `all` as a current alias for enabled instrumentation, rather than
+an option promising additional closure records.
+
 ## Validation
 
 Complete local logs and raw exports are retained under `target/quality/gh-94/`.
