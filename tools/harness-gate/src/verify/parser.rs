@@ -220,81 +220,88 @@ fn count_xml_elements(content: &str, wanted: &[u8], allowed_roots: &[&[u8]]) -> 
     Ok(count)
 }
 
-fn count_json_results(value: &Value, path: Option<&str>) -> Result<usize> {
-    if let Some(path) = path {
-        if path.split('.').any(|segment| segment.is_empty()) {
-            return Err(anyhow::anyhow!(
-                "JSON result path {path:?} must be a non-empty dot path"
-            ));
+fn count_json_path(value: &Value, path: &str) -> Result<usize> {
+    if path.split('.').any(|segment| segment.is_empty()) {
+        return Err(anyhow::anyhow!(
+            "JSON result path {path:?} must be a non-empty dot path"
+        ));
+    }
+    let mut current = value;
+    for segment in path.split('.') {
+        current = current
+            .get(segment)
+            .ok_or_else(|| anyhow::anyhow!("JSON result path {path:?} is missing"))?;
+    }
+    match current {
+        Value::Array(items) => Ok(items.len()),
+        Value::Number(number) => {
+            let count = number.as_u64().ok_or_else(|| {
+                anyhow::anyhow!("JSON result count at {path:?} is not a non-negative integer")
+            })?;
+            usize::try_from(count)
+                .map_err(|_| anyhow::anyhow!("JSON result count at {path:?} does not fit in usize"))
         }
-        let mut current = value;
-        for segment in path.split('.') {
-            current = current
-                .get(segment)
-                .ok_or_else(|| anyhow::anyhow!("JSON result path {path:?} is missing"))?;
-        }
-        return match current {
-            Value::Array(items) => Ok(items.len()),
-            Value::Number(number) => {
-                let count = number.as_u64().ok_or_else(|| {
-                    anyhow::anyhow!("JSON result count at {path:?} is not a non-negative integer")
-                })?;
-                usize::try_from(count).map_err(|_| {
-                    anyhow::anyhow!("JSON result count at {path:?} does not fit in usize")
-                })
-            }
-            _ => Err(anyhow::anyhow!(
-                "JSON result path {path:?} must be an array or integer"
-            )),
+        _ => Err(anyhow::anyhow!(
+            "JSON result path {path:?} must be an array or integer"
+        )),
+    }
+}
+
+const SUPPORTED_FIELDS: [&str; 5] = [
+    "testcases",
+    "testCases",
+    "test_results",
+    "testResults",
+    "results",
+];
+
+fn discover_json_results(
+    value: &Value,
+    path: &str,
+    candidates: &mut Vec<(String, usize)>,
+) -> Result<()> {
+    let Value::Object(map) = value else {
+        return Ok(());
+    };
+
+    for field in SUPPORTED_FIELDS {
+        let Some(candidate) = map.get(field) else {
+            continue;
         };
+        let candidate_path = if path.is_empty() {
+            field.to_owned()
+        } else {
+            format!("{path}.{field}")
+        };
+        let Value::Array(items) = candidate else {
+            return Err(anyhow::anyhow!(
+                "JSON result field {candidate_path:?} must be an array"
+            ));
+        };
+        candidates.push((candidate_path, items.len()));
     }
 
-    const SUPPORTED_FIELDS: [&str; 5] = [
-        "testcases",
-        "testCases",
-        "test_results",
-        "testResults",
-        "results",
-    ];
-
-    fn discover(value: &Value, path: &str, candidates: &mut Vec<(String, usize)>) -> Result<()> {
-        let Value::Object(map) = value else {
-            return Ok(());
-        };
-
-        for field in SUPPORTED_FIELDS {
-            let Some(candidate) = map.get(field) else {
-                continue;
-            };
-            let candidate_path = if path.is_empty() {
+    // Only object wrappers may be traversed. In particular, arrays are
+    // result containers, not search roots for unrelated nested values.
+    for (field, child) in map {
+        if SUPPORTED_FIELDS.contains(&field.as_str()) {
+            continue;
+        }
+        if child.is_object() {
+            let child_path = if path.is_empty() {
                 field.to_owned()
             } else {
                 format!("{path}.{field}")
             };
-            let Value::Array(items) = candidate else {
-                return Err(anyhow::anyhow!(
-                    "JSON result field {candidate_path:?} must be an array"
-                ));
-            };
-            candidates.push((candidate_path, items.len()));
+            discover_json_results(child, &child_path, candidates)?;
         }
+    }
+    Ok(())
+}
 
-        // Only object wrappers may be traversed. In particular, arrays are
-        // result containers, not search roots for unrelated nested values.
-        for (field, child) in map {
-            if SUPPORTED_FIELDS.contains(&field.as_str()) {
-                continue;
-            }
-            if child.is_object() {
-                let child_path = if path.is_empty() {
-                    field.to_owned()
-                } else {
-                    format!("{path}.{field}")
-                };
-                discover(child, &child_path, candidates)?;
-            }
-        }
-        Ok(())
+fn count_json_results(value: &Value, path: Option<&str>) -> Result<usize> {
+    if let Some(path) = path {
+        return count_json_path(value, path);
     }
 
     if let Value::Array(items) = value {
@@ -302,7 +309,7 @@ fn count_json_results(value: &Value, path: Option<&str>) -> Result<usize> {
     }
 
     let mut candidates = Vec::new();
-    discover(value, "", &mut candidates)?;
+    discover_json_results(value, "", &mut candidates)?;
     match candidates.as_slice() {
         [] => Err(anyhow::anyhow!(
             "JSON test results contain no supported result array"

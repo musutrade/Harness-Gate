@@ -35,59 +35,16 @@ fn run_check(project: &Project, check: &DoctorCheck) -> Result<String> {
                 .collect::<Vec<_>>();
             command_output(project, program, &args, timeout)
         }
-        DoctorCheckKind::Path { path, path_type } => {
-            let path = resolve_check_path(project, path);
-            let exists = match path_type {
-                PathType::Any => path.exists(),
-                PathType::File => path.is_file(),
-                PathType::Directory => path.is_dir(),
-            };
-            if !exists {
-                bail!("{} is missing", path.display());
-            }
-            Ok(path.display().to_string())
-        }
+        DoctorCheckKind::Path { path, path_type } => check_path(project, path, path_type),
         DoctorCheckKind::Glob { pattern } => check_glob(project, pattern),
-        DoctorCheckKind::Env { name } => {
-            std::env::var_os(name).ok_or_else(|| anyhow::anyhow!("{name} is not configured"))?;
-            Ok(format!("{name} is configured"))
-        }
+        DoctorCheckKind::Env { name } => check_env(name),
         DoctorCheckKind::EnvOrFile {
             env,
             path,
             contains,
-        } => {
-            if std::env::var_os(env).is_some() {
-                return Ok(format!("{env} is configured"));
-            }
-            let path = resolve_check_path(project, path);
-            let found = fs::read_to_string(&path)
-                .map(|content| {
-                    content
-                        .lines()
-                        .any(|line| line.trim_start().starts_with(contains))
-                })
-                .unwrap_or(false);
-            if !found {
-                bail!(
-                    "{env} is absent and {} does not define {contains}",
-                    path.display()
-                );
-            }
-            Ok(format!("{contains} found in {}", path.display()))
-        }
+        } => check_env_or_file(project, env, path, contains),
         DoctorCheckKind::GitConfig { key, expected } => {
-            let args = vec!["config".into(), "--get".into(), key.clone()];
-            let output = crate::process::capture("git", &args, &project.root, timeout)
-                .with_context(|| format!("read Git config {key}"))?;
-            if !output.status.success() {
-                bail!("Git config {key} is not set");
-            }
-            let actual = String::from_utf8_lossy(&output.stdout).trim().to_string();
-            if actual != *expected {
-                bail!("Git config {key} is {actual:?}, expected {expected:?}");
-            }
-            Ok(format!("{key}={expected}"))
+            check_git_config(project, key, expected, timeout)
         }
         DoctorCheckKind::GitRemotes => check_remotes(&project.root, timeout),
         DoctorCheckKind::Version {
@@ -95,28 +52,95 @@ fn run_check(project: &Project, check: &DoctorCheck) -> Result<String> {
             args,
             path,
             trim_prefix,
-        } => {
-            let args = args
-                .iter()
-                .map(|arg| project.expand(arg))
-                .collect::<Vec<_>>();
-            let actual = command_output(project, program, &args, timeout)?
-                .trim_start_matches(trim_prefix)
-                .to_string();
-            let path = resolve_check_path(project, path);
-            let expected = fs::read_to_string(&path)
-                .with_context(|| format!("read version file {}", path.display()))?
-                .trim()
-                .to_string();
-            if actual != expected {
-                bail!("found {actual}, expected {expected}");
-            }
-            Ok(expected)
-        }
+        } => check_version(project, program, args, path, trim_prefix, timeout),
         DoctorCheckKind::Service { service } => {
             crate::service::check_available(project, service, timeout)
         }
     }
+}
+
+fn check_path(project: &Project, path: &str, path_type: &PathType) -> Result<String> {
+    let path = resolve_check_path(project, path);
+    let exists = match path_type {
+        PathType::Any => path.exists(),
+        PathType::File => path.is_file(),
+        PathType::Directory => path.is_dir(),
+    };
+    if !exists {
+        bail!("{} is missing", path.display());
+    }
+    Ok(path.display().to_string())
+}
+
+fn check_env(name: &str) -> Result<String> {
+    std::env::var_os(name).ok_or_else(|| anyhow::anyhow!("{name} is not configured"))?;
+    Ok(format!("{name} is configured"))
+}
+
+fn check_env_or_file(project: &Project, env: &str, path: &str, contains: &str) -> Result<String> {
+    if std::env::var_os(env).is_some() {
+        return Ok(format!("{env} is configured"));
+    }
+    let path = resolve_check_path(project, path);
+    let found = fs::read_to_string(&path)
+        .map(|content| {
+            content
+                .lines()
+                .any(|line| line.trim_start().starts_with(contains))
+        })
+        .unwrap_or(false);
+    if !found {
+        bail!(
+            "{env} is absent and {} does not define {contains}",
+            path.display()
+        );
+    }
+    Ok(format!("{contains} found in {}", path.display()))
+}
+
+fn check_git_config(
+    project: &Project,
+    key: &str,
+    expected: &str,
+    timeout: Duration,
+) -> Result<String> {
+    let args = vec!["config".into(), "--get".into(), key.to_string()];
+    let output = crate::process::capture("git", &args, &project.root, timeout)
+        .with_context(|| format!("read Git config {key}"))?;
+    if !output.status.success() {
+        bail!("Git config {key} is not set");
+    }
+    let actual = String::from_utf8_lossy(&output.stdout).trim().to_string();
+    if actual != expected {
+        bail!("Git config {key} is {actual:?}, expected {expected:?}");
+    }
+    Ok(format!("{key}={expected}"))
+}
+
+fn check_version(
+    project: &Project,
+    program: &str,
+    args: &[String],
+    path: &str,
+    trim_prefix: &str,
+    timeout: Duration,
+) -> Result<String> {
+    let args = args
+        .iter()
+        .map(|arg| project.expand(arg))
+        .collect::<Vec<_>>();
+    let actual = command_output(project, program, &args, timeout)?
+        .trim_start_matches(trim_prefix)
+        .to_string();
+    let path = resolve_check_path(project, path);
+    let expected = fs::read_to_string(&path)
+        .with_context(|| format!("read version file {}", path.display()))?
+        .trim()
+        .to_string();
+    if actual != expected {
+        bail!("found {actual}, expected {expected}");
+    }
+    Ok(expected)
 }
 
 fn resolve_check_path(project: &Project, value: &str) -> PathBuf {
