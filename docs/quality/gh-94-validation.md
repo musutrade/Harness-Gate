@@ -122,6 +122,31 @@ Rust's [instrumentation documentation](https://doc.rust-lang.org/rustc/instrumen
 also describes `all` as a current alias for enabled instrumentation, rather than
 an option promising additional closure records.
 
+## Follow-up: parent counters cannot recover missing closure coverage
+
+A paired-run probe uses one instrumented executable and identical source bytes.
+Calling `field_only` with an empty slice invokes its closure zero times and
+returns true; calling it with one false entry invokes the closure once and
+returns false. Both runs assert the expected result. LLVM emits exactly one
+`field_only` record in each run, with identical function and region counters,
+and no closure record. The function is marked `#[inline(never)]` and its input
+passes through `std::hint::black_box`.
+
+All nine tool commands passed. The source, commands, result assertions and both
+raw exports are retained in `indistinguishable_execution_probe` in the
+[coverage diagnostic](gh-94-coverage-gap.json), with local artifacts under
+`target/quality/gh-94/closure-distinguish/`. This establishes that using parent
+counters to fill the missing closure record can report executed coverage for
+an unexecuted closure. A syntax or mapper repair alone cannot supply the
+missing observation. Acceptance still needs instrumentation that distinguishes
+these executions, alongside the versioned syntax/mapping repair; the existing
+source identity and per-function coverage requirements remain in force.
+
+Documentation consistency and strict OpenSpec validation both passed after
+this diagnostic addition (`docs-consistency-distinguish.log` and
+`openspec-distinguish.log`). Production code is unchanged; its existing Rust
+validation results still apply.
+
 ## Validation
 
 Complete local logs and raw exports are retained under `target/quality/gh-94/`.
