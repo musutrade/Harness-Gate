@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import subprocess
 from collections import defaultdict
+from decimal import Decimal
 from pathlib import Path
 
 from quality_common import CRATE, QUALITY_ROOT, fail, metadata, read_json, write_json
@@ -33,7 +34,7 @@ ADAPTER_MODULES = {
 EXCLUDED_FILES = {"scope/benchmark.rs"}
 
 
-def run(output: Path, threshold: float) -> int:
+def run(output: Path, threshold: float, production: bool = False) -> int:
     raw = output.with_name("coverage.raw.json")
     raw.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(
@@ -66,6 +67,9 @@ def run(output: Path, threshold: float) -> int:
             check=True,
             cwd=CRATE.parent.parent,
         )
+    if production:
+        from production_coverage import run as production_run
+        return production_run(raw, output.with_name("coverage.lcov"), output, Decimal(str(threshold)))
     report = read_json(raw)
     files = report["data"][0]["files"]
     totals: dict[str, list[int]] = defaultdict(lambda: [0, 0])
@@ -153,5 +157,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, default=QUALITY_ROOT / "coverage.json")
     parser.add_argument("--threshold", type=float, default=80.0)
+    parser.add_argument("--production", action="store_true", help="Enforce the expanded production-source inventory (candidate until CI adoption)")
+    parser.add_argument("--raw", type=Path, help="Evaluate an existing LLVM JSON export; requires --production and --lcov")
+    parser.add_argument("--lcov", type=Path, help="Matching LCOV export for --raw")
     args = parser.parse_args()
-    raise SystemExit(run(args.output, args.threshold))
+    if args.raw is not None or args.lcov is not None:
+        if not args.production or args.raw is None or args.lcov is None:
+            parser.error("--raw and --lcov require each other and --production")
+        from production_coverage import run as production_run
+        raise SystemExit(production_run(args.raw, args.lcov, args.output, Decimal(str(args.threshold))))
+    raise SystemExit(run(args.output, args.threshold, args.production))
