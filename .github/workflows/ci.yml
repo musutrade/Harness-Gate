@@ -239,8 +239,7 @@ jobs:
       - name: Evaluate critical-path matrix
         run: |
           python3 tools/quality/critical_paths.py \
-            --evidence target/quality/nextest.jsonl \
-            --coverage target/quality/coverage.json \
+            --collect --evidence target/quality/critical-path-runs/bundle.json \
             --output target/quality/critical-paths.json
 
       - name: Upload quality evidence
