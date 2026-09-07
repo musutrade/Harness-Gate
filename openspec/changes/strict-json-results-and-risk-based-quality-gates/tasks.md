@@ -77,10 +77,12 @@ Validation evidence for 7.1–7.4: [GH-95 validation](../../../docs/quality/gh-9
 
 ## 8. Integrate gates and document adoption
 
-- [ ] 8.1 [P2][L] 将扩展 coverage/risk/matrix 接入 CI 所需质量任务；验收：所需任务失败、取消或跳过使 aggregate 失败，`always()` 上传可用原始证据。关联：[traceability spec](specs/critical-path-source-traceability/spec.md)。
-- [ ] 8.2 [P2][M] 增加质量工具测试入口与本地命令说明；验收：README 的命令可生成与 CI 相同 schema，质量脚本单测和字节码检查通过。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
-- [ ] 8.3 [P2][M] 补充演进 ADR、阈值/例外/基线接受与 rollback 说明；验收：不改写 ADR-0025 历史测量，无自动 baseline accept、阈值降低或分支保护变更。关联：[proposal](proposal.md)。
-- [ ] 8.4 [P2][M] 生成独立候选基线并记录 CI 采集开销；验收：同口径原始证据完整、无假精度 CRAP 声明，既有性能 fixture 未发生超过原阈值的未解释回归。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
+- [x] 8.1 [P2][L] 将扩展 coverage/risk/matrix 接入 CI 所需质量任务；验收：所需任务失败、取消或跳过使 aggregate 失败，`always()` 上传可用原始证据。关联：[traceability spec](specs/critical-path-source-traceability/spec.md)。
+- [x] 8.2 [P2][M] 增加质量工具测试入口与本地命令说明；验收：README 的命令可生成与 CI 相同 schema，质量脚本单测和字节码检查通过。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
+- [x] 8.3 [P2][M] 补充演进 ADR、阈值/例外/基线接受与 rollback 说明；验收：不改写 ADR-0025 历史测量，无自动 baseline accept、阈值降低或分支保护变更。关联：[proposal](proposal.md)。
+- [x] 8.4 [P2][M] 生成独立候选基线并记录 CI 采集开销；验收：同口径原始证据完整、无假精度 CRAP 声明，既有性能 fixture 未发生超过原阈值的未解释回归。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
+
+GH-96 validation: [raw candidate, local commands, timings and benchmark evidence](../../../docs/quality/gh-96-validation.md); [ADR-0039](../../../docs/adr/0039-required-risk-and-traceability-gates.md). All four stages pass; 315 Rust tests and 119 quality-tool tests pass, including failure/cancel/skip and stale-evidence negatives. Independent candidate collection took 338.72 seconds locally; the unchanged five-sample performance policy reports no regression. These task checkoffs certify local implementation evidence only, not hosted CI, baseline acceptance or the remaining tasks.
 
 ## 9. Verify and hand off implementation evidence
 
