@@ -52,17 +52,19 @@ GH-93 本地验收：[逐项证据与命令结果](validation-gh-93.md)；远端
 
 ## 6. Decompose selected high-risk functions
 
-GH-94 draft: decomposition regressions pass, but all tasks below remain
-unaccepted because the frozen analyzer rejects the selected production sources
-and LLVM omits function records for some executed expression closures.
-See [validation and blocking evidence](../../../docs/quality/gh-94-validation.md).
+GH-94 tasks 6.1–6.6 are locally validated using the operator-authorized
+[versioned measurement contract](../../../docs/quality/source-measure-v2.md).
+All 312 regressions and 32 selected function gates pass; every production
+symbol in the six files has its own observation. The complete
+[validation and source/debt evidence](../../../docs/quality/gh-94-validation.md)
+retains the prior blocked draft. CI and controller acceptance remain pending.
 
-- [ ] 6.1 [P2][L] 按 check kind 拆分 doctor 分发与校验职责；验收：5.1 全部通过，热点及新函数满足 CRAP 和 line/region 标准。关联：[design 热点清单](design.md#decisions)。
-- [ ] 6.2 [P2][L] 拆分 CLI command handlers，保留统一错误出口；验收：5.2/5.3 与 CLI contract 对比通过，热点风险报告达标。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
-- [ ] 6.3 [P2][L] 拆分 verification 协调、结果归并和发布职责；验收：5.5 以及取消/超时测试通过，报告排序不变且热点指标达标。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
-- [ ] 6.4 [P2][L] 拆分 task 输入构建、runner/isolation 和环境注入职责；验收：5.6 通过，新旧有效配置的执行输入相同且函数指标达标。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
-- [ ] 6.5 [P2][L] 拆分 adapter 的 preflight、进程生命周期和结果验证；验收：签名/能力/预算/超时/取消/路径逃逸回归全部通过且指标达标。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
-- [ ] 6.6 [P2][M] 核对 JSON 热点与所有拆分后函数的源身份和测量；验收：选定热点 line/region 各至少 80.0%、`crap_line <= 30`，其他历史债务具有明确清单。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
+- [x] 6.1 [P2][L] 按 check kind 拆分 doctor 分发与校验职责；验收：5.1 全部通过，热点及新函数满足 CRAP 和 line/region 标准。关联：[design 热点清单](design.md#decisions)。
+- [x] 6.2 [P2][L] 拆分 CLI command handlers，保留统一错误出口；验收：5.2/5.3 与 CLI contract 对比通过，热点风险报告达标。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
+- [x] 6.3 [P2][L] 拆分 verification 协调、结果归并和发布职责；验收：5.5 以及取消/超时测试通过，报告排序不变且热点指标达标。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
+- [x] 6.4 [P2][L] 拆分 task 输入构建、runner/isolation 和环境注入职责；验收：5.6 通过，新旧有效配置的执行输入相同且函数指标达标。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
+- [x] 6.5 [P2][L] 拆分 adapter 的 preflight、进程生命周期和结果验证；验收：签名/能力/预算/超时/取消/路径逃逸回归全部通过且指标达标。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
+- [x] 6.6 [P2][M] 核对 JSON 热点与所有拆分后函数的源身份和测量；验收：选定热点 line/region 各至少 80.0%、`crap_line <= 30`，其他历史债务具有明确清单。关联：[quality spec](specs/risk-based-quality-evidence/spec.md)。
 
 ## 7. Bind critical paths to source evidence
 

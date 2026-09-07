@@ -131,6 +131,29 @@ instrumentation，输出 `branch_status=unsupported`、原因及工具版本，
 
 ### 4. Risk gates use an incremental ratchet
 
+GH-94's 2026-09-07 operator authorization permits a new development measurement
+series because the frozen parser rejects production syntax and native LLVM
+coverage omits some expression closures. The versioned
+[source-measure contract](../../../docs/quality/source-measure-v2.md) uses a
+locked Rust AST helper, parsed macro expressions and insertion-only closure
+instrumentation in disposable source snapshots. A real compiled fixture must
+distinguish an unexecuted closure from one execution; parent counters are never
+substitutes. Both base and head use identical tool and rule digests. Inverse
+UTF-8 mapping removes only synthetic bytes, retains all original production
+symbols, and blocks missing or ambiguous observations. Version 1 remains
+reproducible; its numbers cannot be compared to this series.
+
+For tasks 6.1–6.6, the six original functions and all 26 extracted named
+responsibilities are explicitly selected. Every one must meet both coverage
+thresholds and the CRAP limit below. Independently inventoried closures also
+follow the incremental rule below: unchanged debt is recorded, changed low-CC
+closures require CRAP <=30, and changed CC >10 closures require both coverage
+thresholds. An incremental acceptance never changes a failed coverage result
+to a pass. The [GH-94 evidence](../../../docs/quality/gh-94-validation.md)
+includes every old/new identity and separately identifies changed coverage debt.
+This limited six-file series does not certify repository-wide gates or tasks
+7–9, and does not accept a replacement baseline.
+
 所有新增或修改的生产函数要求 `crap_line <= 30`。高风险函数定义为
 `CC > 10` 或出现在强制路径/本次热点清单中；这些函数额外要求函数行、
 区域覆盖率分别至少 80.0%，以及断言相关失败行为的测试。

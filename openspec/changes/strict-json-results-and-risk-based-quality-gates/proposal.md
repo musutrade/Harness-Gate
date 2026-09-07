@@ -1,6 +1,6 @@
 # Proposal: Strict JSON Results and Risk-Based Quality Gates
 
-**Status:** Partially implemented — GH-93 tasks 5.1–5.6 locally validated; CI and acceptance pending. See [validation evidence](validation-gh-93.md). Other tasks are not certified by this record.
+**Status:** Partially implemented — GH-93 tasks 5.1–5.6 and GH-94 tasks 6.1–6.6 locally validated. GH-94 CI and acceptance pending. See [GH-93 validation](validation-gh-93.md) and [GH-94 evidence](../../../docs/quality/gh-94-validation.md). Other tasks are not certified by these records.
 **Date:** 2026-09-05  
 **Review baseline:** `c9101c3191be7a5fd639c64c3781ccb154e0ce34` / v0.3.7
 
