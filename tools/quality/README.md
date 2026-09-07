@@ -1,28 +1,69 @@
-# Phase 1 quality evidence
+# Quality evidence and required CI gates
 
 The files in this directory are Python standard-library orchestration for
 quality evidence. They invoke the Rust CLI and Cargo tooling, retain their raw
 output, and turn it into reviewable JSON/Markdown summaries. They are not
 linked into, packaged with, or executed by the `harness-gate` release binary.
 
-Run the gates from the repository root:
+Run from the repository root with Python >=3.11, stable Rust plus
+`llvm-tools-preview`, cargo-nextest and cargo-llvm-cov **0.9.0** installed.
+The collector uses a fresh workspace-local target; standalone commands should
+also override an ambient shared/read-only Cargo target:
 
 ```bash
-python3 tools/quality/coverage.py
-python3 tools/quality/measurement_contract.py
-NEXTEST_EXPERIMENTAL_LIBTEST_JSON=1 cargo nextest run \
-  --manifest-path tools/harness-gate/Cargo.toml --locked --no-fail-fast \
-  --message-format libtest-json-plus --message-format-version 0.1 \
-  > target/quality/nextest.jsonl
-python3 tools/quality/critical_paths.py \
-  --evidence target/quality/nextest.jsonl \
-  --coverage target/quality/coverage.json
-python3 tools/quality/contracts.py
-python3 tools/quality/benchmarks.py
-python3 tools/quality/docs_consistency.py
+export CARGO_TARGET_DIR="$PWD/target/build"
 python3 -m unittest discover -s tools/quality/tests -v
 python3 -m py_compile tools/quality/*.py tools/quality/tests/*.py
+python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json
+
+# Commit product source changes first; provide a full base SHA already in Git.
+# CI supplies the PR base (or push before), the tested SHA, and run ID/attempt.
+BASE_SHA=$(git rev-parse origin/main)
+HEAD_SHA=$(git rev-parse HEAD)
+RUN_ID=local-$(date +%s)
+python3 tools/quality/ci_quality.py collect \
+  --base-sha "$BASE_SHA" --head-sha "$HEAD_SHA" --run-id "$RUN_ID" \
+  --output "target/quality/$RUN_ID"
+python3 tools/quality/ci_quality.py verify \
+  --base-sha "$BASE_SHA" --head-sha "$HEAD_SHA" --run-id "$RUN_ID" \
+  --output "target/quality/$RUN_ID"
 ```
+
+This is exactly CI's collection entry point and candidate schema 1. It retains
+base/head/run identity, commands/exits/timings, four required stage results and
+SHA-256 references to raw evidence. Existing output directories, stale artifacts,
+missing base objects and incomplete collections fail. A candidate is never
+accepted automatically. Full raw artifacts are uploaded with `always()`.
+
+The stages preserve the six-module 80% gate, evaluate the ten production
+boundaries and aggregate at 80%, run the supported six-file GH-94 risk ratchet,
+and collect isolated matrix evidence (all mandatory paths and >=95% applicable
+rows). Changed production Rust files outside the supported risk boundary fail
+with a measurement-review diagnostic; these reports do not certify whole-project
+CRAP. See [ADR-0039](../../docs/adr/0039-required-risk-and-traceability-gates.md).
+
+Individual diagnostic commands use the same report formats:
+
+```bash
+python3 tools/quality/coverage.py --output target/quality/coverage.json
+python3 tools/quality/coverage.py --production \
+  --raw target/quality/coverage.raw.json --lcov target/quality/coverage.lcov \
+  --output target/quality/production.json
+python3 tools/quality/critical_paths.py --collect \
+  --evidence target/quality/critical-path-runs/bundle.json \
+  --output target/quality/critical-paths.json
+python3 tools/quality/measurement_contract.py
+python3 tools/quality/contracts.py
+python3 tools/quality/benchmarks.py --output target/quality/benchmarks.json --samples 5
+```
+
+The matrix rejects aggregate nextest JSONL/module coverage as a replacement for
+isolated evidence. The collector continues other stages after an ordinary gate
+failure, retains the failure and exits nonzero. Candidate timings describe this
+collection environment; hosted CI overhead comes from the uploaded CI candidate.
+This repository has no project-local `.harness-gate/flow.toml` declaring `ci`:
+`harness-gate config check` and `harness-gate verify --profile ci --all` are not
+applicable here.
 
 The helper tests and bytecode compilation run in the `Quality Script Tests`
 CI job and are included in `Required Quality Aggregate`. Quality scripts are
