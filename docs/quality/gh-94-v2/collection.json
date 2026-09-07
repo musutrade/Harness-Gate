@@ -1,0 +1,242 @@
+{
+  "schema": "gh-94-source-collection/2",
+  "base_commit": "764482ca64c754cdb56e3a3f97bc267023497736",
+  "head_source_commit": "a1cc257586393a3cf8b88ab192d131b91d20e188",
+  "workspace": "/home/gem/symphony-workspaces/GH-94",
+  "target": "/home/gem/symphony-workspaces/GH-94/target/gh-94-coverage",
+  "test_profile": "nextest default; cargo test unoptimized + debuginfo",
+  "branch_status": "unsupported",
+  "branch_reason": "series uses stable line/region instrumentation only; no branch observations collected",
+  "artifacts": {
+    "base-manifest.json.gz": {
+      "uncompressed_sha256": "cfc1c06bafe45fc7587ec6fcb4f5b6b1240268ffd96ad632b26a710a265826ba",
+      "sha256": "7da7d7f02bc18c4c29bd71e4e372cf8ee2fff24f0e6891571e895570e9cd7dec",
+      "bytes": 385127
+    },
+    "base-coverage.json.gz": {
+      "uncompressed_sha256": "47fc677b8b132d96c147c45a6cc393136ad3e8e295c0584a44c1f4d0dacde870",
+      "sha256": "cf7129fc409f8fe44a7ac04cae6b064e073ad16f370c39b9c8e462752f7b3b45",
+      "bytes": 3510501
+    },
+    "head-manifest.json.gz": {
+      "uncompressed_sha256": "2cd248a95f1259e29b2ba015cc4d0d6655e36fab899104b6c1eb119238c35b91",
+      "sha256": "2b9ea87bc53f3f7c342fa9379daa0efcce8bd393da98ec73d2138f9b2345f34f",
+      "bytes": 405573
+    },
+    "head-coverage.json.gz": {
+      "uncompressed_sha256": "1f87a7d715146b8595b913e645aa4dd6c7a60dc9256c061b26fc6254d4804c8f",
+      "sha256": "d106eaf280cf5f661afc142e434d79178cabfdcb6ef602695571ff0c6b40bde7",
+      "bytes": 3544518
+    },
+    "analyzer-clippy.log": {
+      "sha256": "2f5a4cb1236812a4fa38cc0315207f3fb8293ff9e2123d3aed12db60c29ddb29",
+      "bytes": 486
+    },
+    "base-coverage.log": {
+      "sha256": "c4efcee0d0a9e17629c7072936672ed387e61561794314b3f411f11305bb680c",
+      "bytes": 40500
+    },
+    "base-measure.log": {
+      "sha256": "58c018d3fd2d26c6769a777acd9973fe4e87d8597e86cc64f899e8442245c376",
+      "bytes": 166
+    },
+    "base-risk.json": {
+      "sha256": "7a85412c2152e8b1159976832959e606a35bd783f2e54b72d5b643909ab29703",
+      "bytes": 280994
+    },
+    "comparison.json": {
+      "sha256": "caa128a6abad8eafebc938256388cf5e62b5b0313215e6cd3b7d773a5caa1e6b",
+      "bytes": 153148
+    },
+    "docs-cargo-error.log": {
+      "sha256": "1518f5efe4e6f2ab73a01b43187054665d70adad18be3c687269a0d7028ada40",
+      "bytes": 120
+    },
+    "docs-consistency.json": {
+      "sha256": "0c036d6838a897ac2b0b46e2c55fb7fcb685f63836d74cde7fa1847f0b1da651",
+      "bytes": 1217
+    },
+    "final-clippy.log": {
+      "sha256": "02b3c49b6bd9f00105907ebc0126839189672ce7e5eb232e94da0f2625e3a839",
+      "bytes": 162
+    },
+    "final-contracts.json": {
+      "sha256": "47dc2b53e907c3d4b46c7f0deb17c2106b568da30904f83fabf8bdeab679e130",
+      "bytes": 50681
+    },
+    "final-contracts.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "final-nextest.log": {
+      "sha256": "77ab6042886c97ca37710cc2eb6b7f4862d8491acbaf15f7beaa5151117c0fc6",
+      "bytes": 40877
+    },
+    "final-openspec.log": {
+      "sha256": "31f34d2d60f42c4c87a493d04f7bd845b5cdb5a10ecc133861f7a8d24c4f44b5",
+      "bytes": 67
+    },
+    "head-coverage.log": {
+      "sha256": "f3faf09a1b1de9134f12f06ddebdca8ff2348fef5fc36a2fec3c12e5a1a5b79b",
+      "bytes": 41082
+    },
+    "head-measure.log": {
+      "sha256": "c02d7fa72101006d0385d43c020c746a7cb3c49824def24172ea4c9e54bfc883",
+      "bytes": 74
+    },
+    "head-risk.json": {
+      "sha256": "852957c0931427490f1420ed770a839210e485680f8a886332d693f440a7c895",
+      "bytes": 295185
+    },
+    "quality-tests.log": {
+      "sha256": "bc86e5421abdcad038f1d49eb8546b5b840b8c1e4e964c491036ebec4fd2b614",
+      "bytes": 14313
+    }
+  },
+  "source_identity": {
+    "base": {
+      "commit": "764482ca64c754cdb56e3a3f97bc267023497736",
+      "sha256": {
+        "doctor/checks.rs": "c116936df9531e71a13a97711ea4de5c645b235f39fb575a5ecc66f079c61bb5",
+        "app/commands.rs": "976e635a17e959c2f22391890e8b5c20dbe393de51c86c20d38bad199ee1432a",
+        "verify/mod.rs": "c898a7787be3cd1368b66109a2496eaf2f067cbaba968f474741ca9c4c8bce7f",
+        "verify/steps.rs": "662ada9a4724006e1e3a9e1ee9cb03e74c086c357867324baa2c84b2e9200cb9",
+        "verify/parser.rs": "d77b6bfdc5a23251517b1fdfc4d0107abea8776b9596542585f87661c4285d7c",
+        "process/adapter.rs": "67dd4999de14625fb3c349bbc0d5e0f8782e78234acf06dc3e03e29f626db135",
+        "Cargo.toml": "1d65eec0d9b12e2c503663230e6b766d8b897f6af422768ca4c389d30b35b9a1",
+        "Cargo.lock": "45ecbd5c5daa4d0d4e1020e5285578937cdcc062d646dd2455b5f91f992c0124",
+        "tests/failure_paths_test.rs": "9c2b3a8d7ac01d5b2660529efc8ed832388d185350897066aa8dd99c8374a912",
+        "tests/cli_test.rs": "a8d2759eaa3b80da4ab942d75c624311a3eaa7cb34711bf67fc1c0e3977c1da0"
+      },
+      "tests_passed": 308,
+      "tests_skipped": 0
+    },
+    "head": {
+      "commit": "a1cc257586393a3cf8b88ab192d131b91d20e188",
+      "sha256": {
+        "doctor/checks.rs": "3288b94edd6eba576cb325f64544ecff346ac6c733b810498d53a135124a74c4",
+        "app/commands.rs": "382a6b13001aa15c9217ba8e183d40351ff7deef0b87de7e62e09f00450b726c",
+        "verify/mod.rs": "eaa204963ef62a0eb8029dbc5141ce4cadd337f3218069b3ac53c7c9d00af29b",
+        "verify/steps.rs": "7d97f5fc813e6e77253a32c0374446f64b520096bd28425f3ef45f31bc3320f4",
+        "verify/parser.rs": "75ae046db0b72a7c2d984283c5145e5e8a6e323412745046065de75ed3c2dc9b",
+        "process/adapter.rs": "ece2f41f4cffedf46a1c8c1bfc4df9248c911deada50eec8c6c7539d2cb9ee2e",
+        "Cargo.toml": "1d65eec0d9b12e2c503663230e6b766d8b897f6af422768ca4c389d30b35b9a1",
+        "Cargo.lock": "45ecbd5c5daa4d0d4e1020e5285578937cdcc062d646dd2455b5f91f992c0124",
+        "tests/failure_paths_test.rs": "822a25b6b3c68384c110bbfb83dfb9ef6189e76e9417ea5c5576a61e2577c300",
+        "tests/cli_test.rs": "a8d2759eaa3b80da4ab942d75c624311a3eaa7cb34711bf67fc1c0e3977c1da0"
+      },
+      "tests_passed": 312,
+      "tests_skipped": 0
+    }
+  },
+  "commands": {
+    "base": [
+      {
+        "command": "python3 tools/quality/source_measure.py prepare --crate target/quality/gh-94/v2/base/tools/harness-gate --binary target/gh-94-measure/debug/harness-gate-rust-measure --manifest target/quality/gh-94/v2/base-manifest.json",
+        "exit": 0
+      },
+      {
+        "command": "CARGO_TARGET_DIR=/home/gem/symphony-workspaces/GH-94/target/gh-94-coverage cargo llvm-cov nextest --manifest-path target/quality/gh-94/v2/base/tools/harness-gate/Cargo.toml --locked --json --output-path target/quality/gh-94/v2/base-coverage.json",
+        "exit": 0
+      },
+      {
+        "command": "python3 tools/quality/source_measure.py measure --crate target/quality/gh-94/v2/base/tools/harness-gate --binary target/gh-94-measure/debug/harness-gate-rust-measure --manifest target/quality/gh-94/v2/base-manifest.json --llvm target/quality/gh-94/v2/base-coverage.json --output target/quality/gh-94/v2/base-risk.json",
+        "exit": 1
+      }
+    ],
+    "head": [
+      {
+        "command": "python3 tools/quality/source_measure.py prepare --crate target/quality/gh-94/v2/head/tools/harness-gate --binary target/gh-94-measure/debug/harness-gate-rust-measure --manifest target/quality/gh-94/v2/head-manifest.json",
+        "exit": 0
+      },
+      {
+        "command": "CARGO_TARGET_DIR=/home/gem/symphony-workspaces/GH-94/target/gh-94-coverage cargo llvm-cov nextest --manifest-path target/quality/gh-94/v2/head/tools/harness-gate/Cargo.toml --locked --json --output-path target/quality/gh-94/v2/head-coverage.json",
+        "exit": 0
+      },
+      {
+        "command": "python3 tools/quality/source_measure.py measure --crate target/quality/gh-94/v2/head/tools/harness-gate --binary target/gh-94-measure/debug/harness-gate-rust-measure --manifest target/quality/gh-94/v2/head-manifest.json --llvm target/quality/gh-94/v2/head-coverage.json --output target/quality/gh-94/v2/head-risk.json",
+        "exit": 0
+      }
+    ]
+  },
+  "tools": {
+    "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+    "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+    "llvm-cov": "cargo-llvm-cov 0.9.0",
+    "nextest": "cargo-nextest 0.9.143 (60fa45f63 2026-08-04)\nrelease: 0.9.143\ncommit-hash: 60fa45f638ffc3f35e74afa65737f45fcd32db2a\ncommit-date: 2026-08-04\nhost: x86_64-unknown-linux-gnu",
+    "openspec": "1.10.0"
+  },
+  "base_manifest_note": "AST inventory metadata was regenerated with the final analyzer. The deterministic edits and instrumented bytes were verified unchanged before reusing the existing base LLVM export; no base tests were rerun.",
+  "binary_provenance_note": "cargo llvm-cov nextest builds and exports the snapshot binaries, including instrumented CLI subprocesses. Collection logs identify test runs; original source and export digests bind the measurements. The task-owned coverage target was cleaned between snapshots; prior base binary files are not retained.",
+  "closure_fixture": {
+    "test": "test_instrumentation_distinguishes_unexecuted_closure_and_rejects_missing_evidence",
+    "empty_input_own_counter": 0,
+    "one_false_element_own_counter": 1,
+    "missing_record": "ValueError: missing LLVM function",
+    "status": "passed in quality unittest run"
+  },
+  "validation": [
+    {
+      "command": "CARGO_TARGET_DIR=target/gh-94-validation cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit": 0,
+      "result": "312 passed, 0 skipped",
+      "artifact": "final-nextest.log"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "exit": 0
+    },
+    {
+      "command": "CARGO_TARGET_DIR=target/gh-94-validation cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit": 0,
+      "artifact": "final-clippy.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit": 0,
+      "result": "92 passed, including all CC decisions and real LLVM closure distinguishing fixture",
+      "artifact": "quality-tests.log"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/quality/rust-measure/Cargo.toml -- --check",
+      "exit": 0
+    },
+    {
+      "command": "CARGO_TARGET_DIR=target/gh-94-measure cargo clippy --manifest-path tools/quality/rust-measure/Cargo.toml --all-targets --locked -- -D warnings",
+      "exit": 0,
+      "artifact": "analyzer-clippy.log"
+    },
+    {
+      "command": "CARGO_TARGET_DIR=target/gh-94-validation python3 tools/quality/contracts.py --output target/quality/gh-94/final-contracts.json",
+      "exit": 0,
+      "result": "20 scenarios and unchanged textual goldens passed",
+      "artifact": "final-contracts.json"
+    },
+    {
+      "command": "CARGO_TARGET_DIR=target/gh-94-validation python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit": 0,
+      "artifact": "docs-consistency.json"
+    },
+    {
+      "command": "openspec validate strict-json-results-and-risk-based-quality-gates --strict",
+      "exit": 0,
+      "artifact": "final-openspec.log"
+    },
+    {
+      "command": "harness-gate config check",
+      "status": "not-applicable",
+      "reason": ".harness-gate/flow.toml absent"
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "status": "not-applicable",
+      "reason": "No project-local configuration or declared ci profile"
+    }
+  ],
+  "resolved_environment_failure": {
+    "command": "cargo run --manifest-path tools/harness-gate/Cargo.toml --locked -- config schema",
+    "exit": 101,
+    "artifact": "docs-cargo-error.log",
+    "impact": "Initial docs check failed before CLI execution because default external target is read-only; workspace CARGO_TARGET_DIR resolves it."
+  }
+}

@@ -79,6 +79,26 @@
 未修改历史热点 SHALL 完整报告并单列债务。例外记录 SHALL 包含 issue、
 owner、审批人、理由、到期日和补偿控制，但不得把失败自动转换为通过。
 
+#### Scenario: Native coverage omits an expression closure
+
+- **WHEN** a supported production closure has no native LLVM function record
+- **THEN** evidence SHALL remain blocked until versioned instrumentation produces
+  its own observation and a compiled fixture distinguishes zero from one execution
+- **AND** parent counters SHALL NOT be substituted; instrumentation SHALL preserve
+  original expressions and inverse mapping SHALL remove only inserted bytes
+- **AND** base and head SHALL use the same analyzer, rule, instrumentation and
+  mapping implementations; missing, ambiguous or mismatched evidence SHALL fail
+
+#### Scenario: Decomposition retains independently measured closure debt
+
+- **WHEN** GH-94 compares its six original hotspots and 26 extracted named functions
+- **THEN** every selected function SHALL meet line AND region coverage >=80.0%
+  and `crap_line <=30`, and every production function/closure in those six files
+  SHALL retain its own source identity and observations
+- **AND** other changed functions SHALL follow the incremental CRAP/high-risk
+  rules below; unchanged historical debt and changed low-risk coverage debt SHALL
+  remain explicit, and an incremental acceptance SHALL NOT imply coverage passed
+
 #### Scenario: A changed hotspot exceeds the CRAP limit
 
 - **WHEN** 变更函数的 `crap_line` 大于 30
