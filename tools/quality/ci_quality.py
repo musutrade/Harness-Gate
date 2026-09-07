@@ -23,6 +23,12 @@ COMMON = ('test', 'security-audit', 'fmt', 'clippy', 'build', 'quality-coverage'
 PUSH_ONLY = ('test-cross-platform', 'build-cross-platform', 'coverage',
              'quality-contracts-cross-platform', 'quality-baseline')
 STAGES = ('legacy', 'production', 'risk', 'matrix')
+REQUIRED_ARTIFACTS = {'coverage.json', 'coverage.raw.json', 'coverage.lcov',
+                      'coverage.cobertura.xml', 'production.json', 'risk.json',
+                      'critical-paths.json', 'critical-path-runs/bundle.json'} | {
+    f'{label}-{suffix}' for label in ('base', 'head') for suffix in (
+        'source.tar', 'manifest.json', 'coverage.json', 'coverage.lcov',
+        'coverage.cobertura.xml', 'risk.json')}
 
 
 def aggregate(event: str, needs: dict) -> list[str]:
@@ -39,7 +45,7 @@ def verify(path: Path, head: str, base: str, run_id: str) -> dict:
     require(set(report['stages']) == set(STAGES), 'missing required evidence stage')
     require(all(s['status'] == 'success' for s in report['stages'].values()),
             'failed, cancelled, skipped or incomplete collection')
-    require(report['artifacts'], 'missing raw evidence')
+    require(REQUIRED_ARTIFACTS <= report['artifacts'].keys(), 'missing required raw evidence')
     for relative, digest in report['artifacts'].items():
         artifact = (path.parent / relative).resolve()
         require(artifact.is_relative_to(path.parent.resolve()), 'artifact escapes candidate')

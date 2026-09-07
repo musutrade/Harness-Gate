@@ -5,6 +5,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import ci_quality as gate
@@ -67,10 +68,15 @@ class CandidateTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         (self.root / 'raw.json').write_text('{"raw":true}')
+        for name in gate.REQUIRED_ARTIFACTS:
+            path = self.root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text('fixture raw evidence')
         self.report = {'schema_version': 1, 'candidate': True, 'commit': 'a' * 40,
                        'base_sha': 'b' * 40, 'run_id': 'fresh-run',
                        'stages': {name: {'status': 'success'} for name in gate.STAGES},
-                       'artifacts': {'raw.json': sha256(self.root / 'raw.json')}}
+                       'artifacts': {name: sha256(self.root / name)
+                                     for name in gate.REQUIRED_ARTIFACTS | {'raw.json'}}}
 
     def verify(self):
         path = self.root / 'candidate.json'
@@ -106,12 +112,53 @@ class CandidateTests(unittest.TestCase):
             self.verify()
 
     def test_missing_artifacts_and_path_escape_rejected(self):
+        original = self.report['artifacts'].copy()
+        for name in gate.REQUIRED_ARTIFACTS:
+            self.report['artifacts'] = original.copy()
+            del self.report['artifacts'][name]
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                self.verify()
         self.report['artifacts'] = {}
         with self.assertRaises(ValueError):
             self.verify()
-        self.report['artifacts'] = {'../foreign.json': 'digest'}
+        self.report['artifacts'] = original | {'../foreign.json': 'digest'}
         with self.assertRaises(ValueError):
             self.verify()
+
+
+class CollectionTests(unittest.TestCase):
+    def test_failure_retains_evidence_and_runs_remaining_stages(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / 'fresh'
+            with patch.object(gate, 'metadata', return_value={}), \
+                    patch.object(gate, 'git_sha', return_value='a' * 40), \
+                    patch.object(gate, 'require_committed_sources'):
+                collector = gate.Collector(output, 'b' * 40, 'a' * 40, 'test')
+                calls = []
+
+                def run(stage):
+                    calls.append(stage)
+                    (output / f'{stage}.log').write_text('raw stage evidence')
+                    if stage == 'legacy':
+                        raise ValueError('negative gate fixture')
+
+                for stage in gate.STAGES:
+                    setattr(collector, stage, lambda stage=stage: run(stage))
+                with self.assertRaises(ValueError):
+                    collector.collect()
+                self.assertEqual(calls, list(gate.STAGES))
+                report = json.loads((output / 'candidate.json').read_text())
+                self.assertEqual(report['stages']['legacy']['status'], 'failure')
+                self.assertEqual(report['stages']['matrix']['status'], 'success')
+                self.assertIn('legacy.log', report['artifacts'])
+
+    def test_existing_candidate_is_never_reused_or_overwritten(self):
+        with tempfile.TemporaryDirectory() as directory:
+            marker = Path(directory) / 'original'
+            marker.write_text('retained')
+            with self.assertRaises(ValueError):
+                gate.Collector(Path(directory), 'b' * 40, 'a' * 40, 'test')
+            self.assertEqual(marker.read_text(), 'retained')
 
 
 if __name__ == '__main__':
