@@ -1,0 +1,1 @@
+{"functions": 198, "selected_failures": ["app/commands.rs::run", "verify/mod.rs::run_selected", "process/adapter.rs::run_with_cancel"], "nonselected_debt_count": 89}

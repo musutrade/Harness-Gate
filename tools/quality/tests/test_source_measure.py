@@ -45,6 +45,22 @@ fn outer(xs: &[bool]) -> bool {
         self.assertEqual([s["test"] for s in symbols], [False, False, False, True])
         self.assertEqual(symbols[0]["raw"]["nested_functions"], 1)
         self.assertNotIn("and_and", symbols[0]["raw"])
+        controls = self.inventory('''fn controls(mut xs: impl Iterator<Item=bool>) -> Option<()> {
+    if xs.next()? && (true || false) {}
+    if let Some(x) = xs.next() { let _ = x; }
+    let Some(_) = xs.next() else { return None; };
+    while xs.next().is_some() { break; }
+    while let Some(_) = xs.next() { break; }
+    for _ in 0..2 { loop { break; } }
+    match xs.next() { Some(true) if true => (), Some(false) => (), _ => () }
+    Some(())
+}''')["symbols"][0]
+        self.assertEqual(controls["raw"], {
+            "if": 3, "question_mark": 1, "and_and": 1, "or_or": 1,
+            "while": 2, "for": 1, "loop": 1, "match": 1,
+            "match_arms": 3, "match_decisions": 2, "guards": 1,
+        })
+        self.assertEqual(complexity(controls["raw"]), 14)
 
     def test_unknown_macro_fails_closed(self):
         with self.assertRaises(subprocess.CalledProcessError):
