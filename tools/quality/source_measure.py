@@ -18,7 +18,8 @@ from function_risk import contains, crap_line, own_lines
 from production_coverage import counts, require
 
 SERIES = {"analyzer": "harness-gate-rust-measure/0.2.0", "rule": "mccabe-rust-2/1",
-          "instrumentation": "closure-black-box/1", "mapping": "insertions-utf8/1"}
+          "instrumentation": "closure-black-box/1", "mapping": "insertions-utf8/1",
+          "selection": "gh94-and-staged-snapshot/1"}
 PREFIX = "{ ::std::hint::black_box(()); "
 SUFFIX = " }"
 HOTSPOTS = {
@@ -29,6 +30,7 @@ HOTSPOTS = {
     "verify/parser.rs": ["count_json_results", "count_json_path", "discover_json_results"],
     "process/adapter.rs": ["run_with_cancel", "prepare_request", "run_process", "wait_for_adapter",
                            "validate_process_output", "finish_response"],
+    "project/input.rs": ["allocate_snapshot_root"],
 }
 
 

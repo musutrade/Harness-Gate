@@ -81,7 +81,7 @@ mapped back by removing inserted bytes. Wholly synthetic, zero-width mapped
 regions are removed. Original executable intervals remain in the denominator.
 Nested/adjacent insertions and non-ASCII source have fixed mapping tests.
 
-Every original production symbol in all six selected files must join to its
+Every original production symbol in all selected files must join to its
 own LLVM function record. Every LLVM function record in those sources must
 join to one innermost AST symbol or an explicitly excluded test symbol.
 Demangled terminal closure names validate kind; a closure type inside a generic
@@ -99,7 +99,7 @@ in each report. Branch coverage remains **unsupported** in this series.
 ## Risk selection and source identity
 
 The six original hotspots and every extracted named responsibility are listed
-in `HOTSPOTS`. All must have line **and** region coverage >=80% and
+in `HOTSPOTS`, alongside `project/input.rs::allocate_snapshot_root`. All must have line **and** region coverage >=80% and
 `crap_line <=30`; the comparison also rejects a missing extracted function.
 CRAP is calculated using exact rational arithmetic:
 
@@ -124,7 +124,13 @@ The original/extracted responsibility table records decomposition separately;
 new functions cannot borrow an old high-risk baseline. Both complete symbol
 inventories and unmatched old identities are retained.
 
-The helper is intentionally scoped to the six GH-94 source files. It does not
+The helper covers the six GH-94 source files and `project/input.rs`. The
+selection identity `gh94-and-staged-snapshot/1` records the added snapshot
+allocator. Both revisions must be remeasured with this selection; prior
+six-file reports cannot be mixed into it. The allocator regression covers a
+symlinked temporary parent, cleanup, and invalid temporary parents. All symbols
+in the added file are inventoried and retain the same incremental ratchet.
+The helper does not
 certify the repository or turn existing version 1 blockers into passes.
 Unsupported platforms, grammar and observations require a new tested series;
 they are not threshold exceptions. CI installs LLVM tools to execute the
