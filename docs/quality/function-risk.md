@@ -4,8 +4,9 @@
 [`strict-json-results-and-risk-based-quality-gates`](../../openspec/changes/strict-json-results-and-risk-based-quality-gates/tasks.md).
 It consumes retained base/head measurement bundles and emits `risk.json` and
 `risk.md`. This is an incremental gate, not an accepted production baseline.
-CI collection, mandatory-path discovery, hotspot refactoring and whole-project
-acceptance remain separate OpenSpec tasks. The policy owner supplies current
+GH-96 integrates the validated GH-94 series in required CI; see
+[ADR-0039](../adr/0039-required-risk-and-traceability-gates.md). This page preserves
+the version 1 bundle interface. Whole-project acceptance remains separate. The policy owner supplies current
 mandatory source identities and reviewed boundary-test links.
 
 ## Run

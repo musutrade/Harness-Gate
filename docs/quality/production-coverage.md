@@ -13,9 +13,10 @@ This is a new candidate series, `production-location-1`, under the
 [OpenSpec design](../../openspec/changes/strict-json-results-and-risk-based-quality-gates/design.md).
 It does not replace the historical measurements in
 [ADR-0025](../adr/0025-phase-1-quality-baseline-gates.md).
-The existing six-module CI invocation remains in place until OpenSpec task 8.1.
-The candidate currently fails the threshold; no baseline acceptance is claimed.
-Coverage improvements and function-risk gates belong to later tasks.
+GH-96 task 8.1 adds the production gate alongside the preserved six-module gate
+on PRs and pushes. The historical GH-91 candidate below failed the threshold;
+no baseline acceptance is claimed. Current adoption and measurement limits are
+recorded in [ADR-0039](../adr/0039-required-risk-and-traceability-gates.md).
 
 ## Service mapping
 

@@ -533,3 +533,11 @@ Thanks to all contributors of the arc-admin project, Harness-Gate evolved from t
 - **Documentation**: [docs/](https://github.com/musutrade/Harness-Gate/tree/main/docs)
 - **Issue Tracker**: https://github.com/musutrade/Harness-Gate/issues
 - **Original Project**: https://github.com/musutrade/arc-admin
+
+### Quality gate development
+
+Local quality-tool tests and the exact CI collection command are documented in
+[tools/quality/README.md](tools/quality/README.md). Coverage, function risk and
+isolated critical-path evidence feed `Required Quality Aggregate` on PRs and
+pushes. Generated baselines remain review-only candidates; adoption policy is
+[ADR-0039](docs/adr/0039-required-risk-and-traceability-gates.md).
