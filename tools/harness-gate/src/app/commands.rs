@@ -34,181 +34,21 @@ pub(super) fn run(project: &Project, command: Commands) -> Result<bool, CliError
         Commands::Compat { .. } => {
             unreachable!("compatibility maintenance actions handled before project discovery")
         }
-        Commands::Doctor { json, strict } => {
-            let report = crate::doctor::run(project)?;
-            if json {
-                println!(
-                    "{}",
-                    serde_json::to_string_pretty(&report).map_err(anyhow::Error::from)?
-                );
-            } else {
-                report.print();
-            }
-            Ok(report.failures == 0 && (!strict || report.warnings == 0))
-        }
-        Commands::Cleanup { dry_run, json } => {
-            let report = crate::service::cleanup_resources(project, dry_run)?;
-            crate::utils::fs::confined_write_json(
-                &project.reports,
-                std::path::Path::new("cleanup.json"),
-                &report,
-                true,
-            )
-            .context("write cleanup evidence")?;
-            if json {
-                println!(
-                    "{}",
-                    serde_json::to_string_pretty(&report).map_err(anyhow::Error::from)?
-                );
-            } else {
-                println!(
-                    "Cleanup {}: scanned {}, active {}, stale {}, reclaimed {}",
-                    if dry_run { "(dry-run)" } else { "complete" },
-                    report.scanned,
-                    report.active,
-                    report.stale,
-                    report.reclaimed
-                );
-                for resource in &report.resources {
-                    println!(
-                        "  {:<12} {:<24} {}",
-                        resource.action, resource.resource_id, resource.lease_file
-                    );
-                }
-                for failure in &report.failures {
-                    eprintln!("  cleanup failure: {failure}");
-                }
-            }
-            Ok(report.failures.is_empty())
-        }
+        Commands::Doctor { json, strict } => run_doctor(project, json, strict),
+        Commands::Cleanup { dry_run, json } => run_cleanup(project, dry_run, json),
         Commands::Scope {
             scope: args,
             json,
             benchmark_repeat,
-        } => {
-            if benchmark_repeat > 0 {
-                let benchmark = crate::scope::benchmark(project, &args.mode(), benchmark_repeat)?;
-                println!(
-                    "{}",
-                    serde_json::to_string_pretty(&benchmark).map_err(anyhow::Error::from)?
-                );
-                return Ok(true);
-            }
-            let result = crate::scope::detect(project, &args.mode())?;
-            result.write_reports(project)?;
-            if json {
-                println!(
-                    "{}",
-                    serde_json::to_string_pretty(&result).map_err(anyhow::Error::from)?
-                );
-            } else {
-                print_scope(&result);
-            }
-            Ok(true)
-        }
-        Commands::Secrets { staged, json } => {
-            let mode = if staged {
-                crate::secrets::SecretMode::Staged
-            } else {
-                crate::secrets::SecretMode::WorkingTree
-            };
-            let findings = crate::secrets::scan(project, mode)?;
-            if json {
-                println!(
-                    "{}",
-                    serde_json::to_string_pretty(&serde_json::json!({
-                        "passed": findings.is_empty(),
-                        "findings": findings,
-                    }))
-                    .map_err(anyhow::Error::from)?
-                );
-            } else if findings.is_empty() {
-                println!("{}", ui::pass("Secret scan passed"));
-            } else {
-                eprintln!(
-                    "{}",
-                    ui::error(format!("Secret scan failed in {} file(s):", findings.len()))
-                );
-                for file in &findings {
-                    eprintln!("  {file}");
-                }
-                eprintln!("Remove and revoke each credential before continuing.");
-            }
-            Ok(findings.is_empty())
-        }
-        Commands::Audit { json } => {
-            let outcome = crate::audit::run(
-                &project.execution_root,
-                &project.audit_config,
-                &project.reports,
-                json,
-            )?;
-            if !json {
-                let summary = format!(
-                    "Audit: {} violation(s), {} blocker(s), {} error(s), {} warning(s)",
-                    outcome.total_violations,
-                    outcome.blocker_count,
-                    outcome.error_count,
-                    outcome.warning_count
-                );
-                println!(
-                    "{}",
-                    if outcome.total_violations == 0 {
-                        ui::pass(summary)
-                    } else {
-                        ui::failure(summary)
-                    }
-                );
-                println!("Report: {}", outcome.report_file.display());
-            }
-            Ok(outcome.total_violations == 0)
-        }
+        } => run_scope(project, args.mode(), json, benchmark_repeat),
+        Commands::Secrets { staged, json } => run_secrets(project, staged, json),
+        Commands::Audit { json } => run_audit(project, json),
         Commands::Verify {
             scope: args,
             components,
             profile,
-        } => {
-            let mode = args.mode();
-            let execution_project = match &mode {
-                ScopeMode::Staged => project.staged_snapshot()?,
-                ScopeMode::Base(_) => project.clone().with_input_mode(InputMode::Base),
-                ScopeMode::All => project.clone().with_input_mode(InputMode::All),
-                ScopeMode::WorkingTree => project.clone(),
-            };
-            let selected = if components.is_empty() {
-                crate::scope::detect(&execution_project, &mode)?
-            } else {
-                let known = execution_project.config.components();
-                for component in &components {
-                    if !known.contains(component) {
-                        return Err(CliError::from(anyhow::anyhow!(
-                            "unknown component {component:?}"
-                        )));
-                    }
-                }
-                crate::verify::explicit_scope(&components)
-            };
-            let profile =
-                profile.unwrap_or_else(|| execution_project.config.project.default_profile.clone());
-            Ok(crate::verify::run(
-                &execution_project,
-                selected,
-                &profile,
-                matches!(mode, ScopeMode::Staged),
-            )?
-            .passed)
-        }
-        Commands::Hook => {
-            let execution_project = project.staged_snapshot()?;
-            let selected = crate::scope::detect(&execution_project, &ScopeMode::Staged)?;
-            Ok(crate::verify::run(
-                &execution_project,
-                selected,
-                &execution_project.config.project.hook_profile,
-                true,
-            )?
-            .passed)
-        }
+        } => run_verify(project, args.mode(), components, profile),
+        Commands::Hook => run_hook(project),
         Commands::ParseLogs { input, output } => {
             crate::audit::parse_logs(&input, &output)?;
             println!("Error context: {}", output.display());
@@ -220,6 +60,189 @@ pub(super) fn run(project: &Project, command: Commands) -> Result<bool, CliError
             unreachable!("handled before project discovery")
         }
     }
+}
+
+fn run_doctor(project: &Project, json: bool, strict: bool) -> Result<bool, CliError> {
+    let report = crate::doctor::run(project)?;
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(anyhow::Error::from)?
+        );
+    } else {
+        report.print();
+    }
+    Ok(report.failures == 0 && (!strict || report.warnings == 0))
+}
+
+fn run_cleanup(project: &Project, dry_run: bool, json: bool) -> Result<bool, CliError> {
+    let report = crate::service::cleanup_resources(project, dry_run)?;
+    crate::utils::fs::confined_write_json(
+        &project.reports,
+        std::path::Path::new("cleanup.json"),
+        &report,
+        true,
+    )
+    .context("write cleanup evidence")?;
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(anyhow::Error::from)?
+        );
+    } else {
+        println!(
+            "Cleanup {}: scanned {}, active {}, stale {}, reclaimed {}",
+            if dry_run { "(dry-run)" } else { "complete" },
+            report.scanned,
+            report.active,
+            report.stale,
+            report.reclaimed
+        );
+        for resource in &report.resources {
+            println!(
+                "  {:<12} {:<24} {}",
+                resource.action, resource.resource_id, resource.lease_file
+            );
+        }
+        for failure in &report.failures {
+            eprintln!("  cleanup failure: {failure}");
+        }
+    }
+    Ok(report.failures.is_empty())
+}
+
+fn run_scope(
+    project: &Project,
+    mode: ScopeMode,
+    json: bool,
+    benchmark_repeat: usize,
+) -> Result<bool, CliError> {
+    if benchmark_repeat > 0 {
+        let benchmark = crate::scope::benchmark(project, &mode, benchmark_repeat)?;
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&benchmark).map_err(anyhow::Error::from)?
+        );
+        return Ok(true);
+    }
+    let result = crate::scope::detect(project, &mode)?;
+    result.write_reports(project)?;
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&result).map_err(anyhow::Error::from)?
+        );
+    } else {
+        print_scope(&result);
+    }
+    Ok(true)
+}
+
+fn run_secrets(project: &Project, staged: bool, json: bool) -> Result<bool, CliError> {
+    let mode = if staged {
+        crate::secrets::SecretMode::Staged
+    } else {
+        crate::secrets::SecretMode::WorkingTree
+    };
+    let findings = crate::secrets::scan(project, mode)?;
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&serde_json::json!({
+                "passed": findings.is_empty(),
+                "findings": findings,
+            }))
+            .map_err(anyhow::Error::from)?
+        );
+    } else if findings.is_empty() {
+        println!("{}", ui::pass("Secret scan passed"));
+    } else {
+        eprintln!(
+            "{}",
+            ui::error(format!("Secret scan failed in {} file(s):", findings.len()))
+        );
+        for file in &findings {
+            eprintln!("  {file}");
+        }
+        eprintln!("Remove and revoke each credential before continuing.");
+    }
+    Ok(findings.is_empty())
+}
+
+fn run_audit(project: &Project, json: bool) -> Result<bool, CliError> {
+    let outcome = crate::audit::run(
+        &project.execution_root,
+        &project.audit_config,
+        &project.reports,
+        json,
+    )?;
+    if !json {
+        let summary = format!(
+            "Audit: {} violation(s), {} blocker(s), {} error(s), {} warning(s)",
+            outcome.total_violations,
+            outcome.blocker_count,
+            outcome.error_count,
+            outcome.warning_count
+        );
+        println!(
+            "{}",
+            if outcome.total_violations == 0 {
+                ui::pass(summary)
+            } else {
+                ui::failure(summary)
+            }
+        );
+        println!("Report: {}", outcome.report_file.display());
+    }
+    Ok(outcome.total_violations == 0)
+}
+
+fn run_verify(
+    project: &Project,
+    mode: ScopeMode,
+    components: Vec<String>,
+    profile: Option<String>,
+) -> Result<bool, CliError> {
+    let execution_project = match &mode {
+        ScopeMode::Staged => project.staged_snapshot()?,
+        ScopeMode::Base(_) => project.clone().with_input_mode(InputMode::Base),
+        ScopeMode::All => project.clone().with_input_mode(InputMode::All),
+        ScopeMode::WorkingTree => project.clone(),
+    };
+    let selected = if components.is_empty() {
+        crate::scope::detect(&execution_project, &mode)?
+    } else {
+        let known = execution_project.config.components();
+        for component in &components {
+            if !known.contains(component) {
+                return Err(CliError::from(anyhow::anyhow!(
+                    "unknown component {component:?}"
+                )));
+            }
+        }
+        crate::verify::explicit_scope(&components)
+    };
+    let profile =
+        profile.unwrap_or_else(|| execution_project.config.project.default_profile.clone());
+    Ok(crate::verify::run(
+        &execution_project,
+        selected,
+        &profile,
+        matches!(mode, ScopeMode::Staged),
+    )?
+    .passed)
+}
+
+fn run_hook(project: &Project) -> Result<bool, CliError> {
+    let execution_project = project.staged_snapshot()?;
+    let selected = crate::scope::detect(&execution_project, &ScopeMode::Staged)?;
+    Ok(crate::verify::run(
+        &execution_project,
+        selected,
+        &execution_project.config.project.hook_profile,
+        true,
+    )?
+    .passed)
 }
 
 fn run_config(project: &Project, action: ConfigAction) -> Result<bool, CliError> {
