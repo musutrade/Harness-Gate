@@ -1,12 +1,12 @@
 {
   "binary": {
-    "bytes": 7953272,
-    "path": "tools/harness-gate/target/release-small/harness-gate",
-    "sha256": "2cad70d1664f907125571106f07c1fd74950b0d4874a85328e0e2dc35b797af4"
+    "bytes": 8719488,
+    "path": "/home/runner/work/Harness-Gate/Harness-Gate/tools/harness-gate/target/release-small/harness-gate",
+    "sha256": "70c920a9418a00159af189cd9671c0b83cf447b8359ab03f922c74350564d902"
   },
   "cache_state": "cold-and-warm",
-  "cargo": "cargo 1.98.0 (797e8a9bc 2026-08-05)",
-  "commit": "b92755f9ec87c251516863a0136c28f811187ab5",
+  "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "commit": "764482ca64c754cdb56e3a3f97bc267023497736",
   "fixture_version": 1,
   "harness_version": 1,
   "logical_cpus": 4,
@@ -20,39 +20,134 @@
     "incompatible_series": "record as a new baseline series",
     "threshold_percent": 15.0
   },
-  "rustc": "rustc 1.98.0 (88d9e12ae 2026-08-18)",
-  "series_key": "x86_64-unknown-linux-gnu:rustc 1.98.0 (88d9e12ae 2026-08-18):1:1:cold-and-warm",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "scope_matcher": {
+    "cached_per_iteration_us": {
+      "count": 5,
+      "max": 6741.55,
+      "median": 6645.73,
+      "min": 6486.98
+    },
+    "equivalent": true,
+    "iterations": 100,
+    "paths": 601,
+    "runs": [
+      {
+        "cached_per_iteration_us": 6486.98,
+        "cached_total_us": 648698,
+        "equivalent": true,
+        "iterations": 100,
+        "mode": "working-tree",
+        "paths": 601,
+        "raw": "benchmark-runs/scope/sample-1.json",
+        "sample": 1,
+        "speedup": 1.900064436764103,
+        "uncached_per_iteration_us": 12325.68,
+        "uncached_total_us": 1232568,
+        "wall_seconds": 2.1599533579999957
+      },
+      {
+        "cached_per_iteration_us": 6741.55,
+        "cached_total_us": 674155,
+        "equivalent": true,
+        "iterations": 100,
+        "mode": "working-tree",
+        "paths": 601,
+        "raw": "benchmark-runs/scope/sample-2.json",
+        "sample": 2,
+        "speedup": 1.8426637791012452,
+        "uncached_per_iteration_us": 12422.41,
+        "uncached_total_us": 1242241,
+        "wall_seconds": 2.1952809790000174
+      },
+      {
+        "cached_per_iteration_us": 6645.73,
+        "cached_total_us": 664573,
+        "equivalent": true,
+        "iterations": 100,
+        "mode": "working-tree",
+        "paths": 601,
+        "raw": "benchmark-runs/scope/sample-3.json",
+        "sample": 3,
+        "speedup": 1.870041364906489,
+        "uncached_per_iteration_us": 12427.79,
+        "uncached_total_us": 1242779,
+        "wall_seconds": 2.1861791219999986
+      },
+      {
+        "cached_per_iteration_us": 6663.39,
+        "cached_total_us": 666339,
+        "equivalent": true,
+        "iterations": 100,
+        "mode": "working-tree",
+        "paths": 601,
+        "raw": "benchmark-runs/scope/sample-4.json",
+        "sample": 4,
+        "speedup": 1.856178311640171,
+        "uncached_per_iteration_us": 12368.44,
+        "uncached_total_us": 1236844,
+        "wall_seconds": 2.182176807000019
+      },
+      {
+        "cached_per_iteration_us": 6497.06,
+        "cached_total_us": 649706,
+        "equivalent": true,
+        "iterations": 100,
+        "mode": "working-tree",
+        "paths": 601,
+        "raw": "benchmark-runs/scope/sample-5.json",
+        "sample": 5,
+        "speedup": 1.9081938599920578,
+        "uncached_per_iteration_us": 12397.65,
+        "uncached_total_us": 1239765,
+        "wall_seconds": 2.167961708000007
+      }
+    ],
+    "speedup": {
+      "count": 5,
+      "max": 1.9081938599920578,
+      "median": 1.870041364906489,
+      "min": 1.8426637791012452
+    },
+    "uncached_per_iteration_us": {
+      "count": 5,
+      "max": 12427.79,
+      "median": 12397.65,
+      "min": 12325.68
+    }
+  },
+  "series_key": "x86_64-unknown-linux-gnu:rustc 1.98.1 (48a229cea 2026-09-01):1:1:cold-and-warm",
   "target": "x86_64-unknown-linux-gnu",
   "tests_seconds": {
-    "cold": 32.387211088000015,
+    "cold": 54.98504250100001,
     "count": 5,
-    "max": 5.093888540999956,
-    "median": 4.343678221000005,
-    "min": 3.654937593999989,
+    "max": 12.66852720099996,
+    "median": 12.625195534,
+    "min": 12.617914353999993,
     "warm_samples": [
-      3.747396141000081,
-      3.654937593999989,
-      4.343678221000005,
-      4.585426950999931,
-      5.093888540999956
+      12.625195534,
+      12.66852720099996,
+      12.62784205600002,
+      12.617914353999993,
+      12.621828303999962
     ]
   },
-  "timestamp_utc": "2026-08-29T00:37:27.326251+00:00",
+  "timestamp_utc": "2026-09-07T08:22:51.533813+00:00",
   "tool": "quality-benchmarks",
   "verification": {
     "comparison": {
-      "delta_percent": -45.90454131077849,
-      "parallel_median_seconds": 0.354974717999994,
+      "delta_percent": -41.01546223472056,
+      "parallel_median_seconds": 0.4586132690000113,
       "regression": false,
-      "serial_median_seconds": 0.656200588000047,
-      "speedup": 1.8485840109887997
+      "serial_median_seconds": 0.7775143899999648,
+      "speedup": 1.695359560126346
     },
     "parallel": {
       "configured_limit": 2,
       "count": 5,
-      "max": 0.35515716999998403,
-      "median": 0.354974717999994,
-      "min": 0.35454379200007224,
+      "max": 0.4602099210000006,
+      "median": 0.4586132690000113,
+      "min": 0.4570537889999855,
       "observed_peak": 2,
       "runs": [
         {
@@ -62,7 +157,7 @@
           "report": "benchmark-runs/parallel/sample-1/test_result.json",
           "sample": 1,
           "scheduler_overhead_seconds": 0.0,
-          "seconds": 0.35454379200007224,
+          "seconds": 0.4589141820000009,
           "service_startup_reuse": {
             "node_uses": 0,
             "reuses": 0,
@@ -71,27 +166,27 @@
           },
           "steps": [
             {
-              "duration_ms": 50,
+              "duration_ms": 51,
               "label": "secret scan",
-              "log": "benchmark-runs/parallel/sample-1/secret_scan.json",
+              "log": "benchmark-runs/parallel/sample-1/invocations/inv-1788769358-009517137-32459-1/secret_scan.json",
               "passed": true
             },
             {
-              "duration_ms": 0,
+              "duration_ms": 2,
               "label": "architecture audit",
-              "log": "benchmark-runs/parallel/sample-1/review_context.json",
+              "log": "benchmark-runs/parallel/sample-1/invocations/inv-1788769358-009517137-32459-1/review_context.json",
               "passed": true
             },
             {
-              "duration_ms": 300,
+              "duration_ms": 317,
               "label": "benchmark diff",
-              "log": "benchmark-runs/parallel/sample-1/logs/benchmark_diff.log",
+              "log": "benchmark-runs/parallel/sample-1/invocations/inv-1788769358-009517137-32459-1/logs/benchmark_diff.log",
               "passed": true
             },
             {
-              "duration_ms": 300,
+              "duration_ms": 317,
               "label": "benchmark status",
-              "log": "benchmark-runs/parallel/sample-1/logs/benchmark_status.log",
+              "log": "benchmark-runs/parallel/sample-1/invocations/inv-1788769358-009517137-32459-1/logs/benchmark_status.log",
               "passed": true
             }
           ]
@@ -103,7 +198,7 @@
           "report": "benchmark-runs/parallel/sample-2/test_result.json",
           "sample": 2,
           "scheduler_overhead_seconds": 0.0,
-          "seconds": 0.3550139610000542,
+          "seconds": 0.4570537889999855,
           "service_startup_reuse": {
             "node_uses": 0,
             "reuses": 0,
@@ -112,27 +207,27 @@
           },
           "steps": [
             {
-              "duration_ms": 50,
+              "duration_ms": 52,
               "label": "secret scan",
-              "log": "benchmark-runs/parallel/sample-2/secret_scan.json",
+              "log": "benchmark-runs/parallel/sample-2/invocations/inv-1788769358-472165123-32484-1/secret_scan.json",
               "passed": true
             },
             {
-              "duration_ms": 0,
+              "duration_ms": 2,
               "label": "architecture audit",
-              "log": "benchmark-runs/parallel/sample-2/review_context.json",
+              "log": "benchmark-runs/parallel/sample-2/invocations/inv-1788769358-472165123-32484-1/review_context.json",
               "passed": true
             },
             {
-              "duration_ms": 300,
+              "duration_ms": 317,
               "label": "benchmark diff",
-              "log": "benchmark-runs/parallel/sample-2/logs/benchmark_diff.log",
+              "log": "benchmark-runs/parallel/sample-2/invocations/inv-1788769358-472165123-32484-1/logs/benchmark_diff.log",
               "passed": true
             },
             {
-              "duration_ms": 300,
+              "duration_ms": 317,
               "label": "benchmark status",
-              "log": "benchmark-runs/parallel/sample-2/logs/benchmark_status.log",
+              "log": "benchmark-runs/parallel/sample-2/invocations/inv-1788769358-472165123-32484-1/logs/benchmark_status.log",
               "passed": true
             }
           ]
@@ -144,7 +239,7 @@
           "report": "benchmark-runs/parallel/sample-3/test_result.json",
           "sample": 3,
           "scheduler_overhead_seconds": 0.0,
-          "seconds": 0.3547987069999863,
+          "seconds": 0.4602099210000006,
           "service_startup_reuse": {
             "node_uses": 0,
             "reuses": 0,
@@ -153,27 +248,27 @@
           },
           "steps": [
             {
-              "duration_ms": 50,
+              "duration_ms": 51,
               "label": "secret scan",
-              "log": "benchmark-runs/parallel/sample-3/secret_scan.json",
+              "log": "benchmark-runs/parallel/sample-3/invocations/inv-1788769358-932726062-32509-1/secret_scan.json",
               "passed": true
             },
             {
-              "duration_ms": 0,
+              "duration_ms": 1,
               "label": "architecture audit",
-              "log": "benchmark-runs/parallel/sample-3/review_context.json",
+              "log": "benchmark-runs/parallel/sample-3/invocations/inv-1788769358-932726062-32509-1/review_context.json",
               "passed": true
             },
             {
-              "duration_ms": 300,
+              "duration_ms": 317,
               "label": "benchmark diff",
-              "log": "benchmark-runs/parallel/sample-3/logs/benchmark_diff.log",
+              "log": "benchmark-runs/parallel/sample-3/invocations/inv-1788769358-932726062-32509-1/logs/benchmark_diff.log",
               "passed": true
             },
             {
-              "duration_ms": 300,
+              "duration_ms": 316,
               "label": "benchmark status",
-              "log": "benchmark-runs/parallel/sample-3/logs/benchmark_status.log",
+              "log": "benchmark-runs/parallel/sample-3/invocations/inv-1788769358-932726062-32509-1/logs/benchmark_status.log",
               "passed": true
             }
           ]
@@ -185,7 +280,7 @@
           "report": "benchmark-runs/parallel/sample-4/test_result.json",
           "sample": 4,
           "scheduler_overhead_seconds": 0.0,
-          "seconds": 0.354974717999994,
+          "seconds": 0.45850771900001064,
           "service_startup_reuse": {
             "node_uses": 0,
             "reuses": 0,
@@ -194,27 +289,27 @@
           },
           "steps": [
             {
-              "duration_ms": 50,
+              "duration_ms": 52,
               "label": "secret scan",
-              "log": "benchmark-runs/parallel/sample-4/secret_scan.json",
+              "log": "benchmark-runs/parallel/sample-4/invocations/inv-1788769359-396388331-32534-1/secret_scan.json",
               "passed": true
             },
             {
-              "duration_ms": 0,
+              "duration_ms": 2,
               "label": "architecture audit",
-              "log": "benchmark-runs/parallel/sample-4/review_context.json",
+              "log": "benchmark-runs/parallel/sample-4/invocations/inv-1788769359-396388331-32534-1/review_context.json",
               "passed": true
             },
             {
-              "duration_ms": 300,
+              "duration_ms": 317,
               "label": "benchmark diff",
-              "log": "benchmark-runs/parallel/sample-4/logs/benchmark_diff.log",
+              "log": "benchmark-runs/parallel/sample-4/invocations/inv-1788769359-396388331-32534-1/logs/benchmark_diff.log",
               "passed": true
             },
             {
-              "duration_ms": 300,
+              "duration_ms": 317,
               "label": "benchmark status",
-              "log": "benchmark-runs/parallel/sample-4/logs/benchmark_status.log",
+              "log": "benchmark-runs/parallel/sample-4/invocations/inv-1788769359-396388331-32534-1/logs/benchmark_status.log",
               "passed": true
             }
           ]
@@ -226,7 +321,7 @@
           "report": "benchmark-runs/parallel/sample-5/test_result.json",
           "sample": 5,
           "scheduler_overhead_seconds": 0.0,
-          "seconds": 0.35515716999998403,
+          "seconds": 0.4586132690000113,
           "service_startup_reuse": {
             "node_uses": 0,
             "reuses": 0,
@@ -235,38 +330,38 @@
           },
           "steps": [
             {
-              "duration_ms": 51,
+              "duration_ms": 52,
               "label": "secret scan",
-              "log": "benchmark-runs/parallel/sample-5/secret_scan.json",
+              "log": "benchmark-runs/parallel/sample-5/invocations/inv-1788769359-858513754-32559-1/secret_scan.json",
               "passed": true
             },
             {
-              "duration_ms": 0,
+              "duration_ms": 1,
               "label": "architecture audit",
-              "log": "benchmark-runs/parallel/sample-5/review_context.json",
+              "log": "benchmark-runs/parallel/sample-5/invocations/inv-1788769359-858513754-32559-1/review_context.json",
               "passed": true
             },
             {
-              "duration_ms": 300,
+              "duration_ms": 317,
               "label": "benchmark diff",
-              "log": "benchmark-runs/parallel/sample-5/logs/benchmark_diff.log",
+              "log": "benchmark-runs/parallel/sample-5/invocations/inv-1788769359-858513754-32559-1/logs/benchmark_diff.log",
               "passed": true
             },
             {
-              "duration_ms": 300,
+              "duration_ms": 316,
               "label": "benchmark status",
-              "log": "benchmark-runs/parallel/sample-5/logs/benchmark_status.log",
+              "log": "benchmark-runs/parallel/sample-5/invocations/inv-1788769359-858513754-32559-1/logs/benchmark_status.log",
               "passed": true
             }
           ]
         }
       ],
       "samples": [
-        0.35454379200007224,
-        0.3550139610000542,
-        0.3547987069999863,
-        0.354974717999994,
-        0.35515716999998403
+        0.4589141820000009,
+        0.4570537889999855,
+        0.4602099210000006,
+        0.45850771900001064,
+        0.4586132690000113
       ],
       "scheduler_overhead_seconds": {
         "count": 5,
@@ -284,9 +379,9 @@
     "serial": {
       "configured_limit": 1,
       "count": 5,
-      "max": 0.7561404240000229,
-      "median": 0.656200588000047,
-      "min": 0.6557071949999909,
+      "max": 0.7793089740000028,
+      "median": 0.7775143899999648,
+      "min": 0.7744713200000319,
       "observed_peak": 1,
       "runs": [
         {
@@ -295,8 +390,8 @@
           "observed_peak": 1,
           "report": "benchmark-runs/serial/sample-1/test_result.json",
           "sample": 1,
-          "scheduler_overhead_seconds": 0.005793455999969388,
-          "seconds": 0.6557934559999694,
+          "scheduler_overhead_seconds": 0.09130897400000282,
+          "seconds": 0.7793089740000028,
           "service_startup_reuse": {
             "node_uses": 2,
             "reuses": 1,
@@ -305,27 +400,27 @@
           },
           "steps": [
             {
-              "duration_ms": 50,
+              "duration_ms": 52,
               "label": "secret scan",
-              "log": "benchmark-runs/serial/sample-1/secret_scan.json",
+              "log": "benchmark-runs/serial/sample-1/invocations/inv-1788769354-092348345-32322-1/secret_scan.json",
               "passed": true
             },
             {
-              "duration_ms": 0,
+              "duration_ms": 2,
               "label": "architecture audit",
-              "log": "benchmark-runs/serial/sample-1/review_context.json",
+              "log": "benchmark-runs/serial/sample-1/invocations/inv-1788769354-092348345-32322-1/review_context.json",
               "passed": true
             },
             {
-              "duration_ms": 300,
+              "duration_ms": 317,
               "label": "benchmark diff",
-              "log": "benchmark-runs/serial/sample-1/logs/benchmark_diff.log",
+              "log": "benchmark-runs/serial/sample-1/invocations/inv-1788769354-092348345-32322-1/logs/benchmark_diff.log",
               "passed": true
             },
             {
-              "duration_ms": 300,
+              "duration_ms": 317,
               "label": "benchmark status",
-              "log": "benchmark-runs/serial/sample-1/logs/benchmark_status.log",
+              "log": "benchmark-runs/serial/sample-1/invocations/inv-1788769354-092348345-32322-1/logs/benchmark_status.log",
               "passed": true
             }
           ]
@@ -336,8 +431,8 @@
           "observed_peak": 1,
           "report": "benchmark-runs/serial/sample-2/test_result.json",
           "sample": 2,
-          "scheduler_overhead_seconds": 0.006200588000046969,
-          "seconds": 0.656200588000047,
+          "scheduler_overhead_seconds": 0.08759309800001125,
+          "seconds": 0.7775930980000112,
           "service_startup_reuse": {
             "node_uses": 2,
             "reuses": 1,
@@ -346,27 +441,27 @@
           },
           "steps": [
             {
-              "duration_ms": 50,
+              "duration_ms": 52,
               "label": "secret scan",
-              "log": "benchmark-runs/serial/sample-2/secret_scan.json",
+              "log": "benchmark-runs/serial/sample-2/invocations/inv-1788769354-875320421-32348-1/secret_scan.json",
               "passed": true
             },
             {
-              "duration_ms": 0,
+              "duration_ms": 4,
               "label": "architecture audit",
-              "log": "benchmark-runs/serial/sample-2/review_context.json",
+              "log": "benchmark-runs/serial/sample-2/invocations/inv-1788769354-875320421-32348-1/review_context.json",
               "passed": true
             },
             {
-              "duration_ms": 300,
+              "duration_ms": 317,
               "label": "benchmark diff",
-              "log": "benchmark-runs/serial/sample-2/logs/benchmark_diff.log",
+              "log": "benchmark-runs/serial/sample-2/invocations/inv-1788769354-875320421-32348-1/logs/benchmark_diff.log",
               "passed": true
             },
             {
-              "duration_ms": 300,
+              "duration_ms": 317,
               "label": "benchmark status",
-              "log": "benchmark-runs/serial/sample-2/logs/benchmark_status.log",
+              "log": "benchmark-runs/serial/sample-2/invocations/inv-1788769354-875320421-32348-1/logs/benchmark_status.log",
               "passed": true
             }
           ]
@@ -377,8 +472,8 @@
           "observed_peak": 1,
           "report": "benchmark-runs/serial/sample-3/test_result.json",
           "sample": 3,
-          "scheduler_overhead_seconds": 0.006270251000023541,
-          "seconds": 0.6562702510000236,
+          "scheduler_overhead_seconds": 0.08547132000003199,
+          "seconds": 0.7744713200000319,
           "service_startup_reuse": {
             "node_uses": 2,
             "reuses": 1,
@@ -387,27 +482,27 @@
           },
           "steps": [
             {
-              "duration_ms": 50,
+              "duration_ms": 53,
               "label": "secret scan",
-              "log": "benchmark-runs/serial/sample-3/secret_scan.json",
+              "log": "benchmark-runs/serial/sample-3/invocations/inv-1788769355-656404908-32374-1/secret_scan.json",
               "passed": true
             },
             {
-              "duration_ms": 0,
+              "duration_ms": 2,
               "label": "architecture audit",
-              "log": "benchmark-runs/serial/sample-3/review_context.json",
+              "log": "benchmark-runs/serial/sample-3/invocations/inv-1788769355-656404908-32374-1/review_context.json",
               "passed": true
             },
             {
-              "duration_ms": 300,
+              "duration_ms": 317,
               "label": "benchmark diff",
-              "log": "benchmark-runs/serial/sample-3/logs/benchmark_diff.log",
+              "log": "benchmark-runs/serial/sample-3/invocations/inv-1788769355-656404908-32374-1/logs/benchmark_diff.log",
               "passed": true
             },
             {
-              "duration_ms": 300,
+              "duration_ms": 317,
               "label": "benchmark status",
-              "log": "benchmark-runs/serial/sample-3/logs/benchmark_status.log",
+              "log": "benchmark-runs/serial/sample-3/invocations/inv-1788769355-656404908-32374-1/logs/benchmark_status.log",
               "passed": true
             }
           ]
@@ -418,8 +513,8 @@
           "observed_peak": 1,
           "report": "benchmark-runs/serial/sample-4/test_result.json",
           "sample": 4,
-          "scheduler_overhead_seconds": 0.005707194999990839,
-          "seconds": 0.6557071949999909,
+          "scheduler_overhead_seconds": 0.09051438999996475,
+          "seconds": 0.7775143899999648,
           "service_startup_reuse": {
             "node_uses": 2,
             "reuses": 1,
@@ -428,27 +523,27 @@
           },
           "steps": [
             {
-              "duration_ms": 50,
+              "duration_ms": 52,
               "label": "secret scan",
-              "log": "benchmark-runs/serial/sample-4/secret_scan.json",
+              "log": "benchmark-runs/serial/sample-4/invocations/inv-1788769356-434489960-32400-1/secret_scan.json",
               "passed": true
             },
             {
-              "duration_ms": 0,
+              "duration_ms": 1,
               "label": "architecture audit",
-              "log": "benchmark-runs/serial/sample-4/review_context.json",
+              "log": "benchmark-runs/serial/sample-4/invocations/inv-1788769356-434489960-32400-1/review_context.json",
               "passed": true
             },
             {
-              "duration_ms": 300,
+              "duration_ms": 317,
               "label": "benchmark diff",
-              "log": "benchmark-runs/serial/sample-4/logs/benchmark_diff.log",
+              "log": "benchmark-runs/serial/sample-4/invocations/inv-1788769356-434489960-32400-1/logs/benchmark_diff.log",
               "passed": true
             },
             {
-              "duration_ms": 300,
+              "duration_ms": 317,
               "label": "benchmark status",
-              "log": "benchmark-runs/serial/sample-4/logs/benchmark_status.log",
+              "log": "benchmark-runs/serial/sample-4/invocations/inv-1788769356-434489960-32400-1/logs/benchmark_status.log",
               "passed": true
             }
           ]
@@ -459,8 +554,8 @@
           "observed_peak": 1,
           "report": "benchmark-runs/serial/sample-5/test_result.json",
           "sample": 5,
-          "scheduler_overhead_seconds": 0.006140424000022904,
-          "seconds": 0.7561404240000229,
+          "scheduler_overhead_seconds": 0.0878073170000111,
+          "seconds": 0.7748073170000112,
           "service_startup_reuse": {
             "node_uses": 2,
             "reuses": 1,
@@ -469,44 +564,44 @@
           },
           "steps": [
             {
-              "duration_ms": 50,
+              "duration_ms": 52,
               "label": "secret scan",
-              "log": "benchmark-runs/serial/sample-5/secret_scan.json",
+              "log": "benchmark-runs/serial/sample-5/invocations/inv-1788769357-215421835-32426-1/secret_scan.json",
               "passed": true
             },
             {
-              "duration_ms": 0,
+              "duration_ms": 1,
               "label": "architecture audit",
-              "log": "benchmark-runs/serial/sample-5/review_context.json",
+              "log": "benchmark-runs/serial/sample-5/invocations/inv-1788769357-215421835-32426-1/review_context.json",
               "passed": true
             },
             {
-              "duration_ms": 400,
+              "duration_ms": 317,
               "label": "benchmark diff",
-              "log": "benchmark-runs/serial/sample-5/logs/benchmark_diff.log",
+              "log": "benchmark-runs/serial/sample-5/invocations/inv-1788769357-215421835-32426-1/logs/benchmark_diff.log",
               "passed": true
             },
             {
-              "duration_ms": 300,
+              "duration_ms": 317,
               "label": "benchmark status",
-              "log": "benchmark-runs/serial/sample-5/logs/benchmark_status.log",
+              "log": "benchmark-runs/serial/sample-5/invocations/inv-1788769357-215421835-32426-1/logs/benchmark_status.log",
               "passed": true
             }
           ]
         }
       ],
       "samples": [
-        0.6557934559999694,
-        0.656200588000047,
-        0.6562702510000236,
-        0.6557071949999909,
-        0.7561404240000229
+        0.7793089740000028,
+        0.7775930980000112,
+        0.7744713200000319,
+        0.7775143899999648,
+        0.7748073170000112
       ],
       "scheduler_overhead_seconds": {
         "count": 5,
-        "max": 0.006270251000023541,
-        "median": 0.006140424000022904,
-        "min": 0.005707194999990839
+        "max": 0.09130897400000282,
+        "median": 0.0878073170000111,
+        "min": 0.08547132000003199
       },
       "service_startup_reuse": {
         "node_uses": 10,
