@@ -1,0 +1,74 @@
+{
+  "source_commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "result": "315 passed, 0 skipped",
+      "exit_code": 0,
+      "log": "nextest-final.log"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "result": "pass",
+      "exit_code": 0,
+      "log": "fmt-final.log"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "result": "pass",
+      "exit_code": 0,
+      "log": "clippy-final.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "result": "119 passed",
+      "exit_code": 0,
+      "log": "python-tests-final.log"
+    },
+    {
+      "command": "python3 -m py_compile tools/quality/*.py tools/quality/tests/*.py",
+      "result": "pass",
+      "exit_code": 0,
+      "log": "py-compile.log"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "result": "pass",
+      "exit_code": 0,
+      "log": "docs-consistency.log"
+    },
+    {
+      "command": "openspec validate strict-json-results-and-risk-based-quality-gates --strict",
+      "result": "valid",
+      "exit_code": 0,
+      "log": "openspec-final.log"
+    },
+    {
+      "command": "python3 tools/quality/ci_quality.py collect --base-sha c0e612351c2efd515fde96bcefad80c1365534a2 --head-sha 41e23761e0caa06cab1f6d5ebca1a79648fbb301 --run-id gh96-local-3 --output target/quality/gh96-candidate-3",
+      "result": "all four stages passed; 338.71634095799527 seconds",
+      "exit_code": 0,
+      "log": "collection-3.log"
+    },
+    {
+      "command": "python3 tools/quality/ci_quality.py verify --base-sha c0e612351c2efd515fde96bcefad80c1365534a2 --head-sha 41e23761e0caa06cab1f6d5ebca1a79648fbb301 --run-id gh96-local-3 --output target/quality/gh96-archive-verification",
+      "result": "137 artifacts verified after archive extraction",
+      "exit_code": 0,
+      "log": "verify.log"
+    },
+    {
+      "command": "python3 tools/quality/benchmarks.py --output target/quality/gh-96/benchmarks.json --samples 5 --raw-dir target/quality/gh-96/benchmark-runs",
+      "result": "regression=false; delta_percent=-33.734780293697355; unchanged threshold_percent=15.0",
+      "exit_code": 0,
+      "log": "benchmarks.log"
+    }
+  ],
+  "not_applicable": {
+    "commands": [
+      "harness-gate config check",
+      "harness-gate verify --profile ci --all"
+    ],
+    "reason": "No .harness-gate/flow.toml with a ci profile in this source repository."
+  },
+  "environment": "Current Symphony workspace only. Local Git metadata copy via target/gh96-bin/git; standalone Cargo target overridden to $PWD/target/rust because ambient shared target is read-only. Linux only.",
+  "candidate_archive_sha256": "e227afc1ee994a2889d4df09758c339472d306aec4e3f2371ae1958db1c28dfd"
+}

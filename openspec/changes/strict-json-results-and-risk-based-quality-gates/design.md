@@ -151,8 +151,19 @@ closures require CRAP <=30, and changed CC >10 closures require both coverage
 thresholds. An incremental acceptance never changes a failed coverage result
 to a pass. The [GH-94 evidence](../../../docs/quality/gh-94-validation.md)
 includes every old/new identity and separately identifies changed coverage debt.
-This limited six-file series does not certify repository-wide gates or tasks
-7–9, and does not accept a replacement baseline.
+That GH-94 record alone does not certify repository-wide gates or tasks 7–9,
+and does not accept a replacement baseline.
+
+GH-96 tasks 8.1–8.4 integrate this bounded series with the original six-module
+gate, extended production coverage and GH-95 isolated traceability collection.
+Changes to Rust source outside the six measured files fail pending measurement
+review, including test-only edits in those files; unmeasured changes cannot
+silently pass. PR and push collection use the same candidate schema and explicit
+commit/base/run identity. All applicable required results must be `success`;
+raw evidence uploads use `always()`. The [evolution ADR](../../../docs/adr/0039-required-risk-and-traceability-gates.md)
+defines unchanged thresholds, exceptions, explicit baseline acceptance and
+reviewed rollback. The [GH-96 evidence](../../../docs/quality/gh-96-validation.md)
+distinguishes local CI-command overhead from hosted runner measurements.
 
 所有新增或修改的生产函数要求 `crap_line <= 30`。高风险函数定义为
 `CC > 10` 或出现在强制路径/本次热点清单中；这些函数额外要求函数行、
