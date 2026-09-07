@@ -183,7 +183,7 @@ class QualityEvidenceSeriesTests(unittest.TestCase):
                 name="other-analyzer"
             ),
             "analyzer.version": lambda record: record["series"]["analyzer"].update(
-                version="0.1.1"
+                version="999.0.0"
             ),
             "rule.version": lambda record: record["series"]["rule"].update(version="2"),
             "toolchain.target": lambda record: record["series"]["toolchain"].update(
