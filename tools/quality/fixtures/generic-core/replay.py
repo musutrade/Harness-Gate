@@ -35,6 +35,35 @@ def payload(path):
     return gzip.decompress(path.read_bytes()) if path.suffix == '.gz' else path.read_bytes()
 
 
+def missing_file_source(value):
+    """Identify only native ENOENT/file-or-path-not-found diagnostics."""
+    if not isinstance(value, str) or not value.startswith('artifact/source '):
+        return None
+    source, separator, reason = value.partition(': ')
+    prefixes = ('[Errno 2] No such file or directory', 'No such file or directory',
+                '[WinError 2] The system cannot find the file specified',
+                '[WinError 3] The system cannot find the path specified',
+                'The system cannot find the file specified. (os error 2)',
+                'The system cannot find the path specified. (os error 3)')
+    return source if separator and reason.startswith(prefixes) else None
+
+
+def oracle_matches(expected, actual, path=''):
+    """Preserve every semantic field; allow only known OS missing-file wording."""
+    if canonical(expected) == canonical(actual):
+        return True
+    if isinstance(expected, dict) and isinstance(actual, dict):
+        return expected.keys() == actual.keys() and all(
+            oracle_matches(value, actual[key], path + '/' + key)
+            for key, value in expected.items())
+    if isinstance(expected, list) and isinstance(actual, list):
+        return len(expected) == len(actual) and all(
+            oracle_matches(a, b, path + '/' + str(i))
+            for i, (a, b) in enumerate(zip(expected, actual)))
+    source = missing_file_source(expected)
+    return path.endswith('/reason') and source is not None and source == missing_file_source(actual)
+
+
 def portable_errors(value, work):
     """Remove only the replay-owned temporary prefix from OS error reasons."""
     if isinstance(value, dict):
@@ -117,7 +146,7 @@ def replay(root=ROOT):
             case = json.loads(payload(root / item['input']))
             actual = evaluate(case, blobs, Path(directory) / item['id'])
             expected = payload(root / item['expected'])
-            if canonical(actual) != expected:
+            if not oracle_matches(json.loads(expected), actual):
                 raise ValueError('oracle mismatch: ' + item['id'])
             results.append(dict(id=item['id'], state=actual.get('policy_result', {}).get(
                 'aggregate', {}).get('state', 'rejected')))

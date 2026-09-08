@@ -15,6 +15,8 @@ import tarfile
 QUALITY = Path(sys.argv[1]).resolve()
 WORK = Path(sys.argv[2]).resolve()
 sys.path.insert(0, str(QUALITY))
+sys.path.insert(0, str(QUALITY / 'fixtures/generic-core'))
+import replay
 import harness_evidence as evidence
 import project_model as project
 
@@ -85,7 +87,7 @@ for item in manifest['cases']:
             if not actual['accepted']:
                 assert actual['reason_class'] == frozen['reason_class']
                 # OS paths alone differ; the retained oracle pins all other text.
-                assert actual['reason'].replace(str(WORK / item['id']), '$CASE_ROOT') == frozen['reason'], (item['id'], actual, frozen)
+                assert replay.oracle_matches(frozen, replay.portable_errors(actual, WORK / item['id'])), (item['id'], actual, frozen)
 
 base_project = read(QUALITY / 'fixtures/project-model/base.json')
 base_records = read(QUALITY / 'fixtures/harness-evidence/polyglot.json')

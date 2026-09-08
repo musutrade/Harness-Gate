@@ -18,7 +18,7 @@ def prepare(work):
             raise ValueError('unknown case schema: ' + item['id'])
         expected = json.loads(replay.payload(replay.ROOT / item['expected']))
         actual = replay.evaluate(case, blobs, work / 'oracle' / item['id'])
-        if replay.canonical(actual) != replay.canonical(expected):
+        if not replay.oracle_matches(expected, actual):
             raise ValueError('frozen Python oracle mismatch: ' + item['id'])
         # Roots are explicit trusted transport context, not record-owned paths.
         for side in ('head', 'base'):
