@@ -23,12 +23,23 @@ COMMON = ('test', 'security-audit', 'fmt', 'clippy', 'build', 'quality-coverage'
 PUSH_ONLY = ('test-cross-platform', 'build-cross-platform', 'coverage',
              'quality-contracts-cross-platform', 'quality-baseline')
 STAGES = ('legacy', 'production', 'risk', 'matrix')
+REPLAY_RELOCATION = ('tools/harness-gate/quality-core/examples/differential_replay.rs',
+                     'tools/harness-gate/quality-replay/examples/differential_replay.rs')
 REQUIRED_ARTIFACTS = {'coverage.json', 'coverage.raw.json', 'coverage.lcov',
                       'coverage.cobertura.xml', 'production.json', 'risk.json',
                       'critical-paths.json', 'critical-path-runs/bundle.json'} | {
     f'{label}-{suffix}' for label in ('base', 'head') for suffix in (
         'source.tar', 'manifest.json', 'coverage.json', 'coverage.lcov',
         'coverage.cobertura.xml', 'risk.json')}
+
+
+def relocated_migration_sources(base: str, head: str) -> set[str]:
+    """Recognize only the unchanged move of the unpublished replay executable."""
+    old, new = REPLAY_RELOCATION
+    change = subprocess.check_output(
+        ['git', 'diff', '--name-status', '--find-renames=100%', base, head, '--', old, new],
+        cwd=ROOT, text=True)
+    return {old} if change == f'R100\t{old}\t{new}\n' else set()
 
 
 def aggregate(event: str, needs: dict) -> list[str]:
@@ -95,7 +106,9 @@ class Collector:
         base, head = self.report['base_sha'], self.report['commit']
         changed = subprocess.check_output(['git', 'diff', '--name-only', base, head, '--',
                                             'tools/harness-gate/src', 'tools/harness-gate/quality-core'], cwd=ROOT, text=True).splitlines()
+        relocated = relocated_migration_sources(base, head)
         unsupported = [p for p in changed if p.endswith('.rs') and
+                       p not in relocated and
                        p not in {str((ROOT / 'tools/harness-gate/src' / source).resolve().relative_to(ROOT))
                                  for source in SOURCE_FILES} and not
                        (p.startswith('tools/harness-gate/quality-core/tests/') or
