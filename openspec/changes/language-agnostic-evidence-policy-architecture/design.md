@@ -87,6 +87,13 @@ language = "java"
 
 Language/framework fields are descriptive and adapter-selection inputs, not core policy branches.
 
+GH-111 implements tasks 0.3 and 1.1–1.4 as a standalone development model. The
+[migration inventory](../../../docs/quality/migration-compatibility.md) freezes
+current machine contracts; the [v1 model record](../../../docs/quality/project-model.md)
+specifies the schemas, canonical identity, directed relationship graph and
+explicit rename/move/split lineage. The TOML above remains an illustrative shape,
+not a new project-local configuration contract (task 9.1 is still pending).
+
 **Alternatives:** one Harness-Gate project per language would avoid a component model but cannot express cross-component contracts or project-level release evidence. A tool-centric model would couple the core to current ecosystems.
 
 ### 2. Subjects are generic analyzable entities with versioned identity
@@ -116,6 +123,14 @@ The core never joins evidence only by short symbol name. Symbol-like subjects us
 For ecosystems where source ranges or stable qualified symbols cannot be supplied, the adapter declares reduced identity capability and the relevant policies decide whether that evidence is sufficient. Ambiguous identities never silently merge.
 
 Rename/move/split mapping is explicit baseline metadata; a new identity cannot automatically inherit favorable historical debt.
+
+The initial executable schema uses versioned kinds such as `function/v1`,
+repository-relative paths, a generic `discriminator` field and optional `span`.
+Project, target and boundary references also participate in `subject-identity/v1`.
+Its ID hashes canonical source identity and excludes descriptive metadata. The
+example above is conceptual; the committed project-model schema is normative
+for this standalone model. A successful lineage lookup does not accept a
+baseline or implement generic debt/ratchet policy.
 
 ### 3. Collectors measure; they do not own release policy
 

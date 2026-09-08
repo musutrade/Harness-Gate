@@ -166,3 +166,11 @@ The CI workflow keeps coverage, contract, benchmark, and documentation jobs
 independent for diagnostics, then runs `quality-required` with `always()`. That
 aggregate job fails closed when any dependency fails, is cancelled, or is
 skipped, and is the single check to select in repository branch protection.
+
+## Standalone generic project model
+
+The GH-111 [project model](../../docs/quality/project-model.md) and
+[migration compatibility inventory](../../docs/quality/migration-compatibility.md)
+implement only OpenSpec tasks 0.3 and 1.1–1.4. Synthetic fixtures need no language
+toolchains. The current Rust required gates remain authoritative; this model does
+not evaluate policy or collect generic evidence.

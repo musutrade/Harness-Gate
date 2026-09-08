@@ -29,6 +29,25 @@ Harness-Gate SHALL derive subject identity from component identity, normalized s
 - **THEN** the identities are distinct
 - **AND** no policy comparison joins them solely because their short names match.
 
+#### Scenario: Reject incomplete or conflicting identity
+- **GIVEN** a subject with an unknown versioned kind, missing source digest, duplicate identity, conflicting source path, or unresolved component/target/boundary
+- **WHEN** the standalone project model is validated
+- **THEN** validation fails closed before the subject can participate in a relationship or baseline lookup.
+
+### Requirement: Require explicit identity lineage
+Rename, move and split lineage SHALL identify exact retired base and new head subject identities. An identity lookup MUST NOT grant favorable historical baseline inheritance by symbol or path similarity. Lineage resolution alone SHALL NOT accept a baseline or establish compatible metric series.
+
+#### Scenario: Resolve an explicitly mapped split
+- **GIVEN** one retired base identity and two or more distinct new head identities of the same kind
+- **WHEN** an explicit split mapping is validated against both projects
+- **THEN** each new identity resolves to the declared base identity for lineage
+- **AND** no metric values or favorable debt treatment are implicitly copied.
+
+#### Scenario: Reject ambiguous or absent mapping
+- **GIVEN** duplicate mapping sources/destinations, unknown identities, or a new identity without explicit mapping
+- **WHEN** historical identity inheritance is requested
+- **THEN** validation or lookup fails closed.
+
 ### Requirement: Model cross-component relationships
 Harness-Gate SHALL support explicit relationships between components and subjects so that cross-component gates can bind producers, consumers, and shared contracts.
 
