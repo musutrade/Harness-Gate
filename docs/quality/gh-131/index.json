@@ -1,0 +1,39 @@
+{
+  "schema": "gh131-validation/v1",
+  "archives": {
+    "validation.tar.gz": {
+      "sha256": "999c0d393553e0a83cab558a113cf146922ef4266101c4aac97c986fab68e32d",
+      "bytes": 29496
+    }
+  },
+  "inputs": {
+    "tools/quality/typescript_reference.py": {
+      "sha256": "347ec0c980e77d519a5b956af49762f6be9a3d15d6d03a8ad697ded1186b490b",
+      "bytes": 7889
+    },
+    "tools/quality/tests/test_typescript_reference.py": {
+      "sha256": "2fc73b04ceac7f6593dbcb6722415c91ee91ec5913b5cc8d5fe2a1abfc5caf55",
+      "bytes": 15726
+    },
+    "tools/quality/typescript_semantics.py": {
+      "sha256": "71ac267b84ca2c2cb24f88ec0d03fd05df84d63d61687f40d3eea0cd642647bc",
+      "bytes": 16916
+    },
+    "tools/quality/fixtures/typescript-angular/evidence/native.tar.gz": {
+      "sha256": "b4d83c5f3f2465976781a8bbbe6c1fb30613cae6dbaad8309cb1952ff01050b3",
+      "bytes": 719760
+    },
+    "tools/quality/fixtures/typescript-angular/semantics/source-index.json": {
+      "sha256": "026a7a319d417d4168eabe57fcdf3ece6f1dd313f9ae90c5619f617920ad39ac",
+      "bytes": 25954
+    },
+    "tools/quality/fixtures/typescript-angular/semantics/receipt.json": {
+      "sha256": "d972dcf03ad178758afd43274226b1664f4c7120a5af66077de73b4e1cf55d05",
+      "bytes": 281
+    },
+    "tools/quality/fixtures/typescript-angular/semantics/native-counters.json": {
+      "sha256": "7e52c0aadfd7459ec6edadceaf0aed66735f43f37d29f8d473460cc3a009530b",
+      "bytes": 2491
+    }
+  }
+}
