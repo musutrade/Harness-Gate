@@ -11,8 +11,8 @@ Nothing below is implemented by GH-119. S <1h; M 1–2h; L 2–<4h.
 
 ## 2. Resolve identity and measurement semantics
 
-- [ ] 2.1 [P1][M] Implement versioned source identity and source-map validation; acceptance: TS-01/TS-02 decisions recorded, unique original-source subjects, rejected ambiguity/staleness/tampering and explicit template limitations.
-- [ ] 2.2 [P1][M] Define coverage counters, capability matrix and measurement series; acceptance: exact native counter fixtures, explicit absent/unsupported states, no invented CRAP or cross-series baseline reuse.
+- [x] 2.1 [P1][M] Implement versioned source identity and source-map validation; acceptance: TS-01/TS-02 decisions recorded, unique original-source subjects, rejected ambiguity/staleness/tampering and explicit template limitations. [GH-130 evidence](../../../docs/quality/gh-130/README.md): pinned compiler AST identities and source-map validation pass native replay and adversarial provenance tests; [TS-01/TS-02 decisions](../../../docs/quality/typescript-source-semantics.md) retain template/generated measurements as unsupported.
+- [x] 2.2 [P1][M] Define coverage counters, capability matrix and measurement series; acceptance: exact native counter fixtures, explicit absent/unsupported states, no invented CRAP or cross-series baseline reuse. [GH-130 evidence](../../../docs/quality/gh-130/README.md): exact native file/function/method counters, unavailable zero denominators, unsupported complexity/CRAP and incompatible TypeScript/Rust series covered by 18 focused tests. Collector/policy integration and certification remain unchecked below; hosted required CI is pending at submission.
 
 ## 3. Implement the adapter and reuse generic policy
 
