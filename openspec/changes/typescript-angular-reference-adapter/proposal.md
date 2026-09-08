@@ -1,6 +1,6 @@
 # Proposal: TypeScript/Angular Reference Adapter
 
-**Status:** Implemented through task 4.1; task 4.2 advisory replay and bounded certification record published with hosted validation pending; task 4.3 review remains open. No general adapter certification or required-gate migration.
+**Status:** Tasks 1.1–4.2 accepted with merged PR and successful required CI evidence. Task 4.3 bounded capability review recorded; final required CI and controller closure remain pending. No universal frontend certification or required-gate migration.
 **Date:** 2026-09-08
 **Depends on:** acceptance of `language-agnostic-evidence-policy-architecture`
 (GH-119); no required-gate migration is implied.
@@ -76,3 +76,4 @@ Adapter code owns tool parsing; existing core code owns policy and aggregation.
 - [Design and mismatch register](design.md)
 - [Acceptance spec](specs/typescript-angular-reference-adapter/spec.md)
 - [Implementation tasks](tasks.md)
+- [Final bounded acceptance review and predecessor CI](../../../docs/quality/gh-136/README.md)
