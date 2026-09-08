@@ -11,8 +11,9 @@ and lockfiles are committed. The [native evidence](../../../tools/quality/fixtur
 retains repeated clean-install inventories, successful real build/tests,
 configuration digests, source bytes, raw counters and production/test source maps.
 Compatibility is demonstrated by these operations, not inferred from the
-synthetic frontend fixture. Adapter identity, policy and certification remain
-the unchecked later tasks; TS-01–TS-03 below are not resolved by native collection.
+synthetic frontend fixture. GH-130 tasks 2.1–2.2 add the [identity and measurement semantics](../../../docs/quality/typescript-source-semantics.md).
+TS-01/TS-02 are resolved within that bounded scope; TS-03, collector integration,
+policy acceptance and certification remain later tasks.
 
 The application will have a component with an external template, a service with
 tested and untested branches, same-named methods in distinct classes, a lazy
@@ -62,8 +63,8 @@ TypeScript adapter. They limit acceptance; they are not proof of tool behavior.
 
 | ID | Evidence / mismatch | Required disposition and owner |
 | --- | --- | --- |
-| TS-01 | Architecture design §2 describes reduced identity negotiation; executable v1 requires a nonempty discriminator and source digest. [Project model](../../../docs/quality/project-model.md) explicitly excludes reduced identity negotiation. | Identity task 2.1 must reject ambiguous/anonymous mappings unless it can derive an unambiguous versioned source identity. If reduced identity is needed, propose a reviewed generic schema/protocol delta; never forge a name or digest. Open; blocks any claim of reduced-identity support. |
-| TS-02 | A v1 subject has one source path/digest and optional span, while external templates, emitted JavaScript and source maps involve multiple files. Their joint identity is not a defined v1 subject contract. | Tasks 2.1–2.2 must bind source-backed subjects to original files and retain transformation inputs as digested artifacts. Certify TypeScript only initially. Template/generated multi-source coverage remains unsupported unless real fixtures establish an adequate representation or a reviewed core delta. Open; blocks template coverage certification. |
+| TS-01 | Architecture design §2 describes reduced identity negotiation; executable v1 requires a nonempty discriminator and source digest. [Project model](../../../docs/quality/project-model.md) explicitly excludes reduced identity negotiation. | Identity task 2.1 must reject ambiguous/anonymous mappings unless it can derive an unambiguous versioned source identity. If reduced identity is needed, propose a reviewed generic schema/protocol delta; never forge a name or digest. **Resolved by GH-130 / task 2.1:** pinned parser ownership/kind/span and original bytes satisfy full v1 identity; exact declaration joins reject ambiguity. Reduced identity remains unsupported. [Decision and evidence](../../../docs/quality/typescript-source-semantics.md#ts-01-original-source-identity). |
+| TS-02 | A v1 subject has one source path/digest and optional span, while external templates, emitted JavaScript and source maps involve multiple files. Their joint identity is not a defined v1 subject contract. | Tasks 2.1–2.2 must bind source-backed subjects to original files and retain transformation inputs as digested artifacts. Certify TypeScript only initially. Template/generated multi-source coverage remains unsupported unless real fixtures establish an adequate representation or a reviewed core delta. **Resolved by GH-130 / tasks 2.1–2.2:** one original TypeScript source per subject, caller-pinned artifact provenance and validated test mappings. Template/generated multi-source measurements remain unsupported; no generic amendment requested. [Decision and evidence](../../../docs/quality/typescript-source-semantics.md#ts-02-transformation-provenance-and-boundaries). |
 | TS-03 | The collector runner requires every requested capability on each returned record; requests cannot currently express separate capability sets per subject kind. See [collector contract](../../../docs/quality/collector-protocol.md). | Task 3.1 must test mixed file/method/route requests with explicit unsupported/not-applicable states. If genuine collection needs cannot fit that contract, stop and propose a generic request-scope delta. Open integration question; no silent omission of requested capabilities. |
 
 For each finding, retain the reproducer, expected and actual generic behavior,

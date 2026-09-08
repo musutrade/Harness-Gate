@@ -23,6 +23,18 @@ template, branch or risk measurements SHALL NOT become numeric defaults.
 - **WHEN** original source identity cannot be established
 - **THEN** collection fails closed before favorable policy or baseline use.
 
+#### Scenario: Exact original TypeScript counters
+- **GIVEN** a mapped source-backed file, function or method
+- **WHEN** line and function coverage are normalized
+- **THEN** integer covered/total counters retain native statement-start line and function-hit semantics
+- **AND** an empty denominator is unavailable with no numeric value.
+
+#### Scenario: Bound transformation inputs
+- **GIVEN** caller-bound original bytes, emitted bytes, parser identity and test source maps
+- **WHEN** a basename join, changed artifact, incomplete map or ambiguous original mapping is supplied
+- **THEN** measurement fails before any favorable policy or baseline use
+- **AND** template/generated multi-source measurements remain unsupported without a separately accepted generic amendment.
+
 #### Scenario: Unmeasured template or risk
 - **GIVEN** a requested metric outside the accepted adapter capability matrix
 - **WHEN** the response is validated and a blocking policy requires support
@@ -33,6 +45,12 @@ The adapter SHALL emit validated collector-protocol and harness-evidence/v1
 records without final delivery decisions. Existing generic policy, lineage,
 ratchet and aggregation code SHALL own thresholds and debt. TypeScript series
 SHALL remain distinct from Rust and from incompatible frontend tool versions.
+
+#### Scenario: Complete TypeScript series identity
+- **GIVEN** compiler, builder, runner, provider, mapping/rule and normalization versions
+- **AND** runtime/target, configuration and source-boundary semantics
+- **WHEN** any semantic field changes, or a Rust series is supplied as the baseline
+- **THEN** generic series compatibility fails and explicit baseline migration is required.
 
 #### Scenario: Instrumentation upgrade
 - **GIVEN** a base measurement using different coverage or mapping semantics
