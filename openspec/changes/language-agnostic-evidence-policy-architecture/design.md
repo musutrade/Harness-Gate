@@ -154,36 +154,15 @@ This separation prevents divergent rules such as one adapter considering 75% cov
 
 The existing `quality-evidence.schema.json` is a Rust complexity-evidence contract and must not be silently broadened in place into the universal schema. `harness-evidence/v1` is introduced alongside it; an adapter/projection preserves the old record and its series while adding generic project/component/subject/capability metadata.
 
-The generic schema is versioned as `harness-evidence/v1`. A representative record is:
-
-```json
-{
-  "schema": "harness-evidence/v1",
-  "project": "example-platform",
-  "component": "api",
-  "collector": {
-    "name": "rust-function-risk",
-    "version": "1.0.0"
-  },
-  "series": "rust-function-risk-1",
-  "subject": {
-    "kind": "function",
-    "language": "rust",
-    "identity": "...",
-    "path": "src/service/lease.rs",
-    "symbol": "LeaseManager::reconcile"
-  },
-  "metrics": {
-    "complexity.cyclomatic": { "value": 13 },
-    "coverage.line": { "covered": 47, "total": 55, "ratio": 0.854545 },
-    "risk.crap": { "value": 13.4 }
-  },
-  "artifacts": [
-    { "kind": "raw", "path": "target/quality/...", "sha256": "..." }
-  ],
-  "status": "measured"
-}
-```
+The executable v1 [schema](../../../tools/quality/schema/harness-evidence.schema.json)
+and [contract record](../../../docs/quality/harness-evidence.md) define the normative
+shape. The [synthetic batch](../../../tools/quality/fixtures/harness-evidence/polyglot.json)
+contains complete Rust/TypeScript/Python/Java examples. Metrics use discriminated
+ratio/count/boolean/duration/size/decimal values, and ratios preserve covered/total
+counts. The full project-model subject is embedded; provenance includes an explicit
+base commit. Canonical serialization and filesystem integrity are validated before
+consumption. This GH-112 implementation covers tasks 2.1–2.5 and 3.1–3.4 only;
+real Rust projection and equivalence remain tasks 7 and 10.
 
 The common envelope standardizes provenance, identity, metrics and artifact linkage. It does not imply that Rust LLVM coverage, Java JaCoCo coverage, Python coverage.py and TypeScript Istanbul have identical semantics. Their measurement contracts and series remain distinct.
 
