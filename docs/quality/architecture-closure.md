@@ -1,5 +1,12 @@
 # Language-agnostic architecture closure record (GH-119)
 
+**Current boundary (GH-152):** GH-151's merged PR #158 transfers generic decisions
+and reports to the released Rust core. The [Python retention policy](python-retention.md)
+and [consolidation closure record](gh-152/README.md) supersede the historical
+development-only status below. The [bounded TypeScript/Angular reference](typescript-certification.md)
+has its own accepted evidence; no broader certification is added here.
+The remainder records GH-119's original acceptance scope.
+
 **Status:** Predecessor tasks 0.3–10.4 accepted; final closure prepared in GH-119.
 Task 10.5 creates an independent proposal. This PR's required CI and controller
 merge/issue closure remain pending. This record does not claim hosted

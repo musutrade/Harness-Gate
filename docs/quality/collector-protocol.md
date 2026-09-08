@@ -1,5 +1,10 @@
 # Collector protocol v1
 
+Current runtime ownership and Python freeze/retirement rules are defined in the
+[Python retention policy](python-retention.md). The released Rust core owns final
+generic decisions; Python interfaces below remain adapter/reference tooling.
+
+
 GH-113 implements OpenSpec tasks 4.1–4.4 as a standalone development/CI Python
 boundary in [collector_runner.py](../../tools/quality/collector_runner.py), beside
 the [normalized evidence contract](harness-evidence.md). It does not change the

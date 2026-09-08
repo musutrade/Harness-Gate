@@ -1,5 +1,8 @@
 # Generic policy engine v1
 
+Python commands below require `--reference-only` and cannot approve releases.
+See the [freeze and retirement policy](python-retention.md).
+
 GH-114 implements OpenSpec tasks 5.1–5.5; GH-115 adds tasks 6.1–6.4 to the
 standalone **shadow** evaluator.
 The existing Rust required gates and `Required Quality Aggregate` remain release
@@ -159,7 +162,7 @@ No exception governance waiver or approval authority is implemented.
 Run from the repository root:
 
 ```bash
-python3 tools/quality/policy_engine.py \
+python3 tools/quality/policy_engine.py --reference-only \
   --policy tools/quality/fixtures/policy/policy.json \
   --evidence tools/quality/fixtures/harness-evidence/polyglot.json \
   --project tools/quality/fixtures/project-model/base.json \

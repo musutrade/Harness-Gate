@@ -142,3 +142,23 @@ dependencies, thresholds and release authority are unchanged. Versioned risk and
 production coverage include all linked core production, including outside `src/`,
 with authentic compatible base/head counters. Tasks 6.1–6.3 are this acceptance;
 task 7 and full-proposal acceptance remain outstanding.
+
+
+## Final Python dispositions and consolidation closure (GH-152)
+
+PR #158 merged at `63a7f9538b13d4f8888eff6b35663cda40270e70` with successful
+required CI, completing tasks 6.1–6.3. The [final inventory](../quality/gh-152/python-boundary.json)
+freezes all eight C-class modules as non-authoritative reference implementations.
+The two Python decision CLIs require explicit `--reference-only` use. Source-hash
+and import-boundary regressions prevent silent oracle drift and required-tool
+imports of generic Python decisions. Legacy complexity-evidence validation and
+Python collector transport retain their documented mixed roles.
+
+The [retention policy](../quality/python-retention.md) intentionally preserves
+A-class CI/dev tooling and B-class ecosystem adapters, and defines C/D freeze,
+repair, replacement and retirement evidence. The release binary contains all
+generic decision semantics; Python references cannot approve release or provide
+automatic fallback. Required release checks remain unchanged. No new ecosystem
+certification follows from runtime consolidation. [GH-152 closure evidence](../quality/gh-152/README.md)
+records local validation and leaves final task 7.3 acceptance to successful
+required CI and controller merge; historical stage records above remain intact.
