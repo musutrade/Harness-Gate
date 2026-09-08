@@ -77,6 +77,18 @@ The migration SHALL NOT require CI/dev tooling or ecosystem adapters to be rewri
 - **THEN** the adapter remains a supported implementation choice
 - **AND** no Python generic-semantic module is required to make the authoritative final decision.
 
+#### Scenario: Frozen Python reference is retained after transfer
+- **GIVEN** a C-class Python implementation retained for replay, adapter preflight or rollback investigation
+- **WHEN** it is invoked after Rust authority transfer
+- **THEN** it has no generic release-approval path and the Python decision CLIs require explicit reference-only use
+- **AND** reviewed source hashes freeze its generic semantics, with any repair requiring compatibility evidence.
+
+#### Scenario: Migration tooling is retired
+- **GIVEN** retained C/D reference tooling and accepted compatibility evidence
+- **WHEN** retirement is proposed
+- **THEN** live callers have reviewed replacements, equivalent positive/negative coverage is retained, and rollback no longer requires the implementation
+- **AND** historical source identities, corpus, decisions and baselines are preserved.
+
 ### Requirement: Preserve existing release authority until explicit transfer
 The existence of a Rust candidate SHALL NOT by itself change existing required-check identity, branch protection, or release authority. Transfer SHALL occur only after real Rust and TypeScript/Angular corpus equivalence, negative-matrix acceptance, hosted CI success, and documented rollback.
 

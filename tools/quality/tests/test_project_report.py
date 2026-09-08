@@ -182,7 +182,7 @@ class ProjectReportTests(unittest.TestCase):
             for prefix, code, state in [('single-rust-', 0, 'pass'), ('', 1, 'fail')]:
                 output = Path(directory) / 'report.json'
                 config = FIXTURE / (prefix + 'config.json' if prefix else 'project-config.json')
-                command = [sys.executable, str(ROOT / 'project_report.py'), 'evaluate',
+                command = [sys.executable, str(ROOT / 'project_report.py'), '--reference-only', 'evaluate',
                            '--config', str(config), '--root', str(REPO),
                            '--evidence', str(FIXTURE / (prefix + 'evidence.json')),
                            '--expected', str(FIXTURE / 'expected.json'),
@@ -202,7 +202,7 @@ class ProjectReportTests(unittest.TestCase):
             legacy = b'version = "1"\n[project]\nname = "rust-project"\n'
             flow.write_bytes(legacy)
             output = root / 'report.json'
-            command = [sys.executable, str(ROOT / 'project_report.py'), 'check', '--output', str(output)]
+            command = [sys.executable, str(ROOT / 'project_report.py'), '--reference-only', 'check', '--output', str(output)]
             result = subprocess.run(command, cwd=root, capture_output=True, text=True)
             self.assertEqual(result.returncode, 1)
             self.assertIn('project.json', json.loads(output.read_text())['error'])

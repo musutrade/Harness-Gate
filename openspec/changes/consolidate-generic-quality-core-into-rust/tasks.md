@@ -63,6 +63,16 @@ in PR #158; candidate acceptance above precedes that switch.
 
 ## 7. Demote Python generic semantics safely
 
-- [ ] 7.1 [P1][M] Apply final dispositions to C-class Python modules; acceptance: each is removed, converted to a thin Rust wrapper, or frozen as non-authoritative reference code with no release-approval path.
-- [ ] 7.2 [P1][S] Document A/B/D retention policy; acceptance: CI/dev tooling and ecosystem adapters remain intentionally Python where appropriate, and migration/reference tooling has an explicit freeze/retirement policy.
+- [x] 7.1 [P1][M] Apply final dispositions to C-class Python modules; acceptance: each is removed, converted to a thin Rust wrapper, or frozen as non-authoritative reference code with no release-approval path.
+- [x] 7.2 [P1][S] Document A/B/D retention policy; acceptance: CI/dev tooling and ecosystem adapters remain intentionally Python where appropriate, and migration/reference tooling has an explicit freeze/retirement policy.
 - [ ] 7.3 [P1][M] Update architecture/ADR/quality documentation and run final strict OpenSpec validation; acceptance: product boundary is unambiguous, release binary responsibility is documented, full required CI passes, and no claim implies new ecosystem certification.
+
+
+GH-152 closure evidence: [final disposition and validation record](../../../docs/quality/gh-152/README.md).
+GH-151 merged as PR #158 at `63a7f9538b13d4f8888eff6b35663cda40270e70`
+with required CI complete. All eight C modules are frozen non-authoritative
+references, and A/B/D retention and retirement are explicit. Task 7.3 remains
+unchecked until this PR's required hosted CI succeeds; documentation and local
+strict validation alone do not accept the full proposal. The controller owns
+final acceptance/merge/issue closure. Keep the named change available for strict
+validation until then; this submission does not claim archival.

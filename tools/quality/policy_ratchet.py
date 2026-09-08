@@ -1,4 +1,8 @@
-"""Baseline identity and review metadata for the generic shadow policy engine."""
+"""Frozen non-authoritative Python reference; see docs/quality/python-retention.md.
+
+Generic decisions belong to the released Rust core. No release-approval path.
+
+Baseline identity and review metadata for the generic shadow policy engine."""
 from datetime import datetime, timezone
 
 import harness_evidence as evidence

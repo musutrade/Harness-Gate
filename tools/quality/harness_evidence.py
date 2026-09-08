@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Standalone normalized evidence contracts; no release decision or collector."""
+"""Frozen non-authoritative Python reference; see docs/quality/python-retention.md.
+
+Generic decisions belong to the released Rust core. No release-approval path.
+
+Standalone normalized evidence contracts; no release decision or collector."""
 from __future__ import annotations
 
 import argparse
