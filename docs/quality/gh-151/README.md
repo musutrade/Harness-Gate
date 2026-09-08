@@ -104,6 +104,29 @@ Earlier failed boundary and read-only Git diagnostics in `validation.json`,
 operator authorization permits these measurement extensions and writing this
 workspace's Git metadata; staging has been verified. They are not current blockers.
 
+## Candidate review iterations
+
+PR [#158](https://github.com/musutrade/Harness-Gate/pull/158) reviews this change.
+Candidate `7870dcc43a9f974aca38a9dbf1736dc19a1d873d` passed hosted Rust shadow
+[run 34241643293](https://github.com/musutrade/Harness-Gate/actions/runs/34241643293)
+with 33 cases and zero unresolved mismatches. Its required CI did **not** pass:
+risk preflight treated the unchanged move of the unpublished replay example as
+an unsupported production deletion. Transfer was not accepted.
+
+The repair recognizes only Git's exact, 100%-similarity relocation from
+`quality-core/examples/differential_replay.rs` to
+`quality-replay/examples/differential_replay.rs`. A changed executable is rejected;
+all linked core production symbols remain in the measured series. A real Git
+fixture tests both the exact move and changed-content rejection. Required check
+names, dependencies, measurement thresholds and failure handling are unchanged.
+
+[Retained raw comparisons](shadow-7870dcc.tar.xz) contain all 133 downloaded
+Python/Rust/CLI comparison, report, stderr and identity files, plus a per-file
+SHA-256 manifest and the original archive index. Their archive SHA-256 is
+`78b3e6edba669a4a46f0742e18c29fd1753ca3a3596b02196da106a11e7bce4a`.
+The complete materialized inputs remain in hosted artifact `10062375474` and the
+frozen corpus. This historical shadow success does not accept another SHA.
+
 ## Rollback
 
 Before transfer, disable `RUST_GENERIC_SHADOW`, remove the GH-151 branch opt-in,
