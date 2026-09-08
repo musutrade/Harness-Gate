@@ -26,7 +26,7 @@ fn partial_base_context_is_rejected_before_evaluation() {
     let output = Command::new(env!("CARGO_BIN_EXE_harness-gate"))
         .args([
             "quality",
-            "shadow",
+            "evaluate",
             "--project",
             "project.json",
             "--policy",

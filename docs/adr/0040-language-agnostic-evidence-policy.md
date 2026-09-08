@@ -124,12 +124,21 @@ candidate-library Cargo example, outside the installed CLI. Existing Rust requir
 gates and release authority remain unchanged. Hosted shadow integration, authority
 transfer and Python disposition remain separate tasks 6–7.
 
-## Authority-transfer candidate review (GH-151)
+## Generic Rust authority transfer (GH-151)
 
-The [GH-151 record](../quality/gh-151/README.md) prepares an opt-in Rust shadow
-workflow and an explicit-context `harness-gate quality evaluate` command using
-the same generic Rust library. Collector protocol and report schemas remain
-compatible. The operator authorized versioned production risk/coverage extensions. The
-review awaits green hosted Rust shadow and required CI on the exact candidate
-SHA before transfer. Existing required CI and release authority are unchanged. Tasks 6–7
-and the full proposal are not accepted.
+The [GH-151 decision and evidence](../quality/gh-151/README.md) accept candidate
+`0fc96d7644d623f31e31fe1a512cb68db0b2003b` after hosted Rust shadow and every
+existing required CI check passed. All 33 Rust/Angular/contract cases and the
+12-category negative matrix pass with zero unresolved mismatch; full comparisons,
+hosted identities and rollback are retained. A separate descendant commit enables
+`harness-gate quality evaluate`, binding final generic decisions and reporting to
+the released Rust library without Python C-class runtime dependencies. PR #158
+records the exact transfer SHA and final hosted validation.
+
+Collectors still measure using protocol v1; policy requiredness and final
+aggregation remain core-owned. The report's legacy `mode: shadow` field remains
+wire-compatible and does not select authority. The required aggregate's name,
+dependencies, thresholds and release authority are unchanged. Versioned risk and
+production coverage include all linked core production, including outside `src/`,
+with authentic compatible base/head counters. Tasks 6.1–6.3 are this acceptance;
+task 7 and full-proposal acceptance remain outstanding.
