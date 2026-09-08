@@ -62,3 +62,27 @@ Harness-Gate SHALL support explicit relationships between components and subject
 - **WHEN** the relationship graph is loaded
 - **THEN** the frontend, API, and contract are linked explicitly
 - **AND** a contract gate can evaluate that relationship without inferring it from filenames.
+
+### Requirement: Opt in to project configuration without changing legacy defaults
+The standalone shadow CLI SHALL load a versioned `.harness-gate/project.json`
+manifest with explicit model and policy references. Existing Rust `flow.toml`
+loading and default paths SHALL remain unchanged. Unknown configuration versions,
+keys and references escaping the project root SHALL fail explicitly.
+
+#### Scenario: Retain single-component Rust configuration
+- **GIVEN** a project with an existing Rust `flow.toml`
+- **WHEN** shadow project reporting is adopted with an explicit JSON manifest
+- **THEN** the Rust configuration remains unchanged
+- **AND** a missing shadow manifest cannot silently construct a default model.
+
+### Requirement: Report project gates with lossless indexes
+Machine reports SHALL retain the original policy results and raw evidence links,
+index gates by component, subject, policy and status, and report local and
+cross-component aggregates for each participant without counting shared gates
+twice in the project aggregate.
+
+#### Scenario: Locally green participants have a failing shared contract
+- **GIVEN** passing frontend and API local gates and a required breaking-contract failure
+- **WHEN** a project report is emitted
+- **THEN** both local aggregates remain pass and both cross-component aggregates fail
+- **AND** the project fails with one gate entry per evaluated policy and subject.
