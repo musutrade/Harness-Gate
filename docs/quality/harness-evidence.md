@@ -7,8 +7,10 @@ and [validator](../../tools/quality/harness_evidence.py) define
 [`quality-evidence.schema.json`](../../tools/quality/schema/quality-evidence.schema.json).
 The [migration inventory](migration-compatibility.md) and
 [ADR-0039](../adr/0039-required-risk-and-traceability-gates.md) still govern the
-required Rust path. Real collectors, Rust projection, numeric policy/ratchet
-evaluation, baseline acceptance and the architecture ADR remain later tasks.
+required Rust path. Standalone collector, policy and ratchet contracts now exist;
+the [Rust reference adapter](rust-reference-adapter.md) adds retained-evidence
+shadow comparison. Required-gate rollout, baseline acceptance and the architecture
+ADR remain later tasks.
 
 ## Envelope and validation boundary
 
@@ -62,6 +64,7 @@ Unknown names/types fail closed; extensions require a reviewed contract update.
 | boolean | `{"type":"boolean","value":true}` | JSON boolean, never numeric 0/1. |
 | duration | `{"type":"duration","value":1000,"unit":"nanoseconds"}` | Nonnegative integer with explicit fixed unit. |
 | size | `{"type":"size","value":128,"unit":"bytes"}` | Nonnegative integer with explicit fixed unit. |
+| rational | `{"type":"rational","numerator":433,"denominator":108}` | Exact nonnegative integer fraction with positive denominator. An alternative series type for `risk.crap`; never silently mixed with decimal CRAP. |
 | decimal | `{"type":"decimal","value":"3.072"}` | Exact nonnegative decimal string; no exponent, leading zeroes or fractional trailing zeroes. Used for `risk.crap`. |
 
 Coverage and mutation score use ratios; complexity, mutation counts, security
