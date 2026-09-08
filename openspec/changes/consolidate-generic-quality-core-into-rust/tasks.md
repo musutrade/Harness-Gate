@@ -7,12 +7,14 @@ All tasks belong to [proposal](proposal.md), [design](design.md), and the accept
 - [x] 1.1 [P1][M] Inventory every production-like `tools/quality/*.py` module and classify A/B/C/D; acceptance: record purpose, callers, CI role, release impact, authoritative/non-authoritative status, and final disposition.
 - [x] 1.2 [P1][M] Freeze shared positive/negative compatibility fixtures from retained Rust and TypeScript/Angular evidence; acceptance: exact inputs, expected outputs, schema versions and canonicalization rules are reviewable without recollecting expensive native evidence.
 
-Validation: [GH-146 boundary and evidence](../../../docs/quality/gh-146/README.md); all 31 production modules inventoried and all 33 frozen oracle cases replayed successfully. Required hosted CI remains pending before merge; tasks 2–7 are not accepted.
+Validation: [GH-146 boundary and evidence](../../../docs/quality/gh-146/README.md); all 31 production modules inventoried and all 33 frozen oracle cases replayed successfully. GH-146 merged as PR #153 with required CI complete. Tasks 3–7 remain unaccepted.
 
 ## 2. Move evidence and project semantics into Rust
 
-- [ ] 2.1 [P1][L] Implement Rust `harness-evidence/v1` model/validation and typed value/capability/series integrity semantics; acceptance: shared valid fixtures pass, malformed/stale/tampered/unknown/incompatible fixtures fail with equivalent reason classes.
-- [ ] 2.2 [P1][L] Implement Rust project/component/subject/source-boundary/relationship model validation; acceptance: subject identity, path containment, duplicate/unknown references and relationship semantics match the Python reference corpus.
+- [x] 2.1 [P1][L] Implement Rust `harness-evidence/v1` model/validation and typed value/capability/series integrity semantics; acceptance: shared valid fixtures pass, malformed/stale/tampered/unknown/incompatible fixtures fail with equivalent reason classes.
+- [x] 2.2 [P1][L] Implement Rust project/component/subject/source-boundary/relationship model validation; acceptance: subject identity, path containment, duplicate/unknown references and relationship semantics match the Python reference corpus.
+
+Validation: [GH-147 implementation and evidence](../../../docs/quality/gh-147/README.md); 323 Rust tests pass, including 399 evidence/project/series/capability differential cases derived from the frozen corpus and boundary mutations. The candidate library has no CLI dependency or release authority. Hosted CI on the final pushed SHA is pending; this does not accept the full proposal or tasks 3–7.
 
 ## 3. Move policy and ratchet semantics into Rust
 
