@@ -174,3 +174,12 @@ The GH-111 [project model](../../docs/quality/project-model.md) and
 implement only OpenSpec tasks 0.3 and 1.1–1.4. Synthetic fixtures need no language
 toolchains. The current Rust required gates remain authoritative; this model does
 not evaluate policy or collect generic evidence.
+
+## Shadow project contracts and reporting
+
+[`project_report.py`](project_report.py) checks an opt-in
+`.harness-gate/project.json` and emits project/component/gate reports from retained
+normalized evidence. [Configuration, contract metrics and CLI examples](../../docs/quality/project-reporting.md)
+include a single Rust topology and a synthetic Angular + Rust + Python + Java
+project whose green local gates are blocked by a breaking API contract. These
+fixtures do not certify additional adapters or replace required Rust CI.
