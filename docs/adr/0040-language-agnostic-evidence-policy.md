@@ -102,3 +102,14 @@ failures. Cross-component provenance validation remains a separate task 4.1
 boundary that fails closed without a validator. The CLI has no dependency on the
 candidate library; existing required CI and release authority remain unchanged.
 This stage does not accept reporting, replay, authority transfer or the full proposal.
+
+## Candidate Rust relationship and reporting implementation (GH-149)
+
+OpenSpec tasks 4.1–4.2 replace the temporary contract callback above with Rust
+provenance validation over normalized evidence. Rust also constructs the lossless
+project gate table, participant/subject/policy/status/relationship indexes and
+component/local/cross-component aggregates using existing policy requiredness.
+[GH-149 evidence](../quality/gh-149/README.md) compares complete reports with the
+Python reference and confirms that green local gates cannot hide a breaking
+provider/consumer contract. This is candidate-library implementation only;
+replay acceptance and authority transfer remain separate tasks.
