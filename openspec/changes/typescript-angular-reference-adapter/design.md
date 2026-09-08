@@ -19,7 +19,12 @@ using native retained replay and explicitly controlled policy derivations alongs
 the Rust reference gates. GH-133 task 3.3 adds [real contract integration](../../../docs/quality/gh-133/README.md):
 pinned oasdiff output and freshly generated client bytes enter unchanged generic
 cross-component gates. Passing native local gates coexist with a blocking real
-OpenAPI change. Fresh acceptance history pairs and certification remain tasks 4.1–4.3.
+OpenAPI change. GH-134 task 4.1 adds [real acceptance history pairs](../../../docs/quality/gh-134/README.md):
+four fresh native runs retain clean Git revisions, exact counters and matching
+generic outcomes/debt for a compatible change and a real coverage regression.
+The negative matrix reproduces integrity, identity, capability, series and
+collection failures. No new architecture mismatch or generic contract delta is
+introduced. Certification and review remain tasks 4.2–4.3.
 
 The application will have a component with an external template, a service with
 tested and untested branches, same-named methods in distinct classes, a lazy
