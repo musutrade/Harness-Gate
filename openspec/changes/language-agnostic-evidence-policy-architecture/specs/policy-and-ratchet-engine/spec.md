@@ -51,3 +51,27 @@ A failed or blocked policy result SHALL identify the affected component/subject,
 - **GIVEN** a changed function fails a CRAP policy
 - **WHEN** the result is serialized
 - **THEN** it includes the subject identity, base/head CRAP, threshold/ratchet rule, evidence links, and remediation classes such as reducing complexity or increasing meaningful coverage.
+
+### Requirement: Use closed typed policies and caller-owned scopes
+Policies SHALL use typed limits and a fixed comparison operator set, with no
+arbitrary code DSL. Project, component, boundary, changed-subject and
+critical-subject selectors SHALL evaluate caller-owned declared subjects in the
+requested target. Missing required subject measurements SHALL NOT disappear.
+
+#### Scenario: A collector omits a selected subject
+- **GIVEN** a required project policy and a declared subject absent from evidence
+- **WHEN** all returned measurements satisfy their thresholds
+- **THEN** the missing subject produces `measurement_error` and prevents success.
+
+#### Scenario: Required child cannot be erased by aggregation
+- **GIVEN** required children in `fail`, `cancelled`, `measurement_error`, `blocked`, or `skipped`
+- **WHEN** aggregation runs
+- **THEN** the aggregate remains non-pass and retains each original child state
+- **AND** only policy-owned `required: false` exempts these children from blocking
+- **AND** informational children do not block.
+
+#### Scenario: All generic metric types share one evaluator
+- **GIVEN** synthetic coverage, CRAP, mutation, breaking-change counts and boolean metrics
+- **WHEN** typed limits are evaluated across heterogeneous subjects
+- **THEN** the same exact comparison implementation evaluates each measurement
+- **AND** unavailable values are never converted into numerical success.

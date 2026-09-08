@@ -65,11 +65,19 @@ Required CI remains pending; later tasks and full architecture acceptance remain
 
 ## 5. Implement the generic policy engine
 
-- [ ] 5.1 [P1][L] 定义 typed policy schema 和 scope selectors；验收：支持 project/component/boundary/changed-subject/critical-subject scopes，不引入任意代码 DSL。
-- [ ] 5.2 [P1][M] 实现 generic numeric/boolean/count comparisons；验收：coverage、CRAP、mutation、breaking-change count 等 synthetic metrics 通过同一 evaluator。
-- [ ] 5.3 [P1][M] 实现 gate result states：`pass/fail/warning/informational/skipped/unsupported/not_applicable/measurement_error/blocked`；验收：`fail` 与 `measurement_error` 在机器结果和 aggregate 中保持不同原因。
-- [ ] 5.4 [P1][M] 实现 fail-closed aggregate；验收：required child gate failure/cancel/measurement_error/blocked/skipped 按配置不能变绿，informational 不影响 required aggregate。
-- [ ] 5.5 [P2][M] 输出 machine-readable violation/remediation contract；验收：Agent 可获得 component、subject、metric、base/head、limit、series、evidence links 和 remediation class。
+- [x] 5.1 [P1][L] 定义 typed policy schema 和 scope selectors；验收：支持 project/component/boundary/changed-subject/critical-subject scopes，不引入任意代码 DSL。
+- [x] 5.2 [P1][M] 实现 generic numeric/boolean/count comparisons；验收：coverage、CRAP、mutation、breaking-change count 等 synthetic metrics 通过同一 evaluator。
+- [x] 5.3 [P1][M] 实现 gate result states：`pass/fail/warning/informational/skipped/unsupported/not_applicable/measurement_error/blocked`；验收：`fail` 与 `measurement_error` 在机器结果和 aggregate 中保持不同原因。
+- [x] 5.4 [P1][M] 实现 fail-closed aggregate；验收：required child gate failure/cancel/measurement_error/blocked/skipped 按配置不能变绿，informational 不影响 required aggregate。
+- [x] 5.5 [P2][M] 输出 machine-readable violation/remediation contract；验收：Agent 可获得 component、subject、metric、base/head、limit、series、evidence links 和 remediation class。
+
+Validation evidence for 5.1–5.5 (GH-114): the
+[policy contract](../../../docs/quality/policy-engine.md),
+[focused evaluator tests](../../../tools/quality/tests/test_policy_engine.py), and
+[actual local validation record](../../../docs/quality/gh-114/validation-summary.json)
+cover typed selectors/comparisons, all distinct result states, required-child
+aggregation and agent remediation records. This is a standalone shadow evaluator;
+ratchet tasks 6.x, Rust migration and required-gate equivalence remain unaccepted.
 
 ## 6. Generalize baseline, debt and ratchet
 
