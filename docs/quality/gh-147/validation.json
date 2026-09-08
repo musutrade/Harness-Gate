@@ -1,0 +1,147 @@
+{
+  "issue": "GH-147",
+  "scope": [
+    "2.1",
+    "2.2"
+  ],
+  "baseline": "5b45cb134f48c29adacacb0760b4bbba5a0218a7",
+  "dependency": {
+    "issue": 146,
+    "pr": 153,
+    "state": "merged; required CI complete before implementation"
+  },
+  "environment": {
+    "CARGO_HOME": "$WORKSPACE/target/cargo-home",
+    "CARGO_TARGET_DIR": "$WORKSPACE/target/build"
+  },
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 0,
+      "result": "323 passed, 0 skipped (315 CLI + 8 candidate library tests)",
+      "log": "nextest-workspace.log"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "fmt-workspace.log"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml --all -- --check",
+      "exit_code": 0,
+      "result": "passed for all workspace packages",
+      "log": "fmt-all-final.log"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 0,
+      "result": "passed for both workspace packages",
+      "log": "clippy-workspace.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 0,
+      "result": "289 passed",
+      "log": "python-workspace.log"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 0,
+      "result": "passed: links, examples, migration, schemas and wording",
+      "log": "docs-consistency.log",
+      "artifact": "docs-consistency.json"
+    },
+    {
+      "command": "openspec validate consolidate-generic-quality-core-into-rust --strict",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "openspec.log"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "result": "passed"
+    }
+  ],
+  "baseline_reference": {
+    "evidence_tests": 18,
+    "project_tests": 9,
+    "result": "passed before implementation"
+  },
+  "differential": {
+    "frozen_cases": 33,
+    "cases": 399,
+    "evidence": 309,
+    "project": 46,
+    "series": 15,
+    "requirements": 29,
+    "unexplained_mismatches": 0
+  },
+  "not_applicable": [
+    {
+      "command": "harness-gate config check",
+      "reason": ".harness-gate/flow.toml absent; no declared ci profile"
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "reason": ".harness-gate/flow.toml absent; no declared ci profile"
+    }
+  ],
+  "resolved_attempts": [
+    {
+      "command": "cargo check --manifest-path tools/harness-gate/Cargo.toml",
+      "log": "check.log",
+      "error": "Read-only file system (os error 30) downloading tinyvec into the global Cargo cache",
+      "resolution": "Workspace-local Cargo home and target; check-retry.log passed."
+    },
+    {
+      "logs": [
+        "focused.log",
+        "nextest.log",
+        "nextest-final.log"
+      ],
+      "resolution": "Fixed JSON syntax/duplicate-key recursion and exact arbitrary-precision typed decoding; final nextest-workspace.log passes."
+    },
+    {
+      "log": "python-unittest.log",
+      "resolution": "Candidate core isolated as a workspace library; CLI production-source inventory preserved. Final python-workspace.log passes."
+    },
+    {
+      "log": "fmt-all.log",
+      "resolution": "Formatted candidate library; fmt-all-final.log passes."
+    }
+  ],
+  "hosted_ci": "pending on final pushed SHA; controller owns required CI acceptance",
+  "authority": "Candidate library only; CLI has no dependency. Existing coverage/risk collectors explicitly select CLI package; no policy, ratchet, report or authority transfer.",
+  "archive": {
+    "path": "validation.tar.gz",
+    "sha256": "1407c211b70cb469ff2d780905f63418f0f4e4640d807513044b400a03b706da",
+    "files": {
+      "baseline-evidence.log": "77b2693c4552deb7cfeaf184bb55ae74819470e912b1684f80715e542734d948",
+      "baseline-project.log": "c55ce1f62fa322e93a2dc27d83872bfafd0d410662d86fc2332dbd070a4316af",
+      "check-retry.log": "11e8b67ccfc0a7bf80bf5acab53c5d4c97679a5b7d0f3859b5b93b0e6bcd1b2c",
+      "check.log": "b1c0647079277cf21bd54b4ff51e4f81c461190ff1097bb2676074eeffa9ac8f",
+      "clippy-final.log": "06089d517618cb8de28cdeb05ac2b7a0e1120b51d5b7365e44da242d9ba54af9",
+      "clippy-workspace.log": "78e0cbc163fb2aae74c9be3dbc8132111194f814d9dec5e77dd49785eed14357",
+      "clippy.log": "3be772aeb193830cc6ab19102dcffffb6ff40b1d46aef0fc6b24f4e60296a6ad",
+      "docs-consistency.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "fmt-all-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "fmt-all.log": "4a08ae27b8fd8e00aad2a94719b62f2181d3cf4c0e1b3d4d80d8a6bc1c7a24dd",
+      "fmt-workspace.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "focused.log": "d4fabce3a7d92da3d43bd565aa2599adb207ec19826adb6ed55f975573835e35",
+      "json-boundary.log": "43866f944e9ec72138fe565993b08a35b6be9c3530fc42c1ddac9a19d24826d9",
+      "nextest-final.log": "a446889ba78bc8b110bf4cb538c192ab7f0e888b6ba7a1f64868a280a8d8ba34",
+      "nextest-workspace.log": "6824955a5d60b9747142ce5f340d4468ee893f8127d6680af90a3f3d08fabbf4",
+      "nextest.log": "dbf2fb16ff67f1ab29383679398bea41a3d0893c81e3e84c035c18d9a5eeac46",
+      "openspec.log": "c278b42501fec6559263d401ab0e6eaefea6dc95b1ac1e4705d604a399f477b1",
+      "python-unittest-final.log": "cfa15bb7ba50643a09fafe91b2ab8ffd1bd42cc6dc442f1e193885e8229e1f31",
+      "python-unittest.log": "6e05c675bc6992912337d81bd3e1cd12e01b9132669c949e60e02b45225070c6",
+      "python-workspace.log": "13d5d7726ad1efc0aace57d7256f0a111299e6add7c376184a7c545221b5df9a",
+      "typed-values-final.log": "fda387364e7455622e3acf4a610cfe3710be15b9973c611c2d936019800a34cf",
+      "typed-values.log": "582d821b58bc8b93de7a0da5b20e01caa93b6f70967f27d3fe6782943eef4a4f",
+      "boundary.json": "319c26ecd0d623e78125d5a057b245ef6e983f10b00521dcf0bce030de451957",
+      "docs-consistency.json": "3cf48542b6912fb1cc5b26b0025eb84db71141601390d41ea3b1b43e24b82f6d"
+    }
+  }
+}
