@@ -127,6 +127,35 @@ class CandidateTests(unittest.TestCase):
 
 
 class CollectionTests(unittest.TestCase):
+    def test_replay_relocation_requires_an_exact_move_in_git(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+
+            def git(*args):
+                return subprocess.check_output(['git', *args], cwd=root, text=True,
+                                               stderr=subprocess.DEVNULL).strip()
+
+            git('init')
+            git('config', 'user.email', 'fixture@example.invalid')
+            git('config', 'user.name', 'Fixture')
+            old, new = (root / name for name in gate.REPLAY_RELOCATION)
+            old.parent.mkdir(parents=True)
+            old.write_text('migration-only replay executable\n')
+            git('add', '.')
+            git('commit', '-m', 'base')
+            base = git('rev-parse', 'HEAD')
+            new.parent.mkdir(parents=True)
+            old.rename(new)
+            git('add', '.')
+            git('commit', '-m', 'move')
+            with patch.object(gate, 'ROOT', root):
+                self.assertEqual(gate.relocated_migration_sources(base, 'HEAD'),
+                                 {gate.REPLAY_RELOCATION[0]})
+                new.write_text('changed executable\n')
+                git('add', '.')
+                git('commit', '-m', 'change')
+                self.assertEqual(gate.relocated_migration_sources(base, 'HEAD'), set())
+
     def test_failure_retains_evidence_and_runs_remaining_stages(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / 'fresh'
