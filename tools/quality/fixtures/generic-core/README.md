@@ -83,3 +83,12 @@ product API. A schema or golden change requires an explicit reviewed compatibili
 delta and new retained validation evidence. Replay never updates goldens. Keep
 this corpus through authority transfer and freeze it afterward until replacement
 coverage is reviewed; do not delete native evidence or baselines during migration.
+
+## Rust differential replay (GH-150)
+
+Tasks 5.1–5.4 add `differential.py`, which verifies this same frozen oracle before
+passing explicit context and retained bytes to the Rust candidate example.
+See [commands, comparator rules and acceptance evidence](../../../../docs/quality/gh-150/README.md).
+The original Python replay above remains available. No golden/schema bytes,
+required gates or release authority change. Both the Rust replay and the Python
+reference remain non-authoritative; authority transfer is still tasks 6–7.

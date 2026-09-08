@@ -46,20 +46,23 @@ def portable_errors(value, work):
     return value
 
 
+def materialize(value, blobs, root):
+    roots = {}
+    for kind in ('source', 'artifact'):
+        destination = root / kind
+        destination.mkdir(parents=True)
+        for name, sha in value['files'][kind].items():
+            model.canonical_path(name)
+            path = destination / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(blobs[sha])
+        roots[kind + '_root'] = destination
+    return dict(project=value['project'], expected=value['expected'], **roots)
+
+
 def evaluate(case, blobs, work):
     def context(side):
-        value = case[side]
-        roots = {}
-        for kind in ('source', 'artifact'):
-            root = work / side / kind
-            root.mkdir(parents=True)
-            for name, sha in value['files'][kind].items():
-                model.canonical_path(name)
-                path = root / name
-                path.parent.mkdir(parents=True, exist_ok=True)
-                path.write_bytes(blobs[sha])
-            roots[kind + '_root'] = root
-        return dict(project=value['project'], expected=value['expected'], **roots)
+        return materialize(case[side], blobs, work / side)
 
     head = context('head')
     result = {}
@@ -84,7 +87,7 @@ def evaluate(case, blobs, work):
     return portable_errors(result, work)
 
 
-def replay(root=ROOT):
+def load_corpus(root=ROOT):
     manifest = evidence.load_json(root / 'manifest.json')
     if manifest['schema'] != 'generic-core-corpus/v1':
         raise ValueError('unknown corpus schema')
@@ -103,6 +106,11 @@ def replay(root=ROOT):
             if digest(data) != member.name:
                 raise ValueError('changed corpus blob: ' + member.name)
             blobs[member.name] = data
+    return manifest, blobs
+
+
+def replay(root=ROOT):
+    manifest, blobs = load_corpus(root)
     results = []
     with tempfile.TemporaryDirectory() as directory:
         for item in manifest['cases']:
