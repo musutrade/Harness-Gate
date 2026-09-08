@@ -87,3 +87,21 @@ requested capability SHALL have an explicit state in each returned record.
 - **WHEN** the runner times out
 - **THEN** it kills the process group and returns `timeout`.
 - **AND** this process cleanup does not claim an operating-system sandbox.
+
+### Requirement: Retain same-run advisory shadow evidence
+Generic shadow CI SHALL consume the existing Rust collection artifact from the
+same workflow run and attempt, verify the original base/head/run identity, and
+retain projection and compatibility reports on success or failure. It SHALL NOT
+repeat Rust test, coverage, risk or matrix collection.
+
+#### Scenario: Missing or partial current-run collection
+- **GIVEN** the current Rust collection fails or its artifact is missing
+- **WHEN** the advisory shadow job runs
+- **THEN** it reports a comparison or measurement error where execution is available
+- **AND** it does not substitute another run or manufacture successful acceptance.
+
+#### Scenario: Required authority remains unchanged
+- **GIVEN** the generic shadow job disagrees with the current Rust result
+- **WHEN** CI evaluates release eligibility
+- **THEN** `Required Quality Aggregate` retains its existing name, dependencies and fail-closed behavior
+- **AND** Rust remains the sole required authority while the disagreement blocks equivalence acceptance.

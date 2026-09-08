@@ -89,3 +89,12 @@ the adapter rejects it as incompatible. GH-97 is a retained passing candidate,
 not an accepted production baseline. No fixture invents missing historical
 coverage or implies a baseline approval. See the
 [validation record](gh-116-validation.md) for actual checks and limitations.
+
+## Generic shadow rollout and acceptance
+
+GH-118 adds an advisory workflow that downloads the current collection artifact
+and uses the same base/head/run identities. The [defined two-run acceptance
+window](rust-equivalence-acceptance.md), [validation evidence](gh-118-validation.md)
+and [ADR-0040](../adr/0040-language-agnostic-evidence-policy.md) record completed
+local equivalence validation. Rust remains the sole required release authority;
+changing that authority requires a separate reviewed rollout.

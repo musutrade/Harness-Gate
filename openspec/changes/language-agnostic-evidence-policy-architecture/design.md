@@ -486,5 +486,24 @@ The [implementation contract and executable examples](../../../docs/quality/proj
 record metric semantics, baseline trust boundaries and additive compatibility.
 The four-language topology is synthetic; no second reference ecosystem or
 OpenAPI tool adapter is certified. The [validation record](../../../docs/quality/gh-117-validation.md)
-covers this scoped implementation. Tasks 10.1–10.5, the final architecture ADR
-and full proposal acceptance remain pending.
+covers this scoped implementation.
+
+## GH-118 shadow rollout and scoped equivalence acceptance
+
+The advisory `Generic Quality Shadow` job depends only on the existing Rust
+collection job. It downloads that run/attempt artifact and projects the original
+base/head/run context without another collection. Upload preserves normalized
+evidence, policy and compatibility reports even on failure. The required
+aggregate keeps its name, dependencies and fail-closed behavior. Rust remains
+the sole release authority.
+
+The [pinned acceptance window](../../../docs/quality/rust-equivalence-acceptance.md)
+requires both GH-96 and GH-97 retained runs at two distinct head commits, plus
+all negative adapter fixtures. This retrospective window passed locally with no
+unexplained outcome, debt, unsupported-state or measurement-error differences.
+It does not claim a hosted soak or certify additional series or ecosystems.
+[ADR-0040](../../../docs/adr/0040-language-agnostic-evidence-policy.md) records
+noninterchangeable series, collector/policy separation and the fail-closed trust
+boundary. The [validation record](../../../docs/quality/gh-118-validation.md)
+covers tasks 10.1–10.4; required hosted CI, task 10.5 and full proposal acceptance
+remain pending. Any authority replacement requires a separate reviewed rollout.

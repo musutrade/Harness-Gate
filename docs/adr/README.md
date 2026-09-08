@@ -59,6 +59,8 @@ We use a simplified version of the Michael Nygard ADR template:
 
 - [ADR-0039](0039-required-risk-and-traceability-gates.md) - Require coverage, risk and traceability evidence in CI
 
+- [ADR-0040](0040-language-agnostic-evidence-policy.md) - Keep language-agnostic evidence and policy behind a fail-closed migration boundary
+
 ## Creating New ADRs
 
 When making a significant architectural decision:
