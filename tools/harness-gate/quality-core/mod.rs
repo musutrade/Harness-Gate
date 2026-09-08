@@ -1,12 +1,14 @@
-//! Candidate generic semantics for OpenSpec tasks 2.1–3.2. No release authority.
+//! Candidate generic semantics for OpenSpec tasks 2.1–4.2. No release authority.
 // CLI integration is deliberately deferred to the replay/authority tasks.
 
 mod comparison;
+pub mod cross_component;
 pub mod evidence;
 mod json;
 pub mod model;
 pub mod policy;
 pub mod project;
+pub mod project_report;
 pub mod ratchet;
 mod schema;
 
