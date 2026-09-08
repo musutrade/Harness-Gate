@@ -113,3 +113,13 @@ component/local/cross-component aggregates using existing policy requiredness.
 Python reference and confirms that green local gates cannot hide a breaking
 provider/consumer contract. This is candidate-library implementation only;
 replay acceptance and authority transfer remain separate tasks.
+
+## Non-authoritative Rust replay acceptance (GH-150)
+
+OpenSpec tasks 5.1–5.4 add an explicit-context Rust replay/comparator and exercise
+the retained Rust, TypeScript/Angular and contract corpora without native
+recollection. [GH-150 evidence](../quality/gh-150/README.md) retains field-level
+comparison results and the consolidated fail-closed matrix. The entry point is a
+candidate-library Cargo example, outside the installed CLI. Existing Rust required
+gates and release authority remain unchanged. Hosted shadow integration, authority
+transfer and Python disposition remain separate tasks 6–7.
