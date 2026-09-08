@@ -48,6 +48,12 @@ Rename, move and split lineage SHALL identify exact retired base and new head su
 - **WHEN** historical identity inheritance is requested
 - **THEN** validation or lookup fails closed.
 
+#### Scenario: Map a content edit without weakening identity
+- **GIVEN** a retired source identity and a new identity with the same component, target, boundary, kind, path and discriminator
+- **WHEN** a one-to-one `modify` mapping explicitly binds their exact IDs
+- **THEN** source-digest or span changes retain reviewed lineage
+- **AND** changes to the locator or target cannot masquerade as a modification.
+
 ### Requirement: Model cross-component relationships
 Harness-Gate SHALL support explicit relationships between components and subjects so that cross-component gates can bind producers, consumers, and shared contracts.
 
