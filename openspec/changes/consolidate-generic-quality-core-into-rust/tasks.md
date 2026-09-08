@@ -32,10 +32,12 @@ Validation: [GH-149 implementation and evidence](../../../docs/quality/gh-149/RE
 
 ## 5. Differential acceptance
 
-- [ ] 5.1 [P1][L] Add a non-authoritative Rust differential replay entry point and comparator; acceptance: it consumes explicit project/policy/evidence/base/selection/source/artifact context and reports field-level mismatches without recollecting native evidence.
-- [ ] 5.2 [P1][M] Run retained Rust-corpus acceptance; acceptance: zero unexplained semantic mismatches across positive and negative cases, with all current Rust required gates unchanged.
-- [ ] 5.3 [P1][M] Run retained TypeScript/Angular-corpus acceptance; acceptance: exact accepted counters and generic outcomes reproduce with zero unexplained mismatches, including source identity, unsupported states and contract failures.
-- [ ] 5.4 [P1][M] Run the consolidated negative matrix; acceptance: missing/stale/tampered evidence, ambiguous identity, unsupported required capability, malformed value, incompatible series, missing base, invalid exception and provenance/contract errors remain fail-closed.
+- [x] 5.1 [P1][L] Add a non-authoritative Rust differential replay entry point and comparator; acceptance: it consumes explicit project/policy/evidence/base/selection/source/artifact context and reports field-level mismatches without recollecting native evidence.
+- [x] 5.2 [P1][M] Run retained Rust-corpus acceptance; acceptance: zero unexplained semantic mismatches across positive and negative cases, with all current Rust required gates unchanged.
+- [x] 5.3 [P1][M] Run retained TypeScript/Angular-corpus acceptance; acceptance: exact accepted counters and generic outcomes reproduce with zero unexplained mismatches, including source identity, unsupported states and contract failures.
+- [x] 5.4 [P1][M] Run the consolidated negative matrix; acceptance: missing/stale/tampered evidence, ambiguous identity, unsupported required capability, malformed value, incompatible series, missing base, invalid exception and provenance/contract errors remain fail-closed.
+
+Validation: [GH-150 replay and acceptance evidence](../../../docs/quality/gh-150/README.md); 329 Rust tests and 289 Python tests pass. The standalone comparator replays all 33 frozen cases (14 Rust, 16 Angular, 3 contract) with zero unexplained mismatches. Full outputs and 227 classified missing-file diagnostic variations are retained. Twelve explicit negative categories and the existing 399 evidence/project and 826 policy/report comparisons remain fail-closed. Formatting, Clippy, docs consistency and strict OpenSpec validation pass. No required CI definition or release authority changes; hosted CI on the final submitted SHA remains pending for the controller. Tasks 6–7 and full proposal acceptance remain outstanding.
 
 ## 6. Transfer generic semantic authority
 
