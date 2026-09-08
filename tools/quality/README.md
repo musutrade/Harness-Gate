@@ -4,15 +4,16 @@ This directory contains Python CI tooling, ecosystem adapters, generic shadow
 semantics and migration references. The [frozen product-boundary inventory](../../docs/quality/gh-146/python-boundary.md)
 classifies every production module and records its callers, authority and final
 disposition. These modules are not linked into, packaged with, or executed by
-the `harness-gate` release binary. Generic semantics are scheduled to move into
-Rust after differential acceptance; this freeze does not transfer authority.
+the `harness-gate` release binary. After GH-151 hosted acceptance, `harness-gate quality evaluate` owns authoritative
+generic decisions and reporting in Rust. Python remains collection, CI and reference
+tooling; final C-class module dispositions belong to task 7.
 The [shared compatibility corpus](fixtures/generic-core/README.md) retains exact
 inputs, full expected outputs and native/source bytes for that migration.
 
-[GH-151](../../docs/quality/gh-151/README.md) prepares the Rust product command and
-opt-in differential workflow. Its explicit transfer review awaits
-hosted required CI and Rust shadow acceptance; the presence
-of that command does not accept or replace required CI authority.
+[GH-151](../../docs/quality/gh-151/README.md) records the exact hosted candidate
+acceptance, retained comparisons, separate authority switch and rollback. The
+opt-in differential workflow retains both engines. Existing required CI names,
+dependencies and release authority remain unchanged.
 
 Run from the repository root with Python >=3.12, stable Rust plus
 `llvm-tools-preview`, cargo-nextest and cargo-llvm-cov **0.9.0** installed.

@@ -232,3 +232,21 @@ The required Rust suite includes complete frozen replay and consolidated negativ
 assertions alongside the existing reference boundary comparisons. See
 [GH-150 acceptance evidence](../../../docs/quality/gh-150/README.md). No required
 workflow or release authority changes; tasks 6–7 remain outstanding.
+
+## Task 6 hosted acceptance and authority transfer
+
+GH-151 accepts reviewed candidate `0fc96d7644d623f31e31fe1a512cb68db0b2003b`
+after hosted shadow and all existing required CI passed, with all 33 retained
+cases, the negative matrix and zero unresolved mismatches. The
+[explicit decision and raw evidence](../../../docs/quality/gh-151/README.md)
+retain the candidate, hosted merge checkout, comparisons and rollback. A distinct
+transfer commit enables the released `quality evaluate` Rust entry point; its
+identity and final hosted validation are recorded in PR #158.
+
+Collectors retain protocol v1 and only measure. Generic evaluation and report
+construction use the linked Rust core without a Python runtime. The legacy
+report mode remains wire-compatible. The required aggregate and its dependencies
+are unchanged; shadow output cannot replace a required check. The operator's
+versioned measurement extensions include linked core production outside `src/`
+with identical analyzer/thresholds on authentic base/head series. Task 7 remains
+outside this issue, and this record does not accept the full proposal.
