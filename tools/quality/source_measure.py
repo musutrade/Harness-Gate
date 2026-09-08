@@ -212,16 +212,16 @@ def measure(manifest: dict, llvm: dict, crate: Path, binary: Path) -> list[dict]
     return result
 
 
-def compare(base: dict, head: dict) -> dict:
+def compare(base: dict, head: dict, *, series=SERIES, hotspots=HOTSPOTS) -> dict:
     """Apply the documented incremental ratchet without losing closure debt."""
-    require(base["series"] == head["series"] == SERIES, "incompatible base/head series")
+    require(base["series"] == head["series"] == series, "incompatible base/head series")
     require(base["tools"] == head["tools"], "incompatible base/head measurement tools")
     for report in (base, head):
-        require({r["source"] for r in report["functions"]} == set(HOTSPOTS), "incomplete selected source inventory")
-        for source, names in HOTSPOTS.items():
+        require({r["source"] for r in report["functions"]} == set(hotspots), "incomplete selected source inventory")
+        for source, names in hotspots.items():
             require(any(r["source"] == source and r["name"] == names[0] for r in report["functions"]),
                     f"missing original hotspot: {source}")
-    for source, names in HOTSPOTS.items():
+    for source, names in hotspots.items():
         require(all(any(r["source"] == source and r["name"] == name for r in head["functions"])
                     for name in names), f"missing extracted hotspot: {source}")
     old = defaultdict(list)
@@ -232,7 +232,7 @@ def compare(base: dict, head: dict) -> dict:
         matches = old[(row["source"], row["kind"], row["syntax_sha256"])]
         previous = matches.pop(0) if matches else None
         changed = previous is None
-        selected = row["name"] in HOTSPOTS[row["source"]]
+        selected = row["name"] in hotspots[row["source"]]
         high_risk = selected or (changed and row["cc"] > 10)
         from fractions import Fraction
         passed = row["passed"] if high_risk else (Fraction(*row["crap_exact"]) <= 30 if changed else True)
@@ -245,8 +245,8 @@ def compare(base: dict, head: dict) -> dict:
         decisions.append(identity)
         if not passed:
             failures.append(f"{row['source']}::{row['name']}")
-    return {"series": SERIES, "identities": decisions, "failures": failures,
-            "decompositions": HOTSPOTS,
+    return {"series": series, "identities": decisions, "failures": failures,
+            "decompositions": hotspots,
             "retired_or_changed_base": [{k: r[k] for k in ("source", "name", "span", "syntax_sha256")}
                 for rows in old.values() for r in rows]}
 

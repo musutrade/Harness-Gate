@@ -1,0 +1,143 @@
+{
+  "issue": "GH-116",
+  "scope": [
+    "7.1",
+    "7.2",
+    "7.3",
+    "7.4",
+    "7.5"
+  ],
+  "validation_context": "Working-tree validation from f00d001d4ad8933a37c6b748ae44cde369656597; source hashes below identify implementation tested.",
+  "environment_override": {
+    "CARGO_TARGET_DIR": "/home/gem/symphony-workspaces/GH-116/target/gh-116-cargo"
+  },
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 0,
+      "result": "315 passed, 0 skipped",
+      "log": "nextest.log"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "fmt.log"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "clippy.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 0,
+      "result": "190 passed",
+      "log": "python.log"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "docs-consistency.log"
+    },
+    {
+      "command": "openspec validate language-agnostic-evidence-policy-architecture --strict",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "openspec.log"
+    },
+    {
+      "command": "python3 tools/quality/rust_reference.py --candidate target/quality/gh-116/history/candidate.json --head-sha 381d5f418655969d29b81f89069845e6667f35c9 --base-sha 381d5f418655969d29b81f89069845e6667f35c9 --run-id gh97-final-local --output target/quality/gh-116/final-shadow",
+      "exit_code": 0,
+      "result": "compatible; current pass; generic pass; migration_blocked false",
+      "log": "shadow-cli.log"
+    }
+  ],
+  "not_applicable": [
+    {
+      "command": "harness-gate config check",
+      "reason": ".harness-gate/flow.toml is absent; no declared project-local ci profile"
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "reason": ".harness-gate/flow.toml is absent; no declared project-local ci profile"
+    }
+  ],
+  "before_change": {
+    "command": "python3 -m unittest discover -s tools/quality/tests -v",
+    "exit_code": 0,
+    "result": "177 passed",
+    "log": "before-python.log"
+  },
+  "historical_shadow": {
+    "schema": "rust-reference-shadow/v1",
+    "mode": "shadow",
+    "authoritative": "rust",
+    "identity": {
+      "base_commit": "381d5f418655969d29b81f89069845e6667f35c9",
+      "commit": "381d5f418655969d29b81f89069845e6667f35c9",
+      "run": "gh97-final-local",
+      "target": "x86_64-unknown-linux-gnu"
+    },
+    "candidate_sha256": "81d0f9c1487c59edd077cdac8f30fc7e29049c497cbe73d51fcc87dd954f6530",
+    "state": "compatible",
+    "compatible": true,
+    "migration_blocked": false,
+    "compatibility_failures": [],
+    "current_state": "pass",
+    "generic_state": "pass",
+    "current_stages": {
+      "legacy": {
+        "seconds": 75.63862280399917,
+        "status": "success"
+      },
+      "matrix": {
+        "seconds": 252.11926128400228,
+        "status": "success"
+      },
+      "production": {
+        "seconds": 2.252278769003169,
+        "status": "success"
+      },
+      "risk": {
+        "seconds": 66.62991042799695,
+        "status": "success"
+      }
+    },
+    "functions": 212,
+    "legacy_debt": 75,
+    "retained_artifacts": 137,
+    "production_aggregate": {
+      "blockers": [],
+      "state": "pass"
+    },
+    "risk_aggregate": {
+      "blockers": [],
+      "state": "pass"
+    }
+  },
+  "limitations": [
+    "No required gate replaced; hosted required CI pending.",
+    "Accepted Phase 1 performance baseline retains its original incompatible series; GH-97 is not an accepted production baseline.",
+    "No new coverage collection or baseline acceptance."
+  ],
+  "delivery_environment": {
+    "command": "git add tools/quality/rust_reference.py",
+    "exit_code": 128,
+    "error": "fatal: Unable to create '/home/gem/symphony-workspaces/GH-116/.git/index.lock': Read-only file system",
+    "resolution": "Copy only this workspace Git metadata to target/gh-116-git for commit/push on symphony/GH-116."
+  },
+  "source_sha256": {
+    "tools/quality/rust_reference.py": "415282990af074f3ada3dcd4f7b783e13aa0f2a1f28700254724b8b1c66c8a0a",
+    "tools/quality/harness_evidence.py": "98a84b640bf5628e09bd96772cf1f3a7174e37f79bfa4cd6cc1abc2ed0fbac0e",
+    "tools/quality/policy_engine.py": "5e28ce282dcee15c25525facbce4d0aca1602f0be246379a8555619b146f291c",
+    "tools/quality/source_measure.py": "ae9adec849d35fede7b056f74a2389a7986b3671cd9948d660f9d632d731486d",
+    "tools/quality/schema/harness-evidence.schema.json": "81e30a003a5fed7309ac4f8919ddf3730fd7d981389d105af1a9dcd7d4180330",
+    "tools/quality/schema/policy.schema.json": "dc24c1694cbfe8910ffe3d3d2fb15256665c5a91e21de659b22173a0a56934d1",
+    "tools/quality/tests/test_rust_reference.py": "9a22bdb583d6f28d54bca10bf5094eb38bbafcbf425cb5b8ca8f1d7855b263ab",
+    "tools/quality/tests/test_harness_evidence.py": "75bc6f412fd2d22b6a8c66b0279957cef8cfeeecaefede8bd5351a0a26b953f5",
+    "tools/quality/fixtures/rust-reference/history.json": "fe449aceb02a62ab1d8c998af6fdefb7777d3230cc3a30e01e61e5e32185026f"
+  }
+}

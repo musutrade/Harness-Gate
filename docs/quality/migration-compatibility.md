@@ -51,3 +51,7 @@ and capability limits, and treat any outcome/debt/provenance mismatch as a
 blocking compatibility failure. Neither this inventory nor local validation
 constitutes Rust equivalence acceptance or baseline approval. ADR-0039 remains
 the accepted authority; the full architecture ADR belongs to task 10.4.
+
+GH-116 adds the [Rust reference adapter](rust-reference-adapter.md) and
+[historical compatibility validation](gh-116-validation.md) for tasks 7.1–7.5.
+The current Rust required gates and baseline approval rules remain authoritative.
