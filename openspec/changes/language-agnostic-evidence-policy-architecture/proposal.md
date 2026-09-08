@@ -1,6 +1,6 @@
 # Proposal: Language-Agnostic Evidence and Policy Architecture
 
-**Status:** Draft — entry criteria satisfied; project-model contracts landed in GH-111; normalized evidence/capability contracts landed in GH-112; collector boundary tasks 4.1–4.4 landed in GH-113; generic policy tasks 5.1–5.5 landed in GH-114; baseline/debt/ratchet tasks 6.1–6.4 landed in GH-115; Rust shadow adapter tasks 7.1–7.5 landed in GH-116; cross-component/reporting tasks 8.1–8.3 and 9.1–9.3 landed in GH-117; shadow CI, retrospective Rust equivalence and ADR tasks 10.1–10.4 are locally validated and under review in GH-118; task 10.5, full proposal acceptance and required-gate migration remain pending.
+**Status:** Closure prepared in GH-119 — tasks 0.3–10.4 accepted through merged PRs and successful required CI; task 10.5 creates the independent TypeScript/Angular proposal. Final required CI and controller acceptance remain pending. Generic stability across ecosystems and required-gate migration are not claimed. See the [closure ledger](../../../docs/quality/architecture-closure.md).
 **Date:** 2026-09-08  
 **Review baseline:** `ad54d8df6d21d3f6e3a0b5ee83918ae078a84d61` (`main`)  
 **Depends on:** the completed `strict-json-results-and-risk-based-quality-gates` delivery series and its accepted/recorded Rust quality contracts.  
@@ -133,3 +133,12 @@ path; adapters should project already-retained evidence whenever possible.
 - ADR-0025: Phase 1 quality gates
 - ADR-0039: Required risk and traceability gates
 - ADR-0034: Fail-closed trust boundaries
+
+## Closure and next change
+
+The [acceptance ledger](../../../docs/quality/architecture-closure.md) links every
+preceding task range to merged PR, required CI and validation evidence. The
+[independent TypeScript/Angular proposal](../typescript-angular-reference-adapter/proposal.md)
+validates the abstraction with real second-ecosystem collection; its tasks are
+unimplemented. Its design explicitly records identity and capability mismatches.
+Final closure requires GH-119 required CI and controller acceptance.
