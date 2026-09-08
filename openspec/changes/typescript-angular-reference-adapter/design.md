@@ -24,7 +24,7 @@ four fresh native runs retain clean Git revisions, exact counters and matching
 generic outcomes/debt for a compatible change and a real coverage regression.
 The negative matrix reproduces integrity, identity, capability, series and
 collection failures. No new architecture mismatch or generic contract delta is
-introduced. Certification and review remain tasks 4.2–4.3.
+introduced. GH-135 task 4.2 adds [opt-in advisory replay and local validation](../../../docs/quality/gh-135/README.md) and the [bounded certification matrix](../../../docs/quality/typescript-certification.md), including reproducer/evidence links for TS-01–TS-04 and rollback. Required hosted validation for task 4.2 and final task 4.3 review remain pending.
 
 The application will have a component with an external template, a service with
 tested and untested branches, same-named methods in distinct classes, a lazy
