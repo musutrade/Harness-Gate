@@ -114,12 +114,13 @@ class Collector:
             manifest = self.directory / f'{label}-manifest.json'
             self.python(f'{label}-prepare', 'source_measure.py', 'prepare', '--crate', crate,
                         '--binary', binary, '--manifest', manifest)
+            # Measure the established CLI package on both sides of the baseline.
             cargo_manifest = str(crate / 'Cargo.toml')
-            self.command(f'{label}-coverage', ['cargo', 'llvm-cov', 'nextest', '--locked',
+            self.command(f'{label}-coverage', ['cargo', 'llvm-cov', 'nextest', '--package', 'harness-gate', '--locked',
                          '--manifest-path', cargo_manifest, '--json', '--output-path',
                          str(self.directory / f'{label}-coverage.json')])
             for flag, suffix in (('--lcov', 'lcov'), ('--cobertura', 'cobertura.xml')):
-                self.command(f'{label}-{suffix}', ['cargo', 'llvm-cov', 'report', '--manifest-path',
+                self.command(f'{label}-{suffix}', ['cargo', 'llvm-cov', 'report', '--package', 'harness-gate', '--manifest-path',
                              cargo_manifest, flag, '--output-path', str(self.directory / f'{label}-coverage.{suffix}')])
             # A complete base report may contain historical selected failures.
             # The compare command enforces every selected head threshold.

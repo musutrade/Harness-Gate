@@ -37,10 +37,13 @@ EXCLUDED_FILES = {"scope/benchmark.rs"}
 def run(output: Path, threshold: float, production: bool = False) -> int:
     raw = output.with_name("coverage.raw.json")
     raw.parent.mkdir(parents=True, exist_ok=True)
+    # Keep the existing CLI measurement boundary; the candidate workspace crate
+    # has its own differential tests and has not transferred semantic authority.
     subprocess.run(
         [
             "cargo",
             "llvm-cov",
+            "--package", "harness-gate",
             "--manifest-path",
             str(CRATE / "Cargo.toml"),
             "--locked",
@@ -56,6 +59,7 @@ def run(output: Path, threshold: float, production: bool = False) -> int:
             [
                 "cargo",
                 "llvm-cov",
+                "--package", "harness-gate",
                 "--manifest-path",
                 str(CRATE / "Cargo.toml"),
                 "--locked",
