@@ -14,6 +14,8 @@ import unittest
 
 QUALITY, WORK = map(lambda p: Path(p).resolve(), sys.argv[1:])
 sys.path[:0] = [str(QUALITY), str(QUALITY / 'tests')]
+sys.path.insert(0, str(QUALITY / 'fixtures/generic-core'))
+import replay
 import harness_evidence as evidence
 import project_model as project
 import policy_engine as engine
@@ -69,8 +71,8 @@ def evaluate_case(name, args, kwargs, frozen=None):
         expected = dict(accepted=True, value=frozen['policy_result']) if 'policy_result' in frozen else dict(
             accepted=False, **frozen['evaluation_error'])
         # Only temporary root paths change from the retained corpus.
-        canonical = json.loads(json.dumps(oracle).replace(str(WORK / name), '$CASE_ROOT'))
-        assert canonical == expected, name
+        canonical = replay.portable_errors(oracle, WORK / name)
+        assert replay.oracle_matches(expected, canonical), name
     cases.append(dict(name=name, kind='evaluate', args=plain(args), kwargs=plain(kwargs),
                       oracle=oracle))
     if oracle["accepted"]:

@@ -77,10 +77,10 @@ fn assert_outcome(case: &Value, result: Result<Value>) {
                     "{}: {message} versus {expected}",
                     case["name"]
                 );
-            } else if expected.starts_with("artifact/source ") && expected.contains("No such file")
-            {
+            } else if super::replay::missing_file_source(expected).is_some() {
                 assert!(
-                    message.starts_with("artifact/source ") && message.contains("No such file"),
+                    super::replay::missing_file_source(&message)
+                        == super::replay::missing_file_source(expected),
                     "{message}"
                 );
             } else {
@@ -228,10 +228,12 @@ fn source_and_artifact_bytes_are_verified_at_the_boundary() {
             ctx.artifact_root = temp.path();
         }
         let records = json!([record]);
-        assert!(evidence::validate_evidence(&records, &ctx)
-            .unwrap_err()
-            .message
-            .contains("No such file"));
+        assert!(super::replay::missing_file_source(
+            &evidence::validate_evidence(&records, &ctx)
+                .unwrap_err()
+                .message
+        )
+        .is_some());
         fs::create_dir(&target).unwrap();
         assert_eq!(
             evidence::validate_evidence(&records, &ctx)

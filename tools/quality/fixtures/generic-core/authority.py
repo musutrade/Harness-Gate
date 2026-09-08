@@ -32,11 +32,7 @@ def compare(expected, actual, path=''):
     if isinstance(expected, list) and isinstance(actual, list) and len(expected) == len(actual):
         return [diff for i, (left, right) in enumerate(zip(expected, actual))
                 for diff in compare(left, right, path + '/' + str(i))]
-    diagnostic = (path.endswith('/reason') and isinstance(expected, str)
-                  and isinstance(actual, str)
-                  and all(value.startswith('artifact/source ') and
-                          'No such file or directory' in value for value in (expected, actual))
-                  and expected.split(': ')[0] == actual.split(': ')[0])
+    diagnostic = replay.oracle_matches(expected, actual, path)
     return [dict(path=path, expected=expected, actual=actual,
                  classification='os-missing-file-wording' if diagnostic else 'mismatch')]
 
