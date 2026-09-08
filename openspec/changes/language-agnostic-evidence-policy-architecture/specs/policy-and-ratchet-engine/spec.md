@@ -95,3 +95,22 @@ requested target. Missing required subject measurements SHALL NOT disappear.
 - **WHEN** typed limits are evaluated across heterogeneous subjects
 - **THEN** the same exact comparison implementation evaluates each measurement
 - **AND** unavailable values are never converted into numerical success.
+
+### Requirement: Define and retain Rust equivalence acceptance
+Rust equivalence acceptance SHALL require the two hash-pinned GH-96 and GH-97
+retained runs at distinct head commits in the GH-118 window manifest, with their
+original base/head/run identities, and the complete adversarial adapter suite
+without skips. Any difference in gate outcomes, debt classification, unsupported
+states or measurement-error semantics SHALL block acceptance. This retrospective
+acceptance SHALL NOT change release authority or accept a new baseline.
+
+#### Scenario: Replayed window and negative measurement fixtures
+- **GIVEN** both pinned archives and the versioned evaluator
+- **WHEN** the acceptance runner evaluates the window and negative fixtures
+- **THEN** it retains evaluator hashes, per-run results and fixture outcomes
+- **AND** missing or duplicated runs, altered archives or failed fixtures prevent acceptance.
+
+#### Scenario: Green aggregate conceals unsupported-state drift
+- **GIVEN** an optional Rust measurement is unsupported
+- **WHEN** a generic result changes it to success or measurement error, or omits the gate
+- **THEN** equivalence acceptance fails even if the aggregate would otherwise pass.
