@@ -199,12 +199,14 @@ jobs:
         run: cargo install cargo-tarpaulin --locked --force
 
       - name: Generate coverage
-        run: cargo tarpaulin --manifest-path tools/harness-gate/Cargo.toml --out Xml --output-dir coverage
+        # The full CLI corpus spawns Rust subprocesses through Python. LLVM
+        # instrumentation avoids ptrace overhead while retaining those tests.
+        run: cargo tarpaulin --manifest-path tools/harness-gate/Cargo.toml --locked --engine llvm --timeout 300 --out Xml --output-dir "$GITHUB_WORKSPACE/coverage"
 
       - name: Upload to Codecov
         uses: codecov/codecov-action@v5
         with:
-          files: tools/harness-gate/coverage/cobertura.xml
+          files: coverage/cobertura.xml
           fail_ci_if_error: false
 
   quality-coverage:
