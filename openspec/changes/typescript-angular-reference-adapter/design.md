@@ -14,8 +14,10 @@ Compatibility is demonstrated by these operations, not inferred from the
 synthetic frontend fixture. GH-130 tasks 2.1–2.2 add the [identity and measurement semantics](../../../docs/quality/typescript-source-semantics.md).
 TS-01/TS-02 are resolved within that bounded scope. GH-131 task 3.1 adds the
 [retained collector](../../../docs/quality/typescript-collector.md) and resolves
-TS-03 without a generic contract change. Policy acceptance and certification
-remain later tasks.
+TS-03 without a generic contract change. GH-132 task 3.2 adds [generic policy validation](../../../docs/quality/gh-132/README.md)
+using native retained replay and explicitly controlled policy derivations alongside
+the Rust reference gates. Real contract integration, fresh native acceptance pairs
+and certification remain later tasks.
 
 The application will have a component with an external template, a service with
 tested and untested branches, same-named methods in distinct classes, a lazy
