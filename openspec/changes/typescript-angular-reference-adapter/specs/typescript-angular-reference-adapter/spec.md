@@ -81,6 +81,12 @@ their provenance and block incompatible contracts.
 - **WHEN** generic policy evaluates compatibility and generated-client drift evidence
 - **THEN** the contract gate blocks project pass with raw evidence links.
 
+#### Scenario: Contract measurement cannot establish trustworthy facts
+- **GIVEN** failed contract measurement, missing artifacts, a stale generated client,
+  or tool/invocation/component provenance that does not match the measured subjects
+- **WHEN** the adapter and generic gates evaluate the contract
+- **THEN** the project cannot pass, and tool-specific parsing remains outside generic policy.
+
 ### Requirement: Record and review architectural mismatches
 Every discovered mismatch SHALL retain a reproducer, affected generic contract,
 expected/actual behavior and disposition. Required core changes SHALL receive
