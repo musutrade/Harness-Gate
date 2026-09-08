@@ -112,6 +112,14 @@ Rust required-check identity and authority SHALL remain unchanged.
 - **THEN** only evidenced capabilities are certified
 - **AND** no required gate, other ecosystem or unmeasured platform is enabled.
 
+#### Scenario: Opt-in retained advisory replay and rollback
+- **GIVEN** the locked retained coverage window and native contract artifacts
+- **WHEN** the separate manual advisory workflow is dispatched
+- **THEN** the existing adapter/evidence/policy flow and negative fixtures replay without duplicate native collection
+- **AND** machine-readable reports and raw evidence are retained even on failure
+- **AND** disabling the workflow or opt-in adapter selection preserves evidence and accepted baselines
+- **AND** Rust required dependencies, aggregate identity and release authority remain unchanged.
+
 ## Implementation and review
 
 Follow the ordered sub-four-hour [tasks](../../tasks.md); their acceptance
