@@ -52,10 +52,16 @@ Required CI remains pending; later tasks and full architecture acceptance remain
 
 ## 4. Separate collector adapters from policy
 
-- [ ] 4.1 [P1][M] 定义 collector request/response protocol；验收：request 包含 project/component、commit/target、requested capabilities、workspace/output roots 和 collection parameters，response 只返回 evidence/artifacts/error，不返回最终 release decision。
-- [ ] 4.2 [P1][L] 实现 core collector runner 与 evidence validation boundary；验收：subprocess 非零、超时、输出越界、malformed JSON、未声明 artifact 都有 typed failure。
-- [ ] 4.3 [P2][M] 支持 internal/reference adapter 使用与 external subprocess 相同的 evidence contract；验收：policy engine 不需要知道 adapter 是内部还是外部。
-- [ ] 4.4 [P2][M] 增加 synthetic collector fixtures；验收：至少覆盖成功、unsupported、measurement error、stale commit、duplicate subject、artifact tamper。
+- [x] 4.1 [P1][M] 定义 collector request/response protocol；验收：request 包含 project/component、commit/target、requested capabilities、workspace/output roots 和 collection parameters，response 只返回 evidence/artifacts/error，不返回最终 release decision。
+- [x] 4.2 [P1][L] 实现 core collector runner 与 evidence validation boundary；验收：subprocess 非零、超时、输出越界、malformed JSON、未声明 artifact 都有 typed failure。
+- [x] 4.3 [P2][M] 支持 internal/reference adapter 使用与 external subprocess 相同的 evidence contract；验收：policy engine 不需要知道 adapter 是内部还是外部。
+- [x] 4.4 [P2][M] 增加 synthetic collector fixtures；验收：至少覆盖成功、unsupported、measurement error、stale commit、duplicate subject、artifact tamper。
+
+GH-113 validation: [collector protocol and boundary](../../../docs/quality/collector-protocol.md)
+(tasks 4.1–4.3), [synthetic adapter fixtures](../../../tools/quality/fixtures/collectors/README.md)
+(task 4.4), and [local results and retained evidence](../../../docs/quality/gh-113-validation.md).
+The focused collector suite validates both transports and typed negative paths.
+Required CI remains pending; later tasks and full architecture acceptance remain unchecked.
 
 ## 5. Implement the generic policy engine
 

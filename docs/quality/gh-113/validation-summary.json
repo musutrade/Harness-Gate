@@ -1,0 +1,114 @@
+{
+  "issue": "GH-113",
+  "scope": [
+    "4.1",
+    "4.2",
+    "4.3",
+    "4.4"
+  ],
+  "checkout_base": "8d26e56fa3c2ff4ccc4eb67c72741a2743439c30",
+  "baseline": {
+    "command": "python3 -m unittest discover -s tools/quality/tests -p 'test_harness_evidence.py' -v",
+    "exit_code": 0,
+    "tests": 18,
+    "log": "baseline-evidence.log"
+  },
+  "focused": {
+    "command": "python3 -m unittest discover -s tools/quality/tests -p 'test_collector_runner.py' -v",
+    "exit_code": 0,
+    "tests": 12,
+    "log": "collector-tests.log",
+    "declarative_scenarios": 17,
+    "transport_case_executions": 29
+  },
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 101,
+      "duration_seconds": 0.4,
+      "log": "nextest.log",
+      "environment_override": {}
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "exit_code": 0,
+      "duration_seconds": 0.67,
+      "log": "fmt.log",
+      "environment_override": {}
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 101,
+      "duration_seconds": 0.19,
+      "log": "clippy.log",
+      "environment_override": {}
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 0,
+      "duration_seconds": 10.62,
+      "log": "python.log",
+      "environment_override": {}
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 1,
+      "duration_seconds": 1.23,
+      "log": "docs.log",
+      "environment_override": {}
+    },
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 0,
+      "duration_seconds": 70.02,
+      "log": "nextest-local-target.log",
+      "environment_override": {
+        "CARGO_TARGET_DIR": "/home/gem/symphony-workspaces/GH-113/target/gh-113-cargo"
+      }
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 0,
+      "duration_seconds": 27.39,
+      "log": "clippy-local-target.log",
+      "environment_override": {
+        "CARGO_TARGET_DIR": "/home/gem/symphony-workspaces/GH-113/target/gh-113-cargo"
+      }
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 0,
+      "duration_seconds": 56.27,
+      "log": "docs-local-target.log",
+      "environment_override": {
+        "CARGO_TARGET_DIR": "/home/gem/symphony-workspaces/GH-113/target/gh-113-cargo"
+      }
+    }
+  ],
+  "not_applicable": [
+    {
+      "command": "harness-gate config check",
+      "reason": "Checkout has no .harness-gate/flow.toml and therefore no declared ci profile."
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "reason": "Checkout has no .harness-gate/flow.toml and therefore no declared ci profile."
+    }
+  ],
+  "input_sha256": {
+    "tools/quality/collector_runner.py": "11a7a3d3a35a18f8bad987eaa01f36652599d471154254e49d98caaa1ac58d85",
+    "tools/quality/fixtures/collectors/cases.json": "82effdc80eb21edf8467b73a741635519098568ff0d069aa4ccf4866dc28cd4d",
+    "tools/quality/fixtures/collectors/synthetic.py": "fcce97ee01293d3a507d3c41251abb33404ab6cf9f703ce309eecffe4b2ac5c9",
+    "tools/quality/harness_evidence.py": "78d8d555a6b88676c22ba205cf4b373dd3b1e07b8f713b03f0b0536db24071b1",
+    "tools/quality/schema/collector-protocol.schema.json": "a3c23c578783dd4cbb1f4be3bb41a5c3552aee563e89116a5ff53fd4c159e545",
+    "tools/quality/schema/harness-evidence.schema.json": "9866ae0554a8fdd4d40aa3e242950fad935c6773da98d6b3673d43b6afa1e042",
+    "tools/quality/tests/test_collector_runner.py": "a585f6932e1c268cf7511b8f16ee1cc4553c9bf91d40616f99508d1ea4d31e7e"
+  },
+  "delivery_limitation": {
+    "command": "git add tools/quality/collector_runner.py",
+    "exit_code": 128,
+    "error": "fatal: Unable to create '/home/gem/symphony-workspaces/GH-113/.git/index.lock': Read-only file system",
+    "workaround": "Copy current workspace .git to target/gh-113-git; use --git-dir=target/gh-113-git --work-tree=. for commit and push."
+  },
+  "required_ci": "pending; controller owns merge and closure"
+}
