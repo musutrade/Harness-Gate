@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Check opt-in project configuration and report generic shadow gates."""
+"""Frozen non-authoritative Python reference; see docs/quality/python-retention.md.
+
+Generic decisions belong to the released Rust core. No release-approval path.
+
+Check opt-in project configuration and report generic shadow gates."""
 from __future__ import annotations
 
 import argparse
@@ -77,6 +81,8 @@ def main():
     parser.add_argument('--output', required=True, type=Path)
     for name in ('evidence', 'expected', 'source-root', 'artifact-root', 'selection'):
         parser.add_argument('--' + name, type=Path)
+    parser.add_argument('--reference-only', action='store_true', required=True,
+                        help='Acknowledge frozen reference output cannot approve a release')
     args = parser.parse_args()
     try:
         project, policy = load_config(args.config, args.root)

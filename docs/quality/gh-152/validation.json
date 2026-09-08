@@ -1,0 +1,94 @@
+{
+  "issue": "GH-152",
+  "scope": "OpenSpec tasks 7.1-7.3; final acceptance conditional on hosted CI and controller merge",
+  "baseline_commit": "63a7f9538b13d4f8888eff6b35663cda40270e70",
+  "tested_tree": "GH-152 implementation worktree before commit; logs report baseline HEAD where applicable",
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 0,
+      "result": "332 passed; 0 skipped",
+      "log": "nextest-workspace.log",
+      "environment": {
+        "CARGO_HOME": "$PWD/target/quality/gh-152/cargo-home",
+        "CARGO_TARGET_DIR": "$PWD/target/quality/gh-152/cargo-target"
+      }
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "exit_code": 0,
+      "result": "pass",
+      "log": "fmt.log",
+      "environment": {}
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 0,
+      "result": "pass",
+      "log": "clippy.log",
+      "environment": {
+        "CARGO_HOME": "$PWD/target/quality/gh-152/cargo-home",
+        "CARGO_TARGET_DIR": "$PWD/target/quality/gh-152/cargo-target"
+      }
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 0,
+      "result": "296 passed",
+      "log": "python.log",
+      "environment": {}
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 0,
+      "result": "pass; machine report included",
+      "log": "docs-consistency.log",
+      "environment": {
+        "CARGO_HOME": "$PWD/target/quality/gh-152/cargo-home",
+        "CARGO_TARGET_DIR": "$PWD/target/quality/gh-152/cargo-target"
+      }
+    },
+    {
+      "command": "openspec validate consolidate-generic-quality-core-into-rust --strict",
+      "exit_code": 0,
+      "result": "pass",
+      "log": "openspec.log",
+      "environment": {}
+    }
+  ],
+  "baseline": {
+    "command": "python3 -m unittest discover -s tools/quality/tests -v",
+    "exit_code": 0,
+    "result": "293 passed before changes",
+    "log": "baseline-python.log"
+  },
+  "focused_regressions": {
+    "command": "python3 -m unittest discover -s tools/quality/tests -p test_python_retention.py -v",
+    "exit_code": 0,
+    "result": "3 passed",
+    "log": "retention-tests.log"
+  },
+  "environment_failure": {
+    "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+    "exit_code": 101,
+    "error": "failed to open /home/gem/.cargo/registry/cache/index.crates.io-1949cf8c6b5b557f/tinyvec-1.13.2.crate: Read-only file system (os error 30)",
+    "impact": "Initial Cargo metadata/download could not run with the shared read-only cache. Retried successfully with workspace-local cache and target directory; no dependency or lockfile changes.",
+    "log": "nextest.log"
+  },
+  "not_applicable": [
+    {
+      "command": "harness-gate config check",
+      "reason": "Checkout has no .harness-gate/flow.toml declaring a ci profile; no project-local configuration invented."
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "reason": "Checkout has no .harness-gate/flow.toml declaring a ci profile; no project-local configuration invented."
+    }
+  ],
+  "hosted_ci": "Pending for this submission; not polled. GH-151 predecessor acceptance is recorded separately.",
+  "logs_archive": "validation.tar.gz",
+  "delivery_environment": {
+    "error": "git add failed: Unable to create /home/gem/symphony-workspaces/GH-152/.git/index.lock: Read-only file system",
+    "workaround": "Copied only this workspace .git into target/quality/gh-152/delivery-git; commit and push use GIT_DIR=$PWD/target/quality/gh-152/delivery-git and GIT_WORK_TREE=$PWD on the same symphony/GH-152 branch. Original read-only metadata remains at baseline; the handoff pins the actual pushed commit."
+  }
+}

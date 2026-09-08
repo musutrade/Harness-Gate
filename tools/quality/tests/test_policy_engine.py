@@ -210,7 +210,7 @@ class PolicyTests(unittest.TestCase):
             self.policy['rules'][0]['operator'] = 'gt'
             self.policy['rules'][0]['scope'] = {'kind': 'component', 'component': 'frontend'}
             policy.write_text(json.dumps(self.policy))
-            command = [sys.executable, str(ROOT / 'policy_engine.py'), '--policy', str(policy),
+            command = [sys.executable, str(ROOT / 'policy_engine.py'), '--reference-only', '--policy', str(policy),
                        '--evidence', str(FIXTURES / 'polyglot.json'), '--project',
                        str(ROOT / 'fixtures/project-model/base.json'), '--source-root',
                        str(self.context['source_root']), '--artifact-root', str(FIXTURES),

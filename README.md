@@ -314,13 +314,14 @@ review.
 
 ## Evidence architecture and adapter support
 
-The development-only generic evidence/policy core supports component identity,
-validated evidence, policy, ratchets and project reports. Rust is the implemented
-reference adapter with bounded equivalence acceptance; its existing required
-quality path remains authoritative. TypeScript/Angular, Python, Java and contract
-examples are synthetic, not certified adapters. The independent TypeScript/Angular
-follow-up is a proposal only. See the [support and closure record](docs/quality/architecture-closure.md)
-for accepted evidence, limitations and the next change.
+The released Rust core owns generic evidence validation, project identity, policy,
+ratchets, contracts and project reports through `harness-gate quality evaluate`.
+Collectors may remain Python or another language; they measure while Rust decides.
+The existing required CI aggregate retains release responsibility. Python generic
+modules are [frozen reference code](docs/quality/python-retention.md).
+Rust and the bounded TypeScript/Angular reference adapter retain their accepted
+support limits; this consolidation adds no ecosystem certification. See the
+[support and closure record](docs/quality/architecture-closure.md).
 
 ## Features
 

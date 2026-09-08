@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Generic shadow policy evaluation over validated harness-evidence/v1 facts."""
+"""Frozen non-authoritative Python reference; see docs/quality/python-retention.md.
+
+Generic decisions belong to the released Rust core. No release-approval path.
+
+Generic shadow policy evaluation over validated harness-evidence/v1 facts."""
 from __future__ import annotations
 
 import argparse
@@ -288,6 +292,8 @@ def main():
     for name in ('base-evidence', 'base-project', 'base-source-root', 'base-artifact-root',
                  'base-expected', 'mappings', 'exceptions'):
         parser.add_argument('--' + name, type=Path)
+    parser.add_argument('--reference-only', action='store_true', required=True,
+                        help='Acknowledge frozen reference output cannot approve a release')
     args = parser.parse_args()
     try:
         base_paths = (args.base_evidence, args.base_project, args.base_source_root,
