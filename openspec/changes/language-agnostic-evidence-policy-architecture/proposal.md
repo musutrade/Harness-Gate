@@ -1,6 +1,6 @@
 # Proposal: Language-Agnostic Evidence and Policy Architecture
 
-**Status:** Draft — entry criteria satisfied; architecture implementation has not started.  
+**Status:** Draft — entry criteria satisfied; initial project-model implementation is under review in GH-111; migration remains unaccepted.
 **Date:** 2026-09-08  
 **Review baseline:** `ad54d8df6d21d3f6e3a0b5ee83918ae078a84d61` (`main`)  
 **Depends on:** the completed `strict-json-results-and-risk-based-quality-gates` delivery series and its accepted/recorded Rust quality contracts.  
