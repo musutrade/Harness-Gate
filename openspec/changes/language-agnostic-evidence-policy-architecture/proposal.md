@@ -1,6 +1,6 @@
 # Proposal: Language-Agnostic Evidence and Policy Architecture
 
-**Status:** Draft — entry criteria satisfied; project-model contracts landed in GH-111; normalized evidence/capability contracts are under review in GH-112; migration remains unaccepted.
+**Status:** Draft — entry criteria satisfied; project-model contracts landed in GH-111; normalized evidence/capability contracts landed in GH-112; collector boundary tasks 4.1–4.4 are under review in GH-113; migration remains unaccepted.
 **Date:** 2026-09-08  
 **Review baseline:** `ad54d8df6d21d3f6e3a0b5ee83918ae078a84d61` (`main`)  
 **Depends on:** the completed `strict-json-results-and-risk-based-quality-gates` delivery series and its accepted/recorded Rust quality contracts.  
