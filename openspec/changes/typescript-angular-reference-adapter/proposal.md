@@ -1,6 +1,6 @@
 # Proposal: TypeScript/Angular Reference Adapter
 
-**Status:** Partially implemented through task 3.1; independent follow-up, no adapter certified.
+**Status:** Partially implemented through task 3.2; independent follow-up, no adapter certified.
 **Date:** 2026-09-08
 **Depends on:** acceptance of `language-agnostic-evidence-policy-architecture`
 (GH-119); no required-gate migration is implied.
