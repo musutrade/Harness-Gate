@@ -16,7 +16,7 @@ Nothing below is implemented by GH-119. S <1h; M 1–2h; L 2–<4h.
 
 ## 3. Implement the adapter and reuse generic policy
 
-- [ ] 3.1 [P1][L] Implement the versioned collector adapter; acceptance: retained artifacts validate through the existing runner, TS-03 resolved, failure/timeout and every requested capability covered.
+- [x] 3.1 [P1][L] Implement the versioned collector adapter; acceptance: retained artifacts validate through the existing runner, TS-03 resolved, failure/timeout and every requested capability covered. [GH-131 validation](../../../docs/quality/gh-131/README.md): 11 focused adapter tests, 241 Python tests and 315 Rust tests pass; explicit mixed-subject capability states preserve the v1 contracts. Required hosted CI is pending at submission.
 - [ ] 3.2 [P1][M] Evaluate native frontend coverage with generic policy and ratchets alongside Rust; acceptance: thresholds, regression, lineage and debt tests pass without core language branches.
 - [ ] 3.3 [P1][L] Integrate real OpenAPI compatibility/generated-client checks; acceptance: a breaking contract blocks project pass despite passing component-local gates, with raw provenance in the report.
 
