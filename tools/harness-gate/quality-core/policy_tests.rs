@@ -1,5 +1,5 @@
-//! Differential task 3 tests. The Python process is a test oracle, never runtime.
-use super::{error, evidence::ValidationContext, json, policy, ratchet, Result};
+//! Differential tasks 3–4 tests. The Python process is a test oracle, never runtime.
+use super::{evidence::ValidationContext, json, policy, project_report, ratchet, Result};
 use serde_json::{json, Value};
 use std::{fs, path::Path, process::Command, sync::LazyLock};
 use tempfile::TempDir;
@@ -39,20 +39,6 @@ fn run(case: &Value) -> Result<Value> {
         "evaluate" => {
             let ctx = context(k);
             let base = k.get("base_context").filter(|v| !v.is_null()).map(context);
-            let outcomes = case["contracts"].clone();
-            let validator = move |record: &Value, rule: &Value, _: &Value| {
-                let outcome = &outcomes[format!(
-                    "{}/{}",
-                    record["id"].as_str().unwrap(),
-                    rule["id"].as_str().unwrap()
-                )];
-                assert!(outcome.is_object(), "unexpected relationship validation");
-                if outcome["accepted"] == true {
-                    Ok(())
-                } else {
-                    Err(error(outcome["reason"].as_str().unwrap()))
-                }
-            };
             policy::evaluate(
                 &a[0],
                 &a[1],
@@ -64,10 +50,10 @@ fn run(case: &Value) -> Result<Value> {
                     mappings: k.get("mappings").filter(|v| !v.is_null()),
                     exceptions: k.get("exceptions"),
                     now: k["now"].as_str(),
-                    contract_validator: Some(&validator),
                 },
             )
         }
+        "report" => project_report::report(&a[0], &a[1], &a[2]),
         "decision" => ratchet::decision(&a[0], &a[1], Some(&a[2])).map(|v| json!(v)),
         "compare" => policy::compare(&a[0], a[1].as_str().unwrap(), &a[2]).map(Value::Bool),
         "aggregate" => policy::aggregate(
@@ -128,7 +114,20 @@ fn frozen_policy_and_reference_acceptance_match_python() {
     let mut mismatches = Vec::new();
     for case in &REFERENCE.1 {
         let actual = match run(case) {
-            Ok(value) => json!({"accepted":true,"value":value}),
+            Ok(value) => {
+                if let Some(expected) = case.get("project_report") {
+                    let report = project_report::report(
+                        &value,
+                        &case["kwargs"]["project"],
+                        &case["args"][0],
+                    )
+                    .unwrap();
+                    if let Some(diff) = difference(&report, expected, "$.project_report") {
+                        mismatches.push(format!("{}: {diff}", case["name"]));
+                    }
+                }
+                json!({"accepted":true,"value":value})
+            }
             Err(e) => {
                 json!({"accepted":false,"reason_class":format!("{:?}",e.class),"reason":e.message})
             }
@@ -143,24 +142,43 @@ fn frozen_policy_and_reference_acceptance_match_python() {
         mismatches.len(),
         mismatches.join("\n")
     );
+}
 
-    // Task 4.1 is a separate validator: absence must never authorize a contract.
+#[test]
+fn green_local_gates_and_breaking_contract_block_project_with_provenance() {
     let case = REFERENCE
         .1
         .iter()
-        .find(|c| c["name"] == "contract-compatible")
+        .find(|c| c["name"] == "contract-breaking")
         .unwrap();
-    let report = policy::evaluate(
-        &case["args"][0],
-        &case["args"][1],
-        &context(&case["kwargs"]),
-        &policy::EvaluationOptions::default(),
-    )
-    .unwrap();
-    assert_eq!(report["aggregate"]["state"], "measurement_error");
-    assert!(report["results"]
+    let result = run(case).unwrap();
+    let report =
+        project_report::report(&result, &case["kwargs"]["project"], &case["args"][0]).unwrap();
+    assert_eq!(report["aggregate"]["state"], "fail");
+    for component in ["api", "frontend"] {
+        assert_eq!(report["components"][component]["local"]["state"], "pass");
+        assert_eq!(
+            report["components"][component]["cross_component"]["state"],
+            "fail"
+        );
+        assert_eq!(
+            report["components"][component]["aggregate"]["state"],
+            "fail"
+        );
+    }
+    assert_eq!(report["gates"].as_object().unwrap().len(), 5);
+    assert_eq!(report["aggregate"]["blockers"].as_array().unwrap().len(), 3);
+    let gate = report["gates"]
+        .as_object()
+        .unwrap()
+        .values()
+        .find(|g| g["policy"] == "contract.breaking_changes")
+        .unwrap();
+    assert_eq!(gate["record"]["relationship"]["producer"], "api");
+    assert_eq!(gate["record"]["relationship"]["consumer"], "frontend");
+    assert!(!gate["record"]["evidence_links"]["head"]["artifacts"]
         .as_array()
         .unwrap()
-        .iter()
-        .any(|r| r["reason"] == "relationship provenance validator required"));
+        .is_empty());
+    assert!(difference(&report, &case["project_report"], "$").is_none());
 }

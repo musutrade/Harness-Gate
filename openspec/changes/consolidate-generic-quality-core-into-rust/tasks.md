@@ -7,7 +7,7 @@ All tasks belong to [proposal](proposal.md), [design](design.md), and the accept
 - [x] 1.1 [P1][M] Inventory every production-like `tools/quality/*.py` module and classify A/B/C/D; acceptance: record purpose, callers, CI role, release impact, authoritative/non-authoritative status, and final disposition.
 - [x] 1.2 [P1][M] Freeze shared positive/negative compatibility fixtures from retained Rust and TypeScript/Angular evidence; acceptance: exact inputs, expected outputs, schema versions and canonicalization rules are reviewable without recollecting expensive native evidence.
 
-Validation: [GH-146 boundary and evidence](../../../docs/quality/gh-146/README.md); all 31 production modules inventoried and all 33 frozen oracle cases replayed successfully. GH-146 merged as PR #153 with required CI complete. Tasks 3–7 remain unaccepted.
+Validation: [GH-146 boundary and evidence](../../../docs/quality/gh-146/README.md); all 31 production modules inventoried and all 33 frozen oracle cases replayed successfully. GH-146 merged as PR #153 with required CI complete. Tasks 5–7 remain unaccepted.
 
 ## 2. Move evidence and project semantics into Rust
 
@@ -21,12 +21,14 @@ Validation: [GH-147 implementation and evidence](../../../docs/quality/gh-147/RE
 - [x] 3.1 [P1][L] Implement Rust policy schema validation, typed comparison, scope selection, `GateResult`, requiredness and aggregate semantics; acceptance: all policy fixtures produce zero unexplained semantic mismatches with Python.
 - [x] 3.2 [P1][L] Implement Rust baseline compatibility, lineage, debt/trend ratchet and exception-review semantics; acceptance: legacy/new/improved debt, rename/move lineage, missing base, incompatible series and invalid exceptions match Python behavior.
 
-Validation: [GH-148 implementation and evidence](../../../docs/quality/gh-148/README.md); 324 Rust tests and 289 Python tests pass. The 33 frozen policy outputs and reference boundary cases yield 391 differential comparisons with zero unexplained semantic mismatches; the existing 399 evidence/project/series/capability cases also pass. Formatting and Clippy pass. Requiredness remains policy-owned and current required CI authority is unchanged. Contract provenance is an explicit callback pending task 4.1 and fails closed when absent. Hosted required CI on the final pushed SHA is pending; tasks 4–7 and full proposal acceptance remain incomplete.
+Validation: [GH-148 implementation and evidence](../../../docs/quality/gh-148/README.md); 324 Rust tests and 289 Python tests pass. The 33 frozen policy outputs and reference boundary cases yield 391 differential comparisons with zero unexplained semantic mismatches; the existing 399 evidence/project/series/capability cases also pass. Formatting and Clippy pass. Requiredness remains policy-owned and current required CI authority is unchanged. GH-148 merged as PR #155 with required CI complete. Its temporary fail-closed contract callback is replaced by task 4.1 below; full proposal acceptance remains incomplete.
 
 ## 4. Move cross-component and project reporting semantics into Rust
 
-- [ ] 4.1 [P1][M] Implement Rust cross-component contract/relationship validation on normalized evidence; acceptance: green local gates plus breaking provider/consumer contract still blocks the project with equivalent provenance.
-- [ ] 4.2 [P1][L] Implement Rust project reporting and indexes; acceptance: component/local/cross-component aggregates, gate tables, indexes, evidence links and stable contract fields match canonical Python output.
+- [x] 4.1 [P1][M] Implement Rust cross-component contract/relationship validation on normalized evidence; acceptance: green local gates plus breaking provider/consumer contract still blocks the project with equivalent provenance.
+- [x] 4.2 [P1][L] Implement Rust project reporting and indexes; acceptance: component/local/cross-component aggregates, gate tables, indexes, evidence links and stable contract fields match canonical Python output.
+
+Validation: [GH-149 implementation and evidence](../../../docs/quality/gh-149/README.md); 325 Rust tests and 289 Python tests pass. The 33 frozen cases and 31 reference tests yield 826 differential comparisons, including 133 complete project-report cases, with zero unexplained mismatches. A dedicated Rust regression confirms green local gates plus a breaking provider/consumer contract block both participants and the project with equivalent provenance. Formatting and Clippy pass. Required hosted CI on the final pushed SHA is pending; tasks 5–7 and full proposal acceptance remain incomplete.
 
 ## 5. Differential acceptance
 

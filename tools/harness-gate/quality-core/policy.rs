@@ -1,6 +1,10 @@
 //! Policy-owned gates and aggregation over validated evidence; shadow-only.
 pub use super::comparison::compare;
-use super::{array, error, evidence, index, project, ratchet, require, schema, string, Result};
+use super::{
+    array, cross_component, error, evidence, index, project, ratchet, require, schema, string,
+    Result,
+};
+use cross_component::{relationship, subjects as contract_subjects};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::collections::BTreeSet;
@@ -32,40 +36,6 @@ pub struct GateResult {
 
 fn state(value: &str) -> Result<GateState> {
     serde_json::from_value(json!(value)).map_err(|_| error("unknown gate state"))
-}
-
-fn relationship<'a>(project: &'a Value, id: &Value) -> Result<&'a Value> {
-    let matches: Vec<_> = array(&project["relationships"])
-        .iter()
-        .filter(|r| r["id"] == *id)
-        .collect();
-    require(matches.len() == 1, "unknown contract relationship")?;
-    Ok(matches[0])
-}
-
-fn contract_subjects<'a>(
-    project: &'a Value,
-    id: &Value,
-    target: Option<&Value>,
-) -> Result<Vec<&'a Value>> {
-    let link = relationship(project, id)?;
-    let selected: Vec<_> = array(&project["subjects"])
-        .iter()
-        .filter(|s| {
-            array(&link["subjects"]).contains(&s["id"])
-                && s["kind"] == "contract/v1"
-                && target.is_none_or(|t| s["target"] == *t)
-        })
-        .collect();
-    require(
-        !selected.is_empty(),
-        "relationship has no contract subject for target",
-    )?;
-    require(
-        selected.iter().all(|s| s["component"] == link["producer"]),
-        "contract must belong to relationship provider",
-    )?;
-    Ok(selected)
 }
 
 pub fn validate_policy(policy: &Value, project: &Value) -> Result<()> {
@@ -294,9 +264,6 @@ fn result(
     }
 }
 
-/// Future task 4.1 supplies relationship provenance validation at this boundary.
-/// A missing validator fails closed; it cannot authorize a relationship gate.
-pub type ContractValidator = dyn Fn(&Value, &Value, &Value) -> Result<()>;
 #[derive(Default)]
 pub struct EvaluationOptions<'a> {
     pub selection: Option<&'a Value>,
@@ -305,7 +272,6 @@ pub struct EvaluationOptions<'a> {
     pub mappings: Option<&'a Value>,
     pub exceptions: Option<&'a Value>,
     pub now: Option<&'a str>,
-    pub contract_validator: Option<&'a ContractValidator>,
 }
 
 pub fn evaluate(
@@ -457,9 +423,7 @@ pub fn evaluate(
                         let value =
                             metric(head, &rule["metric"]).expect("validated supported metric");
                         if rule["scope"]["kind"] == "relationship" {
-                            options.contract_validator.ok_or_else(|| {
-                                error("relationship provenance validator required")
-                            })?(h, rule, context.project)?;
+                            cross_component::validate(h, rule, context.project)?;
                         }
                         if rule.get("ratchet").is_some() {
                             if let Some(b) = base {
