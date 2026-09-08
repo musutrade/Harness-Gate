@@ -142,11 +142,25 @@ CI rollout and architecture acceptance are pending.
 
 ## 10. CI rollout and architecture acceptance
 
-- [ ] 10.1 [P1][M] 增加 generic shadow CI job；验收：优先消费 `ci_quality.py collect` 已产生的 candidate/raw artifacts，不重复执行昂贵 Rust test/coverage/risk/matrix collection，上传 projection 与 compatibility evidence。
-- [ ] 10.2 [P1][M] 验证 `Required Quality Aggregate` 在 shadow 模式不被新架构替换；验收：check name、existing required dependencies 和 fail-closed semantics 保持不变，current required gates 继续是唯一发布权威直到独立 equivalence acceptance。
-- [ ] 10.3 [P1][L] 完成 Rust equivalence acceptance；验收：规定次数/提交范围内 old/new 结果无未解释差异，measurement-error negative fixtures 通过。
-- [ ] 10.4 [P1][M] 编写 ADR 记录 language-agnostic evidence/policy architecture；验收：明确 Rust 是 reference adapter、series 不统一、collector 不决定 pass/fail、fail-closed trust boundary。
+- [x] 10.1 [P1][M] 增加 generic shadow CI job；验收：优先消费 `ci_quality.py collect` 已产生的 candidate/raw artifacts，不重复执行昂贵 Rust test/coverage/risk/matrix collection，上传 projection 与 compatibility evidence。
+- [x] 10.2 [P1][M] 验证 `Required Quality Aggregate` 在 shadow 模式不被新架构替换；验收：check name、existing required dependencies 和 fail-closed semantics 保持不变，current required gates 继续是唯一发布权威直到独立 equivalence acceptance。
+- [x] 10.3 [P1][L] 完成 Rust equivalence acceptance；验收：规定次数/提交范围内 old/new 结果无未解释差异，measurement-error negative fixtures 通过。
+- [x] 10.4 [P1][M] 编写 ADR 记录 language-agnostic evidence/policy architecture；验收：明确 Rust 是 reference adapter、series 不统一、collector 不决定 pass/fail、fail-closed trust boundary。
 - [ ] 10.5 [P1][S] 关闭本 change 前明确下一 change；验收：创建独立的 TypeScript/Angular reference-adapter proposal，用真实第二生态验证抽象，而不是在本 change 偷带实现。
+
+Validation evidence for 10.1–10.4 (GH-118): the
+[shadow workflow and frozen aggregate tests](../../../tools/quality/tests/test_rust_equivalence.py),
+[defined two-run window](../../../docs/quality/rust-equivalence-acceptance.md),
+[ADR-0040](../../../docs/adr/0040-language-agnostic-evidence-policy.md) and
+[local validation record](../../../docs/quality/gh-118-validation.md) retain the
+completed acceptance evidence. Both pinned runs at distinct head commits replayed
+without outcome/debt/capability differences; all 15 adversarial adapter fixtures
+passed, including measurement errors and unsupported-state drift. All 315 Rust
+and 207 Python tests, formatting, Clippy, docs consistency and strict OpenSpec
+validation passed locally. The required aggregate and Rust release authority
+remain unchanged. Hosted required CI must pass before merge; retrospective
+acceptance does not certify a hosted soak or replace any required gate. Task 10.5
+and full proposal acceptance remain pending.
 
 ## Delivery Rule
 

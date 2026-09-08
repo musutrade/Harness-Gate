@@ -133,8 +133,28 @@ class Projection:
         context = {'project': self.project, 'source_root': self.sources,
                    'artifact_root': self.root, 'expected': self.expected}
         evidence.validate_evidence(self.records, **context)
-        return engine.evaluate({'schema': 'harness-policy/v1', 'rules': self.rules},
-                               self.records, **context)
+        result = engine.evaluate({'schema': 'harness-policy/v1', 'rules': self.rules},
+                                 self.records, **context)
+        # Optional unsupported gates do not affect the aggregate. Their semantic
+        # state must still agree, or an apparently green replay could hide drift.
+        rules = {rule['id']: rule for rule in self.rules}
+        records = {record['subject']['id']: record for record in self.records}
+        expected = {(rule['id'], record['subject']['id']) for rule in self.rules
+                    for record in self.records
+                    if record['subject']['boundary'] == rule['scope']['boundary']}
+        actual = [(gate['policy'], gate['subject']) for gate in result['results']]
+        evidence.require(len(actual) == len(set(actual)) and set(actual) == expected,
+                         'Rust/generic policy result inventory mismatch')
+        for gate in result['results']:
+            metric = rules[gate['policy']]['metric']
+            state = next(c['state'] for c in records[gate['subject']]['capabilities']
+                         if c['metric'] == metric)
+            if state in ('unsupported', 'not_applicable'):
+                evidence.require(gate['state'] == state,
+                                 'Rust/generic capability state mismatch: ' + metric)
+            evidence.require(gate['state'] != 'measurement_error',
+                             'generic policy measurement_error: ' + metric)
+        return result
 
 
 def coverage_values(row):

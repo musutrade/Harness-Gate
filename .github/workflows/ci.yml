@@ -251,6 +251,46 @@ jobs:
             !target/quality/candidate/snapshots
           if-no-files-found: warn
 
+  quality-generic-shadow:
+    name: Generic Quality Shadow
+    # Advisory only: never add this job to quality-required's dependencies.
+    if: ${{ always() }}
+    needs: [quality-coverage]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.x'
+
+      - name: Download this run's retained Rust candidate
+        uses: actions/download-artifact@v6
+        with:
+          name: quality-coverage-${{ github.run_id }}-${{ github.run_attempt }}
+          path: target/quality/candidate
+
+      - name: Project and compare retained evidence
+        if: ${{ always() }}
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+          RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          python3 tools/quality/rust_reference.py \
+            --candidate target/quality/candidate/candidate.json \
+            --base-sha "$BASE_SHA" --head-sha "$HEAD_SHA" --run-id "$RUN_ID" \
+            --output target/quality/generic-shadow
+
+      - name: Upload generic projection and compatibility evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: quality-generic-shadow-${{ github.run_id }}-${{ github.run_attempt }}
+          path: target/quality/generic-shadow/*.json
+          if-no-files-found: error
+
   quality-contracts:
     name: Quality CLI Contracts
     runs-on: ubuntu-latest
