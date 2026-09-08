@@ -6,8 +6,8 @@ Nothing below is implemented by GH-119. S <1h; M 1–2h; L 2–<4h.
 
 ## 1. Freeze the real fixture
 
-- [ ] 1.1 [P1][M] Select and lock the Angular/Node/TypeScript/builder/runner/provider versions; acceptance: reproducible install and recorded measurement boundaries, argv and configuration digests.
-- [ ] 1.2 [P1][M] Create the CLI-generated application and Rust contract fixture from the design; acceptance: real build, tests and raw coverage, with tested/untested branches, duplicate method names, external template and generated client.
+- [x] 1.1 [P1][M] Select and lock the Angular/Node/TypeScript/builder/runner/provider versions; acceptance: reproducible install and recorded measurement boundaries, argv and configuration digests. [GH-129 evidence](../../../tools/quality/fixtures/typescript-angular/evidence/README.md): two clean locked installs with identical package inventories, exact runtime/tool records and hashed configuration.
+- [x] 1.2 [P1][M] Create the CLI-generated application and Rust contract fixture from the design; acceptance: real build, tests and raw coverage, with tested/untested branches, duplicate method names, external template and generated client. [GH-129 evidence](../../../tools/quality/fixtures/typescript-angular/evidence/README.md): production build, seven Angular tests against a live Rust provider, native Istanbul counters, production/test source maps and a retained real compiler failure. Hosted required CI remains pending at submission; no adapter certification is claimed.
 
 ## 2. Resolve identity and measurement semantics
 
