@@ -77,7 +77,6 @@ pub fn evaluate(case: &Value) -> Result<Value> {
     Ok(output)
 }
 
-/// Every differing leaf is retained, including absent versus null and array order.
 /// Identify only native missing-file diagnostics, preserving the logical source.
 pub(super) fn missing_file_source(message: &str) -> Option<&str> {
     let (source, reason) = message.split_once(": ")?;
@@ -93,6 +92,7 @@ pub(super) fn missing_file_source(message: &str) -> Option<&str> {
         .then_some(source)
 }
 
+/// Every differing leaf is retained, including absent versus null and array order.
 /// Only the previously accepted OS missing-file wording is classified separately.
 pub fn compare(expected: &Value, actual: &Value) -> Value {
     fn walk(
