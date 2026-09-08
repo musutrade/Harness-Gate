@@ -261,6 +261,14 @@ Component-specific overrides are explicit. Tool adapters cannot silently change 
 
 The v1 policy model intentionally supports a limited set of deterministic operations rather than arbitrary code execution or a user-defined programming language.
 
+GH-114 implements tasks 5.1–5.5 through the standalone
+[typed policy and result contract](../../../docs/quality/policy-engine.md).
+All selectors expand caller-owned subjects in the requested target; no implicit
+cross-subject averaging or language branch is introduced. Exact comparisons use
+normalized types. Required non-pass states other than informational block, and
+the aggregate retains original child causes, including cancellation. Optional
+base evidence supplies remediation context only; tasks 6.x remain pending.
+
 ### 9. Baseline and ratchet are core services
 
 The baseline service compares compatible base/head evidence by subject identity and explicit identity mapping.
