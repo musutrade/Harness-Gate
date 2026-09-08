@@ -158,11 +158,14 @@ The executable v1 [schema](../../../tools/quality/schema/harness-evidence.schema
 and [contract record](../../../docs/quality/harness-evidence.md) define the normative
 shape. The [synthetic batch](../../../tools/quality/fixtures/harness-evidence/polyglot.json)
 contains complete Rust/TypeScript/Python/Java examples. Metrics use discriminated
-ratio/count/boolean/duration/size/decimal values, and ratios preserve covered/total
-counts. The full project-model subject is embedded; provenance includes an explicit
+ratio/count/boolean/duration/size/decimal values, with exact rational CRAP added
+by GH-116 to retain repeating native fractions. Ratios preserve covered/total
+counts. Decimal and rational CRAP remain distinct series types. The full
+project-model subject is embedded; provenance includes an explicit
 base commit. Canonical serialization and filesystem integrity are validated before
 consumption. This GH-112 implementation covers tasks 2.1–2.5 and 3.1–3.4 only;
-real Rust projection and equivalence remain tasks 7 and 10.
+Rust shadow projection is recorded below; required-gate equivalence acceptance
+and rollout remain later tasks.
 
 The common envelope standardizes provenance, identity, metrics and artifact linkage. It does not imply that Rust LLVM coverage, Java JaCoCo coverage, Python coverage.py and TypeScript Istanbul have identical semantics. Their measurement contracts and series remain distinct.
 
@@ -369,6 +372,19 @@ Existing Rust evidence is migrated in layers:
 5. only replace old required paths after equivalence is demonstrated.
 
 No task may remeasure or reinterpret accepted historical Rust data solely to make it fit this architecture.
+
+GH-116 implements tasks 7.1–7.5 with the standalone
+[Rust reference adapter](../../../docs/quality/rust-reference-adapter.md).
+It verifies and projects a retained candidate without subprocess collection,
+then compares native production and risk decisions with generic policy results.
+Native identity matching and debt rules compile into explicit generic policies;
+the separate generic no-regression ratchet does not redefine Rust's existing
+changed-function contract. Other required candidate stage statuses pass through
+unchanged. Any mismatch blocks migration and the current Rust path stays
+authoritative. Historical validation preserves the accepted Phase 1 series,
+which predates this candidate format, and replays the unaccepted GH-97 candidate
+without granting baseline approval. See the
+[validation record](../../../docs/quality/gh-116-validation.md).
 
 ### 13. External adapters use a versioned collector protocol
 

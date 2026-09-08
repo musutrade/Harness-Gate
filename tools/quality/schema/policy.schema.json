@@ -261,6 +261,9 @@
             },
             {
               "$ref": "#/definitions/Size"
+            },
+            {
+              "$ref": "#/definitions/Rational"
             }
           ]
         },
@@ -298,6 +301,28 @@
               "type": "boolean"
             }
           }
+        }
+      }
+    },
+    "Rational": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "numerator",
+        "denominator"
+      ],
+      "properties": {
+        "type": {
+          "const": "rational"
+        },
+        "numerator": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "denominator": {
+          "type": "integer",
+          "minimum": 1
         }
       }
     }

@@ -13,7 +13,7 @@ from quality_evidence import _schema_matches
 
 SCHEMA_DIR = Path(__file__).resolve().parent / "schema"
 VALUE_TYPES = {name: name.title() for name in
-               ("ratio", "count", "boolean", "duration", "size", "decimal")}
+               ("ratio", "count", "boolean", "duration", "size", "decimal", "rational")}
 # Shared names describe policy inputs, never cross-tool measurement equivalence.
 METRIC_TYPES = {
     **{f"coverage.{key}": "ratio" for key in ("line", "function", "region", "branch")},
@@ -29,6 +29,10 @@ METRIC_TYPES = {
 
 class MeasurementError(ValueError):
     """Invalid evidence cannot satisfy a required capability."""
+
+
+def metric_type_matches(name, kind):
+    return kind == METRIC_TYPES.get(name) or (name == "risk.crap" and kind == "rational")
 
 
 def require(condition, message):
@@ -89,7 +93,7 @@ def validate_series(series):
     require(list(contracts) == sorted(contracts), "series metrics must be sorted by name")
     for name, contract in contracts.items():
         require(name in METRIC_TYPES, f"unknown generic metric: {name}")
-        require(contract["type"] == METRIC_TYPES[name], f"wrong metric type: {name}")
+        require(metric_type_matches(name, contract["type"]), f"wrong metric type: {name}")
     require(series["id"] == series_id(series), "noncanonical measurement series identity")
     return series
 
@@ -157,7 +161,8 @@ def _record(record, project, source_root, artifact_root, expected):
                     value["type"] in VALUE_TYPES,
                     "unknown metric value type")
             _shape(value, definition=VALUE_TYPES[value["type"]])
-            require(value["type"] == METRIC_TYPES[name], "metric value/series type mismatch")
+            contract = next(c for c in record["series"]["metrics"] if c["name"] == name)
+            require(value["type"] == contract["type"], "metric value/series type mismatch")
             if value["type"] == "ratio":
                 require(value["covered"] <= value["total"], "covered exceeds total")
             refs = metric["artifacts"]

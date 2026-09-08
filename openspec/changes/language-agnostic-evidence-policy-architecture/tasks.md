@@ -98,11 +98,22 @@ production baseline acceptance and remaining proposal tasks are not claimed.
 
 ## 7. Migrate Rust as the reference adapter
 
-- [ ] 7.1 [P1][L] 将现有 Rust production coverage evidence 包装为 generic evidence，不改变 raw counts/series；验收：现有 coverage 报告与 generic projection 数值、source digest 和 gate outcome 一致。
-- [ ] 7.2 [P1][L] 将现有 Rust complexity/CRAP evidence 包装为 generic function-risk evidence；验收：现有 `crap_line`、CC、line/function/region raw counts 和 subject identity 不被重新解释。
-- [ ] 7.3 [P1][M] 将 Rust capability 状态映射到 generic model；验收：现有 branch unsupported 等语义保持。
-- [ ] 7.4 [P1][L] 在 shadow mode 运行 current evaluator 与 generic policy engine；验收：复用同一 candidate/raw evidence、base/head/run identity，所有 required Rust gate outcome、debt classification、unsupported/measurement-error 语义一致；任何差异产生 compatibility failure，不替换现有 required gate。
-- [ ] 7.5 [P1][M] 增加 historical fixture compatibility tests；验收：至少覆盖 accepted baseline、failed gate、measurement error、legacy debt、changed-function ratchet。
+- [x] 7.1 [P1][L] 将现有 Rust production coverage evidence 包装为 generic evidence，不改变 raw counts/series；验收：现有 coverage 报告与 generic projection 数值、source digest 和 gate outcome 一致。
+- [x] 7.2 [P1][L] 将现有 Rust complexity/CRAP evidence 包装为 generic function-risk evidence；验收：现有 `crap_line`、CC、line/function/region raw counts 和 subject identity 不被重新解释。
+- [x] 7.3 [P1][M] 将 Rust capability 状态映射到 generic model；验收：现有 branch unsupported 等语义保持。
+- [x] 7.4 [P1][L] 在 shadow mode 运行 current evaluator 与 generic policy engine；验收：复用同一 candidate/raw evidence、base/head/run identity，所有 required Rust gate outcome、debt classification、unsupported/measurement-error 语义一致；任何差异产生 compatibility failure，不替换现有 required gate。
+- [x] 7.5 [P1][M] 增加 historical fixture compatibility tests；验收：至少覆盖 accepted baseline、failed gate、measurement error、legacy debt、changed-function ratchet。
+
+Validation evidence for 7.1–7.5 (GH-116): the
+[Rust shadow adapter contract](../../../docs/quality/rust-reference-adapter.md),
+[historical acceptance tests](../../../tools/quality/tests/test_rust_reference.py),
+and [local validation record](../../../docs/quality/gh-116-validation.md) cover
+unchanged raw counts, source digests, exact/display CRAP, identities, debt,
+capabilities and outcomes on the same retained candidate. Negative fixtures
+block mismatches and required-stage failures without collecting again. The
+accepted Phase 1 baseline retains its incompatible original series; the GH-97
+passing candidate is not relabeled as an accepted baseline. Current Rust gates
+remain authoritative; full migration, rollout and proposal acceptance are pending.
 
 ## 8. Add cross-component contract abstractions
 

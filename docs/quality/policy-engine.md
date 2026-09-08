@@ -188,4 +188,7 @@ serialization and CLI exit behavior. Actual command evidence is recorded in the
 [GH-115 focused tests](../../tools/quality/tests/test_policy_ratchet.py) exercise
 four synthetic ecosystems and negative identity/series/exception paths. See the
 [GH-115 validation record](gh-115-validation.md) and retained machine evidence.
-Rust migration, adapter equivalence and required CI rollout remain later tasks.
+The [Rust reference adapter](rust-reference-adapter.md) compiles the existing Rust
+policy into this engine for shadow comparison. Exact rational CRAP values and
+limits compare as integer fractions; decimal and rational series cannot mix.
+Required CI rollout remains a later task.

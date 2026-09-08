@@ -37,7 +37,7 @@ class HarnessEvidenceTests(unittest.TestCase):
             self.assertEqual(raw["source"], record["source"])
             values = {m["name"]: m["value"] for m in record["metrics"]}
             self.assertEqual(values, raw["tool_native"]["values"])
-            self.assertEqual({v["type"] for v in values.values()}, set(evidence.VALUE_TYPES))
+            self.assertEqual({v["type"] for v in values.values()}, set(evidence.VALUE_TYPES) - {"rational"})
             self.assertEqual(values["coverage.line"], {"type": "ratio", "covered": 4, "total": 5})
 
     def test_negative_fixtures_fail_with_measurement_error(self):
