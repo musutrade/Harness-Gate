@@ -70,7 +70,7 @@ def evaluate_case(name, args, kwargs, frozen=None):
     if frozen is not None:
         expected = dict(accepted=True, value=frozen['policy_result']) if 'policy_result' in frozen else dict(
             accepted=False, **frozen['evaluation_error'])
-        # Only temporary root paths change from the retained corpus.
+        # Temporary roots and known native missing-file wording may vary.
         canonical = replay.portable_errors(oracle, WORK / name)
         assert replay.oracle_matches(expected, canonical), name
     cases.append(dict(name=name, kind='evaluate', args=plain(args), kwargs=plain(kwargs),

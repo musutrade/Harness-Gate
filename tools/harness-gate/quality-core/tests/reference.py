@@ -86,7 +86,7 @@ for item in manifest['cases']:
             assert actual['accepted'] == frozen['accepted']
             if not actual['accepted']:
                 assert actual['reason_class'] == frozen['reason_class']
-                # OS paths alone differ; the retained oracle pins all other text.
+                # Only known missing-file wording may vary; semantic fields stay exact.
                 assert replay.oracle_matches(frozen, replay.portable_errors(actual, WORK / item['id'])), (item['id'], actual, frozen)
 
 base_project = read(QUALITY / 'fixtures/project-model/base.json')
