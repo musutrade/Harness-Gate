@@ -1,0 +1,88 @@
+## ADDED Requirements
+
+### Requirement: Validate a real second ecosystem
+The adapter SHALL collect from a runnable locked TypeScript/Angular application
+using real build, test and coverage tools, retaining versions, configuration,
+invocations, source bytes and raw artifacts for the requested base/head/run/target.
+Synthetic envelopes alone SHALL NOT satisfy second-ecosystem acceptance.
+
+#### Scenario: Replay real frontend collection
+- **GIVEN** a locked application with tested and untested production branches
+- **WHEN** the adapter normalizes its retained coverage output
+- **THEN** normalized covered/total counters equal the raw measurements
+- **AND** generic policy can reproduce pass and deliberate regression outcomes.
+
+### Requirement: Preserve source identity and explicit capability limits
+The adapter SHALL produce unambiguous versioned source-backed subjects and
+validate source-map and artifact integrity before policy use. It SHALL declare
+every requested capability with the existing capability states. Unsupported
+template, branch or risk measurements SHALL NOT become numeric defaults.
+
+#### Scenario: Ambiguous or stale transformation
+- **GIVEN** same-named methods or transformed output with stale or ambiguous source maps
+- **WHEN** original source identity cannot be established
+- **THEN** collection fails closed before favorable policy or baseline use.
+
+#### Scenario: Unmeasured template or risk
+- **GIVEN** a requested metric outside the accepted adapter capability matrix
+- **WHEN** the response is validated and a blocking policy requires support
+- **THEN** the explicit unavailable state is retained and the gate cannot pass.
+
+### Requirement: Reuse generic policy with distinct measurement series
+The adapter SHALL emit validated collector-protocol and harness-evidence/v1
+records without final delivery decisions. Existing generic policy, lineage,
+ratchet and aggregation code SHALL own thresholds and debt. TypeScript series
+SHALL remain distinct from Rust and from incompatible frontend tool versions.
+
+#### Scenario: Instrumentation upgrade
+- **GIVEN** a base measurement using different coverage or mapping semantics
+- **WHEN** a head measurement is compared without explicit compatible baseline acceptance
+- **THEN** the comparison fails closed without losing historical debt.
+
+### Requirement: Exercise real cross-component contract failure
+The reference fixture SHALL include real provider/client contract-tool artifacts
+and explicit participating components. Generic project aggregation SHALL retain
+their provenance and block incompatible contracts.
+
+#### Scenario: Green components with a breaking interface
+- **GIVEN** passing frontend and Rust component gates and a real breaking OpenAPI change
+- **WHEN** generic policy evaluates compatibility and generated-client drift evidence
+- **THEN** the contract gate blocks project pass with raw evidence links.
+
+### Requirement: Record and review architectural mismatches
+Every discovered mismatch SHALL retain a reproducer, affected generic contract,
+expected/actual behavior and disposition. Required core changes SHALL receive
+reviewed spec deltas plus Rust and frontend validation before adoption. Adapters
+SHALL NOT conceal mismatches with language-specific policy or fabricated identity.
+
+#### Scenario: Existing subject contract cannot express a measurement
+- **GIVEN** an unresolved TS-01, TS-02, TS-03 or newly discovered mismatch
+- **WHEN** acceptance is reviewed
+- **THEN** the affected capability remains uncertified until evidence resolves it
+- **AND** deferral explicitly narrows the support matrix.
+
+### Requirement: Bound certification and preserve release authority
+Acceptance SHALL retain two real base/head pairs, one pass and one intentional
+regression, plus negative integrity, identity, capability, series and collection
+failure cases. Certification SHALL name the exact fixture, versions, environment,
+series and supported capabilities. Required CI SHALL pass before closure.
+Rust required-check identity and authority SHALL remain unchanged.
+
+#### Scenario: Advisory frontend run succeeds
+- **GIVEN** a successful frontend acceptance window
+- **WHEN** support status is documented
+- **THEN** only evidenced capabilities are certified
+- **AND** no required gate, other ecosystem or unmeasured platform is enabled.
+
+## Implementation and review
+
+Follow the ordered sub-four-hour [tasks](../../tasks.md); their acceptance
+criteria define the implementation milestones. Protocol usage is:
+
+```text
+caller-bound request -> real tools / retained raw output
+  -> validated harness-evidence/v1 -> existing generic policy -> project report
+```
+
+The [design](../../design.md) records alternatives and rollback: disable the
+advisory adapter/job while preserving evidence, baselines and Rust authority.

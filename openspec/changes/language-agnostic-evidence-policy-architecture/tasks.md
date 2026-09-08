@@ -1,7 +1,8 @@
 # Implementation Tasks
 
 本清单对应 [proposal](proposal.md) 和 [design](design.md)。前置 Issue 系列已闭环，
-本 change 现可进入正式评审与 Issue 拆分，但尚未授权一次性重写 Core。迁移期间
+任务 0.3–10.4 的 merged PR、required CI 和验收证据已汇总于
+[closure ledger](../../../docs/quality/architecture-closure.md)。GH-119 完成最终 proposal/closure 准备；最终 CI 和控制器验收仍待完成。迁移期间
 现有 Rust required gates 始终是发布权威，generic path 先以 shadow/equivalence
 模式运行。
 
@@ -146,7 +147,7 @@ CI rollout and architecture acceptance are pending.
 - [x] 10.2 [P1][M] 验证 `Required Quality Aggregate` 在 shadow 模式不被新架构替换；验收：check name、existing required dependencies 和 fail-closed semantics 保持不变，current required gates 继续是唯一发布权威直到独立 equivalence acceptance。
 - [x] 10.3 [P1][L] 完成 Rust equivalence acceptance；验收：规定次数/提交范围内 old/new 结果无未解释差异，measurement-error negative fixtures 通过。
 - [x] 10.4 [P1][M] 编写 ADR 记录 language-agnostic evidence/policy architecture；验收：明确 Rust 是 reference adapter、series 不统一、collector 不决定 pass/fail、fail-closed trust boundary。
-- [ ] 10.5 [P1][S] 关闭本 change 前明确下一 change；验收：创建独立的 TypeScript/Angular reference-adapter proposal，用真实第二生态验证抽象，而不是在本 change 偷带实现。
+- [x] 10.5 [P1][S] 关闭本 change 前明确下一 change；验收：创建独立的 TypeScript/Angular reference-adapter proposal，用真实第二生态验证抽象，而不是在本 change 偷带实现。
 
 Validation evidence for 10.1–10.4 (GH-118): the
 [shadow workflow and frozen aggregate tests](../../../tools/quality/tests/test_rust_equivalence.py),
@@ -159,9 +160,21 @@ passed, including measurement errors and unsupported-state drift. All 315 Rust
 and 207 Python tests, formatting, Clippy, docs consistency and strict OpenSpec
 validation passed locally. The required aggregate and Rust release authority
 remain unchanged. Hosted required CI must pass before merge; retrospective
-acceptance does not certify a hosted soak or replace any required gate. Task 10.5
-and full proposal acceptance remain pending.
+acceptance does not certify a hosted soak or replace any required gate. These are
+submission-time results; the closure ledger records subsequent merged acceptance. Final GH-119 required CI and controller acceptance remain pending.
 
 ## Delivery Rule
 
 本 change 不应被单个大型 Issue 一次实现。建议按上述 section 拆成多个可独立验收的 GitHub Issues；每个 Issue 必须创建 PR、等待 required CI、保留兼容/负向证据，并由控制器完成 merge/closure。任何超过 L 的实现必须继续拆分。
+
+## GH-119 final closure evidence
+
+Task 10.5 creates the independent
+[TypeScript/Angular proposal](../typescript-angular-reference-adapter/proposal.md),
+[design/mismatch register](../typescript-angular-reference-adapter/design.md),
+[spec](../typescript-angular-reference-adapter/specs/typescript-angular-reference-adapter/spec.md)
+and unchecked implementation tasks. The [closure ledger](../../../docs/quality/architecture-closure.md)
+links all predecessor task ranges to accepted deliveries; the
+[validation record](../../../docs/quality/gh-119-validation.md) records final local
+validation. No non-Rust adapter or required-gate replacement is enabled. The
+controller must observe this PR’s required CI before final merge/issue closure.
