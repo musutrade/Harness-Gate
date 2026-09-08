@@ -13,7 +13,7 @@ from quality_common import CRATE, metadata, read_json, sha256, write_json
 INVENTORY = Path(__file__).with_name("production-source.json")
 METRICS = ("lines", "functions", "regions")
 REQUIRED = {"config", "verify", "process", "audit", "scope", "secrets",
-            "app", "project", "doctor", "service-core"}
+            "app", "project", "doctor", "service-core", "quality-core"}
 
 
 class CoverageTokenizer(Tokenizer):
@@ -91,10 +91,10 @@ def test_ranges(source: str) -> list[tuple[int, int]]:
 
 def load_inventory(path: Path, crate: Path) -> tuple[dict, dict, dict]:
     inventory = read_json(path)
-    require(inventory["schema_version"] == 1 and inventory["version"] == "production-source-1",
+    require(inventory["schema_version"] == 1 and inventory["version"] == "production-source-2",
             "unsupported production inventory version")
-    require(inventory["source_root"] == "src" and inventory["threshold"] == 80,
-            "production policy requires src inventory and 80% threshold")
+    require(inventory["source_roots"] == ["src", "quality-core"] and inventory["threshold"] == 80,
+            "production policy requires src and quality-core inventory and 80% threshold")
     require(inventory["metrics_version"] == "production-location-1", "unknown metrics version")
     require(inventory["inline_exclusions"]["rule"] == "cfg-test-items-1",
             "unknown inline exclusion rule")
@@ -118,9 +118,9 @@ def load_inventory(path: Path, crate: Path) -> tuple[dict, dict, dict]:
                 f"invalid exclusion reason/kind: {source}")
         excluded[source] = row
     for row in inventory["external_exclusions"]:
-        require(row["prefix"] == "tests/" and row["kind"] == "test" and bool(row["reason"].strip()),
+        require((row["prefix"], row["kind"]) in (("tests/", "test"), ("quality-replay/", "migration-reference")) and bool(row["reason"].strip()),
                 "unsupported external exclusion")
-    actual = {p.relative_to(crate).as_posix() for p in (crate / "src").rglob("*.rs")}
+    actual = {p.relative_to(crate).as_posix() for root in inventory["source_roots"] for p in (crate / root).rglob("*.rs")}
     declared = owners.keys() | excluded.keys()
     require(actual == declared,
             f"source inventory mismatch: unknown={sorted(actual - declared)}, missing={sorted(declared - actual)}")

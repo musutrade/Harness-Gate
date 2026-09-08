@@ -41,6 +41,12 @@ Validation: [GH-150 replay and acceptance evidence](../../../docs/quality/gh-150
 
 ## 6. Transfer generic semantic authority
 
+GH-151 implementation and the pending transfer review are recorded in
+[the candidate evidence](../../../docs/quality/gh-151/README.md). The operator
+authorized versioned production and risk measurement extensions. Hosted shadow
+and required acceptance of the exact candidate SHA remain outstanding;
+predecessor CI success does not accept the transfer.
+
 - [ ] 6.1 [P1][M] Integrate the Rust generic core into an opt-in shadow CI path; acceptance: existing `Required Quality Aggregate` name/dependencies/authority are unchanged and Rust/Python differential artifacts are retained.
 - [ ] 6.2 [P1][L] Perform explicit authority-transfer acceptance; acceptance: Rust and TypeScript/Angular corpora plus negative matrix are green, hosted CI is green, rollback is documented, and no unresolved mismatch remains.
 - [ ] 6.3 [P1][M] Route authoritative generic evaluation/reporting through Rust while preserving collector protocol compatibility; acceptance: external collectors still measure only, and final generic decisions no longer require Python C-class modules.
