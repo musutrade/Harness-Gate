@@ -21,7 +21,7 @@ The generic envelope SHALL coexist with existing tool-specific and Rust-specific
 - **AND** the normalized record preserves its series identity, source digest, symbol identity, raw counts, and metric value.
 
 ### Requirement: Distinguish capability and measurement states
-Normalized evidence SHALL distinguish at least `supported`, `unsupported`, `not_configured`, `not_collected`, and `measurement_error` capability/measurement states. Non-numeric states MUST NOT be coerced into numeric pass values.
+Normalized evidence SHALL distinguish at least `supported`, `unsupported`, `not_configured`, `not_collected`, `measurement_error`, and `not_applicable` capability/measurement states. Non-numeric states MUST NOT be coerced into numeric pass values.
 
 #### Scenario: Unsupported branch coverage
 - **GIVEN** a collector whose measurement contract does not support branch coverage
@@ -46,3 +46,33 @@ Measurements from incompatible series SHALL NOT be compared numerically for regr
 - **WHEN** a ratchet attempts to compare them
 - **THEN** the comparison is rejected as incompatible
 - **AND** the system does not claim improvement or regression from the numeric values alone.
+
+### Requirement: Use explicit typed values and deterministic serialization
+The v1 envelope SHALL use discriminated ratio, count, boolean, duration, size and
+exact decimal forms. Ratios SHALL retain covered/total integers with a positive
+denominator. Metric names SHALL match their declared series value types. Canonical
+serialization SHALL validate the complete batch and provenance before emitting
+UTF-8 JSON with sorted object keys, compact separators and preserved array order.
+
+#### Scenario: Reject ambiguous or fabricated values
+- **GIVEN** a metric with an untyped JSON number, unknown type, or zero denominator
+- **WHEN** the normalized record is validated
+- **THEN** validation returns `measurement_error`.
+- **AND** every non-supported capability is forbidden from carrying any metric value.
+
+### Requirement: Enforce explicit capability availability policy
+Capability requirements SHALL specify component, metric, required/informational
+mode and a blocked/measurement_error outcome for unavailable required metrics.
+Availability results SHALL preserve the original capability state and evidence ID
+and SHALL NOT constitute a numeric threshold or release decision.
+
+#### Scenario: Preserve informational unsupported state
+- **GIVEN** valid unsupported evidence with raw provenance
+- **WHEN** an informational capability requirement is evaluated
+- **THEN** the result remains `unsupported` without a numeric value.
+- **AND** a required requirement produces its explicit blocking outcome.
+
+#### Scenario: Reject a false support claim
+- **GIVEN** a supported capability with missing metric evidence
+- **WHEN** either required or informational availability is evaluated
+- **THEN** validation returns `measurement_error` before availability evaluation.
