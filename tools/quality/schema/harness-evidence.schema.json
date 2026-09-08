@@ -76,6 +76,9 @@
         "unavailable",
         "measurement_error"
       ]
+    },
+    "contract": {
+      "$ref": "#/definitions/Contract"
     }
   },
   "definitions": {
@@ -605,6 +608,79 @@
         "denominator": {
           "type": "integer",
           "minimum": 1
+        }
+      }
+    },
+    "Contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relationship",
+        "producer",
+        "consumer",
+        "contract_artifact"
+      ],
+      "properties": {
+        "relationship": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9._-]*$"
+        },
+        "producer": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9._-]*$"
+        },
+        "consumer": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9._-]*$"
+        },
+        "contract_artifact": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9._-]*$"
+        },
+        "baseline": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "artifact",
+            "commit",
+            "series_id"
+          ],
+          "properties": {
+            "artifact": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9._-]*$"
+            },
+            "commit": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "series_id": {
+              "type": "string",
+              "pattern": "^measurement-series/v1:[0-9a-f]{64}$"
+            }
+          }
+        },
+        "consumer_artifact": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9._-]*$"
+        },
+        "generated_client": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "artifact",
+            "contract_sha256"
+          ],
+          "properties": {
+            "artifact": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9._-]*$"
+            },
+            "contract_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
         }
       }
     }

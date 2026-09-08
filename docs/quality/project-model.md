@@ -87,3 +87,11 @@ The [fixtures](../../tools/quality/fixtures/project-model/README.md) exercise th
 model without installing Angular, Rust, Python or Java measurement toolchains.
 The normative requirements remain in the
 [OpenSpec](../../openspec/changes/language-agnostic-evidence-policy-architecture/specs/language-agnostic-project-model/spec.md).
+
+## Opt-in configuration and contract evaluation
+
+GH-117 adds an explicit JSON manifest and relationship-scoped shadow contract
+rules on top of this graph. See [project reporting](project-reporting.md) for
+placement, unchanged `flow.toml` defaults, machine indexes and executable single
+Rust and synthetic polyglot examples. Graph validation itself still does not
+run collectors or decide gate outcomes.

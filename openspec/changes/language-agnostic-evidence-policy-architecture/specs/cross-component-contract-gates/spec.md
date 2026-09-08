@@ -39,3 +39,17 @@ If a required contract relationship cannot be evaluated because its contract, ba
 - **WHEN** evaluation runs
 - **THEN** the result is blocking and explicitly identifies the missing baseline
 - **AND** no compatibility claim is made.
+
+### Requirement: Use generic typed contract metrics and explicit scope
+Relationship-scoped rules SHALL select provider-owned `contract/v1` subjects and
+compare `contract.schema_valid`, `contract.breaking_changes`,
+`contract.client_drift` and `contract.compatible` using the generic typed policy
+engine. Required baseline and consumer/client provenance SHALL be checked before
+supported metrics are compared. Missing capabilities SHALL retain their existing
+unavailable state without fabricated values.
+
+#### Scenario: Detect contradictory generated-client drift
+- **GIVEN** retained contract and client artifacts and the input contract digest used by the generator
+- **WHEN** a reported drift boolean disagrees with digest equality
+- **THEN** the contract gate returns a blocking measurement error
+- **AND** the report retains both artifact digests and participant identities.
