@@ -81,3 +81,12 @@ equivalence window. Unmeasured frontend capabilities remain unavailable, and
 existing Rust required release authority remains unchanged. Any future generic
 amendment needs a separately reviewed spec delta and Rust/frontend validation;
 authority migration needs a future independent accepted change.
+
+## Generic-core consolidation freeze (GH-146)
+
+The [Python product-boundary inventory](../quality/gh-146/python-boundary.md)
+and [shared compatibility corpus](../../tools/quality/fixtures/generic-core/README.md)
+freeze the migration oracle for OpenSpec `consolidate-generic-quality-core-into-rust`
+tasks 1.1–1.2. Generic semantics still run in Python shadow/reference paths.
+The existing Rust required checks and their release authority remain unchanged;
+this record does not accept the later Rust implementation or authority transfer.

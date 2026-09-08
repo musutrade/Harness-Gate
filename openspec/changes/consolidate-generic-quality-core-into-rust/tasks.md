@@ -4,8 +4,10 @@ All tasks belong to [proposal](proposal.md), [design](design.md), and the accept
 
 ## 1. Freeze the product boundary and compatibility corpus
 
-- [ ] 1.1 [P1][M] Inventory every production-like `tools/quality/*.py` module and classify A/B/C/D; acceptance: record purpose, callers, CI role, release impact, authoritative/non-authoritative status, and final disposition.
-- [ ] 1.2 [P1][M] Freeze shared positive/negative compatibility fixtures from retained Rust and TypeScript/Angular evidence; acceptance: exact inputs, expected outputs, schema versions and canonicalization rules are reviewable without recollecting expensive native evidence.
+- [x] 1.1 [P1][M] Inventory every production-like `tools/quality/*.py` module and classify A/B/C/D; acceptance: record purpose, callers, CI role, release impact, authoritative/non-authoritative status, and final disposition.
+- [x] 1.2 [P1][M] Freeze shared positive/negative compatibility fixtures from retained Rust and TypeScript/Angular evidence; acceptance: exact inputs, expected outputs, schema versions and canonicalization rules are reviewable without recollecting expensive native evidence.
+
+Validation: [GH-146 boundary and evidence](../../../docs/quality/gh-146/README.md); all 31 production modules inventoried and all 33 frozen oracle cases replayed successfully. Required hosted CI remains pending before merge; tasks 2–7 are not accepted.
 
 ## 2. Move evidence and project semantics into Rust
 
