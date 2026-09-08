@@ -3,9 +3,8 @@
 //! `harness-gate` is a configurable development workflow and architecture
 //! guard command-line tool.
 //!
-//! The executable is the supported interface. This library target intentionally
-//! contains no public runtime API; it provides crate-level documentation for
-//! the CLI package on docs.rs without exposing the binary's internal modules.
+//! The executable provides workflow commands. The `quality` library owns generic
+//! evaluation of normalized evidence, independently of collector implementations.
 //!
 //! ## Install
 //!
@@ -21,3 +20,6 @@
 //! - [Crates.io package](https://crates.io/crates/harness-gate)
 //!
 //! The binary's command reference is available with `harness-gate --help`.
+
+#[path = "../quality-core/mod.rs"]
+pub mod quality;

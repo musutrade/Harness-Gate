@@ -1,5 +1,5 @@
 //! Non-authoritative replay transport and field-level comparison. No collectors.
-use crate::{error, evidence, policy, project_report, require, Result};
+use super::{error, evidence, policy, project_report, require, Result};
 use serde_json::{json, Value};
 use std::{collections::BTreeSet, path::Path};
 
@@ -25,7 +25,7 @@ fn context(value: &Value) -> Result<evidence::ValidationContext<'_>> {
     })
 }
 
-fn failure(e: crate::Error) -> Value {
+fn failure(e: super::Error) -> Value {
     json!({"reason_class": format!("{:?}", e.class), "reason": e.message})
 }
 
@@ -189,11 +189,12 @@ mod tests {
     use super::*;
     #[test]
     fn differences_preserve_all_fields_and_exact_values() {
-        let expected =
-            crate::parse(r#"{"a/b~":[100000000000000000000,2],"missing":null,"state":"pass"}"#)
-                .unwrap();
+        let expected = super::super::parse(
+            r#"{"a/b~":[100000000000000000000,2],"missing":null,"state":"pass"}"#,
+        )
+        .unwrap();
         let actual =
-            crate::parse(r#"{"a/b~":[100000000000000000001,3,4],"state":"fail"}"#).unwrap();
+            super::super::parse(r#"{"a/b~":[100000000000000000001,3,4],"state":"fail"}"#).unwrap();
         let result = compare(&expected, &actual);
         let diffs = result["mismatches"].as_array().unwrap();
         assert_eq!(diffs.len(), 5);
@@ -246,7 +247,7 @@ mod acceptance {
         let root = Path::new(env!("CARGO_MANIFEST_DIR"));
         let input_path = work.path().join("input.json");
         let output = Command::new("python3")
-            .arg(root.join("../../quality/fixtures/generic-core/differential.py"))
+            .arg(root.join("../quality/fixtures/generic-core/differential.py"))
             .arg("--prepare")
             .arg(work.path())
             .arg("--output")
@@ -258,7 +259,7 @@ mod acceptance {
             "{}",
             String::from_utf8_lossy(&output.stderr)
         );
-        let input = crate::parse(&fs::read_to_string(input_path).unwrap()).unwrap();
+        let input = super::super::parse(&fs::read_to_string(input_path).unwrap()).unwrap();
         let result = replay(&input).unwrap();
         assert_eq!(result["case_count"], 33);
         assert_eq!(result["mismatch_count"], 0, "{result}");

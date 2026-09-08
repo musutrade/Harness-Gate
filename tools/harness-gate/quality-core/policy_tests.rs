@@ -8,8 +8,8 @@ static REFERENCE: LazyLock<(TempDir, Vec<Value>)> = LazyLock::new(|| {
     let temp = tempfile::tempdir().unwrap();
     let root = Path::new(env!("CARGO_MANIFEST_DIR"));
     let output = Command::new("python3")
-        .arg(root.join("tests/policy_reference.py"))
-        .arg(root.parent().unwrap().parent().unwrap().join("quality"))
+        .arg(root.join("quality-core/tests/policy_reference.py"))
+        .arg(root.parent().unwrap().join("quality"))
         .arg(temp.path())
         .output()
         .unwrap();

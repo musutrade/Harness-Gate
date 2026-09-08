@@ -1,5 +1,5 @@
-//! Candidate generic semantics for OpenSpec tasks 2.1–5.4. No release authority.
-// Released CLI integration and authority transfer remain deferred.
+//! Generic evidence, policy and reporting semantics shipped with Harness-Gate.
+//! The replay comparator remains non-authoritative migration tooling.
 
 mod comparison;
 pub mod cross_component;

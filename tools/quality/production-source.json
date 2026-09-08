@@ -1,7 +1,6 @@
 {
   "schema_version": 1,
-  "version": "production-source-1",
-  "source_root": "src",
+  "version": "production-source-2",
   "threshold": 80,
   "metrics_version": "production-location-1",
   "boundaries": {
@@ -10,7 +9,8 @@
       "files": [
         "src/app/commands.rs",
         "src/app/mod.rs",
-        "src/app/output.rs"
+        "src/app/output.rs",
+        "src/app/quality.rs"
       ]
     },
     "audit": {
@@ -189,6 +189,23 @@
         "src/verify/steps.rs",
         "src/verify/waiver.rs"
       ]
+    },
+    "quality-core": {
+      "blocking": true,
+      "files": [
+        "quality-core/comparison.rs",
+        "quality-core/cross_component.rs",
+        "quality-core/evidence.rs",
+        "quality-core/json.rs",
+        "quality-core/mod.rs",
+        "quality-core/model.rs",
+        "quality-core/policy.rs",
+        "quality-core/project.rs",
+        "quality-core/project_report.rs",
+        "quality-core/ratchet.rs",
+        "quality-core/replay.rs",
+        "quality-core/schema.rs"
+      ]
     }
   },
   "exclusions": [
@@ -251,6 +268,16 @@
       "path": "src/verify/tests.rs",
       "kind": "test",
       "reason": "Test-only module compiled under cfg(test)."
+    },
+    {
+      "path": "quality-core/policy_tests.rs",
+      "kind": "test",
+      "reason": "Test module reachable only under cfg(test)."
+    },
+    {
+      "path": "quality-core/tests.rs",
+      "kind": "test",
+      "reason": "Test module reachable only under cfg(test)."
     }
   ],
   "external_exclusions": [
@@ -258,6 +285,11 @@
       "prefix": "tests/",
       "kind": "test",
       "reason": "Integration test drivers and fixtures are not production code."
+    },
+    {
+      "prefix": "quality-replay/",
+      "kind": "migration-reference",
+      "reason": "Unpublished differential comparator workspace package; not part of the shipped harness-gate library or binary. The linked quality-core remains production."
     }
   ],
   "inline_exclusions": {
@@ -293,7 +325,7 @@
     {
       "path": "src/lib.rs",
       "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
-      "sha256": "e19a0df5524cb2fe7c5128312a5a0e58aff13468efc15be8a90ca4df2c8b4e06"
+      "sha256": "373bde6804041cd4412e9a4881d63d940e0df714f4488ff946350bd36ab82999"
     },
     {
       "path": "src/preset/mod.rs",
@@ -314,6 +346,15 @@
       "path": "src/utils/mod.rs",
       "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
       "sha256": "c93da3bb9222a3893fafdefa65e2e455bb720e0b0b84d05b244bd061e3d58877"
+    },
+    {
+      "path": "quality-core/model.rs",
+      "reason": "Wire type declarations and serde derives have no executable LLVM mapping on this target; the file remains in the production inventory.",
+      "sha256": "b8959e7e3ffdea692a7a6d12bdde62372d58985c5e279f0708ca9a128831169c"
     }
+  ],
+  "source_roots": [
+    "src",
+    "quality-core"
   ]
 }
