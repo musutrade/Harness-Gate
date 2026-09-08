@@ -62,7 +62,7 @@ class RatchetTests(unittest.TestCase):
             subject['discriminator'] += '_renamed'
         elif kind == 'move':
             path = Path(subject['path'])
-            subject['path'] = str(path.with_name('moved' + path.suffix))
+            subject['path'] = path.with_name('moved' + path.suffix).as_posix()
             shutil.copyfile(self.context['source_root'] / before['path'],
                             self.context['source_root'] / subject['path'])
         subject['id'] = model.subject_id(self.context['project']['id'], subject)
