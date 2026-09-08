@@ -1,6 +1,6 @@
 # Proposal: Consolidate Generic Quality Core into Rust
 
-**Status:** Draft; architecture proposal only, implementation not started.
+**Status:** Implementation in progress: tasks 1.1–1.2 frozen in GH-146; authority transfer and the remaining implementation are not accepted.
 **Date:** 2026-09-08
 **Baseline:** `main` after TypeScript/Angular reference-adapter closure (`817190f2e26d176bb227858647c0f5a61b31ba26`).
 
