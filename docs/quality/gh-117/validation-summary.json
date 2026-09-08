@@ -1,0 +1,109 @@
+{
+  "issue": "GH-117",
+  "scope": [
+    "8.1",
+    "8.2",
+    "8.3",
+    "9.1",
+    "9.2",
+    "9.3"
+  ],
+  "baseline": "b21ae2d86c1d89058eb7e16f15eeaac7e90bcc73",
+  "environment": {
+    "CARGO_TARGET_DIR": "$PWD/target/gh-117-cargo",
+    "TMPDIR_final_python": "$PWD/target/gh-117-tmp"
+  },
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "status": "pass",
+      "exit_code": 0,
+      "detail": "315 passed; 0 skipped",
+      "artifact": "nextest.log"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "status": "pass",
+      "exit_code": 0,
+      "detail": "",
+      "artifact": "fmt.log"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "status": "pass",
+      "exit_code": 0,
+      "detail": "",
+      "artifact": "clippy.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "status": "pass",
+      "exit_code": 0,
+      "detail": "202 tests",
+      "artifact": "python-tests.log"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "status": "pass",
+      "exit_code": 0,
+      "detail": "",
+      "artifact": "docs-consistency.log"
+    },
+    {
+      "command": "openspec validate language-agnostic-evidence-policy-architecture --strict",
+      "status": "pass",
+      "exit_code": 0,
+      "detail": "",
+      "artifact": "openspec.log"
+    },
+    {
+      "command": "harness-gate config check",
+      "status": "not_applicable",
+      "exit_code": null,
+      "detail": ".harness-gate/flow.toml is absent",
+      "artifact": null
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "status": "not_applicable",
+      "exit_code": null,
+      "detail": "no project-local ci profile; flow.toml absent",
+      "artifact": null
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -p test_project_report.py -v",
+      "status": "pass",
+      "exit_code": 0,
+      "detail": "12 tests",
+      "artifact": "contracts-tests.log"
+    },
+    {
+      "command": "python3 tools/quality/project_report.py evaluate --config tools/quality/fixtures/contracts/single-rust-config.json --evidence tools/quality/fixtures/contracts/single-rust-evidence.json --expected tools/quality/fixtures/contracts/expected.json --source-root tools/quality/fixtures/contracts/sources --artifact-root tools/quality/fixtures --output target/gh-117-evidence/single-report.json",
+      "status": "pass",
+      "exit_code": 0,
+      "detail": "Expected project pass",
+      "artifact": "single-report.json"
+    },
+    {
+      "command": "python3 tools/quality/project_report.py evaluate --config tools/quality/fixtures/contracts/project-config.json --evidence tools/quality/fixtures/contracts/evidence.json --expected tools/quality/fixtures/contracts/expected.json --source-root tools/quality/fixtures/contracts/sources --artifact-root tools/quality/fixtures --output target/gh-117-evidence/polyglot-report.json",
+      "status": "pass",
+      "exit_code": 1,
+      "detail": "Expected project fail despite four passing local gates",
+      "artifact": "polyglot-report.json"
+    },
+    {
+      "command": "python3 tools/quality/project_report.py check --config tools/quality/fixtures/contracts/single-rust-config.json --output target/gh-117-evidence/single-config.json",
+      "status": "pass",
+      "exit_code": 0,
+      "detail": "explicit opt-in configuration",
+      "artifact": "single-config.json"
+    }
+  ],
+  "limitations": [
+    "Shadow-only; synthetic contracts and non-Rust ecosystems; no OpenAPI or client-generator adapter certification.",
+    "Baseline provenance checks caller-retained inputs, without independently resolving Git objects.",
+    "Project-local flow.toml absent; config check and verify ci are not applicable.",
+    "Required hosted CI pending; must pass before merge.",
+    "Git metadata is read-only; copied this workspace metadata to target/gh-117-git for commit and push."
+  ]
+}

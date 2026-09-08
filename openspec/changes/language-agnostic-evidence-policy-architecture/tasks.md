@@ -117,15 +117,28 @@ remain authoritative; full migration, rollout and proposal acceptance are pendin
 
 ## 8. Add cross-component contract abstractions
 
-- [ ] 8.1 [P2][M] 定义 contract subject 和 participating component relationship；验收：一个 synthetic OpenAPI contract 可同时绑定 frontend/client 与 backend/provider。
-- [ ] 8.2 [P2][M] 定义 generic contract metrics：schema valid、breaking changes、generated-client drift、compatibility status；验收：不依赖具体 OpenAPI 工具即可跑 synthetic policy fixtures。
-- [ ] 8.3 [P2][M] 验证 project aggregate 可同时包含 component-local gate 与 cross-component gate；验收：两个组件本地全绿但 breaking contract 仍阻止 project pass。
+- [x] 8.1 [P2][M] 定义 contract subject 和 participating component relationship；验收：一个 synthetic OpenAPI contract 可同时绑定 frontend/client 与 backend/provider。
+- [x] 8.2 [P2][M] 定义 generic contract metrics：schema valid、breaking changes、generated-client drift、compatibility status；验收：不依赖具体 OpenAPI 工具即可跑 synthetic policy fixtures。
+- [x] 8.3 [P2][M] 验证 project aggregate 可同时包含 component-local gate 与 cross-component gate；验收：两个组件本地全绿但 breaking contract 仍阻止 project pass。
 
 ## 9. Configuration and reporting migration
 
-- [ ] 9.1 [P2][M] 决定 component manifest 落点并扩展 config/schema；验收：旧单组件 Rust 配置仍兼容或有明确迁移错误，不静默改变默认路径。
-- [ ] 9.2 [P2][M] 增加 project/component/gate machine report；验收：报告可按 component、subject、policy、status 聚合，并保留 raw evidence link。
-- [ ] 9.3 [P2][M] 更新 CLI/docs 示例；验收：展示单 Rust 项目和 Angular+Rust+Python+Java synthetic 项目，不宣称后者 adapter 已实现。
+- [x] 9.1 [P2][M] 决定 component manifest 落点并扩展 config/schema；验收：旧单组件 Rust 配置仍兼容或有明确迁移错误，不静默改变默认路径。
+- [x] 9.2 [P2][M] 增加 project/component/gate machine report；验收：报告可按 component、subject、policy、status 聚合，并保留 raw evidence link。
+- [x] 9.3 [P2][M] 更新 CLI/docs 示例；验收：展示单 Rust 项目和 Angular+Rust+Python+Java synthetic 项目，不宣称后者 adapter 已实现。
+
+Validation evidence for 8.1–8.3 and 9.1–9.3 (GH-117): the
+[contract/config/report decision](../../../docs/quality/project-reporting.md),
+[synthetic fixtures](../../../tools/quality/fixtures/contracts/README.md),
+[12 acceptance tests](../../../tools/quality/tests/test_project_report.py), and
+[local validation record](../../../docs/quality/gh-117-validation.md) demonstrate
+explicit provider/consumer bindings, four generic contract metrics, and a
+blocking project result despite green component-local gates. Compatible and
+multiple-consumer fixtures, missing/tampered provenance and configuration
+rejection cases are covered. The additive JSON CLI retains raw links and
+component/subject/policy/status indexes without changing Rust `flow.toml`
+defaults. Non-Rust and contract adapters remain synthetic; required hosted CI,
+CI rollout and architecture acceptance are pending.
 
 ## 10. CI rollout and architecture acceptance
 
