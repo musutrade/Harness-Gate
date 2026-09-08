@@ -147,7 +147,7 @@ def validate_project(project):
 
 
 def validate_mappings(base, head, mappings):
-    """Resolve explicit one-to-one rename/move or one-to-many split lineage.
+    """Resolve explicit one-to-one modify/rename/move or one-to-many split lineage.
 
     The returned head->base identity index conveys lineage only. Metric series,
     baseline acceptance and debt/ratchet policy remain separate contracts.
@@ -174,6 +174,11 @@ def validate_mappings(base, head, mappings):
                     "ambiguous mapping destination")
             before, after = old[source], new[destination]
             require(before["kind"] == after["kind"], "mapping changes subject kind")
+            require(before["target"] == after["target"], "mapping changes target")
+            if kind == "modify":
+                require(all(before[key] == after[key] for key in
+                            ("component", "target", "boundary", "kind", "path", "discriminator")),
+                        "modification changes subject locator")
             if kind == "rename":
                 require((before["component"], before["path"]) ==
                         (after["component"], after["path"]) and

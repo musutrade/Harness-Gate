@@ -61,6 +61,8 @@ The [mapping schema](../../tools/quality/schema/subject-mappings.schema.json)
 uses `subject-mappings/v1`, project ID, and mappings with `kind`, `from`, `to`,
 and a nonempty `reason`. Base and head projects must validate independently.
 
+- Modify: one retired base identity to one new head identity, preserving component,
+  target, boundary, kind, path and discriminator; source digest or span may change.
 - Rename: one retired base identity to one new head identity, same component/path
   and subject kind, different qualified discriminator.
 - Move: one retired base identity to one new head identity, different component
@@ -68,7 +70,7 @@ and a nonempty `reason`. Base and head projects must validate independently.
 - Split: one retired base identity to two or more distinct new head identities,
   all with the same subject kind. Destinations are explicitly enumerated.
 
-Unknown IDs, repeated sources/destinations, an old identity still present at head,
+All mappings preserve the target. Unknown IDs, repeated sources/destinations, an old identity still present at head,
 destinations already present at base, cross-project mappings, invalid cardinality,
 and unsupported operations fail. Combined move-and-rename and merge are not v1
 operations; no heuristic attempts to infer their lineage.
@@ -77,8 +79,9 @@ operations; no heuristic attempts to infer their lineage.
 lineage. A new or changed identity without mapping raises `ModelError`; it cannot
 inherit favorable debt or baseline state by short name, path or source similarity.
 Resolving lineage does **not** copy metric values or approve favorable inheritance
-for a split. A future policy must independently check accepted baseline,
-measurement-series compatibility, changed-subject rules and split treatment.
+for a split. The [shadow ratchet](policy-engine.md) independently checks base
+provenance and measurement-series compatibility, and treats split children as new
+subjects without a debt allowance. It does not accept a production baseline.
 
 The [fixtures](../../tools/quality/fixtures/project-model/README.md) exercise the
 model without installing Angular, Rust, Python or Java measurement toolchains.
