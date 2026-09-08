@@ -21,6 +21,27 @@ class FrozenCorpusTests(unittest.TestCase):
         self.assertEqual(actual['reason'], "missing '$CASE_ROOT/head/source/a.rs'")
         self.assertEqual(actual['artifacts'], value['artifacts'])
 
+    def test_missing_file_wording_preserves_all_semantic_fields(self):
+        expected = dict(accepted=False, reason_class='MeasurementError',
+                        reason='artifact/source src/a: [Errno 2] No such file or directory: /tmp/a')
+        variants = [
+            '[WinError 2] The system cannot find the file specified: C:/a',
+            '[WinError 3] The system cannot find the path specified: C:/a',
+            'The system cannot find the file specified. (os error 2)',
+            'The system cannot find the path specified. (os error 3)',
+            'No such file or directory (os error 2)',
+        ]
+        for reason in variants:
+            actual = dict(expected, reason='artifact/source src/a: ' + reason)
+            self.assertTrue(replay.oracle_matches(expected, actual), reason)
+            for key, value in [('accepted', True), ('reason_class', 'ModelError'),
+                               ('reason', 'artifact/source src/b: ' + reason),
+                               ('reason', 'artifact/source src/a: Permission denied'),
+                               ('reason', 'artifact/source src/a: [WinError 5] Access is denied')]:
+                self.assertFalse(replay.oracle_matches(expected, dict(actual, **{key: value})))
+        self.assertFalse(replay.oracle_matches({'value': True}, {'value': 1}))
+        self.assertFalse(replay.oracle_matches({'reason': expected['reason']}, {}))
+
     def test_every_frozen_case_matches_full_python_output(self):
         result = replay.replay()
         manifest = json.loads((FIXTURE / 'manifest.json').read_text())

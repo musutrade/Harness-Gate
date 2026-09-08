@@ -77,6 +77,21 @@ pub fn evaluate(case: &Value) -> Result<Value> {
     Ok(output)
 }
 
+/// Identify only native missing-file diagnostics, preserving the logical source.
+pub(super) fn missing_file_source(message: &str) -> Option<&str> {
+    let (source, reason) = message.split_once(": ")?;
+    let prefixes = [
+        "[Errno 2] No such file or directory",
+        "No such file or directory",
+        "[WinError 2] The system cannot find the file specified",
+        "[WinError 3] The system cannot find the path specified",
+        "The system cannot find the file specified. (os error 2)",
+        "The system cannot find the path specified. (os error 3)",
+    ];
+    (source.starts_with("artifact/source ") && prefixes.iter().any(|p| reason.starts_with(p)))
+        .then_some(source)
+}
+
 /// Every differing leaf is retained, including absent versus null and array order.
 /// Only the previously accepted OS missing-file wording is classified separately.
 pub fn compare(expected: &Value, actual: &Value) -> Value {
@@ -124,11 +139,8 @@ pub fn compare(expected: &Value, actual: &Value) -> Value {
                 expected.and_then(Value::as_str),
                 actual.and_then(Value::as_str),
             ) {
-                if e.starts_with("artifact/source ")
-                    && a.starts_with("artifact/source ")
-                    && e.contains("No such file or directory")
-                    && a.contains("No such file or directory")
-                    && e.split(": ").next() == a.split(": ").next()
+                if missing_file_source(e).is_some()
+                    && missing_file_source(e) == missing_file_source(a)
                 {
                     diff["classification"] = json!("os-missing-file-wording");
                     diagnostics.push(diff);
@@ -217,9 +229,27 @@ mod tests {
                 .len(),
             1
         );
+        for reason in [
+            "[Errno 2] No such file or directory: /tmp/a",
+            "[WinError 2] The system cannot find the file specified: C:/a",
+            "[WinError 3] The system cannot find the path specified: C:/a",
+            "The system cannot find the file specified. (os error 2)",
+            "The system cannot find the path specified. (os error 3)",
+        ] {
+            let actual = json!({"reason": format!("artifact/source src/a: {reason}")});
+            let result = compare(&e, &actual);
+            assert!(result["mismatches"].as_array().unwrap().is_empty());
+            assert_eq!(result["diagnostic_variations"].as_array().unwrap().len(), 1);
+        }
+        assert_eq!(missing_file_source("no separator"), None);
+        assert_eq!(
+            missing_file_source("other: No such file or directory"),
+            None
+        );
         for a in [
             json!({"reason":"artifact/source src/b: No such file or directory"}),
             json!({"reason":"artifact/source src/a: Permission denied"}),
+            json!({"reason":"artifact/source src/a: [WinError 5] Access is denied"}),
             json!({"state":"pass"}),
         ] {
             assert!(!compare(&e, &a)["mismatches"].as_array().unwrap().is_empty());

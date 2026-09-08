@@ -77,11 +77,8 @@ fn difference(a: &Value, b: &Value, path: &str) -> Option<String> {
     // Compare the path and failure category; retain every semantic field exactly.
     if path.ends_with(".reason") {
         if let (Some(a), Some(b)) = (a.as_str(), b.as_str()) {
-            if a.starts_with("artifact/source ")
-                && b.starts_with("artifact/source ")
-                && a.contains("No such file or directory")
-                && b.contains("No such file or directory")
-                && a.split(": ").next() == b.split(": ").next()
+            if super::replay::missing_file_source(a).is_some()
+                && super::replay::missing_file_source(a) == super::replay::missing_file_source(b)
             {
                 return None;
             }

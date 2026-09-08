@@ -14,6 +14,8 @@ import unittest
 
 QUALITY, WORK = map(lambda p: Path(p).resolve(), sys.argv[1:])
 sys.path[:0] = [str(QUALITY), str(QUALITY / 'tests')]
+sys.path.insert(0, str(QUALITY / 'fixtures/generic-core'))
+import replay
 import harness_evidence as evidence
 import project_model as project
 import policy_engine as engine
@@ -68,17 +70,17 @@ def evaluate_case(name, args, kwargs, frozen=None):
     if frozen is not None:
         expected = dict(accepted=True, value=frozen['policy_result']) if 'policy_result' in frozen else dict(
             accepted=False, **frozen['evaluation_error'])
-        # Only temporary root paths change from the retained corpus.
-        canonical = json.loads(json.dumps(oracle).replace(str(WORK / name), '$CASE_ROOT'))
-        assert canonical == expected, name
+        # Temporary roots and known native missing-file wording may vary.
+        canonical = replay.portable_errors(oracle, WORK / name)
+        assert replay.oracle_matches(expected, canonical), name
     cases.append(dict(name=name, kind='evaluate', args=plain(args), kwargs=plain(kwargs),
                       oracle=oracle))
     if oracle["accepted"]:
         report = project_report.report(oracle["value"], kwargs["project"], args[0])
         cases[-1]["project_report"] = report
         if frozen is not None and "project_report" in frozen:
-            canonical = json.loads(json.dumps(report).replace(str(WORK / name), "$CASE_ROOT"))
-            assert canonical == frozen["project_report"], name
+            canonical = replay.portable_errors(report, WORK / name)
+            assert replay.oracle_matches(frozen["project_report"], canonical), name
         cases.append(dict(name=name + "/report", kind="report",
                           args=[oracle["value"], plain(kwargs["project"]), args[0]], kwargs={},
                           oracle=dict(accepted=True, value=report)))
