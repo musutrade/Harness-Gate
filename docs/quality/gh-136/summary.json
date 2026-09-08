@@ -1,0 +1,433 @@
+{
+  "authority": "advisory",
+  "certification": "bounded; see typescript-certification.md",
+  "checkout": "67b0927f66be7768458ae4f1a433194925345e44",
+  "checks": {
+    "acceptance_tests": {
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/quality/tests",
+        "-p",
+        "test_typescript_acceptance.py",
+        "-v"
+      ],
+      "exit_code": 0
+    },
+    "contracts": {
+      "breaking": {
+        "actual": "fail",
+        "archive_sha256": "4737984f683bdc30d53fae29207248e3425d4711649e334e1cedcdaa4bc752d2",
+        "expected": "fail",
+        "series": [
+          {
+            "collector": {
+              "name": "typescript-contract-reference",
+              "version": "1"
+            },
+            "id": "measurement-series/v1:0b7ab5d8cf69f7a5fcd4df7e7ffe8acb0483d92a67cabcf3eafc3c05adce78ae",
+            "metrics": [
+              {
+                "name": "contract.breaking_changes",
+                "type": "count"
+              },
+              {
+                "name": "contract.client_drift",
+                "type": "boolean"
+              },
+              {
+                "name": "contract.compatible",
+                "type": "boolean"
+              }
+            ],
+            "name": "native-quote-contract-api",
+            "normalization": {
+              "name": "typescript-contract-reference",
+              "version": "1"
+            },
+            "rule": {
+              "name": "oasdiff-and-generated-bytes",
+              "version": "1"
+            },
+            "runtime": {
+              "name": "node-rust-linux-x86-64",
+              "version": "reference-v1"
+            },
+            "source_identity": {
+              "name": "subject-identity",
+              "version": "1"
+            },
+            "target": "native-contract",
+            "tool": {
+              "name": "native-contract-toolchain",
+              "version": "cargo=cargo 1.97.1 (c980f4866 2026-06-30);generator=0.29.0;llvm-cov=cargo-llvm-cov 0.9.0;node=v24.18.0;npm=11.16.0;oasdiff=oasdiff version 1.11.7;rustc=rustc 1.97.1 (8bab26f4f 2026-07-14)"
+            }
+          },
+          {
+            "collector": {
+              "name": "typescript-contract-reference",
+              "version": "1"
+            },
+            "id": "measurement-series/v1:de29b26f969ecaff8ccfc2adfed43649b7edb7ad19cc8f30d227fb520f1b3800",
+            "metrics": [
+              {
+                "name": "coverage.function",
+                "type": "ratio"
+              }
+            ],
+            "name": "native-quote-file-api",
+            "normalization": {
+              "name": "typescript-contract-reference",
+              "version": "1"
+            },
+            "rule": {
+              "name": "native-file-function-counters",
+              "version": "1"
+            },
+            "runtime": {
+              "name": "node-rust-linux-x86-64",
+              "version": "reference-v1"
+            },
+            "source_identity": {
+              "name": "subject-identity",
+              "version": "1"
+            },
+            "target": "native-contract",
+            "tool": {
+              "name": "native-contract-toolchain",
+              "version": "cargo=cargo 1.97.1 (c980f4866 2026-06-30);generator=0.29.0;llvm-cov=cargo-llvm-cov 0.9.0;node=v24.18.0;npm=11.16.0;oasdiff=oasdiff version 1.11.7;rustc=rustc 1.97.1 (8bab26f4f 2026-07-14)"
+            }
+          },
+          {
+            "collector": {
+              "name": "typescript-contract-reference",
+              "version": "1"
+            },
+            "id": "measurement-series/v1:90b536226b840a1351b870ac31aa4c8fcc151dbacce404b61bf5e6435010847f",
+            "metrics": [
+              {
+                "name": "coverage.function",
+                "type": "ratio"
+              }
+            ],
+            "name": "native-quote-file-frontend",
+            "normalization": {
+              "name": "typescript-contract-reference",
+              "version": "1"
+            },
+            "rule": {
+              "name": "native-file-function-counters",
+              "version": "1"
+            },
+            "runtime": {
+              "name": "node-rust-linux-x86-64",
+              "version": "reference-v1"
+            },
+            "source_identity": {
+              "name": "subject-identity",
+              "version": "1"
+            },
+            "target": "native-contract",
+            "tool": {
+              "name": "native-contract-toolchain",
+              "version": "cargo=cargo 1.97.1 (c980f4866 2026-06-30);generator=0.29.0;llvm-cov=cargo-llvm-cov 0.9.0;node=v24.18.0;npm=11.16.0;oasdiff=oasdiff version 1.11.7;rustc=rustc 1.97.1 (8bab26f4f 2026-07-14)"
+            }
+          }
+        ]
+      },
+      "compatible": {
+        "actual": "pass",
+        "archive_sha256": "014466ec14f6f3362a6325368151aab0d685c3d4d2b95ccdb87d8fd4582db96e",
+        "expected": "pass",
+        "series": [
+          {
+            "collector": {
+              "name": "typescript-contract-reference",
+              "version": "1"
+            },
+            "id": "measurement-series/v1:0b7ab5d8cf69f7a5fcd4df7e7ffe8acb0483d92a67cabcf3eafc3c05adce78ae",
+            "metrics": [
+              {
+                "name": "contract.breaking_changes",
+                "type": "count"
+              },
+              {
+                "name": "contract.client_drift",
+                "type": "boolean"
+              },
+              {
+                "name": "contract.compatible",
+                "type": "boolean"
+              }
+            ],
+            "name": "native-quote-contract-api",
+            "normalization": {
+              "name": "typescript-contract-reference",
+              "version": "1"
+            },
+            "rule": {
+              "name": "oasdiff-and-generated-bytes",
+              "version": "1"
+            },
+            "runtime": {
+              "name": "node-rust-linux-x86-64",
+              "version": "reference-v1"
+            },
+            "source_identity": {
+              "name": "subject-identity",
+              "version": "1"
+            },
+            "target": "native-contract",
+            "tool": {
+              "name": "native-contract-toolchain",
+              "version": "cargo=cargo 1.97.1 (c980f4866 2026-06-30);generator=0.29.0;llvm-cov=cargo-llvm-cov 0.9.0;node=v24.18.0;npm=11.16.0;oasdiff=oasdiff version 1.11.7;rustc=rustc 1.97.1 (8bab26f4f 2026-07-14)"
+            }
+          },
+          {
+            "collector": {
+              "name": "typescript-contract-reference",
+              "version": "1"
+            },
+            "id": "measurement-series/v1:de29b26f969ecaff8ccfc2adfed43649b7edb7ad19cc8f30d227fb520f1b3800",
+            "metrics": [
+              {
+                "name": "coverage.function",
+                "type": "ratio"
+              }
+            ],
+            "name": "native-quote-file-api",
+            "normalization": {
+              "name": "typescript-contract-reference",
+              "version": "1"
+            },
+            "rule": {
+              "name": "native-file-function-counters",
+              "version": "1"
+            },
+            "runtime": {
+              "name": "node-rust-linux-x86-64",
+              "version": "reference-v1"
+            },
+            "source_identity": {
+              "name": "subject-identity",
+              "version": "1"
+            },
+            "target": "native-contract",
+            "tool": {
+              "name": "native-contract-toolchain",
+              "version": "cargo=cargo 1.97.1 (c980f4866 2026-06-30);generator=0.29.0;llvm-cov=cargo-llvm-cov 0.9.0;node=v24.18.0;npm=11.16.0;oasdiff=oasdiff version 1.11.7;rustc=rustc 1.97.1 (8bab26f4f 2026-07-14)"
+            }
+          },
+          {
+            "collector": {
+              "name": "typescript-contract-reference",
+              "version": "1"
+            },
+            "id": "measurement-series/v1:90b536226b840a1351b870ac31aa4c8fcc151dbacce404b61bf5e6435010847f",
+            "metrics": [
+              {
+                "name": "coverage.function",
+                "type": "ratio"
+              }
+            ],
+            "name": "native-quote-file-frontend",
+            "normalization": {
+              "name": "typescript-contract-reference",
+              "version": "1"
+            },
+            "rule": {
+              "name": "native-file-function-counters",
+              "version": "1"
+            },
+            "runtime": {
+              "name": "node-rust-linux-x86-64",
+              "version": "reference-v1"
+            },
+            "source_identity": {
+              "name": "subject-identity",
+              "version": "1"
+            },
+            "target": "native-contract",
+            "tool": {
+              "name": "native-contract-toolchain",
+              "version": "cargo=cargo 1.97.1 (c980f4866 2026-06-30);generator=0.29.0;llvm-cov=cargo-llvm-cov 0.9.0;node=v24.18.0;npm=11.16.0;oasdiff=oasdiff version 1.11.7;rustc=rustc 1.97.1 (8bab26f4f 2026-07-14)"
+            }
+          }
+        ]
+      }
+    },
+    "contracts_tests": {
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/quality/tests",
+        "-p",
+        "test_typescript_contracts.py",
+        "-v"
+      ],
+      "exit_code": 0
+    },
+    "coverage": {
+      "exact_counter_comparisons": 88,
+      "pairs": {
+        "compatible": {
+          "debt": "pass",
+          "threshold": "pass"
+        },
+        "regression": {
+          "debt": "fail",
+          "threshold": "fail"
+        }
+      },
+      "unexplained_mismatches": []
+    }
+  },
+  "coverage_series": {
+    "collector": {
+      "name": "typescript-reference",
+      "version": "1"
+    },
+    "id": "measurement-series/v1:b680df6dc529cafbbadf4ebba23627d2f34c6c16d30d22dcf5210b29c727a408",
+    "metrics": [
+      {
+        "name": "accessibility.violations",
+        "type": "count"
+      },
+      {
+        "name": "bundle.size",
+        "type": "size"
+      },
+      {
+        "name": "complexity.cognitive",
+        "type": "count"
+      },
+      {
+        "name": "complexity.cyclomatic",
+        "type": "count"
+      },
+      {
+        "name": "contract.breaking_changes",
+        "type": "count"
+      },
+      {
+        "name": "contract.client_drift",
+        "type": "boolean"
+      },
+      {
+        "name": "contract.compatible",
+        "type": "boolean"
+      },
+      {
+        "name": "contract.schema_valid",
+        "type": "boolean"
+      },
+      {
+        "name": "coverage.branch",
+        "type": "ratio"
+      },
+      {
+        "name": "coverage.function",
+        "type": "ratio"
+      },
+      {
+        "name": "coverage.line",
+        "type": "ratio"
+      },
+      {
+        "name": "coverage.region",
+        "type": "ratio"
+      },
+      {
+        "name": "mutation.killed",
+        "type": "count"
+      },
+      {
+        "name": "mutation.score",
+        "type": "ratio"
+      },
+      {
+        "name": "mutation.survived",
+        "type": "count"
+      },
+      {
+        "name": "performance.duration",
+        "type": "duration"
+      },
+      {
+        "name": "performance.regression",
+        "type": "boolean"
+      },
+      {
+        "name": "risk.crap",
+        "type": "decimal"
+      },
+      {
+        "name": "security.findings",
+        "type": "count"
+      }
+    ],
+    "name": "typescript-source-coverage",
+    "normalization": {
+      "name": "istanbul-start-line-max-innermost/v1",
+      "version": "1"
+    },
+    "rule": {
+      "name": "typescript-source-coverage",
+      "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+    },
+    "runtime": {
+      "name": "node-jsdom",
+      "version": "24.18.0/jsdom@28.0.0"
+    },
+    "source_identity": {
+      "name": "typescript-original-source/v1",
+      "version": "1"
+    },
+    "target": "node-jsdom",
+    "tool": {
+      "name": "typescript-toolchain",
+      "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+    }
+  },
+  "fixture_revisions": {
+    "runs": {
+      "compatible-base": {
+        "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+        "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+        "run": "compatible-base",
+        "target": "node-jsdom"
+      },
+      "compatible-head": {
+        "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+        "commit": "e8c569b30461a1502eb7d35336672799157465d3",
+        "run": "compatible-head",
+        "target": "node-jsdom"
+      },
+      "regression-base": {
+        "base_commit": "e09b480256c2bc9ca30d4d1e5f70dea5b312eae4",
+        "commit": "e09b480256c2bc9ca30d4d1e5f70dea5b312eae4",
+        "run": "regression-base",
+        "target": "node-jsdom"
+      },
+      "regression-head": {
+        "base_commit": "e09b480256c2bc9ca30d4d1e5f70dea5b312eae4",
+        "commit": "6322986c399e84b161e947bda5c72c983b78c7bf",
+        "run": "regression-head",
+        "target": "node-jsdom"
+      }
+    },
+    "schema": "typescript-acceptance-window/v1"
+  },
+  "replay_environment": {
+    "platform": "Linux-7.0.0-31-generic-x86_64-with-glibc2.43",
+    "python": "3.14.4"
+  },
+  "schema": "typescript-advisory-results/v1",
+  "status": "pass"
+}

@@ -1,12 +1,14 @@
 # Bounded TypeScript/Angular certification
 
 This record covers only the retained repository reference fixture and capabilities
-below, under [OpenSpec task 4.2](../../openspec/changes/typescript-angular-reference-adapter/tasks.md)
+below, under [OpenSpec tasks 4.2–4.3](../../openspec/changes/typescript-angular-reference-adapter/tasks.md)
 and [ADR-0040](../adr/0040-language-agnostic-evidence-policy.md).
-Local acceptance is evidenced by [GH-135 validation](gh-135/README.md).
-Required hosted CI is pending at submission; task 4.2 stays unchecked until it
-passes. Final follow-up review is task 4.3 and is not claimed here.
-This record confers no release authority or general Angular/platform certification.
+[GH-136 final review](gh-136/README.md) links merged predecessor PRs and successful
+required CI through task 4.2, retained real-tool evidence and repeated local replay.
+Task 4.3 review is recorded; final acceptance/closure requires successful required
+CI on the review PR and controller merge.
+This is a bounded TypeScript/Angular reference adapter, not universal frontend
+certification. This record confers no release authority or general Angular/platform certification.
 
 ## Exact fixture and toolchain
 
