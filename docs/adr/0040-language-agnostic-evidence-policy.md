@@ -67,3 +67,17 @@ execution, or a second ecosystem. GH-119 task 10.5 creates the separate
 The adapter remains unimplemented and uncertified; final architecture closure
 awaits GH-119 required CI and controller acceptance. Cross-ecosystem stability
 requires real second-ecosystem evidence.
+
+## TypeScript/Angular follow-up review (GH-136)
+
+The [bounded acceptance review](../quality/gh-136/README.md) supersedes the
+implementation status above for this independent adapter follow-up: tasks
+1.1–4.2 have merged PR and required CI evidence, and task 4.3 review is recorded
+with final CI/controller closure pending. Only the retained fixture, exact
+measurement series and supported capabilities in the
+[certification matrix](../quality/typescript-certification.md) are covered.
+This adds no generic contract amendment and does not broaden this ADR’s Rust
+equivalence window. Unmeasured frontend capabilities remain unavailable, and
+existing Rust required release authority remains unchanged. Any future generic
+amendment needs a separately reviewed spec delta and Rust/frontend validation;
+authority migration needs a future independent accepted change.
