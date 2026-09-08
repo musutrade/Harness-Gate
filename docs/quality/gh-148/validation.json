@@ -1,0 +1,168 @@
+{
+  "issue": "GH-148",
+  "scope": [
+    "3.1",
+    "3.2"
+  ],
+  "baseline": "ba28f2a9910ced926adb053c4a85d85ba15fbbf5",
+  "dependency": {
+    "issue": 147,
+    "pr": 154,
+    "head_sha": "81fe6e7b6138e1cda673b91a231250889408dba9",
+    "state": "merged; required CI complete before implementation"
+  },
+  "environment": {
+    "CARGO_HOME": "$WORKSPACE/target/gh-148/cargo-home",
+    "CARGO_TARGET_DIR": "$WORKSPACE/target/gh-148/build",
+    "git": "Workspace-local copy of this checkout Git metadata used because .git is read-only; no other workspace accessed."
+  },
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 0,
+      "duration_seconds": 102.52,
+      "log": "nextest.log",
+      "result": "324 passed, 0 skipped (315 CLI + 9 candidate library tests)"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "exit_code": 0,
+      "duration_seconds": 0.472,
+      "log": "fmt.log",
+      "result": "passed"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml --all -- --check",
+      "exit_code": 0,
+      "duration_seconds": 0.529,
+      "log": "fmt-all.log",
+      "result": "passed"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 0,
+      "duration_seconds": 1.502,
+      "log": "clippy.log",
+      "result": "passed"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 0,
+      "log": "python.log",
+      "result": "289 passed"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 0,
+      "duration_seconds": 2.831,
+      "log": "docs-consistency.log",
+      "result": "passed"
+    },
+    {
+      "command": "openspec validate consolidate-generic-quality-core-into-rust --strict",
+      "exit_code": 0,
+      "duration_seconds": 1.942,
+      "log": "openspec.log",
+      "result": "passed"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "duration_seconds": 0.011,
+      "log": "diff-check.log",
+      "result": "passed"
+    }
+  ],
+  "baseline_reference": {
+    "command": "PYTHONPATH=tools/quality python3 -m unittest discover -s tools/quality/tests -p test_policy*.py -v",
+    "result": "19 passed before implementation",
+    "log": "reference.log"
+  },
+  "differential": {
+    "frozen_cases": 33,
+    "reference_tests": 19,
+    "policy_cases": 391,
+    "evaluate": 120,
+    "compare": 181,
+    "decision": 36,
+    "aggregate": 23,
+    "validate_policy": 19,
+    "selection": 12,
+    "unexplained_mismatches": 0,
+    "existing_evidence_project_series_capability_cases": 399,
+    "diagnostic_normalization": "Two frozen missing-source OS errors: same artifact/source path and missing-file failure required; Rust/Python prefix and errno formatting only."
+  },
+  "not_applicable": [
+    {
+      "command": "harness-gate config check",
+      "reason": ".harness-gate/flow.toml absent; no declared ci profile"
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "reason": ".harness-gate/flow.toml absent; no declared ci profile"
+    }
+  ],
+  "resolved_attempts": [
+    {
+      "command": "cargo check --manifest-path tools/harness-gate/Cargo.toml -p harness-gate-quality-core",
+      "log": "check.log",
+      "error": "failed to open /home/gem/.cargo/registry/cache/index.crates.io-1949cf8c6b5b557f/tinyvec-1.13.2.crate: Read-only file system (os error 30)",
+      "resolution": "Copied registry into workspace-local CARGO_HOME. CARGO_HOME-only retry also hit /home/gem/cargo-target/debug/.cargo-build-lock: Read-only file system (os error 30). Setting workspace-local CARGO_TARGET_DIR resolved both; check-local.log passed. No remaining environment blocker."
+    },
+    {
+      "logs": [
+        "policy-test.log",
+        "policy-test2.log",
+        "policy-test3.log"
+      ],
+      "resolution": "Corrected exact schema/typed-value diagnostic ordering against Python; final differential test passes."
+    },
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 100,
+      "log": "nextest-initial.log",
+      "result": "323 passed, 1 failed",
+      "resolution": "Shared validation initially changed project control-character diagnostic order; kept domain validation local to new policy/comparison/exception entry points. Final 324 tests pass."
+    }
+  ],
+  "limitations": [
+    "Bounded frozen-corpus compatibility evidence, not full migration acceptance.",
+    "Contract provenance outcomes enter through an explicit validator callback; task 4.1 implements that validator. Missing callback fails closed and is tested.",
+    "Library has no Python runtime or CLI dependency; test oracle requires Python. Existing required CI authority is unchanged.",
+    "Exception timestamps use Rust RFC 3339 parsing; the frozen forms are covered, not every additional spelling accepted by Python ISO parsing."
+  ],
+  "hosted_ci": "pending on final pushed SHA; controller owns required CI acceptance",
+  "artifacts": {
+    "validation.tar.gz": "cb0427207cc035bbb630dc8ffbaa97a4b668e76981e13f5d9b4ae647689ec99f",
+    "logs": {
+      "check-local.log": "471ec31600ac35431255358288d6790b4fdf015bfcf4aaa6331af6995e2373fb",
+      "check.log": "3a862259dcf7a0dc3f2b854dd47830347fe52436367b9545be848921000e23ac",
+      "clippy.log": "a32dbe3ac96c28f175e9abc7c9fd75ae342cdd748da0cccb205d4f4efe61486a",
+      "diff-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "docs-consistency.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "fmt-all.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "fmt-write.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "fmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nextest-initial.log": "ed4a0bb60089773998aed5c1cfa6b716b2a07b928e8273f95371d0c7d1b63a12",
+      "nextest.log": "e9d116160c19af50508b7e55b5940680a8860ccd98dfa3a408552112e0ccb8eb",
+      "openspec.log": "c278b42501fec6559263d401ab0e6eaefea6dc95b1ac1e4705d604a399f477b1",
+      "oracle.log": "9dbeda90902891ed5d0098ede346e4bf5211665c1eec7e7604c27b7a84867877",
+      "policy-test.log": "e90f02d16085b50d98a8856d6a532315dc1959dcf3cc9ec52deeadde68655216",
+      "policy-test2.log": "966e34380576560a42fbd8edfc679304ca7b9b07d1772f60362b05384e4040f3",
+      "policy-test3.log": "816713e3b4f3f3c7a5a646dc96c42c82dc1569ebc253de2efe5c52b759b48d68",
+      "python.log": "65546e67831870dffb87163414ba2c7dabbcb51fc6af2db39a6c7aeacce49330",
+      "reference.log": "eccb58cbac17dfd82c03d79d7a4ffd3c37781c2fe0c5b4dfb5f85cce3c526c77",
+      "clippy.status.json": "ada51bff5f8e28d31076f8eecda2c48cf149cb8ef23594a62e21c08a7d28ece1",
+      "diff-check.status.json": "576d9bf335247d07138c6b9f9177b2d6acab6476204f9fdb30918dec5a1a3019",
+      "docs-consistency.status.json": "cf960213040083f9cb94fc03bb8d55836ed3e94c4c662b849ec7b7fe2db1b6ad",
+      "fmt-all.status.json": "84e78e52f0f6268f6274ee20428b0abfcf55905b7c1f00f9d1ede96252b50472",
+      "fmt-write.status.json": "0efb96b7ead658fc183d6b203e01db541c7bcdba07bfd2254583dc5629f3549b",
+      "fmt.status.json": "54ec77def2f8f36afe78b03c67881970f0909bd58eae1637d4f83d1baf6ba8bb",
+      "nextest-initial.status.json": "16127b92ff126138b25b7887d8fd8040b4179bb70debed576c703ecad4af41b5",
+      "nextest.status.json": "bef119e8abe0aad8d6dc92146e94ec086b0c4b33f7c61df70f900f63c0d825ea",
+      "openspec.status.json": "4e9ac94ab12dc18b0fb74394811e2c0f808891ca034b659bd21e7cd3e27b95ff",
+      "python.status.json": "89c3b8b81f2342172421bb8fe0a7cd3475ceecff3217d2edc284b945f2bd2738",
+      "docs-consistency.json": "669ddab82fea7bcf712bd30359e8a0811e1750a7acc313fae710b4eea5346c5a"
+    }
+  }
+}
