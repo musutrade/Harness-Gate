@@ -1,4 +1,4 @@
-//! Policy-owned gates and aggregation over validated evidence; shadow-only.
+//! Policy-owned gates and aggregation over validated evidence.
 pub use super::comparison::compare;
 use super::{
     array, cross_component, error, evidence, index, project, ratchet, require, schema, string,

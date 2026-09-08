@@ -91,6 +91,46 @@ fn compatibility_cli_preserves_comparison_and_rollback_evidence() {
 }
 
 #[test]
+fn migration_cli_preserves_source_and_refuses_overwrite() {
+    let root = TempDir::new().unwrap();
+    let legacy = include_str!("../../quality/fixtures/v1-flow.toml");
+    fs::write(root.path().join("legacy.toml"), legacy).unwrap();
+    fs::create_dir(root.path().join(".harness-gate")).unwrap();
+    fs::write(
+        root.path().join(".harness-gate/audit.toml"),
+        include_str!("../presets/empty.audit.toml"),
+    )
+    .unwrap();
+    success(
+        command(root.path())
+            .args(["--config", "legacy.toml", "config", "migrate"])
+            .output()
+            .unwrap(),
+    );
+    success(
+        command(root.path())
+            .args(["config", "check"])
+            .output()
+            .unwrap(),
+    );
+    assert_eq!(
+        fs::read_to_string(root.path().join("legacy.toml")).unwrap(),
+        legacy
+    );
+    assert!(root.path().join(".harness-gate/secrets.toml").is_file());
+    let migrated = fs::read(root.path().join(".harness-gate/flow.toml")).unwrap();
+    let refused = command(root.path())
+        .args(["config", "migrate", "--input", "legacy.toml"])
+        .output()
+        .unwrap();
+    assert!(!refused.status.success());
+    assert_eq!(
+        fs::read(root.path().join(".harness-gate/flow.toml")).unwrap(),
+        migrated
+    );
+}
+
+#[test]
 fn config_cli_discovers_nested_project_and_rejects_file_root() {
     let root = fixture();
     let nested = root.path().join("nested");
