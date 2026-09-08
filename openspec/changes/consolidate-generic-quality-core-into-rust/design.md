@@ -1,5 +1,21 @@
 # Design: Rust-authoritative Generic Quality Core
 
+## Current implementation and closure
+
+Tasks 1–6 are accepted through merged PR #158 and successful required CI. The
+released Rust binary now owns generic evaluation and project reports. GH-152
+applies the [final Python boundary and retirement policy](../../../docs/quality/python-retention.md):
+all eight inventoried C modules are frozen non-authoritative references, with
+explicit reference-only Python decision CLIs and checked source hashes. A/B
+Python tooling remains intentional; D artifacts and semantics remain frozen
+until reviewed replacement and retirement. Legacy measurement validation and
+collector transport retain their documented mixed roles. No ecosystem support
+claim expands. [Final closure evidence](../../../docs/quality/gh-152/README.md)
+tracks task 7.3's remaining required-CI/controller acceptance.
+
+The sections below retain the original migration design and stage-specific
+records; candidate-only and pending-transfer descriptions describe those stages.
+
 ## Context
 
 Harness-Gate has completed the language-agnostic architecture migration and a bounded real TypeScript/Angular second-ecosystem acceptance. The external protocol boundary is now credible: collectors can produce normalized evidence without owning delivery decisions.
@@ -99,10 +115,10 @@ Human wording may be normalized where it is explicitly non-contractual; machine 
 
 ## Authority model during migration
 
-GH-151's [pending transfer review](../../../docs/quality/gh-151/README.md)
-records the proposed product CLI, opt-in workflow, local differential evidence,
-rollback, versioned production measurements and outstanding hosted acceptance. The candidate
-does not supersede the authority requirements below.
+GH-151's [authority-transfer review](../../../docs/quality/gh-151/README.md)
+records the product CLI, opt-in workflow, differential evidence, rollback,
+versioned production measurements and completed hosted acceptance. The original
+authority requirements below governed that transfer.
 
 The existing required Rust CI remains authoritative. Python generic semantics act as the reference for the new generic core until acceptance. Rust candidate output is shadow evidence.
 
@@ -169,7 +185,8 @@ Expected disposition, subject to inventory evidence:
 - `harness_evidence.py`, `project_model.py`, `policy_engine.py`, `policy_ratchet.py`, `cross_component.py`, `project_report.py`: C-class semantics migrate to Rust; afterward remove/freeze/wrap according to dependency inventory.
 - `rust_equivalence.py`, `typescript_advisory.py` and migration-specific replayers: D-class; retain through acceptance, then document freeze/retirement policy.
 
-The final inventory, not this provisional list, is authoritative.
+The [GH-152 final inventory](../../../docs/quality/gh-152/python-boundary.json),
+not this historical provisional list, now governs dispositions.
 
 ## Task 1 freeze record
 

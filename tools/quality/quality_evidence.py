@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Validate versioned quality evidence records (stdlib only).
+"""Frozen non-authoritative Python reference; see docs/quality/python-retention.md.
+
+Generic decisions belong to the released Rust core. No release-approval path.
+Legacy complexity-evidence validation remains required Python measurement tooling.
+
+Validate versioned quality evidence records (stdlib only).
 
 The canonical machine-readable shape lives in
 ``tools/quality/schema/quality-evidence.schema.json``.  This module loads that
