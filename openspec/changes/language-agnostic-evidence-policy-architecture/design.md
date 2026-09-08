@@ -10,7 +10,7 @@ and isolated critical-path evidence. `Required Quality Aggregate` is the stable 
 check. The existing Rust risk series is deliberately conservative and does not certify
 repository-wide CRAP for unmeasured production sources.
 
-Motivation and authorization boundaries are defined in [proposal](proposal.md). This document defines a future architecture; it is not proof that implementation, migration, CI rollout or non-Rust ecosystem support has been completed.
+Motivation and authorization boundaries are defined in [proposal](proposal.md). Implementation and scoped Rust acceptance are now recorded in the [closure ledger](../../../docs/quality/architecture-closure.md). Conceptual examples below are not normative schemas; no real non-Rust adapter is certified.
 
 Harness-Gate currently has strong Rust-first evidence semantics, including production-source ownership, raw line/function/region coverage, function risk/CRAP evidence, measurement series, critical-path traceability, negative fixtures and fail-closed behavior. Those semantics should be preserved. The purpose of this design is to separate them from the core so future ecosystems can participate without cloning or weakening policy behavior.
 
@@ -92,7 +92,7 @@ GH-111 implements tasks 0.3 and 1.1–1.4 as a standalone development model. The
 current machine contracts; the [v1 model record](../../../docs/quality/project-model.md)
 specifies the schemas, canonical identity, directed relationship graph and
 explicit rename/move/split lineage. The TOML above remains an illustrative shape,
-not a new project-local configuration contract (task 9.1 is still pending).
+not a new project-local configuration contract (task 9.1 selected the opt-in JSON manifest; see the GH-117 decision below).
 
 **Alternatives:** one Harness-Gate project per language would avoid a component model but cannot express cross-component contracts or project-level release evidence. A tool-centric model would couple the core to current ecosystems.
 
@@ -120,7 +120,7 @@ The core never joins evidence only by short symbol name. Symbol-like subjects us
 }
 ```
 
-For ecosystems where source ranges or stable qualified symbols cannot be supplied, the adapter declares reduced identity capability and the relevant policies decide whether that evidence is sufficient. Ambiguous identities never silently merge.
+The conceptual design allowed reduced identity capability when source ranges or stable qualified symbols cannot be supplied. Executable v1 does not implement that negotiation: span is optional, but a source digest and unambiguous discriminator are required. The second-ecosystem mismatch register records this gap as TS-01. Ambiguous identities must fail closed; reduced identity requires a reviewed contract change.
 
 Rename/move/split mapping is explicit baseline metadata; a new identity cannot automatically inherit favorable historical debt.
 
@@ -164,8 +164,8 @@ counts. Decimal and rational CRAP remain distinct series types. The full
 project-model subject is embedded; provenance includes an explicit
 base commit. Canonical serialization and filesystem integrity are validated before
 consumption. This GH-112 implementation covers tasks 2.1–2.5 and 3.1–3.4 only;
-Rust shadow projection is recorded below; required-gate equivalence acceptance
-and rollout remain later tasks.
+Rust shadow projection is recorded below; scoped equivalence acceptance is recorded under GH-118 below; authoritative
+gate replacement remains a separate rollout.
 
 The common envelope standardizes provenance, identity, metrics and artifact linkage. It does not imply that Rust LLVM coverage, Java JaCoCo coverage, Python coverage.py and TypeScript Istanbul have identical semantics. Their measurement contracts and series remain distinct.
 
@@ -505,5 +505,15 @@ It does not claim a hosted soak or certify additional series or ecosystems.
 [ADR-0040](../../../docs/adr/0040-language-agnostic-evidence-policy.md) records
 noninterchangeable series, collector/policy separation and the fail-closed trust
 boundary. The [validation record](../../../docs/quality/gh-118-validation.md)
-covers tasks 10.1–10.4; required hosted CI, task 10.5 and full proposal acceptance
+covers tasks 10.1–10.4; their merged PR and successful required hosted CI are
+linked in the GH-119 closure ledger. Final GH-119 CI and controller acceptance
 remain pending. Any authority replacement requires a separate reviewed rollout.
+
+## GH-119 closure and second-ecosystem boundary
+
+The [closure ledger](../../../docs/quality/architecture-closure.md) reconciles
+submission-time statuses with accepted predecessor deliveries. The separate
+[TypeScript/Angular design](../typescript-angular-reference-adapter/design.md)
+selects a real fixture plan and records TS-01–TS-03 mismatches and open integration
+questions. It does not implement or enable an adapter. Generic v1 closure does
+not certify ecosystem stability or authorize required-gate replacement.

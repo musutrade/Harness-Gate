@@ -1,6 +1,6 @@
 # ADR-0040: Language-agnostic evidence and policy with a fail-closed migration boundary
 
-**Status:** Proposed for acceptance with GH-118; required Rust authority continues.
+**Status:** Accepted through GH-118 / merged PR #127 and successful required CI; required Rust authority continues. See the [closure ledger](../quality/architecture-closure.md).
 
 **Date:** 2026-09-08
 
@@ -62,6 +62,8 @@ results, not independently reimplemented generic collectors.
 
 The acceptance window covers two retained Linux Rust runs and explicit negative
 fixtures. It does not certify future series, other platforms, hosted shadow
-execution, or a second ecosystem. The separately scoped task 10.5 and real
-TypeScript/Angular reference adapter remain pending; the whole OpenSpec change
-is not declared accepted or stable.
+execution, or a second ecosystem. GH-119 task 10.5 creates the separate
+[TypeScript/Angular proposal](../../openspec/changes/typescript-angular-reference-adapter/proposal.md).
+The adapter remains unimplemented and uncertified; final architecture closure
+awaits GH-119 required CI and controller acceptance. Cross-ecosystem stability
+requires real second-ecosystem evidence.

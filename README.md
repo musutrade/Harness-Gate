@@ -312,6 +312,16 @@ followed by `harness-gate hook`. Before a PR or release, run
 `harness-gate verify --all`; upload the reports directory when a failure needs
 review.
 
+## Evidence architecture and adapter support
+
+The development-only generic evidence/policy core supports component identity,
+validated evidence, policy, ratchets and project reports. Rust is the implemented
+reference adapter with bounded equivalence acceptance; its existing required
+quality path remains authoritative. TypeScript/Angular, Python, Java and contract
+examples are synthetic, not certified adapters. The independent TypeScript/Angular
+follow-up is a proposal only. See the [support and closure record](docs/quality/architecture-closure.md)
+for accepted evidence, limitations and the next change.
+
 ## Features
 
 ### Multi-component Workflow Management
