@@ -77,7 +77,7 @@ jobs:
         uses: taiki-e/install-action@cargo-nextest
 
       - name: Run tests
-        run: cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked
+        run: cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked --no-fail-fast
 
   security-audit:
     name: Security Audit
