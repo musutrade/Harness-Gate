@@ -147,7 +147,8 @@
             "boolean",
             "duration",
             "size",
-            "decimal"
+            "decimal",
+            "rational"
           ]
         }
       }
@@ -340,6 +341,9 @@
         },
         {
           "$ref": "#/definitions/Decimal"
+        },
+        {
+          "$ref": "#/definitions/Rational"
         }
       ],
       "description": "Explicitly discriminated values. Ratios preserve covered/total; no floating JSON numbers. Semantic validation enforces covered <= total and the named metric contract."
@@ -577,6 +581,28 @@
           "minimum": 1
         },
         "end_column": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "Rational": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "numerator",
+        "denominator"
+      ],
+      "properties": {
+        "type": {
+          "const": "rational"
+        },
+        "numerator": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "denominator": {
           "type": "integer",
           "minimum": 1
         }
