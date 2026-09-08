@@ -196,3 +196,18 @@ measurement boundary and baseline. No gate threshold, required-check dependency,
 production hotspot inventory or release authority changes. See the
 [GH-147 validation record](../../../docs/quality/gh-147/README.md) and
 [ADR-0040](../../../docs/adr/0040-language-agnostic-evidence-policy.md).
+
+## Task 4 implementation record
+
+GH-149 replaces the task 3 provenance callback with generic Rust contract
+validation. The policy engine validates evidence and trusted source/artifact
+context first, then checks provider/consumer bindings before typed comparison.
+The same relationship and subject selectors serve policy validation and evidence
+provenance validation. Missing provenance remains a measurement error.
+
+Rust project reporting retains the policy result and lossless ordered gate table,
+then builds participant and other indexes and reuses policy aggregation for
+component/local/cross-component views. Shared participant references do not
+increase project blocker counts. Reports retain `mode: shadow`; the CLI has no
+candidate dependency. See [GH-149 validation](../../../docs/quality/gh-149/README.md).
+Tasks 5–7 and full proposal acceptance remain outstanding.
