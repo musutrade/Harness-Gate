@@ -21,11 +21,14 @@ FIXTURE = ROOT / 'fixtures/typescript-angular'
 
 
 class TypeScriptCollectorTests(unittest.TestCase):
+    native_directory = FIXTURE / 'evidence'
+    semantics_directory = FIXTURE / 'semantics'
+
     @classmethod
     def setUpClass(cls):
-        cls.native = (FIXTURE / 'evidence/native.tar.gz').read_bytes()
-        cls.index = (FIXTURE / 'semantics/source-index.json').read_bytes()
-        cls.receipt = evidence.load_json(FIXTURE / 'semantics/receipt.json')
+        cls.native = (cls.native_directory / 'native.tar.gz').read_bytes()
+        cls.index = (cls.semantics_directory / 'source-index.json').read_bytes()
+        cls.receipt = evidence.load_json(cls.semantics_directory / 'receipt.json')
         with tarfile.open(fileobj=io.BytesIO(cls.native), mode='r:gz') as archive:
             cls.files = {m.name: archive.extractfile(m).read() for m in archive.getmembers()}
         cls.manifest = json.loads(cls.files['manifest.json'])
@@ -132,7 +135,7 @@ class TypeScriptCollectorTests(unittest.TestCase):
                        and r['subject']['kind'] == 'file/v1')
         self.assertEqual(next(m['value'] for m in pricing['metrics'] if m['name'] == 'coverage.line'),
                          {'type': 'ratio', 'covered': 4, 'total': 6})
-        golden = evidence.load_json(FIXTURE / 'semantics/native-counters.json')
+        golden = evidence.load_json(self.semantics_directory / 'native-counters.json')
         for path, scopes in golden['files'].items():
             rows = [r for r in internal if r['subject']['path'] == 'app/' + path
                     and r['subject']['kind'] != 'route/v1']

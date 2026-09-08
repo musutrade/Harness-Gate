@@ -1,0 +1,9 @@
+{
+  "argv": [
+    "node",
+    "/home/gem/symphony-workspaces/GH-134/target/quality/gh134/native-v2/compatible/repo/fixture/source-index.cjs",
+    "/home/gem/symphony-workspaces/GH-134/target/quality/gh134/native-v2/compatible/repo/fixture/app"
+  ],
+  "exit_status": 0,
+  "stderr": ""
+}
