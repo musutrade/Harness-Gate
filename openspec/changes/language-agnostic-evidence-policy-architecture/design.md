@@ -267,7 +267,8 @@ All selectors expand caller-owned subjects in the requested target; no implicit
 cross-subject averaging or language branch is introduced. Exact comparisons use
 normalized types. Required non-pass states other than informational block, and
 the aggregate retains original child causes, including cancellation. Optional
-base evidence supplies remediation context only; tasks 6.x remain pending.
+base evidence supplies remediation context; tasks 6.1–6.4 add explicit ratchet rules
+as documented below.
 
 ### 9. Baseline and ratchet are core services
 
@@ -284,6 +285,18 @@ Required semantics include:
 - stale or mismatched commit/target evidence is a measurement error.
 
 The policy engine distinguishes "below absolute threshold" from "regressed relative to base" so projects can stage adoption without claiming legacy compliance.
+
+GH-115 implements tasks 6.1–6.4 in the standalone shadow evaluator. The
+[policy contract](../../../docs/quality/policy-engine.md) defines the closed
+ratchet flags, exact comparison directions, derived debt ledger and independent
+absolute-compliance fields. A source-digest/span edit uses an explicit one-to-one
+`modify` mapping with an unchanged locator, extending the GH-111 mapping model.
+Unmapped identities and split children receive new-subject treatment without debt
+inheritance. Missing historical values or incompatible series prevent incremental
+success. Separate exception metadata preserves the quality result and adds review
+state; invalid/expired metadata blocks the combined aggregate. This implementation
+does not accept the later Rust migration or alter current required gates.
+
 
 ### 10. Cross-component contracts are first-class subjects and gates
 
