@@ -1,5 +1,10 @@
 # Cross-component contracts and project reports
 
+After [GH-151 hosted acceptance](gh-151/README.md), the explicit-context
+`harness-gate quality evaluate` entry point produces authoritative generic decisions
+and project reports in Rust using the same collector and report contracts.
+The historical Python interface documented below remains reference/shadow tooling.
+
 GH-117 implements OpenSpec tasks 8.1–8.3 and 9.1–9.3 in the standalone
 **shadow** evaluator. Rust remains the reference adapter. Angular/TypeScript,
 Python, Java, OpenAPI comparison and client generation here are **synthetic
@@ -158,9 +163,10 @@ exercise both commands and negative provenance cases. The
 
 ## Rust candidate migration
 
-The independent `harness-gate-quality-core` library now implements generic
+GH-149's independent `harness-gate-quality-core` candidate implemented generic
 contract provenance checks and `project_report::report` under OpenSpec tasks
 4.1–4.2. Its complete reports are compared with this Python reference, including
 participant aggregates, lossless indexes and evidence links. See
-[GH-149 validation](gh-149/README.md). The CLI and current shadow reporting path
-retain their existing authority until the later migration acceptance tasks.
+[GH-149 validation](gh-149/README.md). GH-151 subsequently linked that core into
+the released Rust package and accepted authoritative generic evaluation and
+reporting as described above. Python shadow reports remain reference evidence.

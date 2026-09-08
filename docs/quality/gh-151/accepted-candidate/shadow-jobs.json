@@ -1,0 +1,121 @@
+{
+  "total_count": 1,
+  "jobs": [
+    {
+      "id": 102119429779,
+      "run_id": 34243502830,
+      "workflow_name": "Rust Generic Shadow",
+      "head_branch": "symphony/GH-151",
+      "run_url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/runs/34243502830",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUEcwzc8AAAAXxsrWkw",
+      "head_sha": "0fc96d7644d623f31e31fe1a512cb68db0b2003b",
+      "url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/jobs/102119429779",
+      "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34243502830/job/102119429779",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-08T15:14:49Z",
+      "started_at": "2026-09-08T15:14:51Z",
+      "completed_at": "2026-09-08T15:18:03Z",
+      "name": "differential",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-09-08T15:14:52Z",
+          "completed_at": "2026-09-08T15:14:53Z"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-09-08T15:14:53Z",
+          "completed_at": "2026-09-08T15:14:58Z"
+        },
+        {
+          "name": "Bind retained evidence to the reviewed commit",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-09-08T15:14:58Z",
+          "completed_at": "2026-09-08T15:14:58Z"
+        },
+        {
+          "name": "Run dtolnay/rust-toolchain@stable",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-09-08T15:14:58Z",
+          "completed_at": "2026-09-08T15:14:59Z"
+        },
+        {
+          "name": "Run actions/setup-python@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-09-08T15:14:59Z",
+          "completed_at": "2026-09-08T15:14:59Z"
+        },
+        {
+          "name": "Build the shipped core and migration comparator",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-09-08T15:14:59Z",
+          "completed_at": "2026-09-08T15:15:47Z"
+        },
+        {
+          "name": "Compare retained Rust, Angular and negative cases",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-09-08T15:15:47Z",
+          "completed_at": "2026-09-08T15:17:48Z"
+        },
+        {
+          "name": "Retain both engines, field differences and original evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-09-08T15:17:48Z",
+          "completed_at": "2026-09-08T15:18:01Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-09-08T15:18:02Z",
+          "completed_at": "2026-09-08T15:18:02Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-09-08T15:18:02Z",
+          "completed_at": "2026-09-08T15:18:02Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-09-08T15:18:02Z",
+          "completed_at": "2026-09-08T15:18:02Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/musutrade/Harness-Gate/check-runs/102119429779",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000007515,
+      "runner_name": "GitHub Actions 1000007515",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    }
+  ]
+}

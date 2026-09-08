@@ -123,3 +123,22 @@ comparison results and the consolidated fail-closed matrix. The entry point is a
 candidate-library Cargo example, outside the installed CLI. Existing Rust required
 gates and release authority remain unchanged. Hosted shadow integration, authority
 transfer and Python disposition remain separate tasks 6–7.
+
+## Generic Rust authority transfer (GH-151)
+
+The [GH-151 decision and evidence](../quality/gh-151/README.md) accept candidate
+`0fc96d7644d623f31e31fe1a512cb68db0b2003b` after hosted Rust shadow and every
+existing required CI check passed. All 33 Rust/Angular/contract cases and the
+12-category negative matrix pass with zero unresolved mismatch; full comparisons,
+hosted identities and rollback are retained. A separate descendant commit enables
+`harness-gate quality evaluate`, binding final generic decisions and reporting to
+the released Rust library without Python C-class runtime dependencies. PR #158
+records the exact transfer SHA and final hosted validation.
+
+Collectors still measure using protocol v1; policy requiredness and final
+aggregation remain core-owned. The report's legacy `mode: shadow` field remains
+wire-compatible and does not select authority. The required aggregate's name,
+dependencies, thresholds and release authority are unchanged. Versioned risk and
+production coverage include all linked core production, including outside `src/`,
+with authentic compatible base/head counters. Tasks 6.1–6.3 are this acceptance;
+task 7 and full-proposal acceptance remain outstanding.

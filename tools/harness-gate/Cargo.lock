@@ -515,6 +515,7 @@ dependencies = [
  "tera",
  "thiserror",
  "toml",
+ "unicode-normalization",
  "ureq",
  "url",
  "windows-sys 0.61.2",
@@ -525,6 +526,7 @@ name = "harness-gate-quality-core"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "harness-gate",
  "regex",
  "serde",
  "serde_json",

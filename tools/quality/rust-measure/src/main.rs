@@ -203,6 +203,19 @@ impl<'ast> Visit<'ast> for Inventory {
                 Ok(expressions)
             })
             .parse2(node.tokens.clone())
+        } else if node.path.segments.last().unwrap().ident == "vec" {
+            (|input: syn::parse::ParseStream| {
+                let value: Expr = input.parse()?;
+                input.parse::<Token![;]>()?;
+                let length: Expr = input.parse()?;
+                Ok(vec![value, length])
+            })
+            .parse2(node.tokens.clone())
+            .or_else(|_| {
+                syn::punctuated::Punctuated::<Expr, Token![,]>::parse_terminated
+                    .parse2(node.tokens.clone())
+                    .map(|args| args.into_iter().collect())
+            })
         } else {
             syn::punctuated::Punctuated::<Expr, Token![,]>::parse_terminated
                 .parse2(node.tokens.clone())
@@ -244,7 +257,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     println!(
         "{}",
-        json!({"analyzer": "harness-gate-rust-measure", "version": "0.2.0", "rule": "mccabe-rust-2", "symbols": inventory.symbols})
+        json!({"analyzer": "harness-gate-rust-measure", "version": "0.3.0", "rule": "mccabe-rust-3", "symbols": inventory.symbols})
     );
     Ok(())
 }

@@ -13,8 +13,6 @@ fn quality() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
         .parent()
         .unwrap()
-        .parent()
-        .unwrap()
         .join("quality")
 }
 
@@ -23,7 +21,7 @@ fn quality() -> PathBuf {
 static REFERENCE: LazyLock<(TempDir, Vec<Value>)> = LazyLock::new(|| {
     let temp = tempfile::tempdir().unwrap();
     let output = Command::new("python3")
-        .arg(Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/reference.py"))
+        .arg(Path::new(env!("CARGO_MANIFEST_DIR")).join("quality-core/tests/reference.py"))
         .arg(quality())
         .arg(temp.path())
         .output()

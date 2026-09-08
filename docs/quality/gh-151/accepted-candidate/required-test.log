@@ -1,0 +1,806 @@
+﻿2026-09-08T15:14:52.9291467Z Current runner version: '2.337.0'
+2026-09-08T15:14:52.9316622Z ##[group]Runner Image Provisioner
+2026-09-08T15:14:52.9317570Z Hosted Compute Agent
+2026-09-08T15:14:52.9318198Z Version: 20260828.587
+2026-09-08T15:14:52.9318894Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+2026-09-08T15:14:52.9319736Z Build Date: 2026-08-28T16:44:25Z
+2026-09-08T15:14:52.9320467Z Worker ID: {e6c36654-e981-4273-a0d0-096d0475bf71}
+2026-09-08T15:14:52.9321253Z Azure Region: westus
+2026-09-08T15:14:52.9321857Z ##[endgroup]
+2026-09-08T15:14:52.9323778Z ##[group]Operating System
+2026-09-08T15:14:52.9324599Z Ubuntu
+2026-09-08T15:14:52.9325143Z 24.04.4
+2026-09-08T15:14:52.9325715Z LTS
+2026-09-08T15:14:52.9326255Z ##[endgroup]
+2026-09-08T15:14:52.9326855Z ##[group]Runner Image
+2026-09-08T15:14:52.9327518Z Image: ubuntu-24.04
+2026-09-08T15:14:52.9328106Z Version: 20260831.293.1
+2026-09-08T15:14:52.9329450Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260831.293/images/ubuntu/Ubuntu2404-Readme.md
+2026-09-08T15:14:52.9331183Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260831.293
+2026-09-08T15:14:52.9332242Z ##[endgroup]
+2026-09-08T15:14:52.9333746Z ##[group]GITHUB_TOKEN Permissions
+2026-09-08T15:14:52.9335756Z Contents: read
+2026-09-08T15:14:52.9336426Z Metadata: read
+2026-09-08T15:14:52.9336994Z ##[endgroup]
+2026-09-08T15:14:52.9339186Z Secret source: Actions
+2026-09-08T15:14:52.9340431Z Prepare workflow directory
+2026-09-08T15:14:52.9749109Z Prepare all required actions
+2026-09-08T15:14:52.9798090Z Getting action download info
+2026-09-08T15:14:53.3469618Z Download action repository 'actions/checkout@v5' (SHA:fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09)
+2026-09-08T15:14:53.4966624Z Download action repository 'dtolnay/rust-toolchain@stable' (SHA:6bed0761d98439e5a578e2877258200ad565ba87)
+2026-09-08T15:14:53.7023976Z Download action repository 'actions/cache@v5' (SHA:caa296126883cff596d87d8935842f9db880ef25)
+2026-09-08T15:14:53.8849880Z Download action repository 'taiki-e/install-action@cargo-nextest' (SHA:6b0301021c3283456ec7dd2c489e8222869f400d)
+2026-09-08T15:14:54.5050253Z Complete job name: Test
+2026-09-08T15:14:54.5957890Z ##[group]Run actions/checkout@v5
+2026-09-08T15:14:54.5959209Z with:
+2026-09-08T15:14:54.5960028Z   repository: musutrade/Harness-Gate
+2026-09-08T15:14:54.5968986Z   token: ***
+2026-09-08T15:14:54.5969780Z   ssh-strict: true
+2026-09-08T15:14:54.5970589Z   ssh-user: git
+2026-09-08T15:14:54.5971408Z   persist-credentials: true
+2026-09-08T15:14:54.5972309Z   clean: true
+2026-09-08T15:14:54.5973268Z   sparse-checkout-cone-mode: true
+2026-09-08T15:14:54.5974244Z   fetch-depth: 1
+2026-09-08T15:14:54.5975036Z   fetch-tags: false
+2026-09-08T15:14:54.5975848Z   show-progress: true
+2026-09-08T15:14:54.5976687Z   lfs: false
+2026-09-08T15:14:54.5977454Z   submodules: false
+2026-09-08T15:14:54.5978293Z   set-safe-directory: true
+2026-09-08T15:14:54.5979250Z   allow-unsafe-pr-checkout: false
+2026-09-08T15:14:54.5980503Z env:
+2026-09-08T15:14:54.5981272Z   CARGO_TERM_COLOR: always
+2026-09-08T15:14:54.5982194Z   RUST_BACKTRACE: 1
+2026-09-08T15:14:54.5983160Z ##[endgroup]
+2026-09-08T15:14:54.7009120Z Syncing repository: musutrade/Harness-Gate
+2026-09-08T15:14:54.7013444Z ##[group]Getting Git version info
+2026-09-08T15:14:54.7015713Z Working directory is '/home/runner/work/Harness-Gate/Harness-Gate'
+2026-09-08T15:14:54.7019131Z [command]/usr/bin/git version
+2026-09-08T15:14:54.7099797Z git version 2.55.0
+2026-09-08T15:14:54.7219557Z ##[endgroup]
+2026-09-08T15:14:54.7229768Z Temporarily overriding HOME='/home/runner/work/_temp/69c681dd-0ec2-4f56-842c-f18d7a4c9761' before making global git config changes
+2026-09-08T15:14:54.7234569Z Adding repository directory to the temporary git global config as a safe directory
+2026-09-08T15:14:54.7238588Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Harness-Gate/Harness-Gate
+2026-09-08T15:14:54.7244470Z Deleting the contents of '/home/runner/work/Harness-Gate/Harness-Gate'
+2026-09-08T15:14:54.7247928Z ##[group]Initializing the repository
+2026-09-08T15:14:54.7250622Z [command]/usr/bin/git init /home/runner/work/Harness-Gate/Harness-Gate
+2026-09-08T15:14:54.7343450Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-09-08T15:14:54.7346923Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-09-08T15:14:54.7350084Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-09-08T15:14:54.7352604Z hint: call:
+2026-09-08T15:14:54.7354124Z hint:
+2026-09-08T15:14:54.7355706Z hint: 	git config --global init.defaultBranch <name>
+2026-09-08T15:14:54.7357881Z hint:
+2026-09-08T15:14:54.7359993Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-09-08T15:14:54.7363660Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-09-08T15:14:54.7366595Z hint:
+2026-09-08T15:14:54.7368141Z hint: 	git branch -m <name>
+2026-09-08T15:14:54.7369827Z hint:
+2026-09-08T15:14:54.7372045Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-09-08T15:14:54.7376125Z Initialized empty Git repository in /home/runner/work/Harness-Gate/Harness-Gate/.git/
+2026-09-08T15:14:54.7382043Z [command]/usr/bin/git remote add origin https://github.com/musutrade/Harness-Gate
+2026-09-08T15:14:54.7420041Z ##[endgroup]
+2026-09-08T15:14:54.7422704Z ##[group]Disabling automatic garbage collection
+2026-09-08T15:14:54.7425050Z [command]/usr/bin/git config --local gc.auto 0
+2026-09-08T15:14:54.7459259Z ##[endgroup]
+2026-09-08T15:14:54.7461426Z ##[group]Setting up auth
+2026-09-08T15:14:54.7464824Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-09-08T15:14:54.7502566Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-09-08T15:14:54.7920773Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-09-08T15:14:54.7965317Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-09-08T15:14:54.8194162Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-09-08T15:14:54.8230990Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-09-08T15:14:54.8458350Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-09-08T15:14:54.8498750Z ##[endgroup]
+2026-09-08T15:14:54.8500248Z ##[group]Fetching the repository
+2026-09-08T15:14:54.8509738Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +4e0c4b59bc721120777dda8ccfbd21ebdde84b4f:refs/remotes/pull/158/merge
+2026-09-08T15:14:57.9332028Z From https://github.com/musutrade/Harness-Gate
+2026-09-08T15:14:57.9334364Z  * [new ref]         4e0c4b59bc721120777dda8ccfbd21ebdde84b4f -> pull/158/merge
+2026-09-08T15:14:57.9346426Z ##[endgroup]
+2026-09-08T15:14:57.9356339Z ##[group]Determining the checkout info
+2026-09-08T15:14:57.9357393Z ##[endgroup]
+2026-09-08T15:14:57.9357911Z [command]/usr/bin/git sparse-checkout disable
+2026-09-08T15:14:57.9407487Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-09-08T15:14:57.9441872Z ##[group]Checking out the ref
+2026-09-08T15:14:57.9445845Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/158/merge
+2026-09-08T15:14:58.1905627Z Note: switching to 'refs/remotes/pull/158/merge'.
+2026-09-08T15:14:58.1906238Z 
+2026-09-08T15:14:58.1906537Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-09-08T15:14:58.1907191Z changes and commit them, and you can discard any commits you make in this
+2026-09-08T15:14:58.1907829Z state without impacting any branches by switching back to a branch.
+2026-09-08T15:14:58.1908576Z 
+2026-09-08T15:14:58.1911159Z If you want to create a new branch to retain commits you create, you may
+2026-09-08T15:14:58.1912408Z do so (now or later) by using -c with the switch command. Example:
+2026-09-08T15:14:58.1913391Z 
+2026-09-08T15:14:58.1913812Z   git switch -c <new-branch-name>
+2026-09-08T15:14:58.1914197Z 
+2026-09-08T15:14:58.1914392Z Or undo this operation with:
+2026-09-08T15:14:58.1914684Z 
+2026-09-08T15:14:58.1914850Z   git switch -
+2026-09-08T15:14:58.1915079Z 
+2026-09-08T15:14:58.1915833Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-09-08T15:14:58.1916389Z 
+2026-09-08T15:14:58.1916933Z HEAD is now at 4e0c4b5 Merge 0fc96d7644d623f31e31fe1a512cb68db0b2003b into 9a73ae0f7c61d804fbfc2fe35eac8377eb1fc22e
+2026-09-08T15:14:58.1932615Z ##[endgroup]
+2026-09-08T15:14:58.1981587Z [command]/usr/bin/git log -1 --format=%H
+2026-09-08T15:14:58.2009575Z 4e0c4b59bc721120777dda8ccfbd21ebdde84b4f
+2026-09-08T15:14:58.2370253Z ##[group]Run dtolnay/rust-toolchain@stable
+2026-09-08T15:14:58.2370631Z with:
+2026-09-08T15:14:58.2370889Z   toolchain: stable
+2026-09-08T15:14:58.2371157Z env:
+2026-09-08T15:14:58.2371394Z   CARGO_TERM_COLOR: always
+2026-09-08T15:14:58.2371678Z   RUST_BACKTRACE: 1
+2026-09-08T15:14:58.2371937Z ##[endgroup]
+2026-09-08T15:14:58.2438567Z ##[start-action display=Parse toolchain version;id=__dtolnay_rust-toolchain.parse]
+2026-09-08T15:14:58.2503943Z ##[group]Run if [[ -z $toolchain ]]; then
+2026-09-08T15:14:58.2504382Z [36;1mif [[ -z $toolchain ]]; then[0m
+2026-09-08T15:14:58.2504985Z [36;1m  # GitHub does not enforce `required: true` inputs itself. https://github.com/actions/runner/issues/1070[0m
+2026-09-08T15:14:58.2505619Z [36;1m  echo "'toolchain' is a required input" >&2[0m
+2026-09-08T15:14:58.2505971Z [36;1m  exit 1[0m
+2026-09-08T15:14:58.2506366Z [36;1melif [[ $toolchain =~ ^stable' '[0-9]+' '(year|month|week|day)s?' 'ago$ ]]; then[0m
+2026-09-08T15:14:58.2506888Z [36;1m  if [[ Linux == macOS ]]; then[0m
+2026-09-08T15:14:58.2507490Z [36;1m    echo "toolchain=1.$((($(date -v-$(sed 's/stable \([0-9]*\) \(.\).*/\1\2/' <<< $toolchain) +%s)/60/60/24-16569)/7/6))" >> $GITHUB_OUTPUT[0m
+2026-09-08T15:14:58.2508060Z [36;1m  else[0m
+2026-09-08T15:14:58.2508519Z [36;1m    echo "toolchain=1.$((($(date --date "${toolchain#stable }" +%s)/60/60/24-16569)/7/6))" >> $GITHUB_OUTPUT[0m
+2026-09-08T15:14:58.2509036Z [36;1m  fi[0m
+2026-09-08T15:14:58.2509392Z [36;1melif [[ $toolchain =~ ^stable' 'minus' '[0-9]+' 'releases?$ ]]; then[0m
+2026-09-08T15:14:58.2509993Z [36;1m  echo "toolchain=1.$((($(date +%s)/60/60/24-16569)/7/6-${toolchain//[^0-9]/}))" >> $GITHUB_OUTPUT[0m
+2026-09-08T15:14:58.2510509Z [36;1melif [[ $toolchain =~ ^1\.[0-9]+$ ]]; then[0m
+2026-09-08T15:14:58.2511091Z [36;1m  echo "toolchain=1.$((i=${toolchain#1.}, c=($(date +%s)/60/60/24-16569)/7/6, i+9*i*(10*i<=c)+90*i*(100*i<=c)))" >> $GITHUB_OUTPUT[0m
+2026-09-08T15:14:58.2511644Z [36;1melse[0m
+2026-09-08T15:14:58.2511945Z [36;1m  echo "toolchain=$toolchain" >> $GITHUB_OUTPUT[0m
+2026-09-08T15:14:58.2512296Z [36;1mfi[0m
+2026-09-08T15:14:58.2554249Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-09-08T15:14:58.2554675Z env:
+2026-09-08T15:14:58.2555025Z   CARGO_TERM_COLOR: always
+2026-09-08T15:14:58.2555542Z   RUST_BACKTRACE: 1
+2026-09-08T15:14:58.2555927Z   toolchain: stable
+2026-09-08T15:14:58.2556280Z ##[endgroup]
+2026-09-08T15:14:58.2667677Z ##[end-action id=__dtolnay_rust-toolchain.parse;outcome=success;conclusion=success;duration_ms=22]
+2026-09-08T15:14:58.2680527Z ##[start-action display=Construct rustup command line;id=__dtolnay_rust-toolchain.flags]
+2026-09-08T15:14:58.2717777Z ##[group]Run echo "targets=$(for t in ${targets//,/ }; do echo -n ' --target' $t; done)" >> $GITHUB_OUTPUT
+2026-09-08T15:14:58.2718530Z [36;1mecho "targets=$(for t in ${targets//,/ }; do echo -n ' --target' $t; done)" >> $GITHUB_OUTPUT[0m
+2026-09-08T15:14:58.2719256Z [36;1mecho "components=$(for c in ${components//,/ }; do echo -n ' --component' $c; done)" >> $GITHUB_OUTPUT[0m
+2026-09-08T15:14:58.2719991Z [36;1mecho "downgrade=" >> $GITHUB_OUTPUT[0m
+2026-09-08T15:14:58.2753901Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-09-08T15:14:58.2754320Z env:
+2026-09-08T15:14:58.2754569Z   CARGO_TERM_COLOR: always
+2026-09-08T15:14:58.2754859Z   RUST_BACKTRACE: 1
+2026-09-08T15:14:58.2755151Z   targets: 
+2026-09-08T15:14:58.2755393Z   components: 
+2026-09-08T15:14:58.2755657Z ##[endgroup]
+2026-09-08T15:14:58.2828431Z ##[end-action id=__dtolnay_rust-toolchain.flags;outcome=success;conclusion=success;duration_ms=14]
+2026-09-08T15:14:58.2831195Z ##[start-action display=Set $CARGO_HOME;id=__dtolnay_rust-toolchain.__run]
+2026-09-08T15:14:58.2859752Z ##[group]Run echo CARGO_HOME=${CARGO_HOME:-"$HOME/.cargo"} >> $GITHUB_ENV
+2026-09-08T15:14:58.2860279Z [36;1mecho CARGO_HOME=${CARGO_HOME:-"$HOME/.cargo"} >> $GITHUB_ENV[0m
+2026-09-08T15:14:58.2893991Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-09-08T15:14:58.2894613Z env:
+2026-09-08T15:14:58.2894891Z   CARGO_TERM_COLOR: always
+2026-09-08T15:14:58.2895200Z   RUST_BACKTRACE: 1
+2026-09-08T15:14:58.2895473Z ##[endgroup]
+2026-09-08T15:14:58.2960774Z ##[end-action id=__dtolnay_rust-toolchain.__run;outcome=success;conclusion=success;duration_ms=12]
+2026-09-08T15:14:58.2963949Z ##[start-action display=Install rustup if needed;id=__dtolnay_rust-toolchain.__run_2]
+2026-09-08T15:14:58.2998911Z ##[group]Run if ! command -v rustup &>/dev/null; then
+2026-09-08T15:14:58.2999339Z [36;1mif ! command -v rustup &>/dev/null; then[0m
+2026-09-08T15:14:58.3000159Z [36;1m  curl --proto '=https' --tlsv1.2 --retry 10 --retry-connrefused --location --silent --show-error --fail https://sh.rustup.rs | sh -s -- --default-toolchain none -y[0m
+2026-09-08T15:14:58.3000950Z [36;1m  echo "$CARGO_HOME/bin" >> $GITHUB_PATH[0m
+2026-09-08T15:14:58.3001292Z [36;1mfi[0m
+2026-09-08T15:14:58.3036161Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-09-08T15:14:58.3036592Z env:
+2026-09-08T15:14:58.3036848Z   CARGO_TERM_COLOR: always
+2026-09-08T15:14:58.3037135Z   RUST_BACKTRACE: 1
+2026-09-08T15:14:58.3037405Z   CARGO_HOME: /home/runner/.cargo
+2026-09-08T15:14:58.3037701Z ##[endgroup]
+2026-09-08T15:14:58.3100367Z ##[end-action id=__dtolnay_rust-toolchain.__run_2;outcome=success;conclusion=success;duration_ms=13]
+2026-09-08T15:14:58.3103369Z ##[start-action display=Install rustup if needed on windows;id=__dtolnay_rust-toolchain.__run_3]
+2026-09-08T15:14:58.3110255Z ##[end-action id=__dtolnay_rust-toolchain.__run_3;outcome=skipped;conclusion=skipped;duration_ms=0]
+2026-09-08T15:14:58.3121291Z ##[start-action display=rustup toolchain install stable;id=__dtolnay_rust-toolchain.__run_4]
+2026-09-08T15:14:58.3149721Z ##[group]Run rustup toolchain install stable --profile minimal --no-self-update
+2026-09-08T15:14:58.3150319Z [36;1mrustup toolchain install stable --profile minimal --no-self-update[0m
+2026-09-08T15:14:58.3185571Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-09-08T15:14:58.3185976Z env:
+2026-09-08T15:14:58.3186219Z   CARGO_TERM_COLOR: always
+2026-09-08T15:14:58.3186504Z   RUST_BACKTRACE: 1
+2026-09-08T15:14:58.3186768Z   CARGO_HOME: /home/runner/.cargo
+2026-09-08T15:14:58.3187079Z   RUSTUP_PERMIT_COPY_RENAME: 1
+2026-09-08T15:14:58.3187366Z ##[endgroup]
+2026-09-08T15:14:58.5318478Z info: syncing channel updates for stable-x86_64-unknown-linux-gnu
+2026-09-08T15:14:58.6552726Z info: latest update on 2026-09-03 for version 1.98.1 (48a229cea 2026-09-01)
+2026-09-08T15:14:58.6705828Z info: removing previous version of component clippy
+2026-09-08T15:14:58.6725208Z info: removing previous version of component rustfmt
+2026-09-08T15:14:58.6737793Z info: removing previous version of component cargo
+2026-09-08T15:14:58.6790669Z info: removing previous version of component rust-std
+2026-09-08T15:14:58.6839885Z info: removing previous version of component rustc
+2026-09-08T15:14:58.6898837Z info: downloading 5 components
+2026-09-08T15:15:06.7832630Z 
+2026-09-08T15:15:06.7917011Z   stable-x86_64-unknown-linux-gnu updated - rustc 1.98.1 (48a229cea 2026-09-01) (from rustc 1.98.0 (88d9e12ae 2026-08-18))
+2026-09-08T15:15:06.7918141Z 
+2026-09-08T15:15:06.7990067Z ##[end-action id=__dtolnay_rust-toolchain.__run_4;outcome=success;conclusion=success;duration_ms=8486]
+2026-09-08T15:15:06.7997160Z ##[start-action display=rustup default stable;id=__dtolnay_rust-toolchain.__run_5]
+2026-09-08T15:15:06.8018319Z ##[group]Run rustup default stable
+2026-09-08T15:15:06.8018671Z [36;1mrustup default stable[0m
+2026-09-08T15:15:06.8055103Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-09-08T15:15:06.8055498Z env:
+2026-09-08T15:15:06.8055726Z   CARGO_TERM_COLOR: always
+2026-09-08T15:15:06.8056001Z   RUST_BACKTRACE: 1
+2026-09-08T15:15:06.8056269Z   CARGO_HOME: /home/runner/.cargo
+2026-09-08T15:15:06.8056559Z ##[endgroup]
+2026-09-08T15:15:06.8166074Z info: using existing install for stable-x86_64-unknown-linux-gnu
+2026-09-08T15:15:06.8174371Z info: default toolchain set to stable-x86_64-unknown-linux-gnu
+2026-09-08T15:15:06.8174856Z 
+2026-09-08T15:15:06.8243605Z   stable-x86_64-unknown-linux-gnu unchanged - rustc 1.98.1 (48a229cea 2026-09-01)
+2026-09-08T15:15:06.8244308Z 
+2026-09-08T15:15:06.8261233Z ##[end-action id=__dtolnay_rust-toolchain.__run_5;outcome=success;conclusion=success;duration_ms=26]
+2026-09-08T15:15:06.8264116Z ##[start-action display=Create cachekey;id=__dtolnay_rust-toolchain.rustc-version]
+2026-09-08T15:15:06.8284298Z ##[group]Run DATE=$(rustc +stable --version --verbose | sed -ne 's/^commit-date: \(20[0-9][0-9]\)-\([01][0-9]\)-\([0-3][0-9]\)$/\1\2\3/p')
+2026-09-08T15:15:06.8285226Z [36;1mDATE=$(rustc +stable --version --verbose | sed -ne 's/^commit-date: \(20[0-9][0-9]\)-\([01][0-9]\)-\([0-3][0-9]\)$/\1\2\3/p')[0m
+2026-09-08T15:15:06.8285970Z [36;1mHASH=$(rustc +stable --version --verbose | sed -ne 's/^commit-hash: //p')[0m
+2026-09-08T15:15:06.8286535Z [36;1mecho "cachekey=$(echo $DATE$HASH | head -c12)" >> $GITHUB_OUTPUT[0m
+2026-09-08T15:15:06.8318926Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-09-08T15:15:06.8319372Z env:
+2026-09-08T15:15:06.8319597Z   CARGO_TERM_COLOR: always
+2026-09-08T15:15:06.8319874Z   RUST_BACKTRACE: 1
+2026-09-08T15:15:06.8320131Z   CARGO_HOME: /home/runner/.cargo
+2026-09-08T15:15:06.8320419Z ##[endgroup]
+2026-09-08T15:15:06.8651811Z ##[end-action id=__dtolnay_rust-toolchain.rustc-version;outcome=success;conclusion=success;duration_ms=38]
+2026-09-08T15:15:06.8654942Z ##[start-action display=Disable incremental compilation;id=__dtolnay_rust-toolchain.__run_6]
+2026-09-08T15:15:06.8672878Z ##[group]Run if [ -z "${CARGO_INCREMENTAL+set}" ]; then
+2026-09-08T15:15:06.8673572Z [36;1mif [ -z "${CARGO_INCREMENTAL+set}" ]; then[0m
+2026-09-08T15:15:06.8673922Z [36;1m  echo CARGO_INCREMENTAL=0 >> $GITHUB_ENV[0m
+2026-09-08T15:15:06.8674221Z [36;1mfi[0m
+2026-09-08T15:15:06.8707805Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-09-08T15:15:06.8708158Z env:
+2026-09-08T15:15:06.8708374Z   CARGO_TERM_COLOR: always
+2026-09-08T15:15:06.8708631Z   RUST_BACKTRACE: 1
+2026-09-08T15:15:06.8708858Z   CARGO_HOME: /home/runner/.cargo
+2026-09-08T15:15:06.8709119Z ##[endgroup]
+2026-09-08T15:15:06.8768306Z ##[end-action id=__dtolnay_rust-toolchain.__run_6;outcome=success;conclusion=success;duration_ms=11]
+2026-09-08T15:15:06.8770591Z ##[start-action display=Enable colors in Cargo output;id=__dtolnay_rust-toolchain.__run_7]
+2026-09-08T15:15:06.8789134Z ##[group]Run if [ -z "${CARGO_TERM_COLOR+set}" ]; then
+2026-09-08T15:15:06.8789503Z [36;1mif [ -z "${CARGO_TERM_COLOR+set}" ]; then[0m
+2026-09-08T15:15:06.8789833Z [36;1m  echo CARGO_TERM_COLOR=always >> $GITHUB_ENV[0m
+2026-09-08T15:15:06.8790112Z [36;1mfi[0m
+2026-09-08T15:15:06.8822261Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-09-08T15:15:06.8822627Z env:
+2026-09-08T15:15:06.8822835Z   CARGO_TERM_COLOR: always
+2026-09-08T15:15:06.8823367Z   RUST_BACKTRACE: 1
+2026-09-08T15:15:06.8823610Z   CARGO_HOME: /home/runner/.cargo
+2026-09-08T15:15:06.8823909Z   CARGO_INCREMENTAL: 0
+2026-09-08T15:15:06.8824306Z ##[endgroup]
+2026-09-08T15:15:06.8881357Z ##[end-action id=__dtolnay_rust-toolchain.__run_7;outcome=success;conclusion=success;duration_ms=10]
+2026-09-08T15:15:06.8883983Z ##[start-action display=Enable Cargo sparse registry;id=__dtolnay_rust-toolchain.__run_8]
+2026-09-08T15:15:06.8902597Z ##[group]Run # implemented in 1.66, stabilized in 1.68, made default in 1.70
+2026-09-08T15:15:06.8903471Z [36;1m# implemented in 1.66, stabilized in 1.68, made default in 1.70[0m
+2026-09-08T15:15:06.8904229Z [36;1mif [ -z "${CARGO_REGISTRIES_CRATES_IO_PROTOCOL+set}" -o -f "/home/runner/work/_temp"/.implicit_cargo_registries_crates_io_protocol ]; then[0m
+2026-09-08T15:15:06.8905006Z [36;1m  if rustc +stable --version --verbose | grep -q '^release: 1\.6[89]\.'; then[0m
+2026-09-08T15:15:06.8905612Z [36;1m    touch "/home/runner/work/_temp"/.implicit_cargo_registries_crates_io_protocol || true[0m
+2026-09-08T15:15:06.8906356Z [36;1m    echo CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse >> $GITHUB_ENV[0m
+2026-09-08T15:15:06.8906912Z [36;1m  elif rustc +stable --version --verbose | grep -q '^release: 1\.6[67]\.'; then[0m
+2026-09-08T15:15:06.8907516Z [36;1m    touch "/home/runner/work/_temp"/.implicit_cargo_registries_crates_io_protocol || true[0m
+2026-09-08T15:15:06.8908069Z [36;1m    echo CARGO_REGISTRIES_CRATES_IO_PROTOCOL=git >> $GITHUB_ENV[0m
+2026-09-08T15:15:06.8908436Z [36;1m  fi[0m
+2026-09-08T15:15:06.8908636Z [36;1mfi[0m
+2026-09-08T15:15:06.8940405Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-09-08T15:15:06.8940776Z env:
+2026-09-08T15:15:06.8941053Z   CARGO_TERM_COLOR: always
+2026-09-08T15:15:06.8941299Z   RUST_BACKTRACE: 1
+2026-09-08T15:15:06.8941529Z   CARGO_HOME: /home/runner/.cargo
+2026-09-08T15:15:06.8941788Z   CARGO_INCREMENTAL: 0
+2026-09-08T15:15:06.8942006Z ##[endgroup]
+2026-09-08T15:15:06.9252023Z ##[end-action id=__dtolnay_rust-toolchain.__run_8;outcome=success;conclusion=success;duration_ms=36]
+2026-09-08T15:15:06.9254843Z ##[start-action display=Work around spurious network errors in curl 8.0;id=__dtolnay_rust-toolchain.__run_9]
+2026-09-08T15:15:06.9274599Z ##[group]Run # https://rust-lang.zulipchat.com/#narrow/stream/246057-t-cargo/topic/timeout.20investigation
+2026-09-08T15:15:06.9275363Z [36;1m# https://rust-lang.zulipchat.com/#narrow/stream/246057-t-cargo/topic/timeout.20investigation[0m
+2026-09-08T15:15:06.9275985Z [36;1mif rustc +stable --version --verbose | grep -q '^release: 1\.7[01]\.'; then[0m
+2026-09-08T15:15:06.9276451Z [36;1m  echo CARGO_HTTP_MULTIPLEXING=false >> $GITHUB_ENV[0m
+2026-09-08T15:15:06.9276781Z [36;1mfi[0m
+2026-09-08T15:15:06.9311215Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-09-08T15:15:06.9311592Z env:
+2026-09-08T15:15:06.9311817Z   CARGO_TERM_COLOR: always
+2026-09-08T15:15:06.9312075Z   RUST_BACKTRACE: 1
+2026-09-08T15:15:06.9312318Z   CARGO_HOME: /home/runner/.cargo
+2026-09-08T15:15:06.9312594Z   CARGO_INCREMENTAL: 0
+2026-09-08T15:15:06.9312826Z ##[endgroup]
+2026-09-08T15:15:06.9496585Z ##[end-action id=__dtolnay_rust-toolchain.__run_9;outcome=success;conclusion=success;duration_ms=24]
+2026-09-08T15:15:06.9500535Z ##[start-action display=rustc +stable --version --verbose;id=__dtolnay_rust-toolchain.__run_10]
+2026-09-08T15:15:06.9519867Z ##[group]Run rustc +stable --version --verbose
+2026-09-08T15:15:06.9520240Z [36;1mrustc +stable --version --verbose[0m
+2026-09-08T15:15:06.9553835Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-09-08T15:15:06.9554215Z env:
+2026-09-08T15:15:06.9554427Z   CARGO_TERM_COLOR: always
+2026-09-08T15:15:06.9554686Z   RUST_BACKTRACE: 1
+2026-09-08T15:15:06.9554933Z   CARGO_HOME: /home/runner/.cargo
+2026-09-08T15:15:06.9555218Z   CARGO_INCREMENTAL: 0
+2026-09-08T15:15:06.9555450Z ##[endgroup]
+2026-09-08T15:15:06.9719120Z rustc 1.98.1 (48a229cea 2026-09-01)
+2026-09-08T15:15:06.9719987Z binary: rustc
+2026-09-08T15:15:06.9720703Z commit-hash: 48a229ceaefd4985c50990b14116b6d856af0985
+2026-09-08T15:15:06.9721281Z commit-date: 2026-09-01
+2026-09-08T15:15:06.9721693Z host: x86_64-unknown-linux-gnu
+2026-09-08T15:15:06.9722611Z release: 1.98.1
+2026-09-08T15:15:06.9723761Z LLVM version: 22.1.8
+2026-09-08T15:15:06.9736843Z ##[end-action id=__dtolnay_rust-toolchain.__run_10;outcome=success;conclusion=success;duration_ms=23]
+2026-09-08T15:15:07.1640909Z ##[group]Run actions/cache@v5
+2026-09-08T15:15:07.1641222Z with:
+2026-09-08T15:15:07.1641750Z   path: ~/.cargo/bin/
+~/.cargo/registry/index/
+~/.cargo/registry/cache/
+~/.cargo/git/db/
+tools/harness-gate/target/
+
+2026-09-08T15:15:07.1642481Z   key: Linux-cargo-cede352afc084cdee021280b0e9e92b0ccbe9019782c2c5f9df7457e5017d962
+2026-09-08T15:15:07.1643347Z   enableCrossOsArchive: false
+2026-09-08T15:15:07.1643679Z   fail-on-cache-miss: false
+2026-09-08T15:15:07.1643933Z   lookup-only: false
+2026-09-08T15:15:07.1644154Z   save-always: false
+2026-09-08T15:15:07.1644373Z env:
+2026-09-08T15:15:07.1644572Z   CARGO_TERM_COLOR: always
+2026-09-08T15:15:07.1644812Z   RUST_BACKTRACE: 1
+2026-09-08T15:15:07.1645050Z   CARGO_HOME: /home/runner/.cargo
+2026-09-08T15:15:07.1645327Z   CARGO_INCREMENTAL: 0
+2026-09-08T15:15:07.1645552Z ##[endgroup]
+2026-09-08T15:15:07.5519490Z Cache hit for: Linux-cargo-cede352afc084cdee021280b0e9e92b0ccbe9019782c2c5f9df7457e5017d962
+2026-09-08T15:15:08.8684810Z Received 0 of 311204686 (0.0%), 0.0 MBs/sec
+2026-09-08T15:15:09.8698570Z Received 96468992 of 311204686 (31.0%), 46.0 MBs/sec
+2026-09-08T15:15:10.8706450Z Received 218103808 of 311204686 (70.1%), 69.3 MBs/sec
+2026-09-08T15:15:11.8710559Z Received 301989888 of 311204686 (97.0%), 71.9 MBs/sec
+2026-09-08T15:15:12.8715302Z Received 307010382 of 311204686 (98.7%), 58.5 MBs/sec
+2026-09-08T15:15:12.8898947Z Received 311204686 of 311204686 (100.0%), 59.2 MBs/sec
+2026-09-08T15:15:12.8899560Z Cache Size: ~297 MB (311204686 B)
+2026-09-08T15:15:12.8951787Z [command]/usr/bin/tar -xf /home/runner/work/_temp/f1b9ac99-7c41-4e3a-aacd-cd8053d4c974/cache.tzst -P -C /home/runner/work/Harness-Gate/Harness-Gate --use-compress-program unzstd
+2026-09-08T15:15:14.8217132Z Cache restored successfully
+2026-09-08T15:15:14.8429878Z Cache restored from key: Linux-cargo-cede352afc084cdee021280b0e9e92b0ccbe9019782c2c5f9df7457e5017d962
+2026-09-08T15:15:14.8646799Z ##[group]Run taiki-e/install-action@cargo-nextest
+2026-09-08T15:15:14.8647136Z with:
+2026-09-08T15:15:14.8647338Z   tool: cargo-nextest
+2026-09-08T15:15:14.8647563Z   checksum: true
+2026-09-08T15:15:14.8647770Z   fallback: cargo-binstall
+2026-09-08T15:15:14.8647994Z env:
+2026-09-08T15:15:14.8648183Z   CARGO_TERM_COLOR: always
+2026-09-08T15:15:14.8648412Z   RUST_BACKTRACE: 1
+2026-09-08T15:15:14.8648630Z   CARGO_HOME: /home/runner/.cargo
+2026-09-08T15:15:14.8648886Z   CARGO_INCREMENTAL: 0
+2026-09-08T15:15:14.8649097Z ##[endgroup]
+2026-09-08T15:15:14.8655508Z ##[start-action display=Run bail() {;id=__taiki-e_install-action.__run]
+2026-09-08T15:15:14.8671506Z ##[group]Run bail() {
+2026-09-08T15:15:14.8671770Z [36;1mbail() {[0m
+2026-09-08T15:15:14.8672020Z [36;1m  printf '::error::install-action: %s\n' "$*"[0m
+2026-09-08T15:15:14.8672324Z [36;1m  exit 1[0m
+2026-09-08T15:15:14.8672533Z [36;1m}[0m
+2026-09-08T15:15:14.8672908Z [36;1m# If /bin/sh is dash, environment variable containing % is not imported, but is fine[0m
+2026-09-08T15:15:14.8673769Z [36;1m# because it also means that it will not be exposed to subprocess.[0m
+2026-09-08T15:15:14.8674194Z [36;1mif /usr/bin/env | grep -Eq '^BASH_FUNC_'; then[0m
+2026-09-08T15:15:14.8674737Z [36;1m  bail 'bash function injection via BASH_FUNC_ environment variable is not allowed for security reasons'[0m
+2026-09-08T15:15:14.8675221Z [36;1mfi[0m
+2026-09-08T15:15:14.8675445Z [36;1mif ! command -v bash >/dev/null; then[0m
+2026-09-08T15:15:14.8675787Z [36;1m  if grep -Eq '^ID=alpine' /etc/os-release; then[0m
+2026-09-08T15:15:14.8676228Z [36;1m    printf '::group::Install packages required for install-action (bash)\n'[0m
+2026-09-08T15:15:14.8676656Z [36;1m    # NB: sync with apk_install in main.sh[0m
+2026-09-08T15:15:14.8676973Z [36;1m    if command -v sudo >/dev/null; then[0m
+2026-09-08T15:15:14.8677468Z [36;1m      sudo apk --no-cache add bash[0m
+2026-09-08T15:15:14.8677785Z [36;1m    elif command -v doas >/dev/null; then[0m
+2026-09-08T15:15:14.8678087Z [36;1m      doas apk --no-cache add bash[0m
+2026-09-08T15:15:14.8678353Z [36;1m    else[0m
+2026-09-08T15:15:14.8678572Z [36;1m      apk --no-cache add bash[0m
+2026-09-08T15:15:14.8678832Z [36;1m    fi[0m
+2026-09-08T15:15:14.8679043Z [36;1m    printf '::endgroup::\n'[0m
+2026-09-08T15:15:14.8679290Z [36;1m  else[0m
+2026-09-08T15:15:14.8679512Z [36;1m    bail 'this action requires bash'[0m
+2026-09-08T15:15:14.8679793Z [36;1m  fi[0m
+2026-09-08T15:15:14.8679976Z [36;1mfi[0m
+2026-09-08T15:15:14.8680251Z [36;1mbash --noprofile --norc "${GITHUB_ACTION_PATH:?}/main.sh"[0m
+2026-09-08T15:15:14.8681662Z shell: /usr/bin/env -u ENV -u BASH_ENV -u CDPATH -u SHELLOPTS -u BASHOPTS /bin/sh -eu {0}
+2026-09-08T15:15:14.8682074Z env:
+2026-09-08T15:15:14.8682264Z   CARGO_TERM_COLOR: always
+2026-09-08T15:15:14.8682493Z   RUST_BACKTRACE: 1
+2026-09-08T15:15:14.8682723Z   CARGO_HOME: /home/runner/.cargo
+2026-09-08T15:15:14.8683247Z   CARGO_INCREMENTAL: 0
+2026-09-08T15:15:14.8683507Z   INPUT_TOOL: cargo-nextest
+2026-09-08T15:15:14.8683753Z   INPUT_CHECKSUM: true
+2026-09-08T15:15:14.8683988Z   INPUT_FALLBACK: cargo-binstall
+2026-09-08T15:15:14.8686780Z   DEFAULT_GITHUB_TOKEN: ***
+2026-09-08T15:15:14.8687114Z   ACTION_USER_AGENT: taiki-e/install-action (cargo-nextest)
+2026-09-08T15:15:14.8687450Z   RUNNER_OS: Linux
+2026-09-08T15:15:14.8687657Z   RUNNER_ARCH: X64
+2026-09-08T15:15:14.8687857Z ##[endgroup]
+2026-09-08T15:15:15.2242177Z info: host platform: x86_64_linux
+2026-09-08T15:15:15.2513295Z info: installing cargo-nextest@latest
+2026-09-08T15:15:15.2719539Z info: downloading https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.143/cargo-nextest-0.9.143-x86_64-unknown-linux-gnu.tar.gz
+2026-09-08T15:15:15.4048023Z info: verifying sha256 checksum for cargo-nextest-0.9.143-x86_64-unknown-linux-gnu.tar.gz
+2026-09-08T15:15:15.6837658Z info: cargo-nextest installed at /home/runner/.cargo/bin/cargo-nextest
+2026-09-08T15:15:15.6841328Z + cargo-nextest nextest --version
+2026-09-08T15:15:15.6871598Z cargo-nextest 0.9.143 (60fa45f63 2026-08-04)
+2026-09-08T15:15:15.6872330Z release: 0.9.143
+2026-09-08T15:15:15.6872815Z commit-hash: 60fa45f638ffc3f35e74afa65737f45fcd32db2a
+2026-09-08T15:15:15.6873753Z commit-date: 2026-08-04
+2026-09-08T15:15:15.6874146Z host: x86_64-unknown-linux-gnu
+2026-09-08T15:15:15.6875932Z 
+2026-09-08T15:15:15.6887988Z ##[end-action id=__taiki-e_install-action.__run;outcome=success;conclusion=success;duration_ms=823]
+2026-09-08T15:15:15.6893327Z ##[start-action display=Run Set-StrictMode -Version Latest;id=__taiki-e_install-action.__run_2]
+2026-09-08T15:15:15.6897654Z ##[end-action id=__taiki-e_install-action.__run_2;outcome=skipped;conclusion=skipped;duration_ms=0]
+2026-09-08T15:15:15.6925569Z ##[group]Run cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked
+2026-09-08T15:15:15.6926219Z [36;1mcargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked[0m
+2026-09-08T15:15:15.6963744Z shell: /usr/bin/bash -e {0}
+2026-09-08T15:15:15.6964004Z env:
+2026-09-08T15:15:15.6964216Z   CARGO_TERM_COLOR: always
+2026-09-08T15:15:15.6964465Z   RUST_BACKTRACE: 1
+2026-09-08T15:15:15.6964696Z   CARGO_HOME: /home/runner/.cargo
+2026-09-08T15:15:15.6964972Z   CARGO_INCREMENTAL: 0
+2026-09-08T15:15:15.6965206Z ##[endgroup]
+2026-09-08T15:15:16.6795388Z [1m[92m   Compiling[0m harness-gate v0.3.7 (/home/runner/work/Harness-Gate/Harness-Gate/tools/harness-gate)
+2026-09-08T15:15:17.6546145Z [1m[92m   Compiling[0m harness-gate-quality-core v0.1.0 (/home/runner/work/Harness-Gate/Harness-Gate/tools/harness-gate/quality-replay)
+2026-09-08T15:15:30.3739106Z [1m[92m    Finished[0m `test` profile [unoptimized + debuginfo] target(s) in 13.82s
+2026-09-08T15:15:30.4198651Z ────────────
+2026-09-08T15:15:30.4200087Z [32;1m Nextest run[0m ID [1maa7eedc3-d61d-456c-8731-dcf535a2e726[0m with nextest profile: [1mdefault[0m
+2026-09-08T15:15:30.4202012Z [32;1m    Starting[0m [1m332[0m tests across [1m9[0m binaries
+2026-09-08T15:15:30.4274088Z [32;1m        PASS[0m [   0.007s] (  1/332) [35;1mharness-gate[0m [36mquality::replay::tests[0m[36m::[0m[34;1mdifferences_preserve_all_fields_and_exact_values[0m
+2026-09-08T15:15:30.4348414Z [32;1m        PASS[0m [   0.007s] (  2/332) [35;1mharness-gate[0m [36mquality::replay::tests[0m[36m::[0m[34;1monly_known_missing_file_wording_is_classified[0m
+2026-09-08T15:15:30.4414908Z [32;1m        PASS[0m [   0.006s] (  3/332) [35;1mharness-gate[0m [36mquality::replay::tests[0m[36m::[0m[34;1mtransport_rejects_missing_context_and_empty_batches[0m
+2026-09-08T15:15:49.4342553Z [32;1m        PASS[0m [  18.993s] (  4/332) [35;1mharness-gate[0m [36mquality::tests[0m[36m::[0m[34;1mcapability_availability_matches_python[0m
+2026-09-08T15:15:49.4539028Z [32;1m        PASS[0m [   0.019s] (  5/332) [35;1mharness-gate[0m [36mquality::tests[0m[36m::[0m[34;1membedded_contracts_match_frozen_reference[0m
+2026-09-08T15:16:30.4225878Z [33;1m        SLOW[0m [> 60.000s] (───────) [35;1mharness-gate[0m [36mquality::policy_tests[0m[36m::[0m[34;1mgreen_local_gates_and_breaking_contract_block_project_with_provenance[0m
+2026-09-08T15:16:30.4274646Z [33;1m        SLOW[0m [> 60.000s] (───────) [35;1mharness-gate[0m [36mquality::policy_tests[0m[36m::[0m[34;1mfrozen_policy_and_reference_acceptance_match_python[0m
+2026-09-08T15:16:30.4294582Z [33;1m        SLOW[0m [> 60.000s] (───────) [35;1mharness-gate[0m [36mquality::replay::acceptance[0m[36m::[0m[34;1mretained_corpora_and_consolidated_negative_matrix[0m
+2026-09-08T15:16:41.9777861Z [32;1m        PASS[0m [  71.556s] (  6/332) [35;1mharness-gate[0m [36mquality::policy_tests[0m[36m::[0m[34;1mgreen_local_gates_and_breaking_contract_block_project_with_provenance[0m
+2026-09-08T15:16:41.9854360Z [32;1m        PASS[0m [   0.009s] (  7/332) [35;1mharness-gate[0m [36mquality::tests[0m[36m::[0m[34;1mjson_boundary_rejects_duplicate_keys_and_malformed_values[0m
+2026-09-08T15:16:49.4565127Z [33;1m        SLOW[0m [> 60.000s] (───────) [35;1mharness-gate[0m [36mquality::tests[0m[36m::[0m[34;1mfrozen_evidence_and_integrity_matrix_matches_python[0m
+2026-09-08T15:16:53.7795300Z [32;1m        PASS[0m [  64.324s] (  8/332) [35;1mharness-gate[0m [36mquality::tests[0m[36m::[0m[34;1mfrozen_evidence_and_integrity_matrix_matches_python[0m
+2026-09-08T15:16:59.5607187Z [32;1m        PASS[0m [  17.576s] (  9/332) [35;1mharness-gate[0m [36mquality::tests[0m[36m::[0m[34;1mmeasurement_series_compatibility_matches_python[0m
+2026-09-08T15:17:11.2895464Z [32;1m        PASS[0m [  17.509s] ( 10/332) [35;1mharness-gate[0m [36mquality::tests[0m[36m::[0m[34;1mproject_identity_ownership_and_relationships_match_python[0m
+2026-09-08T15:17:11.2975246Z [32;1m        PASS[0m [   0.008s] ( 11/332) [35;1mharness-gate[0m [36mquality::tests[0m[36m::[0m[34;1mtyped_values_preserve_arbitrary_precision[0m
+2026-09-08T15:17:11.3365216Z [32;1m        PASS[0m [   0.039s] ( 12/332) [35;1mharness-gate::ci_adoption_test[0m [34;1mcompatibility_cli_preserves_comparison_and_rollback_evidence[0m
+2026-09-08T15:17:11.4799039Z [32;1m        PASS[0m [   0.145s] ( 13/332) [35;1mharness-gate::ci_adoption_test[0m [34;1mconfig_cli_discovers_nested_project_and_rejects_file_root[0m
+2026-09-08T15:17:11.5682924Z [32;1m        PASS[0m [   0.088s] ( 14/332) [35;1mharness-gate::ci_adoption_test[0m [34;1mmigration_cli_preserves_source_and_refuses_overwrite[0m
+2026-09-08T15:17:11.6671556Z [32;1m        PASS[0m [   0.098s] ( 15/332) [35;1mharness-gate::cli_test[0m [34;1mtest_audit_reports_a_typed_configuration_error[0m
+2026-09-08T15:17:11.6978575Z [32;1m        PASS[0m [   0.030s] ( 16/332) [35;1mharness-gate::cli_test[0m [34;1mtest_cleanup_dry_run_writes_machine_readable_evidence[0m
+2026-09-08T15:17:11.7172063Z [32;1m        PASS[0m [   0.019s] ( 17/332) [35;1mharness-gate::cli_test[0m [34;1mtest_color_always_styles_human_readable_output[0m
+2026-09-08T15:17:11.7843418Z [32;1m        PASS[0m [   0.067s] ( 18/332) [35;1mharness-gate::cli_test[0m [34;1mtest_color_never_keeps_human_readable_output_plain[0m
+2026-09-08T15:17:11.7965137Z [32;1m        PASS[0m [   0.010s] ( 19/332) [35;1mharness-gate::cli_test[0m [34;1mtest_config_check_without_config[0m
+2026-09-08T15:17:11.8581064Z [32;1m        PASS[0m [   0.063s] ( 20/332) [35;1mharness-gate::cli_test[0m [34;1mtest_doctor_basic[0m
+2026-09-08T15:17:11.8705392Z [32;1m        PASS[0m [   0.010s] ( 21/332) [35;1mharness-gate::cli_test[0m [34;1mtest_help_command[0m
+2026-09-08T15:17:11.8792307Z [32;1m        PASS[0m [   0.011s] ( 22/332) [35;1mharness-gate::cli_test[0m [34;1mtest_init_with_invalid_preset[0m
+2026-09-08T15:17:11.8899470Z [32;1m        PASS[0m [   0.010s] ( 23/332) [35;1mharness-gate::cli_test[0m [34;1mtest_invalid_subcommand[0m
+2026-09-08T15:17:12.0336086Z [32;1m        PASS[0m [   0.141s] ( 24/332) [35;1mharness-gate::cli_test[0m [34;1mtest_legacy_report_dir_alias_warns_and_new_namespace_wins[0m
+2026-09-08T15:17:12.0434562Z [32;1m        PASS[0m [   0.010s] ( 25/332) [35;1mharness-gate::cli_test[0m [34;1mtest_presets_command[0m
+2026-09-08T15:17:12.1979060Z [32;1m        PASS[0m [   0.156s] ( 26/332) [35;1mharness-gate::cli_test[0m [34;1mtest_rust_and_python_projects_use_their_own_audit_configuration[0m
+2026-09-08T15:17:12.2143728Z [32;1m        PASS[0m [   0.016s] ( 27/332) [35;1mharness-gate::cli_test[0m [34;1mtest_schema_export_writes_the_flow_schema_without_a_project_config[0m
+2026-09-08T15:17:12.3454419Z [32;1m        PASS[0m [   0.131s] ( 28/332) [35;1mharness-gate::cli_test[0m [34;1mtest_scope_without_git[0m
+2026-09-08T15:17:12.4891384Z [32;1m        PASS[0m [   0.143s] ( 29/332) [35;1mharness-gate::cli_test[0m [34;1mtest_secrets_reports_a_typed_configuration_error[0m
+2026-09-08T15:17:12.5658254Z [32;1m        PASS[0m [   0.076s] ( 30/332) [35;1mharness-gate::cli_test[0m [34;1mtest_verify_reports_a_typed_selection_error[0m
+2026-09-08T15:17:12.5785091Z [32;1m        PASS[0m [   0.010s] ( 31/332) [35;1mharness-gate::cli_test[0m [34;1mtest_verify_without_project[0m
+2026-09-08T15:17:12.5869939Z [32;1m        PASS[0m [   0.010s] ( 32/332) [35;1mharness-gate::cli_test[0m [34;1mtest_version_command[0m
+2026-09-08T15:17:13.4815455Z [32;1m        PASS[0m [   0.894s] ( 33/332) [35;1mharness-gate::critical_paths_test[0m [34;1mjson_false_positive_cli_fails_with_incomplete_parser_report[0m
+2026-09-08T15:17:14.4161359Z [32;1m        PASS[0m [   0.934s] ( 34/332) [35;1mharness-gate::failure_paths_test[0m [34;1mcli_selection_profile_alias_and_discovery_boundaries[0m
+2026-09-08T15:17:14.9537453Z [32;1m        PASS[0m [   0.537s] ( 35/332) [35;1mharness-gate::failure_paths_test[0m [34;1mcompatibility_dispatch_retains_request_identity_and_shadow_failure[0m
+2026-09-08T15:17:16.5247019Z [32;1m        PASS[0m [  16.964s] ( 36/332) [35;1mharness-gate[0m [36mquality::tests[0m[36m::[0m[34;1msource_and_artifact_bytes_are_verified_at_the_boundary[0m
+2026-09-08T15:17:18.0521131Z [32;1m        PASS[0m [   3.098s] ( 37/332) [35;1mharness-gate::failure_paths_test[0m [34;1mconfigured_runner_service_isolation_and_shards_match_the_executed_process[0m
+2026-09-08T15:17:19.1874914Z [32;1m        PASS[0m [   1.135s] ( 38/332) [35;1mharness-gate::failure_paths_test[0m [34;1mextracted_cli_handlers_preserve_text_json_and_hook_snapshot_contracts[0m
+2026-09-08T15:17:19.7574640Z [32;1m        PASS[0m [   3.233s] ( 39/332) [35;1mharness-gate::failure_paths_test[0m [34;1mdoctor_kinds_execute_success_required_failure_and_optional_warning[0m
+2026-09-08T15:17:20.6246421Z [32;1m        PASS[0m [   1.437s] ( 40/332) [35;1mharness-gate::failure_paths_test[0m [34;1mstaged_content_controls_result_and_snapshots_are_cleaned_after_failure[0m
+2026-09-08T15:17:20.6415090Z [32;1m        PASS[0m [   0.017s] ( 41/332) [35;1mharness-gate::integration_test[0m [34;1mtest_config_check_invalid[0m
+2026-09-08T15:17:20.7881457Z [32;1m        PASS[0m [   0.147s] ( 42/332) [35;1mharness-gate::integration_test[0m [34;1mtest_config_check_json_is_machine_readable_for_success_and_failure[0m
+2026-09-08T15:17:20.8699472Z [32;1m        PASS[0m [   0.081s] ( 43/332) [35;1mharness-gate::integration_test[0m [34;1mtest_config_check_valid[0m
+2026-09-08T15:17:20.8949921Z [32;1m        PASS[0m [   0.025s] ( 44/332) [35;1mharness-gate::integration_test[0m [34;1mtest_init_creates_gitignore_entry[0m
+2026-09-08T15:17:20.9205830Z [32;1m        PASS[0m [   0.025s] ( 45/332) [35;1mharness-gate::integration_test[0m [34;1mtest_init_twice_fails[0m
+2026-09-08T15:17:20.9383310Z [32;1m        PASS[0m [   0.018s] ( 46/332) [35;1mharness-gate::integration_test[0m [34;1mtest_init_with_rust_api_preset[0m
+2026-09-08T15:17:20.9481999Z [32;1m        PASS[0m [   0.010s] ( 47/332) [35;1mharness-gate::integration_test[0m [34;1mtest_presets_lists_available[0m
+2026-09-08T15:17:21.0377723Z [32;1m        PASS[0m [   0.089s] ( 48/332) [35;1mharness-gate::integration_test[0m [34;1mtest_scope_detection_all[0m
+2026-09-08T15:17:21.8430182Z [32;1m        PASS[0m [   0.805s] ( 49/332) [35;1mharness-gate::integration_test[0m [34;1mtest_secrets_scan_basic[0m
+2026-09-08T15:17:21.9853361Z [32;1m        PASS[0m [   2.228s] ( 50/332) [35;1mharness-gate::failure_paths_test[0m [34;1mverification_cleanup_cancel_and_report_precedence_retains_resource_evidence[0m
+2026-09-08T15:17:22.1240431Z [32;1m        PASS[0m [   0.139s] ( 51/332) [35;1mharness-gate::integration_test[0m [34;1mtest_verify_fails_without_git[0m
+2026-09-08T15:17:22.1352887Z [32;1m        PASS[0m [   0.011s] ( 52/332) [35;1mharness-gate::quality_cli_test[0m [34;1mpartial_base_context_is_rejected_before_evaluation[0m
+2026-09-08T15:17:23.0169638Z [32;1m        PASS[0m [   1.174s] ( 53/332) [35;1mharness-gate::integration_test[0m [34;1mtest_verify_cancellation_stops_the_child_process[0m
+2026-09-08T15:17:23.0423965Z [32;1m        PASS[0m [   0.025s] ( 54/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1marchitecture_rule_detects_multiline_raw_sql_and_query_builder[0m
+2026-09-08T15:17:23.0573232Z [32;1m        PASS[0m [   0.014s] ( 55/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1marchitecture_rule_scans_every_configured_root[0m
+2026-09-08T15:17:23.0747660Z [32;1m        PASS[0m [   0.017s] ( 56/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1maudit_rejects_an_oversized_source_before_reading_it[0m
+2026-09-08T15:17:23.1095023Z [32;1m        PASS[0m [   0.032s] ( 57/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1maudit_reports_redact_violation_content_in_json_and_markdown[0m
+2026-09-08T15:17:23.1215309Z [32;1m        PASS[0m [   0.013s] ( 58/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1maudit_schema_accepts_current_config_and_rejects_incompatible_inputs[0m
+2026-09-08T15:17:23.1364769Z [32;1m        PASS[0m [   0.016s] ( 59/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1maudit_skips_file_symlinks[0m
+2026-09-08T15:17:23.1504938Z [32;1m        PASS[0m [   0.014s] ( 60/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1mconfigured_comment_syntax_handles_strings_and_block_comments[0m
+2026-09-08T15:17:23.1764722Z [32;1m        PASS[0m [   0.026s] ( 61/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1mhard_rule_detects_multiline_and_dynamic_sql_surfaces[0m
+2026-09-08T15:17:23.2104861Z [32;1m        PASS[0m [   0.034s] ( 62/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1mhard_rule_detects_multiline_sensitive_logging[0m
+2026-09-08T15:17:23.2254703Z [32;1m        PASS[0m [   0.014s] ( 63/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1mhard_rule_scans_every_configured_root[0m
+2026-09-08T15:17:23.2758712Z [32;1m        PASS[0m [   0.051s] ( 64/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1minitialized_project_can_add_and_run_its_first_audit_rule[0m
+2026-09-08T15:17:23.2851386Z [32;1m        PASS[0m [   0.009s] ( 65/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1minvalid_rule_regex_returns_an_error[0m
+2026-09-08T15:17:23.2947976Z [32;1m        PASS[0m [   0.010s] ( 66/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1mlegacy_audit_shapes_receive_actionable_migration_errors[0m
+2026-09-08T15:17:23.3063339Z [32;1m        PASS[0m [   0.010s] ( 67/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1mliteral_allowlist_is_a_path_prefix_not_a_substring[0m
+2026-09-08T15:17:23.3393218Z [32;1m        PASS[0m [   0.034s] ( 68/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1mlog_parser_falls_back_to_the_last_thirty_raw_lines[0m
+2026-09-08T15:17:23.3719415Z [32;1m        PASS[0m [   0.034s] ( 69/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1mlog_parser_keeps_the_error_in_a_long_trace[0m
+2026-09-08T15:17:23.4023559Z [32;1m        PASS[0m [   0.030s] ( 70/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1mlog_parser_keeps_the_error_trace[0m
+2026-09-08T15:17:23.4324628Z [32;1m        PASS[0m [   0.030s] ( 71/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1mlog_parser_reads_trace_id_from_the_current_span[0m
+2026-09-08T15:17:23.4694895Z [32;1m        PASS[0m [   0.036s] ( 72/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1mlog_parser_redacts_structured_and_fallback_output[0m
+2026-09-08T15:17:23.4884837Z [32;1m        PASS[0m [   0.018s] ( 73/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1mlog_parser_rejects_an_oversized_line_before_retaining_it[0m
+2026-09-08T15:17:23.5005280Z [32;1m        PASS[0m [   0.014s] ( 74/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1mmissing_rule_root_fails_closed[0m
+2026-09-08T15:17:23.5143849Z [32;1m        PASS[0m [   0.010s] ( 75/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1mregex_allowlist_is_explicit[0m
+2026-09-08T15:17:23.5415002Z [32;1m        PASS[0m [   0.030s] ( 76/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1mreport_keeps_rule_names_with_shared_prefixes_separate[0m
+2026-09-08T15:17:23.5535279Z [32;1m        PASS[0m [   0.010s] ( 77/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1mrule_extension_requires_configured_comment_syntax[0m
+2026-09-08T15:17:23.5614159Z [32;1m        PASS[0m [   0.010s] ( 78/332) [35;1mharness-gate::bin/harness-gate[0m [36maudit::tests[0m[36m::[0m[34;1mrule_root_cannot_escape_project[0m
+2026-09-08T15:17:23.5717638Z [32;1m        PASS[0m [   0.010s] ( 79/332) [35;1mharness-gate::bin/harness-gate[0m [36mcompat::tests[0m[36m::[0m[34;1mcanary_enable_and_rollback_are_auditable[0m
+2026-09-08T15:17:23.5834655Z [32;1m        PASS[0m [   0.009s] ( 80/332) [35;1mharness-gate::bin/harness-gate[0m [36mcompat::tests[0m[36m::[0m[34;1mcomparison_correlates_distinct_invocations_and_artifact_roots[0m
+2026-09-08T15:17:23.5924549Z [32;1m        PASS[0m [   0.009s] ( 81/332) [35;1mharness-gate::bin/harness-gate[0m [36mcompat::tests[0m[36m::[0m[34;1mcomparison_ignores_volatile_fields_but_keeps_status_differences[0m
+2026-09-08T15:17:23.6014611Z [32;1m        PASS[0m [   0.009s] ( 82/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1maudit_configuration_path_rejects_environment_interpolation[0m
+2026-09-08T15:17:23.6091256Z [32;1m        PASS[0m [   0.010s] ( 83/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mboth_builtin_gate_declarations_can_coexist_without_log_conflicts[0m
+2026-09-08T15:17:23.6194555Z [32;1m        PASS[0m [   0.010s] ( 84/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mbuilt_in_gate_declarations_are_validated_as_typed_steps[0m
+2026-09-08T15:17:23.6494546Z [32;1m        PASS[0m [   0.028s] ( 85/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mbuiltin_gate_diagnostics_preserve_typed_field_paths[0m
+2026-09-08T15:17:23.6584574Z [32;1m        PASS[0m [   0.010s] ( 86/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mcomponents_and_profiles_are_not_hard_coded[0m
+2026-09-08T15:17:23.6734715Z [32;1m        PASS[0m [   0.014s] ( 87/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mdependency_order_allows_service_reuse_but_not_log_reuse[0m
+2026-09-08T15:17:23.6824532Z [32;1m        PASS[0m [   0.008s] ( 88/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mdiagnostics_serialize_typed_retry_class_without_message_inference[0m
+2026-09-08T15:17:23.6884257Z [32;1m        PASS[0m [   0.008s] ( 89/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mdiagnostics_truncate_at_the_documented_maximum[0m
+2026-09-08T15:17:23.6974529Z [32;1m        PASS[0m [   0.008s] ( 90/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mdiscovery_errors_keep_configuration_field_paths_in_json_reports[0m
+2026-09-08T15:17:23.7280169Z [32;1m        PASS[0m [   0.032s] ( 91/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mdoctor_parser_alias_and_scope_diagnostics_keep_configuration_paths[0m
+2026-09-08T15:17:23.7420182Z [32;1m        PASS[0m [   0.014s] ( 92/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mduplicate_logs_use_a_conservative_case_normalized_identity[0m
+2026-09-08T15:17:23.7534463Z [32;1m        PASS[0m [   0.010s] ( 93/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mduplicate_service_injection_variables_are_rejected[0m
+2026-09-08T15:17:23.7617451Z [32;1m        PASS[0m [   0.009s] ( 94/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1menvironment_interpolation_requires_defined_variables[0m
+2026-09-08T15:17:23.7744545Z [32;1m        PASS[0m [   0.012s] ( 95/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1menvironment_interpolation_supports_defaults[0m
+2026-09-08T15:17:23.7904917Z [32;1m        PASS[0m [   0.017s] ( 96/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mexecution_and_webhook_contracts_reject_unknown_or_unsafe_inputs[0m
+2026-09-08T15:17:23.8003914Z [32;1m        PASS[0m [   0.010s] ( 97/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mexecution_policy_defaults_to_serial_and_four_workers_when_enabled[0m
+2026-09-08T15:17:23.8164537Z [32;1m        PASS[0m [   0.013s] ( 98/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mexecution_policy_diagnostic_points_to_max_parallel[0m
+2026-09-08T15:17:23.8245450Z [32;1m        PASS[0m [   0.011s] ( 99/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mexecution_policy_rejects_zero_and_values_above_the_bound[0m
+2026-09-08T15:17:23.8404812Z [32;1m        PASS[0m [   0.013s] (100/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mexecution_retry_diagnostic_points_to_the_attempt_limit[0m
+2026-09-08T15:17:23.8494069Z [32;1m        PASS[0m [   0.011s] (101/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mexisting_v2_config_defaults_the_secret_rule_path[0m
+2026-09-08T15:17:23.8774741Z [32;1m        PASS[0m [   0.027s] (102/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mexternal_step_diagnostics_cover_closed_field_contract[0m
+2026-09-08T15:17:23.9134912Z [32;1m        PASS[0m [   0.036s] (103/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mexternal_step_diagnostics_cover_paths_logs_timeouts_and_references[0m
+2026-09-08T15:17:23.9231832Z [32;1m        PASS[0m [   0.010s] (104/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mexternal_steps_reject_gate_fields[0m
+2026-09-08T15:17:23.9374587Z [32;1m        PASS[0m [   0.012s] (105/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mflow_config_accessors_and_schema_cover_the_public_configuration_surface[0m
+2026-09-08T15:17:23.9491764Z [32;1m        PASS[0m [   0.013s] (106/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mgeneric_runner_requires_an_explicit_thread_environment[0m
+2026-09-08T15:17:23.9644456Z [32;1m        PASS[0m [   0.013s] (107/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mhuman_diagnostic_location_has_one_closing_parenthesis[0m
+2026-09-08T15:17:23.9774455Z [32;1m        PASS[0m [   0.013s] (108/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mindependent_semantic_errors_are_aggregated_with_precise_paths[0m
+2026-09-08T15:17:23.9895482Z [32;1m        PASS[0m [   0.014s] (109/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mindependent_services_with_the_same_injection_are_rejected[0m
+2026-09-08T15:17:24.0011628Z [32;1m        PASS[0m [   0.012s] (110/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mjunit_report_path_must_stay_relative_to_the_report_directory[0m
+2026-09-08T15:17:24.0112230Z [32;1m        PASS[0m [   0.010s] (111/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mpolicy_steps_cannot_be_missing[0m
+2026-09-08T15:17:24.0254865Z [32;1m        PASS[0m [   0.014s] (112/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mrepeated_service_references_emit_one_shared_resource_diagnostic_per_pair[0m
+2026-09-08T15:17:24.0434780Z [32;1m        PASS[0m [   0.018s] (113/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mreport_template_diagnostics_cover_pair_paths_and_extensions[0m
+2026-09-08T15:17:24.0530739Z [32;1m        PASS[0m [   0.010s] (114/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mrepository_configuration_is_valid[0m
+2026-09-08T15:17:24.0705035Z [32;1m        PASS[0m [   0.015s] (115/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mrunner_contract_rejects_invalid_fields[0m
+2026-09-08T15:17:24.1094771Z [32;1m        PASS[0m [   0.038s] (116/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mrunner_diagnostics_cover_environment_isolation_and_arguments[0m
+2026-09-08T15:17:24.1424836Z [32;1m        PASS[0m [   0.033s] (117/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mrunner_diagnostics_cover_version_kind_program_and_thread_contracts[0m
+2026-09-08T15:17:24.1514623Z [32;1m        PASS[0m [   0.010s] (118/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mrunner_rejects_shared_isolation_for_multiple_workers[0m
+2026-09-08T15:17:24.1664724Z [32;1m        PASS[0m [   0.014s] (119/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mrunner_thread_environment_cannot_shadow_service_injection[0m
+2026-09-08T15:17:24.1874825Z [32;1m        PASS[0m [   0.022s] (120/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mservice_diagnostics_cover_duplicates_references_and_environment_collisions[0m
+2026-09-08T15:17:24.2048855Z [32;1m        PASS[0m [   0.019s] (121/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mservice_diagnostics_cover_runner_and_multi_service_injection_collisions[0m
+2026-09-08T15:17:24.2149969Z [32;1m        PASS[0m [   0.010s] (122/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mshell_command_strings_are_rejected[0m
+2026-09-08T15:17:24.2253283Z [32;1m        PASS[0m [   0.010s] (123/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mstep_dependency_cycles_are_rejected[0m
+2026-09-08T15:17:24.2374086Z [32;1m        PASS[0m [   0.012s] (124/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mstep_logs_reject_windows_and_path_like_names_on_every_platform[0m
+2026-09-08T15:17:24.2534903Z [32;1m        PASS[0m [   0.015s] (125/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mtemplate_paths_must_stay_inside_a_disjoint_repository_root[0m
+2026-09-08T15:17:24.2674456Z [32;1m        PASS[0m [   0.012s] (126/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mtemplate_symlink_escape_is_rejected[0m
+2026-09-08T15:17:24.2789974Z [32;1m        PASS[0m [   0.014s] (127/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mtransitive_dependency_allows_service_reuse[0m
+2026-09-08T15:17:24.2904522Z [32;1m        PASS[0m [   0.010s] (128/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1munknown_built_in_gate_types_fail_closed[0m
+2026-09-08T15:17:24.2984334Z [32;1m        PASS[0m [   0.009s] (129/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1munknown_fields_are_rejected[0m
+2026-09-08T15:17:24.3120283Z [32;1m        PASS[0m [   0.014s] (130/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1munordered_steps_reusing_a_service_are_rejected_with_field_paths[0m
+2026-09-08T15:17:24.3255573Z [32;1m        PASS[0m [   0.011s] (131/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mversion_one_configuration_can_be_migrated[0m
+2026-09-08T15:17:24.3330369Z [32;1m        PASS[0m [   0.010s] (132/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mversioned_runner_contract_accepts_explicit_isolation[0m
+2026-09-08T15:17:24.3494728Z [32;1m        PASS[0m [   0.015s] (133/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mwebhook_configuration_requires_http_url_and_an_enabled_result[0m
+2026-09-08T15:17:24.3614604Z [32;1m        PASS[0m [   0.012s] (134/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mwindows_prefixed_paths_are_rejected_on_every_platform[0m
+2026-09-08T15:17:24.3714191Z [32;1m        PASS[0m [   0.012s] (135/332) [35;1mharness-gate::bin/harness-gate[0m [36mconfig::tests[0m[36m::[0m[34;1mwindows_style_parent_traversal_is_rejected_on_every_platform[0m
+2026-09-08T15:17:24.4308987Z [32;1m        PASS[0m [   0.059s] (136/332) [35;1mharness-gate::bin/harness-gate[0m [36mdoctor::tests[0m[36m::[0m[34;1mgit_remote_check_rejects_non_git_directory[0m
+2026-09-08T15:17:24.5153755Z [32;1m        PASS[0m [   0.082s] (137/332) [35;1mharness-gate::bin/harness-gate[0m [36mdoctor::tests[0m[36m::[0m[34;1mrelative_glob_matches_paths_from_the_project_root[0m
+2026-09-08T15:17:24.5225990Z [32;1m        PASS[0m [   0.009s] (138/332) [35;1mharness-gate::bin/harness-gate[0m [36mfailure::tests[0m[36m::[0m[34;1mfailure_code_wire_names_are_stable_and_closed[0m
+2026-09-08T15:17:24.5325956Z [32;1m        PASS[0m [   0.007s] (139/332) [35;1mharness-gate::bin/harness-gate[0m [36mfailure::tests[0m[36m::[0m[34;1mretry_class_wire_names_are_stable_and_closed[0m
+2026-09-08T15:17:24.5395787Z [32;1m        PASS[0m [   0.009s] (140/332) [35;1mharness-gate::bin/harness-gate[0m [36mnet_policy::tests[0m[36m::[0m[34;1mnormalizes_exact_hosts_without_wildcards[0m
+2026-09-08T15:17:24.5505644Z [32;1m        PASS[0m [   0.011s] (141/332) [35;1mharness-gate::bin/harness-gate[0m [36mnet_policy::tests[0m[36m::[0m[34;1mrejects_local_address_matrix[0m
+2026-09-08T15:17:24.5604440Z [32;1m        PASS[0m [   0.009s] (142/332) [35;1mharness-gate::bin/harness-gate[0m [36mpreset::tests[0m[36m::[0m[34;1matomic_write_batch_cleans_staged_files_when_staging_fails[0m
+2026-09-08T15:17:24.5688490Z [32;1m        PASS[0m [   0.008s] (143/332) [35;1mharness-gate::bin/harness-gate[0m [36mpreset::tests[0m[36m::[0m[34;1matomic_write_batch_rejects_broken_symlink[0m
+2026-09-08T15:17:24.5784779Z [32;1m        PASS[0m [   0.008s] (144/332) [35;1mharness-gate::bin/harness-gate[0m [36mpreset::tests[0m[36m::[0m[34;1matomic_write_batch_restores_backups_when_commit_fails[0m
+2026-09-08T15:17:24.5887508Z [32;1m        PASS[0m [   0.011s] (145/332) [35;1mharness-gate::bin/harness-gate[0m [36mpreset::tests[0m[36m::[0m[34;1matomic_write_batch_writes_all_entries[0m
+2026-09-08T15:17:24.6014432Z [32;1m        PASS[0m [   0.010s] (146/332) [35;1mharness-gate::bin/harness-gate[0m [36mpreset::tests[0m[36m::[0m[34;1matomic_write_replaces_complete_content[0m
+2026-09-08T15:17:24.6224261Z [32;1m        PASS[0m [   0.021s] (147/332) [35;1mharness-gate::bin/harness-gate[0m [36mpreset::tests[0m[36m::[0m[34;1mevery_embedded_preset_is_valid[0m
+2026-09-08T15:17:24.6284480Z [32;1m        PASS[0m [   0.008s] (148/332) [35;1mharness-gate::bin/harness-gate[0m [36mpreset::tests[0m[36m::[0m[34;1mexisting_symlink_cannot_escape_project[0m
+2026-09-08T15:17:24.6973773Z [32;1m        PASS[0m [   0.070s] (149/332) [35;1mharness-gate::bin/harness-gate[0m [36mpreset::tests[0m[36m::[0m[34;1minit_writes_required_security_configs[0m
+2026-09-08T15:17:24.7065339Z [32;1m        PASS[0m [   0.007s] (150/332) [35;1mharness-gate::bin/harness-gate[0m [36mpreset::tests[0m[36m::[0m[34;1mproject_names_become_portable_ids[0m
+2026-09-08T15:17:25.4269627Z [32;1m        PASS[0m [   0.722s] (151/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::adapter::tests[0m[36m::[0m[34;1martifact_root_budget_counts_undeclared_files[0m
+2026-09-08T15:17:26.8585598Z [32;1m        PASS[0m [   1.429s] (152/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::adapter::tests[0m[36m::[0m[34;1mblocked_stdin_writer_cannot_bypass_adapter_timeout[0m
+2026-09-08T15:17:27.5345222Z [32;1m        PASS[0m [   0.676s] (153/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::adapter::tests[0m[36m::[0m[34;1mcapability_and_signature_fail_closed[0m
+2026-09-08T15:17:30.0491241Z [32;1m        PASS[0m [ 119.629s] (154/332) [35;1mharness-gate[0m [36mquality::policy_tests[0m[36m::[0m[34;1mfrozen_policy_and_reference_acceptance_match_python[0m
+2026-09-08T15:17:30.4275127Z [33;1m        SLOW[0m [>120.000s] (───────) [35;1mharness-gate[0m [36mquality::replay::acceptance[0m[36m::[0m[34;1mretained_corpora_and_consolidated_negative_matrix[0m
+2026-09-08T15:17:31.1427259Z [32;1m        PASS[0m [   3.609s] (155/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::adapter::tests[0m[36m::[0m[34;1mcrash_timeout_cancellation_and_escape_are_isolated[0m
+2026-09-08T15:17:31.4705403Z [32;1m        PASS[0m [   1.421s] (156/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::adapter::tests[0m[36m::[0m[34;1mdurable_nonce_sidecar_rejects_replay_after_host_restart[0m
+2026-09-08T15:17:33.5743890Z [32;1m        PASS[0m [   2.104s] (157/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::adapter::tests[0m[36m::[0m[34;1minvalid_environment_entries_are_rejected_before_spawn[0m
+2026-09-08T15:17:34.3705212Z [32;1m        PASS[0m [   0.795s] (158/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::adapter::tests[0m[36m::[0m[34;1moutput_budget_fails_closed_with_a_truncation_marker[0m
+2026-09-08T15:17:35.0625339Z [32;1m        PASS[0m [   0.691s] (159/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::adapter::tests[0m[36m::[0m[34;1moutput_validation_retains_stream_precedence_and_combined_budget[0m
+2026-09-08T15:17:36.2365364Z [32;1m        PASS[0m [   5.092s] (160/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::adapter::tests[0m[36m::[0m[34;1mfull_request_signature_binds_mutable_fields[0m
+2026-09-08T15:17:36.2709315Z [32;1m        PASS[0m [   1.210s] (161/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::adapter::tests[0m[36m::[0m[34;1mrequest_and_response_validation_edges_fail_closed[0m
+2026-09-08T15:17:36.9589191Z [32;1m        PASS[0m [   0.724s] (162/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::adapter::tests[0m[36m::[0m[34;1msigned_fixture_runs_and_publishes_artifact[0m
+2026-09-08T15:17:37.6915466Z [32;1m        PASS[0m [   0.731s] (163/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::adapter::tests[0m[36m::[0m[34;1mwaiter_terminates_on_writer_failure_and_observed_output_limits[0m
+2026-09-08T15:17:37.7134888Z [32;1m        PASS[0m [   0.023s] (164/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::isolation::tests[0m[36m::[0m[34;1mallocation_has_unique_worker_ids_and_cleanup_state[0m
+2026-09-08T15:17:37.7324642Z [32;1m        PASS[0m [   0.019s] (165/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::task::tests[0m[36m::[0m[34;1mwait_backoff_is_bounded_and_starts_short[0m
+2026-09-08T15:17:37.8074796Z [32;1m        PASS[0m [   0.074s] (166/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::tests[0m[36m::[0m[34;1mabnormal_or_cancelled_worker_removes_isolation_state[0m
+2026-09-08T15:17:37.8819052Z [32;1m        PASS[0m [   0.074s] (167/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::tests[0m[36m::[0m[34;1mcaptured_command_enforces_output_budget[0m
+2026-09-08T15:17:38.0565181Z [32;1m        PASS[0m [   0.174s] (168/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::tests[0m[36m::[0m[34;1mcaptured_command_has_a_hard_timeout[0m
+2026-09-08T15:17:38.0734847Z [32;1m        PASS[0m [   0.018s] (169/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::tests[0m[36m::[0m[34;1mprocess_tree_child_fixture[0m
+2026-09-08T15:17:38.0924772Z [32;1m        PASS[0m [   0.017s] (170/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::tests[0m[36m::[0m[34;1mprocess_tree_parent_fixture[0m
+2026-09-08T15:17:38.1214979Z [32;1m        PASS[0m [   0.030s] (171/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::tests[0m[36m::[0m[34;1mtask_can_remove_an_inherited_environment_variable[0m
+2026-09-08T15:17:38.1794960Z [32;1m        PASS[0m [   0.057s] (172/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::tests[0m[36m::[0m[34;1mtask_runs_in_an_isolated_session[0m
+2026-09-08T15:17:38.4765931Z [32;1m        PASS[0m [   2.203s] (173/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::adapter::tests[0m[36m::[0m[34;1mvalidity_window_and_nonce_replay_fail_closed[0m
+2026-09-08T15:17:38.5353429Z [32;1m        PASS[0m [   0.061s] (174/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::tests[0m[36m::[0m[34;1mtimeout_terminates_the_task[0m
+2026-09-08T15:17:38.6032166Z [32;1m        PASS[0m [   0.068s] (175/332) [35;1mharness-gate::bin/harness-gate[0m [36mproject::tests[0m[36m::[0m[34;1minvocation_reports_resolve_their_stable_invocation_id[0m
+2026-09-08T15:17:38.6713716Z [32;1m        PASS[0m [   0.068s] (176/332) [35;1mharness-gate::bin/harness-gate[0m [36mproject::tests[0m[36m::[0m[34;1mpreparation_does_not_change_the_process_working_directory[0m
+2026-09-08T15:17:38.6800224Z [32;1m        PASS[0m [   0.009s] (177/332) [35;1mharness-gate::bin/harness-gate[0m [36mproject::tests[0m[36m::[0m[34;1mrepository_path_rejects_symlink_escape[0m
+2026-09-08T15:17:38.9371750Z [32;1m        PASS[0m [   0.257s] (178/332) [35;1mharness-gate::bin/harness-gate[0m [36mscope::tests[0m[36m::[0m[34;1mdetects_changes_against_a_base_revision[0m
+2026-09-08T15:17:39.1248117Z [32;1m        PASS[0m [   0.188s] (179/332) [35;1mharness-gate::bin/harness-gate[0m [36mscope::tests[0m[36m::[0m[34;1mdetects_staged_changes[0m
+2026-09-08T15:17:39.4108513Z [32;1m        PASS[0m [   0.286s] (180/332) [35;1mharness-gate::bin/harness-gate[0m [36mscope::tests[0m[36m::[0m[34;1mdetects_working_tree_changes[0m
+2026-09-08T15:17:39.4218583Z [32;1m        PASS[0m [   0.011s] (181/332) [35;1mharness-gate::bin/harness-gate[0m [36mscope::tests[0m[36m::[0m[34;1mfrontend_change_only_selects_frontend[0m
+2026-09-08T15:17:39.6052449Z [32;1m        PASS[0m [   0.183s] (182/332) [35;1mharness-gate::bin/harness-gate[0m [36mscope::tests[0m[36m::[0m[34;1mrejects_a_missing_base_revision[0m
+2026-09-08T15:17:39.6155293Z [32;1m        PASS[0m [   0.010s] (183/332) [35;1mharness-gate::bin/harness-gate[0m [36mscope::tests[0m[36m::[0m[34;1munmatched_paths_are_reported[0m
+2026-09-08T15:17:39.9022830Z [32;1m        PASS[0m [   0.287s] (184/332) [35;1mharness-gate::bin/harness-gate[0m [36mscope::tests[0m[36m::[0m[34;1munmatched_scope_can_fail_closed[0m
+2026-09-08T15:17:39.9131009Z [32;1m        PASS[0m [   0.011s] (185/332) [35;1mharness-gate::bin/harness-gate[0m [36mscope::tests[0m[36m::[0m[34;1mworkflow_changes_force_all_components[0m
+2026-09-08T15:17:39.9506454Z [32;1m        PASS[0m [   0.037s] (186/332) [35;1mharness-gate::bin/harness-gate[0m [36msecrets::tests[0m[36m::[0m[34;1mdefault_preset_secret_config_is_valid[0m
+2026-09-08T15:17:39.9925309Z [32;1m        PASS[0m [   0.042s] (187/332) [35;1mharness-gate::bin/harness-gate[0m [36msecrets::tests[0m[36m::[0m[34;1mdetects_direct_tokens_without_matching_placeholders[0m
+2026-09-08T15:17:40.0366927Z [32;1m        PASS[0m [   0.044s] (188/332) [35;1mharness-gate::bin/harness-gate[0m [36msecrets::tests[0m[36m::[0m[34;1mdetects_named_jwt_and_enterprise_messaging_secrets[0m
+2026-09-08T15:17:40.0835235Z [32;1m        PASS[0m [   0.047s] (189/332) [35;1mharness-gate::bin/harness-gate[0m [36msecrets::tests[0m[36m::[0m[34;1mdetects_postgres_credentials_and_secret_bearing_webhooks[0m
+2026-09-08T15:17:40.0929276Z [32;1m        PASS[0m [   0.009s] (190/332) [35;1mharness-gate::bin/harness-gate[0m [36msecrets::tests[0m[36m::[0m[34;1minvalid_secret_config_fails_closed[0m
+2026-09-08T15:17:40.1006504Z [32;1m        PASS[0m [   0.008s] (191/332) [35;1mharness-gate::bin/harness-gate[0m [36msecrets::tests[0m[36m::[0m[34;1mlocal_test_database_policy_is_configurable[0m
+2026-09-08T15:17:40.1088003Z [32;1m        PASS[0m [   0.008s] (192/332) [35;1mharness-gate::bin/harness-gate[0m [36msecrets::tests[0m[36m::[0m[34;1mplaceholder_prefixes_are_configurable[0m
+2026-09-08T15:17:40.6371015Z [32;1m        PASS[0m [   0.528s] (193/332) [35;1mharness-gate::bin/harness-gate[0m [36msecrets::tests[0m[36m::[0m[34;1mstaged_scan_rejects_an_oversized_blob_before_loading_it[0m
+2026-09-08T15:17:40.8488175Z [32;1m        PASS[0m [   0.212s] (194/332) [35;1mharness-gate::bin/harness-gate[0m [36msecrets::tests[0m[36m::[0m[34;1mstaged_scan_uses_the_staged_secret_config[0m
+2026-09-08T15:17:41.0150411Z [32;1m        PASS[0m [   0.166s] (195/332) [35;1mharness-gate::bin/harness-gate[0m [36msecrets::tests[0m[36m::[0m[34;1mworking_tree_scan_rejects_an_oversized_file[0m
+2026-09-08T15:17:41.1849035Z [32;1m        PASS[0m [   0.170s] (196/332) [35;1mharness-gate::bin/harness-gate[0m [36msecrets::tests[0m[36m::[0m[34;1mworking_tree_scan_skips_file_symlinks[0m
+2026-09-08T15:17:41.1931906Z [32;1m        PASS[0m [   0.008s] (197/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::commands::tests[0m[36m::[0m[34;1mbuilds_deterministic_start_arguments[0m
+2026-09-08T15:17:41.2009537Z [32;1m        PASS[0m [   0.008s] (198/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::commands::tests[0m[36m::[0m[34;1mbuilds_port_healthcheck_cleanup_and_info_arguments[0m
+2026-09-08T15:17:41.2082755Z [32;1m        PASS[0m [   0.007s] (199/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::commands::tests[0m[36m::[0m[34;1mselects_the_expected_docker_compatible_executable[0m
+2026-09-08T15:17:41.2170392Z [32;1m        PASS[0m [   0.008s] (200/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::inspection::tests[0m[36m::[0m[34;1mparses_docker_style_inspection[0m
+2026-09-08T15:17:41.2254854Z [32;1m        PASS[0m [   0.008s] (201/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::inspection::tests[0m[36m::[0m[34;1mrejects_inspection_that_is_not_json[0m
+2026-09-08T15:17:41.2331049Z [32;1m        PASS[0m [   0.007s] (202/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::inspection::tests[0m[36m::[0m[34;1mrejects_inspection_without_an_immutable_object_id[0m
+2026-09-08T15:17:41.2404143Z [32;1m        PASS[0m [   0.007s] (203/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::lease::tests[0m[36m::[0m[34;1mcurrent_process_identity_is_available_on_supported_platforms[0m
+2026-09-08T15:17:41.2478645Z [32;1m        PASS[0m [   0.007s] (204/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::lease::tests[0m[36m::[0m[34;1mexpired_process_lease_is_stale[0m
+2026-09-08T15:17:42.2823550Z [32;1m        PASS[0m [   4.105s] (205/332) [35;1mharness-gate::bin/harness-gate[0m [36mprocess::tests[0m[36m::[0m[34;1mtimeout_terminates_process_tree_without_a_descendant_leak[0m
+2026-09-08T15:17:42.6285496Z [32;1m        PASS[0m [   0.346s] (206/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::lease::tests[0m[36m::[0m[34;1mheartbeat_failure_blocks_release_and_retains_the_marker[0m
+2026-09-08T15:17:42.6511606Z [32;1m        PASS[0m [   1.403s] (207/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::lease::tests[0m[36m::[0m[34;1mfake_docker_and_podman_cleanup_requires_fresh_complete_ownership[0m
+2026-09-08T15:17:42.7846673Z [32;1m        PASS[0m [   0.133s] (208/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::lease::tests[0m[36m::[0m[34;1mpoisoned_lease_lock_fails_closed_and_retains_the_marker[0m
+2026-09-08T15:17:42.7935051Z [32;1m        PASS[0m [   0.009s] (209/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::lease::tests[0m[36m::[0m[34;1mresource_keys_are_stable_and_path_safe[0m
+2026-09-08T15:17:42.9420605Z [32;1m        PASS[0m [   0.148s] (210/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::lease::tests[0m[36m::[0m[34;1mruntime_removal_failure_retains_evidence_and_allows_a_proven_retry[0m
+2026-09-08T15:17:42.9635539Z [32;1m        PASS[0m [   0.334s] (211/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::lease::tests[0m[36m::[0m[34;1mlease_heartbeat_renews_marker_during_a_long_step[0m
+2026-09-08T15:17:42.9716883Z [32;1m        PASS[0m [   0.008s] (212/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1maccepts_an_explicitly_allowed_remote_test_database[0m
+2026-09-08T15:17:42.9794965Z [32;1m        PASS[0m [   0.008s] (213/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1maccepts_an_ipv6_loopback_database[0m
+2026-09-08T15:17:42.9876699Z [32;1m        PASS[0m [   0.008s] (214/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1maccepts_an_isolated_loopback_database[0m
+2026-09-08T15:17:43.0235214Z [32;1m        PASS[0m [   0.081s] (215/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::lease::tests[0m[36m::[0m[34;1muncertain_process_identity_is_retained_without_reclaim[0m
+2026-09-08T15:17:43.0645616Z [32;1m        PASS[0m [   0.077s] (216/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1mcheck_available_rejects_empty_environment_service[0m
+2026-09-08T15:17:43.0997730Z [32;1m        PASS[0m [   0.076s] (217/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1mcheck_available_reports_unknown_service_and_environment_service[0m
+2026-09-08T15:17:43.1434068Z [32;1m        PASS[0m [   0.079s] (218/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1mcleanup_dry_run_lists_active_marked_resources_without_removing_them[0m
+2026-09-08T15:17:43.1774771Z [32;1m        PASS[0m [   0.077s] (219/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1mcleanup_reclaims_a_stale_marked_lease[0m
+2026-09-08T15:17:43.2200268Z [32;1m        PASS[0m [   0.077s] (220/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1mcleanup_surfaces_errors_recorded_by_a_service_resource[0m
+2026-09-08T15:17:43.2551360Z [32;1m        PASS[0m [   0.078s] (221/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1mcross_process_resource_lease_reports_a_conflict_and_can_be_reacquired[0m
+2026-09-08T15:17:43.2964818Z [32;1m        PASS[0m [   0.076s] (222/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1mdocker_service_uses_a_valid_external_value_without_docker[0m
+2026-09-08T15:17:43.3308772Z [32;1m        PASS[0m [   0.075s] (223/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1menvironment_service_injects_configured_value[0m
+2026-09-08T15:17:43.3726381Z [32;1m        PASS[0m [   0.076s] (224/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1menvironment_service_rejects_missing_and_empty_values[0m
+2026-09-08T15:17:43.4072728Z [32;1m        PASS[0m [   0.076s] (225/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1mexclusive_external_service_is_not_reused_after_its_last_lease[0m
+2026-09-08T15:17:43.4553676Z [32;1m        PASS[0m [   0.082s] (226/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1mfailed_service_startup_wakes_waiters_without_deadlock[0m
+2026-09-08T15:17:43.4837572Z [32;1m        PASS[0m [   0.076s] (227/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1mfailed_warmup_is_cached_for_the_first_real_lease[0m
+2026-09-08T15:17:43.5617532Z [32;1m        PASS[0m [   0.078s] (228/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1mmissing_service_is_cached_as_a_failure[0m
+2026-09-08T15:17:43.6328307Z [32;1m        PASS[0m [   0.177s] (229/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1mmanaged_service_lease_excludes_concurrent_users[0m
+2026-09-08T15:17:43.6416230Z [32;1m        PASS[0m [   0.080s] (230/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1mpodman_runtime_uses_external_service_without_starting_a_container[0m
+2026-09-08T15:17:43.6446650Z [32;1m        PASS[0m [   0.009s] (231/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1mrejects_a_database_without_a_test_suffix[0m
+2026-09-08T15:17:43.6515251Z [32;1m        PASS[0m [   0.009s] (232/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1mrejects_a_remote_database_without_an_explicit_override[0m
+2026-09-08T15:17:43.6566117Z [32;1m        PASS[0m [   0.014s] (233/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1mrejects_the_configured_runtime_database[0m
+2026-09-08T15:17:43.7391331Z [32;1m        PASS[0m [   0.088s] (234/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1mreleasing_a_lease_leaves_no_marker_file[0m
+2026-09-08T15:17:43.7434082Z [32;1m        PASS[0m [   0.086s] (235/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1mshareable_environment_service_supports_concurrent_leases[0m
+2026-09-08T15:17:43.7546364Z [32;1m        PASS[0m [   0.011s] (236/332) [35;1mharness-gate::bin/harness-gate[0m [36mutils::fs::tests[0m[36m::[0m[34;1matomic_write_honors_no_replace[0m
+2026-09-08T15:17:43.7657248Z [32;1m        PASS[0m [   0.010s] (237/332) [35;1mharness-gate::bin/harness-gate[0m [36mutils::fs::tests[0m[36m::[0m[34;1mconfined_writer_creates_a_missing_output_root[0m
+2026-09-08T15:17:43.7734796Z [32;1m        PASS[0m [   0.009s] (238/332) [35;1mharness-gate::bin/harness-gate[0m [36mutils::fs::tests[0m[36m::[0m[34;1mconfined_writer_publishes_complete_content[0m
+2026-09-08T15:17:43.7812630Z [32;1m        PASS[0m [   0.008s] (239/332) [35;1mharness-gate::bin/harness-gate[0m [36mutils::fs::tests[0m[36m::[0m[34;1mconfined_writer_rejects_parent_and_target_symlinks[0m
+2026-09-08T15:17:43.7885674Z [32;1m        PASS[0m [   0.007s] (240/332) [35;1mharness-gate::bin/harness-gate[0m [36mutils::git::tests[0m[36m::[0m[34;1mindex_paths_reject_parent_traversal[0m
+2026-09-08T15:17:43.7957291Z [32;1m        PASS[0m [   0.007s] (241/332) [35;1mharness-gate::bin/harness-gate[0m [36mutils::git::tests[0m[36m::[0m[34;1mindex_paths_use_git_separators_on_every_platform[0m
+2026-09-08T15:17:43.8034287Z [32;1m        PASS[0m [   0.008s] (242/332) [35;1mharness-gate::bin/harness-gate[0m [36mutils::git::tests[0m[36m::[0m[34;1mparses_nul_delimited_paths_without_splitting_newlines[0m
+2026-09-08T15:17:43.8108291Z [32;1m        PASS[0m [   0.007s] (243/332) [35;1mharness-gate::bin/harness-gate[0m [36mutils::git::tests[0m[36m::[0m[34;1mrejects_non_utf8_paths[0m
+2026-09-08T15:17:43.8211799Z [32;1m        PASS[0m [   0.082s] (244/332) [35;1mharness-gate::bin/harness-gate[0m [36mservice::tests[0m[36m::[0m[34;1mwarmup_populates_resource_before_the_first_lease[0m
+2026-09-08T15:17:43.8322919Z [32;1m        PASS[0m [   0.011s] (245/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::parser::tests[0m[36m::[0m[34;1mambiguous_standard_results_fail_closed[0m
+2026-09-08T15:17:43.8426213Z [32;1m        PASS[0m [   0.010s] (246/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::parser::tests[0m[36m::[0m[34;1mauto_discovers_root_and_wrapped_supported_result_arrays[0m
+2026-09-08T15:17:43.8445725Z [32;1m        PASS[0m [   0.033s] (247/332) [35;1mharness-gate::bin/harness-gate[0m [36mutils::redaction::tests[0m[36m::[0m[34;1mremoves_common_credential_shapes[0m
+2026-09-08T15:17:43.8537701Z [32;1m        PASS[0m [   0.010s] (248/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::parser::tests[0m[36m::[0m[34;1mauto_discovery_rejects_ambiguous_candidates_even_when_lengths_match[0m
+2026-09-08T15:17:43.8573412Z [32;1m        PASS[0m [   0.013s] (249/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::parser::tests[0m[36m::[0m[34;1mauto_discovery_rejects_error_objects_and_unrelated_nested_arrays[0m
+2026-09-08T15:17:43.8630547Z [32;1m        PASS[0m [   0.009s] (250/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::parser::tests[0m[36m::[0m[34;1mauto_discovery_rejects_non_array_supported_fields[0m
+2026-09-08T15:17:43.8684622Z [32;1m        PASS[0m [   0.009s] (251/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::parser::tests[0m[36m::[0m[34;1mmalformed_standard_results_fail_closed[0m
+2026-09-08T15:17:43.8744571Z [32;1m        PASS[0m [   0.009s] (252/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::parser::tests[0m[36m::[0m[34;1mparses_json_explicit_array_path[0m
+2026-09-08T15:17:43.8774752Z [32;1m        PASS[0m [   0.010s] (253/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::parser::tests[0m[36m::[0m[34;1mparses_json_explicit_non_negative_integer_path[0m
+2026-09-08T15:17:43.8818009Z [32;1m        PASS[0m [   0.010s] (254/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::parser::tests[0m[36m::[0m[34;1mparses_json_result_path[0m
+2026-09-08T15:17:43.8870514Z [32;1m        PASS[0m [   0.010s] (255/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::parser::tests[0m[36m::[0m[34;1mparses_junit_testcases[0m
+2026-09-08T15:17:43.8930247Z [32;1m        PASS[0m [   0.011s] (256/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::parser::tests[0m[36m::[0m[34;1mparses_nested_junit_suites_and_namespaces[0m
+2026-09-08T15:17:43.8995097Z [32;1m        PASS[0m [   0.010s] (257/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::parser::tests[0m[36m::[0m[34;1mparses_trx_results[0m
+2026-09-08T15:17:43.9050828Z [32;1m        PASS[0m [   0.011s] (258/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::parser::tests[0m[36m::[0m[34;1mrejects_invalid_explicit_path_without_auto_discovery_fallback[0m
+2026-09-08T15:17:43.9060163Z [32;1m        PASS[0m [   0.008s] (259/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::parser::tests[0m[36m::[0m[34;1mshard_merge_is_deterministic[0m
+2026-09-08T15:17:43.9164932Z [32;1m        PASS[0m [   0.009s] (260/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::plan::tests[0m[36m::[0m[34;1mdependencies_are_stably_topologically_sorted[0m
+2026-09-08T15:17:43.9176035Z [32;1m        PASS[0m [   0.011s] (261/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::parser::tests[0m[36m::[0m[34;1mshard_merge_rejects_missing_and_duplicate_inputs[0m
+2026-09-08T15:17:44.0002672Z [32;1m        PASS[0m [   0.085s] (262/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::plan::tests[0m[36m::[0m[34;1mlegacy_plan_synthesizes_mandatory_gate_chain[0m
+2026-09-08T15:17:44.0035087Z [32;1m        PASS[0m [   0.087s] (263/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::plan::tests[0m[36m::[0m[34;1mplan_rejects_duplicate_ids_before_building_nodes[0m
+2026-09-08T15:17:44.0852082Z [32;1m        PASS[0m [   0.085s] (264/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::plan::tests[0m[36m::[0m[34;1mplan_rejects_duplicate_logs_at_execution_boundary[0m
+2026-09-08T15:17:44.0875125Z [32;1m        PASS[0m [   0.083s] (265/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::plan::tests[0m[36m::[0m[34;1mplan_rejects_missing_dependency_at_execution_boundary[0m
+2026-09-08T15:17:44.1657608Z [32;1m        PASS[0m [   0.080s] (266/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mconfigured_html_rejects_external_symlink_templates[0m
+2026-09-08T15:17:44.1888245Z [32;1m        PASS[0m [   0.104s] (267/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mconfigured_html_ignores_unrelated_binary_assets[0m
+2026-09-08T15:17:44.2538604Z [32;1m        PASS[0m [   0.088s] (268/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mconfigured_html_rejects_template_outside_root[0m
+2026-09-08T15:17:44.2631240Z [32;1m        PASS[0m [   0.009s] (269/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mhtml_template_replaces_only_supported_fields[0m
+2026-09-08T15:17:44.2935280Z [32;1m        PASS[0m [   0.101s] (270/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mconfigured_html_supports_include_and_inheritance[0m
+2026-09-08T15:17:44.2955411Z [32;1m        PASS[0m [   0.029s] (271/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mjunit_escapes_values_and_records_failures[0m
+2026-09-08T15:17:44.3235097Z [32;1m        PASS[0m [   0.030s] (272/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mmachine_result_keeps_cancellation_distinct_from_failure[0m
+2026-09-08T15:17:44.3244965Z [32;1m        PASS[0m [   0.029s] (273/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mmachine_result_rejects_artifacts_outside_the_invocation[0m
+2026-09-08T15:17:44.3524384Z [32;1m        PASS[0m [   0.031s] (274/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mmachine_result_uses_versioned_status_attempts_and_artifact_references[0m
+2026-09-08T15:17:44.3546134Z [32;1m        PASS[0m [   0.032s] (275/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mmachine_status_does_not_infer_cancellation_from_skip_wording[0m
+2026-09-08T15:17:44.3851240Z [32;1m        PASS[0m [   0.031s] (276/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mmarkdown_and_junit_expose_skipped_steps[0m
+2026-09-08T15:17:44.4143180Z [32;1m        PASS[0m [   0.029s] (277/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mmarkdown_keeps_legacy_summary_shape[0m
+2026-09-08T15:17:44.4965533Z [32;1m        PASS[0m [   0.142s] (278/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mmanifest_records_digests_and_detects_tampering[0m
+2026-09-08T15:17:44.5502337Z [32;1m        PASS[0m [   0.136s] (279/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mmissing_required_log_blocks_complete_evidence[0m
+2026-09-08T15:17:44.6027839Z [32;1m        PASS[0m [   0.107s] (280/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1moptional_html_failure_preserves_base_reports[0m
+2026-09-08T15:17:44.6307644Z [32;1m        PASS[0m [   0.080s] (281/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mredaction_rejects_oversized_evidence_before_reading_it[0m
+2026-09-08T15:17:44.6395838Z [32;1m        PASS[0m [   0.035s] (282/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mredaction_removes_credentials_from_exported_text[0m
+2026-09-08T15:17:44.7176846Z [32;1m        PASS[0m [   0.080s] (283/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mreport_target_rejects_existing_symlink_escape[0m
+2026-09-08T15:17:44.7892287Z [32;1m        PASS[0m [   0.159s] (284/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mregistry_and_machine_result_bindings_are_verified[0m
+2026-09-08T15:17:44.7995822Z [32;1m        PASS[0m [   0.082s] (285/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mreport_target_rejects_missing_directory_through_symlink_escape[0m
+2026-09-08T15:17:44.8695054Z [32;1m        PASS[0m [   0.080s] (286/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mreport_target_rejects_windows_style_traversal[0m
+2026-09-08T15:17:44.9405034Z [32;1m        PASS[0m [   0.141s] (287/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mstale_invocation_metadata_blocks_publication[0m
+2026-09-08T15:17:44.9613231Z [32;1m        PASS[0m [   0.092s] (288/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1msymlink_required_log_blocks_publication_without_touching_target[0m
+2026-09-08T15:17:44.9708624Z [32;1m        PASS[0m [   0.009s] (289/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1munknown_machine_failure_contracts_fail_closed[0m
+2026-09-08T15:17:45.0795947Z [32;1m        PASS[0m [   0.139s] (290/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mundeclared_file_blocks_publication[0m
+2026-09-08T15:17:45.0911236Z [32;1m        PASS[0m [   0.011s] (291/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1munsupported_machine_result_versions_fail_closed[0m
+2026-09-08T15:17:45.1045159Z [32;1m        PASS[0m [   0.011s] (292/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mwebhook_accepts_success_response[0m
+2026-09-08T15:17:45.1130569Z [32;1m        PASS[0m [   0.140s] (293/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1munlink_open_log_blocks_publication[0m
+2026-09-08T15:17:45.1218306Z [32;1m        PASS[0m [   0.009s] (294/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mwebhook_policy_rechecks_every_resolution_and_fails_closed_on_rebinding[0m
+2026-09-08T15:17:45.1308136Z [32;1m        PASS[0m [   0.010s] (295/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mwebhook_policy_rejects_local_address_before_connecting[0m
+2026-09-08T15:17:45.1381479Z [32;1m        PASS[0m [   0.007s] (296/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mwebhook_policy_rejects_unlisted_hosts_without_exposing_secrets[0m
+2026-09-08T15:17:45.2039972Z [32;1m        PASS[0m [   0.101s] (297/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mwebhook_filters_success_notifications_without_contacting_the_endpoint[0m
+2026-09-08T15:17:45.2145222Z [32;1m        PASS[0m [   0.008s] (298/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mwebhook_redirects_are_a_typed_policy_failure[0m
+2026-09-08T15:17:45.2237536Z [32;1m        PASS[0m [   0.012s] (299/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mwebhook_rejects_non_success_response[0m
+2026-09-08T15:17:45.2417175Z [32;1m        PASS[0m [   0.103s] (300/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mwebhook_redacts_sensitive_report_details[0m
+2026-09-08T15:17:45.2708402Z [32;1m        PASS[0m [   0.047s] (301/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mwebhook_reports_connection_failure[0m
+2026-09-08T15:17:45.2789759Z [32;1m        PASS[0m [   0.008s] (302/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::scheduler::tests[0m[36m::[0m[34;1mcancellation_marks_queued_nodes_without_satisfying_dependencies[0m
+2026-09-08T15:17:45.2874398Z [32;1m        PASS[0m [   0.008s] (303/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::scheduler::tests[0m[36m::[0m[34;1mfailed_ancestor_marks_descendant_skipped[0m
+2026-09-08T15:17:45.2955256Z [32;1m        PASS[0m [   0.008s] (304/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::scheduler::tests[0m[36m::[0m[34;1mindexed_readiness_preserves_plan_order_and_unblocks_once[0m
+2026-09-08T15:17:45.3036331Z [32;1m        PASS[0m [   0.008s] (305/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::scheduler::tests[0m[36m::[0m[34;1mindexed_readiness_skips_all_pending_descendants_after_failure[0m
+2026-09-08T15:17:45.3115545Z [32;1m        PASS[0m [   0.008s] (306/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::scheduler::tests[0m[36m::[0m[34;1mready_queue_requires_all_dependencies_to_pass[0m
+2026-09-08T15:17:45.3236020Z [32;1m        PASS[0m [   0.011s] (307/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::scheduler::tests[0m[36m::[0m[34;1mready_queue_respects_stable_order_and_limit[0m
+2026-09-08T15:17:45.3496902Z [32;1m        PASS[0m [   0.107s] (308/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::report::tests[0m[36m::[0m[34;1mwebhook_stops_after_the_first_failure_in_configured_order[0m
+2026-09-08T15:17:45.3605938Z [32;1m        PASS[0m [   0.009s] (309/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::steps::tests[0m[36m::[0m[34;1mcargo_test_threads_are_inserted_after_the_test_separator[0m
+2026-09-08T15:17:45.3676130Z [32;1m        PASS[0m [   0.009s] (310/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::steps::tests[0m[36m::[0m[34;1mrunner_arguments_and_environment_are_recorded[0m
+2026-09-08T15:17:45.3816253Z [32;1m        PASS[0m [   0.014s] (311/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::tests[0m[36m::[0m[34;1ma_new_test_framework_can_supply_its_own_pattern[0m
+2026-09-08T15:17:45.3835366Z [32;1m        PASS[0m [   0.060s] (312/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::scheduler::tests[0m[36m::[0m[34;1mworker_panics_become_scheduler_failures_in_unwind_profiles[0m
+2026-09-08T15:17:45.3904803Z [32;1m        PASS[0m [   0.008s] (313/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::tests[0m[36m::[0m[34;1madapter_failures_choose_primary_by_plan_order[0m
+2026-09-08T15:17:45.3995893Z [32;1m        PASS[0m [   0.009s] (314/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::tests[0m[36m::[0m[34;1mconfigurable_regex_parser_counts_multiple_outputs[0m
+2026-09-08T15:17:45.5588991Z [32;1m        PASS[0m [   0.177s] (315/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::tests[0m[36m::[0m[34;1mbuiltin_adapter_failure_writes_report_before_returning_error[0m
+2026-09-08T15:17:45.6394440Z [32;1m        PASS[0m [   0.240s] (316/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::tests[0m[36m::[0m[34;1mexplicit_builtin_labels_are_preserved_in_the_report[0m
+2026-09-08T15:17:45.8312223Z [32;1m        PASS[0m [   0.272s] (317/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::tests[0m[36m::[0m[34;1mfailed_external_node_blocks_only_its_descendants[0m
+2026-09-08T15:17:45.8799791Z [32;1m        PASS[0m [   0.241s] (318/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::tests[0m[36m::[0m[34;1mgate_failure_writes_compatible_report[0m
+2026-09-08T15:17:45.9119060Z [32;1m        PASS[0m [ 135.491s] (319/332) [35;1mharness-gate[0m [36mquality::replay::acceptance[0m[36m::[0m[34;1mretained_corpora_and_consolidated_negative_matrix[0m
+2026-09-08T15:17:46.0837474Z [32;1m        PASS[0m [   0.250s] (320/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::tests[0m[36m::[0m[34;1mindependent_steps_run_in_parallel_and_publish_in_plan_order[0m
+2026-09-08T15:17:46.1400690Z [32;1m        PASS[0m [   0.228s] (321/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::tests[0m[36m::[0m[34;1mjson_parser_explicit_numeric_path_preserves_count_and_minimum[0m
+2026-09-08T15:17:46.3223951Z [32;1m        PASS[0m [   0.241s] (322/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::tests[0m[36m::[0m[34;1mnon_zero_step_retains_exit_detail_and_log[0m
+2026-09-08T15:17:46.3315019Z [32;1m        PASS[0m [   0.008s] (323/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::tests[0m[36m::[0m[34;1mregex_parser_ignores_ansi_color_sequences[0m
+2026-09-08T15:17:46.3669674Z [32;1m        PASS[0m [   0.227s] (324/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::tests[0m[36m::[0m[34;1mparser_failure_marks_step_failed[0m
+2026-09-08T15:17:46.5426006Z [32;1m        PASS[0m [   0.212s] (325/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::tests[0m[36m::[0m[34;1mreport_publication_error_precedes_gate_adapter_error_and_preserves_invocation_evidence[0m
+2026-09-08T15:17:46.5888787Z [32;1m        PASS[0m [   0.222s] (326/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::tests[0m[36m::[0m[34;1mreport_write_failure_returns_error[0m
+2026-09-08T15:17:46.6970727Z [32;1m        PASS[0m [   0.817s] (327/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::tests[0m[36m::[0m[34;1mjson_parser_compatibility_preserves_success_zero_partial_and_command_failures[0m
+2026-09-08T15:17:46.7733836Z [32;1m        PASS[0m [   0.231s] (328/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::tests[0m[36m::[0m[34;1mservice_failure_does_not_skip_unrelated_steps[0m
+2026-09-08T15:17:46.8528167Z [32;1m        PASS[0m [   0.264s] (329/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::tests[0m[36m::[0m[34;1mtimeout_is_a_failed_step_with_timeout_evidence[0m
+2026-09-08T15:17:47.0071754Z [32;1m        PASS[0m [   0.234s] (330/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::tests[0m[36m::[0m[34;1mwebhook_connection_failure_maps_to_e1404[0m
+2026-09-08T15:17:47.0460669Z [32;1m        PASS[0m [   0.349s] (331/332) [35;1mharness-gate::bin/harness-gate[0m [36mverify::tests[0m[36m::[0m[34;1mverification_runs_use_distinct_invocation_evidence_directories[0m
+2026-09-08T15:18:22.1375210Z [33;1m        SLOW[0m [> 60.000s] (───────) [35;1mharness-gate::quality_cli_test[0m [34;1mshipped_cli_matches_both_corpora_and_negative_matrix_without_python_runtime[0m
+2026-09-08T15:18:22.6602799Z [32;1m        PASS[0m [  60.524s] (332/332) [35;1mharness-gate::quality_cli_test[0m [34;1mshipped_cli_matches_both_corpora_and_negative_matrix_without_python_runtime[0m
+2026-09-08T15:18:22.6604474Z ────────────
+2026-09-08T15:18:22.6605432Z [32;1m     Summary[0m [ 172.240s] [1m332[0m tests run: [1m332[0m [32;1mpassed[0m ([1m5[0m [33;1mslow[0m), [1m0[0m [33;1mskipped[0m
+2026-09-08T15:18:22.6659768Z ##[group]Run cargo run --manifest-path tools/harness-gate/Cargo.toml -- schema export
+2026-09-08T15:18:22.6660545Z [36;1mcargo run --manifest-path tools/harness-gate/Cargo.toml -- schema export[0m
+2026-09-08T15:18:22.6661030Z [36;1mgit diff --exit-code -- schema/flow.schema.json[0m
+2026-09-08T15:18:22.6697614Z shell: /usr/bin/bash -e {0}
+2026-09-08T15:18:22.6697879Z env:
+2026-09-08T15:18:22.6698099Z   CARGO_TERM_COLOR: always
+2026-09-08T15:18:22.6698347Z   RUST_BACKTRACE: 1
+2026-09-08T15:18:22.6698583Z   CARGO_HOME: /home/runner/.cargo
+2026-09-08T15:18:22.6698849Z   CARGO_INCREMENTAL: 0
+2026-09-08T15:18:22.6699072Z ##[endgroup]
+2026-09-08T15:18:22.7892208Z [1m[92m   Compiling[0m harness-gate v0.3.7 (/home/runner/work/Harness-Gate/Harness-Gate/tools/harness-gate)
+2026-09-08T15:18:23.7361539Z [1m[92m   Compiling[0m harness-gate-quality-core v0.1.0 (/home/runner/work/Harness-Gate/Harness-Gate/tools/harness-gate/quality-replay)
+2026-09-08T15:18:31.3822851Z [1m[92m    Finished[0m `dev` profile [unoptimized + debuginfo] target(s) in 8.69s
+2026-09-08T15:18:31.3928348Z [1m[92m     Running[0m `tools/harness-gate/target/debug/harness-gate schema export`
+2026-09-08T15:18:31.4047941Z Schema written: /home/runner/work/Harness-Gate/Harness-Gate/schema/flow.schema.json
+2026-09-08T15:18:31.9073569Z Post job cleanup.
+2026-09-08T15:18:32.0414516Z Cache hit occurred on the primary key Linux-cargo-cede352afc084cdee021280b0e9e92b0ccbe9019782c2c5f9df7457e5017d962, not saving cache.
+2026-09-08T15:18:32.0540803Z Post job cleanup.
+2026-09-08T15:18:32.1469023Z [command]/usr/bin/git version
+2026-09-08T15:18:32.1519047Z git version 2.55.0
+2026-09-08T15:18:32.1563883Z Temporarily overriding HOME='/home/runner/work/_temp/26133b54-753e-4811-abec-38baf05371c4' before making global git config changes
+2026-09-08T15:18:32.1565536Z Adding repository directory to the temporary git global config as a safe directory
+2026-09-08T15:18:32.1570408Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Harness-Gate/Harness-Gate
+2026-09-08T15:18:32.1612390Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-09-08T15:18:32.1649321Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-09-08T15:18:32.1914155Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-09-08T15:18:32.1942881Z http.https://github.com/.extraheader
+2026-09-08T15:18:32.1964887Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-09-08T15:18:32.1999465Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-09-08T15:18:32.2256310Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-09-08T15:18:32.2296697Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-09-08T15:18:32.2700549Z Cleaning up orphan processes

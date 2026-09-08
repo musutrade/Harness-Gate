@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Version 2 AST inventory, distinguishing closure instrumentation and LLVM join.
+"""Version 3 AST inventory, distinguishing closure instrumentation and LLVM join.
 
-This opt-in development series leaves the version 1 analyzer reproducible.
+This required series covers the original hotspots and linked generic production.
+The version 1 analyzer remains reproducible.
 Only inserted bytes are removed from the coverage denominator. Every original
 production function must have its own LLVM record; every LLVM record must join.
 """
@@ -17,9 +18,9 @@ from pathlib import Path
 from function_risk import contains, crap_line, own_lines
 from production_coverage import counts, require
 
-SERIES = {"analyzer": "harness-gate-rust-measure/0.2.0", "rule": "mccabe-rust-2/1",
+SERIES = {"analyzer": "harness-gate-rust-measure/0.3.0", "rule": "mccabe-rust-3/1",
           "instrumentation": "closure-black-box/1", "mapping": "insertions-utf8/1",
-          "selection": "gh94-and-staged-snapshot/1"}
+          "selection": "gh151-generic-production/1"}
 PREFIX = "{ ::std::hint::black_box(()); "
 SUFFIX = " }"
 HOTSPOTS = {
@@ -34,6 +35,12 @@ HOTSPOTS = {
 }
 
 
+# Source paths remain relative to src for lineage with the established series.
+# Both commits are measured with this exact inventory and tool version.
+SOURCE_FILES = sorted(set(HOTSPOTS) | {"app/mod.rs", "app/quality.rs", "cli.rs", "lib.rs"} | {f"../quality-core/{name}.rs" for name in (
+    "comparison", "cross_component", "evidence", "json", "mod", "model",
+    "policy", "project", "project_report", "ratchet", "replay", "schema")})
+
 def digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
@@ -41,7 +48,7 @@ def digest(data: bytes) -> str:
 def ast(source: Path, binary: Path) -> dict:
     result = json.loads(subprocess.check_output([str(binary.resolve()), str(source)], text=True))
     require((result.get("analyzer"), result.get("version"), result.get("rule")) ==
-            ("harness-gate-rust-measure", "0.2.0", "mccabe-rust-2"), "incompatible AST analyzer")
+            ("harness-gate-rust-measure", "0.3.0", "mccabe-rust-3"), "incompatible AST analyzer")
     return result
 
 
@@ -104,10 +111,14 @@ def original_point(point: list[int], edits: list[dict]) -> tuple[int, int]:
     return line, column - shift
 
 
-def prepare(crate: Path, binary: Path) -> dict:
-    manifest = {"series": SERIES, "files": {}}
-    for path in HOTSPOTS:
+def prepare(crate: Path, binary: Path, paths=None) -> dict:
+    manifest = {"series": SERIES, "files": {}, "absent_sources": []}
+    for path in (SOURCE_FILES if paths is None else paths):
         file = crate / "src" / path
+        if not file.exists():
+            require(path not in HOTSPOTS, f"missing selected source: {path}")
+            manifest["absent_sources"].append(path)
+            continue
         source = file.read_text()
         inventory = ast(file, binary)
         transformed, edits = instrument(source, inventory)
@@ -132,6 +143,7 @@ def measure(manifest: dict, llvm: dict, crate: Path, binary: Path) -> list[dict]
     require(manifest["series"] == SERIES, "incompatible measurement series")
     require(llvm["type"] == "llvm.coverage.json.export" and len(llvm["data"]) == 1, "invalid LLVM dataset")
     symbols, excluded = {}, {}
+    source_paths = {(crate / "src" / path).resolve(): path for path in manifest["files"]}
     for path, file in manifest["files"].items():
         source = file["original"]
         require(digest(source.encode()) == file["original_sha256"], "original digest mismatch")
@@ -159,11 +171,8 @@ def measure(manifest: dict, llvm: dict, crate: Path, binary: Path) -> list[dict]
     for index, function in enumerate(llvm["data"][0]["functions"]):
         require(function["regions"], "LLVM function without regions")
         first = function["regions"][0]
-        try:
-            path = Path(function["filenames"][first[5]]).resolve().relative_to((crate / "src").resolve()).as_posix()
-        except ValueError:
-            continue
-        if path not in manifest["files"]:
+        path = source_paths.get(Path(function["filenames"][first[5]]).resolve())
+        if path is None:
             continue
         file = manifest["files"][path]
         mapped = []
@@ -217,7 +226,13 @@ def compare(base: dict, head: dict, *, series=SERIES, hotspots=HOTSPOTS) -> dict
     require(base["series"] == head["series"] == series, "incompatible base/head series")
     require(base["tools"] == head["tools"], "incompatible base/head measurement tools")
     for report in (base, head):
-        require({r["source"] for r in report["functions"]} == set(hotspots), "incomplete selected source inventory")
+        if "source_inventory" in report:
+            require(set(report["source_inventory"]) == set(SOURCE_FILES), "incomplete production source inventory")
+            present = {p for p, sha in report["source_inventory"].items() if sha is not None}
+            require(set(hotspots) <= present, "missing selected source inventory")
+            require({r["source"] for r in report["functions"]} <= present, "function outside source inventory")
+        else:
+            require({r["source"] for r in report["functions"]} == set(hotspots), "incomplete selected source inventory")
         for source, names in hotspots.items():
             require(any(r["source"] == source and r["name"] == names[0] for r in report["functions"]),
                     f"missing original hotspot: {source}")
@@ -232,7 +247,7 @@ def compare(base: dict, head: dict, *, series=SERIES, hotspots=HOTSPOTS) -> dict
         matches = old[(row["source"], row["kind"], row["syntax_sha256"])]
         previous = matches.pop(0) if matches else None
         changed = previous is None
-        selected = row["name"] in hotspots[row["source"]]
+        selected = row["name"] in hotspots.get(row["source"], [])
         high_risk = selected or (changed and row["cc"] > 10)
         from fractions import Fraction
         passed = row["passed"] if high_risk else (Fraction(*row["crap_exact"]) <= 30 if changed else True)
@@ -277,11 +292,15 @@ def main() -> None:
     else:
         require(args.llvm is not None and args.output is not None, "measure needs --llvm and --output")
         manifest = json.loads(args.manifest.read_text())
-        require(set(manifest["files"]) == set(HOTSPOTS), "incomplete selected source manifest")
+        require(set(manifest["files"]) | set(manifest["absent_sources"]) == set(SOURCE_FILES),
+                "incomplete production source manifest")
+        require(not set(manifest["files"]) & set(manifest["absent_sources"]), "ambiguous source presence")
         rows = measure(manifest, json.loads(args.llvm.read_text()), args.crate, args.binary)
         for row in rows:
-            row["selected"] = row["name"] in HOTSPOTS[row["source"]]
+            row["selected"] = row["name"] in HOTSPOTS.get(row["source"], [])
         report = {"series": SERIES, "tools": provenance(args.binary), "functions": rows,
+                  "source_inventory": {**{p: f["original_sha256"] for p, f in manifest["files"].items()},
+                                       **{p: None for p in manifest["absent_sources"]}},
                   "manifest_sha256": digest(args.manifest.read_bytes()),
                   "llvm_sha256": digest(args.llvm.read_bytes()),
                   "selected_failures": [f"{r['source']}::{r['name']}" for r in rows if r["selected"] and not r["passed"]],

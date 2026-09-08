@@ -4,10 +4,16 @@ This directory contains Python CI tooling, ecosystem adapters, generic shadow
 semantics and migration references. The [frozen product-boundary inventory](../../docs/quality/gh-146/python-boundary.md)
 classifies every production module and records its callers, authority and final
 disposition. These modules are not linked into, packaged with, or executed by
-the `harness-gate` release binary. Generic semantics are scheduled to move into
-Rust after differential acceptance; this freeze does not transfer authority.
+the `harness-gate` release binary. After GH-151 hosted acceptance, `harness-gate quality evaluate` owns authoritative
+generic decisions and reporting in Rust. Python remains collection, CI and reference
+tooling; final C-class module dispositions belong to task 7.
 The [shared compatibility corpus](fixtures/generic-core/README.md) retains exact
 inputs, full expected outputs and native/source bytes for that migration.
+
+[GH-151](../../docs/quality/gh-151/README.md) records the exact hosted candidate
+acceptance, retained comparisons, separate authority switch and rollback. The
+opt-in differential workflow retains both engines. Existing required CI names,
+dependencies and release authority remain unchanged.
 
 Run from the repository root with Python >=3.12, stable Rust plus
 `llvm-tools-preview`, cargo-nextest and cargo-llvm-cov **0.9.0** installed.
@@ -39,12 +45,24 @@ SHA-256 references to raw evidence. Existing output directories, stale artifacts
 missing base objects and incomplete collections fail. A candidate is never
 accepted automatically. Full raw artifacts are uploaded with `always()`.
 
-The stages preserve the six-module 80% gate, evaluate the ten production
-boundaries and aggregate at 80%, run the supported six-file GH-94 risk ratchet,
+The stages preserve the six-module 80% gate, evaluate eleven production
+boundaries and aggregate at 80%, run the versioned function-risk ratchet,
 and collect isolated matrix evidence (all mandatory paths and >=95% applicable
 rows). Changed production Rust files outside the supported risk boundary fail
 with a measurement-review diagnostic; these reports do not certify whole-project
 CRAP. See [ADR-0039](../../docs/adr/0039-required-risk-and-traceability-gates.md).
+
+GH-151 extends the inventory to `production-source-2`: `src/` and the linked
+`quality-core/` are production, including the public replay module. The core is
+an eleventh blocking boundary. Test-only modules retain explicit cfg(test)
+exclusions. The unpublished `quality-replay/` comparator is migration tooling.
+Declaration-only files without LLVM records remain production with pinned hashes;
+no executable counters are synthesized. The `gh151-generic-production/1` risk
+selection measures 23 sources on both commits with analyzer 0.3.0 / mccabe-rust-3,
+including vec repetition expressions. Both workspace packages are covered on the
+base. Newly added sources are explicitly absent from its manifest and verified
+against Git. The original selected functions, 80% line/region and CRAP <=30
+thresholds, exact arithmetic, lineage and historical-debt rules are unchanged.
 
 Individual diagnostic commands use the same report formats:
 
