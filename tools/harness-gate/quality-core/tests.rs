@@ -154,6 +154,9 @@ fn embedded_contracts_match_frozen_reference() {
         ("project-model", &*schema::PROJECT),
         ("harness-evidence", &*schema::EVIDENCE),
         ("capability-requirements", &*schema::REQUIREMENTS),
+        ("policy", &*schema::POLICY),
+        ("policy-exceptions", &*schema::EXCEPTIONS),
+        ("subject-mappings", &*schema::MAPPINGS),
     ] {
         let reference = json::parse(
             &fs::read_to_string(quality().join(format!("schema/{name}.schema.json"))).unwrap(),
