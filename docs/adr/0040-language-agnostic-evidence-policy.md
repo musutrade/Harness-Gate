@@ -90,3 +90,15 @@ freeze the migration oracle for OpenSpec `consolidate-generic-quality-core-into-
 tasks 1.1–1.2. Generic semantics still run in Python shadow/reference paths.
 The existing Rust required checks and their release authority remain unchanged;
 this record does not accept the later Rust implementation or authority transfer.
+
+## Candidate Rust policy and ratchet implementation (GH-148)
+
+The independent Rust candidate now implements policy validation, exact typed
+comparison, scope selection, policy-owned requiredness and aggregation, baseline
+lineage, debt/trend ratchets and exception review. The
+[GH-148 compatibility evidence](../quality/gh-148/README.md) covers OpenSpec tasks
+3.1–3.2 against the frozen Python oracle. Exception review cannot waive quality
+failures. Cross-component provenance validation remains a separate task 4.1
+boundary that fails closed without a validator. The CLI has no dependency on the
+candidate library; existing required CI and release authority remain unchanged.
+This stage does not accept reporting, replay, authority transfer or the full proposal.

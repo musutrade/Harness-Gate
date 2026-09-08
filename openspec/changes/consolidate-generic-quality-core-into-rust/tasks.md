@@ -14,12 +14,14 @@ Validation: [GH-146 boundary and evidence](../../../docs/quality/gh-146/README.m
 - [x] 2.1 [P1][L] Implement Rust `harness-evidence/v1` model/validation and typed value/capability/series integrity semantics; acceptance: shared valid fixtures pass, malformed/stale/tampered/unknown/incompatible fixtures fail with equivalent reason classes.
 - [x] 2.2 [P1][L] Implement Rust project/component/subject/source-boundary/relationship model validation; acceptance: subject identity, path containment, duplicate/unknown references and relationship semantics match the Python reference corpus.
 
-Validation: [GH-147 implementation and evidence](../../../docs/quality/gh-147/README.md); 323 Rust tests pass, including 399 evidence/project/series/capability differential cases derived from the frozen corpus and boundary mutations. The candidate library has no CLI dependency or release authority. Hosted CI on the final pushed SHA is pending; this does not accept the full proposal or tasks 3–7.
+Validation: [GH-147 implementation and evidence](../../../docs/quality/gh-147/README.md); 323 Rust tests pass, including 399 evidence/project/series/capability differential cases derived from the frozen corpus and boundary mutations. The candidate library has no CLI dependency or release authority. GH-147 merged as PR #154 with required CI complete; this does not accept the full proposal.
 
 ## 3. Move policy and ratchet semantics into Rust
 
-- [ ] 3.1 [P1][L] Implement Rust policy schema validation, typed comparison, scope selection, `GateResult`, requiredness and aggregate semantics; acceptance: all policy fixtures produce zero unexplained semantic mismatches with Python.
-- [ ] 3.2 [P1][L] Implement Rust baseline compatibility, lineage, debt/trend ratchet and exception-review semantics; acceptance: legacy/new/improved debt, rename/move lineage, missing base, incompatible series and invalid exceptions match Python behavior.
+- [x] 3.1 [P1][L] Implement Rust policy schema validation, typed comparison, scope selection, `GateResult`, requiredness and aggregate semantics; acceptance: all policy fixtures produce zero unexplained semantic mismatches with Python.
+- [x] 3.2 [P1][L] Implement Rust baseline compatibility, lineage, debt/trend ratchet and exception-review semantics; acceptance: legacy/new/improved debt, rename/move lineage, missing base, incompatible series and invalid exceptions match Python behavior.
+
+Validation: [GH-148 implementation and evidence](../../../docs/quality/gh-148/README.md); 324 Rust tests and 289 Python tests pass. The 33 frozen policy outputs and reference boundary cases yield 391 differential comparisons with zero unexplained semantic mismatches; the existing 399 evidence/project/series/capability cases also pass. Formatting and Clippy pass. Requiredness remains policy-owned and current required CI authority is unchanged. Contract provenance is an explicit callback pending task 4.1 and fails closed when absent. Hosted required CI on the final pushed SHA is pending; tasks 4–7 and full proposal acceptance remain incomplete.
 
 ## 4. Move cross-component and project reporting semantics into Rust
 
