@@ -49,8 +49,10 @@ Measurements from incompatible series SHALL NOT be compared numerically for regr
 
 ### Requirement: Use explicit typed values and deterministic serialization
 The v1 envelope SHALL use discriminated ratio, count, boolean, duration, size and
-exact decimal forms. Ratios SHALL retain covered/total integers with a positive
-denominator. Metric names SHALL match their declared series value types. Canonical
+exact decimal forms, plus exact rational CRAP values preserving native Rust
+numerator/denominator integers without rounding. Ratios and rationals SHALL use
+positive denominators. Decimal and rational CRAP SHALL remain distinct series
+value types. Metric names SHALL match their declared series value types. Canonical
 serialization SHALL validate the complete batch and provenance before emitting
 UTF-8 JSON with sorted object keys, compact separators and preserved array order.
 

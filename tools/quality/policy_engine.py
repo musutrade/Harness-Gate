@@ -47,7 +47,8 @@ def validate_policy(policy, project):
     evidence._index(policy['rules'], 'id', 'policy ID')
     for rule in policy['rules']:
         kind = evidence.METRIC_TYPES.get(rule['metric'])
-        evidence.require(kind == rule['limit']['type'], 'policy metric/limit type mismatch')
+        evidence.require(evidence.metric_type_matches(rule['metric'], rule['limit']['type']),
+                         'policy metric/limit type mismatch')
         if kind == 'boolean':
             evidence.require(rule['operator'] in ('eq', 'ne'), 'boolean requires eq or ne')
         if kind == 'ratio':
@@ -64,6 +65,8 @@ def validate_policy(policy, project):
 
 
 def _value(value):
+    if value['type'] == 'rational':
+        return Fraction(value['numerator'], value['denominator'])
     if value['type'] == 'ratio':
         return Fraction(value['covered'], value['total'])
     if value['type'] == 'boolean':
