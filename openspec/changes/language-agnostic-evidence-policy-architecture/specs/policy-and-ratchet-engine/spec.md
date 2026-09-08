@@ -26,6 +26,19 @@ The policy engine SHALL compare compatible base/head evidence for changed subjec
 - **THEN** the policy records a regression according to the configured ratchet semantics
 - **AND** does not ignore the regression solely because 27 is below 30.
 
+#### Scenario: Compatible lineage determines classification without sharing split debt
+- **GIVEN** validated base/head projects, evidence, and explicit subject mappings
+- **WHEN** an incremental rule evaluates subjects
+- **THEN** exact IDs are unchanged and one-to-one modify/rename/move mappings are modified
+- **AND** unmapped identities and split children are new for policy and inherit no debt allowance
+- **AND** missing base, unavailable prior values, ambiguous mappings or incompatible series prevent incremental pass.
+
+#### Scenario: Improved legacy debt coexists with a new threshold failure
+- **GIVEN** compatible base CRAP 64 and head CRAP 55, plus a new subject at 31
+- **WHEN** maximum 30 allows legacy improvement and denies regression
+- **THEN** the ledger records improved remaining debt with absolute compliance false
+- **AND** the new subject fails and blocks the aggregate.
+
 ### Requirement: Preserve distinct result states
 Policy evaluation SHALL preserve at least `pass`, `fail`, `warning`, `informational`, `unsupported`, `not_applicable`, `measurement_error`, and `blocked` states. Required gates SHALL define which non-pass states block delivery.
 
@@ -43,6 +56,13 @@ Policy exceptions SHALL retain issue/owner/approver/reason/expiry/compensating-c
 - **WHEN** policy evaluation runs under the current Harness-Gate exception model
 - **THEN** the failure and exception are both reported
 - **AND** the underlying gate is not silently changed to pass.
+
+#### Scenario: Invalid exception metadata cannot obscure quality failure
+- **GIVEN** a failed quality result with exception metadata
+- **WHEN** owner, issue, reason, expiry or compensating control is missing, blank or expired
+- **THEN** the combined aggregate records a metadata measurement error
+- **AND** the original failed result and quality aggregate remain failed
+- **AND** a supplied approver is retained as metadata without granting waiver authority.
 
 ### Requirement: Produce machine-readable remediation context
 A failed or blocked policy result SHALL identify the affected component/subject, metric, observed values, base/head context when applicable, governing policy, evidence references, and accepted remediation classes when they are known.

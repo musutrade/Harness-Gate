@@ -282,6 +282,22 @@
             "type": "string",
             "minLength": 1
           }
+        },
+        "ratchet": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "deny_regression",
+            "allow_legacy_debt"
+          ],
+          "properties": {
+            "deny_regression": {
+              "type": "boolean"
+            },
+            "allow_legacy_debt": {
+              "type": "boolean"
+            }
+          }
         }
       }
     }

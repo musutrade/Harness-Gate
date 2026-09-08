@@ -1,0 +1,97 @@
+{
+  "issue": "GH-115",
+  "scope": [
+    "6.1",
+    "6.2",
+    "6.3",
+    "6.4"
+  ],
+  "environment_override": {
+    "CARGO_TARGET_DIR": "/home/gem/symphony-workspaces/GH-115/target/gh-115-cargo"
+  },
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 0,
+      "duration_seconds": 48.55,
+      "log": "nextest.log",
+      "tests": 315
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "exit_code": 0,
+      "duration_seconds": 0.51,
+      "log": "fmt.log"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 0,
+      "duration_seconds": 20.26,
+      "log": "clippy.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 0,
+      "duration_seconds": 14.19,
+      "log": "python.log",
+      "tests": 177
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 0,
+      "status": "pass",
+      "log": "docs.log",
+      "artifact": "docs-consistency.json"
+    }
+  ],
+  "not_applicable": [
+    {
+      "command": "harness-gate config check",
+      "reason": "No .harness-gate/flow.toml; no declared ci profile."
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "reason": "No .harness-gate/flow.toml; no declared ci profile."
+    }
+  ],
+  "required_ci": "pending; controller owns merge and closure",
+  "checkout_base": "1dc5db536a00917d8bbc3f2704b6ed2bfbf0c2ea",
+  "dependency": {
+    "issue": 114,
+    "state": "closed",
+    "pr": 123,
+    "merged": true,
+    "merge_commit": "1dc5db536a00917d8bbc3f2704b6ed2bfbf0c2ea"
+  },
+  "baseline": {
+    "command": "python3 -m unittest discover -s tools/quality/tests -p test_policy_engine.py -v",
+    "exit_code": 0,
+    "tests": 9,
+    "log": "before-policy.log"
+  },
+  "example": {
+    "command": "python3 target/quality/gh-115/make-example.py",
+    "exit_code": 0,
+    "artifact": "ratchet-example.json",
+    "expected": "four modified subjects: 64 -> 55 improved debt; new subject 31: fail at <=30"
+  },
+  "limitations": [
+    "Synthetic shadow evidence; no production baseline acceptance or adapter certification.",
+    "Required hosted CI pending."
+  ],
+  "delivery_limitation": {
+    "command": "git add tools/quality/policy_engine.py tools/quality/policy_ratchet.py tools/quality/project_model.py tools/quality/schema tools/quality/tests/test_policy_ratchet.py docs/quality/policy-engine.md docs/quality/project-model.md docs/quality/gh-115-validation.md docs/quality/gh-115 docs/adr/0039-required-risk-and-traceability-gates.md openspec/changes/language-agnostic-evidence-policy-architecture",
+    "exit_code": 128,
+    "error": "fatal: Unable to create '/home/gem/symphony-workspaces/GH-115/.git/index.lock': Read-only file system",
+    "workaround": "Copied current workspace .git to target/gh-115-git; use --git-dir=target/gh-115-git --work-tree=. for commit and push on symphony/GH-115."
+  },
+  "input_sha256": {
+    "tools/quality/policy_engine.py": "e334866fab689be9ec0e696ca1a857b5cc0bbdaa5ca33f11fd7d7ff44106875a",
+    "tools/quality/policy_ratchet.py": "0bec0fcd9ab2bf6ebaf9977cc19ed9168e5f4444c8190907d32d00ac4c6769ba",
+    "tools/quality/project_model.py": "0c4eef77ef31ef511bd414e5b3002f0988ba16c044195ae6e81e6f379cc4059f",
+    "tools/quality/schema/policy.schema.json": "2b4cc95a27dd327a982507759eafc12432c1e86e1fed01e64a477c8e52f4fdfb",
+    "tools/quality/schema/subject-mappings.schema.json": "6a139b941278287af42f220004d4761742ce8d22c7b3bbcf9148fc9405510eaa",
+    "tools/quality/schema/policy-exceptions.schema.json": "da3c0439d1a7484cef7571e9fd5bd5e3446f64419d51a7556ea69c7a004ead78",
+    "tools/quality/tests/test_policy_ratchet.py": "f8fe409f10757aab49f7cc5103be8fdee4c75dfcbdadbede7b9c7d57913947e7"
+  }
+}

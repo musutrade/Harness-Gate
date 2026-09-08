@@ -1,6 +1,7 @@
 # Generic policy engine v1
 
-GH-114 implements OpenSpec tasks 5.1–5.5 as a standalone **shadow** evaluator.
+GH-114 implements OpenSpec tasks 5.1–5.5; GH-115 adds tasks 6.1–6.4 to the
+standalone **shadow** evaluator.
 The existing Rust required gates and `Required Quality Aggregate` remain release
 truth under [ADR 0039](../adr/0039-required-risk-and-traceability-gates.md).
 [Collectors](collector-protocol.md) return facts; policy owns comparisons,
@@ -78,12 +79,80 @@ failure/error/cancellation results cannot erase one another's causes.
 - remediation classes from policy for comparisons, or `repair_measurement` for
   unavailable/invalid measurements.
 
-The Python API accepts optional separately validated base evidence for remediation
-context. Base commit must match the head's declared base; matching subject IDs
-must have compatible series. Missing base subjects remain null. This does not
-classify changes, map renamed subjects, accept baselines, compute regressions or
-implement debt/ratchets (tasks 6.x). Invalid batches report a policy-level error
-with null untrusted subject/value/link fields and caller-owned commit context.
+## Compatible baselines, debt and regression
+
+A rule may add `"ratchet": {"deny_regression": true, "allow_legacy_debt": true}`
+alongside its absolute limit. Both flags are required when ratchet is present.
+Without ratchet, existing absolute evaluation remains supported, including optional
+base values for remediation. Caller-owned `base_records` and `base_context` must
+provide the base project, source/artifact roots and provenance separately. The base
+commit must equal head `base_commit`; project and target must match. Both batches
+pass full source/artifact and series validation. Missing/ambiguous base metrics,
+unavailable historical values or incompatible series produce `measurement_error`.
+New subjects also require a matching series in their component's base evidence;
+an absent baseline is never equivalent to an empty, passing project.
+
+History uses the [GH-111 identity model](project-model.md). Exact identities are
+`unchanged`. Explicit one-to-one `modify`, `rename` or `move` mappings classify the
+head as `modified` and allow comparison only after series validation. `modify`
+extends the mapping schema for content/span changes: component, target, boundary,
+kind, path and discriminator must remain equal. Every mapping requires exact IDs
+and a reason; retired sources and unique destinations prevent ambiguous joins.
+There is no symbol/path similarity fallback. An unmapped new identity is `new`,
+including a content edit without a reviewed mapping. Split children are also `new`
+for policy: their source lineage is recorded, but no historical metric or debt
+allowance is copied. All lineage mappings preserve target.
+
+For ordered operators (`lt/le/gt/ge`), regression is movement away from the limit
+(lower values are better for maxima, higher for minima). Equality/inequality rules
+compare compliance: compliant to noncompliant regresses, the reverse improves,
+and changes with the same compliance remain unchanged. All numeric comparisons
+retain exact typed arithmetic. Subject classification describes source identity;
+metric `trend` independently describes measured change.
+
+| Base → head, maximum 30 | Absolute compliant | Debt | Default ratchet result |
+| --- | --- | --- | --- |
+| 64 → 64 | false | unchanged | informational |
+| 64 → 55 | false | improved | informational |
+| 64 → 65 | false | regressed | fail |
+| 18 → 27 | true | none | fail (regression) |
+| 31 → 30 | true | resolved | pass |
+| new → 31 | false | new | fail |
+
+Here the default example uses both ratchet flags above and `on_violation: fail`.
+`allow_legacy_debt: false` enforces the absolute limit even on improving legacy
+subjects. `deny_regression: false` permits regressions that remain compliant;
+worsening debt still violates the absolute rule. Severity and requiredness remain
+policy-owned. An informational legacy-debt result permits an incremental aggregate
+pass while retaining `absolute_compliant: false`; it never certifies whole-project
+compliance. Policies select only their declared scope, including caller-owned
+changed/critical subject selections.
+
+Each compared result adds `baseline` (classification, lineage and inheritance)
+and `ratchet` (base/head absolute compliance, trend, debt, remaining debt, regression
+and legacy allowance). `debt_ledger` retains complete result records for new,
+unchanged, improved, regressed and resolved debt, with values, series, policy and
+raw evidence links. Resolved entries record progress; unavailable comparisons
+remain explicit errors rather than fabricated ledger values. This ledger is a
+derived report for the validated base/head pair, not an independently trusted
+baseline database or a claim about unselected subjects.
+
+## Exception review metadata
+
+The API accepts a separate `exceptions` array using the
+[closed exception schema](../../tools/quality/schema/policy-exceptions.schema.json).
+Each entry binds a known policy ID and head subject ID and requires nonblank
+`owner`, `issue`, `reason`, `expiry` and `compensating_control`; optional `approver`
+is preserved. Expiry is an ISO datetime with timezone, strictly later than the
+current UTC clock (the API accepts an injected aware `now` for reproducible tests).
+Unknown fields/references, duplicate policy/subject records, missing values,
+malformed timestamps and expired entries block with `measurement_error`.
+
+Valid metadata changes `exception_review` to `documented` and attaches the original
+metadata to the result. It never changes the quality state. `quality_aggregate`
+retains the original gate outcome; `aggregate` additionally blocks invalid exception
+metadata. A failed result stays failed with either valid or invalid exceptions.
+No exception governance waiver or approval authority is implemented.
 
 ## Standalone example and validation
 
@@ -103,7 +172,10 @@ python3 tools/quality/policy_engine.py \
 Expected exit code: **1**. Frontend coverage passes (4/5); CRAP 3.072 exceeds
 3 and produces a structured failure. This synthetic example certifies no real
 ecosystem adapter. `--selection` accepts an object with `changed_subject` and/or
-`critical_subject` ID arrays. The CLI exits zero only for aggregate pass; invalid
+`critical_subject` ID arrays. For incremental evaluation, supply all five `--base-evidence`, `--base-project`,
+`--base-source-root`, `--base-artifact-root`, and `--base-expected` paths. Optional
+`--mappings` supplies `subject-mappings/v1`; `--exceptions` supplies the metadata
+array. Partial base arguments fail closed. The CLI exits zero only for aggregate pass; invalid
 policy/input emits a machine-readable measurement error and exits one.
 
 [Focused tests](../../tools/quality/tests/test_policy_engine.py) cover scope
@@ -112,3 +184,8 @@ and booleans across four synthetic ecosystems, capability states, corrupt and
 missing evidence, every aggregate state, base-series compatibility, remediation
 serialization and CLI exit behavior. Actual command evidence is recorded in the
 [GH-114 validation summary](gh-114/validation-summary.json).
+
+[GH-115 focused tests](../../tools/quality/tests/test_policy_ratchet.py) exercise
+four synthetic ecosystems and negative identity/series/exception paths. See the
+[GH-115 validation record](gh-115-validation.md) and retained machine evidence.
+Rust migration, adapter equivalence and required CI rollout remain later tasks.

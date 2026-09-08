@@ -100,6 +100,13 @@ mandatory rows, auto-accept a new series or change branch protection as rollback
 
 ## Consequences
 
+GH-115 implements generic baseline, debt and exception review in the standalone
+[shadow policy engine](../quality/policy-engine.md), with
+[local validation evidence](../quality/gh-115-validation.md). Legacy debt remains
+explicit and exception metadata does not waive quality failures. This does not
+accept a production baseline or replace the required gates decided here; Rust
+adapter equivalence and migration remain separate OpenSpec tasks.
+
 PR collection costs more than the previous fast PR workflow. Independent stages
 and retained evidence make failures reviewable. The supported risk boundary is
 deliberately restrictive until additional production sources have validated
