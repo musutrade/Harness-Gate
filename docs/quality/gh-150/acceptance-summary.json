@@ -1,0 +1,3823 @@
+{
+  "angular_accepted_counters": {
+    "angular-compatible-debt": {
+      "base": [
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 5,
+                "total": 6,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/pricing.ts",
+            "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:b627bf1d0b36ee3c128cd6cc5e3119b62c355c621e458a6475ca05f302cd2685",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/pricing.ts",
+            "source_sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 4,
+                "total": 5,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/pricing.ts",
+            "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:Pricing.quote:(5, 2):(13, 3)",
+            "id": "subject-identity/v1:8ed4fb9f7bbf40212c16c3f3d6f23e2350482aa6c67cacf7a12d7bfb27963460",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/pricing.ts",
+            "source_sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b",
+            "span": {
+              "end_column": 4,
+              "end_line": 13,
+              "start_column": 3,
+              "start_line": 5
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/standard-quote.ts",
+            "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:7bc9fd560b8177b3a996390b744019f53ac0be4efbe9d2ae1b8dd14e97dae8e2",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/standard-quote.ts",
+            "source_sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/standard-quote.ts",
+            "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:StandardQuote.quote:(2, 2):(2, 32)",
+            "id": "subject-identity/v1:22c11626d4bb53b0e6fd7971740932b7630c00a8f0d02c9c3931085c6a3ed562",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/standard-quote.ts",
+            "source_sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae",
+            "span": {
+              "end_column": 33,
+              "end_line": 2,
+              "start_column": 3,
+              "start_line": 2
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/priority-quote.ts",
+            "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:447ba049056bd90a3cfdc2050b515629fcb4e4dc9034eff001f440957006d8e8",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/priority-quote.ts",
+            "source_sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/priority-quote.ts",
+            "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:PriorityQuote.quote:(2, 2):(2, 32)",
+            "id": "subject-identity/v1:63c938ba2a43fa9d2f4b32f9f84dea164d3ff13d312ba12fa3be7b5f11952eba",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/priority-quote.ts",
+            "source_sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc",
+            "span": {
+              "end_column": 33,
+              "end_line": 2,
+              "start_column": 3,
+              "start_line": 2
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:60a5aad72b38c3ce83df9bc13f826bb48791fbff3d2c5fbcf7a526cc5316e58a",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:ArrowFunction:(4, 36):(4, 90)",
+            "id": "subject-identity/v1:fca79a0d70984b39747ad818571113c158f9f555a7b03d2b60ba5abb5ba287e2",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "span": {
+              "end_column": 91,
+              "end_line": 4,
+              "start_column": 37,
+              "start_line": 4
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:ArrowFunction:(4, 75):(4, 89)",
+            "id": "subject-identity/v1:8ca55d581bdee7a094513d930ff797353c93c486eac6554c907dd2d60b786c52",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "span": {
+              "end_column": 90,
+              "end_line": 4,
+              "start_column": 76,
+              "start_line": 4
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/quote-client.ts",
+            "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:c189d6060d38ba20dfa5ec68d65a34ff0b1cdc55eb40acbeae06800cfc54d7b3",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/quote-client.ts",
+            "source_sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/quote-client.ts",
+            "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:fetchQuote:(3, 0):(6, 1)",
+            "id": "subject-identity/v1:33ed5e344ee9a8b9407664aa74f4fcbdddf90056f8e493ad5611a12d803f834c",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/quote-client.ts",
+            "source_sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc",
+            "span": {
+              "end_column": 2,
+              "end_line": 6,
+              "start_column": 1,
+              "start_line": 3
+            },
+            "target": "node-jsdom"
+          }
+        }
+      ],
+      "head": [
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 5,
+                "total": 6,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/pricing.ts",
+            "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:b627bf1d0b36ee3c128cd6cc5e3119b62c355c621e458a6475ca05f302cd2685",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/pricing.ts",
+            "source_sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 4,
+                "total": 5,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/pricing.ts",
+            "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:Pricing.quote:(5, 2):(13, 3)",
+            "id": "subject-identity/v1:8ed4fb9f7bbf40212c16c3f3d6f23e2350482aa6c67cacf7a12d7bfb27963460",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/pricing.ts",
+            "source_sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b",
+            "span": {
+              "end_column": 4,
+              "end_line": 13,
+              "start_column": 3,
+              "start_line": 5
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/standard-quote.ts",
+            "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:7bc9fd560b8177b3a996390b744019f53ac0be4efbe9d2ae1b8dd14e97dae8e2",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/standard-quote.ts",
+            "source_sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/standard-quote.ts",
+            "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:StandardQuote.quote:(2, 2):(2, 32)",
+            "id": "subject-identity/v1:22c11626d4bb53b0e6fd7971740932b7630c00a8f0d02c9c3931085c6a3ed562",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/standard-quote.ts",
+            "source_sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae",
+            "span": {
+              "end_column": 33,
+              "end_line": 2,
+              "start_column": 3,
+              "start_line": 2
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/priority-quote.ts",
+            "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:447ba049056bd90a3cfdc2050b515629fcb4e4dc9034eff001f440957006d8e8",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/priority-quote.ts",
+            "source_sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/priority-quote.ts",
+            "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:PriorityQuote.quote:(2, 2):(2, 32)",
+            "id": "subject-identity/v1:63c938ba2a43fa9d2f4b32f9f84dea164d3ff13d312ba12fa3be7b5f11952eba",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/priority-quote.ts",
+            "source_sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc",
+            "span": {
+              "end_column": 33,
+              "end_line": 2,
+              "start_column": 3,
+              "start_line": 2
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:60a5aad72b38c3ce83df9bc13f826bb48791fbff3d2c5fbcf7a526cc5316e58a",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:ArrowFunction:(4, 36):(4, 90)",
+            "id": "subject-identity/v1:fca79a0d70984b39747ad818571113c158f9f555a7b03d2b60ba5abb5ba287e2",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "span": {
+              "end_column": 91,
+              "end_line": 4,
+              "start_column": 37,
+              "start_line": 4
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:ArrowFunction:(4, 75):(4, 89)",
+            "id": "subject-identity/v1:8ca55d581bdee7a094513d930ff797353c93c486eac6554c907dd2d60b786c52",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "span": {
+              "end_column": 90,
+              "end_line": 4,
+              "start_column": 76,
+              "start_line": 4
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/quote-client.ts",
+            "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:c189d6060d38ba20dfa5ec68d65a34ff0b1cdc55eb40acbeae06800cfc54d7b3",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/quote-client.ts",
+            "source_sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/quote-client.ts",
+            "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:fetchQuote:(3, 0):(6, 1)",
+            "id": "subject-identity/v1:33ed5e344ee9a8b9407664aa74f4fcbdddf90056f8e493ad5611a12d803f834c",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/quote-client.ts",
+            "source_sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc",
+            "span": {
+              "end_column": 2,
+              "end_line": 6,
+              "start_column": 1,
+              "start_line": 3
+            },
+            "target": "node-jsdom"
+          }
+        }
+      ]
+    },
+    "angular-compatible-threshold": {
+      "base": [
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 5,
+                "total": 6,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/pricing.ts",
+            "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:b627bf1d0b36ee3c128cd6cc5e3119b62c355c621e458a6475ca05f302cd2685",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/pricing.ts",
+            "source_sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 4,
+                "total": 5,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/pricing.ts",
+            "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:Pricing.quote:(5, 2):(13, 3)",
+            "id": "subject-identity/v1:8ed4fb9f7bbf40212c16c3f3d6f23e2350482aa6c67cacf7a12d7bfb27963460",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/pricing.ts",
+            "source_sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b",
+            "span": {
+              "end_column": 4,
+              "end_line": 13,
+              "start_column": 3,
+              "start_line": 5
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/standard-quote.ts",
+            "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:7bc9fd560b8177b3a996390b744019f53ac0be4efbe9d2ae1b8dd14e97dae8e2",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/standard-quote.ts",
+            "source_sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/standard-quote.ts",
+            "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:StandardQuote.quote:(2, 2):(2, 32)",
+            "id": "subject-identity/v1:22c11626d4bb53b0e6fd7971740932b7630c00a8f0d02c9c3931085c6a3ed562",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/standard-quote.ts",
+            "source_sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae",
+            "span": {
+              "end_column": 33,
+              "end_line": 2,
+              "start_column": 3,
+              "start_line": 2
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/priority-quote.ts",
+            "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:447ba049056bd90a3cfdc2050b515629fcb4e4dc9034eff001f440957006d8e8",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/priority-quote.ts",
+            "source_sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/priority-quote.ts",
+            "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:PriorityQuote.quote:(2, 2):(2, 32)",
+            "id": "subject-identity/v1:63c938ba2a43fa9d2f4b32f9f84dea164d3ff13d312ba12fa3be7b5f11952eba",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/priority-quote.ts",
+            "source_sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc",
+            "span": {
+              "end_column": 33,
+              "end_line": 2,
+              "start_column": 3,
+              "start_line": 2
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:60a5aad72b38c3ce83df9bc13f826bb48791fbff3d2c5fbcf7a526cc5316e58a",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:ArrowFunction:(4, 36):(4, 90)",
+            "id": "subject-identity/v1:fca79a0d70984b39747ad818571113c158f9f555a7b03d2b60ba5abb5ba287e2",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "span": {
+              "end_column": 91,
+              "end_line": 4,
+              "start_column": 37,
+              "start_line": 4
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:ArrowFunction:(4, 75):(4, 89)",
+            "id": "subject-identity/v1:8ca55d581bdee7a094513d930ff797353c93c486eac6554c907dd2d60b786c52",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "span": {
+              "end_column": 90,
+              "end_line": 4,
+              "start_column": 76,
+              "start_line": 4
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/quote-client.ts",
+            "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:c189d6060d38ba20dfa5ec68d65a34ff0b1cdc55eb40acbeae06800cfc54d7b3",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/quote-client.ts",
+            "source_sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/quote-client.ts",
+            "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:fetchQuote:(3, 0):(6, 1)",
+            "id": "subject-identity/v1:33ed5e344ee9a8b9407664aa74f4fcbdddf90056f8e493ad5611a12d803f834c",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/quote-client.ts",
+            "source_sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc",
+            "span": {
+              "end_column": 2,
+              "end_line": 6,
+              "start_column": 1,
+              "start_line": 3
+            },
+            "target": "node-jsdom"
+          }
+        }
+      ],
+      "head": [
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 5,
+                "total": 6,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/pricing.ts",
+            "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:b627bf1d0b36ee3c128cd6cc5e3119b62c355c621e458a6475ca05f302cd2685",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/pricing.ts",
+            "source_sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 4,
+                "total": 5,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/pricing.ts",
+            "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:Pricing.quote:(5, 2):(13, 3)",
+            "id": "subject-identity/v1:8ed4fb9f7bbf40212c16c3f3d6f23e2350482aa6c67cacf7a12d7bfb27963460",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/pricing.ts",
+            "source_sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b",
+            "span": {
+              "end_column": 4,
+              "end_line": 13,
+              "start_column": 3,
+              "start_line": 5
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/standard-quote.ts",
+            "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:7bc9fd560b8177b3a996390b744019f53ac0be4efbe9d2ae1b8dd14e97dae8e2",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/standard-quote.ts",
+            "source_sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/standard-quote.ts",
+            "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:StandardQuote.quote:(2, 2):(2, 32)",
+            "id": "subject-identity/v1:22c11626d4bb53b0e6fd7971740932b7630c00a8f0d02c9c3931085c6a3ed562",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/standard-quote.ts",
+            "source_sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae",
+            "span": {
+              "end_column": 33,
+              "end_line": 2,
+              "start_column": 3,
+              "start_line": 2
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/priority-quote.ts",
+            "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:447ba049056bd90a3cfdc2050b515629fcb4e4dc9034eff001f440957006d8e8",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/priority-quote.ts",
+            "source_sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/priority-quote.ts",
+            "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:PriorityQuote.quote:(2, 2):(2, 32)",
+            "id": "subject-identity/v1:63c938ba2a43fa9d2f4b32f9f84dea164d3ff13d312ba12fa3be7b5f11952eba",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/priority-quote.ts",
+            "source_sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc",
+            "span": {
+              "end_column": 33,
+              "end_line": 2,
+              "start_column": 3,
+              "start_line": 2
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:60a5aad72b38c3ce83df9bc13f826bb48791fbff3d2c5fbcf7a526cc5316e58a",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:ArrowFunction:(4, 36):(4, 90)",
+            "id": "subject-identity/v1:fca79a0d70984b39747ad818571113c158f9f555a7b03d2b60ba5abb5ba287e2",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "span": {
+              "end_column": 91,
+              "end_line": 4,
+              "start_column": 37,
+              "start_line": 4
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:ArrowFunction:(4, 75):(4, 89)",
+            "id": "subject-identity/v1:8ca55d581bdee7a094513d930ff797353c93c486eac6554c907dd2d60b786c52",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "span": {
+              "end_column": 90,
+              "end_line": 4,
+              "start_column": 76,
+              "start_line": 4
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/quote-client.ts",
+            "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:c189d6060d38ba20dfa5ec68d65a34ff0b1cdc55eb40acbeae06800cfc54d7b3",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/quote-client.ts",
+            "source_sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/quote-client.ts",
+            "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:fetchQuote:(3, 0):(6, 1)",
+            "id": "subject-identity/v1:33ed5e344ee9a8b9407664aa74f4fcbdddf90056f8e493ad5611a12d803f834c",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/quote-client.ts",
+            "source_sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc",
+            "span": {
+              "end_column": 2,
+              "end_line": 6,
+              "start_column": 1,
+              "start_line": 3
+            },
+            "target": "node-jsdom"
+          }
+        }
+      ]
+    },
+    "angular-regression-debt": {
+      "base": [
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 5,
+                "total": 6,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/pricing.ts",
+            "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:b627bf1d0b36ee3c128cd6cc5e3119b62c355c621e458a6475ca05f302cd2685",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/pricing.ts",
+            "source_sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 4,
+                "total": 5,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/pricing.ts",
+            "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:Pricing.quote:(5, 2):(13, 3)",
+            "id": "subject-identity/v1:8ed4fb9f7bbf40212c16c3f3d6f23e2350482aa6c67cacf7a12d7bfb27963460",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/pricing.ts",
+            "source_sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b",
+            "span": {
+              "end_column": 4,
+              "end_line": 13,
+              "start_column": 3,
+              "start_line": 5
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/standard-quote.ts",
+            "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:7bc9fd560b8177b3a996390b744019f53ac0be4efbe9d2ae1b8dd14e97dae8e2",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/standard-quote.ts",
+            "source_sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/standard-quote.ts",
+            "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:StandardQuote.quote:(2, 2):(2, 32)",
+            "id": "subject-identity/v1:22c11626d4bb53b0e6fd7971740932b7630c00a8f0d02c9c3931085c6a3ed562",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/standard-quote.ts",
+            "source_sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae",
+            "span": {
+              "end_column": 33,
+              "end_line": 2,
+              "start_column": 3,
+              "start_line": 2
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/priority-quote.ts",
+            "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:447ba049056bd90a3cfdc2050b515629fcb4e4dc9034eff001f440957006d8e8",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/priority-quote.ts",
+            "source_sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/priority-quote.ts",
+            "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:PriorityQuote.quote:(2, 2):(2, 32)",
+            "id": "subject-identity/v1:63c938ba2a43fa9d2f4b32f9f84dea164d3ff13d312ba12fa3be7b5f11952eba",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/priority-quote.ts",
+            "source_sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc",
+            "span": {
+              "end_column": 33,
+              "end_line": 2,
+              "start_column": 3,
+              "start_line": 2
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:60a5aad72b38c3ce83df9bc13f826bb48791fbff3d2c5fbcf7a526cc5316e58a",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:ArrowFunction:(4, 36):(4, 90)",
+            "id": "subject-identity/v1:fca79a0d70984b39747ad818571113c158f9f555a7b03d2b60ba5abb5ba287e2",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "span": {
+              "end_column": 91,
+              "end_line": 4,
+              "start_column": 37,
+              "start_line": 4
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:ArrowFunction:(4, 75):(4, 89)",
+            "id": "subject-identity/v1:8ca55d581bdee7a094513d930ff797353c93c486eac6554c907dd2d60b786c52",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "span": {
+              "end_column": 90,
+              "end_line": 4,
+              "start_column": 76,
+              "start_line": 4
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/quote-client.ts",
+            "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:c189d6060d38ba20dfa5ec68d65a34ff0b1cdc55eb40acbeae06800cfc54d7b3",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/quote-client.ts",
+            "source_sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/quote-client.ts",
+            "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:fetchQuote:(3, 0):(6, 1)",
+            "id": "subject-identity/v1:33ed5e344ee9a8b9407664aa74f4fcbdddf90056f8e493ad5611a12d803f834c",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/quote-client.ts",
+            "source_sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc",
+            "span": {
+              "end_column": 2,
+              "end_line": 6,
+              "start_column": 1,
+              "start_line": 3
+            },
+            "target": "node-jsdom"
+          }
+        }
+      ],
+      "head": [
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 4,
+                "total": 6,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/pricing.ts",
+            "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:b627bf1d0b36ee3c128cd6cc5e3119b62c355c621e458a6475ca05f302cd2685",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/pricing.ts",
+            "source_sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 3,
+                "total": 5,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/pricing.ts",
+            "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:Pricing.quote:(5, 2):(13, 3)",
+            "id": "subject-identity/v1:8ed4fb9f7bbf40212c16c3f3d6f23e2350482aa6c67cacf7a12d7bfb27963460",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/pricing.ts",
+            "source_sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b",
+            "span": {
+              "end_column": 4,
+              "end_line": 13,
+              "start_column": 3,
+              "start_line": 5
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/standard-quote.ts",
+            "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:7bc9fd560b8177b3a996390b744019f53ac0be4efbe9d2ae1b8dd14e97dae8e2",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/standard-quote.ts",
+            "source_sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/standard-quote.ts",
+            "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:StandardQuote.quote:(2, 2):(2, 32)",
+            "id": "subject-identity/v1:22c11626d4bb53b0e6fd7971740932b7630c00a8f0d02c9c3931085c6a3ed562",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/standard-quote.ts",
+            "source_sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae",
+            "span": {
+              "end_column": 33,
+              "end_line": 2,
+              "start_column": 3,
+              "start_line": 2
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/priority-quote.ts",
+            "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:447ba049056bd90a3cfdc2050b515629fcb4e4dc9034eff001f440957006d8e8",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/priority-quote.ts",
+            "source_sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/priority-quote.ts",
+            "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:PriorityQuote.quote:(2, 2):(2, 32)",
+            "id": "subject-identity/v1:63c938ba2a43fa9d2f4b32f9f84dea164d3ff13d312ba12fa3be7b5f11952eba",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/priority-quote.ts",
+            "source_sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc",
+            "span": {
+              "end_column": 33,
+              "end_line": 2,
+              "start_column": 3,
+              "start_line": 2
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:60a5aad72b38c3ce83df9bc13f826bb48791fbff3d2c5fbcf7a526cc5316e58a",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:ArrowFunction:(4, 36):(4, 90)",
+            "id": "subject-identity/v1:fca79a0d70984b39747ad818571113c158f9f555a7b03d2b60ba5abb5ba287e2",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "span": {
+              "end_column": 91,
+              "end_line": 4,
+              "start_column": 37,
+              "start_line": 4
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:ArrowFunction:(4, 75):(4, 89)",
+            "id": "subject-identity/v1:8ca55d581bdee7a094513d930ff797353c93c486eac6554c907dd2d60b786c52",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "span": {
+              "end_column": 90,
+              "end_line": 4,
+              "start_column": 76,
+              "start_line": 4
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/quote-client.ts",
+            "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:c189d6060d38ba20dfa5ec68d65a34ff0b1cdc55eb40acbeae06800cfc54d7b3",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/quote-client.ts",
+            "source_sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/quote-client.ts",
+            "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:fetchQuote:(3, 0):(6, 1)",
+            "id": "subject-identity/v1:33ed5e344ee9a8b9407664aa74f4fcbdddf90056f8e493ad5611a12d803f834c",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/quote-client.ts",
+            "source_sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc",
+            "span": {
+              "end_column": 2,
+              "end_line": 6,
+              "start_column": 1,
+              "start_line": 3
+            },
+            "target": "node-jsdom"
+          }
+        }
+      ]
+    },
+    "angular-regression-threshold": {
+      "base": [
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 5,
+                "total": 6,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/pricing.ts",
+            "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:b627bf1d0b36ee3c128cd6cc5e3119b62c355c621e458a6475ca05f302cd2685",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/pricing.ts",
+            "source_sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 4,
+                "total": 5,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/pricing.ts",
+            "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:Pricing.quote:(5, 2):(13, 3)",
+            "id": "subject-identity/v1:8ed4fb9f7bbf40212c16c3f3d6f23e2350482aa6c67cacf7a12d7bfb27963460",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/pricing.ts",
+            "source_sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b",
+            "span": {
+              "end_column": 4,
+              "end_line": 13,
+              "start_column": 3,
+              "start_line": 5
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/standard-quote.ts",
+            "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:7bc9fd560b8177b3a996390b744019f53ac0be4efbe9d2ae1b8dd14e97dae8e2",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/standard-quote.ts",
+            "source_sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/standard-quote.ts",
+            "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:StandardQuote.quote:(2, 2):(2, 32)",
+            "id": "subject-identity/v1:22c11626d4bb53b0e6fd7971740932b7630c00a8f0d02c9c3931085c6a3ed562",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/standard-quote.ts",
+            "source_sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae",
+            "span": {
+              "end_column": 33,
+              "end_line": 2,
+              "start_column": 3,
+              "start_line": 2
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/priority-quote.ts",
+            "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:447ba049056bd90a3cfdc2050b515629fcb4e4dc9034eff001f440957006d8e8",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/priority-quote.ts",
+            "source_sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/priority-quote.ts",
+            "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:PriorityQuote.quote:(2, 2):(2, 32)",
+            "id": "subject-identity/v1:63c938ba2a43fa9d2f4b32f9f84dea164d3ff13d312ba12fa3be7b5f11952eba",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/priority-quote.ts",
+            "source_sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc",
+            "span": {
+              "end_column": 33,
+              "end_line": 2,
+              "start_column": 3,
+              "start_line": 2
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:60a5aad72b38c3ce83df9bc13f826bb48791fbff3d2c5fbcf7a526cc5316e58a",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:ArrowFunction:(4, 36):(4, 90)",
+            "id": "subject-identity/v1:fca79a0d70984b39747ad818571113c158f9f555a7b03d2b60ba5abb5ba287e2",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "span": {
+              "end_column": 91,
+              "end_line": 4,
+              "start_column": 37,
+              "start_line": 4
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:ArrowFunction:(4, 75):(4, 89)",
+            "id": "subject-identity/v1:8ca55d581bdee7a094513d930ff797353c93c486eac6554c907dd2d60b786c52",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "span": {
+              "end_column": 90,
+              "end_line": 4,
+              "start_column": 76,
+              "start_line": 4
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/quote-client.ts",
+            "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:c189d6060d38ba20dfa5ec68d65a34ff0b1cdc55eb40acbeae06800cfc54d7b3",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/quote-client.ts",
+            "source_sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/quote-client.ts",
+            "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:fetchQuote:(3, 0):(6, 1)",
+            "id": "subject-identity/v1:33ed5e344ee9a8b9407664aa74f4fcbdddf90056f8e493ad5611a12d803f834c",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/quote-client.ts",
+            "source_sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc",
+            "span": {
+              "end_column": 2,
+              "end_line": 6,
+              "start_column": 1,
+              "start_line": 3
+            },
+            "target": "node-jsdom"
+          }
+        }
+      ],
+      "head": [
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 4,
+                "total": 6,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/pricing.ts",
+            "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:b627bf1d0b36ee3c128cd6cc5e3119b62c355c621e458a6475ca05f302cd2685",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/pricing.ts",
+            "source_sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 3,
+                "total": 5,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/pricing.ts",
+            "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:Pricing.quote:(5, 2):(13, 3)",
+            "id": "subject-identity/v1:8ed4fb9f7bbf40212c16c3f3d6f23e2350482aa6c67cacf7a12d7bfb27963460",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/pricing.ts",
+            "source_sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b",
+            "span": {
+              "end_column": 4,
+              "end_line": 13,
+              "start_column": 3,
+              "start_line": 5
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/standard-quote.ts",
+            "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:7bc9fd560b8177b3a996390b744019f53ac0be4efbe9d2ae1b8dd14e97dae8e2",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/standard-quote.ts",
+            "source_sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/standard-quote.ts",
+            "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:StandardQuote.quote:(2, 2):(2, 32)",
+            "id": "subject-identity/v1:22c11626d4bb53b0e6fd7971740932b7630c00a8f0d02c9c3931085c6a3ed562",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/standard-quote.ts",
+            "source_sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae",
+            "span": {
+              "end_column": 33,
+              "end_line": 2,
+              "start_column": 3,
+              "start_line": 2
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/priority-quote.ts",
+            "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:447ba049056bd90a3cfdc2050b515629fcb4e4dc9034eff001f440957006d8e8",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/priority-quote.ts",
+            "source_sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/priority-quote.ts",
+            "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:PriorityQuote.quote:(2, 2):(2, 32)",
+            "id": "subject-identity/v1:63c938ba2a43fa9d2f4b32f9f84dea164d3ff13d312ba12fa3be7b5f11952eba",
+            "identity_version": "subject-identity/v1",
+            "kind": "method/v1",
+            "metadata": {},
+            "path": "app/src/app/priority-quote.ts",
+            "source_sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc",
+            "span": {
+              "end_column": 33,
+              "end_line": 2,
+              "start_column": 3,
+              "start_line": 2
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:60a5aad72b38c3ce83df9bc13f826bb48791fbff3d2c5fbcf7a526cc5316e58a",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:ArrowFunction:(4, 36):(4, 90)",
+            "id": "subject-identity/v1:fca79a0d70984b39747ad818571113c158f9f555a7b03d2b60ba5abb5ba287e2",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "span": {
+              "end_column": 91,
+              "end_line": 4,
+              "start_column": 37,
+              "start_line": 4
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/app.routes.ts",
+            "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:ArrowFunction:(4, 75):(4, 89)",
+            "id": "subject-identity/v1:8ca55d581bdee7a094513d930ff797353c93c486eac6554c907dd2d60b786c52",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/app.routes.ts",
+            "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+            "span": {
+              "end_column": 90,
+              "end_line": 4,
+              "start_column": 76,
+              "start_line": 4
+            },
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/quote-client.ts",
+            "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:file",
+            "id": "subject-identity/v1:c189d6060d38ba20dfa5ec68d65a34ff0b1cdc55eb40acbeae06800cfc54d7b3",
+            "identity_version": "subject-identity/v1",
+            "kind": "file/v1",
+            "metadata": {},
+            "path": "app/src/app/quote-client.ts",
+            "source_sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc",
+            "target": "node-jsdom"
+          }
+        },
+        {
+          "metrics": [
+            {
+              "name": "coverage.function",
+              "value": {
+                "covered": 1,
+                "total": 1,
+                "type": "ratio"
+              }
+            },
+            {
+              "name": "coverage.line",
+              "value": {
+                "covered": 2,
+                "total": 2,
+                "type": "ratio"
+              }
+            }
+          ],
+          "source": {
+            "path": "app/src/app/quote-client.ts",
+            "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+          },
+          "subject": {
+            "boundary": "production-ts",
+            "component": "typescript",
+            "discriminator": "typescript-original-source/v1:fetchQuote:(3, 0):(6, 1)",
+            "id": "subject-identity/v1:33ed5e344ee9a8b9407664aa74f4fcbdddf90056f8e493ad5611a12d803f834c",
+            "identity_version": "subject-identity/v1",
+            "kind": "function/v1",
+            "metadata": {},
+            "path": "app/src/app/quote-client.ts",
+            "source_sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc",
+            "span": {
+              "end_column": 2,
+              "end_line": 6,
+              "start_column": 1,
+              "start_line": 3
+            },
+            "target": "node-jsdom"
+          }
+        }
+      ]
+    }
+  },
+  "authoritative": false,
+  "case_count": 33,
+  "cases": [
+    {
+      "aggregate": "pass",
+      "diagnostic_variations": 0,
+      "id": "rust-0-production",
+      "mismatches": 0,
+      "validation": {
+        "accepted": true
+      }
+    },
+    {
+      "aggregate": "pass",
+      "diagnostic_variations": 0,
+      "id": "rust-0-base-risk",
+      "mismatches": 0,
+      "validation": {
+        "accepted": true
+      }
+    },
+    {
+      "aggregate": "pass",
+      "diagnostic_variations": 0,
+      "id": "rust-0-head-risk",
+      "mismatches": 0,
+      "validation": {
+        "accepted": true
+      }
+    },
+    {
+      "aggregate": "pass",
+      "diagnostic_variations": 0,
+      "id": "rust-1-production",
+      "mismatches": 0,
+      "validation": {
+        "accepted": true
+      }
+    },
+    {
+      "aggregate": "pass",
+      "diagnostic_variations": 0,
+      "id": "rust-1-base-risk",
+      "mismatches": 0,
+      "validation": {
+        "accepted": true
+      }
+    },
+    {
+      "aggregate": "pass",
+      "diagnostic_variations": 0,
+      "id": "rust-1-head-risk",
+      "mismatches": 0,
+      "validation": {
+        "accepted": true
+      }
+    },
+    {
+      "aggregate": "pass",
+      "diagnostic_variations": 0,
+      "id": "angular-compatible-threshold",
+      "mismatches": 0,
+      "validation": {
+        "accepted": true
+      }
+    },
+    {
+      "aggregate": "pass",
+      "diagnostic_variations": 0,
+      "id": "angular-compatible-debt",
+      "mismatches": 0,
+      "validation": {
+        "accepted": true
+      }
+    },
+    {
+      "aggregate": "fail",
+      "diagnostic_variations": 0,
+      "id": "angular-regression-threshold",
+      "mismatches": 0,
+      "validation": {
+        "accepted": true
+      }
+    },
+    {
+      "aggregate": "fail",
+      "diagnostic_variations": 0,
+      "id": "angular-regression-debt",
+      "mismatches": 0,
+      "validation": {
+        "accepted": true
+      }
+    },
+    {
+      "aggregate": "fail",
+      "diagnostic_variations": 0,
+      "id": "contract-breaking",
+      "mismatches": 0,
+      "validation": {
+        "accepted": true
+      }
+    },
+    {
+      "aggregate": "pass",
+      "diagnostic_variations": 0,
+      "id": "contract-compatible",
+      "mismatches": 0,
+      "validation": {
+        "accepted": true
+      }
+    },
+    {
+      "aggregate": "measurement_error",
+      "diagnostic_variations": 0,
+      "id": "rust-missing-evidence",
+      "mismatches": 0,
+      "validation": {
+        "accepted": false,
+        "reason": "evidence batch must be nonempty",
+        "reason_class": "MeasurementError"
+      }
+    },
+    {
+      "aggregate": "measurement_error",
+      "diagnostic_variations": 0,
+      "id": "rust-stale-context",
+      "mismatches": 0,
+      "validation": {
+        "accepted": false,
+        "reason": "stale commit/base/target/run evidence",
+        "reason_class": "MeasurementError"
+      }
+    },
+    {
+      "aggregate": "measurement_error",
+      "diagnostic_variations": 0,
+      "id": "rust-tampered-artifact",
+      "mismatches": 0,
+      "validation": {
+        "accepted": false,
+        "reason": "artifact/source digest mismatch",
+        "reason_class": "MeasurementError"
+      }
+    },
+    {
+      "aggregate": "measurement_error",
+      "diagnostic_variations": 221,
+      "id": "rust-missing-source",
+      "mismatches": 0,
+      "validation": {
+        "accepted": false,
+        "reason": "artifact/source evidence/production.json: No such file or directory (os error 2)",
+        "reason_class": "MeasurementError"
+      }
+    },
+    {
+      "aggregate": "rejected",
+      "diagnostic_variations": 0,
+      "id": "rust-duplicate-subject",
+      "mismatches": 0,
+      "validation": {
+        "accepted": false,
+        "reason": "duplicate subject identity: subject-identity/v1:fbe7e8107cff88dcab66d99b911a3890062740bfce1a2f392f31eb4471df77d3",
+        "reason_class": "MeasurementError"
+      }
+    },
+    {
+      "aggregate": "measurement_error",
+      "diagnostic_variations": 0,
+      "id": "rust-malformed-value",
+      "mismatches": 0,
+      "validation": {
+        "accepted": false,
+        "reason": "covered exceeds total",
+        "reason_class": "MeasurementError"
+      }
+    },
+    {
+      "aggregate": "measurement_error",
+      "diagnostic_variations": 0,
+      "id": "rust-unknown-capability",
+      "mismatches": 0,
+      "validation": {
+        "accepted": false,
+        "reason": "$.capabilities[0].state: expected one of ['supported', 'unsupported', 'not_configured', 'not_collected', 'measurement_error', 'not_applicable'], got 'unknown'",
+        "reason_class": "MeasurementError"
+      }
+    },
+    {
+      "aggregate": "blocked",
+      "diagnostic_variations": 0,
+      "id": "rust-required-unsupported",
+      "mismatches": 0,
+      "validation": {
+        "accepted": true
+      }
+    },
+    {
+      "aggregate": "measurement_error",
+      "diagnostic_variations": 0,
+      "id": "angular-missing-evidence",
+      "mismatches": 0,
+      "validation": {
+        "accepted": false,
+        "reason": "evidence batch must be nonempty",
+        "reason_class": "MeasurementError"
+      }
+    },
+    {
+      "aggregate": "measurement_error",
+      "diagnostic_variations": 0,
+      "id": "angular-stale-context",
+      "mismatches": 0,
+      "validation": {
+        "accepted": false,
+        "reason": "stale commit/base/target/run evidence",
+        "reason_class": "MeasurementError"
+      }
+    },
+    {
+      "aggregate": "measurement_error",
+      "diagnostic_variations": 0,
+      "id": "angular-tampered-artifact",
+      "mismatches": 0,
+      "validation": {
+        "accepted": false,
+        "reason": "artifact/source digest mismatch",
+        "reason_class": "MeasurementError"
+      }
+    },
+    {
+      "aggregate": "measurement_error",
+      "diagnostic_variations": 6,
+      "id": "angular-missing-source",
+      "mismatches": 0,
+      "validation": {
+        "accepted": false,
+        "reason": "artifact/source app/src/app/pricing.ts: No such file or directory (os error 2)",
+        "reason_class": "MeasurementError"
+      }
+    },
+    {
+      "aggregate": "rejected",
+      "diagnostic_variations": 0,
+      "id": "angular-duplicate-subject",
+      "mismatches": 0,
+      "validation": {
+        "accepted": false,
+        "reason": "duplicate subject identity: subject-identity/v1:b627bf1d0b36ee3c128cd6cc5e3119b62c355c621e458a6475ca05f302cd2685",
+        "reason_class": "MeasurementError"
+      }
+    },
+    {
+      "aggregate": "measurement_error",
+      "diagnostic_variations": 0,
+      "id": "angular-malformed-value",
+      "mismatches": 0,
+      "validation": {
+        "accepted": false,
+        "reason": "covered exceeds total",
+        "reason_class": "MeasurementError"
+      }
+    },
+    {
+      "aggregate": "measurement_error",
+      "diagnostic_variations": 0,
+      "id": "angular-unknown-capability",
+      "mismatches": 0,
+      "validation": {
+        "accepted": false,
+        "reason": "$.capabilities[0].state: expected one of ['supported', 'unsupported', 'not_configured', 'not_collected', 'measurement_error', 'not_applicable'], got 'unknown'",
+        "reason_class": "MeasurementError"
+      }
+    },
+    {
+      "aggregate": "blocked",
+      "diagnostic_variations": 0,
+      "id": "angular-required-unsupported",
+      "mismatches": 0,
+      "validation": {
+        "accepted": true
+      }
+    },
+    {
+      "aggregate": "measurement_error",
+      "diagnostic_variations": 0,
+      "id": "angular-missing-base",
+      "mismatches": 0,
+      "validation": {
+        "accepted": true
+      }
+    },
+    {
+      "aggregate": "measurement_error",
+      "diagnostic_variations": 0,
+      "id": "angular-incompatible-series",
+      "mismatches": 0,
+      "validation": {
+        "accepted": true
+      }
+    },
+    {
+      "aggregate": "measurement_error",
+      "diagnostic_variations": 0,
+      "id": "angular-invalid-exception",
+      "mismatches": 0,
+      "validation": {
+        "accepted": true
+      }
+    },
+    {
+      "aggregate": "blocked",
+      "diagnostic_variations": 0,
+      "id": "angular-empty-selection",
+      "mismatches": 0,
+      "validation": {
+        "accepted": true
+      }
+    },
+    {
+      "aggregate": "rejected",
+      "diagnostic_variations": 0,
+      "id": "contract-unknown-producer",
+      "mismatches": 0,
+      "validation": {
+        "accepted": false,
+        "reason": "unknown relationship component",
+        "reason_class": "MeasurementError"
+      }
+    }
+  ],
+  "corpora": {
+    "angular": 16,
+    "contract": 3,
+    "rust": 14
+  },
+  "diagnostic_variations": 227,
+  "mismatch_count": 0,
+  "schema": "gh-150-compatibility-acceptance/v1"
+}
