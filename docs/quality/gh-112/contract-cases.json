@@ -1,0 +1,186 @@
+{
+  "negative_cases": [
+    {
+      "case": "missing-id",
+      "status": "measurement_error",
+      "expected_rejection": true,
+      "error": "$: missing required field(s): id"
+    },
+    {
+      "case": "illegal-status",
+      "status": "measurement_error",
+      "expected_rejection": true,
+      "error": "$.status: expected one of ['measured', 'unavailable', 'measurement_error'], got 'pass'"
+    },
+    {
+      "case": "bad-digest",
+      "status": "measurement_error",
+      "expected_rejection": true,
+      "error": "$.artifacts[0].sha256: value 'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz' does not match pattern '^[0-9a-f]{64}$'"
+    },
+    {
+      "case": "tampered-digest",
+      "status": "measurement_error",
+      "expected_rejection": true,
+      "error": "artifact/source digest mismatch"
+    },
+    {
+      "case": "stale-artifact",
+      "status": "measurement_error",
+      "expected_rejection": true,
+      "error": "stale artifact provenance"
+    },
+    {
+      "case": "stale-evidence",
+      "status": "measurement_error",
+      "expected_rejection": true,
+      "error": "stale commit/base/target/run evidence"
+    },
+    {
+      "case": "missing-artifact",
+      "status": "measurement_error",
+      "expected_rejection": true,
+      "error": "artifact/source artifacts/missing.json: [Errno 2] No such file or directory: '/home/gem/symphony-workspaces/GH-112/tools/quality/fixtures/harness-evidence/artifacts/missing.json'"
+    },
+    {
+      "case": "path-escape",
+      "status": "measurement_error",
+      "expected_rejection": true,
+      "error": "artifact/source ../outside.json: path must be canonical and relative"
+    },
+    {
+      "case": "unknown-type",
+      "status": "measurement_error",
+      "expected_rejection": true,
+      "error": "unknown metric value type"
+    },
+    {
+      "case": "untyped-number",
+      "status": "measurement_error",
+      "expected_rejection": true,
+      "error": "unknown metric value type"
+    },
+    {
+      "case": "invalid-ratio",
+      "status": "measurement_error",
+      "expected_rejection": true,
+      "error": "covered exceeds total"
+    },
+    {
+      "case": "unsupported-with-value",
+      "status": "measurement_error",
+      "expected_rejection": true,
+      "error": "capability/evidence mismatch: coverage.line"
+    },
+    {
+      "case": "supported-without-value",
+      "status": "measurement_error",
+      "expected_rejection": true,
+      "error": "capability/evidence mismatch: coverage.branch"
+    },
+    {
+      "case": "wrong-series",
+      "status": "measurement_error",
+      "expected_rejection": true,
+      "error": "noncanonical measurement series identity"
+    },
+    {
+      "case": "tool-version-drift",
+      "status": "measurement_error",
+      "expected_rejection": true,
+      "error": "noncanonical measurement series identity"
+    },
+    {
+      "case": "missing-base",
+      "status": "measurement_error",
+      "expected_rejection": true,
+      "error": "$.context: missing required field(s): base_commit"
+    }
+  ],
+  "capability_results": [
+    {
+      "component": "frontend",
+      "metric": "coverage.line",
+      "evidence_id": "typescript-synthetic-evidence",
+      "state": "supported",
+      "status": "available"
+    },
+    {
+      "component": "frontend",
+      "metric": "coverage.branch",
+      "evidence_id": "typescript-synthetic-evidence",
+      "state": "unsupported",
+      "status": "blocked"
+    },
+    {
+      "component": "frontend",
+      "metric": "coverage.region",
+      "evidence_id": "typescript-synthetic-evidence",
+      "state": "not_collected",
+      "status": "not_collected"
+    },
+    {
+      "component": "api",
+      "metric": "coverage.line",
+      "evidence_id": "rust-synthetic-evidence",
+      "state": "supported",
+      "status": "available"
+    },
+    {
+      "component": "api",
+      "metric": "coverage.branch",
+      "evidence_id": "rust-synthetic-evidence",
+      "state": "unsupported",
+      "status": "blocked"
+    },
+    {
+      "component": "api",
+      "metric": "coverage.region",
+      "evidence_id": "rust-synthetic-evidence",
+      "state": "not_collected",
+      "status": "not_collected"
+    },
+    {
+      "component": "worker",
+      "metric": "coverage.line",
+      "evidence_id": "python-synthetic-evidence",
+      "state": "supported",
+      "status": "available"
+    },
+    {
+      "component": "worker",
+      "metric": "coverage.branch",
+      "evidence_id": "python-synthetic-evidence",
+      "state": "unsupported",
+      "status": "blocked"
+    },
+    {
+      "component": "worker",
+      "metric": "coverage.region",
+      "evidence_id": "python-synthetic-evidence",
+      "state": "not_collected",
+      "status": "not_collected"
+    },
+    {
+      "component": "billing",
+      "metric": "coverage.line",
+      "evidence_id": "java-synthetic-evidence",
+      "state": "supported",
+      "status": "available"
+    },
+    {
+      "component": "billing",
+      "metric": "coverage.branch",
+      "evidence_id": "java-synthetic-evidence",
+      "state": "unsupported",
+      "status": "blocked"
+    },
+    {
+      "component": "billing",
+      "metric": "coverage.region",
+      "evidence_id": "java-synthetic-evidence",
+      "state": "not_collected",
+      "status": "not_collected"
+    }
+  ]
+}

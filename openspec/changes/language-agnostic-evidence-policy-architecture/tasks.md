@@ -30,18 +30,25 @@ remain pending; no later task is accepted by this implementation.
 
 ## 2. Introduce `harness-evidence/v1`
 
-- [ ] 2.1 [P1][M] 定义并新增 `harness-evidence/v1` normalized envelope schema；验收：包含 project/component、collector、series、subject、metrics、capabilities、commit/target/run、artifacts、status 和 source integrity 字段；不得原地重解释现有 Rust `quality-evidence.schema.json`。
-- [ ] 2.2 [P1][M] 实现 schema validator 与 canonical serialization；验收：缺字段、未知状态、非法 metric value、重复 evidence ID、错误 digest 均失败关闭。
-- [ ] 2.3 [P1][M] 定义 raw artifact linkage 和 artifact digest 规则；验收：路径越界、缺 artifact、digest 不符和 stale artifact 报 measurement_error。
-- [ ] 2.4 [P2][M] 定义 generic metric namespace 和 typed value forms；验收：ratio、raw covered/total、integer count、boolean、duration/size 等不通过无类型 JSON 数字混用。
-- [ ] 2.5 [P2][S] 增加 Rust/TypeScript/Python/Java synthetic evidence samples；验收：相同 generic policy 能读取不同 ecosystem series，不宣称指标 series 可互换。
+- [x] 2.1 [P1][M] 定义并新增 `harness-evidence/v1` normalized envelope schema；验收：包含 project/component、collector、series、subject、metrics、capabilities、commit/target/run、artifacts、status 和 source integrity 字段；不得原地重解释现有 Rust `quality-evidence.schema.json`。
+- [x] 2.2 [P1][M] 实现 schema validator 与 canonical serialization；验收：缺字段、未知状态、非法 metric value、重复 evidence ID、错误 digest 均失败关闭。
+- [x] 2.3 [P1][M] 定义 raw artifact linkage 和 artifact digest 规则；验收：路径越界、缺 artifact、digest 不符和 stale artifact 报 measurement_error。
+- [x] 2.4 [P2][M] 定义 generic metric namespace 和 typed value forms；验收：ratio、raw covered/total、integer count、boolean、duration/size 等不通过无类型 JSON 数字混用。
+- [x] 2.5 [P2][S] 增加 Rust/TypeScript/Python/Java synthetic evidence samples；验收：相同 generic policy 能读取不同 ecosystem series，不宣称指标 series 可互换。
 
 ## 3. Add capability and measurement-series contracts
 
-- [ ] 3.1 [P1][M] 实现 capability 状态：`supported/unsupported/not_configured/not_collected/measurement_error/not_applicable`；验收：任何非 supported 状态都不能被转换为 0%/100%。
-- [ ] 3.2 [P1][M] 定义 measurement-series identity；验收：tool/rule/identity/normalization 语义变化产生不兼容 series，base/head compare 拒绝静默混用。
-- [ ] 3.3 [P2][M] 定义 capability requirement policy；验收：required metric unsupported 时按 policy 产生 blocked/measurement_error，而 informational metric 可保留 unsupported。
-- [ ] 3.4 [P2][M] 增加 series/capability negative fixtures；验收：缺 base、错误 series、tool version 漂移、能力谎报后缺证据均失败关闭。
+- [x] 3.1 [P1][M] 实现 capability 状态：`supported/unsupported/not_configured/not_collected/measurement_error/not_applicable`；验收：任何非 supported 状态都不能被转换为 0%/100%。
+- [x] 3.2 [P1][M] 定义 measurement-series identity；验收：tool/rule/identity/normalization 语义变化产生不兼容 series，base/head compare 拒绝静默混用。
+- [x] 3.3 [P2][M] 定义 capability requirement policy；验收：required metric unsupported 时按 policy 产生 blocked/measurement_error，而 informational metric 可保留 unsupported。
+- [x] 3.4 [P2][M] 增加 series/capability negative fixtures；验收：缺 base、错误 series、tool version 漂移、能力谎报后缺证据均失败关闭。
+
+GH-112 validation: [normalized schema and contract](../../../docs/quality/harness-evidence.md)
+(tasks 2.1–2.4, 3.1–3.3), [four-ecosystem and negative fixtures](../../../tools/quality/fixtures/harness-evidence/README.md)
+(tasks 2.5, 3.4), and [local results with retained machine evidence](../../../docs/quality/gh-112-validation.md).
+The focused suite validates all nine scoped tasks, including artifact integrity,
+typed values, six distinct capability states and incompatible series rejection.
+Required CI remains pending; later tasks and full architecture acceptance remain unchecked.
 
 ## 4. Separate collector adapters from policy
 
