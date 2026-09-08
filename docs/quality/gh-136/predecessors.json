@@ -1,0 +1,1699 @@
+{
+  "schema": "typescript-angular-predecessor-review/v1",
+  "review_date": "2026-09-08",
+  "scope": "GH-136 task 4.3; completed predecessor checks only, no final PR CI claim",
+  "predecessors": [
+    {
+      "issue": 129,
+      "issue_state": "closed",
+      "issue_closed_at": "2026-09-08T06:46:02Z",
+      "pr": 137,
+      "url": "https://github.com/musutrade/Harness-Gate/pull/137",
+      "title": "feat(fixtures): freeze Angular toolchain and retain real native evidence",
+      "head_sha": "98bb4c3cdca9e190ad111c0ab2b46e8fe8bd6a36",
+      "base_sha": "ca8ec49e8777c30a01b8a380c4ec39f0f28af355",
+      "merge_sha": "40a24467aa9f8617bcffec22e4abcf58c6046ac6",
+      "merged_at": "2026-09-08T06:45:58Z",
+      "checks": [
+        {
+          "name": "Generic Quality Shadow",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34195289915/job/101963850589",
+          "head_sha": "98bb4c3cdca9e190ad111c0ab2b46e8fe8bd6a36",
+          "completed_at": "2026-09-08T06:45:17Z"
+        },
+        {
+          "name": "Required Quality Aggregate",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34195289915/job/101963850568",
+          "head_sha": "98bb4c3cdca9e190ad111c0ab2b46e8fe8bd6a36",
+          "completed_at": "2026-09-08T06:45:08Z"
+        },
+        {
+          "name": "Quality CLI Contracts (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34195289915/job/101961559181",
+          "head_sha": "98bb4c3cdca9e190ad111c0ab2b46e8fe8bd6a36",
+          "completed_at": "2026-09-08T06:34:54Z"
+        },
+        {
+          "name": "Quality Performance Baseline",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34195289915/job/101961559085",
+          "head_sha": "98bb4c3cdca9e190ad111c0ab2b46e8fe8bd6a36",
+          "completed_at": "2026-09-08T06:34:54Z"
+        },
+        {
+          "name": "Code Coverage",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34195289915/job/101961559031",
+          "head_sha": "98bb4c3cdca9e190ad111c0ab2b46e8fe8bd6a36",
+          "completed_at": "2026-09-08T06:34:54Z"
+        },
+        {
+          "name": "Test (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34195289915/job/101961558782",
+          "head_sha": "98bb4c3cdca9e190ad111c0ab2b46e8fe8bd6a36",
+          "completed_at": "2026-09-08T06:34:54Z"
+        },
+        {
+          "name": "Build (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34195289915/job/101961558678",
+          "head_sha": "98bb4c3cdca9e190ad111c0ab2b46e8fe8bd6a36",
+          "completed_at": "2026-09-08T06:34:54Z"
+        },
+        {
+          "name": "Quality Coverage and Critical Paths",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34195289915/job/101961558194",
+          "head_sha": "98bb4c3cdca9e190ad111c0ab2b46e8fe8bd6a36",
+          "completed_at": "2026-09-08T06:44:57Z"
+        },
+        {
+          "name": "Build",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34195289915/job/101961558191",
+          "head_sha": "98bb4c3cdca9e190ad111c0ab2b46e8fe8bd6a36",
+          "completed_at": "2026-09-08T06:37:19Z"
+        },
+        {
+          "name": "Quality Script Tests",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34195289915/job/101961558178",
+          "head_sha": "98bb4c3cdca9e190ad111c0ab2b46e8fe8bd6a36",
+          "completed_at": "2026-09-08T06:35:54Z"
+        },
+        {
+          "name": "Quality CLI Contracts",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34195289915/job/101961558177",
+          "head_sha": "98bb4c3cdca9e190ad111c0ab2b46e8fe8bd6a36",
+          "completed_at": "2026-09-08T06:35:51Z"
+        },
+        {
+          "name": "Documentation Consistency",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34195289915/job/101961558155",
+          "head_sha": "98bb4c3cdca9e190ad111c0ab2b46e8fe8bd6a36",
+          "completed_at": "2026-09-08T06:35:49Z"
+        },
+        {
+          "name": "Test",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34195289915/job/101961558112",
+          "head_sha": "98bb4c3cdca9e190ad111c0ab2b46e8fe8bd6a36",
+          "completed_at": "2026-09-08T06:36:28Z"
+        },
+        {
+          "name": "Release Governance Contracts",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34195289915/job/101961558107",
+          "head_sha": "98bb4c3cdca9e190ad111c0ab2b46e8fe8bd6a36",
+          "completed_at": "2026-09-08T06:35:04Z"
+        },
+        {
+          "name": "Format",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34195289915/job/101961558095",
+          "head_sha": "98bb4c3cdca9e190ad111c0ab2b46e8fe8bd6a36",
+          "completed_at": "2026-09-08T06:35:11Z"
+        },
+        {
+          "name": "Security Audit",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34195289915/job/101961558039",
+          "head_sha": "98bb4c3cdca9e190ad111c0ab2b46e8fe8bd6a36",
+          "completed_at": "2026-09-08T06:38:04Z"
+        },
+        {
+          "name": "Clippy",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34195289915/job/101961557892",
+          "head_sha": "98bb4c3cdca9e190ad111c0ab2b46e8fe8bd6a36",
+          "completed_at": "2026-09-08T06:35:44Z"
+        }
+      ],
+      "files": [
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/design.md",
+          "status": "modified"
+        },
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/tasks.md",
+          "status": "modified"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/README.md",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/.editorconfig",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/.gitignore",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/.node-version",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/.npmrc",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/.prettierrc",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/README.md",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/angular.json",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/package-lock.json",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/package.json",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/app.config.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/app.css",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/app.html",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/app.routes.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/app.spec.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/app.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/details/details.css",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/details/details.html",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/details/details.spec.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/details/details.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/generated/core/ApiError.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/generated/core/ApiRequestOptions.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/generated/core/ApiResult.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/generated/core/CancelablePromise.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/generated/core/OpenAPI.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/generated/core/request.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/generated/index.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/generated/models/Quote.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/generated/services/DefaultService.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/pricing.spec.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/pricing.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/priority-quote.spec.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/priority-quote.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/quote-client.spec.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/quote-client.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/standard-quote.spec.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/app/standard-quote.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/index.html",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/main.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/src/styles.css",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/tsconfig.app.json",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/tsconfig.json",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/tsconfig.spec.json",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/app/vitest.config.ts",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/collect.py",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/evidence/README.md",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/evidence/failed-build.tar.gz",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/evidence/index.json",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/evidence/native.tar.gz",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/evidence/validation.tar.gz",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/provider/Cargo.lock",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/provider/Cargo.toml",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/provider/openapi.json",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/provider/src/main.rs",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/toolchain.json",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/tests/test_angular_fixture_collection.py",
+          "status": "added"
+        }
+      ]
+    },
+    {
+      "issue": 130,
+      "issue_state": "closed",
+      "issue_closed_at": "2026-09-08T07:20:26Z",
+      "pr": 138,
+      "url": "https://github.com/musutrade/Harness-Gate/pull/138",
+      "title": "feat(quality): resolve TypeScript source identity and coverage series",
+      "head_sha": "5db70cda1ccadefe87f7b04f2f25dff924d4598c",
+      "base_sha": "40a24467aa9f8617bcffec22e4abcf58c6046ac6",
+      "merge_sha": "da08cbf3e8d9d34084c7a0933dd2cda83fc8e86f",
+      "merged_at": "2026-09-08T07:20:21Z",
+      "checks": [
+        {
+          "name": "Required Quality Aggregate",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34198098891/job/101972430518",
+          "head_sha": "5db70cda1ccadefe87f7b04f2f25dff924d4598c",
+          "completed_at": "2026-09-08T07:19:30Z"
+        },
+        {
+          "name": "Generic Quality Shadow",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34198098891/job/101972430411",
+          "head_sha": "5db70cda1ccadefe87f7b04f2f25dff924d4598c",
+          "completed_at": "2026-09-08T07:19:44Z"
+        },
+        {
+          "name": "Build (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34198098891/job/101970294412",
+          "head_sha": "5db70cda1ccadefe87f7b04f2f25dff924d4598c",
+          "completed_at": "2026-09-08T07:11:18Z"
+        },
+        {
+          "name": "Quality CLI Contracts (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34198098891/job/101970294237",
+          "head_sha": "5db70cda1ccadefe87f7b04f2f25dff924d4598c",
+          "completed_at": "2026-09-08T07:11:18Z"
+        },
+        {
+          "name": "Test (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34198098891/job/101970294206",
+          "head_sha": "5db70cda1ccadefe87f7b04f2f25dff924d4598c",
+          "completed_at": "2026-09-08T07:11:18Z"
+        },
+        {
+          "name": "Code Coverage",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34198098891/job/101970294125",
+          "head_sha": "5db70cda1ccadefe87f7b04f2f25dff924d4598c",
+          "completed_at": "2026-09-08T07:11:18Z"
+        },
+        {
+          "name": "Quality Performance Baseline",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34198098891/job/101970293962",
+          "head_sha": "5db70cda1ccadefe87f7b04f2f25dff924d4598c",
+          "completed_at": "2026-09-08T07:11:18Z"
+        },
+        {
+          "name": "Quality CLI Contracts",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34198098891/job/101970293515",
+          "head_sha": "5db70cda1ccadefe87f7b04f2f25dff924d4598c",
+          "completed_at": "2026-09-08T07:12:25Z"
+        },
+        {
+          "name": "Clippy",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34198098891/job/101970293494",
+          "head_sha": "5db70cda1ccadefe87f7b04f2f25dff924d4598c",
+          "completed_at": "2026-09-08T07:12:09Z"
+        },
+        {
+          "name": "Quality Script Tests",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34198098891/job/101970293453",
+          "head_sha": "5db70cda1ccadefe87f7b04f2f25dff924d4598c",
+          "completed_at": "2026-09-08T07:12:31Z"
+        },
+        {
+          "name": "Test",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34198098891/job/101970293332",
+          "head_sha": "5db70cda1ccadefe87f7b04f2f25dff924d4598c",
+          "completed_at": "2026-09-08T07:12:16Z"
+        },
+        {
+          "name": "Quality Coverage and Critical Paths",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34198098891/job/101970293273",
+          "head_sha": "5db70cda1ccadefe87f7b04f2f25dff924d4598c",
+          "completed_at": "2026-09-08T07:19:22Z"
+        },
+        {
+          "name": "Release Governance Contracts",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34198098891/job/101970293234",
+          "head_sha": "5db70cda1ccadefe87f7b04f2f25dff924d4598c",
+          "completed_at": "2026-09-08T07:11:29Z"
+        },
+        {
+          "name": "Build",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34198098891/job/101970293225",
+          "head_sha": "5db70cda1ccadefe87f7b04f2f25dff924d4598c",
+          "completed_at": "2026-09-08T07:13:39Z"
+        },
+        {
+          "name": "Format",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34198098891/job/101970293169",
+          "head_sha": "5db70cda1ccadefe87f7b04f2f25dff924d4598c",
+          "completed_at": "2026-09-08T07:11:33Z"
+        },
+        {
+          "name": "Documentation Consistency",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34198098891/job/101970293101",
+          "head_sha": "5db70cda1ccadefe87f7b04f2f25dff924d4598c",
+          "completed_at": "2026-09-08T07:12:19Z"
+        },
+        {
+          "name": "Security Audit",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34198098891/job/101970292954",
+          "head_sha": "5db70cda1ccadefe87f7b04f2f25dff924d4598c",
+          "completed_at": "2026-09-08T07:14:42Z"
+        }
+      ],
+      "files": [
+        {
+          "filename": "docs/quality/gh-130/README.md",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-130/index.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-130/validation.tar.gz",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/typescript-source-semantics.md",
+          "status": "added"
+        },
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/design.md",
+          "status": "modified"
+        },
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/specs/typescript-angular-reference-adapter/spec.md",
+          "status": "modified"
+        },
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/tasks.md",
+          "status": "modified"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/coverage-oracle.cjs",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/semantics/README.md",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/semantics/native-counters.json",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/semantics/receipt.json",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/semantics/source-index.json",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/fixtures/typescript-angular/source-index.cjs",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/tests/test_typescript_semantics.py",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/typescript_semantics.py",
+          "status": "added"
+        }
+      ]
+    },
+    {
+      "issue": 131,
+      "issue_state": "closed",
+      "issue_closed_at": "2026-09-08T08:00:37Z",
+      "pr": 139,
+      "url": "https://github.com/musutrade/Harness-Gate/pull/139",
+      "title": "feat(quality): implement TypeScript/Angular collector adapter",
+      "head_sha": "6bc8e2e6e30eb7ea3b1b5c7ae476ce143b02132b",
+      "base_sha": "da08cbf3e8d9d34084c7a0933dd2cda83fc8e86f",
+      "merge_sha": "3f11c517071da8ee1ffd0bcd61c5e8b3019dd11f",
+      "merged_at": "2026-09-08T08:00:32Z",
+      "checks": [
+        {
+          "name": "Required Quality Aggregate",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34201259619/job/101983013393",
+          "head_sha": "6bc8e2e6e30eb7ea3b1b5c7ae476ce143b02132b",
+          "completed_at": "2026-09-08T07:59:26Z"
+        },
+        {
+          "name": "Generic Quality Shadow",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34201259619/job/101983013340",
+          "head_sha": "6bc8e2e6e30eb7ea3b1b5c7ae476ce143b02132b",
+          "completed_at": "2026-09-08T07:59:30Z"
+        },
+        {
+          "name": "Build (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34201259619/job/101980357722",
+          "head_sha": "6bc8e2e6e30eb7ea3b1b5c7ae476ce143b02132b",
+          "completed_at": "2026-09-08T07:49:18Z"
+        },
+        {
+          "name": "Quality CLI Contracts (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34201259619/job/101980328053",
+          "head_sha": "6bc8e2e6e30eb7ea3b1b5c7ae476ce143b02132b",
+          "completed_at": "2026-09-08T07:49:18Z"
+        },
+        {
+          "name": "Quality Performance Baseline",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34201259619/job/101980327534",
+          "head_sha": "6bc8e2e6e30eb7ea3b1b5c7ae476ce143b02132b",
+          "completed_at": "2026-09-08T07:49:18Z"
+        },
+        {
+          "name": "Test (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34201259619/job/101980327515",
+          "head_sha": "6bc8e2e6e30eb7ea3b1b5c7ae476ce143b02132b",
+          "completed_at": "2026-09-08T07:49:18Z"
+        },
+        {
+          "name": "Code Coverage",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34201259619/job/101980327321",
+          "head_sha": "6bc8e2e6e30eb7ea3b1b5c7ae476ce143b02132b",
+          "completed_at": "2026-09-08T07:49:18Z"
+        },
+        {
+          "name": "Quality Coverage and Critical Paths",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34201259619/job/101980326687",
+          "head_sha": "6bc8e2e6e30eb7ea3b1b5c7ae476ce143b02132b",
+          "completed_at": "2026-09-08T07:59:15Z"
+        },
+        {
+          "name": "Release Governance Contracts",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34201259619/job/101980326630",
+          "head_sha": "6bc8e2e6e30eb7ea3b1b5c7ae476ce143b02132b",
+          "completed_at": "2026-09-08T07:49:28Z"
+        },
+        {
+          "name": "Documentation Consistency",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34201259619/job/101980326624",
+          "head_sha": "6bc8e2e6e30eb7ea3b1b5c7ae476ce143b02132b",
+          "completed_at": "2026-09-08T07:50:11Z"
+        },
+        {
+          "name": "Security Audit",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34201259619/job/101980326614",
+          "head_sha": "6bc8e2e6e30eb7ea3b1b5c7ae476ce143b02132b",
+          "completed_at": "2026-09-08T07:52:32Z"
+        },
+        {
+          "name": "Format",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34201259619/job/101980326600",
+          "head_sha": "6bc8e2e6e30eb7ea3b1b5c7ae476ce143b02132b",
+          "completed_at": "2026-09-08T07:49:36Z"
+        },
+        {
+          "name": "Build",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34201259619/job/101980326582",
+          "head_sha": "6bc8e2e6e30eb7ea3b1b5c7ae476ce143b02132b",
+          "completed_at": "2026-09-08T07:51:41Z"
+        },
+        {
+          "name": "Clippy",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34201259619/job/101980326566",
+          "head_sha": "6bc8e2e6e30eb7ea3b1b5c7ae476ce143b02132b",
+          "completed_at": "2026-09-08T07:50:04Z"
+        },
+        {
+          "name": "Quality Script Tests",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34201259619/job/101980326507",
+          "head_sha": "6bc8e2e6e30eb7ea3b1b5c7ae476ce143b02132b",
+          "completed_at": "2026-09-08T07:50:38Z"
+        },
+        {
+          "name": "Quality CLI Contracts",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34201259619/job/101980326500",
+          "head_sha": "6bc8e2e6e30eb7ea3b1b5c7ae476ce143b02132b",
+          "completed_at": "2026-09-08T07:50:20Z"
+        },
+        {
+          "name": "Test",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34201259619/job/101980326333",
+          "head_sha": "6bc8e2e6e30eb7ea3b1b5c7ae476ce143b02132b",
+          "completed_at": "2026-09-08T07:50:17Z"
+        }
+      ],
+      "files": [
+        {
+          "filename": "docs/quality/gh-131/README.md",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-131/index.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-131/validation.tar.gz",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/typescript-collector.md",
+          "status": "added"
+        },
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/design.md",
+          "status": "modified"
+        },
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/proposal.md",
+          "status": "modified"
+        },
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/specs/typescript-angular-reference-adapter/spec.md",
+          "status": "modified"
+        },
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/tasks.md",
+          "status": "modified"
+        },
+        {
+          "filename": "tools/quality/tests/test_typescript_reference.py",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/typescript_reference.py",
+          "status": "added"
+        }
+      ]
+    },
+    {
+      "issue": 132,
+      "issue_state": "closed",
+      "issue_closed_at": "2026-09-08T08:24:48Z",
+      "pr": 140,
+      "url": "https://github.com/musutrade/Harness-Gate/pull/140",
+      "title": "test(quality): verify native TypeScript policy and ratchets",
+      "head_sha": "6e694016fd80de427da4737feb852227404cea74",
+      "base_sha": "3f11c517071da8ee1ffd0bcd61c5e8b3019dd11f",
+      "merge_sha": "9dbb950e57f0985976cc0f5db04c47d6cb401d23",
+      "merged_at": "2026-09-08T08:24:44Z",
+      "checks": [
+        {
+          "name": "Generic Quality Shadow",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34203538107/job/101989900290",
+          "head_sha": "6e694016fd80de427da4737feb852227404cea74",
+          "completed_at": "2026-09-08T08:23:54Z"
+        },
+        {
+          "name": "Required Quality Aggregate",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34203538107/job/101989900180",
+          "head_sha": "6e694016fd80de427da4737feb852227404cea74",
+          "completed_at": "2026-09-08T08:23:40Z"
+        },
+        {
+          "name": "Code Coverage",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34203538107/job/101987677315",
+          "head_sha": "6e694016fd80de427da4737feb852227404cea74",
+          "completed_at": "2026-09-08T08:15:38Z"
+        },
+        {
+          "name": "Quality Performance Baseline",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34203538107/job/101987641109",
+          "head_sha": "6e694016fd80de427da4737feb852227404cea74",
+          "completed_at": "2026-09-08T08:15:38Z"
+        },
+        {
+          "name": "Build (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34203538107/job/101987641028",
+          "head_sha": "6e694016fd80de427da4737feb852227404cea74",
+          "completed_at": "2026-09-08T08:15:38Z"
+        },
+        {
+          "name": "Test (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34203538107/job/101987640962",
+          "head_sha": "6e694016fd80de427da4737feb852227404cea74",
+          "completed_at": "2026-09-08T08:15:38Z"
+        },
+        {
+          "name": "Quality CLI Contracts (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34203538107/job/101987640950",
+          "head_sha": "6e694016fd80de427da4737feb852227404cea74",
+          "completed_at": "2026-09-08T08:15:38Z"
+        },
+        {
+          "name": "Clippy",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34203538107/job/101987640400",
+          "head_sha": "6e694016fd80de427da4737feb852227404cea74",
+          "completed_at": "2026-09-08T08:16:28Z"
+        },
+        {
+          "name": "Documentation Consistency",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34203538107/job/101987640175",
+          "head_sha": "6e694016fd80de427da4737feb852227404cea74",
+          "completed_at": "2026-09-08T08:17:02Z"
+        },
+        {
+          "name": "Test",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34203538107/job/101987640079",
+          "head_sha": "6e694016fd80de427da4737feb852227404cea74",
+          "completed_at": "2026-09-08T08:16:33Z"
+        },
+        {
+          "name": "Quality Coverage and Critical Paths",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34203538107/job/101987640038",
+          "head_sha": "6e694016fd80de427da4737feb852227404cea74",
+          "completed_at": "2026-09-08T08:23:33Z"
+        },
+        {
+          "name": "Quality CLI Contracts",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34203538107/job/101987640026",
+          "head_sha": "6e694016fd80de427da4737feb852227404cea74",
+          "completed_at": "2026-09-08T08:16:46Z"
+        },
+        {
+          "name": "Quality Script Tests",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34203538107/job/101987640003",
+          "head_sha": "6e694016fd80de427da4737feb852227404cea74",
+          "completed_at": "2026-09-08T08:17:16Z"
+        },
+        {
+          "name": "Format",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34203538107/job/101987639994",
+          "head_sha": "6e694016fd80de427da4737feb852227404cea74",
+          "completed_at": "2026-09-08T08:15:56Z"
+        },
+        {
+          "name": "Release Governance Contracts",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34203538107/job/101987639925",
+          "head_sha": "6e694016fd80de427da4737feb852227404cea74",
+          "completed_at": "2026-09-08T08:15:47Z"
+        },
+        {
+          "name": "Build",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34203538107/job/101987639899",
+          "head_sha": "6e694016fd80de427da4737feb852227404cea74",
+          "completed_at": "2026-09-08T08:18:03Z"
+        },
+        {
+          "name": "Security Audit",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34203538107/job/101987639854",
+          "head_sha": "6e694016fd80de427da4737feb852227404cea74",
+          "completed_at": "2026-09-08T08:18:51Z"
+        }
+      ],
+      "files": [
+        {
+          "filename": "docs/quality/gh-132/README.md",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-132/index.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-132/validation.tar.gz",
+          "status": "added"
+        },
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/design.md",
+          "status": "modified"
+        },
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/proposal.md",
+          "status": "modified"
+        },
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/tasks.md",
+          "status": "modified"
+        },
+        {
+          "filename": "tools/quality/tests/test_typescript_policy.py",
+          "status": "added"
+        }
+      ]
+    },
+    {
+      "issue": 133,
+      "issue_state": "closed",
+      "issue_closed_at": "2026-09-08T08:56:51Z",
+      "pr": 141,
+      "url": "https://github.com/musutrade/Harness-Gate/pull/141",
+      "title": "feat(quality): integrate real OpenAPI and generated-client contract gates",
+      "head_sha": "2888033a3e843a0f4f4e5fc2cf161f4495bb3500",
+      "base_sha": "9dbb950e57f0985976cc0f5db04c47d6cb401d23",
+      "merge_sha": "76ab074b83459c60c1c6152b11c09712934d1cb1",
+      "merged_at": "2026-09-08T08:56:47Z",
+      "checks": [
+        {
+          "name": "Generic Quality Shadow",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34206490734/job/101999451391",
+          "head_sha": "2888033a3e843a0f4f4e5fc2cf161f4495bb3500",
+          "completed_at": "2026-09-08T08:56:30Z"
+        },
+        {
+          "name": "Required Quality Aggregate",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34206490734/job/101999451376",
+          "head_sha": "2888033a3e843a0f4f4e5fc2cf161f4495bb3500",
+          "completed_at": "2026-09-08T08:56:25Z"
+        },
+        {
+          "name": "Quality Performance Baseline",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34206490734/job/101997108424",
+          "head_sha": "2888033a3e843a0f4f4e5fc2cf161f4495bb3500",
+          "completed_at": "2026-09-08T08:48:17Z"
+        },
+        {
+          "name": "Test (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34206490734/job/101997079172",
+          "head_sha": "2888033a3e843a0f4f4e5fc2cf161f4495bb3500",
+          "completed_at": "2026-09-08T08:48:17Z"
+        },
+        {
+          "name": "Build (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34206490734/job/101997079067",
+          "head_sha": "2888033a3e843a0f4f4e5fc2cf161f4495bb3500",
+          "completed_at": "2026-09-08T08:48:17Z"
+        },
+        {
+          "name": "Quality CLI Contracts (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34206490734/job/101997078302",
+          "head_sha": "2888033a3e843a0f4f4e5fc2cf161f4495bb3500",
+          "completed_at": "2026-09-08T08:48:17Z"
+        },
+        {
+          "name": "Code Coverage",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34206490734/job/101997078272",
+          "head_sha": "2888033a3e843a0f4f4e5fc2cf161f4495bb3500",
+          "completed_at": "2026-09-08T08:48:17Z"
+        },
+        {
+          "name": "Quality Coverage and Critical Paths",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34206490734/job/101997077512",
+          "head_sha": "2888033a3e843a0f4f4e5fc2cf161f4495bb3500",
+          "completed_at": "2026-09-08T08:56:15Z"
+        },
+        {
+          "name": "Security Audit",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34206490734/job/101997077478",
+          "head_sha": "2888033a3e843a0f4f4e5fc2cf161f4495bb3500",
+          "completed_at": "2026-09-08T08:51:31Z"
+        },
+        {
+          "name": "Build",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34206490734/job/101997077470",
+          "head_sha": "2888033a3e843a0f4f4e5fc2cf161f4495bb3500",
+          "completed_at": "2026-09-08T08:50:24Z"
+        },
+        {
+          "name": "Quality Script Tests",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34206490734/job/101997077463",
+          "head_sha": "2888033a3e843a0f4f4e5fc2cf161f4495bb3500",
+          "completed_at": "2026-09-08T08:49:47Z"
+        },
+        {
+          "name": "Test",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34206490734/job/101997077442",
+          "head_sha": "2888033a3e843a0f4f4e5fc2cf161f4495bb3500",
+          "completed_at": "2026-09-08T08:49:18Z"
+        },
+        {
+          "name": "Release Governance Contracts",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34206490734/job/101997077414",
+          "head_sha": "2888033a3e843a0f4f4e5fc2cf161f4495bb3500",
+          "completed_at": "2026-09-08T08:48:29Z"
+        },
+        {
+          "name": "Format",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34206490734/job/101997077382",
+          "head_sha": "2888033a3e843a0f4f4e5fc2cf161f4495bb3500",
+          "completed_at": "2026-09-08T08:48:34Z"
+        },
+        {
+          "name": "Documentation Consistency",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34206490734/job/101997077344",
+          "head_sha": "2888033a3e843a0f4f4e5fc2cf161f4495bb3500",
+          "completed_at": "2026-09-08T08:49:15Z"
+        },
+        {
+          "name": "Quality CLI Contracts",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34206490734/job/101997077316",
+          "head_sha": "2888033a3e843a0f4f4e5fc2cf161f4495bb3500",
+          "completed_at": "2026-09-08T08:49:20Z"
+        },
+        {
+          "name": "Clippy",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34206490734/job/101997077042",
+          "head_sha": "2888033a3e843a0f4f4e5fc2cf161f4495bb3500",
+          "completed_at": "2026-09-08T08:49:02Z"
+        }
+      ],
+      "files": [
+        {
+          "filename": "docs/quality/gh-133/README.md",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-133/breaking-native.tar.gz",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-133/compatible-native.tar.gz",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-133/index.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-133/reports.tar.gz",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-133/validation.tar.gz",
+          "status": "added"
+        },
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/design.md",
+          "status": "modified"
+        },
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/proposal.md",
+          "status": "modified"
+        },
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/specs/typescript-angular-reference-adapter/spec.md",
+          "status": "modified"
+        },
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/tasks.md",
+          "status": "modified"
+        },
+        {
+          "filename": "tools/quality/collect_typescript_contracts.py",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/tests/test_typescript_contracts.py",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/typescript_contracts.py",
+          "status": "added"
+        }
+      ]
+    },
+    {
+      "issue": 134,
+      "issue_state": "closed",
+      "issue_closed_at": "2026-09-08T09:26:20Z",
+      "pr": 142,
+      "url": "https://github.com/musutrade/Harness-Gate/pull/142",
+      "title": "test(quality): retain real frontend acceptance window",
+      "head_sha": "bdceae294d9e0d2aee445fb7c81e54c63b9eea4d",
+      "base_sha": "76ab074b83459c60c1c6152b11c09712934d1cb1",
+      "merge_sha": "2de3b1c0baf909f7b5f6a0f52fb1b893b6f25fbc",
+      "merged_at": "2026-09-08T09:26:17Z",
+      "checks": [
+        {
+          "name": "Required Quality Aggregate",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34209034166/job/102007838522",
+          "head_sha": "bdceae294d9e0d2aee445fb7c81e54c63b9eea4d",
+          "completed_at": "2026-09-08T09:24:49Z"
+        },
+        {
+          "name": "Generic Quality Shadow",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34209034166/job/102007838454",
+          "head_sha": "bdceae294d9e0d2aee445fb7c81e54c63b9eea4d",
+          "completed_at": "2026-09-08T09:24:48Z"
+        },
+        {
+          "name": "Build (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34209034166/job/102005358558",
+          "head_sha": "bdceae294d9e0d2aee445fb7c81e54c63b9eea4d",
+          "completed_at": "2026-09-08T09:15:56Z"
+        },
+        {
+          "name": "Quality CLI Contracts (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34209034166/job/102005358428",
+          "head_sha": "bdceae294d9e0d2aee445fb7c81e54c63b9eea4d",
+          "completed_at": "2026-09-08T09:15:56Z"
+        },
+        {
+          "name": "Code Coverage",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34209034166/job/102005358294",
+          "head_sha": "bdceae294d9e0d2aee445fb7c81e54c63b9eea4d",
+          "completed_at": "2026-09-08T09:15:56Z"
+        },
+        {
+          "name": "Test (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34209034166/job/102005357879",
+          "head_sha": "bdceae294d9e0d2aee445fb7c81e54c63b9eea4d",
+          "completed_at": "2026-09-08T09:15:56Z"
+        },
+        {
+          "name": "Quality Performance Baseline",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34209034166/job/102005357848",
+          "head_sha": "bdceae294d9e0d2aee445fb7c81e54c63b9eea4d",
+          "completed_at": "2026-09-08T09:15:56Z"
+        },
+        {
+          "name": "Quality CLI Contracts",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34209034166/job/102005357199",
+          "head_sha": "bdceae294d9e0d2aee445fb7c81e54c63b9eea4d",
+          "completed_at": "2026-09-08T09:16:57Z"
+        },
+        {
+          "name": "Documentation Consistency",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34209034166/job/102005357004",
+          "head_sha": "bdceae294d9e0d2aee445fb7c81e54c63b9eea4d",
+          "completed_at": "2026-09-08T09:16:55Z"
+        },
+        {
+          "name": "Quality Coverage and Critical Paths",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34209034166/job/102005356999",
+          "head_sha": "bdceae294d9e0d2aee445fb7c81e54c63b9eea4d",
+          "completed_at": "2026-09-08T09:24:19Z"
+        },
+        {
+          "name": "Quality Script Tests",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34209034166/job/102005356911",
+          "head_sha": "bdceae294d9e0d2aee445fb7c81e54c63b9eea4d",
+          "completed_at": "2026-09-08T09:17:46Z"
+        },
+        {
+          "name": "Test",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34209034166/job/102005356893",
+          "head_sha": "bdceae294d9e0d2aee445fb7c81e54c63b9eea4d",
+          "completed_at": "2026-09-08T09:16:53Z"
+        },
+        {
+          "name": "Build",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34209034166/job/102005356838",
+          "head_sha": "bdceae294d9e0d2aee445fb7c81e54c63b9eea4d",
+          "completed_at": "2026-09-08T09:18:05Z"
+        },
+        {
+          "name": "Security Audit",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34209034166/job/102005356825",
+          "head_sha": "bdceae294d9e0d2aee445fb7c81e54c63b9eea4d",
+          "completed_at": "2026-09-08T09:19:13Z"
+        },
+        {
+          "name": "Release Governance Contracts",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34209034166/job/102005356781",
+          "head_sha": "bdceae294d9e0d2aee445fb7c81e54c63b9eea4d",
+          "completed_at": "2026-09-08T09:16:07Z"
+        },
+        {
+          "name": "Format",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34209034166/job/102005356691",
+          "head_sha": "bdceae294d9e0d2aee445fb7c81e54c63b9eea4d",
+          "completed_at": "2026-09-08T09:16:15Z"
+        },
+        {
+          "name": "Clippy",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34209034166/job/102005356537",
+          "head_sha": "bdceae294d9e0d2aee445fb7c81e54c63b9eea4d",
+          "completed_at": "2026-09-08T09:16:45Z"
+        }
+      ],
+      "files": [
+        {
+          "filename": "docs/quality/gh-134/README.md",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/compatible-base/native-counters.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/compatible-base/native-counters.json.command.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/compatible-base/native.tar.gz",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/compatible-base/normalized.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/compatible-base/receipt.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/compatible-base/source-index.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/compatible-base/source-index.json.command.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/compatible-head/native-counters.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/compatible-head/native-counters.json.command.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/compatible-head/native.tar.gz",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/compatible-head/normalized.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/compatible-head/receipt.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/compatible-head/source-index.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/compatible-head/source-index.json.command.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/compatible.bundle",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/regression-base/native-counters.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/regression-base/native-counters.json.command.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/regression-base/native.tar.gz",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/regression-base/normalized.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/regression-base/receipt.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/regression-base/source-index.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/regression-base/source-index.json.command.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/regression-head/native-counters.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/regression-head/native-counters.json.command.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/regression-head/native.tar.gz",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/regression-head/normalized.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/regression-head/receipt.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/regression-head/source-index.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/regression-head/source-index.json.command.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/regression.bundle",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/results.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/validation.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/validation.tar.gz",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-134/window.json",
+          "status": "added"
+        },
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/design.md",
+          "status": "modified"
+        },
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/proposal.md",
+          "status": "modified"
+        },
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/tasks.md",
+          "status": "modified"
+        },
+        {
+          "filename": "tools/quality/tests/test_typescript_acceptance.py",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/tests/test_typescript_reference.py",
+          "status": "modified"
+        },
+        {
+          "filename": "tools/quality/typescript_acceptance.py",
+          "status": "added"
+        }
+      ]
+    },
+    {
+      "issue": 135,
+      "issue_state": "closed",
+      "issue_closed_at": "2026-09-08T09:47:34Z",
+      "pr": 143,
+      "url": "https://github.com/musutrade/Harness-Gate/pull/143",
+      "title": "ci(quality): add advisory frontend replay and bounded certification",
+      "head_sha": "64bda19bb8569472493c08ce312e5db99d1868de",
+      "base_sha": "2de3b1c0baf909f7b5f6a0f52fb1b893b6f25fbc",
+      "merge_sha": "67b0927f66be7768458ae4f1a433194925345e44",
+      "merged_at": "2026-09-08T09:47:30Z",
+      "checks": [
+        {
+          "name": "Required Quality Aggregate",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34210938259/job/102014541640",
+          "head_sha": "64bda19bb8569472493c08ce312e5db99d1868de",
+          "completed_at": "2026-09-08T09:46:54Z"
+        },
+        {
+          "name": "Generic Quality Shadow",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34210938259/job/102014541524",
+          "head_sha": "64bda19bb8569472493c08ce312e5db99d1868de",
+          "completed_at": "2026-09-08T09:47:15Z"
+        },
+        {
+          "name": "Build (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34210938259/job/102011509811",
+          "head_sha": "64bda19bb8569472493c08ce312e5db99d1868de",
+          "completed_at": "2026-09-08T09:36:33Z"
+        },
+        {
+          "name": "Code Coverage",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34210938259/job/102011509567",
+          "head_sha": "64bda19bb8569472493c08ce312e5db99d1868de",
+          "completed_at": "2026-09-08T09:36:33Z"
+        },
+        {
+          "name": "Test (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34210938259/job/102011509564",
+          "head_sha": "64bda19bb8569472493c08ce312e5db99d1868de",
+          "completed_at": "2026-09-08T09:36:33Z"
+        },
+        {
+          "name": "Quality CLI Contracts (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34210938259/job/102011509357",
+          "head_sha": "64bda19bb8569472493c08ce312e5db99d1868de",
+          "completed_at": "2026-09-08T09:36:33Z"
+        },
+        {
+          "name": "Quality Performance Baseline",
+          "conclusion": "skipped",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34210938259/job/102011509304",
+          "head_sha": "64bda19bb8569472493c08ce312e5db99d1868de",
+          "completed_at": "2026-09-08T09:36:33Z"
+        },
+        {
+          "name": "Documentation Consistency",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34210938259/job/102011508818",
+          "head_sha": "64bda19bb8569472493c08ce312e5db99d1868de",
+          "completed_at": "2026-09-08T09:37:20Z"
+        },
+        {
+          "name": "Quality Script Tests",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34210938259/job/102011508751",
+          "head_sha": "64bda19bb8569472493c08ce312e5db99d1868de",
+          "completed_at": "2026-09-08T09:37:58Z"
+        },
+        {
+          "name": "Quality Coverage and Critical Paths",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34210938259/job/102011508717",
+          "head_sha": "64bda19bb8569472493c08ce312e5db99d1868de",
+          "completed_at": "2026-09-08T09:46:45Z"
+        },
+        {
+          "name": "Quality CLI Contracts",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34210938259/job/102011508703",
+          "head_sha": "64bda19bb8569472493c08ce312e5db99d1868de",
+          "completed_at": "2026-09-08T09:37:27Z"
+        },
+        {
+          "name": "Clippy",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34210938259/job/102011508593",
+          "head_sha": "64bda19bb8569472493c08ce312e5db99d1868de",
+          "completed_at": "2026-09-08T09:37:23Z"
+        },
+        {
+          "name": "Build",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34210938259/job/102011508583",
+          "head_sha": "64bda19bb8569472493c08ce312e5db99d1868de",
+          "completed_at": "2026-09-08T09:39:01Z"
+        },
+        {
+          "name": "Release Governance Contracts",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34210938259/job/102011508455",
+          "head_sha": "64bda19bb8569472493c08ce312e5db99d1868de",
+          "completed_at": "2026-09-08T09:36:43Z"
+        },
+        {
+          "name": "Format",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34210938259/job/102011508388",
+          "head_sha": "64bda19bb8569472493c08ce312e5db99d1868de",
+          "completed_at": "2026-09-08T09:36:52Z"
+        },
+        {
+          "name": "Security Audit",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34210938259/job/102011508386",
+          "head_sha": "64bda19bb8569472493c08ce312e5db99d1868de",
+          "completed_at": "2026-09-08T09:39:42Z"
+        },
+        {
+          "name": "Test",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34210938259/job/102011508224",
+          "head_sha": "64bda19bb8569472493c08ce312e5db99d1868de",
+          "completed_at": "2026-09-08T09:37:30Z"
+        }
+      ],
+      "files": [
+        {
+          "filename": ".github/workflows/frontend-advisory.yml",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-135/README.md",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-135/index.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-135/summary.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-135/validation.tar.gz",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/gh-135/workflow-validation.json",
+          "status": "added"
+        },
+        {
+          "filename": "docs/quality/typescript-certification.md",
+          "status": "added"
+        },
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/design.md",
+          "status": "modified"
+        },
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/proposal.md",
+          "status": "modified"
+        },
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/specs/typescript-angular-reference-adapter/spec.md",
+          "status": "modified"
+        },
+        {
+          "filename": "openspec/changes/typescript-angular-reference-adapter/tasks.md",
+          "status": "modified"
+        },
+        {
+          "filename": "tools/quality/tests/test_typescript_advisory.py",
+          "status": "added"
+        },
+        {
+          "filename": "tools/quality/typescript_advisory.py",
+          "status": "added"
+        }
+      ]
+    }
+  ]
+}
