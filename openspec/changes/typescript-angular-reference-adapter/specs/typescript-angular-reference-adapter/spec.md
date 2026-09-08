@@ -46,6 +46,20 @@ records without final delivery decisions. Existing generic policy, lineage,
 ratchet and aggregation code SHALL own thresholds and debt. TypeScript series
 SHALL remain distinct from Rust and from incompatible frontend tool versions.
 
+#### Scenario: Mixed subject request under collector v1
+- **GIVEN** caller-owned file, function, method and source-backed route subjects
+- **WHEN** one v1 capability set is requested through the generic collector runner
+- **THEN** every returned record explicitly declares every requested capability
+- **AND** route execution and unmeasured metrics remain unsupported without numeric defaults
+- **AND** capability omission or a per-kind capability object is rejected.
+
+#### Scenario: Bound retained frontend replay
+- **GIVEN** a caller-owned receipt binding raw archive/index digests, native revision and replay scope
+- **WHEN** current sources/configuration, tool success, maps and provenance validate
+- **THEN** both runner transports yield the same normalized facts with unchanged native artifacts
+- **AND** failed tools, timeout, malformed output, stale/tampered or undeclared artifacts,
+  source-map failures and provenance mismatch yield no usable evidence batch.
+
 #### Scenario: Complete TypeScript series identity
 - **GIVEN** compiler, builder, runner, provider, mapping/rule and normalization versions
 - **AND** runtime/target, configuration and source-boundary semantics
