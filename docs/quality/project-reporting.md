@@ -155,3 +155,12 @@ python3 tools/quality/project_report.py evaluate \
 No collection tool is invoked. [Acceptance tests](../../tools/quality/tests/test_project_report.py)
 exercise both commands and negative provenance cases. The
 [validation record](gh-117-validation.md) records actual checks and limitations.
+
+## Rust candidate migration
+
+The independent `harness-gate-quality-core` library now implements generic
+contract provenance checks and `project_report::report` under OpenSpec tasks
+4.1–4.2. Its complete reports are compared with this Python reference, including
+participant aggregates, lossless indexes and evidence links. See
+[GH-149 validation](gh-149/README.md). The CLI and current shadow reporting path
+retain their existing authority until the later migration acceptance tasks.

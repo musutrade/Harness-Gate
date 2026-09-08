@@ -1,0 +1,141 @@
+{
+  "issue": "GH-149",
+  "scope": [
+    "4.1",
+    "4.2"
+  ],
+  "baseline": "d95421ea83fd1d4a4893759564ec6c591cf095d6",
+  "dependency": {
+    "issue": 148,
+    "pr": 155,
+    "head_sha": "19b1e338877283a3855716762b58ae7b15d8c37b",
+    "state": "merged; required CI complete before implementation"
+  },
+  "environment": {
+    "CARGO_HOME": "$WORKSPACE/target/gh-149/cargo-home",
+    "CARGO_TARGET_DIR": "$WORKSPACE/target/gh-149/build",
+    "git": "Writable copy of this checkout Git metadata at $WORKSPACE/target/gh-149/git, with GIT_WORK_TREE=$WORKSPACE; original .git is read-only. Same symphony/GH-149 branch and baseline; no other checkout accessed for delivery."
+  },
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "log": "nextest.log",
+      "result": "325 passed, 0 skipped; 826 policy/report comparisons and 399 evidence/project/series/capability comparisons",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "log": "fmt.log",
+      "result": "pass",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml --all -- --check",
+      "log": "fmt-all.log",
+      "result": "pass",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "log": "clippy.log",
+      "result": "pass",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "log": "python-tests.log",
+      "result": "289 passed",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -p test_project_report.py -v",
+      "log": "baseline-project-report.log",
+      "result": "12 passed before implementation",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "log": "docs-consistency.log",
+      "result": "pass with local Cargo cache/build environment; examples, migration, schema synchronization, and links pass",
+      "exit_code": 0
+    },
+    {
+      "command": "openspec validate consolidate-generic-quality-core-into-rust --strict",
+      "log": "openspec.log",
+      "result": "pass",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --check",
+      "log": "diff-check.log",
+      "result": "pass",
+      "exit_code": 0
+    }
+  ],
+  "not_applicable": [
+    {
+      "command": "harness-gate config check",
+      "reason": "Checkout has no .harness-gate/flow.toml declaring a ci profile; not run, not passed."
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "reason": "Checkout has no .harness-gate/flow.toml declaring a ci profile; not run, not passed."
+    }
+  ],
+  "initial_failures": [
+    {
+      "command": "CARGO_TARGET_DIR=\"$PWD/target/gh-149/build\" cargo test --manifest-path tools/harness-gate/Cargo.toml --locked -p harness-gate-quality-core frozen_policy -- --nocapture",
+      "log": "initial-rust.log",
+      "error": "failed to open /home/gem/.cargo/registry/cache/index.crates.io-1949cf8c6b5b557f/tinyvec-1.13.2.crate: Read-only file system (os error 30)",
+      "impact": "Initial Rust test could not start; original exit code was not captured. Copied registry into workspace-local CARGO_HOME and all subsequent Rust checks passed."
+    },
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 100,
+      "log": "nextest-initial.log",
+      "result": "324 passed, 1 failed",
+      "resolution": "New regression incorrectly expected 8 gates from the expanded Python fixture; frozen contract-breaking has 5. Corrected only the assertion; all 325 tests then passed. All 826 differential comparisons passed in both runs."
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 1,
+      "log": "docs-consistency-initial.log",
+      "details": "docs-consistency-initial.json",
+      "error": "quality gate failed: documentation, examples, or schema synchronization failed",
+      "impact": "Initial run preceded evidence file creation and lacked local Cargo environment; two evidence links missing, Cargo examples/migration/schema failed. Rerun after files exist with local Cargo directories."
+    },
+    {
+      "command": "git commit -m \"feat(quality): implement Rust contract validation and project reports\"",
+      "exit_code": 128,
+      "error": "fatal: Unable to create '/home/gem/symphony-workspaces/GH-149/.git/index.lock': Read-only file system",
+      "impact": "Staging and commit blocked in original metadata. Copied this checkout .git into workspace-local target/gh-149/git for staging, commit and push."
+    }
+  ],
+  "limitations": [
+    "Candidate library only; no CLI dependency, native tool/language-specific decision logic, or required gate authority change.",
+    "Python is the test oracle only; native collectors are not rerun. Complete fields compared; only previously classified OS missing-file wording normalized with matching path and failure class.",
+    "Tasks 5\u20137 and full migration acceptance remain outstanding."
+  ],
+  "hosted_ci": "pending on final pushed SHA; controller owns required CI acceptance",
+  "artifacts": {
+    "validation.tar.gz": "c68866b30218fa79dc9748ba0b11167918f9473db6aa4b2b44c2c69f543a4e35",
+    "logs": {
+      "baseline-project-report.log": "cfa55a7efbc667ea908bb1ec03e5fb55616e9fa20ab78a968ec6080673367892",
+      "clippy.log": "1f509f8df0f42ac11e2838482c76649e845934107c2f431c0612a5f99d5c26b8",
+      "contract-report-test.log": "8fcc2244f6452119e612dbb9a89f77007b43df26e311c9916d50e4817fc910a9",
+      "diff-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "docs-consistency-initial.log": "6fdde67acd13145abd556580c3ab8d9ea34bad99a09db00ccf28a3fbeabecb76",
+      "docs-consistency.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "fmt-all.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "fmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "initial-rust.log": "a5371a327c5dcfda45041f83306ec81cd756bb4806763e6cfe8f32c50697c3b3",
+      "nextest-initial.log": "5a0f2c6319bf67c13024f911a92b8992f4d4ea773b6143a02fcc92e78a36ff49",
+      "nextest.log": "f92fe30d6a6b6fd48ddacd6edfc06613ca9d620a9c6e0a1737956ed1b413b871",
+      "openspec.log": "c278b42501fec6559263d401ab0e6eaefea6dc95b1ac1e4705d604a399f477b1",
+      "oracle.log": "85def6ebff21750715fdb26c42fd187a74c0920dec7870db18d5057792fc2417",
+      "python-tests.log": "e8d5b674d90842fe49a42741e9cd3100a2bb3b23c1b12dbc44e9093590fffea1",
+      "docs-consistency-initial.json": "3ee84424fd869b7abb6c43264fbd8520f8b2cb2495e30f68d8006753dd0a0f4c",
+      "docs-consistency.json": "5bbe06b52e679edebc957494d1abf82f89a5ebc0fa0f96132c55a3d3a64a3d88"
+    }
+  }
+}

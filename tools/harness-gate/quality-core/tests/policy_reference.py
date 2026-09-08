@@ -1,8 +1,4 @@
-"""Test-only task 3 oracle. Frozen inputs plus calls exercised by reference tests.
-
-Collectors are never rerun. Relationship provenance is supplied as an external
-validation outcome: implementing that validator belongs to OpenSpec task 4.1.
-"""
+"""Test-only tasks 3–4 oracle. Retained bytes only; collectors are never rerun."""
 import copy
 from dataclasses import asdict, is_dataclass
 from datetime import datetime
@@ -24,6 +20,8 @@ import policy_engine as engine
 import policy_ratchet as ratchet
 import test_policy_engine
 import test_policy_ratchet
+import test_project_report
+import project_report
 
 
 def read(path):
@@ -66,13 +64,6 @@ with tarfile.open(root / 'artifacts.tar.gz') as archive:
 
 
 def evaluate_case(name, args, kwargs, frozen=None):
-    # Pin external task 4.1 validation separately from Rust policy semantics.
-    contracts = {}
-    for record in args[1]:
-        for rule in args[0]['rules']:
-            if rule['scope']['kind'] == 'relationship':
-                contracts[record['id'] + '/' + rule['id']] = outcome(
-                    lambda: engine.contracts.validate(record, rule, kwargs['project']))
     oracle = outcome(lambda: original_evaluate(*args, **kwargs))
     if frozen is not None:
         expected = dict(accepted=True, value=frozen['policy_result']) if 'policy_result' in frozen else dict(
@@ -81,7 +72,16 @@ def evaluate_case(name, args, kwargs, frozen=None):
         canonical = json.loads(json.dumps(oracle).replace(str(WORK / name), '$CASE_ROOT'))
         assert canonical == expected, name
     cases.append(dict(name=name, kind='evaluate', args=plain(args), kwargs=plain(kwargs),
-                      contracts=contracts, oracle=oracle))
+                      oracle=oracle))
+    if oracle["accepted"]:
+        report = project_report.report(oracle["value"], kwargs["project"], args[0])
+        cases[-1]["project_report"] = report
+        if frozen is not None and "project_report" in frozen:
+            canonical = json.loads(json.dumps(report).replace(str(WORK / name), "$CASE_ROOT"))
+            assert canonical == frozen["project_report"], name
+        cases.append(dict(name=name + "/report", kind="report",
+                          args=[oracle["value"], plain(kwargs["project"]), args[0]], kwargs={},
+                          oracle=dict(accepted=True, value=report)))
     return oracle
 
 
@@ -168,7 +168,7 @@ class Result(unittest.TextTestResult):
 
 
 suite = unittest.TestSuite(unittest.defaultTestLoader.loadTestsFromModule(module)
-                           for module in (test_policy_engine, test_policy_ratchet))
+                           for module in (test_policy_engine, test_policy_ratchet, test_project_report))
 log = io.StringIO()
 run = unittest.TextTestRunner(stream=log, resultclass=Result).run(suite)
 assert run.wasSuccessful(), log.getvalue()
@@ -232,6 +232,18 @@ for op in ('lt','le','eq','ne','ge','gt'):
         rule = test_policy_engine.rule('risk.crap', {'type':'decimal','value':'30'}, operator=op,
                                       ratchet={'deny_regression':True,'allow_legacy_debt':True})
         add('decision', rule, {'type':'decimal','value':str(after)}, {'type':'decimal','value':str(before)})
+# Report-only shapes exercise empty indexes, absent subject IDs, optional failures,
+# and components with no gates using the reference aggregate semantics.
+f = test_project_report.ProjectReportTests()
+f.setUp()
+project_value, policy_value = plain(f.project), plain(f.policy)
+base_result = original_evaluate(f.policy, f.records, **f.context)
+for name, result in [('empty', {**base_result, 'results': []}),
+                     ('missing-subject', {**base_result, 'results': [
+                         {**base_result['results'][0], 'subject': None}]})]:
+    cases.append(dict(name='report-boundary/' + name, kind='report',
+                      args=[result, project_value, policy_value], kwargs={},
+                      oracle=outcome(lambda: project_report.report(result, project_value, policy_value))))
 (WORK / 'cases.json').write_text(json.dumps(cases, ensure_ascii=False))
 print(json.dumps(dict(frozen_cases=len(manifest['cases']), reference_tests=run.testsRun,
                      comparisons=len(cases), kinds={k: sum(c['kind'] == k for c in cases)
