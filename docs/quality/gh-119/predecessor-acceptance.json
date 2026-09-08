@@ -1,0 +1,198 @@
+{
+  "observed_on": "2026-09-08",
+  "source": "GitHub REST issues, pulls and commits/{head_sha}/check-runs; predecessor observations only",
+  "deliveries": [
+    {
+      "issue": {
+        "number": 111,
+        "state": "closed",
+        "reason": "completed",
+        "closed_at": "2026-09-08T02:10:17Z"
+      },
+      "pr": 120,
+      "url": "https://github.com/musutrade/Harness-Gate/pull/120",
+      "head_sha": "7b7ece937be2932c7ce6499f428f56c7a819467f",
+      "merge_sha": "bc64ad541c083ba688f40b7a08e72d2dfcc1497c",
+      "merged_at": "2026-09-08T02:10:13Z",
+      "check_count": 16,
+      "check_conclusions": {
+        "skipped": 5,
+        "success": 11
+      },
+      "required_aggregate": {
+        "name": "Required Quality Aggregate",
+        "conclusion": "success",
+        "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34178533051/job/101914341654",
+        "completed_at": "2026-09-08T02:10:01Z"
+      }
+    },
+    {
+      "issue": {
+        "number": 112,
+        "state": "closed",
+        "reason": "completed",
+        "closed_at": "2026-09-08T02:39:02Z"
+      },
+      "pr": 121,
+      "url": "https://github.com/musutrade/Harness-Gate/pull/121",
+      "head_sha": "571c83edfae6a64a10e6c05e394653c08152935e",
+      "merge_sha": "8d26e56fa3c2ff4ccc4eb67c72741a2743439c30",
+      "merged_at": "2026-09-08T02:38:59Z",
+      "check_count": 16,
+      "check_conclusions": {
+        "skipped": 5,
+        "success": 11
+      },
+      "required_aggregate": {
+        "name": "Required Quality Aggregate",
+        "conclusion": "success",
+        "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34180255773/job/101919169031",
+        "completed_at": "2026-09-08T02:38:24Z"
+      }
+    },
+    {
+      "issue": {
+        "number": 113,
+        "state": "closed",
+        "reason": "completed",
+        "closed_at": "2026-09-08T03:06:10Z"
+      },
+      "pr": 122,
+      "url": "https://github.com/musutrade/Harness-Gate/pull/122",
+      "head_sha": "bcb16e9b4167bda792d5c67e9331bc0d68b19e31",
+      "merge_sha": "fb70a5d34353393ff0b9f3300590b72265c99351",
+      "merged_at": "2026-09-08T03:06:06Z",
+      "check_count": 16,
+      "check_conclusions": {
+        "skipped": 5,
+        "success": 11
+      },
+      "required_aggregate": {
+        "name": "Required Quality Aggregate",
+        "conclusion": "success",
+        "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34181669768/job/101923557047",
+        "completed_at": "2026-09-08T03:05:03Z"
+      }
+    },
+    {
+      "issue": {
+        "number": 114,
+        "state": "closed",
+        "reason": "completed",
+        "closed_at": "2026-09-08T03:30:34Z"
+      },
+      "pr": 123,
+      "url": "https://github.com/musutrade/Harness-Gate/pull/123",
+      "head_sha": "8ec5ea81e8a53831d736fd2b438053ce0a0c793b",
+      "merge_sha": "1dc5db536a00917d8bbc3f2704b6ed2bfbf0c2ea",
+      "merged_at": "2026-09-08T03:30:30Z",
+      "check_count": 16,
+      "check_conclusions": {
+        "skipped": 5,
+        "success": 11
+      },
+      "required_aggregate": {
+        "name": "Required Quality Aggregate",
+        "conclusion": "success",
+        "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34183102612/job/101927723864",
+        "completed_at": "2026-09-08T03:29:49Z"
+      }
+    },
+    {
+      "issue": {
+        "number": 115,
+        "state": "closed",
+        "reason": "completed",
+        "closed_at": "2026-09-08T03:58:10Z"
+      },
+      "pr": 124,
+      "url": "https://github.com/musutrade/Harness-Gate/pull/124",
+      "head_sha": "faec7ae243efd17cccc3c379a79c1b7529d80b03",
+      "merge_sha": "f00d001d4ad8933a37c6b748ae44cde369656597",
+      "merged_at": "2026-09-08T03:58:07Z",
+      "check_count": 16,
+      "check_conclusions": {
+        "skipped": 5,
+        "success": 11
+      },
+      "required_aggregate": {
+        "name": "Required Quality Aggregate",
+        "conclusion": "success",
+        "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34184710465/job/101932271380",
+        "completed_at": "2026-09-08T03:57:35Z"
+      }
+    },
+    {
+      "issue": {
+        "number": 116,
+        "state": "closed",
+        "reason": "completed",
+        "closed_at": "2026-09-08T04:39:00Z"
+      },
+      "pr": 125,
+      "url": "https://github.com/musutrade/Harness-Gate/pull/125",
+      "head_sha": "1f96d0046b444dfc65a74e3e70fdcb08fde03412",
+      "merge_sha": "b21ae2d86c1d89058eb7e16f15eeaac7e90bcc73",
+      "merged_at": "2026-09-08T04:38:56Z",
+      "check_count": 16,
+      "check_conclusions": {
+        "skipped": 5,
+        "success": 11
+      },
+      "required_aggregate": {
+        "name": "Required Quality Aggregate",
+        "conclusion": "success",
+        "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34187050998/job/101939150767",
+        "completed_at": "2026-09-08T04:37:52Z"
+      }
+    },
+    {
+      "issue": {
+        "number": 117,
+        "state": "closed",
+        "reason": "completed",
+        "closed_at": "2026-09-08T05:10:39Z"
+      },
+      "pr": 126,
+      "url": "https://github.com/musutrade/Harness-Gate/pull/126",
+      "head_sha": "66db8759052408d4410dbfa462bff3604d4b760f",
+      "merge_sha": "0eca68ea1d2d8f8998fbca715a51a18cc72e6367",
+      "merged_at": "2026-09-08T05:10:36Z",
+      "check_count": 16,
+      "check_conclusions": {
+        "skipped": 5,
+        "success": 11
+      },
+      "required_aggregate": {
+        "name": "Required Quality Aggregate",
+        "conclusion": "success",
+        "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34188949046/job/101944676206",
+        "completed_at": "2026-09-08T05:09:48Z"
+      }
+    },
+    {
+      "issue": {
+        "number": 118,
+        "state": "closed",
+        "reason": "completed",
+        "closed_at": "2026-09-08T05:41:57Z"
+      },
+      "pr": 127,
+      "url": "https://github.com/musutrade/Harness-Gate/pull/127",
+      "head_sha": "0c38d54e7841d07559c7a330e6080af0708ebf03",
+      "merge_sha": "ee1a5ab50ef2e1a77636e8a554326bd7d43dbc85",
+      "merged_at": "2026-09-08T05:41:52Z",
+      "check_count": 17,
+      "check_conclusions": {
+        "skipped": 5,
+        "success": 12
+      },
+      "required_aggregate": {
+        "name": "Required Quality Aggregate",
+        "conclusion": "success",
+        "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34190872501/job/101950364875",
+        "completed_at": "2026-09-08T05:40:25Z"
+      }
+    }
+  ]
+}

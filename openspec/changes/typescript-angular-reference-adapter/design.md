@@ -1,0 +1,99 @@
+# Design: Real TypeScript/Angular abstraction validation
+
+## Fixture and measurement decisions
+
+There is no Angular application or pinned Angular version in this checkout.
+The follow-up will create a repository-owned fixture at
+`tools/quality/fixtures/typescript-angular/app/`, using the Angular CLI after
+selecting a supported Angular/Node/TypeScript combination. Commit its exact
+versions, lockfile, builder, runner, instrumentation provider and configuration
+digests before accepting measurements. Do not infer compatibility from current
+documentation or from the synthetic frontend fixture.
+
+The application will have a component with an external template, a service with
+tested and untested branches, same-named methods in distinct classes, a lazy
+route, and a generated client for a small Rust provider's OpenAPI contract.
+Use real build/test/coverage and contract-tool output. Retain argv, tool versions,
+exit status, base/head/run/target, source bytes, raw counters, source maps,
+generated-client artifacts and their digests. A build failure or partial collection
+cannot supply a passing evidence batch.
+
+Angular documents configurable coverage reporters and coverage collection via
+`ng test --coverage`; actual commands must be confirmed against the fixture's
+pinned builder. See [Angular coverage](https://angular.dev/guide/testing/code-coverage).
+TypeScript source maps relate emitted JavaScript to original sources; preserve
+and validate that relationship, including source contents, rather than joining
+by basename. See [TypeScript sourceMap](https://www.typescriptlang.org/tsconfig/sourceMap.html).
+
+## Existing interfaces and authority
+
+Use `harness-collector-request/v1` and `harness-collector-response/v1` through
+the GH-113 runner, with `harness-project/v1` subjects and `harness-evidence/v1`.
+Configure the mixed project through the opt-in JSON project manifest; the
+conceptual TOML in the architecture design is not supported syntax.
+
+The adapter owns source parsing, coordinate normalization, raw-tool formats and
+series definition. Generic policy owns thresholds, support requirements,
+ratchets and project aggregation. No `language == "typescript"` branch belongs
+in the policy engine. Tool exit facts remain distinct from policy outcomes.
+
+Initial acceptance targets source-backed file/function/method line and function
+coverage with covered/total counters. Branch coverage is claimed only for the
+mapped TypeScript constructs actually measured. Complexity and CRAP remain
+`unsupported` until their own compatible measurement contract is implemented;
+never substitute file coverage for function coverage. A zero denominator is
+explicitly unavailable, not perfect coverage. Requested unavailable capabilities
+retain one of the existing six states and cannot acquire numeric defaults.
+
+Series identity includes compiler, builder, test runner, coverage provider,
+mapping/rule versions, runtime/target, boundary and normalization semantics.
+Changed semantics create a new series requiring explicit baseline acceptance.
+Rust and TypeScript series are never compared as interchangeable. Use explicit
+modify/rename/move lineage for digest-changing subjects and retain historical debt.
+
+## Architectural mismatch register
+
+These findings were recorded while drafting GH-119, before running a real
+TypeScript adapter. They limit acceptance; they are not proof of tool behavior.
+
+| ID | Evidence / mismatch | Required disposition and owner |
+| --- | --- | --- |
+| TS-01 | Architecture design §2 describes reduced identity negotiation; executable v1 requires a nonempty discriminator and source digest. [Project model](../../../docs/quality/project-model.md) explicitly excludes reduced identity negotiation. | Identity task 2.1 must reject ambiguous/anonymous mappings unless it can derive an unambiguous versioned source identity. If reduced identity is needed, propose a reviewed generic schema/protocol delta; never forge a name or digest. Open; blocks any claim of reduced-identity support. |
+| TS-02 | A v1 subject has one source path/digest and optional span, while external templates, emitted JavaScript and source maps involve multiple files. Their joint identity is not a defined v1 subject contract. | Tasks 2.1–2.2 must bind source-backed subjects to original files and retain transformation inputs as digested artifacts. Certify TypeScript only initially. Template/generated multi-source coverage remains unsupported unless real fixtures establish an adequate representation or a reviewed core delta. Open; blocks template coverage certification. |
+| TS-03 | The collector runner requires every requested capability on each returned record; requests cannot currently express separate capability sets per subject kind. See [collector contract](../../../docs/quality/collector-protocol.md). | Task 3.1 must test mixed file/method/route requests with explicit unsupported/not-applicable states. If genuine collection needs cannot fit that contract, stop and propose a generic request-scope delta. Open integration question; no silent omission of requested capabilities. |
+
+For each finding, retain the reproducer, expected and actual generic behavior,
+affected contract, decision, PR and validation evidence. Adapter-specific parsing
+is appropriate; altering generic semantics inside an adapter is not. An unresolved
+finding may be deferred only by narrowing the documented capability scope;
+it cannot be counted as a passed second-ecosystem capability.
+
+## Acceptance, rollout and rollback
+
+Run locked install, Angular build, tests and coverage once per fixture revision.
+Normalize retained output, replay generic policy and ratchets, and compare exact
+native counters for two base/head pairs. Include intentional missing coverage,
+duplicate symbols, stale/tampered source maps, changed tool series, unsupported
+metrics, failed subprocesses and debt-preservation cases.
+
+A real OpenAPI compatibility check and generated-client drift check must exercise
+the existing provider/consumer relationship and project report: local component
+gates may pass while the contract gate fails. If tools cannot support a claimed
+metric, return its explicit unavailable state and block that acceptance criterion.
+
+Add an opt-in advisory job with retained artifacts and a certification matrix
+limited to the pinned fixture, environment, series and capabilities. Keep Rust's
+required aggregate untouched. Rollback disables this job/adapter selection and
+retains evidence and accepted baselines; no authoritative gate needs replacement.
+Generic changes, if required, need both Rust regression and real frontend evidence.
+
+## Alternatives and implementation sequence
+
+Synthetic JSON alone cannot validate frontend mapping, so it remains a unit-test
+aid. Treating emitted JavaScript coverage as TypeScript coverage would hide source
+identity errors. A new frontend-specific policy engine would bypass the abstraction.
+
+Execute [tasks](tasks.md) in order: freeze tools and fixture (two M tasks), define
+identity/series (two M tasks), implement and integrate (three M/L tasks), then run
+acceptance and document limits (three M/S tasks). Each task is under four hours;
+split any overrun before implementation. No calendar delivery date is asserted.
