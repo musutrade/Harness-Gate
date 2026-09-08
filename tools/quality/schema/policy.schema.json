@@ -225,6 +225,40 @@
                   ]
                 }
               }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "relationship"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "relationship"
+                },
+                "relationship": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9._-]*$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "subject"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "subject"
+                },
+                "subject": {
+                  "type": "string",
+                  "pattern": "^subject-identity/v1:[0-9a-f]{64}$"
+                }
+              }
             }
           ]
         },

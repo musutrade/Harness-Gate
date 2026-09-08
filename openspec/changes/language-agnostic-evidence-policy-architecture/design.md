@@ -55,7 +55,7 @@ Project
 
 A `Component` represents an independently analyzable technical unit such as a frontend, API, worker, CLI, library or contract package. It may declare language/framework metadata, but the core does not use that metadata to implement language-specific behavior.
 
-Example configuration shape:
+Initial conceptual configuration shape (not accepted `flow.toml` syntax; see the GH-117 JSON placement decision below):
 
 ```toml
 version = "1"
@@ -317,7 +317,7 @@ Contract collectors may produce generic metrics/events such as:
 
 ```text
 contract.breaking_changes = N
-contract.generated_client_drift = true/false
+contract.client_drift = true/false
 contract.schema_valid = true/false
 ```
 
@@ -464,3 +464,27 @@ preceding Issues closed
 3. Which current Rust policy code can be generalized without changing accepted report contracts.
 4. Whether external collectors are subprocess-only in v1 or may also be linked/internal adapters behind the same interface.
 5. Which TypeScript/Angular project will serve as the first non-Rust validation fixture after this change is accepted.
+
+
+### GH-117 configuration and reporting decision (tasks 8.1–8.3, 9.1–9.3)
+
+Use an opt-in `.harness-gate/project.json` manifest (`harness-project-config/v1`)
+with explicit repository-relative model and policy references. Keep component
+and relationship declarations in the referenced `harness-project/v1` document.
+The standalone Python CLI resolves references against an explicit project root;
+unknown versions/keys and escaping paths fail. Rust `flow.toml` parsing, default
+paths, source boundaries and release authority remain unchanged.
+
+Relationship-scoped policies select provider-owned contract subjects and validate
+retained head/base contract, consumer expectation and generated-client provenance
+before generic metric comparison. Exact subject scopes support local gates.
+The report keeps one lossless gate table with component/subject/policy/status/
+relationship indexes and separate local/cross-component aggregates. Shared gates
+appear under both participants but count only once at project level.
+
+The [implementation contract and executable examples](../../../docs/quality/project-reporting.md)
+record metric semantics, baseline trust boundaries and additive compatibility.
+The four-language topology is synthetic; no second reference ecosystem or
+OpenAPI tool adapter is certified. The [validation record](../../../docs/quality/gh-117-validation.md)
+covers this scoped implementation. Tasks 10.1–10.5, the final architecture ADR
+and full proposal acceptance remain pending.

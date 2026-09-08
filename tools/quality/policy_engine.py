@@ -13,6 +13,7 @@ import sys
 import harness_evidence as evidence
 import project_model as model
 import policy_ratchet as ratchet
+import cross_component as contracts
 
 
 class GateState(str, Enum):
@@ -55,6 +56,15 @@ def validate_policy(policy, project):
             evidence.require(rule['limit']['covered'] <= rule['limit']['total'],
                              'policy ratio exceeds total')
         scope = rule['scope']
+        if scope['kind'] == 'subject':
+            evidence.require(scope['subject'] in {s['id'] for s in project['subjects']},
+                             'unknown policy subject')
+        if scope['kind'] == 'relationship':
+            evidence.require(rule['metric'].startswith('contract.'),
+                             'relationship scope requires a contract metric')
+            evidence.require('ratchet' not in rule,
+                             'contract comparison uses retained baseline provenance, not debt ratchet')
+            contracts.subjects(project, scope['relationship'])
         if 'component' in scope:
             evidence.require(scope['component'] in components, 'unknown policy component')
         if 'boundary' in scope:
@@ -94,6 +104,10 @@ def compare(observed, operator, limit):
 def _select(scope, project, selection, target):
     subjects = [s for s in project['subjects'] if s['target'] == target]
     kind = scope['kind']
+    if kind == 'subject':
+        return [s for s in subjects if s['id'] == scope['subject']]
+    if kind == 'relationship':
+        return contracts.subjects(project, scope['relationship'], target)
     if kind in ('changed_subject', 'critical_subject'):
         evidence.require(kind in selection, f'missing caller-owned {kind} selection')
         ids = selection[kind]
@@ -107,6 +121,10 @@ def _select(scope, project, selection, target):
 
 
 def _result(rule, subject, state, reason, context, head=None, base=None):
+    if subject is None and rule['scope']['kind'] == 'subject':
+        subject = next(s for s in context['project']['subjects']
+                       if s['id'] == rule['scope']['subject'])
+
     def metric(record):
         return next((m['value'] for m in record['metrics'] if m['name'] == rule['metric']),
                     None) if record else None
@@ -123,6 +141,10 @@ def _result(rule, subject, state, reason, context, head=None, base=None):
                                 (GateState.FAIL, GateState.WARNING, GateState.INFORMATIONAL)
                                 else ['repair_measurement']) if state != GateState.PASS else [],
     }
+    if rule['scope']['kind'] == 'relationship':
+        detail['relationship'] = contracts.relationship(context['project'],
+                                                        rule['scope']['relationship'])
+        detail['contract'] = head.get('contract') if head else None
     return GateResult(rule['id'], subject['id'] if subject else None, state, reason, detail)
 
 
@@ -185,7 +207,11 @@ def evaluate(policy, records, *, selection=None, base_records=None, base_context
             for subject in subjects:
                 head, base, baseline, assessment = None, None, None, None
                 try:
-                    head = ratchet.metric_record(records, subject['id'], rule['metric'])
+                    candidates = records
+                    if rule['scope']['kind'] == 'relationship':
+                        candidates = [r for r in records if r.get('contract', {}).get(
+                            'relationship', rule['scope']['relationship']) == rule['scope']['relationship']]
+                    head = ratchet.metric_record(candidates, subject['id'], rule['metric'])
                     if 'ratchet' in rule:
                         evidence.require(lineage is not None, 'missing base for incremental policy')
                         base, baseline = ratchet.baseline(head, rule['metric'], base_records,
@@ -206,6 +232,8 @@ def evaluate(policy, records, *, selection=None, base_records=None, base_context
                     reason = capability['state']
                     if state is None:
                         value = next(m['value'] for m in head['metrics'] if m['name'] == rule['metric'])
+                        if rule['scope']['kind'] == 'relationship':
+                            contracts.validate(head, rule, context['project'])
                         if 'ratchet' in rule:
                             prior_value = None
                             if base:
