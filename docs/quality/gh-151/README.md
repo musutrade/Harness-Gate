@@ -1,9 +1,12 @@
-# GH-151: Rust authority-transfer candidate
+# GH-151: Rust generic authority transfer
 
-OpenSpec tasks 6.1–6.3 are **not yet accepted**. The opt-in shadow workflow and
-released-package integration are implemented for review. Authority transfer is
-pending hosted shadow and required CI acceptance of the exact candidate SHA.
-Do not merge this candidate or use its results to replace existing required CI.
+OpenSpec tasks 6.1–6.3 transfer generic evaluation and reporting to the released
+Rust core. The operator-authorized transfer decision follows successful hosted
+shadow and required CI on reviewed candidate
+`0fc96d7644d623f31e31fe1a512cb68db0b2003b`. The separate transfer commit enables
+`quality evaluate`; its full SHA and final hosted validation are recorded in
+[PR #158](https://github.com/musutrade/Harness-Gate/pull/158). Task 7 and full
+proposal acceptance remain outside this issue. The required aggregate is unchanged.
 
 The predecessor is complete: GH-150 PR [#157](https://github.com/musutrade/Harness-Gate/pull/157)
 merged as `9a73ae0f7c61d804fbfc2fe35eac8377eb1fc22e` after required CI succeeded
@@ -13,19 +16,20 @@ and [Generic Quality Shadow](https://github.com/musutrade/Harness-Gate/actions/r
 are green. That existing shadow job projects Python reference results; it is not
 evidence that the new Rust shadow workflow has run.
 
-## Implemented candidate
+## Authoritative Rust entry point
 
 The `harness-gate` package now includes the generic Rust library and its embedded
 schemas. The unpublished `harness-gate-quality-core` workspace package becomes a
 compatibility facade for the migration comparator, which uses the same library
 as the executable. Publishing the CLI does not require publishing that facade.
 
-The candidate exposes `quality shadow`; the transfer commit will enable
-`quality evaluate` only after hosted acceptance. The entry point consumes existing contracts with trusted
-context supplied separately from collector records:
+The accepted candidate exposed `quality shadow`. After the explicit acceptance
+below, the separate transfer commit enables `quality evaluate` as the authoritative
+generic decision and report entry point. It consumes existing contracts with
+trusted context supplied separately from collector records:
 
 ```bash
-harness-gate quality shadow \
+harness-gate quality evaluate \
   --project project.json --policy policy.json --evidence evidence.json \
   --expected expected.json --source-root source --artifact-root artifacts \
   --now 2026-09-08T00:00:00Z --output project-report.json
@@ -81,7 +85,7 @@ retention window expires if it is needed for a later review. The existing
 name, dependencies, thresholds and release authority. Branch protection and repository variables remain unchanged. Each artifact
 includes the exact checked-out PR head SHA and hosted run identity.
 
-## Explicit transfer decision: pending hosted acceptance
+## Explicit transfer decision: accepted candidate
 
 The operator authorized versioned measurement extensions on 2026-09-08.
 `production-source-2` includes the linked core as an eleventh blocking production
@@ -93,16 +97,48 @@ with explicit absent-source records for predecessor files. Both revisions use th
 same analyzer, instrumentation and thresholds. Every measured production symbol
 must join real LLVM counters. Historical debt retains syntax-based lineage.
 
-Local validation and exact candidate/transfer commit identities will be recorded
-alongside hosted evidence. Transfer is not accepted from local or predecessor
-results. Acceptance requires both ecosystem corpora, the negative matrix, hosted
-Rust shadow and every existing required check to pass with no unresolved mismatch.
-The existing required aggregate retains its name, dependencies and authority.
+The [hosted API records and explicit decision](accepted-candidate/decision.json)
+accept reviewed candidate `0fc96d7644d623f31e31fe1a512cb68db0b2003b` only after:
+
+- [Rust Generic Shadow run 34243502830](https://github.com/musutrade/Harness-Gate/actions/runs/34243502830) succeeded: 33 cases (14 Rust, 16 Angular, 3 contract), zero unresolved mismatches, and complete CLI reports with an empty executable search path.
+- [Required CI run 34243502555](https://github.com/musutrade/Harness-Gate/actions/runs/34243502555) succeeded, including all existing required jobs and `Required Quality Aggregate`. Its GitHub merge checkout was `4e0c4b59bc721120777dda8ccfbd21ebdde84b4f` for that reviewed head.
+- The retained required test log records 332 passing tests, including the consolidated 12-category negative matrix and the shipped CLI corpus test.
+- Rollback below was documented before acceptance.
+
+[All raw Python/Rust/CLI comparisons](shadow-0fc96d7.tar.xz) are retained with
+identity, the original artifact index and per-file SHA-256 hashes. Archive SHA-256:
+`de982349e25a5d8e0c138130eca7e51d8c569d2e99eb0abdbbab520f5f25b7a2`.
+Hosted artifact `10063111207` retains complete materialized evidence for 30 days;
+the frozen corpus retains original inputs. Required coverage/risk evidence is
+artifact `10063624125`. The raw API records retain every job conclusion, including
+push-only jobs correctly skipped by the unchanged pull-request workflow.
+
+[Downloaded required quality reports and collection logs](quality-0fc96d7.tar.xz)
+retain the successful production, risk and critical-path stages, both risk
+reports, candidate identity and archive/per-file manifests. Archive SHA-256:
+`b70587783a33dc116dad2e7275aacaf4bf63d76dca436e645ac5c0a52754d557`.
+The hosted artifact retains the additional native coverage profiles and sources.
+
+Acceptance is based on this candidate's hosted results, not predecessor or local
+results. The transfer commit is a distinct descendant; PR #158 records both full
+commit identities and the final shadow/required CI results. The existing required
+aggregate retains its name, dependencies and authority. Differential tooling stays
+non-authoritative; it cannot substitute for a required result.
 
 Earlier failed boundary and read-only Git diagnostics in `validation.json`,
 `validation.tar.gz` and `validation-retry.tar.gz` are historical records. Current
 operator authorization permits these measurement extensions and writing this
 workspace's Git metadata; staging has been verified. They are not current blockers.
+
+## Local transfer validation
+
+[Exact commands, environment, exit statuses and complete logs](local-transfer/validation.json)
+record 332 passing Rust tests and 293 passing Python tests. Cargo formatting,
+Clippy with warnings denied, documentation consistency and strict OpenSpec
+validation pass. The CLI corpus test exercises authoritative `quality evaluate`
+with an empty executable search path. Local Cargo home and target directories
+avoid the host's read-only/shared build configuration. Final hosted shadow and
+required checks validate the distinct transfer SHA recorded in PR #158.
 
 ## Candidate review iterations
 
@@ -133,7 +169,7 @@ Before transfer, disable `RUST_GENERIC_SHADOW`, remove the GH-151 branch opt-in,
 and stop manual dispatches. Existing
 required CI remains authoritative; preserve downloaded differential artifacts.
 
-After a future accepted transfer, revert the transfer commit(s) and redeploy the
+After transfer, revert the transfer commit(s) and redeploy the
 previous accepted release, restoring its recorded authority path. Keep the
 frozen Python reference, corpus, original evidence, baselines and source/series
 identities. Re-run required CI before releasing the rollback. Do not interpret a

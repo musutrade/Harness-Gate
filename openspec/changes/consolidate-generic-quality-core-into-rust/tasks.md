@@ -41,15 +41,25 @@ Validation: [GH-150 replay and acceptance evidence](../../../docs/quality/gh-150
 
 ## 6. Transfer generic semantic authority
 
-GH-151 implementation and the pending transfer review are recorded in
-[the candidate evidence](../../../docs/quality/gh-151/README.md). The operator
-authorized versioned production and risk measurement extensions. Hosted shadow
-and required acceptance of the exact candidate SHA remain outstanding;
-predecessor CI success does not accept the transfer.
+GH-151 [hosted evidence and explicit decision](../../../docs/quality/gh-151/README.md)
+accept candidate `0fc96d7644d623f31e31fe1a512cb68db0b2003b`: Rust shadow run
+34243502830 and required CI run 34243502555 passed, with 33 corpus cases,
+12 negative categories, 332 required Rust tests and zero unresolved mismatches.
+Raw comparisons, exact hosted identities and rollback are retained. The operator
+authorized the versioned production/risk measurement extensions. The separate
+transfer commit and its final validation are recorded in PR #158.
 
-- [ ] 6.1 [P1][M] Integrate the Rust generic core into an opt-in shadow CI path; acceptance: existing `Required Quality Aggregate` name/dependencies/authority are unchanged and Rust/Python differential artifacts are retained.
-- [ ] 6.2 [P1][L] Perform explicit authority-transfer acceptance; acceptance: Rust and TypeScript/Angular corpora plus negative matrix are green, hosted CI is green, rollback is documented, and no unresolved mismatch remains.
-- [ ] 6.3 [P1][M] Route authoritative generic evaluation/reporting through Rust while preserving collector protocol compatibility; acceptance: external collectors still measure only, and final generic decisions no longer require Python C-class modules.
+- [x] 6.1 [P1][M] Integrate the Rust generic core into an opt-in shadow CI path; acceptance: existing `Required Quality Aggregate` name/dependencies/authority are unchanged and Rust/Python differential artifacts are retained.
+- [x] 6.2 [P1][L] Perform explicit authority-transfer acceptance; acceptance: Rust and TypeScript/Angular corpora plus negative matrix are green, hosted CI is green, rollback is documented, and no unresolved mismatch remains.
+- [x] 6.3 [P1][M] Route authoritative generic evaluation/reporting through Rust while preserving collector protocol compatibility; acceptance: external collectors still measure only, and final generic decisions no longer require Python C-class modules.
+
+Validation of the separate Rust authority switch: 332 Rust tests and 293 Python
+tests pass, including the complete CLI corpus with an empty executable search
+path. Formatting, Clippy and docs consistency pass. Exact commands and logs are
+retained in [GH-151 local transfer evidence](../../../docs/quality/gh-151/local-transfer/validation.json).
+Project-local config check/verify are not applicable: no `ci` profile exists.
+Final hosted shadow and required validation are recorded against the transfer SHA
+in PR #158; candidate acceptance above precedes that switch.
 
 ## 7. Demote Python generic semantics safely
 

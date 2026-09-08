@@ -6,8 +6,8 @@ use std::{fs, path::PathBuf};
 
 #[derive(Debug, Subcommand)]
 pub(crate) enum QualityAction {
-    /// Evaluate a migration candidate; results do not transfer release authority.
-    Shadow(Box<EvaluateArgs>),
+    /// Evaluate generic evidence and produce the authoritative project decision in Rust.
+    Evaluate(Box<EvaluateArgs>),
 }
 
 #[derive(Debug, Args)]
@@ -60,7 +60,7 @@ fn read(path: &PathBuf) -> Result<Value> {
 }
 
 pub(crate) fn run(action: &QualityAction) -> Result<bool> {
-    let QualityAction::Shadow(args) = action;
+    let QualityAction::Evaluate(args) = action;
     // Clear an earlier report before reading inputs: errors must not leave a stale pass.
     // Refuse aliases of input documents before touching the destination.
     let paths = [

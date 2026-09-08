@@ -1,0 +1,52 @@
+{
+  "timestamp": "2026-09-08T15:35:09.607868+00:00",
+  "environment": {
+    "CARGO_HOME": "/home/gem/symphony-workspaces/GH-151/target/gh-151/cargo-home",
+    "CARGO_TARGET_DIR": "/home/gem/symphony-workspaces/GH-151/target/gh-151/build"
+  },
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 0,
+      "seconds": 181.029,
+      "log": "nextest.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 0,
+      "seconds": 196.945,
+      "log": "python.log"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "exit_code": 0,
+      "seconds": 0.55,
+      "log": "fmt.log"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 0,
+      "seconds": 4.983,
+      "log": "clippy.log"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 0,
+      "seconds": 6.382,
+      "log": "docs.log"
+    },
+    {
+      "command": "openspec validate consolidate-generic-quality-core-into-rust --strict",
+      "exit_code": 0,
+      "log": "openspec.log"
+    }
+  ],
+  "not_applicable": [
+    "harness-gate config check",
+    "harness-gate verify --profile ci --all"
+  ],
+  "reason": "No .harness-gate/flow.toml declaring a ci profile exists in this checkout.",
+  "rust_tests_passed": 332,
+  "python_tests_passed": 293,
+  "validated_code": "Separate authority switch from accepted candidate 0fc96d7644d623f31e31fe1a512cb68db0b2003b; full transfer commit identity is recorded in PR #158."
+}

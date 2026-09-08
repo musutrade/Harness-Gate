@@ -51,7 +51,7 @@ def cli_cases(binary, cases, output):
         report = work / 'report.json'
         # A stale favorable report must be removed on model/transport errors.
         write(report, {'stale': True, 'aggregate': {'state': 'pass'}})
-        command = [str(binary), 'quality', 'shadow', '--output', str(report),
+        command = [str(binary), 'quality', 'evaluate', '--output', str(report),
                    '--now', case['now']]
         for name in ('policy', 'selection', 'mappings', 'exceptions'):
             if name in case:
