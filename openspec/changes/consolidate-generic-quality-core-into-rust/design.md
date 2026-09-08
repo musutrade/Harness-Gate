@@ -173,3 +173,26 @@ and [shared retained corpus](../../../tools/quality/fixtures/generic-core/README
 The inventory supersedes the provisional filename dispositions above, including
 the mixed generic-validation responsibilities in `collector_runner.py` and
 `quality_evidence.py`. No runtime authority moves in this slice.
+
+## Task 2 implementation record
+
+GH-147 adds the candidate `harness-gate-quality-core` workspace library under
+`tools/harness-gate/quality-core`. It validates evidence, typed measurements,
+capability availability, series compatibility, project ownership and structural
+relationships. The CLI does not depend on it. Policy decisions, relationship
+evidence evaluation, reports and authority transfer remain later tasks.
+
+The library embeds unchanged accepted schemas, checked against the Python copies
+by a Rust test. Canonical identities retain sorted UTF-8 JSON, NFC paths and exact
+integers. Typed decoding goes through JSON text to preserve arbitrary-precision
+integers, including powers of ten, without an intermediate float conversion.
+The Python oracle is invoked only by tests against retained bytes; no collector
+is rerun. Schema error wording may report only the first failure, while rejection
+classes and domain-specific reasons match the reference.
+
+Both workspace packages run in the required Cargo test command. Existing coverage
+and risk collection explicitly select the CLI package to retain the accepted
+measurement boundary and baseline. No gate threshold, required-check dependency,
+production hotspot inventory or release authority changes. See the
+[GH-147 validation record](../../../docs/quality/gh-147/README.md) and
+[ADR-0040](../../../docs/adr/0040-language-agnostic-evidence-policy.md).
