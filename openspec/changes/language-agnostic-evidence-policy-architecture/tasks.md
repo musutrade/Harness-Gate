@@ -77,14 +77,24 @@ Validation evidence for 5.1–5.5 (GH-114): the
 [actual local validation record](../../../docs/quality/gh-114/validation-summary.json)
 cover typed selectors/comparisons, all distinct result states, required-child
 aggregation and agent remediation records. This is a standalone shadow evaluator;
-ratchet tasks 6.x, Rust migration and required-gate equivalence remain unaccepted.
+GH-115 ratchet validation is recorded below; Rust migration and required-gate
+equivalence remain unaccepted.
 
 ## 6. Generalize baseline, debt and ratchet
 
-- [ ] 6.1 [P1][L] 实现 compatible base/head evidence comparison；验收：新/修改/未修改 subject 分类稳定，缺 base 或 incompatible series 阻止增量 pass。
-- [ ] 6.2 [P1][M] 实现 debt ledger 与 no-regression ratchet；验收：未修改 legacy debt 可单列，新增 debt 失败，改善 debt 记录 improved，不伪称全库合格。
-- [ ] 6.3 [P2][M] 实现 absolute threshold 与 regression policy 同时存在；验收：例如 base CRAP 64 -> head 55 可标 improved/debt，而新函数 CRAP 31 仍失败。
-- [ ] 6.4 [P2][M] 接入 exception metadata 但保持 exception 不自动变 pass；验收：owner/issue/reason/expiry/compensating control 缺失或过期失败，exception 只改变审查状态。
+- [x] 6.1 [P1][L] 实现 compatible base/head evidence comparison；验收：新/修改/未修改 subject 分类稳定，缺 base 或 incompatible series 阻止增量 pass。
+- [x] 6.2 [P1][M] 实现 debt ledger 与 no-regression ratchet；验收：未修改 legacy debt 可单列，新增 debt 失败，改善 debt 记录 improved，不伪称全库合格。
+- [x] 6.3 [P2][M] 实现 absolute threshold 与 regression policy 同时存在；验收：例如 base CRAP 64 -> head 55 可标 improved/debt，而新函数 CRAP 31 仍失败。
+- [x] 6.4 [P2][M] 接入 exception metadata 但保持 exception 不自动变 pass；验收：owner/issue/reason/expiry/compensating control 缺失或过期失败，exception 只改变审查状态。
+
+Validation evidence for 6.1–6.4 (GH-115): the
+[policy contract](../../../docs/quality/policy-engine.md),
+[acceptance fixtures](../../../tools/quality/tests/test_policy_ratchet.py), and
+[actual local validation record](../../../docs/quality/gh-115-validation.md)
+cover compatible history, stable explicit identity classification, conservative
+split treatment, debt/trend alongside absolute limits, and exception review that
+preserves quality failures. Only these shadow-engine tasks are implemented;
+production baseline acceptance and remaining proposal tasks are not claimed.
 
 ## 7. Migrate Rust as the reference adapter
 

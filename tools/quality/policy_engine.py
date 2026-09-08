@@ -12,6 +12,7 @@ import sys
 
 import harness_evidence as evidence
 import project_model as model
+import policy_ratchet as ratchet
 
 
 class GateState(str, Enum):
@@ -146,8 +147,9 @@ def aggregate(policy, results):
     return {'state': status, 'blockers': blockers}
 
 
-def evaluate(policy, records, *, selection=None, base_records=None, base_context=None, **context):
-    """Evaluate each selected subject; base values are context only, not a ratchet.
+def evaluate(policy, records, *, selection=None, base_records=None, base_context=None,
+             mappings=None, exceptions=None, now=None, **context):
+    """Evaluate absolute limits and optional compatible-series debt/ratchet rules.
 
     Context and selections are caller-owned. Complete evidence is validated before
     any metric is used. Empty/missing scopes never produce vacuous required success.
@@ -160,11 +162,9 @@ def evaluate(policy, records, *, selection=None, base_records=None, base_context
             evidence.validate_evidence(records, **context)
         else:
             evidence.require(records == [], 'evidence must be a list')
-        if base_records is not None:
-            evidence.require(base_context is not None, 'missing base validation context')
-            evidence.require(base_context['expected']['commit'] == context['expected']['base_commit'],
-                             'base commit does not match head provenance')
-            evidence.validate_evidence(base_records, **base_context)
+        lineage = None
+        if base_records is not None or base_context is not None or mappings is not None:
+            lineage = ratchet.validate_base(base_records, base_context, context, mappings)
     except (evidence.MeasurementError, model.ModelError) as error:
         results = [_result(rule, None, GateState.MEASUREMENT_ERROR, str(error), context)
                    for rule in policy['rules']]
@@ -180,13 +180,14 @@ def evaluate(policy, records, *, selection=None, base_records=None, base_context
                 results.append(_result(rule, None, GateState.NOT_APPLICABLE,
                                        'scope selects no subjects', context))
             for subject in subjects:
-                matching = [r for r in records if r['subject']['id'] == subject['id'] and
-                            any(c['metric'] == rule['metric'] for c in r['capabilities'])]
-                head = matching[0] if len(matching) == 1 else None
-                base = None
+                head, base, baseline, assessment = None, None, None, None
                 try:
-                    evidence.require(head is not None, 'missing or ambiguous subject metric evidence')
-                    if base_records is not None:
+                    head = ratchet.metric_record(records, subject['id'], rule['metric'])
+                    if 'ratchet' in rule:
+                        evidence.require(lineage is not None, 'missing base for incremental policy')
+                        base, baseline = ratchet.baseline(head, rule['metric'], base_records,
+                                                          base_context, lineage)
+                    elif base_records is not None:
                         prior = [r for r in base_records if r['subject']['id'] == subject['id'] and
                                  any(c['metric'] == rule['metric'] for c in r['capabilities'])]
                         evidence.require(len(prior) <= 1, 'ambiguous base evidence')
@@ -202,14 +203,49 @@ def evaluate(policy, records, *, selection=None, base_records=None, base_context
                     reason = capability['state']
                     if state is None:
                         value = next(m['value'] for m in head['metrics'] if m['name'] == rule['metric'])
-                        passed = compare(value, rule['operator'], rule['limit'])
-                        state = GateState.PASS if passed else GateState(rule['on_violation'])
-                        reason = 'comparison satisfied' if passed else 'policy limit violated'
+                        if 'ratchet' in rule:
+                            prior_value = None
+                            if base:
+                                base_cap = next(c for c in base['capabilities']
+                                                if c['metric'] == rule['metric'])
+                                evidence.require(base_cap['state'] == 'supported',
+                                                 'base metric unavailable: ' + base_cap['state'])
+                                prior_value = next(m['value'] for m in base['metrics']
+                                                   if m['name'] == rule['metric'])
+                            state, assessment = ratchet.decision(rule, value, prior_value, compare)
+                            state = GateState(state)
+                            reason = 'ratchet ' + assessment['trend'] + '; debt ' + assessment['debt']
+                        else:
+                            passed = compare(value, rule['operator'], rule['limit'])
+                            state = GateState.PASS if passed else GateState(rule['on_violation'])
+                            reason = 'comparison satisfied' if passed else 'policy limit violated'
                 except evidence.MeasurementError as error:
                     state, reason = GateState.MEASUREMENT_ERROR, str(error)
-                results.append(_result(rule, subject, state, reason, context, head, base))
+                result = _result(rule, subject, state, reason, context, head, base)
+                if baseline is not None:
+                    result.record['baseline'] = baseline
+                if assessment is not None:
+                    result.record['ratchet'] = assessment
+                results.append(result)
+    review = ratchet.review_exceptions(exceptions if exceptions is not None else [],
+                                      policy, context['project'], now)
+    for result in results:
+        matching = [item for item in review['exceptions'] if isinstance(item, dict) and
+                    item.get('policy') == result.policy and item.get('subject') == result.subject
+                    ] if isinstance(review['exceptions'], list) else []
+        result.record['exception_review'] = {'state': review['state'] if matching else 'none',
+                                             'exceptions': matching}
+    quality = aggregate(policy, results)
+    combined = {**quality, 'blockers': list(quality['blockers'])}
+    if review['errors']:
+        combined['state'] = GateState.MEASUREMENT_ERROR
+        combined['blockers'].append({'state': GateState.MEASUREMENT_ERROR,
+                                     'reason': 'invalid exception metadata', 'errors': review['errors']})
     return {'schema': 'harness-policy-results/v1', 'mode': 'shadow',
-            'aggregate': aggregate(policy, results), 'results': [r.to_dict() for r in results],
+            'aggregate': combined, 'quality_aggregate': quality, 'exception_review': review,
+            'results': [r.to_dict() for r in results],
+            'debt_ledger': [r.to_dict() for r in results
+                            if r.record.get('ratchet', {}).get('debt', 'none') != 'none'],
             'violations': [r.to_dict() for r in results if r.state != GateState.PASS]}
 
 
@@ -218,10 +254,24 @@ def main():
     for name in ('policy', 'evidence', 'project', 'source-root', 'artifact-root', 'expected', 'output'):
         parser.add_argument('--' + name, required=True, type=Path)
     parser.add_argument('--selection', type=Path)
+    for name in ('base-evidence', 'base-project', 'base-source-root', 'base-artifact-root',
+                 'base-expected', 'mappings', 'exceptions'):
+        parser.add_argument('--' + name, type=Path)
     args = parser.parse_args()
     try:
+        base_paths = (args.base_evidence, args.base_project, args.base_source_root,
+                      args.base_artifact_root, args.base_expected)
+        evidence.require(not any(base_paths) or all(base_paths), 'incomplete base CLI context')
+        base_context = {'project': evidence.load_json(args.base_project),
+                        'source_root': args.base_source_root,
+                        'artifact_root': args.base_artifact_root,
+                        'expected': evidence.load_json(args.base_expected)} if all(base_paths) else None
         result = evaluate(evidence.load_json(args.policy), evidence.load_json(args.evidence),
                           selection=evidence.load_json(args.selection) if args.selection else None,
+                          base_records=evidence.load_json(args.base_evidence) if args.base_evidence else None,
+                          base_context=base_context,
+                          mappings=evidence.load_json(args.mappings) if args.mappings else None,
+                          exceptions=evidence.load_json(args.exceptions) if args.exceptions else None,
                           project=evidence.load_json(args.project), source_root=args.source_root,
                           artifact_root=args.artifact_root, expected=evidence.load_json(args.expected))
     except (evidence.MeasurementError, model.ModelError) as error:
