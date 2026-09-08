@@ -18,6 +18,49 @@ pub(super) static REQUIREMENTS: LazyLock<Value> = LazyLock::new(|| {
 static PATTERNS: LazyLock<Mutex<HashMap<String, regex::Regex>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
+pub(super) static POLICY: LazyLock<Value> =
+    LazyLock::new(|| serde_json::from_str(include_str!("schema/policy.schema.json")).unwrap());
+pub(super) static EXCEPTIONS: LazyLock<Value> = LazyLock::new(|| {
+    serde_json::from_str(include_str!("schema/policy-exceptions.schema.json")).unwrap()
+});
+pub(super) static MAPPINGS: LazyLock<Value> = LazyLock::new(|| {
+    serde_json::from_str(include_str!("schema/subject-mappings.schema.json")).unwrap()
+});
+
+// Stable Python-style diagnostic values used by the frozen schema walker.
+fn repr(value: &Value) -> String {
+    match value {
+        Value::Null => "None".into(),
+        Value::Bool(v) => if *v { "True" } else { "False" }.into(),
+        Value::String(v) => {
+            let quote = if v.contains('\'') && !v.contains('"') {
+                '"'
+            } else {
+                '\''
+            };
+            let mut out = String::from(quote);
+            for c in v.chars() {
+                match c {
+                    '\\' => out.push_str("\\\\"),
+                    '\n' => out.push_str("\\n"),
+                    '\r' => out.push_str("\\r"),
+                    '\t' => out.push_str("\\t"),
+                    c if c == quote => {
+                        out.push('\\');
+                        out.push(c);
+                    }
+                    c if c < ' ' || c == '\u{7f}' => out.push_str(&format!("\\x{:02x}", c as u32)),
+                    c => out.push(c),
+                }
+            }
+            out.push(quote);
+            out
+        }
+        Value::Array(v) => format!("[{}]", v.iter().map(repr).collect::<Vec<_>>().join(", ")),
+        _ => value.to_string(),
+    }
+}
+
 pub(super) fn shape(value: &Value, schema: &Value, definition: Option<&str>) -> Result<()> {
     walk(
         value,
@@ -56,16 +99,41 @@ fn walk(v: &Value, s: &Value, root: &Value, path: &str) -> Result<()> {
             matches,
         );
         if !valid {
-            return Err(fail(format!("expected type {kind}")));
+            let expected = kind.as_array().map_or_else(
+                || vec![kind.as_str().unwrap()],
+                |k| k.iter().map(|v| v.as_str().unwrap()).collect(),
+            );
+            let expected = expected
+                .iter()
+                .map(|k| format!("'{k}'"))
+                .collect::<Vec<_>>()
+                .join(", ");
+            let got = match v {
+                Value::Null => "NoneType",
+                Value::Bool(_) => "boolean",
+                Value::Number(_) if json::integer(v) => "integer",
+                Value::Number(_) => "number",
+                Value::String(_) => "string",
+                Value::Array(_) => "array",
+                Value::Object(_) => "object",
+            };
+            return Err(fail(format!("expected type [{expected}], got {got}")));
         }
     }
     if let Some(c) = s.get("const") {
-        require(v == c, format!("{path}: expected const {c}"))?;
+        require(
+            v == c,
+            format!("{path}: expected const {}, got {}", repr(c), repr(v)),
+        )?;
     }
     if let Some(values) = s["enum"].as_array() {
         require(
             values.contains(v),
-            format!("{path}: expected one of {}", s["enum"]),
+            format!(
+                "{path}: expected one of {}, got {}",
+                repr(&s["enum"]),
+                repr(v)
+            ),
         )?;
     }
     if let Some(text) = v.as_str() {
@@ -80,7 +148,11 @@ fn walk(v: &Value, s: &Value, root: &Value, path: &str) -> Result<()> {
                 regex.is_match(text)
                     || (pattern.ends_with('$')
                         && text.strip_suffix('\n').is_some_and(|s| regex.is_match(s))),
-                format!("{path}: value does not match pattern {pattern}"),
+                format!(
+                    "{path}: value {} does not match pattern {}",
+                    repr(v),
+                    repr(&Value::String(pattern.into()))
+                ),
             )?;
         }
         for (key, ok) in [("minLength", true), ("maxLength", false)] {
@@ -91,7 +163,10 @@ fn walk(v: &Value, s: &Value, root: &Value, path: &str) -> Result<()> {
                     } else {
                         text.chars().count() as u64 <= limit
                     },
-                    format!("{path}: string violates {key}"),
+                    format!(
+                        "{path}: string is {} than {limit}",
+                        if ok { "shorter" } else { "longer" }
+                    ),
                 )?;
             }
         }
@@ -101,17 +176,22 @@ fn walk(v: &Value, s: &Value, root: &Value, path: &str) -> Result<()> {
             json::integer(v)
                 && !v.to_string().starts_with('-')
                 && json::integer_cmp(v, minimum).is_ge(),
-            format!("{path}: integer is below minimum {minimum}"),
+            format!("{path}: integer {v} is below minimum {minimum}"),
         )?;
     }
     if let Some(object) = v.as_object() {
         if let Some(required) = s["required"].as_array() {
-            for key in required {
-                require(
-                    object.contains_key(key.as_str().unwrap()),
-                    format!("{path}: missing required field: {key}"),
-                )?;
-            }
+            let missing: Vec<_> = required
+                .iter()
+                .filter_map(|key| {
+                    let key = key.as_str().unwrap();
+                    (!object.contains_key(key)).then_some(key)
+                })
+                .collect();
+            require(
+                missing.is_empty(),
+                format!("{path}: missing required field(s): {}", missing.join(", ")),
+            )?;
         }
         if let Some(properties) = s["properties"].as_object() {
             for (key, child) in properties {
@@ -121,12 +201,15 @@ fn walk(v: &Value, s: &Value, root: &Value, path: &str) -> Result<()> {
             }
         }
         if s["additionalProperties"] == false {
-            for key in object.keys() {
-                require(
-                    s["properties"].get(key).is_some(),
-                    format!("{path}: unknown field: {key}"),
-                )?;
-            }
+            let unknown: Vec<_> = object
+                .keys()
+                .filter(|key| s["properties"].get(*key).is_none())
+                .map(String::as_str)
+                .collect();
+            require(
+                unknown.is_empty(),
+                format!("{path}: unknown field(s): {}", unknown.join(", ")),
+            )?;
         }
     }
     if let Some(values) = v.as_array() {

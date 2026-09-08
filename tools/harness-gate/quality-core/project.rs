@@ -28,7 +28,7 @@ fn contains(root: &str, path: &str) -> bool {
             .is_some_and(|tail| tail.starts_with('/'))
 }
 
-fn metadata(value: &Value) -> Result<()> {
+pub(super) fn metadata(value: &Value) -> Result<()> {
     match value {
         Value::String(s) => require(
             !s.chars().any(|c| c < ' '),
