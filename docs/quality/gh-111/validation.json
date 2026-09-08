@@ -1,0 +1,133 @@
+{
+  "issue": "GH-111",
+  "scope": [
+    "0.3",
+    "1.1",
+    "1.2",
+    "1.3",
+    "1.4"
+  ],
+  "checkout_base": "ef88e95330ae54a0107f94aa8ca9e58a1daf7385",
+  "authority": "Existing Rust gates remain authoritative; no architecture or equivalence acceptance. CI pending.",
+  "commands": [
+    {
+      "command": "python3 -m unittest tools.quality.tests.test_ci_quality tools.quality.tests.test_quality_evidence -v",
+      "exit_code": 0,
+      "log": "before.log",
+      "result": "32 tests passed before changes"
+    },
+    {
+      "command": "python3 -m unittest tools.quality.tests.test_project_model -v",
+      "exit_code": 0,
+      "log": "project-model.log",
+      "result": "9 tests passed; later fixture/test refinements included in final full suite"
+    },
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 101,
+      "log": "nextest.log",
+      "result": "shared Cargo target read-only"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "exit_code": 0,
+      "log": "fmt.log",
+      "result": "passed"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 101,
+      "log": "clippy-initial.log",
+      "result": "shared Cargo target read-only"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 1,
+      "log": "docs-consistency-initial.log",
+      "result": "examples/migration/schema synchronization failed; initial report retained"
+    },
+    {
+      "command": "CARGO_TARGET_DIR=\"$PWD/target/gh-111-build\" cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 0,
+      "log": "nextest-workspace.log",
+      "result": "315 passed, 0 skipped"
+    },
+    {
+      "command": "CARGO_TARGET_DIR=\"$PWD/target/gh-111-build\" cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 0,
+      "log": "clippy-workspace.log",
+      "result": "passed"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 0,
+      "log": "unittest.log",
+      "result": "128 tests passed after final Python/fixture edits"
+    },
+    {
+      "command": "CARGO_TARGET_DIR=\"$PWD/target/gh-111-build\" python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 0,
+      "log": "docs-consistency-workspace.log",
+      "result": "passed after documentation and evidence links added"
+    },
+    {
+      "command": "harness-gate config check",
+      "exit_code": null,
+      "log": null,
+      "result": "not applicable: .harness-gate/flow.toml absent"
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "exit_code": null,
+      "log": null,
+      "result": "not applicable: .harness-gate/flow.toml absent; no declared ci profile"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "log": null,
+      "result": "passed"
+    }
+  ],
+  "log_sha256": {
+    "before.log": "13ebb0c795973967c85327805e7fe22bedf4972a00961eeb49315a62e5766efe",
+    "clippy-initial.log": "1518f5efe4e6f2ab73a01b43187054665d70adad18be3c687269a0d7028ada40",
+    "clippy-workspace.log": "f004b5607c40ec14395285a85c715b06d8fbc0ba6b977f2b84296d27fb62a2d0",
+    "docs-consistency-initial.json": "6a7902aa0944603fc26bc7d545932745950c23ec7eabcbf77bc7cba37ec611a8",
+    "docs-consistency-initial.log": "6fdde67acd13145abd556580c3ab8d9ea34bad99a09db00ccf28a3fbeabecb76",
+    "docs-consistency-workspace.json": "16cb5dc1b9ba966329c31f06d4d48ba5312b2ea824c02e454883fd715926fddf",
+    "docs-consistency-workspace.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "nextest-workspace.log": "989fbabd06964c1ae0afbec0dd87d929414d5ed6aa6a45ba95d7dfd86f5e2c94",
+    "nextest.log": "6ae1243d90746b546d3b2e8fcff2cce9b1fc70cd1bc336dabcc3976f5d642ff1",
+    "project-model.log": "ca53a659439ae2811fb39a767906853e29c03b3210dbb04f09794aadbb4432ee",
+    "unittest.log": "5fc085724313bae625838f94e26d32efa0d5783f8a8b5cba6982918ef9c9ce80"
+  },
+  "contract_fixture_sha256": {
+    "tools/quality/project_model.py": "52877d32b8f54672f7d08ffa90fed355a7e19be3afa0aa76ad72fe556d04b486",
+    "tools/quality/tests/test_project_model.py": "f18e7be671c910ba5b57ec975a98b5ccb65dc8da401e81b1e15158f31d9cbaee",
+    "tools/quality/schema/project-model.schema.json": "fd6274e0f1f03a02c9ee701eccde3f117ff6f75d5d145e18a3f835995449282a",
+    "tools/quality/schema/subject-mappings.schema.json": "065dbc9fc477efc11c2f0d678258e0d0bbcff4acd4e43d170affe098a1f558c6",
+    "tools/quality/fixtures/project-model/README.md": "9c41e7026922ee04bb13f1e543ab9d970f16cd97c587eaf1ec5810df464f71ae",
+    "tools/quality/fixtures/project-model/base.json": "0a42f8b3c7a8af95afa7078b53c308a5d2d1dcd9164a5f80944d89562dcde040",
+    "tools/quality/fixtures/project-model/head-sources/api/src/moved.rs": "da634fb05ddb3730b63b5402f5bb4c2c06a797c5d1d921e1bd179f37d264dfa9",
+    "tools/quality/fixtures/project-model/head-sources/api/src/openapi.json": "aa17e322ab2e77709904324daec249619531fe06174466a7b1bac4253455daa6",
+    "tools/quality/fixtures/project-model/head-sources/billing/src/Run.java": "d89419590e04fdcf2af14db32cd12d2bbc57f33ab9fea81decaa1ed3eb14d2af",
+    "tools/quality/fixtures/project-model/head-sources/frontend/src/run.ts": "43d323082cdc9b8169480f49ca9fa6c71e04fa5c4ecbd3f5782b1d7cfba00a9a",
+    "tools/quality/fixtures/project-model/head-sources/worker/src/run.py": "d9a807f2791a173ceeab98bdef93dd6ca735c10ac0b07cf0ed070b2fcb27ba48",
+    "tools/quality/fixtures/project-model/head.json": "ead0c4ec02a7ae5b1d0820bf1c946ec5b50e3d7d01562c797bddef5a17bf91c9",
+    "tools/quality/fixtures/project-model/mappings.json": "dad6f43b41f4067ea660c76fb15960b11c198a6190ad9fc69dcfef9fb64b8fad",
+    "tools/quality/fixtures/project-model/sources/api/src/openapi.json": "aa17e322ab2e77709904324daec249619531fe06174466a7b1bac4253455daa6",
+    "tools/quality/fixtures/project-model/sources/api/src/run.rs": "da634fb05ddb3730b63b5402f5bb4c2c06a797c5d1d921e1bd179f37d264dfa9",
+    "tools/quality/fixtures/project-model/sources/billing/src/Run.java": "d89419590e04fdcf2af14db32cd12d2bbc57f33ab9fea81decaa1ed3eb14d2af",
+    "tools/quality/fixtures/project-model/sources/frontend/src/run.ts": "bc1433346d93df45e19f5a2e87c4474e44089706c5f5ad3152df86a1979d1cdf",
+    "tools/quality/fixtures/project-model/sources/worker/src/run.py": "a40c04aa22c369fa354406d31613f110878d800e33ddd428e124b513762b3635"
+  },
+  "archive_sha256": "8096070d16f10b83f6d11638618458155f3549219ac796d63a73728ac1e48ae3",
+  "limitations": [
+    "Shared Cargo target /home/gem/cargo-target is read-only; workspace-local target used.",
+    "Generic model validates declared identities and graph consistency; synthetic source bytes checked by tests. No real ecosystem adapters or policy authority.",
+    "No project-local flow.toml; project config/ci verify commands not applicable.",
+    "Original .git is read-only: git add failed with exit 128 creating index.lock. Delivery uses copied metadata target/gh-111-git on the same prepared branch/worktree; original .git HEAD remains checkout base. Handoff records actual pushed SHA."
+  ]
+}
