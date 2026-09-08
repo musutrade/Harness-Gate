@@ -9,6 +9,9 @@ use anyhow::Context;
 
 pub(super) fn run(project: &Project, command: Commands) -> Result<bool, CliError> {
     match command {
+        Commands::Quality { .. } => {
+            unreachable!("generic evaluation is handled before project discovery")
+        }
         Commands::Adapter { .. } => {
             unreachable!("adapter execution is handled before project discovery")
         }

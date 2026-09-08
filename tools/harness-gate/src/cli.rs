@@ -30,6 +30,11 @@ pub(crate) struct Cli {
 
 #[derive(Debug, Subcommand)]
 pub(crate) enum Commands {
+    /// Evaluate normalized evidence with the Rust generic core.
+    Quality {
+        #[command(subcommand)]
+        action: crate::app::quality::QualityAction,
+    },
     /// Run the versioned serial compatibility launcher and migration tools.
     Compat {
         #[command(subcommand)]

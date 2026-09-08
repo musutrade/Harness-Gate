@@ -236,7 +236,7 @@ def project_risk(root, sources, context, report, previous, *, label):
         matches = old[(row['source'], row['kind'], row['syntax_sha256'])]
         prior = matches.popleft()[1] if matches else None
         changed = prior is None
-        selected = row['name'] in hotspots[row['source']]
+        selected = row['name'] in hotspots.get(row['source'], [])
         high = selected or (changed and row['cc'] > 10)
         group = 'high' if high else 'changed' if changed else 'legacy'
         groups.add(group)
@@ -249,7 +249,14 @@ def project_risk(root, sources, context, report, previous, *, label):
                        'risk.crap': {'type': 'rational', 'numerator': row['crap_exact'][0],
                                      'denominator': row['crap_exact'][1]}})
         # Native identity, closure kind, span, float display and all raw counters remain lossless metadata.
-        record = projection.add(f'function-{index}', 'tools/harness-gate/src/' + row['source'],
+        source = row['source']
+        if report['series'] == rust.SERIES:
+            evidence.require(source in rust.SOURCE_FILES, 'unknown Rust production source')
+        else:
+            evidence.require(source in hotspots, 'unknown historical Rust source')
+        path = ('tools/harness-gate/' + source.removeprefix('../') if source.startswith('../quality-core/')
+                else 'tools/harness-gate/src/' + source)
+        record = projection.add(f'function-{index}', path,
                                 row['source_sha256'], 'function/v1', row, values, states, group)
         identities.append({'subject': record['subject']['id'], 'source': row['source'], 'name': row['name'],
                            'span': row['span'], 'syntax_sha256': row['syntax_sha256'],
@@ -280,7 +287,7 @@ def sources_from_archive(archive, destination):
     with tarfile.open(archive) as bundle:
         seen = set()
         for member in bundle:
-            if not member.name.startswith('tools/harness-gate/src/') or member.isdir():
+            if not member.name.startswith(('tools/harness-gate/src/', 'tools/harness-gate/quality-core/')) or member.isdir():
                 continue
             model.canonical_path(member.name)
             evidence.require(member.isfile() and member.name not in seen, 'unsafe/duplicate source archive member')

@@ -99,6 +99,11 @@ Human wording may be normalized where it is explicitly non-contractual; machine 
 
 ## Authority model during migration
 
+GH-151's [pending transfer review](../../../docs/quality/gh-151/README.md)
+records the proposed product CLI, opt-in workflow, local differential evidence,
+rollback, versioned production measurements and outstanding hosted acceptance. The candidate
+does not supersede the authority requirements below.
+
 The existing required Rust CI remains authoritative. Python generic semantics act as the reference for the new generic core until acceptance. Rust candidate output is shadow evidence.
 
 Authority transfer occurs only after:
