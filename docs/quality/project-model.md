@@ -1,5 +1,10 @@
 # Generic project model v1 (GH-111)
 
+Current runtime ownership and Python freeze/retirement rules are defined in the
+[Python retention policy](python-retention.md). The released Rust core owns final
+generic decisions; Python interfaces below remain adapter/reference tooling.
+
+
 This implements OpenSpec tasks 1.1–1.4 as a standalone, development-only model.
 The [schema](../../tools/quality/schema/project-model.schema.json) and
 [validator](../../tools/quality/project_model.py) do not alter project-local

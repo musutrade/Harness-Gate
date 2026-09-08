@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Collector transport and validation boundary; never a release evaluator."""
+"""Frozen non-authoritative Python reference; see docs/quality/python-retention.md.
+
+Generic decisions belong to the released Rust core. No release-approval path.
+Python transport remains supported; its generic preflight is reference-only.
+
+Collector transport and validation boundary; never a release evaluator."""
 from __future__ import annotations
 
 import copy

@@ -1,5 +1,10 @@
 # Normalized evidence and capability contracts v1
 
+Current runtime ownership and Python freeze/retirement rules are defined in the
+[Python retention policy](python-retention.md). The released Rust core owns final
+generic decisions; Python interfaces below remain adapter/reference tooling.
+
+
 GH-112 implements OpenSpec tasks 2.1–2.5 and 3.1–3.4 as standalone development
 contracts. The [schema](../../tools/quality/schema/harness-evidence.schema.json)
 and [validator](../../tools/quality/harness_evidence.py) define

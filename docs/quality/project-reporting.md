@@ -1,5 +1,8 @@
 # Cross-component contracts and project reports
 
+Python commands below require `--reference-only` and cannot approve releases.
+See the [freeze and retirement policy](python-retention.md).
+
 After [GH-151 hosted acceptance](gh-151/README.md), the explicit-context
 `harness-gate quality evaluate` entry point produces authoritative generic decisions
 and project reports in Rust using the same collector and report contracts.
@@ -130,10 +133,10 @@ Rust evidence to exercise configuration; real Rust shadow replay is documented
 in the [reference adapter guide](rust-reference-adapter.md).
 
 ```bash
-python3 tools/quality/project_report.py check \
+python3 tools/quality/project_report.py --reference-only check \
   --config tools/quality/fixtures/contracts/single-rust-config.json \
   --output target/quality/single-config.json
-python3 tools/quality/project_report.py evaluate \
+python3 tools/quality/project_report.py --reference-only evaluate \
   --config tools/quality/fixtures/contracts/single-rust-config.json \
   --evidence tools/quality/fixtures/contracts/single-rust-evidence.json \
   --expected tools/quality/fixtures/contracts/expected.json \
@@ -148,7 +151,7 @@ failures: one breaking response-field rename, stale generated client, and
 incompatible consumer expectation. The next command intentionally exits **1**:
 
 ```bash
-python3 tools/quality/project_report.py evaluate \
+python3 tools/quality/project_report.py --reference-only evaluate \
   --config tools/quality/fixtures/contracts/project-config.json \
   --evidence tools/quality/fixtures/contracts/evidence.json \
   --expected tools/quality/fixtures/contracts/expected.json \
