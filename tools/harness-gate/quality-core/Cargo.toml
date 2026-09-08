@@ -1,0 +1,22 @@
+[package]
+name = "harness-gate-quality-core"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.88"
+publish = false
+license = "MIT"
+description = "Candidate generic evidence and project semantics for Harness-Gate"
+
+[lib]
+path = "mod.rs"
+
+[dependencies]
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = { version = "1.0.151", features = ["arbitrary_precision", "raw_value"] }
+thiserror = "2.0"
+sha2 = "0.10"
+regex = "1.13.1"
+unicode-normalization = "0.1"
+
+[dev-dependencies]
+tempfile = "3.27"

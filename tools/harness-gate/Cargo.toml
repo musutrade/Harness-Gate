@@ -79,3 +79,9 @@ opt-level = "z"       # Optimize for size
 panic = "abort"       # No unwinding support for smaller binary
 codegen-units = 1     # Pinned back to 1: distribution builds trade compile time for size.
                       # Compare exact bytes only within the same target/toolchain series.
+
+# Candidate generic semantics are independently tested until authority transfer.
+[workspace]
+members = ["quality-core"]
+default-members = [".", "quality-core"]
+resolver = "2"
