@@ -46,3 +46,44 @@ Development/CI-only collectors MAY be implemented outside the release binary, bu
 - **WHEN** Harness-Gate records its evidence
 - **THEN** its version and invocation are captured
 - **AND** the collector does not need to be linked into the shipped Harness-Gate binary.
+
+### Requirement: Bind invocation to a versioned request and exclusive response
+The v1 request SHALL contain project/component IDs, expected collector identity,
+commit/base/target/run context, requested capabilities, canonical workspace/output
+roots and collection parameters. The v1 response SHALL contain only its schema
+version, normalized evidence, declared raw artifacts and a typed error. Evidence
+and error outcomes SHALL be mutually exclusive; final release decisions SHALL be
+rejected. Internal and subprocess adapters SHALL use the same validation boundary.
+
+#### Scenario: Consume either adapter without transport-dependent policy
+- **GIVEN** equivalent synthetic retained evidence from an internal callable and an external stdin/stdout adapter
+- **WHEN** the runner validates each response and the capability consumer evaluates the returned records
+- **THEN** normalized records and capability outcomes are identical.
+- **AND** unsupported and measurement-error states retain their semantics.
+
+### Requirement: Reject invalid collection before policy consumption
+The runner SHALL return typed fail-closed errors for nonzero subprocess exit,
+timeout, malformed JSON, output-root escape, undeclared or missing artifacts,
+stale provenance, duplicate subject/series pairs and artifact tampering. Every
+requested capability SHALL have an explicit state in each returned record.
+
+#### Scenario: Collector exits unsuccessfully after printing evidence
+- **GIVEN** a subprocess that prints a schema-valid response but exits nonzero
+- **WHEN** collection completes
+- **THEN** the runner returns `subprocess_exit` without usable evidence.
+
+#### Scenario: Tampered or undeclared raw output
+- **GIVEN** a dedicated empty output root and a collector response
+- **WHEN** a raw file is unregistered, escapes through a path or symlink, or differs from its declared digest/size
+- **THEN** the runner returns the corresponding typed artifact failure before policy evaluation.
+
+#### Scenario: Stale or duplicate evidence
+- **GIVEN** evidence from another commit/base/target/run or repeated subject/series identity
+- **WHEN** either adapter submits the batch
+- **THEN** the runner returns `stale_context` or `duplicate_subject` without usable evidence.
+
+#### Scenario: Timeout with inherited output handles
+- **GIVEN** a POSIX subprocess and its child retain stdout beyond the deadline
+- **WHEN** the runner times out
+- **THEN** it kills the process group and returns `timeout`.
+- **AND** this process cleanup does not claim an operating-system sandbox.
