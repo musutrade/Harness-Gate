@@ -1,0 +1,22 @@
+{
+  "status": "pass",
+  "baseline": "docs/quality/gh-135/workflow-validation.json",
+  "files": {
+    ".github/workflows/ci.yml": {
+      "expected_sha256": "2b6e0fae405b0d73ae79ab066eaf2e6f7ca287630b004c470f824676ee0bffa8",
+      "actual_sha256": "2b6e0fae405b0d73ae79ab066eaf2e6f7ca287630b004c470f824676ee0bffa8"
+    },
+    ".github/workflows/release.yml": {
+      "expected_sha256": "7adaad2200a5d1a154a4400f147762ad6b940f49b7a5d06a7c67fb878240862d",
+      "actual_sha256": "7adaad2200a5d1a154a4400f147762ad6b940f49b7a5d06a7c67fb878240862d"
+    },
+    "tools/quality/ci_quality.py": {
+      "expected_sha256": "469dae4e2f74654a8c353f7be0f416b8d1abac0d64e3ae1d951c4f23548ace41",
+      "actual_sha256": "469dae4e2f74654a8c353f7be0f416b8d1abac0d64e3ae1d951c4f23548ace41"
+    },
+    "tools/quality/fixtures/typescript-angular/toolchain.json": {
+      "expected_sha256": "fcd428ad283c64b8e36e27a428be1c00851d2c890183383cd6e3a0d54d5777db",
+      "actual_sha256": "fcd428ad283c64b8e36e27a428be1c00851d2c890183383cd6e3a0d54d5777db"
+    }
+  }
+}

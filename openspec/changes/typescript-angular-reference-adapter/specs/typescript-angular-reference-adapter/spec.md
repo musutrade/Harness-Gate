@@ -122,6 +122,14 @@ Rust required-check identity and authority SHALL remain unchanged.
 
 ## Implementation and review
 
+Task 4.3's [final review](../../../../../docs/quality/gh-136/README.md) links
+tasks 1.1–4.2 to merged PRs, successful required CI on their submitted SHAs and
+retained native evidence. The [certification matrix](../../../../../docs/quality/typescript-certification.md)
+bounds the exact fixture, toolchain, environment, series and capabilities.
+No generic amendment is introduced. Review completion does not close the
+follow-up before required CI passes on the final review SHA and controller
+acceptance; all deferred capabilities and Rust release authority remain unchanged.
+
 Follow the ordered sub-four-hour [tasks](../../tasks.md); their acceptance
 criteria define the implementation milestones. Protocol usage is:
 
