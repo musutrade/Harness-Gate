@@ -12,14 +12,21 @@ S = 小于 1 小时，M = 1–2 小时，L = 2–不足 4 小时；超出估算�
 
 - [x] 0.1 [P0][S] 确认当前 `strict-json-results-and-risk-based-quality-gates` 相关 Issues 已完成、关闭或明确移出范围；验收：前置 Issue 系列已闭环，本 change 以 `main` `ad54d8df6d21d3f6e3a0b5ee83918ae078a84d61` 为 review baseline，不隐式接管旧 Issue。
 - [x] 0.2 [P0][S] 冻结本 change 的非目标和迁移边界；验收：明确“不重写 Rust 指标语义、不在本 change 实现 Angular/Python/Java 全套 adapter、不更改 branch protection/required-check identity”；现有 Rust required path 在 equivalence acceptance 前保持 authoritative。
-- [ ] 0.3 [P1][M] 建立架构迁移兼容性清单；验收：至少列出 `ci_quality.py collect/verify/aggregate`、candidate schema 1、production coverage、GH-94 Rust risk series、isolated critical-path matrix、`quality-evidence.schema.json`、artifact digests、`Quality Coverage and Critical Paths` 与稳定的 `Required Quality Aggregate` consumers，并标记必须保持兼容的机器契约。
+- [x] 0.3 [P1][M] 建立架构迁移兼容性清单；验收：至少列出 `ci_quality.py collect/verify/aggregate`、candidate schema 1、production coverage、GH-94 Rust risk series、isolated critical-path matrix、`quality-evidence.schema.json`、artifact digests、`Quality Coverage and Critical Paths` 与稳定的 `Required Quality Aggregate` consumers，并标记必须保持兼容的机器契约。
 
 ## 1. Define the language-agnostic project model
 
-- [ ] 1.1 [P1][M] 定义 `Project`、`Component`、`Target`、`SourceBoundary`、`Subject` 和 cross-component relationship schema；验收：同一 fixture 声明 Angular、Rust、Python、Java 四组件且无需 core language branch。
-- [ ] 1.2 [P1][M] 定义 versioned subject kinds 与 generic subject identity；验收：函数/方法同名、路径冲突、缺 digest、重复 identity、未知 kind 均 fail closed。
-- [ ] 1.3 [P2][M] 定义 rename/move/split identity mapping；验收：无显式 mapping 时不能继承历史有利基线，歧义 mapping 失败。
-- [ ] 1.4 [P2][S] 建立 synthetic multi-component fixtures；验收：fixture 不依赖真实语言工具链，也能覆盖 component graph、subject identity 和 cross-component relation。
+- [x] 1.1 [P1][M] 定义 `Project`、`Component`、`Target`、`SourceBoundary`、`Subject` 和 cross-component relationship schema；验收：同一 fixture 声明 Angular、Rust、Python、Java 四组件且无需 core language branch。
+- [x] 1.2 [P1][M] 定义 versioned subject kinds 与 generic subject identity；验收：函数/方法同名、路径冲突、缺 digest、重复 identity、未知 kind 均 fail closed。
+- [x] 1.3 [P2][M] 定义 rename/move/split identity mapping；验收：无显式 mapping 时不能继承历史有利基线，歧义 mapping 失败。
+- [x] 1.4 [P2][S] 建立 synthetic multi-component fixtures；验收：fixture 不依赖真实语言工具链，也能覆盖 component graph、subject identity 和 cross-component relation。
+
+GH-111 validation: [compatibility inventory](../../../docs/quality/migration-compatibility.md)
+(task 0.3), [project/identity/mapping contracts](../../../docs/quality/project-model.md)
+(tasks 1.1–1.3), and [synthetic fixtures](../../../tools/quality/fixtures/project-model/README.md)
+(task 1.4). [Local results and retained evidence](../../../docs/quality/gh-111-validation.md)
+cover positive and fail-closed cases. Required CI and full architecture acceptance
+remain pending; no later task is accepted by this implementation.
 
 ## 2. Introduce `harness-evidence/v1`
 
