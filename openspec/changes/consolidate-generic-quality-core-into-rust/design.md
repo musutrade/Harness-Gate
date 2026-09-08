@@ -165,3 +165,11 @@ Expected disposition, subject to inventory evidence:
 - `rust_equivalence.py`, `typescript_advisory.py` and migration-specific replayers: D-class; retain through acceptance, then document freeze/retirement policy.
 
 The final inventory, not this provisional list, is authoritative.
+
+## Task 1 freeze record
+
+GH-146 records the [complete Python boundary](../../../docs/quality/gh-146/python-boundary.md)
+and [shared retained corpus](../../../tools/quality/fixtures/generic-core/README.md).
+The inventory supersedes the provisional filename dispositions above, including
+the mixed generic-validation responsibilities in `collector_runner.py` and
+`quality_evidence.py`. No runtime authority moves in this slice.
