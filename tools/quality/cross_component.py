@@ -1,4 +1,8 @@
-"""Tool-independent contract bindings over already validated normalized evidence."""
+"""Frozen non-authoritative Python reference; see docs/quality/python-retention.md.
+
+Generic decisions belong to the released Rust core. No release-approval path.
+
+Tool-independent contract bindings over already validated normalized evidence."""
 import harness_evidence as evidence
 
 

@@ -1,6 +1,6 @@
 # Proposal: Consolidate Generic Quality Core into Rust
 
-**Status:** Tasks 1.1–5.4 merged with required CI complete (GH-146–GH-150). GH-151 accepts candidate `0fc96d7644d623f31e31fe1a512cb68db0b2003b` after hosted Rust shadow and required CI success, then implements the separate tasks 6.1–6.3 authority switch. Final transfer validation and commit identity are recorded in PR #158 and [GH-151 evidence](../../../docs/quality/gh-151/README.md). Task 7 and the full proposal remain unaccepted.
+**Status:** Tasks 1.1–6.3 are accepted through merged PRs #153–#158 with required CI complete. GH-152 implements final Python dispositions and retention policy (tasks 7.1–7.2) and prepares task 7.3 closure. [Final evidence](../../../docs/quality/gh-152/README.md) records actual validation. Full change acceptance and archival remain conditional on successful required CI for GH-152 and controller merge; this submission does not claim that future result.
 **Date:** 2026-09-08
 **Baseline:** `main` after TypeScript/Angular reference-adapter closure (`817190f2e26d176bb227858647c0f5a61b31ba26`).
 

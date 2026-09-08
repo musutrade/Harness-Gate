@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Shadow project/subject contracts; no collector or release-policy authority."""
+"""Frozen non-authoritative Python reference; see docs/quality/python-retention.md.
+
+Generic decisions belong to the released Rust core. No release-approval path.
+
+Shadow project/subject contracts; no collector or release-policy authority."""
 from __future__ import annotations
 
 import argparse

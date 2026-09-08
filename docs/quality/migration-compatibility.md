@@ -1,5 +1,10 @@
 # Rust migration compatibility inventory (OpenSpec 0.3 / GH-111)
 
+Current runtime ownership and Python freeze/retirement rules are defined in the
+[Python retention policy](python-retention.md). The released Rust core owns final
+generic decisions; Python interfaces below remain adapter/reference tooling.
+
+
 Review baseline: `ad54d8df6d21d3f6e3a0b5ee83918ae078a84d61`.
 All rows below are **frozen machine or consumer contracts**. The current Rust
 path remains the release authority until a separately reviewed equivalence

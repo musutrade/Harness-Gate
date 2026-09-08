@@ -1,0 +1,534 @@
+{
+  "caller_inventory": "Callers inherited from GH-146; retained historical dependency inventory. C source hashes are the final enforceable freeze; A/B/D hashes are informational snapshots.",
+  "issue": "GH-152",
+  "modules": [
+    {
+      "authoritative_status": "Non-authoritative for release; generic shadow/reference or development tooling",
+      "callers": [
+        ".github/workflows/ci.yml",
+        ".github/workflows/quality-baseline-refresh.yml"
+      ],
+      "category": "A",
+      "ci_role": "Quality-scripts regression coverage; advisory/shadow or manual execution only",
+      "final_disposition": "Retain maintained Python CI/dev tooling with existing required responsibilities.",
+      "module": "tools/quality/benchmarks.py",
+      "purpose": "Capture deterministic verification, test, and release-small baselines.",
+      "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
+      "sha256": "10264b7f3f132dc9d01c019b77e365f60dd15023fc4611f65d4dbdfd9bb184dd"
+    },
+    {
+      "authoritative_status": "Repository Rust required-path helper; authoritative within its existing CI responsibility",
+      "callers": [
+        ".github/workflows/ci.yml",
+        "tools/quality/rust_reference.py",
+        "tools/quality/tests/test_ci_quality.py",
+        "tools/quality/tests/test_rust_equivalence.py"
+      ],
+      "category": "A",
+      "ci_role": "Required Rust quality/contract/docs path (directly or transitively); quality-scripts regression coverage",
+      "final_disposition": "Retain maintained Python CI/dev tooling with existing required responsibilities.",
+      "module": "tools/quality/ci_quality.py",
+      "purpose": "Required CI policy and fresh, review-only quality candidates (schema 1).",
+      "release_impact": "Not packaged in release binary. Existing required CI can block release eligibility; preserve behavior.",
+      "sha256": "57b33dfc765ad776b4ae1290e3160bcefb035dc3e6b197231c47351daf60ce6b"
+    },
+    {
+      "authoritative_status": "Non-authoritative for release; generic shadow/reference or development tooling",
+      "callers": [
+        "Manual CLI documented in docs/quality/gh-133/README.md; no tracked automatic caller"
+      ],
+      "category": "B",
+      "ci_role": "Quality-scripts regression coverage; advisory/shadow or manual execution only",
+      "final_disposition": "Retain ecosystem adapter; normalization/preflight only, with final generic decisions in Rust.",
+      "module": "tools/quality/collect_typescript_contracts.py",
+      "purpose": "Collect real task-3.3 contract runs in an isolated, disposable output directory.",
+      "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
+      "sha256": "7bcc45f52f5a2d8fdebc6294523ed9101f33f10a9e3eaec8a87bcf31e75f82c0"
+    },
+    {
+      "authoritative_status": "Frozen non-authoritative generic reference; cannot approve releases.",
+      "callers": [
+        "tools/quality/tests/test_collector_runner.py",
+        "tools/quality/tests/test_typescript_reference.py",
+        "tools/quality/typescript_acceptance.py"
+      ],
+      "category": "C",
+      "ci_role": "Quality-scripts regression coverage; advisory/shadow or manual execution only",
+      "final_disposition": "Frozen non-authoritative reference; no generic release-approval path. See python-retention.md for mixed-module exceptions.",
+      "freeze": "Full source hash; changes require reviewed compatibility evidence under docs/quality/python-retention.md.",
+      "module": "tools/quality/collector_runner.py",
+      "purpose": "Collector transport and validation boundary; never a release evaluator.",
+      "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
+      "sha256": "f79a21dadc950d2cf54a97c0bb7a73d2990f7329e084037d505946db51e057e9"
+    },
+    {
+      "authoritative_status": "Repository Rust required-path helper; authoritative within its existing CI responsibility",
+      "callers": [
+        "tools/quality/function_risk.py",
+        "tools/quality/production_coverage.py",
+        "tools/quality/tests/test_complexity_analyzer.py",
+        "tools/quality/tests/test_function_risk.py",
+        "tools/quality/tests/test_quality_evidence.py",
+        "tools/quality/tests/test_risk_bundle.py"
+      ],
+      "category": "B",
+      "ci_role": "Required Rust quality/contract/docs path (directly or transitively); quality-scripts regression coverage",
+      "final_disposition": "Retain ecosystem adapter; normalization/preflight only, with final generic decisions in Rust.",
+      "module": "tools/quality/complexity_analyzer.py",
+      "purpose": "Deterministic development complexity analyzer for the frozen fixture subset.",
+      "release_impact": "Not packaged in release binary. Existing required CI can block release eligibility; preserve behavior.",
+      "sha256": "b39907e62acfc4b4bec4d6db2b054053b2d7ffe702528bf60e8f1e30874b88ab"
+    },
+    {
+      "authoritative_status": "Repository Rust required-path helper; authoritative within its existing CI responsibility",
+      "callers": [
+        ".github/workflows/ci.yml",
+        ".github/workflows/release.yml"
+      ],
+      "category": "A",
+      "ci_role": "Required Rust quality/contract/docs path (directly or transitively); quality-scripts regression coverage",
+      "final_disposition": "Retain maintained Python CI/dev tooling with existing required responsibilities.",
+      "module": "tools/quality/contracts.py",
+      "purpose": "Exercise the public CLI contract and compare normalized golden snapshots.",
+      "release_impact": "Not packaged in release binary. Existing required CI can block release eligibility; preserve behavior.",
+      "sha256": "a8ab2f39ecf8d414d609438b19663eab7cf843050b17a9aa55143f9c9413b227"
+    },
+    {
+      "authoritative_status": "Repository Rust required-path helper; authoritative within its existing CI responsibility",
+      "callers": [
+        "tools/quality/measurement_contract.py"
+      ],
+      "category": "A",
+      "ci_role": "Required Rust quality/contract/docs path (directly or transitively); quality-scripts regression coverage",
+      "final_disposition": "Retain maintained Python CI/dev tooling with existing required responsibilities.",
+      "module": "tools/quality/coverage.py",
+      "purpose": "Generate and gate source-boundary coverage evidence.",
+      "release_impact": "Not packaged in release binary. Existing required CI can block release eligibility; preserve behavior.",
+      "sha256": "18e4630c83763357cb9d4308833bb5cb709ea3401e9102eef3d17e32021101c8"
+    },
+    {
+      "authoritative_status": "Repository Rust required-path helper; authoritative within its existing CI responsibility",
+      "callers": [
+        "tools/quality/ci_quality.py",
+        "tools/quality/critical_paths_collect.py",
+        "tools/quality/tests/test_critical_paths.py"
+      ],
+      "category": "A",
+      "ci_role": "Required Rust quality/contract/docs path (directly or transitively); quality-scripts regression coverage",
+      "final_disposition": "Retain maintained Python CI/dev tooling with existing required responsibilities.",
+      "module": "tools/quality/critical_paths.py",
+      "purpose": "Fail-closed, isolated test-to-source critical-path evidence (rule v2).",
+      "release_impact": "Not packaged in release binary. Existing required CI can block release eligibility; preserve behavior.",
+      "sha256": "9a3e138dbd3e67203cd3bd3bb6a9add2e738f416b3c7023e6f309f02cc771523"
+    },
+    {
+      "authoritative_status": "Repository Rust required-path helper; authoritative within its existing CI responsibility",
+      "callers": [
+        "tools/quality/critical_paths.py"
+      ],
+      "category": "A",
+      "ci_role": "Required Rust quality/contract/docs path (directly or transitively); quality-scripts regression coverage",
+      "final_disposition": "Retain maintained Python CI/dev tooling with existing required responsibilities.",
+      "module": "tools/quality/critical_paths_collect.py",
+      "purpose": "Collect fresh LLVM profiles from one exact nextest identity per path.",
+      "release_impact": "Not packaged in release binary. Existing required CI can block release eligibility; preserve behavior.",
+      "sha256": "8695ec07a5581831ad9030e52b9a8cea5e6ce9f96e7602777791a34911aa7e76"
+    },
+    {
+      "authoritative_status": "Frozen non-authoritative generic reference; cannot approve releases.",
+      "callers": [
+        "tools/quality/policy_engine.py"
+      ],
+      "category": "C",
+      "ci_role": "Quality-scripts regression coverage; advisory/shadow or manual execution only",
+      "final_disposition": "Frozen non-authoritative reference; no generic release-approval path. See python-retention.md for mixed-module exceptions.",
+      "freeze": "Full source hash; changes require reviewed compatibility evidence under docs/quality/python-retention.md.",
+      "module": "tools/quality/cross_component.py",
+      "purpose": "Tool-independent contract bindings over already validated normalized evidence.",
+      "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
+      "sha256": "a861c3e3f3ab9a79a036c6ac41a1a0883fef553a3723878d721d2032f3833111"
+    },
+    {
+      "authoritative_status": "Repository Rust required-path helper; authoritative within its existing CI responsibility",
+      "callers": [
+        ".github/workflows/ci.yml",
+        ".github/workflows/release.yml",
+        "tools/quality/tests/test_docs_consistency.py"
+      ],
+      "category": "A",
+      "ci_role": "Required Rust quality/contract/docs path (directly or transitively); quality-scripts regression coverage",
+      "final_disposition": "Retain maintained Python CI/dev tooling with existing required responsibilities.",
+      "module": "tools/quality/docs_consistency.py",
+      "purpose": "Check Markdown links, embedded examples, and generated Schema sync.",
+      "release_impact": "Not packaged in release binary. Existing required CI can block release eligibility; preserve behavior.",
+      "sha256": "191b567ba7d98cfc26473bf9aa7dccc2ac2b0e98d09646814fb1d1602f33e473"
+    },
+    {
+      "authoritative_status": "Repository Rust required-path helper; authoritative within its existing CI responsibility",
+      "callers": [
+        "tools/quality/risk.py",
+        "tools/quality/rust_reference.py",
+        "tools/quality/source_measure.py",
+        "tools/quality/tests/test_function_risk.py",
+        "tools/quality/tests/test_risk_bundle.py"
+      ],
+      "category": "B",
+      "ci_role": "Required Rust quality/contract/docs path (directly or transitively); quality-scripts regression coverage",
+      "final_disposition": "Retain ecosystem adapter; normalization/preflight only, with final generic decisions in Rust.",
+      "module": "tools/quality/function_risk.py",
+      "purpose": "Versioned, source-location based joins of locked complexity and LLVM evidence.",
+      "release_impact": "Not packaged in release binary. Existing required CI can block release eligibility; preserve behavior.",
+      "sha256": "474721231723fe5ca1ee3c50033a15319f59bbb152f755ce366d800e006c3abc"
+    },
+    {
+      "authoritative_status": "Frozen non-authoritative generic reference; cannot approve releases.",
+      "callers": [
+        "tools/quality/collector_runner.py",
+        "tools/quality/cross_component.py",
+        "tools/quality/fixtures/generic-core/replay.py",
+        "tools/quality/policy_engine.py",
+        "tools/quality/policy_ratchet.py",
+        "tools/quality/project_report.py",
+        "tools/quality/rust_reference.py",
+        "tools/quality/tests/test_collector_runner.py",
+        "tools/quality/tests/test_harness_evidence.py",
+        "tools/quality/tests/test_policy_engine.py",
+        "tools/quality/tests/test_policy_ratchet.py",
+        "tools/quality/tests/test_project_report.py",
+        "tools/quality/tests/test_rust_reference.py",
+        "tools/quality/tests/test_typescript_acceptance.py",
+        "tools/quality/tests/test_typescript_contracts.py",
+        "tools/quality/tests/test_typescript_policy.py",
+        "tools/quality/tests/test_typescript_reference.py",
+        "tools/quality/tests/test_typescript_semantics.py",
+        "tools/quality/typescript_acceptance.py",
+        "tools/quality/typescript_advisory.py",
+        "tools/quality/typescript_contracts.py",
+        "tools/quality/typescript_reference.py",
+        "tools/quality/typescript_semantics.py"
+      ],
+      "category": "C",
+      "ci_role": "Quality-scripts regression coverage; advisory/shadow or manual execution only",
+      "final_disposition": "Frozen non-authoritative reference; no generic release-approval path. See python-retention.md for mixed-module exceptions.",
+      "freeze": "Full source hash; changes require reviewed compatibility evidence under docs/quality/python-retention.md.",
+      "module": "tools/quality/harness_evidence.py",
+      "purpose": "Standalone normalized evidence contracts; no release decision or collector.",
+      "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
+      "sha256": "f08736199f6e192b8e3ab3c9269ce2743f5624940561663919f99790545281e2"
+    },
+    {
+      "authoritative_status": "Repository Rust required-path helper; authoritative within its existing CI responsibility",
+      "callers": [
+        "Manual CLI documented in tools/quality/README.md and docs/quality/measurement-contract.md; no tracked automatic caller"
+      ],
+      "category": "A",
+      "ci_role": "Required Rust quality/contract/docs path (directly or transitively); quality-scripts regression coverage",
+      "final_disposition": "Retain maintained Python CI/dev tooling with existing required responsibilities.",
+      "module": "tools/quality/measurement_contract.py",
+      "purpose": "Capture the reproducibility contract for quality measurements.",
+      "release_impact": "Not packaged in release binary. Existing required CI can block release eligibility; preserve behavior.",
+      "sha256": "8d3b7b9afbd12bd5e9b55410c3205a692fdc568da56bb1d5c9c6368a937c0670"
+    },
+    {
+      "authoritative_status": "Frozen non-authoritative generic reference; cannot approve releases.",
+      "callers": [
+        "tools/quality/fixtures/generic-core/replay.py",
+        "tools/quality/project_report.py",
+        "tools/quality/rust_reference.py",
+        "tools/quality/tests/test_policy_engine.py",
+        "tools/quality/tests/test_policy_ratchet.py",
+        "tools/quality/tests/test_project_report.py",
+        "tools/quality/tests/test_rust_reference.py",
+        "tools/quality/tests/test_typescript_contracts.py",
+        "tools/quality/tests/test_typescript_policy.py",
+        "tools/quality/typescript_acceptance.py",
+        "tools/quality/typescript_contracts.py"
+      ],
+      "category": "C",
+      "ci_role": "Quality-scripts regression coverage; advisory/shadow or manual execution only",
+      "final_disposition": "Frozen non-authoritative reference; no generic release-approval path. See python-retention.md for mixed-module exceptions.",
+      "freeze": "Full source hash; changes require reviewed compatibility evidence under docs/quality/python-retention.md.",
+      "module": "tools/quality/policy_engine.py",
+      "purpose": "Generic shadow policy evaluation over validated harness-evidence/v1 facts.",
+      "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
+      "sha256": "a3ac2948eec2a27b3968e531c2e6f9e7f797afd832f819190734aa545388e619"
+    },
+    {
+      "authoritative_status": "Frozen non-authoritative generic reference; cannot approve releases.",
+      "callers": [
+        "tools/quality/policy_engine.py"
+      ],
+      "category": "C",
+      "ci_role": "Quality-scripts regression coverage; advisory/shadow or manual execution only",
+      "final_disposition": "Frozen non-authoritative reference; no generic release-approval path. See python-retention.md for mixed-module exceptions.",
+      "freeze": "Full source hash; changes require reviewed compatibility evidence under docs/quality/python-retention.md.",
+      "module": "tools/quality/policy_ratchet.py",
+      "purpose": "Baseline identity and review metadata for the generic shadow policy engine.",
+      "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
+      "sha256": "90eeb951393bed7393d5ed1a223c533e18c986ecb63ad06c7fbceeecef640620"
+    },
+    {
+      "authoritative_status": "Non-authoritative for release; generic shadow/reference or development tooling",
+      "callers": [
+        "Standalone manual CLI (__main__); no tracked automatic caller"
+      ],
+      "category": "A",
+      "ci_role": "Quality-scripts regression coverage; advisory/shadow or manual execution only",
+      "final_disposition": "Retain maintained Python CI/dev tooling with existing required responsibilities.",
+      "module": "tools/quality/post_remediation_benchmarks.py",
+      "purpose": "Capture R-16 scheduler/wait scenario baselines and R-17 validation evidence.",
+      "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
+      "sha256": "42189a915336d7b867dedc4f5c4262c4dd9b26d6a28dadb778e1fc46435d696d"
+    },
+    {
+      "authoritative_status": "Repository Rust required-path helper; authoritative within its existing CI responsibility",
+      "callers": [
+        "tools/quality/ci_quality.py",
+        "tools/quality/coverage.py",
+        "tools/quality/critical_paths.py",
+        "tools/quality/critical_paths_collect.py",
+        "tools/quality/function_risk.py",
+        "tools/quality/risk.py",
+        "tools/quality/rust_reference.py",
+        "tools/quality/source_measure.py",
+        "tools/quality/tests/test_production_coverage.py",
+        "tools/quality/tests/test_risk_bundle.py"
+      ],
+      "category": "A",
+      "ci_role": "Required Rust quality/contract/docs path (directly or transitively); quality-scripts regression coverage",
+      "final_disposition": "Retain maintained Python CI/dev tooling with existing required responsibilities.",
+      "module": "tools/quality/production_coverage.py",
+      "purpose": "Strict production-location coverage; CI adoption is OpenSpec task 8.1.",
+      "release_impact": "Not packaged in release binary. Existing required CI can block release eligibility; preserve behavior.",
+      "sha256": "170d7d7470161a25380fdfaf1d0ca62c453e988202ad23dd54ac7b4c548683f1"
+    },
+    {
+      "authoritative_status": "Frozen non-authoritative generic reference; cannot approve releases.",
+      "callers": [
+        "tools/quality/collector_runner.py",
+        "tools/quality/fixtures/generic-core/replay.py",
+        "tools/quality/harness_evidence.py",
+        "tools/quality/policy_engine.py",
+        "tools/quality/policy_ratchet.py",
+        "tools/quality/project_report.py",
+        "tools/quality/rust_reference.py",
+        "tools/quality/tests/test_policy_ratchet.py",
+        "tools/quality/tests/test_project_model.py",
+        "tools/quality/tests/test_typescript_policy.py",
+        "tools/quality/tests/test_typescript_reference.py",
+        "tools/quality/typescript_contracts.py",
+        "tools/quality/typescript_reference.py",
+        "tools/quality/typescript_semantics.py"
+      ],
+      "category": "C",
+      "ci_role": "Quality-scripts regression coverage; advisory/shadow or manual execution only",
+      "final_disposition": "Frozen non-authoritative reference; no generic release-approval path. See python-retention.md for mixed-module exceptions.",
+      "freeze": "Full source hash; changes require reviewed compatibility evidence under docs/quality/python-retention.md.",
+      "module": "tools/quality/project_model.py",
+      "purpose": "Shadow project/subject contracts; no collector or release-policy authority.",
+      "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
+      "sha256": "d1d493bbd4566b8aaf469d0f28fdee89a3c3a3e3ebfe3e1068b9d93e90d1b196"
+    },
+    {
+      "authoritative_status": "Frozen non-authoritative generic reference; cannot approve releases.",
+      "callers": [
+        "tools/quality/fixtures/generic-core/replay.py",
+        "tools/quality/tests/test_project_report.py",
+        "tools/quality/tests/test_typescript_contracts.py",
+        "tools/quality/typescript_contracts.py"
+      ],
+      "category": "C",
+      "ci_role": "Quality-scripts regression coverage; advisory/shadow or manual execution only",
+      "final_disposition": "Frozen non-authoritative reference; no generic release-approval path. See python-retention.md for mixed-module exceptions.",
+      "freeze": "Full source hash; changes require reviewed compatibility evidence under docs/quality/python-retention.md.",
+      "module": "tools/quality/project_report.py",
+      "purpose": "Check opt-in project configuration and report generic shadow gates.",
+      "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
+      "sha256": "ff1a83d66fa63f988faad8a586e2f8ce9ad7c2f37d4e39c83841da6662c2acd5"
+    },
+    {
+      "authoritative_status": "Repository Rust required-path helper; authoritative within its existing CI responsibility",
+      "callers": [
+        "tools/quality/benchmarks.py",
+        "tools/quality/ci_quality.py",
+        "tools/quality/contracts.py",
+        "tools/quality/coverage.py",
+        "tools/quality/critical_paths.py",
+        "tools/quality/critical_paths_collect.py",
+        "tools/quality/docs_consistency.py",
+        "tools/quality/measurement_contract.py",
+        "tools/quality/post_remediation_benchmarks.py",
+        "tools/quality/production_coverage.py",
+        "tools/quality/risk.py",
+        "tools/quality/rust_equivalence.py",
+        "tools/quality/rust_reference.py",
+        "tools/quality/tests/test_ci_quality.py",
+        "tools/quality/tests/test_production_coverage.py",
+        "tools/quality/tests/test_quality_common.py",
+        "tools/quality/tests/test_risk_bundle.py",
+        "tools/quality/tests/test_rust_reference.py"
+      ],
+      "category": "A",
+      "ci_role": "Required Rust quality/contract/docs path (directly or transitively); quality-scripts regression coverage",
+      "final_disposition": "Retain maintained Python CI/dev tooling with existing required responsibilities.",
+      "module": "tools/quality/quality_common.py",
+      "purpose": "Shared helpers for the repository quality evidence commands.",
+      "release_impact": "Not packaged in release binary. Existing required CI can block release eligibility; preserve behavior.",
+      "sha256": "1b908a7e791fc6df4a5f2d5112a0180c35a6e39a1e8f932a95672d24c78e4cf8"
+    },
+    {
+      "authoritative_status": "Non-authoritative generic reference; legacy quality_evidence measurement integrity remains required CI tooling.",
+      "callers": [
+        "tools/quality/complexity_analyzer.py",
+        "tools/quality/function_risk.py",
+        "tools/quality/harness_evidence.py",
+        "tools/quality/project_model.py",
+        "tools/quality/tests/test_complexity_analyzer.py",
+        "tools/quality/tests/test_quality_evidence.py"
+      ],
+      "category": "C",
+      "ci_role": "Required Rust quality/contract/docs path (directly or transitively); quality-scripts regression coverage",
+      "final_disposition": "Frozen non-authoritative reference; no generic release-approval path. See python-retention.md for mixed-module exceptions.",
+      "freeze": "Full source hash; changes require reviewed compatibility evidence under docs/quality/python-retention.md.",
+      "module": "tools/quality/quality_evidence.py",
+      "purpose": "Validate versioned quality evidence records (stdlib only).",
+      "release_impact": "Not packaged in release binary. Existing required CI can block release eligibility; preserve behavior.",
+      "sha256": "8938ce2fc2d49caf2e3f3dac284fe3d07a13a3da9cbd8e1e729f011e2d5d145e"
+    },
+    {
+      "authoritative_status": "Repository Rust required-path helper; authoritative within its existing CI responsibility",
+      "callers": [
+        "tools/quality/tests/test_function_risk.py",
+        "tools/quality/tests/test_risk_bundle.py"
+      ],
+      "category": "A",
+      "ci_role": "Required Rust quality/contract/docs path (directly or transitively); quality-scripts regression coverage",
+      "final_disposition": "Retain maintained Python CI/dev tooling with existing required responsibilities.",
+      "module": "tools/quality/risk.py",
+      "purpose": "Build risk.json/risk.md from two retained, commit-bound measurement bundles.",
+      "release_impact": "Not packaged in release binary. Existing required CI can block release eligibility; preserve behavior.",
+      "sha256": "535a380ba1dfc335153b2f6599d4d946b3a31401b44d368b917ee7b0dc6ebe0a"
+    },
+    {
+      "authoritative_status": "Non-authoritative for release; generic shadow/reference or development tooling",
+      "callers": [
+        "tools/quality/tests/test_rust_equivalence.py"
+      ],
+      "category": "D",
+      "ci_role": "Quality-scripts regression coverage; advisory/shadow or manual execution only",
+      "final_disposition": "Retain replay tooling; freeze accepted inputs, outputs and semantics. Retire only after reviewed caller replacement and rollback evidence preservation.",
+      "module": "tools/quality/rust_equivalence.py",
+      "purpose": "Replay the pinned Rust acceptance window and its adversarial fixtures.",
+      "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
+      "sha256": "bb3ac19e54f6b44949f492e2d9b0a127f06bddc9be9052f0768c492ec4726498"
+    },
+    {
+      "authoritative_status": "Non-authoritative for release; generic shadow/reference or development tooling",
+      "callers": [
+        ".github/workflows/ci.yml",
+        "tools/quality/rust_equivalence.py",
+        "tools/quality/tests/test_rust_reference.py",
+        "tools/quality/tests/test_typescript_policy.py"
+      ],
+      "category": "D",
+      "ci_role": "Quality-scripts regression coverage; advisory/shadow or manual execution only",
+      "final_disposition": "Retain replay tooling; freeze accepted inputs, outputs and semantics. Retire only after reviewed caller replacement and rollback evidence preservation.",
+      "module": "tools/quality/rust_reference.py",
+      "purpose": "Project retained Rust candidate evidence and compare policies in shadow mode.",
+      "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
+      "sha256": "73a76252eebbd1534cfae8d395c70c03a862de3c17908c721eee4d6c5a179a75"
+    },
+    {
+      "authoritative_status": "Repository Rust required-path helper; authoritative within its existing CI responsibility",
+      "callers": [
+        "tools/quality/ci_quality.py",
+        "tools/quality/rust_reference.py",
+        "tools/quality/tests/test_source_measure.py"
+      ],
+      "category": "B",
+      "ci_role": "Required Rust quality/contract/docs path (directly or transitively); quality-scripts regression coverage",
+      "final_disposition": "Retain ecosystem adapter; normalization/preflight only, with final generic decisions in Rust.",
+      "module": "tools/quality/source_measure.py",
+      "purpose": "Version 2 AST inventory, distinguishing closure instrumentation and LLVM join.",
+      "release_impact": "Not packaged in release binary. Existing required CI can block release eligibility; preserve behavior.",
+      "sha256": "a51b9eb36ae560c5d78253addd9c2c8f82b71b9c3b7a6c627b0c54f3c2f0cab4"
+    },
+    {
+      "authoritative_status": "Non-authoritative for release; generic shadow/reference or development tooling",
+      "callers": [
+        "tools/quality/tests/test_typescript_acceptance.py",
+        "tools/quality/typescript_advisory.py"
+      ],
+      "category": "D",
+      "ci_role": "Quality-scripts regression coverage; advisory/shadow or manual execution only",
+      "final_disposition": "Retain replay tooling; freeze accepted inputs, outputs and semantics. Retire only after reviewed caller replacement and rollback evidence preservation.",
+      "module": "tools/quality/typescript_acceptance.py",
+      "purpose": "GH-134: collect and replay two real, locked frontend history pairs.",
+      "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
+      "sha256": "73d3f5a6cfb65b162863074c23815a6044fde64bd578423316e68503bb180342"
+    },
+    {
+      "authoritative_status": "Non-authoritative for release; generic shadow/reference or development tooling",
+      "callers": [
+        ".github/workflows/frontend-advisory.yml",
+        "tools/quality/tests/test_typescript_advisory.py"
+      ],
+      "category": "D",
+      "ci_role": "Quality-scripts regression coverage; advisory/shadow or manual execution only",
+      "final_disposition": "Retain replay tooling; freeze accepted inputs, outputs and semantics. Retire only after reviewed caller replacement and rollback evidence preservation.",
+      "module": "tools/quality/typescript_advisory.py",
+      "purpose": "Opt-in replay of the bounded frontend window; owns no required CI authority.",
+      "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
+      "sha256": "2f1bb5b82b5b83717db499240c84028d6c9a9a77bdcd1ae5b4d6d0033c9ab3d5"
+    },
+    {
+      "authoritative_status": "Non-authoritative for release; generic shadow/reference or development tooling",
+      "callers": [
+        "tools/quality/collect_typescript_contracts.py",
+        "tools/quality/tests/test_typescript_contracts.py",
+        "tools/quality/typescript_advisory.py"
+      ],
+      "category": "B",
+      "ci_role": "Quality-scripts regression coverage; advisory/shadow or manual execution only",
+      "final_disposition": "Retain ecosystem adapter; normalization/preflight only, with final generic decisions in Rust.",
+      "module": "tools/quality/typescript_contracts.py",
+      "purpose": "Development-only native contract adapter; tool parsing stays outside policy.",
+      "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
+      "sha256": "be30cd166091ab263cf344620fdaaedd3cfaa7a4ff61c0f3cdd971606b3637e9"
+    },
+    {
+      "authoritative_status": "Non-authoritative for release; generic shadow/reference or development tooling",
+      "callers": [
+        "tools/quality/tests/test_typescript_reference.py",
+        "tools/quality/typescript_acceptance.py"
+      ],
+      "category": "B",
+      "ci_role": "Quality-scripts regression coverage; advisory/shadow or manual execution only",
+      "final_disposition": "Retain ecosystem adapter; normalization/preflight only, with final generic decisions in Rust.",
+      "module": "tools/quality/typescript_reference.py",
+      "purpose": "Version 1 retained TypeScript/Angular collector; no policy decisions.",
+      "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
+      "sha256": "347ec0c980e77d519a5b956af49762f6be9a3d15d6d03a8ad697ded1186b490b"
+    },
+    {
+      "authoritative_status": "Non-authoritative for release; generic shadow/reference or development tooling",
+      "callers": [
+        "tools/quality/tests/test_typescript_acceptance.py",
+        "tools/quality/tests/test_typescript_reference.py",
+        "tools/quality/tests/test_typescript_semantics.py",
+        "tools/quality/typescript_acceptance.py",
+        "tools/quality/typescript_reference.py"
+      ],
+      "category": "B",
+      "ci_role": "Quality-scripts regression coverage; advisory/shadow or manual execution only",
+      "final_disposition": "Retain ecosystem adapter; normalization/preflight only, with final generic decisions in Rust.",
+      "module": "tools/quality/typescript_semantics.py",
+      "purpose": "TypeScript identity/measurement primitives; not a collector or policy engine.",
+      "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
+      "sha256": "71ac267b84ca2c2cb24f88ec0d03fd05df84d63d61687f40d3eea0cd642647bc"
+    }
+  ],
+  "policy": "docs/quality/python-retention.md",
+  "predecessor_merge": "63a7f9538b13d4f8888eff6b35663cda40270e70",
+  "schema": "python-boundary/v1"
+}

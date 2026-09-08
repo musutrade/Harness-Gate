@@ -250,7 +250,7 @@ class RatchetTests(unittest.TestCase):
                      'project': self.context['project'], 'expected': self.context['expected'],
                      'base-evidence': self.base, 'base-project': self.base_context['project'],
                      'base-expected': self.base_context['expected'], 'mappings': self.mappings}
-        command = [sys.executable, str(ROOT / 'policy_engine.py')]
+        command = [sys.executable, str(ROOT / 'policy_engine.py'), '--reference-only']
         for name, document in documents.items():
             path = root / (name + '.json')
             path.write_text(json.dumps(document))
