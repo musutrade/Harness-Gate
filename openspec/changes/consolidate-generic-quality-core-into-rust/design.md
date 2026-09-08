@@ -211,3 +211,19 @@ component/local/cross-component views. Shared participant references do not
 increase project blocker counts. Reports retain `mode: shadow`; the CLI has no
 candidate dependency. See [GH-149 validation](../../../docs/quality/gh-149/README.md).
 Tasks 5–7 and full proposal acceptance remain outstanding.
+
+## Task 5 replay and acceptance record
+
+GH-150 adds a non-authoritative Rust library replay/comparator and a Cargo example
+outside the released CLI. The retained-corpus driver verifies hashes, reproduces
+the frozen Python oracle, and supplies explicit head/base project, records,
+expected context, source/artifact roots, policy, selection and clock. It reuses
+retained bytes without native collection. The comparator retains all field-level
+mismatches at JSON Pointer paths; absent/null, exact numbers and array order stay
+significant. Previously accepted OS missing-file wording variations are reported
+separately with both strings and the same logical path/failure category.
+
+The required Rust suite includes complete frozen replay and consolidated negative
+assertions alongside the existing reference boundary comparisons. See
+[GH-150 acceptance evidence](../../../docs/quality/gh-150/README.md). No required
+workflow or release authority changes; tasks 6–7 remain outstanding.
