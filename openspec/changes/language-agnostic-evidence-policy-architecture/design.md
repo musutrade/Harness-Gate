@@ -351,7 +351,8 @@ No task may remeasure or reinterpret accepted historical Rust data solely to mak
 
 ### 13. External adapters use a versioned collector protocol
 
-A future external adapter can receive a request file/stdin and return evidence:
+The standalone GH-113 runner accepts internal callables and external stdin/stdout
+adapters behind the same validated evidence interface:
 
 ```text
 harness-gate -> collector request
@@ -361,6 +362,15 @@ collector -> raw artifacts + harness-evidence/v1
 The protocol must carry project/component, commit/target, requested capabilities, workspace roots, output locations and policy-independent collection parameters.
 
 The core validates returned evidence, artifact digests, declared series and capabilities before policy evaluation.
+
+The [v1 collector contract](../../../docs/quality/collector-protocol.md) defines
+the caller-bound request, exclusive evidence/error response, dedicated output
+inventory, typed failures, and transport-independent return value. The
+[synthetic fixtures](../../../tools/quality/fixtures/collectors/README.md) exercise
+both transports using retained normalized/raw evidence. This implements tasks
+4.1–4.4 only; authoritative Rust collection and later policy/migration tasks remain
+unchanged. Internal execution is trusted code; external execution is not an OS
+sandbox. POSIX subprocess deadlines terminate the process group.
 
 ### 14. Security and trust boundaries remain fail-closed
 
