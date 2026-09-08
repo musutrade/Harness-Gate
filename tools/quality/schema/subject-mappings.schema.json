@@ -34,7 +34,8 @@
             "enum": [
               "rename",
               "move",
-              "split"
+              "split",
+              "modify"
             ]
           },
           "from": {
