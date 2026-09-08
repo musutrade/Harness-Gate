@@ -79,8 +79,8 @@ def evaluate_case(name, args, kwargs, frozen=None):
         report = project_report.report(oracle["value"], kwargs["project"], args[0])
         cases[-1]["project_report"] = report
         if frozen is not None and "project_report" in frozen:
-            canonical = json.loads(json.dumps(report).replace(str(WORK / name), "$CASE_ROOT"))
-            assert canonical == frozen["project_report"], name
+            canonical = replay.portable_errors(report, WORK / name)
+            assert replay.oracle_matches(frozen["project_report"], canonical), name
         cases.append(dict(name=name + "/report", kind="report",
                           args=[oracle["value"], plain(kwargs["project"]), args[0]], kwargs={},
                           oracle=dict(accepted=True, value=report)))
