@@ -24,14 +24,14 @@ class ProductionCoverageTests(unittest.TestCase):
         self.inventory_path = self.root / "inventory.json"
         self.inventory = json.loads(INVENTORY.read_text())
         self.inventory["boundaries"] = {
-            name: {"blocking": name in REQUIRED, "files": [f"src/{name}.rs"]}
+            name: {"blocking": name in REQUIRED, "files": [f"quality-core/{name}.rs" if name == "quality-core" else f"src/{name}.rs"]}
             for name in sorted(REQUIRED | {"service-adapters", "other"})}
         self.inventory["exclusions"] = []
         self.inventory["unmapped_sources"] = []
         self.report = {"type": "llvm.coverage.json.export", "data": [{"files": [], "functions": []}]}
         self.line_records = {}
-        for name in self.inventory["boundaries"]:
-            self.add_source(f"src/{name}.rs")
+        for boundary in self.inventory["boundaries"].values():
+            self.add_source(boundary["files"][0])
 
     def add_source(self, relative, production_hits=(1, 1, 1, 0, 1)):
         path = self.root / relative
@@ -75,14 +75,27 @@ class ProductionCoverageTests(unittest.TestCase):
         self.assertEqual(owners["src/service/runtime.rs"], "service-adapters")
         self.assertIn("src/scope/benchmark.rs", excluded)
         self.assertTrue(inventory["unmapped_sources"])
+        self.assertEqual(owners["quality-core/policy.rs"], "quality-core")
+        self.assertEqual(owners["quality-core/replay.rs"], "quality-core")
 
     def test_exact_threshold_passes_and_keeps_separate_raw_metrics(self):
         result = self.evaluate()
         self.assertEqual(result["status"], "pass")
-        self.assertEqual(result["aggregate"]["lines"], {"covered": 40, "count": 50, "percent": 80.0})
-        self.assertEqual(result["aggregate"]["functions"]["count"], 10)
-        self.assertEqual(result["aggregate"]["regions"]["count"], 20)
+        self.assertEqual(result["aggregate"]["lines"], {"covered": 4 * len(REQUIRED), "count": 5 * len(REQUIRED), "percent": 80.0})
+        self.assertEqual(result["aggregate"]["functions"]["count"], len(REQUIRED))
+        self.assertEqual(result["aggregate"]["regions"]["count"], 2 * len(REQUIRED))
         self.assertEqual(result["boundaries"]["service-adapters"]["status"], "informational")
+
+    def test_outside_src_production_is_blocking_and_uninventoried_sources_fail(self):
+        path = str(self.root / "quality-core/quality-core.rs")
+        self.line_records[path][1] = 0
+        self.sync_segments(path)
+        item = next(f for f in self.report["data"][0]["files"] if f["filename"] == path)
+        item["summary"]["lines"]["covered"] -= 1
+        self.assertIn("quality-core", self.evaluate()["failures"])
+        self.add_source("quality-core/unlisted.rs")
+        with self.assertRaisesRegex(ValueError, "source inventory mismatch"):
+            self.evaluate()
 
     def test_threshold_never_rounds_up_or_accepts_invalid_values(self):
         self.assertFalse(meets_threshold(799999, 1000000))
@@ -102,7 +115,7 @@ class ProductionCoverageTests(unittest.TestCase):
         self.assertIn("app", result["failures"])
         self.assertEqual(result["status"], "fail")
         # Even perfect informational files cannot contribute to the aggregate.
-        self.assertEqual(result["aggregate"]["lines"]["covered"], 39)
+        self.assertEqual(result["aggregate"]["lines"]["covered"], 4 * len(REQUIRED) - 1)
 
     def test_test_only_additions_do_not_change_production_counts(self):
         before = self.evaluate()["aggregate"]
@@ -125,14 +138,14 @@ class ProductionCoverageTests(unittest.TestCase):
         for region in function["regions"]:
             region[4] = 0
         result = self.evaluate()
-        self.assertEqual(result["aggregate"]["functions"]["count"], 10)
-        self.assertEqual(result["aggregate"]["functions"]["covered"], 9)
+        self.assertEqual(result["aggregate"]["functions"]["count"], len(REQUIRED))
+        self.assertEqual(result["aggregate"]["functions"]["covered"], len(REQUIRED) - 1)
 
     def test_instances_are_merged_by_source_location(self):
         function = copy.deepcopy(self.report["data"][0]["functions"][0])
         function["name"] += "-instantiation"
         self.report["data"][0]["functions"].append(function)
-        self.assertEqual(self.evaluate()["aggregate"]["functions"]["count"], 10)
+        self.assertEqual(self.evaluate()["aggregate"]["functions"]["count"], len(REQUIRED))
 
     def test_exclusions_have_reasons_and_never_overlap(self):
         for kind in ["test", "generated", "benchmark-only"]:

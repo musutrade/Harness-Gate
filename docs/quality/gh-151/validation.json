@@ -1,0 +1,156 @@
+{
+  "issue": "GH-151",
+  "status": "blocked; candidate only; authority transfer not accepted",
+  "tasks": {
+    "6.1": "candidate awaiting hosted validation",
+    "6.2": "blocked",
+    "6.3": "candidate, not authoritative"
+  },
+  "environment": {
+    "CARGO_HOME": "<workspace>/target/gh-151/cargo-home",
+    "CARGO_TARGET_DIR": "<workspace>/target/gh-151/build"
+  },
+  "validation": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "result": "passed: 331 tests, zero skipped",
+      "log": "logs/nextest.log"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "result": "passed",
+      "log": "logs/fmt.log"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "result": "passed",
+      "log": "logs/clippy.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "result": "passed: 289 tests",
+      "log": "logs/python-unittest-final.log"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "result": "passed",
+      "log": "logs/docs-consistency-final.log"
+    },
+    {
+      "command": "openspec validate consolidate-generic-quality-core-into-rust --strict",
+      "result": "passed",
+      "log": "logs/openspec.log"
+    },
+    {
+      "command": "cargo package --manifest-path tools/harness-gate/Cargo.toml --package harness-gate --locked --allow-dirty",
+      "result": "passed; extracted publishable package compiled",
+      "log": "logs/package-root.log",
+      "environment": {
+        "CARGO_TARGET_DIR": "<workspace>/target/gh-151/package-build"
+      }
+    },
+    {
+      "command": "python3 tools/quality/fixtures/generic-core/authority.py --harness-gate target/gh-151/build/debug/harness-gate --rust-replay target/gh-151/build/debug/examples/differential_replay --output target/gh-151/acceptance",
+      "result": "passed: 33 shipped CLI cases, zero unresolved mismatches; differential exit 0",
+      "log": "logs/authority.log"
+    },
+    {
+      "command": "PYTHONPATH=tools/quality python3 target/gh-151/required-risk-preflight.py",
+      "result": "blocked, exit 1: production changes outside supported risk series; measurement review required: src/app/mod.rs, src/app/quality.rs, src/cli.rs, src/lib.rs. Existing predicate applied to tracked and untracked working-tree paths; not a full collection.",
+      "log": "logs/required-risk-preflight.log"
+    },
+    {
+      "command": "git commit -m 'feat(quality): stage Rust generic authority transfer'",
+      "result": "blocked, exit 128: unable to create /home/gem/symphony-workspaces/GH-151/.git/index.lock: Read-only file system; prior git add also failed with this error. No commit, push or PR created.",
+      "log": "logs/commit.log"
+    },
+    {
+      "command": "harness-gate config check",
+      "result": "not applicable: no .harness-gate/flow.toml declaring a ci profile"
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "result": "not applicable: no .harness-gate/flow.toml declaring a ci profile"
+    }
+  ],
+  "limitations": [
+    "Default shared Cargo cache is read-only: initial nextest failed to download tinyvec-1.13.2.crate with OS error 30. Recovered using a workspace-local Cargo cache and target directory; required Cargo commands then passed.",
+    "The initial Python suite exposed the new src/app/quality.rs inventory entry. It was registered and all 289 tests then passed.",
+    "Initial docs consistency ran without the local Cargo environment and failed Cargo-backed examples. Final result is recorded separately.",
+    "Production coverage was not recollected. Inspection shows source_root is fixed to src and source_path rejects the newly linked quality-core production paths; measurement-boundary review is required.",
+    "New hosted Rust shadow and current required checks have not been observed. Only predecessor PR #157 has accepted hosted results.",
+    "No authority acceptance, repository-variable change, workflow dispatch, merge, issue closure or Symphony completion declaration was performed.",
+    "Git metadata is mounted read-only. Candidate changes remain uncommitted in this workspace; no other workspace was accessed."
+  ],
+  "archive": "validation.tar.gz contains logs and full comparison/report outputs. Materialized duplicate source/artifact inputs are omitted locally; immutable input bytes are retained in the existing generic-core fixture corpus. Hosted upload includes materialized inputs.",
+  "previous_continuation_rechecks": [
+    {
+      "turn": 2,
+      "branch": "symphony/GH-151",
+      "command": "git add --dry-run tools/harness-gate/src/app/quality.rs",
+      "exit_code": 128,
+      "error": "fatal: Unable to create '/home/gem/symphony-workspaces/GH-151/.git/index.lock': Read-only file system",
+      "impact": "Cannot stage, commit or push the prepared candidate using this checkout. Controller must restore writable Git metadata in this workspace. No other workspace was accessed; no handoff was declared.",
+      "validation": "Previous passing test results remain applicable; no implementation changes or redundant test reruns in continuation turn 2."
+    }
+  ],
+  "continuation_recheck": {
+    "turn": 3,
+    "branch": "symphony/GH-151",
+    "command": "git add --dry-run docs/quality/gh-151/README.md",
+    "exit_code": 128,
+    "error": "fatal: Unable to create '/home/gem/symphony-workspaces/GH-151/.git/index.lock': Read-only file system",
+    "impact": "Cannot stage, commit or push from this workspace. Controller must restore writable Git metadata here; no other workspace was accessed. Required measurement boundaries and hosted acceptance also remain unresolved. No PR or completion declaration was created.",
+    "validation": "Fresh validation passed: 331 Rust tests (zero skipped), 289 Python tests, formatting, Clippy and docs consistency. Risk boundary preflight still fails; production coverage boundary remains unresolved. Project-local config/verify remain not applicable because .harness-gate/flow.toml is absent. Implementation unchanged.",
+    "checks": [
+      {
+        "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+        "exit_code": 0,
+        "result": "331 passed; zero skipped",
+        "log": "logs/retry-nextest.log"
+      },
+      {
+        "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+        "exit_code": 0,
+        "log": "logs/retry-fmt.log"
+      },
+      {
+        "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+        "exit_code": 0,
+        "log": "logs/retry-clippy.log"
+      },
+      {
+        "command": "python3 -m unittest discover -s tools/quality/tests -v",
+        "exit_code": 0,
+        "result": "289 passed",
+        "log": "logs/retry-python.log"
+      },
+      {
+        "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+        "exit_code": 0,
+        "result": "status pass",
+        "log": "logs/retry-docs.log"
+      },
+      {
+        "command": "PYTHONPATH=tools/quality python3 target/gh-151/required-risk-preflight.py",
+        "exit_code": 1,
+        "result": "production changes outside supported risk series; measurement review required: tools/harness-gate/src/app/mod.rs, tools/harness-gate/src/app/quality.rs, tools/harness-gate/src/cli.rs, tools/harness-gate/src/lib.rs",
+        "log": "logs/retry-risk.log"
+      },
+      {
+        "command": "git add --dry-run docs/quality/gh-151/README.md",
+        "exit_code": 128,
+        "log": "logs/retry-git.log"
+      }
+    ],
+    "archive": "validation-retry.tar.gz"
+  },
+  "latest_controller_continuation": {
+    "continuation_turn": 12,
+    "branch": "symphony/GH-151",
+    "command": "git add --dry-run docs/quality/gh-151/README.md",
+    "exit_code": 128,
+    "error": "fatal: Unable to create '/home/gem/symphony-workspaces/GH-151/.git/index.lock': Read-only file system",
+    "impact": "Submission remains blocked by the unchanged read-only Git mount. Controller must restore writable Git metadata in this workspace before retrying. Candidate implementation and prior validation remain unchanged; no repeated tests, commit, PR, or handoff declaration."
+  }
+}

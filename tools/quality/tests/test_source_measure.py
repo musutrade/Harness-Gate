@@ -11,7 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "tools/quality"))
-from source_measure import HOTSPOTS, SERIES, ast, closure_name, compare, complexity, digest, instrument, measure, original_point
+from source_measure import HOTSPOTS, SERIES, prepare, ast, closure_name, compare, complexity, digest, instrument, measure, original_point
 
 
 class SourceMeasureTests(unittest.TestCase):
@@ -62,6 +62,11 @@ fn outer(xs: &[bool]) -> bool {
         })
         self.assertEqual(complexity(controls["raw"]), 14)
 
+    def test_vec_repeat_visits_value_length_and_closure_decisions(self):
+        symbols = self.inventory('fn f(x: bool) { let _ = vec![|| if x { 1 } else { 2 }; if x { 2 } else { 1 }]; }')["symbols"]
+        self.assertEqual([s["kind"] for s in symbols], ["function", "closure"])
+        self.assertEqual([complexity(s["raw"]) for s in symbols], [2, 2])
+
     def test_unknown_macro_fails_closed(self):
         with self.assertRaises(subprocess.CalledProcessError):
             self.inventory("fn f() { custom!(name => |x| x); }")
@@ -104,6 +109,21 @@ fn outer(xs: &[bool]) -> bool {
         with self.assertRaisesRegex(ValueError, "missing extracted hotspot"):
             compare(base, head)
 
+    def test_production_outside_src_and_absent_base_are_explicit(self):
+        with tempfile.TemporaryDirectory(dir=ROOT / "target") as temp:
+            crate = Path(temp)
+            (crate / "src").mkdir()
+            (crate / "quality-core").mkdir()
+            source = "pub fn evaluate() { let f = |x: bool| x; }"
+            (crate / "quality-core/core.rs").write_text(source)
+            paths = ["../quality-core/core.rs", "app/quality.rs"]
+            manifest = prepare(crate, self.binary, paths)
+            self.assertEqual(manifest["absent_sources"], ["app/quality.rs"])
+            self.assertEqual(manifest["files"][paths[0]]["original"], source)
+            self.assertEqual(len(manifest["files"][paths[0]]["inventory"]["symbols"]), 2)
+            with self.assertRaisesRegex(ValueError, "missing selected source"):
+                prepare(crate, self.binary, ["app/commands.rs"])
+
     def test_unicode_nested_source_map(self):
         source = 'fn f() { let é = "é"; let f = |x| |y| x + y; }'
         inventory = self.inventory(source)
@@ -127,12 +147,13 @@ fn main() {
         with tempfile.TemporaryDirectory(dir=ROOT / "target") as temp:
             crate = Path(temp)
             (crate / "src").mkdir()
-            file = crate / "src/fixture.rs"
+            (crate / "quality-core").mkdir()
+            file = crate / "quality-core/fixture.rs"
             file.write_text(source)
             inventory = ast(file, self.binary)
             transformed, edits = instrument(source, inventory)
             file.write_text(transformed)
-            manifest = {"series": SERIES, "files": {"fixture.rs": {
+            manifest = {"series": SERIES, "files": {"../quality-core/fixture.rs": {
                 "original": source, "original_sha256": digest(source.encode()),
                 "instrumented_sha256": digest(transformed.encode()), "edits": edits, "inventory": inventory}}}
             executable = crate / "fixture"
@@ -166,7 +187,7 @@ fn main() {
             with self.assertRaisesRegex(ValueError, "instrumented source mismatch"):
                 measure(manifest, llvm, crate, self.binary)
             file.write_text(transformed)
-            manifest["files"]["fixture.rs"]["original_sha256"] = "0" * 64
+            manifest["files"]["../quality-core/fixture.rs"]["original_sha256"] = "0" * 64
             with self.assertRaisesRegex(ValueError, "original digest mismatch"):
                 measure(manifest, llvm, crate, self.binary)
 

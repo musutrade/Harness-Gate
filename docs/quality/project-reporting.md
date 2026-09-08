@@ -1,5 +1,10 @@
 # Cross-component contracts and project reports
 
+The [GH-151 Rust integration candidate](gh-151/README.md) adds an explicit-context
+`harness-gate quality evaluate` entry point with the same report contract. Its
+authority transfer remains pending hosted shadow and required CI acceptance.
+The historical Python interface documented below remains reference/shadow tooling.
+
 GH-117 implements OpenSpec tasks 8.1–8.3 and 9.1–9.3 in the standalone
 **shadow** evaluator. Rust remains the reference adapter. Angular/TypeScript,
 Python, Java, OpenAPI comparison and client generation here are **synthetic

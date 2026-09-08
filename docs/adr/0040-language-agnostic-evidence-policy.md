@@ -123,3 +123,13 @@ comparison results and the consolidated fail-closed matrix. The entry point is a
 candidate-library Cargo example, outside the installed CLI. Existing Rust required
 gates and release authority remain unchanged. Hosted shadow integration, authority
 transfer and Python disposition remain separate tasks 6–7.
+
+## Authority-transfer candidate review (GH-151)
+
+The [GH-151 record](../quality/gh-151/README.md) prepares an opt-in Rust shadow
+workflow and an explicit-context `harness-gate quality evaluate` command using
+the same generic Rust library. Collector protocol and report schemas remain
+compatible. The operator authorized versioned production risk/coverage extensions. The
+review awaits green hosted Rust shadow and required CI on the exact candidate
+SHA before transfer. Existing required CI and release authority are unchanged. Tasks 6–7
+and the full proposal are not accepted.
