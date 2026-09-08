@@ -1,10 +1,13 @@
-//! Candidate generic semantics for OpenSpec tasks 2.1–2.2. No release authority.
-// Integration is deliberately deferred to the policy/replay/authority tasks.
+//! Candidate generic semantics for OpenSpec tasks 2.1–3.2. No release authority.
+// CLI integration is deliberately deferred to the replay/authority tasks.
 
+mod comparison;
 pub mod evidence;
 mod json;
 pub mod model;
+pub mod policy;
 pub mod project;
+pub mod ratchet;
 mod schema;
 
 use serde_json::Value;
@@ -69,3 +72,6 @@ pub use json::{canonical, parse};
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod policy_tests;
