@@ -1,0 +1,237 @@
+{
+  "artifacts": {
+    "docs/quality/gh-134/README.md": {
+      "bytes": 8635,
+      "sha256": "ee729619d439bdeae6e31eeb92cda254559c68913d5b3e3fb07d687c7590d32b"
+    },
+    "docs/quality/gh-134/compatible-base/native-counters.json": {
+      "bytes": 2491,
+      "sha256": "772e7ae48562604f1c9d7111660898bfe03b13379f5e886b5c9d7ca8aaf24e6d"
+    },
+    "docs/quality/gh-134/compatible-base/native-counters.json.command.json": {
+      "bytes": 521,
+      "sha256": "89ee8040fc2c7a3e2cb8673705eb9bcaecd37a99c443ce98476a7d8b92752631"
+    },
+    "docs/quality/gh-134/compatible-base/native.tar.gz": {
+      "bytes": 721522,
+      "sha256": "98592277e40d9cd68f27a3a4f538e1e54d149c87a9b83395251534726f754716"
+    },
+    "docs/quality/gh-134/compatible-base/normalized.json": {
+      "bytes": 182408,
+      "sha256": "798a3d689549e5fd18a21151fa08d981ae6467ce35f68214724a40566fadee2b"
+    },
+    "docs/quality/gh-134/compatible-base/receipt.json": {
+      "bytes": 294,
+      "sha256": "d39bd001622f263d1d4e3c7e5c8bc681c914791dd4f5446cafaca8c796a1fd32"
+    },
+    "docs/quality/gh-134/compatible-base/source-index.json": {
+      "bytes": 25954,
+      "sha256": "026a7a319d417d4168eabe57fcdf3ece6f1dd313f9ae90c5619f617920ad39ac"
+    },
+    "docs/quality/gh-134/compatible-base/source-index.json.command.json": {
+      "bytes": 286,
+      "sha256": "1669c35d638f6964a2c2098c0c1502fc2b0e8d1060ba8c4bc4492ebe92f425d4"
+    },
+    "docs/quality/gh-134/compatible-head/native-counters.json": {
+      "bytes": 2491,
+      "sha256": "772e7ae48562604f1c9d7111660898bfe03b13379f5e886b5c9d7ca8aaf24e6d"
+    },
+    "docs/quality/gh-134/compatible-head/native-counters.json.command.json": {
+      "bytes": 521,
+      "sha256": "a151f7f6dc145e72ade49eed17d97a0fe192506ca489b5a3bbb3dcbef440672d"
+    },
+    "docs/quality/gh-134/compatible-head/native.tar.gz": {
+      "bytes": 721651,
+      "sha256": "151f9fd1406afab75466b3a96b67a6da849eae82a9bb65f0a27f9029e82ba939"
+    },
+    "docs/quality/gh-134/compatible-head/normalized.json": {
+      "bytes": 182408,
+      "sha256": "306303b339359375c3696b96863ffce6ae1e103729e06d6dc5e66f648f6c13e4"
+    },
+    "docs/quality/gh-134/compatible-head/receipt.json": {
+      "bytes": 294,
+      "sha256": "2b1f99137bae41e67590a085d15cc49c47fbf5af7183dbb3f209fcf2123898bb"
+    },
+    "docs/quality/gh-134/compatible-head/source-index.json": {
+      "bytes": 25954,
+      "sha256": "026a7a319d417d4168eabe57fcdf3ece6f1dd313f9ae90c5619f617920ad39ac"
+    },
+    "docs/quality/gh-134/compatible-head/source-index.json.command.json": {
+      "bytes": 286,
+      "sha256": "1669c35d638f6964a2c2098c0c1502fc2b0e8d1060ba8c4bc4492ebe92f425d4"
+    },
+    "docs/quality/gh-134/compatible.bundle": {
+      "bytes": 91146,
+      "sha256": "717dab24eb0ac6f6e6f0c8fcfbb3294901ea212d4e1d01a56b6f81fe6ef19659"
+    },
+    "docs/quality/gh-134/regression-base/native-counters.json": {
+      "bytes": 2491,
+      "sha256": "772e7ae48562604f1c9d7111660898bfe03b13379f5e886b5c9d7ca8aaf24e6d"
+    },
+    "docs/quality/gh-134/regression-base/native-counters.json.command.json": {
+      "bytes": 521,
+      "sha256": "60c30bd20ee97e3a6ce9178cf6ca16a5159ec5e4b27cd7cf21580e545d68ee2f"
+    },
+    "docs/quality/gh-134/regression-base/native.tar.gz": {
+      "bytes": 721494,
+      "sha256": "9fcb59050decb914fd1f7a75b51f60d53823601b556e455d6c6795da1aad0e40"
+    },
+    "docs/quality/gh-134/regression-base/normalized.json": {
+      "bytes": 182408,
+      "sha256": "bde57c1baaf6a64a9bf230a296744619152e9f83659240984ea480c7e764bbd9"
+    },
+    "docs/quality/gh-134/regression-base/receipt.json": {
+      "bytes": 294,
+      "sha256": "47dd1f12f4acdea5e5cfa39cece8228f70f5c4d1377540609d8508c92025991f"
+    },
+    "docs/quality/gh-134/regression-base/source-index.json": {
+      "bytes": 25954,
+      "sha256": "026a7a319d417d4168eabe57fcdf3ece6f1dd313f9ae90c5619f617920ad39ac"
+    },
+    "docs/quality/gh-134/regression-base/source-index.json.command.json": {
+      "bytes": 286,
+      "sha256": "176f4179529f6c1dd722f5e01b2288038a7cfe4e353edc7497ddb84c8d7c0449"
+    },
+    "docs/quality/gh-134/regression-head/native-counters.json": {
+      "bytes": 2491,
+      "sha256": "7e52c0aadfd7459ec6edadceaf0aed66735f43f37d29f8d473460cc3a009530b"
+    },
+    "docs/quality/gh-134/regression-head/native-counters.json.command.json": {
+      "bytes": 521,
+      "sha256": "b49087bb425765258633a366a000b6d0e38855a768d3690a43b53679b4031468"
+    },
+    "docs/quality/gh-134/regression-head/native.tar.gz": {
+      "bytes": 721329,
+      "sha256": "3a70f38108b9926e1c5e2d9c39dc47de8f4d81212ab7b27cc72874c9cfcffae3"
+    },
+    "docs/quality/gh-134/regression-head/normalized.json": {
+      "bytes": 182408,
+      "sha256": "1856725b24ea836a6d43d9e8c59e4fbee31a7c5d63938a6e82c59307e975c8f7"
+    },
+    "docs/quality/gh-134/regression-head/receipt.json": {
+      "bytes": 294,
+      "sha256": "ec70f0fe1d9293d604f68374fe9fb641e5387d542b4353f45a603f0f5d04143e"
+    },
+    "docs/quality/gh-134/regression-head/source-index.json": {
+      "bytes": 25954,
+      "sha256": "026a7a319d417d4168eabe57fcdf3ece6f1dd313f9ae90c5619f617920ad39ac"
+    },
+    "docs/quality/gh-134/regression-head/source-index.json.command.json": {
+      "bytes": 286,
+      "sha256": "176f4179529f6c1dd722f5e01b2288038a7cfe4e353edc7497ddb84c8d7c0449"
+    },
+    "docs/quality/gh-134/regression.bundle": {
+      "bytes": 91118,
+      "sha256": "d926a341219ee16e38f69d414eb86ad9494c2150dec444b90c8a4aa01dd0f11e"
+    },
+    "docs/quality/gh-134/results.json": {
+      "bytes": 115568,
+      "sha256": "39065af46c34f1fa398b8889df310bfb1fe5a025286404f1a32565900c910b7f"
+    },
+    "docs/quality/gh-134/validation.tar.gz": {
+      "bytes": 21064,
+      "sha256": "bb93e2da329f2df7f8b65a20fdc6f13ccb0a6b67b9a0791ee118b4be26c1537a"
+    },
+    "docs/quality/gh-134/window.json": {
+      "bytes": 938,
+      "sha256": "45945ecebc3894013721780cd83d832573864d80e19e15d8cebd252fd08fe270"
+    },
+    "openspec/changes/typescript-angular-reference-adapter/design.md": {
+      "bytes": 9946,
+      "sha256": "64d44983d14a6f53be919cd82ff2154ed50fd8f9e266360bfc4b50afdb48cf36"
+    },
+    "openspec/changes/typescript-angular-reference-adapter/proposal.md": {
+      "bytes": 3739,
+      "sha256": "eafe7dca62f8828d6138f2a8fd07185cc875c67886994ffb23ed765b20d01f4c"
+    },
+    "openspec/changes/typescript-angular-reference-adapter/tasks.md": {
+      "bytes": 5235,
+      "sha256": "2553ac7a4028b0497e49bdd45e9fba0e1e3b2f7eb61c17b396f970c2ed0d2afd"
+    },
+    "tools/quality/tests/test_typescript_acceptance.py": {
+      "bytes": 9244,
+      "sha256": "f7883f72732e115408f9c7d63bec293e1cc227a0f23488b96eb51dab82d3b32c"
+    },
+    "tools/quality/tests/test_typescript_reference.py": {
+      "bytes": 15842,
+      "sha256": "9fcadd522d4b7fe7dfb87b3d0bef1d57e46ec40b3b8bd477eebf29284591c020"
+    },
+    "tools/quality/typescript_acceptance.py": {
+      "bytes": 12981,
+      "sha256": "73d3f5a6cfb65b162863074c23815a6044fde64bd578423316e68503bb180342"
+    }
+  },
+  "checks": [
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -p 'test_typescript_*.py' -v",
+      "exit_status": 0,
+      "log": "baseline.log",
+      "result": "49 tests passed before implementation"
+    },
+    {
+      "command": "python3 tools/quality/typescript_acceptance.py --collect --work target/quality/gh134/native-v2",
+      "exit_status": 0,
+      "log": "collection-v2.log",
+      "result": "4 complete native collections; 60 commands exited 0"
+    },
+    {
+      "command": "python3 tools/quality/typescript_acceptance.py --work target/quality/gh134/replay",
+      "exit_status": 0,
+      "log": "replay.log",
+      "result": "88 exact comparisons; native/generic outcomes and debt match"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -p 'test_typescript_acceptance.py' -v",
+      "exit_status": 0,
+      "log": "acceptance.log",
+      "result": "22 tests passed"
+    },
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_status": 0,
+      "log": "nextest.log",
+      "result": "315 tests passed; 0 skipped"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "exit_status": 0,
+      "log": "fmt.log",
+      "result": "passed"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit_status": 0,
+      "log": "clippy.log",
+      "result": "passed"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_status": 0,
+      "log": "python-tests.log",
+      "result": "283 tests passed"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_status": 0,
+      "log": "docs-consistency.log",
+      "result": "status pass"
+    }
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "$PWD/target"
+  },
+  "issue": "GH-134",
+  "limitations": [
+    "Required hosted CI pending before merge.",
+    "No adapter or unmeasured Angular/platform certification; tasks 4.2 and 4.3 remain open.",
+    "Initial collection artifacts were discarded for wrong native revision; all four corrected runs repeated successfully.",
+    "Read-only workspace Git metadata copied within this workspace for delivery."
+  ],
+  "not_applicable": [
+    "harness-gate config check",
+    "harness-gate verify --profile ci --all"
+  ],
+  "not_applicable_reason": "No .harness-gate/flow.toml exists in this checkout.",
+  "schema": "typescript-acceptance-validation/v1",
+  "task": "4.1"
+}

@@ -22,6 +22,6 @@ Nothing below is implemented by GH-119. S <1h; M 1–2h; L 2–<4h.
 
 ## 4. Accept only proven capability
 
-- [ ] 4.1 [P1][M] Retain two base/head acceptance pairs and negative fixtures; acceptance: one compatible pass, one deliberate regression and all design failure cases reproduce, with no unexplained native/generic differences.
+- [x] 4.1 [P1][M] Retain two base/head acceptance pairs and negative fixtures; acceptance: one compatible pass, one deliberate regression and all design failure cases reproduce, with no unexplained native/generic differences. [GH-134 evidence](../../../docs/quality/gh-134/README.md): four fresh native runs with retained Git parent/head histories; 88 exact native/normalized counter comparisons; compatible pass and real coverage regression failure with matching debt; 22 acceptance/negative tests pass. TS-01/TS-02/TS-03 remain bounded, with no generic contract workaround. Certification/review remain tasks 4.2–4.3; required hosted CI is pending at submission.
 - [ ] 4.2 [P1][M] Add advisory CI and publish bounded certification evidence; acceptance: required Rust aggregate is unchanged, all mismatch dispositions link evidence, declared local and required hosted CI checks pass.
 - [ ] 4.3 [P1][S] Review and close this follow-up; acceptance: every claimed capability is evidenced, deferred capabilities stay unavailable, any generic contract amendment has separate review plus Rust/frontend validation.
