@@ -224,6 +224,32 @@ class RustReferenceTests(unittest.TestCase):
             self.assertEqual(identities[1]['accepted'], not changed)
             self.assertEqual(result['aggregate']['state'], 'fail' if changed else 'pass')
 
+    def test_optional_capability_and_measurement_error_drift_blocks_equivalence(self):
+        evaluate = engine.evaluate
+        for state in ('pass', 'measurement_error', 'omitted'):
+            with self.subTest(state=state):
+                def drift(*args, **kwargs):
+                    result = evaluate(*args, **kwargs)
+                    gate = next(g for g in result['results'] if g['state'] == 'unsupported')
+                    if state == 'omitted':
+                        result['results'].remove(gate)
+                    else:
+                        gate['state'] = state
+                    return result
+                with patch.object(engine, 'evaluate', side_effect=drift):
+                    report = self.shadow()
+                self.assertEqual(report['current_state'], 'pass')
+                self.assertEqual(report['state'], 'measurement_error')
+                self.assertFalse(report['compatible'])
+                self.assertTrue(report['migration_blocked'])
+                shutil.rmtree(self.case / 'shadow')
+
+    def test_missing_candidate_retains_measurement_error_report(self):
+        report = self.shadow(self.case / 'missing')
+        self.assertEqual(report['state'], 'measurement_error')
+        self.assertTrue(report['migration_blocked'])
+        self.assertEqual(json.loads((self.case / 'shadow/shadow.json').read_text()), report)
+
     def test_raw_counter_and_display_mismatch_is_rejected(self):
         for field, value in [('crap_line', 0.0), ('cc', 999), ('crap_exact', [1, 0]), ('passed', False)]:
             with self.subTest(field=field), self.assertRaises((ValueError, ArithmeticError)):
