@@ -2,13 +2,17 @@
 
 ## Fixture and measurement decisions
 
-There is no Angular application or pinned Angular version in this checkout.
-The follow-up will create a repository-owned fixture at
-`tools/quality/fixtures/typescript-angular/app/`, using the Angular CLI after
-selecting a supported Angular/Node/TypeScript combination. Commit its exact
-versions, lockfile, builder, runner, instrumentation provider and configuration
-digests before accepting measurements. Do not infer compatibility from current
-documentation or from the synthetic frontend fixture.
+GH-129 implements tasks 1.1–1.2 with the CLI-generated repository fixture at
+`tools/quality/fixtures/typescript-angular/app/` and its small Rust provider.
+The [frozen toolchain](../../../tools/quality/fixtures/typescript-angular/toolchain.json)
+selects Angular/CLI/build 22.0.8, Node 24.18.0, npm 11.16.0, TypeScript 6.0.2,
+Vitest/Istanbul 4.0.8 and openapi-typescript-codegen 0.29.0. Exact package versions
+and lockfiles are committed. The [native evidence](../../../tools/quality/fixtures/typescript-angular/evidence/README.md)
+retains repeated clean-install inventories, successful real build/tests,
+configuration digests, source bytes, raw counters and production/test source maps.
+Compatibility is demonstrated by these operations, not inferred from the
+synthetic frontend fixture. Adapter identity, policy and certification remain
+the unchecked later tasks; TS-01–TS-03 below are not resolved by native collection.
 
 The application will have a component with an external template, a service with
 tested and untested branches, same-named methods in distinct classes, a lazy
