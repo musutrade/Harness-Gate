@@ -187,3 +187,13 @@ Rollback is execution-only: restore the previous setup/cache/job implementation 
 ## Relationship to later workflow integration
 
 This design deliberately does not introduce the product-level `quality.toml`/`verify` orchestration. It establishes a cleaner execution substrate and cost evidence so that later collectors and generic quality evaluation can be integrated without multiplying redundant CI jobs.
+
+## Task 6 hosted decision (GH-169)
+
+[Retained hosted comparison and parity review](../../../docs/quality/ci-topology/after-state.md)
+shows materially less tool-install work, but overlapping PR latency and runner-cost
+ranges. Retain pinned acquisition and immutable evidence validation. Disable
+compiled caches after repeated misses; restore docs Cargo calls after neutral
+hosted execution timing. No timing is extrapolated for the rollback commit.
+Tasks 6.1–6.4 are evidenced separately from task 7 and overall proposal closure;
+the controller owns the submitted SHA’s hosted aggregate result.
