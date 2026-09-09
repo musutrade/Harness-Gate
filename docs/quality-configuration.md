@@ -7,8 +7,9 @@ including their references and policy-owned requirements. Invalid quality input
 produces `HGCFG-QUALITY` diagnostics in `config check --format json`.
 
 This is the configuration layer delivered by GH-179, OpenSpec tasks 1.1–1.4.
-Compilation, collector execution, baseline retrieval and verify/report integration
-are subsequent tasks. A successful config check proves configuration consistency;
+GH-180 adds [trusted compilation](quality-compilation.md), tasks 2.1–2.3.
+Collector execution, baseline retrieval and verify/report integration remain
+subsequent tasks. A successful config check proves configuration consistency;
 it does not certify evidence or establish a quality PASS.
 
 ## File presence and commands

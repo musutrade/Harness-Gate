@@ -31,7 +31,7 @@ class SourceMeasureTests(unittest.TestCase):
 
     def test_quality_configuration_source_certification(self):
         crate = ROOT / 'tools/harness-gate'
-        for name in ('mod', 'model', 'policy', 'validation'):
+        for name in ('mod', 'model', 'policy', 'validation', 'compiler'):
             path = f'config/quality/{name}.rs'
             with self.subTest(path=path):
                 self.assertIn(path, SOURCE_FILES)
