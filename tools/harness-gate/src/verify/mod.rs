@@ -1,5 +1,6 @@
 pub(crate) mod parser;
 mod plan;
+mod quality;
 mod report;
 mod scheduler;
 mod steps;
@@ -93,6 +94,7 @@ pub struct VerificationReport {
     /// Steps that were not dispatched because a prerequisite failed.
     pub skipped_steps: Vec<SkippedStep>,
     pub passed: bool,
+    pub quality: Option<quality::QualityResult>,
 }
 
 #[derive(Debug, Clone)]
@@ -232,6 +234,11 @@ fn run_selected(
     invocation_project.reports = invocation.root.clone();
     let mut progress = Progress::new(plan.nodes.len());
     scope.write_reports(&invocation_project)?;
+    let quality_inputs = if only_step.is_none() {
+        quality::prepare(project, &scope, profile)
+    } else {
+        Ok(None)
+    };
     let services = Mutex::new(ServiceManager::new(&invocation_project));
     let scheduler_result = scheduler::run_plan(
         &invocation_project,
@@ -278,7 +285,14 @@ fn run_selected(
         &mut progress,
         cleanup_error.as_ref(),
     );
-    let passed = cleanup_error.is_none()
+    let quality = quality::run(&invocation_project, quality_inputs);
+    if let Some(result) = &quality {
+        println!("{}", quality::diagnostics(result));
+    }
+    let passed = quality.as_ref().is_none_or(|result| result.passed())
+        && !cancelled
+        && failures.is_empty()
+        && cleanup_error.is_none()
         && steps.iter().all(|step| step.passed)
         && steps.len() == plan.nodes.len();
     let report = VerificationReport {
@@ -303,6 +317,7 @@ fn run_selected(
         steps,
         skipped_steps,
         passed,
+        quality,
     };
     publish_report(&report, &invocation_project, project, &mut progress)?;
 
@@ -439,6 +454,7 @@ fn publish_report(
     progress: &mut Progress,
 ) -> Result<(), VerifyError> {
     report::write(report, invocation_project).map_err(VerifyError::report)?;
+    quality::publish(report, project).map_err(VerifyError::report)?;
     report::mirror_legacy_outputs(invocation_project, project).map_err(VerifyError::report)?;
     report::notify(report, invocation_project).map_err(VerifyError::report)?;
     progress.finish();

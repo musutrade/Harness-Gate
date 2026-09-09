@@ -97,6 +97,7 @@ launched, then fails closed at the released core's unsupported-metric validation
 This preserves the GH-180 boundary without certifying a new metric or ecosystem. Runtime tests
 and a source guard reject introducing closed language dispatch into this path.
 
-`adapter run` remains available for advanced/debug use. Automatic request
-construction during `verify` and final workflow aggregation
-remain later OpenSpec tasks.
+`adapter run` remains available for advanced/debug use.
+[Verification composition](quality-verification.md) consumes host-prepared signed
+requests and combines the resulting quality decision with execution gates.
+Automatic request construction remains a host/pack responsibility.

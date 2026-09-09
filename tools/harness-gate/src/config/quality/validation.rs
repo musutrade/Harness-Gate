@@ -64,6 +64,20 @@ impl QualityConfig {
                 );
             }
         }
+        for profile in self.profiles.values() {
+            if let Some(workflow) = &profile.workflow {
+                for reference in [
+                    Some(&workflow.state),
+                    Some(&workflow.trusted_keys),
+                    workflow.baseline_request.as_ref(),
+                ]
+                .into_iter()
+                .flatten()
+                {
+                    path(root, reference, "workflow input", false)?;
+                }
+            }
+        }
         self.validate_baseline(root)?;
         let requirements = self
             .policies
