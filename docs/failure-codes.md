@@ -17,6 +17,7 @@ is explanatory only and is never used for retry or status decisions.
 | `RESULT_PARTIAL` | A parser found fewer results than required | `parser` |
 | `SCHEDULER_FAILURE` | The verification scheduler or cleanup failed | `exit` |
 | `SECRET_SCAN_FAILURE` | Secret scan found a blocking finding | `exit` |
+| `QUALITY_BLOCKED` | Generic quality policy failed or trusted workflow inputs/evidence are invalid | `exit` |
 | `ARCHITECTURE_AUDIT_FAILURE` | Architecture audit found a blocking violation | `exit` |
 | `STEP_EXECUTION_FAILURE` | A configured step could not execute | `exit` |
 | `STEP_SKIPPED` | A step was not dispatched because a prerequisite failed | `exit` |

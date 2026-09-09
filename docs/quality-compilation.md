@@ -57,10 +57,10 @@ This boundary assumes state comes from the trusted host and pack resolver, never
 from collector-controlled metadata. It checks consistency and bytes, not host
 signatures or Git provenance. [Collector execution](quality-collectors.md) and
 [baseline resolution](quality-baselines.md) expose separate trusted stages;
-integration into `verify` remains a subsequent OpenSpec task. Base evaluation
+[verification composition](quality-verification.md) consumes these stages. Base evaluation
 still accepts the existing complete set of five
 trusted base arguments. Profiles without policy rules do not produce an evaluable
-policy; lifecycle skip/report behavior belongs to the later integration.
+policy; empty-profile lifecycle behavior remains a later profile-semantics task.
 
 ## Determinism and identity
 
