@@ -44,7 +44,8 @@ jobs:
       - name: Verify generated configuration schema
         run: |
           cargo run --manifest-path tools/harness-gate/Cargo.toml -- schema export
-          git diff --exit-code -- schema/flow.schema.json
+          cargo run --manifest-path tools/harness-gate/Cargo.toml --locked -- schema export --quality
+          git diff --exit-code -- schema/flow.schema.json schema/quality.schema.json
 
   test-cross-platform:
     name: Test (${{ matrix.os }})
