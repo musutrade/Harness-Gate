@@ -56,7 +56,7 @@
       "reports": {},
       "status": "pass",
       "stderr": "",
-      "stdout": "Initialized preset \"generic\" in <PROJECT_ROOT>/.harness-gate\nNext: harness-gate --project-root <PROJECT_ROOT> config check\n"
+      "stdout": "Initialized preset \"generic\" in <PROJECT_ROOT>/.harness-gate\nNext: harness-gate --project-root <PROJECT_ROOT> config check\nQuality remains opt-in; no quality policy was generated.\n"
     },
     {
       "ansi": false,

@@ -17,6 +17,30 @@ Output conflicts fail before any configuration files are committed.
 
 ## Local checks
 
+### PR #195 CLI contract repair
+
+The Linux Quality CLI Contracts failure at `a7001dcb3b321cc6898c63598223e8bc4afa633b`
+was reproduced with `python3 tools/quality/contracts.py --output
+target/quality/gh-185/contracts-repair-before.json` (using the Cargo target override
+below). It exited 1 with `CLI contract snapshot differs`; all 20 behavioral
+scenarios passed. The only difference was the intended generic initialization
+notice: `Quality remains opt-in; no quality policy was generated.`
+
+The golden snapshot now includes that notice. No production behavior or contract
+assertion was changed. Running `python3 tools/quality/contracts.py --output
+target/quality/gh-185/contracts-repair-after.json` then passed with all 20 scenarios
+and an exact snapshot match. Before/after JSON and logs remain uncommitted under
+`target/quality/gh-185/`. Hosted Required Quality Aggregate remains CI pending.
+
+The five required local commands listed below were also rerun for this repair:
+nextest passed all 378 tests, formatting and Clippy passed, all 341 Python tests
+passed, and documentation consistency passed. Their logs are `repair-nextest.log`,
+`repair-fmt.log`, `repair-clippy.log`, `repair-python-tests.log` and
+`repair-docs-consistency.log` under the same artifact directory. Root config check
+and CI verification remain not applicable because project-local flow.toml is absent.
+
+### Implementation validation
+
 The commands below ran from the GH-185 workspace on Linux x86_64 with Rust
 1.97.1 and Python 3.14.4. Cargo and Python subprocesses used
 `CARGO_TARGET_DIR="$PWD/target"`: the environment's default `/home/gem/cargo-target`
