@@ -7,6 +7,7 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import ci_timing
+import ci_comparison
 from quality_common import ROOT
 
 
@@ -50,12 +51,36 @@ class HostedTimingTests(unittest.TestCase):
                     ci_timing.normalize_run(run, self.contract)
 
     def test_step_categories_separate_install_collection_and_cleanup(self):
+        self.assertEqual(ci_timing.category('Configure Cargo state'), 'setup')
+        self.assertEqual(ci_timing.category('Seal immutable quality evidence'), 'artifact')
+        self.assertEqual(ci_timing.category('Verify artifact identity and hashes before consumption'), 'artifact')
         self.assertEqual(ci_timing.category('Install cargo-nextest and cargo-llvm-cov'), 'tool_install')
         self.assertEqual(ci_timing.category('Install Rust'), 'setup')
         self.assertEqual(ci_timing.category('Post Install Python'), 'cleanup')
         self.assertEqual(ci_timing.category('Upload quality evidence'), 'artifact')
         with self.assertRaises(ValueError):
             ci_timing.seconds('2026-09-09T01:00:01Z', '2026-09-09T01:00:00Z')
+
+    def test_after_and_stage_evidence_reproduce_with_the_baseline_normalization(self):
+        directory = ROOT / 'docs/quality/ci-topology'
+        for source, output in [('hosted-after-input.json', 'hosted-after.json'),
+                               ('hosted-stage-input.json', 'hosted-stages.json')]:
+            raw = (directory / source).read_bytes()
+            result = ci_timing.normalize(json.loads(raw), self.contract)
+            result['input_sha256'] = hashlib.sha256(raw).hexdigest()
+            self.assertEqual(result, json.loads((directory / output).read_text()))
+
+    def test_comparison_keeps_runner_cost_and_nested_overhead_separate(self):
+        directory = ROOT / 'docs/quality/ci-topology'
+        result = ci_comparison.compare(directory)
+        self.assertEqual(result, json.loads((directory / 'hosted-comparison.json').read_text()))
+        self.assertEqual(result['before']['category_seconds']['tool_install']['median'], 423)
+        self.assertEqual(result['after']['critical_path_seconds']['median'], 878.5)
+        self.assertEqual(result['after']['total_runner_wall_minutes']['max'], 2420 / 60)
+        latest = result['supplemental_log_audit'][0]['jobs']
+        self.assertEqual(sum(j['target_cache_hits'] for j in latest), 0)
+        self.assertEqual(sum(j['target_cache_misses'] for j in latest), 7)
+        self.assertAlmostEqual(sum(j['target_cache_restore_and_save_seconds'] for j in latest), 41.964)
 
 
 if __name__ == '__main__':

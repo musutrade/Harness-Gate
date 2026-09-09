@@ -8,6 +8,12 @@ measurement series, requiredness and native platform requirements are unchanged.
 records. Tasks 5–7 and overall proposal acceptance remain open. Submitted-commit
 Required Quality Aggregate acceptance is pending controller-owned hosted CI.
 
+## GH-169 hosted decision
+
+The experiment below is historical. [Hosted task 6 evidence](after-state.md)
+found neutral docs execution time and reverted the build-once helper to locked
+Cargo calls. All eleven semantic operations and their failure tests remain.
+
 ## Documentation and preset execution
 
 The before-state docs check passed with four presets. It invoked `cargo run`
@@ -15,7 +21,7 @@ The before-state docs check passed with four presets. It invoked `cargo run`
 v1 migration and migrated config check; and schema export. These calls repeated
 Cargo startup and build-freshness resolution, not necessarily full compilation.
 
-`docs_consistency.py` now performs one locked dev binary build, then runs the
+The GH-167 experiment made `docs_consistency.py` perform one locked dev binary build, then runs the
 same 11 CLI operations against the executable reported by Cargo. Compiler JSON
 identifies the executable for this crate; redirected targets and platform suffixes
 need no hardcoded path. Cargo establishes freshness even on cache hits. A failed
@@ -65,7 +71,7 @@ separate compilation from tests inside a step.
 | Build | 153 (140–154) | Retain release/default-feature build. Its uploaded executable does not satisfy the current dev contracts or release-small performance contract. |
 | Clippy | 47 (42–48) | Retain all-targets/all-features analysis; neither a dev executable nor nextest output represents this semantic result. |
 | Quality CLI Contracts | 59 (56–62) | Retain fresh dev build plus contract scenarios. Sharing a dev executable with docs is potentially compatible, but requires validated transport and a new scheduling dependency with no hosted after-state evidence of benefit. |
-| Documentation Consistency | 55 (52–59) | Adopt only the within-job build-once loop above. No job dependency changes. |
+| Documentation Consistency | 55 (52–59) | Initially adopted the within-job build-once loop; GH-169 reverted it after neutral hosted timing. No job dependency changes. |
 | Quality Coverage and Critical Paths | 858 (796–1127) | Retain isolated instrumented collection; it is the last required child in all three samples. |
 
 Developer critical path has median 903 seconds (846–1141). A Linux monolith

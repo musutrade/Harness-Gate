@@ -1,5 +1,11 @@
 # GH-166: Cargo caches and retained artifact boundaries
 
+GH-169 [hosted acceptance and rollback](after-state.md) supersedes the compiled
+cache enablement described below: every caller now leaves target caching disabled
+after repeated misses. Source caches, resolved targets and immutable evidence
+validation remain enabled. The table records the GH-166 experiment.
+
+
 This implements `optimize-ci-execution-topology` tasks 3.1–3.3 after GH-165.
 Engineering Policy, CRAP semantics, required assurance, measurement series and
 Rust authority are unchanged. ADR-0039 and ADR-0040 remain the governing records.

@@ -44,10 +44,14 @@ Task 5 implementation evidence: [GH-168 aggregate contract](../../../docs/qualit
 
 ## 6. Hosted after-state performance and assurance acceptance
 
-- [ ] 6.1 Capture multiple representative successful hosted post-change PR runs using the same normalization as task 1.2.
-- [ ] 6.2 Compare before/after critical path, per-job timing, setup/tool-install time, runner wall minutes by OS, compilation duplication, quality collection time, and artifact overhead. Do not claim a percentage improvement unsupported by hosted evidence.
-- [ ] 6.3 Run semantic parity review: all prior required outcomes, CRAP/coverage/critical-path semantics, platform requirements, release authority, measurement identities, and fail-closed aggregate behavior remain unchanged.
-- [ ] 6.4 Revert individual optimizations that are neutral/worse or introduce trust ambiguity rather than weakening assurance to preserve them.
+- [x] 6.1 Capture multiple representative successful hosted post-change PR runs using the same normalization as task 1.2.
+- [x] 6.2 Compare before/after critical path, per-job timing, setup/tool-install time, runner wall minutes by OS, compilation duplication, quality collection time, and artifact overhead. Do not claim a percentage improvement unsupported by hosted evidence.
+- [x] 6.3 Run semantic parity review: all prior required outcomes, CRAP/coverage/critical-path semantics, platform requirements, release authority, measurement identities, and fail-closed aggregate behavior remain unchanged.
+- [x] 6.4 Revert individual optimizations that are neutral/worse or introduce trust ambiguity rather than weakening assurance to preserve them.
+
+Evidence: [GH-169 hosted comparison, parity review and individual rollbacks](../../../docs/quality/ci-topology/after-state.md);
+[exact local validation](../../../docs/quality/ci-topology/after-validation.json).
+Both sampled aggregates are green. Submitted-SHA CI and overall closure remain pending.
 
 ## 7. Documentation and closure
 
