@@ -9,7 +9,7 @@ mod validation;
 
 use super::{ConfigDiagnostics, FlowConfig};
 use anyhow::{Context, Result};
-pub(crate) use model::QualityConfig;
+pub(crate) use model::{QualityConfig, ReportFormat};
 use std::{fs, io::ErrorKind, path::Path};
 
 pub(crate) const QUALITY_CONFIG_PATH: &str = ".harness-gate/quality.toml";
