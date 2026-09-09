@@ -51,6 +51,10 @@
         "src/config/mod.rs",
         "src/config/model.rs",
         "src/config/path.rs",
+        "src/config/quality/mod.rs",
+        "src/config/quality/model.rs",
+        "src/config/quality/policy.rs",
+        "src/config/quality/validation.rs",
         "src/config/scope.rs",
         "src/config/validation/mod.rs",
         "src/config/validation/primitives.rs",
@@ -278,6 +282,11 @@
       "path": "quality-core/tests.rs",
       "kind": "test",
       "reason": "Test module reachable only under cfg(test)."
+    },
+    {
+      "path": "src/config/quality/tests.rs",
+      "kind": "test",
+      "reason": "Test-only module compiled under cfg(test)."
     }
   ],
   "external_exclusions": [
@@ -315,7 +324,7 @@
     {
       "path": "src/config/mod.rs",
       "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
-      "sha256": "dace8de2f19e6744c2fe5ca63fb875988578d648f48914c34ac1426414f9242f"
+      "sha256": "3c2683a75a13450f73c7f14dc0975fd220b343e6ab7dda873e0e4e59769a2ef7"
     },
     {
       "path": "src/doctor/mod.rs",
@@ -351,6 +360,11 @@
       "path": "quality-core/model.rs",
       "reason": "Wire type declarations and serde derives have no executable LLVM mapping on this target; the file remains in the production inventory.",
       "sha256": "b8959e7e3ffdea692a7a6d12bdde62372d58985c5e279f0708ca9a128831169c"
+    },
+    {
+      "path": "src/config/quality/model.rs",
+      "reason": "Type declarations and derived implementations have no executable LLVM source mapping on this target; the AST inventory contains no handwritten functions or closures.",
+      "sha256": "3a1e9859b1254772b5b5d9211556c6e5b6b8e01644b48156310e4ce95107ee10"
     }
   ],
   "source_roots": [

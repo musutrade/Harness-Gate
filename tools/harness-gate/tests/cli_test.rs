@@ -355,3 +355,89 @@ fn test_color_never_keeps_human_readable_output_plain() {
     assert!(!stdout_str(&output).contains("\x1b["));
     assert!(!stderr_str(&output).contains("\x1b["));
 }
+
+#[test]
+fn quality_config_commands_cross_validate_both_planes() {
+    let ctx = TestContext::new();
+    ctx.init_preset("rust-api");
+    ctx.write_file(
+        ".harness-gate/flow.toml",
+        include_str!("../presets/rust-api.flow.toml"),
+    );
+    let legacy = ctx.run_harness_gate(&["config", "print", "--resolved"]);
+    assert_success(&legacy);
+    let raw_flow = ctx.run_harness_gate(&["config", "print"]);
+    assert_success(&raw_flow);
+    assert_eq!(
+        stdout_str(&raw_flow),
+        include_str!("../presets/rust-api.flow.toml")
+    );
+    assert_failure(&ctx.run_harness_gate(&["config", "print", "--quality"]));
+    let quality = include_str!("../../quality/fixtures/workflow/quality.toml");
+    ctx.write_file(".harness-gate/quality.toml", quality);
+    ctx.write_file(
+        ".harness-gate/policy.json",
+        include_str!("../../quality/fixtures/workflow/policy.json"),
+    );
+    assert_success(&ctx.run_harness_gate(&["config", "check"]));
+    assert_success(&ctx.run_harness_gate(&["config", "check", "--format", "json"]));
+    let printed = ctx.run_harness_gate(&["config", "print", "--quality"]);
+    assert_success(&printed);
+    assert_eq!(stdout_str(&printed).trim(), quality.trim());
+    assert_success(&ctx.run_harness_gate(&["config", "print", "--quality", "--resolved"]));
+    assert_eq!(
+        stdout_str(&legacy),
+        stdout_str(&ctx.run_harness_gate(&["config", "print", "--resolved"]))
+    );
+    let raw_flow_with_quality = ctx.run_harness_gate(&["config", "print"]);
+    assert_success(&raw_flow_with_quality);
+    assert_eq!(stdout_str(&raw_flow), stdout_str(&raw_flow_with_quality));
+    for invalid in [
+        quality.replace(
+            "flow_components = [\"app\"]",
+            "flow_components = [\"missing\"]",
+        ),
+        quality.replace(
+            "[collectors.coverage]",
+            "[collectors.coverage]\nrequired = true",
+        ),
+    ] {
+        ctx.write_file(".harness-gate/quality.toml", &invalid);
+        assert_failure(&ctx.run_harness_gate(&["config", "check"]));
+        assert_failure(&ctx.run_harness_gate(&["config", "print"]));
+        let output = ctx.run_harness_gate(&["config", "check", "--format", "json"]);
+        assert_failure(&output);
+        let report: serde_json::Value = serde_json::from_str(&stdout_str(&output)).unwrap();
+        assert!(report.to_string().contains("HGCFG-QUALITY"));
+    }
+}
+
+#[test]
+fn quality_schema_exports_without_project_or_enabling_quality() {
+    let ctx = TestContext::new();
+    assert_success(&ctx.run_harness_gate(&["schema", "export", "--quality"]));
+    let schema: serde_json::Value =
+        serde_json::from_str(&ctx.read_file("schema/quality.schema.json")).unwrap();
+    assert_eq!(schema["title"], "QualityConfig");
+    assert_success(&ctx.run_harness_gate(&[
+        "schema",
+        "export",
+        "--quality",
+        "--output",
+        "custom.json",
+    ]));
+    assert_eq!(
+        ctx.read_file("custom.json"),
+        ctx.read_file("schema/quality.schema.json")
+    );
+    assert_failure(&ctx.run_harness_gate(&[
+        "schema",
+        "export",
+        "--quality",
+        "--output",
+        "../escape.json",
+    ]));
+    ctx.init_preset("generic");
+    assert_success(&ctx.run_harness_gate(&["config", "check"]));
+    assert_failure(&ctx.run_harness_gate(&["config", "print", "--quality"]));
+}
