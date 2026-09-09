@@ -117,6 +117,13 @@ No scheduling dependency, required outcome or measurement series changes.
 
 It must not install heavy Rust tools, compile the product, recollect coverage, or rerun tests. Python setup may be removed later if/when the same stable aggregate contract is implemented elsewhere, but changing aggregate authority is not required by this optimization.
 
+Tasks 5.1–5.3 retain checkout, Python setup, and the existing aggregate command
+as an exact tested step allowlist. The independent event fixture covers every
+required child, including the unconditional macOS/Windows test matrix, and
+push-only exemptions. Malformed needs payloads and required entries fail with
+controlled diagnostics; CLI tests prohibit process launches and collection.
+See the [GH-168 aggregate contract record](../../../docs/quality/ci-topology/aggregate.md).
+
 ### D8. Avoid job-count optimization that increases critical path
 
 Combining jobs can save setup/runner-minutes but can also serialize independent work. Changes must be evaluated against both:

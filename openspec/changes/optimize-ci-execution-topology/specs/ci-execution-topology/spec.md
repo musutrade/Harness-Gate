@@ -105,6 +105,17 @@ The workflow SHALL retain the exact check name `Required Quality Aggregate` and 
 - **THEN** the aggregate handles that child according to the unchanged event policy
 - **AND** this does not authorize skipping any PR-required child
 
+#### Scenario: Required child result is malformed
+- **GIVEN** the aggregate receives a non-object needs payload or required child entry
+- **WHEN** it evaluates the results
+- **THEN** it fails with a bounded diagnostic
+- **AND** does not collect replacement evidence or invoke external tools
+
+#### Scenario: Aggregate gains a heavy setup or execution step
+- **GIVEN** the aggregate only checks out sources, prepares Python, and evaluates child results
+- **WHEN** an extra action or command adds compilation, tests, collection, or Rust tool installation
+- **THEN** the aggregate step contract regression test fails
+
 ### Requirement: Optimization SHALL consider critical path and total runner work separately
 
 A topology change SHALL NOT be accepted solely because it reduces job count. Acceptance evidence SHALL consider both developer-visible PR critical path and total runner work/setup duplication. An optimization that is neutral/worse or introduces trust ambiguity SHOULD be reverted rather than preserved by weakening assurance.
