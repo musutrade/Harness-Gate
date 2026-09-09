@@ -19,6 +19,7 @@ pub(crate) enum FailureCode {
     SchedulerFailure,
     SecretScanFailure,
     ArchitectureAuditFailure,
+    QualityBlocked,
     StepExecutionFailure,
     StepSkipped,
     OutputLimitExceeded,
@@ -43,39 +44,8 @@ pub(crate) enum FailureCode {
 
 impl fmt::Display for FailureCode {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        formatter.write_str(match self {
-            Self::WebhookDestinationDenied => "WEBHOOK_DESTINATION_DENIED",
-            Self::WebhookRedirectDenied => "WEBHOOK_REDIRECT_DENIED",
-            Self::LeaseOwnershipUncertain => "LEASE_OWNERSHIP_UNCERTAIN",
-            Self::ServiceSetupFailure => "SERVICE_SETUP_FAILURE",
-            Self::ServiceLeaseFailure => "SERVICE_LEASE_FAILURE",
-            Self::ResultParseFailure => "RESULT_PARSE_FAILURE",
-            Self::ResultZero => "RESULT_ZERO",
-            Self::ResultPartial => "RESULT_PARTIAL",
-            Self::SchedulerFailure => "SCHEDULER_FAILURE",
-            Self::SecretScanFailure => "SECRET_SCAN_FAILURE",
-            Self::ArchitectureAuditFailure => "ARCHITECTURE_AUDIT_FAILURE",
-            Self::StepExecutionFailure => "STEP_EXECUTION_FAILURE",
-            Self::StepSkipped => "STEP_SKIPPED",
-            Self::OutputLimitExceeded => "OUTPUT_LIMIT_EXCEEDED",
-            Self::ReaderDeadlineExceeded => "READER_DEADLINE_EXCEEDED",
-            Self::StepCancelled => "STEP_CANCELLED",
-            Self::StepTimeout => "STEP_TIMEOUT",
-            Self::StepFailed => "STEP_FAILED",
-            Self::EvidencePathEscape => "EVIDENCE_PATH_ESCAPE",
-            Self::EvidencePending => "EVIDENCE_PENDING",
-            Self::EvidenceFinalizationFailure => "EVIDENCE_FINALIZATION_FAILURE",
-            Self::EvidencePublicationFailure => "EVIDENCE_PUBLICATION_FAILURE",
-            Self::EvidenceDuplicatePath => "EVIDENCE_DUPLICATE_PATH",
-            Self::EvidenceStepUnbound => "EVIDENCE_STEP_UNBOUND",
-            Self::EvidenceInvocationMismatch => "EVIDENCE_INVOCATION_MISMATCH",
-            Self::EvidenceMissing => "EVIDENCE_MISSING",
-            Self::EvidenceUndeclaredFile => "EVIDENCE_UNDECLARED_FILE",
-            Self::EvidenceSymlink => "EVIDENCE_SYMLINK",
-            Self::EvidenceInvalidType => "EVIDENCE_INVALID_TYPE",
-            Self::EvidenceReadFailure => "EVIDENCE_READ_FAILURE",
-            Self::EvidenceInvalidMetadata => "EVIDENCE_INVALID_METADATA",
-        })
+        let wire_value = serde_json::to_value(self).map_err(|_| fmt::Error)?;
+        formatter.write_str(wire_value.as_str().ok_or(fmt::Error)?)
     }
 }
 
@@ -83,40 +53,8 @@ impl TryFrom<&str> for FailureCode {
     type Error = ();
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
-        Ok(match value {
-            "WEBHOOK_DESTINATION_DENIED" => Self::WebhookDestinationDenied,
-            "WEBHOOK_REDIRECT_DENIED" => Self::WebhookRedirectDenied,
-            "LEASE_OWNERSHIP_UNCERTAIN" => Self::LeaseOwnershipUncertain,
-            "SERVICE_SETUP_FAILURE" => Self::ServiceSetupFailure,
-            "SERVICE_LEASE_FAILURE" => Self::ServiceLeaseFailure,
-            "RESULT_PARSE_FAILURE" => Self::ResultParseFailure,
-            "RESULT_ZERO" => Self::ResultZero,
-            "RESULT_PARTIAL" => Self::ResultPartial,
-            "SCHEDULER_FAILURE" => Self::SchedulerFailure,
-            "SECRET_SCAN_FAILURE" => Self::SecretScanFailure,
-            "ARCHITECTURE_AUDIT_FAILURE" => Self::ArchitectureAuditFailure,
-            "STEP_EXECUTION_FAILURE" => Self::StepExecutionFailure,
-            "STEP_SKIPPED" => Self::StepSkipped,
-            "OUTPUT_LIMIT_EXCEEDED" => Self::OutputLimitExceeded,
-            "READER_DEADLINE_EXCEEDED" => Self::ReaderDeadlineExceeded,
-            "STEP_CANCELLED" => Self::StepCancelled,
-            "STEP_TIMEOUT" => Self::StepTimeout,
-            "STEP_FAILED" => Self::StepFailed,
-            "EVIDENCE_PATH_ESCAPE" => Self::EvidencePathEscape,
-            "EVIDENCE_PENDING" => Self::EvidencePending,
-            "EVIDENCE_FINALIZATION_FAILURE" => Self::EvidenceFinalizationFailure,
-            "EVIDENCE_PUBLICATION_FAILURE" => Self::EvidencePublicationFailure,
-            "EVIDENCE_DUPLICATE_PATH" => Self::EvidenceDuplicatePath,
-            "EVIDENCE_STEP_UNBOUND" => Self::EvidenceStepUnbound,
-            "EVIDENCE_INVOCATION_MISMATCH" => Self::EvidenceInvocationMismatch,
-            "EVIDENCE_MISSING" => Self::EvidenceMissing,
-            "EVIDENCE_UNDECLARED_FILE" => Self::EvidenceUndeclaredFile,
-            "EVIDENCE_SYMLINK" => Self::EvidenceSymlink,
-            "EVIDENCE_INVALID_TYPE" => Self::EvidenceInvalidType,
-            "EVIDENCE_READ_FAILURE" => Self::EvidenceReadFailure,
-            "EVIDENCE_INVALID_METADATA" => Self::EvidenceInvalidMetadata,
-            _ => return Err(()),
-        })
+        Self::deserialize(serde::de::value::StrDeserializer::<serde::de::value::Error>::new(value))
+            .map_err(|_| ())
     }
 }
 
@@ -164,9 +102,54 @@ mod tests {
 
     #[test]
     fn failure_code_wire_names_are_stable_and_closed() {
-        let code = FailureCode::EvidenceInvalidMetadata;
-        assert_eq!(code.to_string(), "EVIDENCE_INVALID_METADATA");
-        assert_eq!(FailureCode::try_from(code.to_string().as_str()), Ok(code));
+        let expected = [
+            "ARCHITECTURE_AUDIT_FAILURE",
+            "EVIDENCE_DUPLICATE_PATH",
+            "EVIDENCE_FINALIZATION_FAILURE",
+            "EVIDENCE_INVALID_METADATA",
+            "EVIDENCE_INVALID_TYPE",
+            "EVIDENCE_INVOCATION_MISMATCH",
+            "EVIDENCE_MISSING",
+            "EVIDENCE_PATH_ESCAPE",
+            "EVIDENCE_PENDING",
+            "EVIDENCE_PUBLICATION_FAILURE",
+            "EVIDENCE_READ_FAILURE",
+            "EVIDENCE_STEP_UNBOUND",
+            "EVIDENCE_SYMLINK",
+            "EVIDENCE_UNDECLARED_FILE",
+            "LEASE_OWNERSHIP_UNCERTAIN",
+            "OUTPUT_LIMIT_EXCEEDED",
+            "QUALITY_BLOCKED",
+            "READER_DEADLINE_EXCEEDED",
+            "RESULT_PARSE_FAILURE",
+            "RESULT_PARTIAL",
+            "RESULT_ZERO",
+            "SCHEDULER_FAILURE",
+            "SECRET_SCAN_FAILURE",
+            "SERVICE_LEASE_FAILURE",
+            "SERVICE_SETUP_FAILURE",
+            "STEP_CANCELLED",
+            "STEP_EXECUTION_FAILURE",
+            "STEP_FAILED",
+            "STEP_SKIPPED",
+            "STEP_TIMEOUT",
+            "WEBHOOK_DESTINATION_DENIED",
+            "WEBHOOK_REDIRECT_DENIED",
+        ];
+        let schema = serde_json::to_value(schemars::schema_for!(FailureCode)).unwrap();
+        let mut declared: Vec<&str> = schema["enum"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|name| name.as_str().unwrap())
+            .collect();
+        declared.sort_unstable();
+        assert_eq!(declared, expected);
+        for name in expected {
+            let code = FailureCode::try_from(name).unwrap();
+            assert_eq!(code.to_string(), name);
+            assert_eq!(serde_json::to_value(code).unwrap(), name);
+        }
         assert!(FailureCode::try_from("future-code").is_err());
     }
 
