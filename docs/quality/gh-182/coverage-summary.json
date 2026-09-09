@@ -1,0 +1,221 @@
+{
+  "status": "pass",
+  "aggregate": {
+    "functions": {
+      "count": 1477,
+      "covered": 1172,
+      "percent": 79.35003385240353
+    },
+    "lines": {
+      "count": 14611,
+      "covered": 12943,
+      "percent": 88.58394360413388
+    },
+    "regions": {
+      "count": 23251,
+      "covered": 19940,
+      "percent": 85.75975226871962
+    },
+    "status": "pass"
+  },
+  "boundaries": {
+    "app": {
+      "status": "pass",
+      "blocking": true,
+      "lines": {
+        "count": 643,
+        "covered": 577,
+        "percent": 89.73561430793157
+      }
+    },
+    "audit": {
+      "status": "pass",
+      "blocking": true,
+      "lines": {
+        "count": 975,
+        "covered": 811,
+        "percent": 83.17948717948718
+      }
+    },
+    "cli": {
+      "status": "informational",
+      "blocking": false,
+      "lines": {
+        "count": 9,
+        "covered": 8,
+        "percent": 88.88888888888889
+      }
+    },
+    "compat": {
+      "status": "informational",
+      "blocking": false,
+      "lines": {
+        "count": 196,
+        "covered": 176,
+        "percent": 89.79591836734694
+      }
+    },
+    "config": {
+      "status": "pass",
+      "blocking": true,
+      "lines": {
+        "count": 3741,
+        "covered": 3415,
+        "percent": 91.2857524726009
+      }
+    },
+    "doctor": {
+      "status": "pass",
+      "blocking": true,
+      "lines": {
+        "count": 252,
+        "covered": 239,
+        "percent": 94.84126984126983
+      }
+    },
+    "error": {
+      "status": "informational",
+      "blocking": false,
+      "lines": {
+        "count": 13,
+        "covered": 13,
+        "percent": 100.0
+      }
+    },
+    "failure": {
+      "status": "informational",
+      "blocking": false,
+      "lines": {
+        "count": 84,
+        "covered": 72,
+        "percent": 85.71428571428571
+      }
+    },
+    "lib": {
+      "status": "informational",
+      "blocking": false,
+      "lines": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      }
+    },
+    "main": {
+      "status": "informational",
+      "blocking": false,
+      "lines": {
+        "count": 10,
+        "covered": 10,
+        "percent": 100.0
+      }
+    },
+    "net_policy": {
+      "status": "informational",
+      "blocking": false,
+      "lines": {
+        "count": 43,
+        "covered": 43,
+        "percent": 100.0
+      }
+    },
+    "preset": {
+      "status": "informational",
+      "blocking": false,
+      "lines": {
+        "count": 196,
+        "covered": 160,
+        "percent": 81.63265306122449
+      }
+    },
+    "process": {
+      "status": "pass",
+      "blocking": true,
+      "lines": {
+        "count": 1377,
+        "covered": 1184,
+        "percent": 85.9840232389252
+      }
+    },
+    "project": {
+      "status": "pass",
+      "blocking": true,
+      "lines": {
+        "count": 424,
+        "covered": 348,
+        "percent": 82.0754716981132
+      }
+    },
+    "quality-core": {
+      "status": "pass",
+      "blocking": true,
+      "lines": {
+        "count": 1817,
+        "covered": 1763,
+        "percent": 97.02806824435883
+      }
+    },
+    "scope": {
+      "status": "pass",
+      "blocking": true,
+      "lines": {
+        "count": 113,
+        "covered": 98,
+        "percent": 86.72566371681415
+      }
+    },
+    "secrets": {
+      "status": "pass",
+      "blocking": true,
+      "lines": {
+        "count": 433,
+        "covered": 400,
+        "percent": 92.37875288683603
+      }
+    },
+    "service-adapters": {
+      "status": "informational",
+      "blocking": false,
+      "lines": {
+        "count": 110,
+        "covered": 94,
+        "percent": 85.45454545454545
+      }
+    },
+    "service-core": {
+      "status": "pass",
+      "blocking": true,
+      "lines": {
+        "count": 1367,
+        "covered": 1163,
+        "percent": 85.07681053401609
+      }
+    },
+    "ui": {
+      "status": "informational",
+      "blocking": false,
+      "lines": {
+        "count": 74,
+        "covered": 54,
+        "percent": 72.97297297297297
+      }
+    },
+    "utils": {
+      "status": "informational",
+      "blocking": false,
+      "lines": {
+        "count": 335,
+        "covered": 287,
+        "percent": 85.67164179104478
+      }
+    },
+    "verify": {
+      "status": "pass",
+      "blocking": true,
+      "lines": {
+        "count": 3469,
+        "covered": 2945,
+        "percent": 84.89478235802825
+      }
+    }
+  }
+}

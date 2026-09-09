@@ -153,6 +153,14 @@ Normal users should not supply `--base-evidence`, `--base-project`, `--base-expe
 
 Introduce provider interfaces that materialize the same trusted base context.
 
+GH-182 implements this stage as `quality baseline`; `verify` integration remains
+task 5. Both transports take independently host-pinned base state and manifest
+digest, validate exact bundle inventory/provenance, and export the existing five
+base inputs. Ecosystem and capability names remain opaque during transport;
+strict evaluator metric support and debt decisions remain unchanged. See
+`docs/quality-baselines.md` and ADR-0044 for the versioned request/manifest contract,
+Git representation limits and optional-baseline behavior.
+
 ### 6.1 Git base-ref provider
 
 A deterministic provider may resolve a configured base ref (for example the merge base with `origin/main`) into an isolated source snapshot and collect/load compatible base evidence. It must bind exact commit identity and must not mutate the developer working tree.

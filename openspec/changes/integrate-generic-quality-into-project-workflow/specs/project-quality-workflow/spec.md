@@ -172,6 +172,19 @@ Harness-Gate SHALL provide project-level baseline resolution that materializes t
 - **THEN** existing Rust missing-baseline semantics apply fail closed/review-required as defined by policy
 - **AND** the provider cannot substitute the current head as a new baseline
 
+#### Scenario: An unknown ecosystem needs a baseline
+- **GIVEN** configured ecosystem, capability and canonical series identifiers unknown to the provider
+- **WHEN** the host supplies an exact trusted Git or retained-artifact baseline
+- **THEN** the same generic transport validates source, config, tool, capability and series identity without language-specific dispatch
+- **AND** stale evidence or incompatible series fail closed
+- **AND** explicit rename/move mappings preserve evaluator debt lineage, while unsupported metric semantics remain the evaluator's responsibility
+
+#### Scenario: An optional baseline is absent or corrupt
+- **GIVEN** policy permits an optional baseline
+- **WHEN** a trusted request, manifest or configured Git ref is unavailable
+- **THEN** resolution explicitly reports unavailability without emitting substitute head evidence
+- **AND** a present corrupt or incompatible artifact still fails validation
+
 ### Requirement: Unified reporting SHALL preserve execution and generic quality provenance
 
 The verify machine report SHALL link source/profile/scope, traditional gate outcomes, collector/capability state, evidence/artifact identities, component/local quality, cross-component contracts, baseline/ratchet/debt, exception context, authoritative generic project report, and final combined status. It SHALL distinguish execution failure from generic quality-policy failure.

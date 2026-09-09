@@ -1,0 +1,201 @@
+{
+  "schema": "baseline-acceptance/v1",
+  "passed": true,
+  "cases": [
+    {
+      "case": "git",
+      "provider": "git",
+      "resolution_succeeded": true
+    },
+    {
+      "case": "merge",
+      "provider": "merge",
+      "resolution_succeeded": true
+    },
+    {
+      "case": "retained",
+      "provider": "retained",
+      "resolution_succeeded": true
+    },
+    {
+      "case": "custom-capability",
+      "provider": "retained",
+      "resolution_succeeded": true
+    },
+    {
+      "case": "custom-git",
+      "provider": "git",
+      "resolution_succeeded": true
+    },
+    {
+      "case": "custom-stale",
+      "provider": "retained",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "custom-incompatible",
+      "provider": "retained",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "rust-debt",
+      "provider": "retained",
+      "resolution_succeeded": true
+    },
+    {
+      "case": "rename",
+      "provider": "retained",
+      "resolution_succeeded": true
+    },
+    {
+      "case": "move",
+      "provider": "retained",
+      "resolution_succeeded": true
+    },
+    {
+      "case": "regression",
+      "provider": "retained",
+      "resolution_succeeded": true
+    },
+    {
+      "case": "optional-missing",
+      "provider": "retained",
+      "resolution_succeeded": true
+    },
+    {
+      "case": "required-missing",
+      "provider": "retained",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "optional-no-request",
+      "provider": "retained",
+      "resolution_succeeded": true
+    },
+    {
+      "case": "required-no-request",
+      "provider": "retained",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "optional-none",
+      "provider": "retained",
+      "resolution_succeeded": true
+    },
+    {
+      "case": "missing-ref",
+      "provider": "git",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "optional-missing-ref",
+      "provider": "git",
+      "resolution_succeeded": true
+    },
+    {
+      "case": "wrong-ref",
+      "provider": "git",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "head-substitution",
+      "provider": "git",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "stale-commit",
+      "provider": "retained",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "stale-run",
+      "provider": "retained",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "changed-config",
+      "provider": "retained",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "changed-tool",
+      "provider": "retained",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "incompatible-series",
+      "provider": "retained",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "manifest-hash",
+      "provider": "retained",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "artifact-hash",
+      "provider": "retained",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "source-hash",
+      "provider": "retained",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "inventory",
+      "provider": "retained",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "traversal",
+      "provider": "retained",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "symlink",
+      "provider": "retained",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "stale-evidence",
+      "provider": "retained",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "capability-binding",
+      "provider": "retained",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "invalid-mapping",
+      "provider": "retained",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "git-source-mismatch",
+      "provider": "git",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "optional-corrupt",
+      "provider": "retained",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "output-in-tree",
+      "provider": "retained",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "existing-output",
+      "provider": "retained",
+      "resolution_succeeded": false
+    },
+    {
+      "case": "dirty-tree",
+      "provider": "git",
+      "resolution_succeeded": true
+    }
+  ]
+}
