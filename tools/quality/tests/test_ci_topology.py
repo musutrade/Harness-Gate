@@ -1,11 +1,14 @@
 """Frozen event contract independent of the aggregate implementation constants."""
 import copy
+import contextlib
+import io
 import json
 from pathlib import Path
 import re
 import subprocess
 import sys
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import ci_quality
@@ -23,7 +26,8 @@ class TopologyTests(unittest.TestCase):
                      for key in CONTRACT['jobs']['quality-required']['needs']}
             self.assertEqual(ci_quality.aggregate(event, needs), [])
             for child in required:
-                for state in ('missing', 'missing-result', 'failure', 'cancelled', 'skipped'):
+                for state in ('missing', 'missing-result', 'failure', 'cancelled', 'skipped',
+                              '', 'unknown', None, True, ['success'], {'status': 'success'}):
                     with self.subTest(event=event, child=child, state=state):
                         bad = copy.deepcopy(needs)
                         if state == 'missing':
@@ -33,6 +37,82 @@ class TopologyTests(unittest.TestCase):
                         else:
                             bad[child]['result'] = state
                         self.assertEqual(ci_quality.aggregate(event, bad), [child])
+
+    def test_push_only_children_are_ignored_only_on_pull_requests(self):
+        push_only = [key for key, job in CONTRACT['jobs'].items()
+                     if job['required_events'] == ['push']]
+        self.assertEqual(set(push_only), set(ci_quality.PUSH_ONLY))
+        for child in push_only:
+            for state in ('missing', 'skipped', 'failure', 'cancelled', 'success'):
+                with self.subTest(child=child, state=state):
+                    needs = {key: {'result': 'success'}
+                             for key in CONTRACT['jobs']['quality-required']['needs']}
+                    if state == 'missing':
+                        del needs[child]
+                    else:
+                        needs[child]['result'] = state
+                    self.assertEqual(ci_quality.aggregate('pull_request', needs), [])
+                    self.assertEqual(ci_quality.aggregate('push', needs),
+                                     [] if state == 'success' else [child])
+
+    def test_malformed_required_child_fails_closed(self):
+        for event in CONTRACT['events']:
+            required = [key for key, job in CONTRACT['jobs'].items()
+                        if event in job['required_events']]
+            for child in required:
+                for value in (None, [], 'success', True, 1):
+                    with self.subTest(event=event, child=child, value=value):
+                        needs = {key: {'result': 'success'} for key in required}
+                        needs[child] = value
+                        self.assertEqual(ci_quality.aggregate(event, needs), [child])
+
+    def test_cli_only_evaluates_results_without_collection_or_processes(self):
+        needs = {key: {'result': 'success'} for key, job in CONTRACT['jobs'].items()
+                 if 'pull_request' in job['required_events']}
+        cases = [('pull_request', json.dumps(needs), 0),
+                 ('push', json.dumps(needs), 1), ('workflow_dispatch', json.dumps(needs), 1)]
+        cases.extend(('pull_request', value, 1)
+                     for value in ('{}', 'null', '[]', 'true', '1', '"success"', '{'))
+        for event, payload, expected in cases:
+            with self.subTest(event=event, payload=payload), contextlib.ExitStack() as stack:
+                for target in ('ci_quality.Collector', 'ci_quality.verify',
+                               'ci_quality.metadata', 'ci_quality.write_json',
+                               'subprocess.Popen'):
+                    stack.enter_context(patch(target, side_effect=AssertionError(target)))
+                stack.enter_context(patch.dict('os.environ',
+                                              EVENT_NAME=event, NEEDS_JSON=payload))
+                stack.enter_context(patch.object(sys, 'argv', ['ci_quality.py', 'aggregate']))
+                stdout, stderr = io.StringIO(), io.StringIO()
+                stack.enter_context(contextlib.redirect_stdout(stdout))
+                stack.enter_context(contextlib.redirect_stderr(stderr))
+                self.assertEqual(ci_quality.main(), expected)
+                self.assertEqual(stdout.getvalue(), '')
+                self.assertLess(len(stderr.getvalue()), 1024)
+                self.assertEqual(bool(stderr.getvalue()), bool(expected))
+
+    def test_aggregate_step_allowlist_prohibits_heavy_work(self):
+        workflow = (ROOT / '.github/workflows/ci.yml').read_text()
+        body = re.split(r'^  [a-z][a-z-]+:\n',
+                        workflow.split('  quality-required:\n')[1], maxsplit=1, flags=re.M)[0]
+        steps = body.split('    steps:\n', 1)[1]
+        # Compare all step content: extra actions, multiline commands, conditional
+        # evaluation and shell error suppression must all require policy review.
+        expected = '''
+      - uses: actions/checkout@v5
+      - name: Install Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.x'
+      - name: Require every quality gate
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          NEEDS_JSON: ${{ toJSON(needs) }}
+        run: python3 tools/quality/ci_quality.py aggregate
+'''
+        def significant_lines(value):
+            return [line for line in value.splitlines()
+                    if line.strip() and not line.lstrip().startswith('#')]
+        self.assertEqual(significant_lines(steps), significant_lines(expected))
 
     def test_cross_platform_pr_failure_blocks_cli(self):
         needs = {key: {'result': 'success'} for key, job in CONTRACT['jobs'].items()
