@@ -28,9 +28,11 @@ Task 3 implementation evidence: [GH-166 Cargo and artifact boundaries](../../../
 
 ## 4. Remove avoidable repeated work
 
-- [ ] 4.1 Refactor documentation/preset consistency validation so all current presets, migration behavior, schema sync, policy anchors, and link/sandbox checks remain covered without unnecessary repeated Cargo startup/compilation.
-- [ ] 4.2 Audit quality-coverage and downstream generic/reference consumers; ensure provenance-sensitive coverage/risk/CRAP/critical-path evidence is collected once per series and reused from retained immutable artifacts rather than recollected.
-- [ ] 4.3 Audit Linux test/build/clippy/contracts execution for duplicate compilation. Apply only hosted-evidence-backed changes that reduce cost without serializing the PR critical path into a slower monolith.
+- [x] 4.1 Refactor documentation/preset consistency validation so all current presets, migration behavior, schema sync, policy anchors, and link/sandbox checks remain covered without unnecessary repeated Cargo startup/compilation.
+- [x] 4.2 Audit quality-coverage and downstream generic/reference consumers; ensure provenance-sensitive coverage/risk/CRAP/critical-path evidence is collected once per series and reused from retained immutable artifacts rather than recollected.
+- [x] 4.3 Audit Linux test/build/clippy/contracts execution for duplicate compilation. Apply only hosted-evidence-backed changes that reduce cost without serializing the PR critical path into a slower monolith.
+
+Task 4 implementation evidence: [GH-167 repeated-work audit](../../../docs/quality/ci-topology/repeated-work.md), [hosted audit input](../../../docs/quality/ci-topology/repeated-work-hosted-audit.json), and [local validation record](../../../docs/quality/ci-topology/repeated-work-validation.json). Real docs reports match all 11 semantic fields; 332 Rust tests and 322 Python tests pass, including all docs failure injections and retained-evidence ownership/replay/transport checks. Formatting, Clippy and strict OpenSpec validation pass. Linux merges and cross-job executable sharing were rejected without hosted after-state evidence. Submitted-commit Required Quality Aggregate acceptance remains controller-owned and pending; tasks 5–7 and overall proposal acceptance remain open.
 
 ## 5. Keep Required Quality Aggregate minimal and stable
 
