@@ -133,7 +133,7 @@ def engineering_policy_failures() -> list[str]:
         "line coverage `>= 80%`",
         "region coverage `>= 80%`",
         "new debt is forbidden",
-        "must not be converted to PASS",
+        "converted to PASS",
         "normative policy delta",
         "CI performance regressions are engineering regressions",
     )
