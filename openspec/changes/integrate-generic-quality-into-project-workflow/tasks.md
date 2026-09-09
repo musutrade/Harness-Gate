@@ -4,10 +4,12 @@ All tasks inherit `docs/engineering-policy.md` and the accepted CI topology. CRA
 
 ## 1. Define quality.toml v1 and cross-plane validation
 
-- [ ] 1.1 Define a language-neutral `.harness-gate/quality.toml` v1 schema/model for project/components, source/artifact boundaries, subjects/discovery, relationships, collector bindings, capability/series expectations, policy bindings, profile participation, baseline provider, and report intent.
-- [ ] 1.2 Enforce authority constraints: collectors cannot declare final requiredness, thresholds, ratchets, aggregate PASS/FAIL, or release authority.
-- [ ] 1.3 Extend `config check/print` and schema/docs tooling to validate flow/quality cross-references, unresolved components/subjects/relationships, incompatible series, missing required producers, invalid profile participation, and baseline/ratchet contradictions.
-- [ ] 1.4 Preserve backward compatibility for repositories without `quality.toml`; no implicit new collectors or policy are imposed on legacy flow-only projects.
+- [x] 1.1 Define a language-neutral `.harness-gate/quality.toml` v1 schema/model for project/components, source/artifact boundaries, subjects/discovery, relationships, collector bindings, capability/series expectations, policy bindings, profile participation, baseline provider, and report intent.
+- [x] 1.2 Enforce authority constraints: collectors cannot declare final requiredness, thresholds, ratchets, aggregate PASS/FAIL, or release authority.
+- [x] 1.3 Extend `config check/print` and schema/docs tooling to validate flow/quality cross-references, unresolved components/subjects/relationships, incompatible series, missing required producers, invalid profile participation, and baseline/ratchet contradictions.
+- [x] 1.4 Preserve backward compatibility for repositories without `quality.toml`; no implicit new collectors or policy are imposed on legacy flow-only projects.
+
+GH-179 local evidence (2026-09-09): `cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked` passed 344 tests, including the new config/schema/CLI authority and cross-reference cases and the frozen Rust/Python comparison suites. `cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check` and `cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings` passed. `python3 -m unittest discover -s tools/quality/tests -v` passed 328 tests; `python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json` passed, validating both schemas, the quality example and all legacy presets. Cargo-dependent checks used `CARGO_TARGET_DIR=$PWD/target` because the environment default `/home/gem/cargo-target` is read-only. Full local logs are in `target/quality/gh-179/`. Root `harness-gate config check` and `harness-gate verify --profile ci --all` are not applicable: this source checkout has no `.harness-gate/flow.toml`. `openspec validate integrate-generic-quality-into-project-workflow --strict` passed. Hosted Required Quality Aggregate and controller acceptance remain pending; tasks 2 onward are not implemented by GH-179.
 
 ## 2. Compile project configuration to trusted generic inputs
 

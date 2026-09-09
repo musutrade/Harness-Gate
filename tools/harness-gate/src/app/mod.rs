@@ -44,8 +44,8 @@ pub(crate) fn run() -> Result<bool, CliError> {
             Ok(true)
         }
         Commands::Schema {
-            action: SchemaAction::Export { output },
-        } => export_schema(standalone_root(&cli)?, output),
+            action: SchemaAction::Export { output, quality },
+        } => export_schema(standalone_root(&cli)?, output.as_deref(), *quality),
         Commands::Config {
             action:
                 ConfigAction::Migrate {
@@ -138,17 +138,28 @@ fn compare_files(
     Ok(comparison.equivalent)
 }
 
-fn export_schema(root: std::path::PathBuf, output: &std::path::Path) -> Result<bool, CliError> {
+fn export_schema(
+    root: std::path::PathBuf,
+    output: Option<&std::path::Path>,
+    quality: bool,
+) -> Result<bool, CliError> {
+    let output = output.unwrap_or_else(|| {
+        std::path::Path::new(if quality {
+            "schema/quality.schema.json"
+        } else {
+            "schema/flow.schema.json"
+        })
+    });
+    let schema = if quality {
+        crate::config::quality::schema_json()?
+    } else {
+        crate::config::schema_json()?
+    };
     if output.is_absolute() {
         return Err(anyhow::anyhow!("schema output must be relative to the project root").into());
     }
-    let path = crate::utils::fs::confined_atomic_write(
-        &root,
-        output,
-        format!("{}\n", crate::config::schema_json()?),
-        true,
-    )
-    .with_context(|| format!("write workflow schema {}", root.join(output).display()))?;
+    let path = crate::utils::fs::confined_atomic_write(&root, output, format!("{schema}\n"), true)
+        .with_context(|| format!("write workflow schema {}", root.join(output).display()))?;
     println!("Schema written: {}", path.display());
     Ok(true)
 }
@@ -157,7 +168,13 @@ fn check_config_json(
     root: std::path::PathBuf,
     config: Option<std::path::PathBuf>,
 ) -> Result<bool, CliError> {
-    match Project::discover(Some(root), config) {
+    match Project::discover(Some(root), config).and_then(|project| {
+        crate::config::quality::QualityConfig::load_optional(
+            &project.execution_root,
+            &project.config,
+        )?;
+        Ok(project)
+    }) {
         Ok(project) => {
             println!(
                 "{}",
