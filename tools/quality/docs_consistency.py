@@ -180,7 +180,12 @@ def run(output: Path) -> int:
                 [*command, "config", "check", "--project-root", str(root)],
                 cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
             ).returncode == 0
-            examples.append({"path": str(preset.relative_to(ROOT)), "status": "pass" if checked else "fail"})
+            quality_expected = preset.with_name(preset_name + ".packs.json").is_file()
+            quality_generated = (root / ".harness-gate/quality.toml").is_file()
+            checked = checked and quality_generated == quality_expected
+            examples.append({"path": str(preset.relative_to(ROOT)),
+                             "quality_generated": quality_generated,
+                             "status": "pass" if checked else "fail"})
     migration_fixture = Path(__file__).with_name("fixtures") / "v1-flow.toml"
     with tempfile.TemporaryDirectory(prefix="harness-gate-migration-") as directory:
         root = Path(directory)
@@ -195,7 +200,8 @@ def run(output: Path) -> int:
             [*command, "config", "check", "--project-root", str(root)],
             cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         ).returncode == 0
-        migration_checked = migration_checked and (root / ".harness-gate" / "secrets.toml").is_file()
+        migration_checked = (migration_checked and (root / ".harness-gate" / "secrets.toml").is_file()
+                             and not (root / ".harness-gate/quality.toml").exists())
     workflow_fixture = Path(__file__).with_name("fixtures") / "workflow"
     with tempfile.TemporaryDirectory(prefix="harness-gate-quality-example-") as directory:
         root = Path(directory)

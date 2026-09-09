@@ -1,4 +1,4 @@
-use super::catalog::{self, AUDIT_TEMPLATE, GITIGNORE_TEMPLATE, SECRETS_TEMPLATE};
+use super::catalog::{self, AUDIT_TEMPLATE, GITIGNORE_TEMPLATE, PACKS, SECRETS_TEMPLATE};
 use super::filesystem::{atomic_write_batch, ensure_writable, resolve_inside};
 use crate::config::{FlowConfig, DEFAULT_CONFIG_PATH};
 use anyhow::{Context, Result};
@@ -25,6 +25,24 @@ pub fn init(target: &Path, name: &str, force: bool) -> Result<()> {
     config.validate()?;
     let directory = flow_path.parent().context("flow config has no parent")?;
     let flow_content = toml::to_string_pretty(&config)?;
+    let mut extra_files = Vec::new();
+    if let Some(recipe) = preset.recipe {
+        let composition = super::composition::compose(recipe, PACKS, &config.project.name)?;
+        let mut files = composition.files;
+        files.insert(
+            crate::config::quality::QUALITY_CONFIG_PATH.into(),
+            toml::to_string_pretty(&composition.quality)?,
+        );
+        files.insert(
+            ".harness-gate/QUALITY.md".into(),
+            include_str!("../../presets/QUALITY.md").into(),
+        );
+        for (path, content) in files {
+            let path = resolve_inside(&root, PathBuf::from(path))?;
+            ensure_writable(&path, force)?;
+            extra_files.push((path, content));
+        }
+    }
     let gitignore = resolve_inside(&root, PathBuf::from(".harness-gate/.gitignore"))?;
     let mut flow_entries = vec![
         (audit_path.as_path(), AUDIT_TEMPLATE.as_bytes()),
@@ -34,6 +52,11 @@ pub fn init(target: &Path, name: &str, force: bool) -> Result<()> {
     if fs::symlink_metadata(&gitignore).is_err() {
         flow_entries.push((gitignore.as_path(), GITIGNORE_TEMPLATE.as_bytes()));
     }
+    flow_entries.extend(
+        extra_files
+            .iter()
+            .map(|(path, content)| (path.as_path(), content.as_bytes())),
+    );
     atomic_write_batch(&flow_entries)?;
 
     println!("Initialized preset {name:?} in {}", directory.display());
@@ -41,6 +64,11 @@ pub fn init(target: &Path, name: &str, force: bool) -> Result<()> {
         "Next: harness-gate --project-root {} config check",
         root.display()
     );
+    if preset.recipe.is_some() {
+        println!("Quality enabled: review .harness-gate/QUALITY.md and provision signed workflow inputs before verify.");
+    } else {
+        println!("Quality remains opt-in; no quality policy was generated.");
+    }
     Ok(())
 }
 
@@ -60,6 +88,8 @@ pub(super) fn project_id(root: &Path) -> String {
     let id = id.trim_matches('-');
     if id.is_empty() {
         "project".into()
+    } else if !id.starts_with(|c: char| c.is_ascii_alphabetic()) {
+        format!("project-{id}")
     } else {
         id.into()
     }

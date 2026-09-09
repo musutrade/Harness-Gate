@@ -81,11 +81,21 @@ This checks off only section 6; preset generation and hosted wiring remain below
 
 ## 7. Upgrade presets and migration UX
 
-- [ ] 7.1 Upgrade `rust-api` to generate coherent flow + quality configuration with accepted Rust quality capabilities and full/CI CRAP policy.
-- [ ] 7.2 Upgrade `angular-only` with certified Angular/TypeScript capabilities while keeping CRAP unsupported.
-- [ ] 7.3 Upgrade `angular-rust-postgres` with frontend/backend components, ecosystem-specific collectors, relationship/contract modeling, service/execution separation, and one project aggregate.
-- [ ] 7.4 Decide/document backward-compatible behavior for `generic` preset and existing flow-only repositories; provide explicit migration/enablement guidance instead of silently imposing policy.
-- [ ] 7.5 Extend preset/config/docs consistency tests so generated flow + quality files cross-validate and retain Engineering Policy anchors.
+- [x] 7.1 Upgrade `rust-api` to generate coherent flow + quality configuration with accepted Rust quality capabilities and full/CI CRAP policy.
+- [x] 7.2 Upgrade `angular-only` with certified Angular/TypeScript capabilities while keeping CRAP unsupported.
+- [x] 7.3 Upgrade `angular-rust-postgres` with frontend/backend components, ecosystem-specific collectors, relationship/contract modeling, service/execution separation, and one project aggregate.
+- [x] 7.4 Decide/document backward-compatible behavior for `generic` preset and existing flow-only repositories; provide explicit migration/enablement guidance instead of silently imposing policy.
+- [x] 7.5 Extend preset/config/docs consistency tests so generated flow + quality files cross-validate and retain Engineering Policy anchors.
+
+GH-185 local evidence: 378 nextest tests and 341 Python tests passed; formatting,
+Clippy, docs consistency (all four generated presets plus opt-in migration), and
+strict OpenSpec validation passed. Unknown-ecosystem composition and generic
+plumbing guards pass without schema/compiler/verifier ecosystem branches.
+See [validation and limitations](../../../docs/quality/gh-185/validation.md) and
+[ADR-0047](../../../docs/adr/0047-composable-quality-preset-packs.md).
+Only tasks 7.1–7.5 are checked off here. Root config/CI verification is not
+applicable without project-local flow.toml; hosted Required Quality Aggregate
+and sections 8–9 remain pending, not accepted by these local checks.
 
 ## 8. CI integration and hosted acceptance
 
