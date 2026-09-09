@@ -56,7 +56,7 @@ certified measurement evidence.
 | `relationships.<id>` | Kind plus distinct `from`/`to` component or subject targets. Relationship endpoints cannot themselves be relationships. Optional map, empty by default. |
 | `collectors.<id>` | Protocol `harness-collector-request/v1`, repository-relative `request` material and nonempty `produces` expectations. |
 | `policies.<id>` | `policy_file`, `rule` ID and `expectation`. The existing `harness-policy/v1` document owns requiredness, limits, violation behavior and ratchet settings. |
-| `profiles.<name>` | Explicit sets of `collectors` and `policies`; names must occur in flow step profiles. At least one profile must be declared; empty participation sets are permitted. |
+| `profiles.<name>` | `assurance` defaults to `complete`; explicit `partial` permits omissions without full-quality PASS. Explicit sets of `collectors` and `policies`; names must occur in flow step profiles. At least one profile must be declared; empty participation sets are permitted. |
 | `baseline` | Explicit `required` flag and a tagged `provider`. |
 | `reporting` | Repository-relative `output` directory and nonempty `formats` set containing `human`, `json`, or both. |
 
@@ -79,7 +79,7 @@ underscores allowed after each segment's initial letter.
 
 Within each participating profile, a target/capability has at most one producer.
 A bound policy and its producer must declare the exact same measurement series;
-equal metric names or numeric values never establish compatibility. A required
+equal metric names or numeric values never establish compatibility. Complete profiles must select every configured required policy. A selected required
 policy must have a producer in that profile. Optional policies may have no
 producer, but an existing producer must still match. Discovery collectors for
 active targets (including component subjects and relationship endpoints) must
@@ -114,3 +114,5 @@ coverage, debt, ratchet, fail-closed and measurement-series semantics are unchan
 The current Rust path remains the sole release authority. Schema/docs validation
 uses the existing CI jobs and adds no collection owner or aggregate evaluator.
 See [ADR-0041](adr/0041-quality-configuration-v1.md) for this bounded decision.
+
+See [profile assurance and retained evidence](quality-profiles.md) for hook/full/ci participation.

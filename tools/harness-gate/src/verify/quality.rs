@@ -1,5 +1,7 @@
 //! Workflow composition over configured contracts. No ecosystem owns this path.
-use crate::config::quality::{baseline, collectors, compiler, QualityConfig, ReportFormat};
+use crate::config::quality::{
+    baseline, collectors, compiler, Assurance, QualityConfig, ReportFormat,
+};
 use crate::process::adapter::{HostPolicy, TrustedKey};
 use crate::{project::Project, scope::ScopeResult};
 use anyhow::{ensure, Context, Result};
@@ -14,6 +16,9 @@ pub(super) struct Prepared {
     baseline: Option<baseline::Request>,
     output: String,
     formats: BTreeSet<ReportFormat>,
+    participation: Value,
+    complete: bool,
+    has_policy: bool,
 }
 
 #[derive(Debug, Serialize)]
@@ -31,11 +36,14 @@ pub struct QualityResult {
     pub output: Option<String>,
     pub formats: BTreeSet<ReportFormat>,
     pub evaluation_time: Option<String>,
+    pub participation: Value,
+    pub full_quality_status: &'static str,
+    pub producers: Value,
 }
 
 impl QualityResult {
     pub(super) fn passed(&self) -> bool {
-        self.status == "pass"
+        self.status == "pass" || (self.status == "not_collected" && self.phase == "complete")
     }
 
     fn pending() -> Self {
@@ -53,6 +61,9 @@ impl QualityResult {
             output: None,
             formats: BTreeSet::new(),
             evaluation_time: None,
+            participation: Value::Null,
+            full_quality_status: "blocked",
+            producers: Value::Null,
         }
     }
 }
@@ -93,6 +104,9 @@ pub(super) fn prepare(
     compiler::compile(root, &state)?;
     validate_selection(&config, &state, scope)?;
     Ok(Some(Prepared {
+        participation: config.participation(profile),
+        complete: participation.assurance == Assurance::Complete,
+        has_policy: !participation.policies.is_empty(),
         state,
         keys: read(root, &workflow.trusted_keys)?,
         baseline: workflow
@@ -153,11 +167,22 @@ fn evaluate(project: &Project, work: Prepared, result: &mut QualityResult) -> Re
     result.selection = serde_json::to_value(&work.state.selection)?;
     result.output = Some(work.output);
     result.formats = work.formats;
+    result.participation = work.participation;
+    result.full_quality_status = if work.complete {
+        "blocked"
+    } else {
+        "not_collected"
+    };
     result.phase = "baseline";
     let temporary = tempfile::tempdir()?;
     let base_root = temporary.path().join("baseline");
-    baseline::resolve(root, &work.state, work.baseline.as_ref(), &base_root)?;
-    result.baseline = read(&base_root, "resolution.json")?;
+    if work.has_policy {
+        baseline::resolve(root, &work.state, work.baseline.as_ref(), &base_root)?;
+        result.baseline = read(&base_root, "resolution.json")?;
+    } else {
+        result.baseline =
+            json!({"status":"not_applicable", "reason":"no policy selected by profile"});
+    }
     let base_inputs: Option<Value> = if result.baseline["status"] == "available" {
         Some(read(&base_root, "inputs.json")?)
     } else {
@@ -178,6 +203,13 @@ fn evaluate(project: &Project, work: Prepared, result: &mut QualityResult) -> Re
     )?;
     result.inputs = serde_json::to_value(&collection.inputs)?;
     result.evidence = collection.evidence;
+    result.producers = serde_json::to_value(collection.producers)?;
+    if !work.has_policy {
+        result.status = "not_collected";
+        result.full_quality_status = "not_collected";
+        result.phase = "complete";
+        return Ok(());
+    }
     result.phase = "evaluation";
     let inputs = collection.inputs;
     let head = ValidationContext {
@@ -218,6 +250,9 @@ fn evaluate(project: &Project, work: Prepared, result: &mut QualityResult) -> Re
         "fail"
     };
     result.phase = "complete";
+    if work.complete {
+        result.full_quality_status = result.status;
+    }
     result.project_report_path = Some(
         project
             .reports
@@ -236,7 +271,21 @@ fn evaluate(project: &Project, work: Prepared, result: &mut QualityResult) -> Re
 }
 
 pub(super) fn diagnostics(result: &QualityResult) -> String {
-    let mut text = format!("Quality: {} ({})\n", result.status, result.phase);
+    let mut text = format!(
+        "Quality profile {}: {} ({}); full quality: {}\n",
+        result.participation["profile"], result.status, result.phase, result.full_quality_status
+    );
+    if let Some(policies) = result.participation["policies"].as_object() {
+        for (id, policy) in policies
+            .iter()
+            .filter(|(_, p)| p["state"] == "not_collected")
+        {
+            text.push_str(&format!(
+                "{id}: not_collected (omitted by profile); capability={} series={}\n",
+                policy["expectation"]["capability"], policy["expectation"]["series"]
+            ));
+        }
+    }
     if let Some(error) = &result.error {
         text.push_str(&format!("{error}\n"));
     }

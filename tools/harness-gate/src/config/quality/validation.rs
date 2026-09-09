@@ -227,6 +227,14 @@ impl QualityConfig {
             "quality.profiles must not be empty"
         );
         for (name, profile) in &self.profiles {
+            if profile.assurance == Assurance::Complete {
+                for (id, required) in requirements {
+                    ensure!(
+                        !required || profile.policies.contains(*id),
+                        "complete profile {name} omits required policy {id}"
+                    );
+                }
+            }
             ensure!(
                 declared.contains(name),
                 "quality profile {name} is not declared in flow steps"

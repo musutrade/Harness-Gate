@@ -9,7 +9,7 @@ mod validation;
 
 use super::{ConfigDiagnostics, FlowConfig};
 use anyhow::{Context, Result};
-pub(crate) use model::{QualityConfig, ReportFormat};
+pub(crate) use model::{Assurance, QualityConfig, ReportFormat};
 use std::{fs, io::ErrorKind, path::Path};
 
 pub(crate) const QUALITY_CONFIG_PATH: &str = ".harness-gate/quality.toml";
@@ -20,6 +20,23 @@ pub fn schema_json() -> Result<String> {
 }
 
 impl QualityConfig {
+    /// Describe configured omissions without manufacturing evidence records or
+    /// metric values. Capability certification remains with the evidence core.
+    pub(crate) fn participation(&self, profile: &str) -> serde_json::Value {
+        let selected = &self.profiles[profile];
+        serde_json::json!({
+            "profile": profile,
+            "assurance": selected.assurance,
+            "policies": self.policies.iter().map(|(id, binding)| {
+                (id, serde_json::json!({
+                    "expectation": binding.expectation,
+                    "state": if selected.policies.contains(id) { "participating" } else { "not_collected" },
+                    "reason": if selected.policies.contains(id) { "selected by profile" } else { "omitted by profile" }
+                }))
+            }).collect::<std::collections::BTreeMap<_, _>>()
+        })
+    }
+
     /// File presence is explicit opt-in. Broken links/unreadable files fail closed.
     pub(crate) fn load_optional(root: &Path, flow: &FlowConfig) -> Result<Option<Self>> {
         let path = root.join(QUALITY_CONFIG_PATH);

@@ -149,6 +149,16 @@ class TypeScriptCollectorTests(unittest.TestCase):
                 self.assertEqual(record['status'], 'unavailable')
                 self.assertEqual({c['state'] for c in record['capabilities']}, {'unsupported'})
 
+    def test_crap_is_explicitly_unsupported_with_no_invented_value_or_series(self):
+        self.request['requested_capabilities'] = ['risk.crap']
+        self.rebind()
+        for record in self.run_adapter():
+            crap = next(c for c in record['capabilities'] if c['metric'] == 'risk.crap')
+            self.assertEqual(crap['state'], 'unsupported')
+            self.assertNotIn('risk.crap', {m['name'] for m in record['metrics']})
+            self.assertEqual(record['series'], ts.measurement_series(
+                self.bundle.toolchain, record['subject']['target'], record['subject']['boundary']))
+
     def test_single_capability_request_preserves_existing_measurement_series(self):
         self.request['requested_capabilities'] = ['coverage.line']
         self.rebind()
