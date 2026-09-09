@@ -78,3 +78,42 @@ checkout was accessed. The retry verified the retained full-suite logs and
 The source-verified base/head risk comparison has not been run locally.
 Hosted Required Quality Aggregate and controller acceptance remain pending;
 local checks are not a claim of hosted acceptance.
+
+## CI repair attempt 1
+
+PR #189 at `34f4ccbf5e45953cee8662825780210f0dd3c301` failed
+`Test (windows-latest)`: 304 tests passed and the compiler acceptance test failed
+with `('pass', 'ERROR [E1000]: command failed: mixed configuration file inventory')`.
+The [failed Windows job](https://github.com/musutrade/Harness-Gate/actions/runs/34331423091/job/102400652657)
+blocked Required Quality Aggregate. Full failed-job output is retained locally in
+`target/quality/gh-180/windows-ci-failure.log`.
+
+The fixture used `str(Path.relative_to(root))` as a contract key. Reproduction
+with `PureWindowsPath` confirms that this emits `.harness-gate\\flow.toml`,
+which does not match the configured `.harness-gate/flow.toml`. The fixture now
+uses `as_posix()` to preserve the configured spelling across platforms. This
+changes fixture serialization only; the compiler still rejects mixed inventory
+and stale digests, and Rust remains the sole decision authority. The existing
+native CLI acceptance test exercises this path on every supported CI platform.
+
+Repair evidence is under `target/quality/gh-180/repair-*`. The 50-case corpus,
+formatting, Clippy, docs consistency, and strict OpenSpec validation pass.
+The corpus includes the unknown ecosystem and all existing negative cases.
+The required nextest command passed 346 tests, 0 skipped, in 177.507 seconds
+(`repair-nextest.log`), with `TMPDIR=/tmp CARGO_TARGET_DIR="$PWD/target"`.
+The required Python unittest command passed 329 tests in 198.784 seconds
+(`repair-python.log`) with the same environment. Exact commands are listed in
+the required-checks table above; repair logs for format, Clippy, OpenSpec and
+the corpus are `repair-fmt.log`, `repair-clippy.log`, `repair-openspec.log`, and
+`repair-corpus.log`. The repaired corpus report is `repair-corpus/acceptance.json`.
+
+The initial docs command without the workspace Cargo target override failed
+with `quality gate failed: documentation, examples, or schema synchronization failed`.
+Its Cargo subprocess failure was confirmed with
+`cargo run --quiet --locked --manifest-path tools/harness-gate/Cargo.toml -- schema export`:
+`error: failed to open: /home/gem/cargo-target/debug/.cargo-build-lock`,
+`Read-only file system (os error 30)`. Repeating docs consistency with
+`TMPDIR=/tmp CARGO_TARGET_DIR="$PWD/target"` passed. The failure and retry logs are
+`repair-docs.log`, `repair-default-target-error.log`, and `repair-docs-retry.log`.
+The project-local config/verify commands remain not applicable. Native Windows
+execution and Required Quality Aggregate after this repair remain CI pending.

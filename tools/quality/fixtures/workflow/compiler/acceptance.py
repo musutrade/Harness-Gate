@@ -51,7 +51,8 @@ def prepare(root, unknown=False):
 
 
 def pin(root, state):
-    state['config_files'] = {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
+    # Contract keys match configured paths, independent of native OS separators.
+    state['config_files'] = {p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
                              for p in sorted((root / '.harness-gate').iterdir())}
     write(root / 'state.json', state)
 

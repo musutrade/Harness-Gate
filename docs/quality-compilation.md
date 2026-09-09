@@ -28,7 +28,9 @@ Its fields are:
   commit/base-commit/target/run context, resolved by the caller.
 - `config_files`: exact repository-relative inventory of flow, quality, every
   referenced policy file and the selected collectors' request files, with SHA-256
-  digests of their bytes. Configuration must pass existing cross-plane validation.
+  digests of their bytes. Keys must match configured paths exactly; use `/`
+  separators when producing this inventory on Windows as well as Unix.
+  Configuration must pass existing cross-plane validation.
 - `components`: configuration aliases mapped to generic component metadata from
   trusted packs. IDs and source boundaries must agree with configuration.
 - `subject_kinds` and `relationship_kinds`: used configuration kind aliases mapped
