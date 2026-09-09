@@ -2,6 +2,12 @@
 
 感谢你对 Harness-Gate 的关注！我们欢迎各种形式的贡献。
 
+## 规范性工程政策
+
+所有贡献（包括人类、Codex、Symphony、其他 Agent 或自动化产生的变更）都必须遵守 [Harness-Gate Engineering Policy](docs/engineering-policy.md)。该文档是仓库的规范性工程契约；ADR 解释历史决策，OpenSpec 描述具体变更，但没有在 Issue/OpenSpec 中重复某条长期规则并不表示该规则失效。
+
+如果变更涉及 quality、coverage、complexity、CRAP、collector、evidence、policy、baseline、ratchet/debt、exception、CI profile、preset、project aggregation 或 release authority，PR/OpenSpec 必须明确说明相关 Engineering Policy 语义保持不变，或提出显式的 normative policy delta。不得以降低阈值、跳过 required gate、吞掉 measurement failure、重置 baseline 或扩大 waiver 的方式把 CI “修绿”。
+
 ## 开发环境设置
 
 ### 前置要求
@@ -34,6 +40,8 @@ cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check
 # Clippy 检查
 cargo clippy --manifest-path tools/harness-gate/Cargo.toml -- -D warnings
 ```
+
+以上只是基础开发检查。涉及质量语义的变更还必须满足 Engineering Policy 和仓库 Required Quality Aggregate 中适用的 coverage、risk/CRAP、critical-path、evidence、policy/ratchet 等 required gates；不能用单独的 `cargo test` 代替这些门禁。
 
 ## 提交代码
 
@@ -78,12 +86,13 @@ Closes #123
 
 ### PR 检查清单
 
+- [ ] 变更遵守 `docs/engineering-policy.md`；若修改长期工程政策，已提交显式 normative policy delta 与证据
 - [ ] 代码通过 `cargo fmt` 格式化
 - [ ] 代码通过 `cargo clippy` 检查
-- [ ] 所有测试通过
-- [ ] 添加了必要的测试
+- [ ] 所有适用的 required gates 和测试通过
+- [ ] 添加了必要的测试和 fail-closed/negative regression coverage
 - [ ] 更新了相关文档
-- [ ] 更新了 CHANGELOG.md
+- [ ] 更新了 CHANGELOG.md（适用时）
 
 ## 代码规范
 
@@ -99,7 +108,7 @@ Closes #123
 
 - 新功能必须包含单元测试
 - 修复 bug 应包含回归测试
-- 测试覆盖率应保持在 80% 以上
+- Coverage、CRAP、complexity、risk 和 debt/ratchet 的权威要求以 Engineering Policy、已接受 measurement series 和机器门禁为准；不得用此文档中的简化数字覆盖它们
 - 集成测试应该是独立的，不依赖外部状态
 
 ## 报告问题
