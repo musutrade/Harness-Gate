@@ -1,0 +1,47 @@
+# Tasks: Optimize CI Execution Topology
+
+All tasks inherit `docs/engineering-policy.md`. CRAP semantics and required assurance remain unchanged throughout this change.
+
+## 1. Freeze current assurance and hosted cost baseline
+
+- [ ] 1.1 Record the current PR/push event-to-job matrix, `Required Quality Aggregate` dependencies, stable check names, and every currently required semantic outcome. Explicitly record that macOS and Windows full tests remain PR-required in this change.
+- [ ] 1.2 Capture normalized hosted timing/cost evidence from representative successful pre-change PR runs: workflow/job/step wall times, critical path, tool-install/setup time, quality collection time, and approximate runner wall minutes by OS.
+- [ ] 1.3 Add regression fixtures/tests for aggregate event semantics so missing/failed/cancelled/skipped required children still fail closed before topology changes begin.
+
+## 2. Normalize pinned CI tool setup
+
+- [ ] 2.1 Replace repeated forced source installs of cargo-nextest/cargo-llvm-cov where appropriate with explicit pinned prebuilt installation or validated tool caches; retain effective version evidence and fail-closed installation behavior.
+- [ ] 2.2 Replace repeated cargo-audit source compilation with an explicit pinned/prebuilt or validated cached installation while preserving `cargo audit --deny warnings` semantics.
+- [ ] 2.3 Centralize repeated setup in transparent reusable CI primitives where useful; keep commands, versions, and failure diagnostics observable.
+
+## 3. Normalize Cargo cache and build-state boundaries
+
+- [ ] 3.1 Define explicit CI Cargo target/cache conventions per OS/job class; verify caches point at the target directory Cargo actually uses and include sufficient invalidation identity.
+- [ ] 3.2 Separate immutable reusable artifacts from mutable compilation caches. Add fail-closed identity/hash validation for any artifact that participates in authoritative quality/contract consumption.
+- [ ] 3.3 Evaluate Linux build reuse for compatible consumers and adopt only cases that preserve the existing contract; do not reuse instrumented coverage builds for release/performance claims or replace native cross-platform execution.
+
+## 4. Remove avoidable repeated work
+
+- [ ] 4.1 Refactor documentation/preset consistency validation so all current presets, migration behavior, schema sync, policy anchors, and link/sandbox checks remain covered without unnecessary repeated Cargo startup/compilation.
+- [ ] 4.2 Audit quality-coverage and downstream generic/reference consumers; ensure provenance-sensitive coverage/risk/CRAP/critical-path evidence is collected once per series and reused from retained immutable artifacts rather than recollected.
+- [ ] 4.3 Audit Linux test/build/clippy/contracts execution for duplicate compilation. Apply only hosted-evidence-backed changes that reduce cost without serializing the PR critical path into a slower monolith.
+
+## 5. Keep Required Quality Aggregate minimal and stable
+
+- [ ] 5.1 Preserve the exact `Required Quality Aggregate` check name, `always()` behavior, and event-specific required-child semantics.
+- [ ] 5.2 Keep the aggregate job limited to fail-closed evaluation of child results and small result emission; prohibit product compilation, tests, coverage/risk collection, or heavy tool installation in the aggregate.
+- [ ] 5.3 Add/retain tests proving skipped push-only children are handled according to event policy while every PR-required child—including macOS/Windows tests—must succeed.
+
+## 6. Hosted after-state performance and assurance acceptance
+
+- [ ] 6.1 Capture multiple representative successful hosted post-change PR runs using the same normalization as task 1.2.
+- [ ] 6.2 Compare before/after critical path, per-job timing, setup/tool-install time, runner wall minutes by OS, compilation duplication, quality collection time, and artifact overhead. Do not claim a percentage improvement unsupported by hosted evidence.
+- [ ] 6.3 Run semantic parity review: all prior required outcomes, CRAP/coverage/critical-path semantics, platform requirements, release authority, measurement identities, and fail-closed aggregate behavior remain unchanged.
+- [ ] 6.4 Revert individual optimizations that are neutral/worse or introduce trust ambiguity rather than weakening assurance to preserve them.
+
+## 7. Documentation and closure
+
+- [ ] 7.1 Document the optimized CI execution model, cache/artifact trust boundaries, pinned tool versions, and how to diagnose cache/artifact failures.
+- [ ] 7.2 Document the hosted performance comparison and remaining bottlenecks, separating developer critical path from total runner cost.
+- [ ] 7.3 Identify any future risk-driven conditional cross-platform proposal as a separate Engineering Policy delta; do not implement it here.
+- [ ] 7.4 Strict-validate this OpenSpec, run all repository required checks, and record final acceptance/rollback evidence before closure.
