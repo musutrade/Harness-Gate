@@ -52,6 +52,7 @@
         "src/config/model.rs",
         "src/config/path.rs",
         "src/config/quality/mod.rs",
+        "src/config/quality/compiler.rs",
         "src/config/quality/model.rs",
         "src/config/quality/policy.rs",
         "src/config/quality/validation.rs",

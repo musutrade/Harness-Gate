@@ -15,9 +15,11 @@ GH-179 CI repair evidence (2026-09-09, PR #188): the aliased-root regression fai
 
 ## 2. Compile project configuration to trusted generic inputs
 
-- [ ] 2.1 Implement deterministic compilation from validated quality configuration + repository/source/profile/scope state into `harness-project/v1`, `harness-policy/v1`, trusted expected context, roots, and optional selection/mapping/exception inputs.
-- [ ] 2.2 Define stable identity/digest rules for compiled inputs and reject mixed/stale source, config, tool, or artifact identity.
-- [ ] 2.3 Add equivalence tests proving direct `quality evaluate` and the compiled path produce identical generic Rust decisions/reports for equivalent inputs, including fail-closed negative cases.
+- [x] 2.1 Implement deterministic compilation from validated quality configuration + repository/source/profile/scope state into `harness-project/v1`, `harness-policy/v1`, trusted expected context, roots, and optional selection/mapping/exception inputs.
+- [x] 2.2 Define stable identity/digest rules for compiled inputs and reject mixed/stale source, config, tool, or artifact identity.
+- [x] 2.3 Add equivalence tests proving direct `quality evaluate` and the compiled path produce identical generic Rust decisions/reports for equivalent inputs, including fail-closed negative cases.
+
+GH-180 local compiler evidence (2026-09-09): the focused nextest CLI integration test passes all 50 retained compilation/equivalence cases with zero unexplained mismatches. Twenty direct/compiled cases compare exact report bytes and exit status, including Rust passing/failing coverage, missing/stale/malformed/duplicate evidence, unsupported capability, subject policy expansion, discovery, multiple subjects, relationships, optional mappings/exceptions and baseline ratchets. Twenty-five stale/mixed compiler cases fail closed and remove stale outputs; four output-alias cases preserve inputs; a changed run context changes the digest. Repeated compilation and reordered subject sets preserve output bytes. Unknown ecosystem/custom collector/series fixtures use the same compiler path, with supported metrics passing and a custom unsupported metric rejected by the existing core. All 346 Rust tests and 329 Python tests pass; fmt, clippy, docs consistency and strict OpenSpec validation pass. Production coverage passes every required boundary against the unchanged 80% threshold (config lines 90.26%; aggregate lines 88.16%). Full-suite results and local measurement/delivery limitations are recorded in `docs/quality/gh-180/validation.md`. See `docs/quality-compilation.md` and ADR-0042. Root `config check` and `verify --profile ci --all` are not applicable because `.harness-gate/flow.toml` is absent. Hosted Required Quality Aggregate/controller acceptance remain pending; tasks 3 onward are not marked complete.
 
 ## 3. Orchestrate collectors through the trusted adapter boundary
 

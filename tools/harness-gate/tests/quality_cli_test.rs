@@ -49,3 +49,23 @@ fn partial_base_context_is_rejected_before_evaluation() {
     assert_eq!(output.status.code(), Some(2));
     assert!(String::from_utf8_lossy(&output.stderr).contains("--base-evidence"));
 }
+
+#[test]
+fn compiled_configuration_matches_direct_rust_and_rejects_stale_inputs() {
+    let work = tempfile::tempdir().unwrap();
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let output = Command::new("python3")
+        .arg(root.join("../quality/fixtures/workflow/compiler/acceptance.py"))
+        .arg("--harness-gate")
+        .arg(env!("CARGO_BIN_EXE_harness-gate"))
+        .arg("--output")
+        .arg(work.path())
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "{}\n{}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+}
