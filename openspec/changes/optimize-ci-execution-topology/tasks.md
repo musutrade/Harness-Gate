@@ -36,9 +36,11 @@ Task 4 implementation evidence: [GH-167 repeated-work audit](../../../docs/quali
 
 ## 5. Keep Required Quality Aggregate minimal and stable
 
-- [ ] 5.1 Preserve the exact `Required Quality Aggregate` check name, `always()` behavior, and event-specific required-child semantics.
-- [ ] 5.2 Keep the aggregate job limited to fail-closed evaluation of child results and small result emission; prohibit product compilation, tests, coverage/risk collection, or heavy tool installation in the aggregate.
-- [ ] 5.3 Add/retain tests proving skipped push-only children are handled according to event policy while every PR-required child—including macOS/Windows tests—must succeed.
+- [x] 5.1 Preserve the exact `Required Quality Aggregate` check name, `always()` behavior, and event-specific required-child semantics.
+- [x] 5.2 Keep the aggregate job limited to fail-closed evaluation of child results and small result emission; prohibit product compilation, tests, coverage/risk collection, or heavy tool installation in the aggregate.
+- [x] 5.3 Add/retain tests proving skipped push-only children are handled according to event policy while every PR-required child—including macOS/Windows tests—must succeed.
+
+Task 5 implementation evidence: [GH-168 aggregate contract](../../../docs/quality/ci-topology/aggregate.md) and [local validation record](../../../docs/quality/ci-topology/aggregate-validation.json). All seven aggregate topology fixtures pass, including every frozen required child on both events, push-only exemptions, malformed results, native matrix/CLI failures, exact step allowlist and process/collection-free evaluation. Submitted-commit hosted Required Quality Aggregate acceptance remains controller-owned and pending; tasks 6–7 and overall proposal acceptance remain open.
 
 ## 6. Hosted after-state performance and assurance acceptance
 

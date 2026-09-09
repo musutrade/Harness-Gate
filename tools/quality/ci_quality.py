@@ -43,9 +43,12 @@ def relocated_migration_sources(base: str, head: str) -> set[str]:
 
 
 def aggregate(event: str, needs: dict) -> list[str]:
+    """Evaluate child outcomes only; never collect evidence or launch tools here."""
     require(event in ('push', 'pull_request'), 'unsupported CI event')
+    require(isinstance(needs, dict), 'CI needs must be an object')
     required = COMMON + (PUSH_ONLY if event == 'push' else ())
-    return [name for name in required if needs.get(name, {}).get('result') != 'success']
+    return [name for name in required
+            if not isinstance(needs.get(name), dict) or needs[name].get('result') != 'success']
 
 
 def verify(path: Path, head: str, base: str, run_id: str) -> dict:
