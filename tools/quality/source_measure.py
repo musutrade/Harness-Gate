@@ -20,7 +20,7 @@ from production_coverage import counts, require
 
 SERIES = {"analyzer": "harness-gate-rust-measure/0.3.0", "rule": "mccabe-rust-3/1",
           "instrumentation": "closure-black-box/1", "mapping": "insertions-utf8/1",
-          "selection": "gh151-generic-production/1"}
+          "selection": "gh179-quality-configuration/1"}
 PREFIX = "{ ::std::hint::black_box(()); "
 SUFFIX = " }"
 HOTSPOTS = {
@@ -37,7 +37,9 @@ HOTSPOTS = {
 
 # Source paths remain relative to src for lineage with the established series.
 # Both commits are measured with this exact inventory and tool version.
-SOURCE_FILES = sorted(set(HOTSPOTS) | {"app/mod.rs", "app/quality.rs", "cli.rs", "lib.rs"} | {f"../quality-core/{name}.rs" for name in (
+SOURCE_FILES = sorted(set(HOTSPOTS) | {"app/mod.rs", "app/quality.rs", "cli.rs", "lib.rs", "config/mod.rs"} |
+    {f"config/quality/{name}.rs" for name in ("mod", "model", "policy", "validation")} |
+    {f"../quality-core/{name}.rs" for name in (
     "comparison", "cross_component", "evidence", "json", "mod", "model",
     "policy", "project", "project_report", "ratchet", "replay", "schema")})
 

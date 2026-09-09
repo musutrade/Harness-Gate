@@ -8,6 +8,10 @@ use std::{
 
 impl QualityConfig {
     pub(super) fn validate(&self, flow: &FlowConfig, root: &Path) -> Result<()> {
+        let canonical_root = root
+            .canonicalize()
+            .context("resolve quality repository root")?;
+        let root = canonical_root.as_path();
         ensure!(self.version == 1, "quality.version must be 1");
         identifier(&self.project.id)?;
         ensure!(

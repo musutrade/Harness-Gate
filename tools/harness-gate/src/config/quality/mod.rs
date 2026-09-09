@@ -37,6 +37,10 @@ impl QualityConfig {
     }
 
     fn load(root: &Path, flow: &FlowConfig) -> Result<Self> {
+        let canonical_root = root
+            .canonicalize()
+            .context("resolve quality repository root")?;
+        let root = canonical_root.as_path();
         let path = crate::project::resolve_repo_path(
             root,
             Path::new(QUALITY_CONFIG_PATH),
