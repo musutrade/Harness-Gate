@@ -249,6 +249,10 @@ fn run_hook(project: &Project) -> Result<bool, CliError> {
 }
 
 fn run_config(project: &Project, action: ConfigAction) -> Result<bool, CliError> {
+    let quality_config = crate::config::quality::QualityConfig::load_optional(
+        &project.execution_root,
+        &project.config,
+    )?;
     match action {
         ConfigAction::Check {
             format: ConfigFormat::Human,
@@ -277,6 +281,9 @@ fn run_config(project: &Project, action: ConfigAction) -> Result<bool, CliError>
                     .join(", ")
             );
             println!("Verification steps: {}", project.config.steps.len());
+            if quality_config.is_some() {
+                println!("Quality configuration valid: .harness-gate/quality.toml (v1)");
+            }
             Ok(true)
         }
         ConfigAction::Check {
@@ -289,8 +296,28 @@ fn run_config(project: &Project, action: ConfigAction) -> Result<bool, CliError>
             );
             Ok(report.valid)
         }
-        ConfigAction::Print { resolved } => {
-            if resolved {
+        ConfigAction::Print { resolved, quality } => {
+            if quality {
+                let config =
+                    quality_config.context("quality.toml is absent; quality is not enabled")?;
+                if resolved {
+                    println!(
+                        "{}",
+                        toml::to_string_pretty(&config).map_err(anyhow::Error::from)?
+                    );
+                } else {
+                    let path = crate::project::resolve_repo_path(
+                        &project.execution_root,
+                        std::path::Path::new(crate::config::quality::QUALITY_CONFIG_PATH),
+                        "quality configuration",
+                        true,
+                    )?;
+                    print!(
+                        "{}",
+                        std::fs::read_to_string(path).context("read quality.toml")?
+                    );
+                }
+            } else if resolved {
                 println!(
                     "{}",
                     toml::to_string_pretty(&project.config).map_err(anyhow::Error::from)?

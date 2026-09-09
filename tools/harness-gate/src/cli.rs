@@ -198,10 +198,13 @@ pub(crate) enum AdapterAction {
 
 #[derive(Debug, Subcommand)]
 pub(crate) enum SchemaAction {
-    /// Export the JSON Schema for flow.toml.
+    /// Export the JSON Schema for flow.toml or quality.toml.
     Export {
-        #[arg(long, value_name = "PATH", default_value = "schema/flow.schema.json")]
-        output: PathBuf,
+        #[arg(long, value_name = "PATH")]
+        output: Option<PathBuf>,
+        /// Select the quality control-plane schema.
+        #[arg(long)]
+        quality: bool,
     },
 }
 
@@ -218,6 +221,9 @@ pub(crate) enum ConfigAction {
         /// Include environment overrides in the rendered TOML.
         #[arg(long)]
         resolved: bool,
+        /// Print quality.toml instead of flow.toml; both planes are validated.
+        #[arg(long)]
+        quality: bool,
     },
     /// Convert a schema v1 flow.toml to .harness-gate/flow.toml schema v2.
     Migrate {

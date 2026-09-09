@@ -51,6 +51,15 @@ Introduce `.harness-gate/quality.toml`, schema version 1. The conceptual model c
 
 The schema should prefer references to versioned machine contracts over embedding language-specific tool options. Tool-specific execution details belong in collector configuration/adapter request material, not generic policy semantics.
 
+The bounded tasks 1.1–1.4 implementation is specified in
+[quality configuration v1](../../../docs/quality-configuration.md) and
+[ADR-0041](../../../docs/adr/0041-quality-configuration-v1.md). It binds existing
+`harness-policy/v1` rule files rather than duplicating requiredness or ratchet
+settings in collector declarations. `config check/print` validate both planes;
+`schema export --quality` exports the independent schema. Compilation and verify
+orchestration remain later tasks; schema export and existing presets never create
+an implicit quality configuration.
+
 ### 2.3 Authority constraints in schema validation
 
 `quality.toml` must not permit a collector to define final requiredness or PASS/FAIL. A collector binding may state what capability/series it is expected to produce and in which profiles it is invoked. Policy bindings determine whether the capability is required and how it is evaluated.

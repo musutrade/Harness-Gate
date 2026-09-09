@@ -38,40 +38,71 @@ fn state(value: &str) -> Result<GateState> {
     serde_json::from_value(json!(value)).map_err(|_| error("unknown gate state"))
 }
 
+/// Validate policy shape and context-free rules before project inputs are compiled.
+pub fn validate_policy_document(policy: &Value) -> Result<()> {
+    super::json::domain(policy)?;
+    schema::shape(policy, &schema::POLICY, None)?;
+    index(&policy["rules"], "id", "policy ID")?;
+    for rule in array(&policy["rules"]) {
+        validate_rule_metric(rule)?;
+        if rule["scope"]["kind"] == "relationship" {
+            validate_relationship_rule(rule)?;
+        }
+    }
+    Ok(())
+}
+
+fn validate_rule_metric(rule: &Value) -> Result<()> {
+    let metric = string(&rule["metric"]);
+    let kind = evidence::metric_type(metric);
+    require(
+        kind.is_some_and(|k| {
+            rule["limit"]["type"] == k
+                || (metric == "risk.crap" && rule["limit"]["type"] == "rational")
+        }),
+        "policy metric/limit type mismatch",
+    )?;
+    if kind == Some("boolean") {
+        require(
+            matches!(rule["operator"].as_str(), Some("eq" | "ne")),
+            "boolean requires eq or ne",
+        )?;
+    }
+    if kind == Some("ratio") {
+        // oneOf is not interpreted by the frozen reference schema walker.
+        require(
+            super::json::integer(&rule["limit"]["covered"])
+                && super::json::integer(&rule["limit"]["total"]),
+            "policy ratio requires integer counters",
+        )?;
+        require(
+            super::json::integer_cmp(&rule["limit"]["covered"], &rule["limit"]["total"]).is_le(),
+            "policy ratio exceeds total",
+        )?;
+    }
+    Ok(())
+}
+
+fn validate_relationship_rule(rule: &Value) -> Result<()> {
+    let metric = string(&rule["metric"]);
+    require(
+        metric.starts_with("contract."),
+        "relationship scope requires a contract metric",
+    )?;
+    require(
+        rule.get("ratchet").is_none(),
+        "contract comparison uses retained baseline provenance, not debt ratchet",
+    )?;
+    Ok(())
+}
+
 pub fn validate_policy(policy: &Value, project: &Value) -> Result<()> {
     super::json::domain(policy)?;
     schema::shape(policy, &schema::POLICY, None)?;
     project::validate_project(project)?;
     index(&policy["rules"], "id", "policy ID")?;
     for rule in array(&policy["rules"]) {
-        let metric = string(&rule["metric"]);
-        let kind = evidence::metric_type(metric);
-        require(
-            kind.is_some_and(|k| {
-                rule["limit"]["type"] == k
-                    || (metric == "risk.crap" && rule["limit"]["type"] == "rational")
-            }),
-            "policy metric/limit type mismatch",
-        )?;
-        if kind == Some("boolean") {
-            require(
-                matches!(rule["operator"].as_str(), Some("eq" | "ne")),
-                "boolean requires eq or ne",
-            )?;
-        }
-        if kind == Some("ratio") {
-            // oneOf is not interpreted by the frozen reference schema walker.
-            require(
-                super::json::integer(&rule["limit"]["covered"])
-                    && super::json::integer(&rule["limit"]["total"]),
-                "policy ratio requires integer counters",
-            )?;
-            require(
-                super::json::integer_cmp(&rule["limit"]["covered"], &rule["limit"]["total"])
-                    .is_le(),
-                "policy ratio exceeds total",
-            )?;
-        }
+        validate_rule_metric(rule)?;
         let scope = &rule["scope"];
         require(
             scope.is_object() && scope["kind"].is_string(),
@@ -86,14 +117,7 @@ pub fn validate_policy(policy: &Value, project: &Value) -> Result<()> {
             )?;
         }
         if scope["kind"] == "relationship" {
-            require(
-                metric.starts_with("contract."),
-                "relationship scope requires a contract metric",
-            )?;
-            require(
-                rule.get("ratchet").is_none(),
-                "contract comparison uses retained baseline provenance, not debt ratchet",
-            )?;
+            validate_relationship_rule(rule)?;
             contract_subjects(project, &scope["relationship"], None)?;
         }
         if let Some(component) = scope.get("component") {
