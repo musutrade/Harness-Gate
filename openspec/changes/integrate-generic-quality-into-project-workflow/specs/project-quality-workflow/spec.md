@@ -246,3 +246,23 @@ Project workflow integration SHALL comply with the accepted optimized CI topolog
 - **WHEN** the caller runs `harness-gate quality evaluate`
 - **THEN** the released Rust evaluator remains available
 - **AND** its authority/semantics match the generic evaluation used by verify
+
+### Requirement: Profile assurance follows capability metadata
+
+The generic workflow SHALL determine participation only from configured profile,
+policy and target/capability/series metadata. Complete assurance SHALL require
+all configured required policies. Partial assurance SHALL never certify full
+quality, including when no policy or collector participates.
+
+#### Scenario: Unknown ecosystem selects expensive and cheap work
+
+- **GIVEN** an unknown pack declares cheap and expensive capability bindings
+- **WHEN** hook, full, ci or a custom profile selects those bindings
+- **THEN** generic configuration enforces the selected assurance and reports omitted bindings as not_collected without ecosystem dispatch or fabricated metric values
+
+#### Scenario: Retained producers avoid duplicate collection
+
+- **GIVEN** the host pins authenticated retained responses and artifacts for the current profile binding
+- **WHEN** verification validates matching context, source, selection, policy, series and provenance
+- **THEN** retained producers are reused and only missing producers launch
+- **AND** stale or altered retention blocks verification before any new collection, without fallback

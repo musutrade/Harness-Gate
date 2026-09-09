@@ -37,14 +37,14 @@ selection, mappings and exceptions remain host/compiler validated contracts.
 After execution, verification resolves the configured baseline into an isolated
 host directory, runs the selected profile's collectors through the signed adapter
 host, validates their evidence and recompiles the pinned head inputs. Baseline
-resolution precedes collection because the original head artifact root must be
-fresh. Configuration, source or evidence mutation cannot become valid by passing
+resolution precedes collection. The head artifact root must be fresh or match
+the authenticated retained artifact inventory. Configuration, source or evidence mutation cannot become valid by passing
 traditional steps. All collectors declared for the selected profile participate;
 there is no implicit ecosystem-specific filtering or request generation.
 
-A configured profile without evaluable workflow inputs fails closed. Profile cost
-boundaries, empty-profile behavior and preset-generated inputs remain subsequent
-OpenSpec tasks. The explicit `step run` interface continues to run its selected
+A configured profile without trusted workflow inputs fails closed.
+[Profile assurance](quality-profiles.md) defines omissions and retained reuse;
+preset-generated inputs remain subsequent OpenSpec tasks. The explicit `step run` interface continues to run its selected
 execution step without invoking project quality.
 
 ## Machine contract
@@ -54,7 +54,9 @@ object with discriminator `quality-verification/v1`. Its fields are:
 
 | Field | Meaning |
 | --- | --- |
-| `status`, `phase`, `error` | `pass`, `fail` or `blocked`; last orchestration phase; redacted failure detail |
+| `status`, `phase`, `error` | `pass`, `fail`, `blocked` or `not_collected`; last orchestration phase; redacted failure detail |
+| `participation`, `full_quality_status` | Selected and omitted policy expectations; complete assurance result (partial profiles always `not_collected`) |
+| `producers` | Each selected producer was `collected` or `retained` |
 | `selection` | Authenticated configured selection aliases |
 | `inputs` | Compiled project/policy, canonical selection, bindings, context and input identity |
 | `evidence` | Validated collector records, capability states and artifact provenance |
@@ -72,7 +74,7 @@ baseline/ratchet/debt ledger and exception review without reinterpreting them.
 Its existing `mode` field is preserved verbatim; workflow composition uses its
 aggregate decision. No language identifier chooses semantics or report shape.
 
-The authoritative report is a required invocation artifact. JSON and human copies
+When policy participates, the authoritative report is a required invocation artifact. JSON and human copies
 selected by `reporting.formats` are written under
 `<reporting.output>/<invocation_id>/`, with the same invocation and combined
 status. Standard invocation reports remain available on a quality failure.

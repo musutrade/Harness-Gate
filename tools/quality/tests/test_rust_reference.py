@@ -60,6 +60,17 @@ class RustReferenceTests(unittest.TestCase):
         candidate['artifacts'][filename] = sha256(root / filename)
         write_json(root / 'candidate.json', candidate)
 
+    def test_complete_profile_fixture_preserves_certified_required_policy_and_series(self):
+        self.shadow()
+        reference = json.loads((ROOT / 'tools/quality/fixtures/workflow/collectors/certified-rust-profiles.json').read_text())
+        rules = json.loads((self.case / 'shadow/head-risk-policy.json').read_text())['rules']
+        records = json.loads((self.case / 'shadow/head-risk-evidence.json').read_text())
+        self.assertEqual(reference['rules'], [r for r in rules if r['required'] and r['scope']['boundary'] == 'high'])
+        self.assertEqual(reference['series'], next(r['series'] for r in records if r['subject']['boundary'] == 'high'))
+        self.assertEqual({r['metric'] for r in reference['rules']}, {'coverage.line', 'coverage.region', 'risk.crap'})
+        for profile in ('full', 'ci'):
+            self.assertEqual(set(reference['profiles'][profile]['policies']), {r['id'] for r in reference['rules']})
+
     def test_historical_replay_preserves_all_values_identities_and_artifacts_without_collection(self):
         with patch.object(subprocess, 'run', side_effect=AssertionError('collection forbidden')), \
              patch.object(subprocess, 'check_output', side_effect=AssertionError('collection forbidden')):

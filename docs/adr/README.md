@@ -82,3 +82,5 @@ When an ADR is superseded:
 1. Update the status to "Superseded by ADR-XXXX"
 2. Create the new ADR that supersedes it
 3. Link between the two documents
+
+- [ADR-0046: Capability-driven quality profiles and retained head evidence](0046-capability-driven-quality-profiles.md)
