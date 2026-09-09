@@ -291,9 +291,12 @@ def collect(binary: Path, staged_secrets: bool = True) -> list[dict[str, Any]]:
 
 
 def run(output: Path, accept: bool = False, structured: bool = False) -> int:
-    binary = CRATE / "target" / "debug" / ("harness-gate.exe" if os.name == "nt" else "harness-gate")
-    if not binary.exists():
-        subprocess.run(["cargo", "build", "--manifest-path", str(CRATE / "Cargo.toml"), "--locked"], check=True, cwd=CRATE.parent.parent)
+    from ci_cargo import target_directory
+
+    # A restored executable is disposable cache state. Cargo must establish
+    # freshness before the binary can supply required contract evidence.
+    subprocess.run(["cargo", "build", "--manifest-path", str(CRATE / "Cargo.toml"), "--locked"], check=True, cwd=CRATE.parent.parent)
+    binary = target_directory() / "debug" / ("harness-gate.exe" if os.name == "nt" else "harness-gate")
     scenarios = collect(binary, staged_secrets=not structured)
     report = {**metadata(tool="cli-contracts", snapshot_version=1), "scenarios": scenarios}
     write_json(output, report)
