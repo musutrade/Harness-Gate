@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check Markdown links, embedded examples, and generated Schema sync."""
+"""Check Markdown links, embedded examples, generated Schema sync, and policy anchors."""
 
 from __future__ import annotations
 
@@ -64,33 +64,10 @@ def local_links() -> list[dict[str, str]]:
 
 
 SANDBOX_NEGATION_MARKERS = (
-    "not",
-    "no ",
-    "never",
-    "without",
-    "deferred",
-    "future",
-    "separate",
-    "rejected",
-    "must not",
-    "should not",
-    "cannot",
-    "can't",
-    "isn't",
-    "aren't",
-    "does not",
-    "do not",
-    "not an",
-    "unless",
-    "until",
-    "before",
-    "out of scope",
-    "non-goal",
-    "would overstate",
-    "later",
-    "may",
-    "might",
-    "could",
+    "not", "no ", "never", "without", "deferred", "future", "separate", "rejected",
+    "must not", "should not", "cannot", "can't", "isn't", "aren't", "does not", "do not",
+    "not an", "unless", "until", "before", "out of scope", "non-goal", "would overstate",
+    "later", "may", "might", "could",
 )
 
 SANDBOX_CLAIM_PATTERNS = (
@@ -100,10 +77,7 @@ SANDBOX_CLAIM_PATTERNS = (
         r"[-\s]?(?:network|filesystem|resource|process)?[-\s]?sandbox(?:ed|ing)?\b",
         re.IGNORECASE,
     ),
-    re.compile(
-        r"\b(?:complete|full)\b[^.!?]{0,60}\bdescendant\s+(?:isolation|containment)\b",
-        re.IGNORECASE,
-    ),
+    re.compile(r"\b(?:complete|full)\b[^.!?]{0,60}\bdescendant\s+(?:isolation|containment)\b", re.IGNORECASE),
     re.compile(
         r"\b(?:os|operating-system)[-\s]?(?:level|enforced)?[-\s]?"
         r"(?:network|filesystem|resource|process)\s+isolation\b",
@@ -113,12 +87,7 @@ SANDBOX_CLAIM_PATTERNS = (
 
 
 def unsupported_sandbox_claims(text: str) -> list[str]:
-    """Return positive OS-sandbox or complete-descendant-isolation claims.
-
-    Sentences that deny, defer, reject, or bound such isolation are accepted;
-    only unsupported positive claims are reported so the R-07 wording check
-    fails closed when documentation drifts toward a stronger promise.
-    """
+    """Return positive OS-sandbox or complete-descendant-isolation claims."""
     compact = re.sub(r"\s+", " ", text)
     failures: list[str] = []
     for pattern in SANDBOX_CLAIM_PATTERNS:
@@ -133,16 +102,10 @@ def unsupported_sandbox_claims(text: str) -> list[str]:
 
 def sandbox_wording_failures() -> list[dict[str, str]]:
     documents = [
-        ROOT / "README.md",
-        ROOT / "README.zh-CN.md",
-        ROOT / "CONTRIBUTING.md",
-        ROOT / "CODE_OF_CONDUCT.md",
-        ROOT / "SECURITY.md",
-        *ROOT.glob("docs/**/*.md"),
-        *ROOT.glob("schema/*.md"),
-        *ROOT.glob("openspec/changes/*/*.md"),
-        *ROOT.glob("openspec/changes/*/specs/**/*.md"),
-        *ROOT.glob("tools/harness-gate/src/**/*.rs"),
+        ROOT / "README.md", ROOT / "README.zh-CN.md", ROOT / "CONTRIBUTING.md",
+        ROOT / "CODE_OF_CONDUCT.md", ROOT / "SECURITY.md", *ROOT.glob("docs/**/*.md"),
+        *ROOT.glob("schema/*.md"), *ROOT.glob("openspec/changes/*/*.md"),
+        *ROOT.glob("openspec/changes/*/specs/**/*.md"), *ROOT.glob("tools/harness-gate/src/**/*.rs"),
     ]
     failures = []
     for document in documents:
@@ -151,12 +114,37 @@ def sandbox_wording_failures() -> list[dict[str, str]]:
         except OSError:
             continue
         for claim in unsupported_sandbox_claims(source):
-            failures.append(
-                {
-                    "document": str(document.relative_to(ROOT)),
-                    "claim": claim,
-                }
-            )
+            failures.append({"document": str(document.relative_to(ROOT)), "claim": claim})
+    return failures
+
+
+def engineering_policy_failures() -> list[str]:
+    """Guard stable normative anchors without duplicating the policy engine."""
+    policy = ROOT / "docs" / "engineering-policy.md"
+    contributing = ROOT / "CONTRIBUTING.md"
+    if not policy.is_file():
+        return ["missing docs/engineering-policy.md"]
+    text = policy.read_text(errors="replace")
+    required_phrases = (
+        "Normative repository policy",
+        "Collectors measure and normalize facts",
+        "released Rust Harness-Gate core",
+        "CRAP `<= 30`",
+        "line coverage `>= 80%`",
+        "region coverage `>= 80%`",
+        "new debt is forbidden",
+        "converted to PASS",
+        "normative policy delta",
+        "CI performance regressions are engineering regressions",
+    )
+    failures = [f"engineering policy missing normative anchor: {phrase}" for phrase in required_phrases if phrase not in text]
+    try:
+        contributing_text = contributing.read_text(errors="replace")
+    except OSError:
+        failures.append("missing CONTRIBUTING.md")
+    else:
+        if "docs/engineering-policy.md" not in contributing_text:
+            failures.append("CONTRIBUTING.md does not reference docs/engineering-policy.md")
     return failures
 
 
@@ -169,13 +157,12 @@ def anchor(value: str) -> str:
 def run(output: Path) -> int:
     link_failures = local_links()
     sandbox_failures = sandbox_wording_failures()
+    policy_failures = engineering_policy_failures()
     english_config = ROOT / "docs" / "configuration.md"
     chinese_config = ROOT / "docs" / "configuration.zh-CN.md"
     schema_catalog = ROOT / "schema" / "README.md"
     language_docs_valid = (
-        english_config.is_file()
-        and chinese_config.is_file()
-        and schema_catalog.is_file()
+        english_config.is_file() and chinese_config.is_file() and schema_catalog.is_file()
         and "# harness-gate schema v2 configuration reference" in english_config.read_text(errors="replace").lower()
     )
     examples = []
@@ -185,15 +172,11 @@ def run(output: Path) -> int:
             preset_name = preset.name.removesuffix(".flow.toml")
             initialized = subprocess.run(
                 ["cargo", "run", "--manifest-path", str(CRATE / "Cargo.toml"), "--locked", "--", "init", "--project-root", str(root), "--preset", preset_name],
-                cwd=ROOT,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
+                cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
             )
             checked = initialized.returncode == 0 and subprocess.run(
                 ["cargo", "run", "--manifest-path", str(CRATE / "Cargo.toml"), "--locked", "--", "config", "check", "--project-root", str(root)],
-                cwd=ROOT,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
+                cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
             ).returncode == 0
             examples.append({"path": str(preset.relative_to(ROOT)), "status": "pass" if checked else "fail"})
     migration_fixture = Path(__file__).with_name("fixtures") / "v1-flow.toml"
@@ -201,59 +184,22 @@ def run(output: Path) -> int:
         root = Path(directory)
         shutil.copy2(migration_fixture, root / "legacy.flow.toml")
         (root / ".harness-gate").mkdir()
-        migrated = root / ".harness-gate" / "flow.toml"
         migration = subprocess.run(
-            [
-                "cargo",
-                "run",
-                "--manifest-path",
-                str(CRATE / "Cargo.toml"),
-                "--locked",
-                "--",
-                "--project-root",
-                str(root),
-                "config",
-                "migrate",
-                "--input",
-                "legacy.flow.toml",
-                "--output",
-                ".harness-gate/flow.toml",
-            ],
-            cwd=ROOT,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            ["cargo", "run", "--manifest-path", str(CRATE / "Cargo.toml"), "--locked", "--", "--project-root", str(root), "config", "migrate", "--input", "legacy.flow.toml", "--output", ".harness-gate/flow.toml"],
+            cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         )
-        (root / ".harness-gate" / "audit.toml").write_text(
-            (CRATE / "presets" / "empty.audit.toml").read_text()
-        )
+        (root / ".harness-gate" / "audit.toml").write_text((CRATE / "presets" / "empty.audit.toml").read_text())
         migration_checked = migration.returncode == 0 and subprocess.run(
             ["cargo", "run", "--manifest-path", str(CRATE / "Cargo.toml"), "--locked", "--", "config", "check", "--project-root", str(root)],
-            cwd=ROOT,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         ).returncode == 0
         migration_checked = migration_checked and (root / ".harness-gate" / "secrets.toml").is_file()
     with tempfile.TemporaryDirectory(prefix="harness-gate-schema-") as directory:
         schema_root = Path(directory)
         generated = schema_root / "flow.schema.json"
         schema = subprocess.run(
-            [
-                "cargo",
-                "run",
-                "--manifest-path",
-                str(CRATE / "Cargo.toml"),
-                "--locked",
-                "--",
-                "--project-root",
-                str(schema_root),
-                "schema",
-                "export",
-                "--output",
-                "flow.schema.json",
-            ],
-            cwd=ROOT,
-            capture_output=True,
-            text=True,
+            ["cargo", "run", "--manifest-path", str(CRATE / "Cargo.toml"), "--locked", "--", "--project-root", str(schema_root), "schema", "export", "--output", "flow.schema.json"],
+            cwd=ROOT, capture_output=True, text=True,
         )
         committed = ROOT / "schema" / "flow.schema.json"
         schema_synced = schema.returncode == 0 and generated.read_bytes() == committed.read_bytes()
@@ -263,21 +209,9 @@ def run(output: Path) -> int:
         machine_data = json.loads(machine_schema.read_text())
         required = set(machine_data.get("required", []))
         machine_schema_valid = machine_data.get("properties", {}).get("schema_version", {}).get("const") == "1" and {
-            "schema_version",
-            "input_mode",
-            "project_identity",
-            "source_identity",
-            "execution_root",
-            "configuration_digest",
-            "scope",
-            "services",
-            "steps",
-            "skipped_steps",
-            "warnings",
-            "failures",
-            "artifacts",
-            "evidence_complete",
-            "status",
+            "schema_version", "input_mode", "project_identity", "source_identity", "execution_root",
+            "configuration_digest", "scope", "services", "steps", "skipped_steps", "warnings",
+            "failures", "artifacts", "evidence_complete", "status",
         } <= required
     except (OSError, json.JSONDecodeError, TypeError):
         machine_schema_valid = False
@@ -286,14 +220,8 @@ def run(output: Path) -> int:
     try:
         manifest_data = json.loads(manifest_schema.read_text())
         manifest_required = set(manifest_data.get("required", []))
-        artifact_required = set(
-            manifest_data.get("definitions", {}).get("artifact", {}).get("required", [])
-        )
-        manifest_schema_valid = (
-            manifest_data.get("properties", {}).get("schema_version", {}).get("const") == "1"
-            and {"schema_version", "invocation_id", "generated_at", "artifacts"} <= manifest_required
-            and {"path", "kind", "size_bytes", "sha256"} <= artifact_required
-        )
+        artifact_required = set(manifest_data.get("definitions", {}).get("artifact", {}).get("required", []))
+        manifest_schema_valid = manifest_data.get("properties", {}).get("schema_version", {}).get("const") == "1" and {"schema_version", "invocation_id", "generated_at", "artifacts"} <= manifest_required and {"path", "kind", "size_bytes", "sha256"} <= artifact_required
     except (OSError, json.JSONDecodeError, TypeError):
         manifest_schema_valid = False
     registry_schema = ROOT / "schema" / "artifact-registry.schema.json"
@@ -301,26 +229,27 @@ def run(output: Path) -> int:
     try:
         registry_data = json.loads(registry_schema.read_text())
         registry_required = set(registry_data.get("required", []))
-        registry_artifact_required = set(
-            registry_data.get("definitions", {}).get("artifact", {}).get("required", [])
-        )
-        registry_schema_valid = (
-            registry_data.get("properties", {}).get("schema_version", {}).get("const") == "1"
-            and {"schema_version", "invocation_id", "artifacts"} <= registry_required
-            and {"invocation_id", "path", "kind", "size_bytes", "sha256"}
-            <= registry_artifact_required
-        )
+        registry_artifact_required = set(registry_data.get("definitions", {}).get("artifact", {}).get("required", []))
+        registry_schema_valid = registry_data.get("properties", {}).get("schema_version", {}).get("const") == "1" and {"schema_version", "invocation_id", "artifacts"} <= registry_required and {"invocation_id", "path", "kind", "size_bytes", "sha256"} <= registry_artifact_required
     except (OSError, json.JSONDecodeError, TypeError):
         registry_schema_valid = False
-    sandbox_wording = {
-        "failures": sandbox_failures,
-        "status": "fail" if sandbox_failures else "pass",
+    sandbox_wording = {"failures": sandbox_failures, "status": "fail" if sandbox_failures else "pass"}
+    engineering_policy = {"failures": policy_failures, "status": "fail" if policy_failures else "pass"}
+    result = {
+        **metadata(tool="docs-consistency"), "link_failures": link_failures, "examples": examples,
+        "migration": {"path": str(migration_fixture.relative_to(ROOT)), "status": "pass" if migration_checked else "fail"},
+        "language_docs_valid": language_docs_valid, "schema_synced": schema_synced,
+        "machine_schema_valid": machine_schema_valid, "manifest_schema_valid": manifest_schema_valid,
+        "registry_schema_valid": registry_schema_valid, "sandbox_wording": sandbox_wording,
+        "engineering_policy": engineering_policy,
+        "status": "pass" if not link_failures and language_docs_valid and schema_synced and machine_schema_valid and manifest_schema_valid and registry_schema_valid and migration_checked and all(item["status"] == "pass" for item in examples) and sandbox_wording["status"] == "pass" and engineering_policy["status"] == "pass" else "fail",
     }
-    result = {**metadata(tool="docs-consistency"), "link_failures": link_failures, "examples": examples, "migration": {"path": str(migration_fixture.relative_to(ROOT)), "status": "pass" if migration_checked else "fail"}, "language_docs_valid": language_docs_valid, "schema_synced": schema_synced, "machine_schema_valid": machine_schema_valid, "manifest_schema_valid": manifest_schema_valid, "registry_schema_valid": registry_schema_valid, "sandbox_wording": sandbox_wording, "status": "pass" if not link_failures and language_docs_valid and schema_synced and machine_schema_valid and manifest_schema_valid and registry_schema_valid and migration_checked and all(item["status"] == "pass" for item in examples) and sandbox_wording["status"] == "pass" else "fail"}
     write_json(output, result)
     if result["status"] != "pass":
         if sandbox_failures:
             fail("unsupported OS-sandbox or descendant-isolation wording found")
+        if policy_failures:
+            fail("normative engineering policy anchors are missing or disconnected")
         fail("documentation, examples, or schema synchronization failed")
     return 0
 
