@@ -116,7 +116,8 @@ class Collector:
                                  for source in SOURCE_FILES} and not
                        (p.startswith('tools/harness-gate/quality-core/tests/') or
                         p in ('tools/harness-gate/quality-core/tests.rs', 'tools/harness-gate/quality-core/policy_tests.rs',
-                              'tools/harness-gate/src/config/quality/tests.rs'))]
+                              'tools/harness-gate/src/config/quality/tests.rs',
+                              'tools/harness-gate/src/config/quality/collectors/tests.rs'))]
         require(not unsupported, 'production changes outside supported risk series; measurement review required: '
                 + ', '.join(unsupported))
         self.command('analyzer-build', ['cargo', 'build', '--locked', '--manifest-path',
