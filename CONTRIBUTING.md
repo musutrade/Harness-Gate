@@ -43,6 +43,9 @@ cargo clippy --manifest-path tools/harness-gate/Cargo.toml -- -D warnings
 
 以上只是基础开发检查。涉及质量语义的变更还必须满足 Engineering Policy 和仓库 Required Quality Aggregate 中适用的 coverage、risk/CRAP、critical-path、evidence、policy/ratchet 等 required gates；不能用单独的 `cargo test` 代替这些门禁。
 
+CI 执行模型、工具版本、缓存与制品信任边界、故障诊断及托管性能对比见
+[CI operating guide](docs/quality/ci-topology/README.md)。
+
 ## 提交代码
 
 ### 提交信息格式
