@@ -154,6 +154,20 @@ class ArtifactTests(unittest.TestCase):
 
 
 class WorkflowBoundaryTests(unittest.TestCase):
+    def test_quality_collection_has_one_owner_and_shadow_only_consumes_evidence(self):
+        workflow = (ROOT / '.github/workflows/ci.yml').read_text()
+        jobs = dict(re.findall(r'^  ([a-z][a-z-]+):\n(.*?)(?=^  [a-z][a-z-]+:|\Z)',
+                               workflow, re.M | re.S))
+        owners = [name for name, body in jobs.items() if 'ci_quality.py collect' in body]
+        self.assertEqual(owners, ['quality-coverage'])
+        self.assertEqual(jobs['quality-coverage'].count('ci_quality.py collect'), 1)
+        consumer = jobs['quality-generic-shadow']
+        self.assertIn('needs: [quality-coverage]', consumer)
+        self.assertIn('quality-coverage-${{ github.run_id }}-${{ github.run_attempt }}', consumer)
+        self.assertIn('--candidate target/quality/candidate/candidate.json', consumer)
+        self.assertNotRegex(consumer, r'cargo|rust-toolchain|install-ci-tool|--collect|coverage\.py|source_measure\.py')
+        self.assertNotIn('ci_artifact.py seal', consumer)
+
     def test_authoritative_consumer_requires_independent_manifest_digest(self):
         workflow = (ROOT / '.github/workflows/ci.yml').read_text()
         consumer = workflow.split('  quality-generic-shadow:\n')[1].split('  quality-contracts:\n')[0]

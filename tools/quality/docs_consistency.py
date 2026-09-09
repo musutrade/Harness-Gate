@@ -154,6 +154,27 @@ def anchor(value: str) -> str:
     return re.sub(r"[-\s]+", "-", value).strip("-")
 
 
+def build_binary() -> Path:
+    """Establish freshness once, using Cargo's actual executable output path."""
+    built = subprocess.run(
+        ["cargo", "build", "--manifest-path", str(CRATE / "Cargo.toml"),
+         "--locked", "--bin", "harness-gate", "--message-format=json-render-diagnostics"],
+        cwd=ROOT, check=True, stdout=subprocess.PIPE, text=True,
+    )
+    executables = []
+    for line in built.stdout.splitlines():
+        artifact = json.loads(line)
+        if (artifact.get("reason") == "compiler-artifact"
+                and artifact.get("target", {}).get("name") == "harness-gate"
+                and artifact["target"].get("kind") == ["bin"]
+                and Path(artifact["manifest_path"]).resolve() == (CRATE / "Cargo.toml").resolve()
+                and artifact.get("executable")):
+            executables.append(Path(artifact["executable"]))
+    if len(executables) != 1 or not executables[0].is_file():
+        fail("Cargo did not produce exactly one harness-gate executable")
+    return executables[0]
+
+
 def run(output: Path) -> int:
     link_failures = local_links()
     sandbox_failures = sandbox_wording_failures()
@@ -165,17 +186,18 @@ def run(output: Path) -> int:
         english_config.is_file() and chinese_config.is_file() and schema_catalog.is_file()
         and "# harness-gate schema v2 configuration reference" in english_config.read_text(errors="replace").lower()
     )
+    binary = str(build_binary())
     examples = []
     for preset in sorted((CRATE / "presets").glob("*.flow.toml")):
         with tempfile.TemporaryDirectory(prefix="harness-gate-example-") as directory:
             root = Path(directory)
             preset_name = preset.name.removesuffix(".flow.toml")
             initialized = subprocess.run(
-                ["cargo", "run", "--manifest-path", str(CRATE / "Cargo.toml"), "--locked", "--", "init", "--project-root", str(root), "--preset", preset_name],
+                [binary, "init", "--project-root", str(root), "--preset", preset_name],
                 cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
             )
             checked = initialized.returncode == 0 and subprocess.run(
-                ["cargo", "run", "--manifest-path", str(CRATE / "Cargo.toml"), "--locked", "--", "config", "check", "--project-root", str(root)],
+                [binary, "config", "check", "--project-root", str(root)],
                 cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
             ).returncode == 0
             examples.append({"path": str(preset.relative_to(ROOT)), "status": "pass" if checked else "fail"})
@@ -185,12 +207,12 @@ def run(output: Path) -> int:
         shutil.copy2(migration_fixture, root / "legacy.flow.toml")
         (root / ".harness-gate").mkdir()
         migration = subprocess.run(
-            ["cargo", "run", "--manifest-path", str(CRATE / "Cargo.toml"), "--locked", "--", "--project-root", str(root), "config", "migrate", "--input", "legacy.flow.toml", "--output", ".harness-gate/flow.toml"],
+            [binary, "--project-root", str(root), "config", "migrate", "--input", "legacy.flow.toml", "--output", ".harness-gate/flow.toml"],
             cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         )
         (root / ".harness-gate" / "audit.toml").write_text((CRATE / "presets" / "empty.audit.toml").read_text())
         migration_checked = migration.returncode == 0 and subprocess.run(
-            ["cargo", "run", "--manifest-path", str(CRATE / "Cargo.toml"), "--locked", "--", "config", "check", "--project-root", str(root)],
+            [binary, "config", "check", "--project-root", str(root)],
             cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         ).returncode == 0
         migration_checked = migration_checked and (root / ".harness-gate" / "secrets.toml").is_file()
@@ -198,7 +220,7 @@ def run(output: Path) -> int:
         schema_root = Path(directory)
         generated = schema_root / "flow.schema.json"
         schema = subprocess.run(
-            ["cargo", "run", "--manifest-path", str(CRATE / "Cargo.toml"), "--locked", "--", "--project-root", str(schema_root), "schema", "export", "--output", "flow.schema.json"],
+            [binary, "--project-root", str(schema_root), "schema", "export", "--output", "flow.schema.json"],
             cwd=ROOT, capture_output=True, text=True,
         )
         committed = ROOT / "schema" / "flow.schema.json"
