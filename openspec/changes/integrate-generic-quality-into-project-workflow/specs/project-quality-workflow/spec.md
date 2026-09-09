@@ -80,6 +80,13 @@ Traditional step success SHALL NOT override a generic required quality failure, 
 - **THEN** final verify fails
 - **AND** the report distinguishes execution/audit failure from generic quality-policy status
 
+#### Scenario: Unknown ecosystem completes the entire verify path
+- **GIVEN** an arbitrary configured ecosystem identifier with a signed collector and trusted retained baseline
+- **WHEN** verify resolves its scope, collects evidence, compiles inputs and invokes the released Rust evaluator
+- **THEN** the unified report retains that identifier as data and links the complete authoritative project report
+- **AND** the same generic path handles execution and quality success/failure independently
+- **AND** a regression guard rejects closed ecosystem enums or language dispatch in generic verify and reporting
+
 ### Requirement: Collector orchestration SHALL preserve the signed language-neutral measurement boundary
 
 Project-level collector orchestration SHALL execute compatible collectors through the accepted adapter/protocol trust boundary, validate executable/package/protocol identity, component/subject selection, expected capabilities, source/config/tool identity, evidence schema, and artifact provenance before evidence enters the generic evaluator.
@@ -195,6 +202,12 @@ The verify machine report SHALL link source/profile/scope, traditional gate outc
 - **THEN** the report identifies the subject and head/base CRAP where applicable
 - **AND** includes threshold/ratchet state and links supporting coverage/complexity evidence
 - **AND** provides remediation context without changing the failing measurement
+
+#### Scenario: Direct evaluation reproduces the verify quality report
+- **GIVEN** the trusted head and optional baseline inputs, evidence and evaluation time retained by verify
+- **WHEN** the advanced `quality evaluate` interface evaluates those exact inputs
+- **THEN** its decision and complete authoritative project report equal the verify quality result
+- **AND** this quality equivalence does not override a required execution or audit failure
 
 ### Requirement: Presets SHALL generate coherent ecosystem quality models
 

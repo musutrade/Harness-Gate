@@ -246,6 +246,16 @@
             "type": "string"
           },
           "uniqueItems": true
+        },
+        "workflow": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Workflow"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "additionalProperties": false
@@ -464,6 +474,29 @@
           "additionalProperties": false
         }
       ]
+    },
+    "Workflow": {
+      "description": "Host-produced inputs for this profile; collectors cannot supply trust roots.",
+      "type": "object",
+      "required": [
+        "state",
+        "trusted_keys"
+      ],
+      "properties": {
+        "baseline_request": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "state": {
+          "type": "string"
+        },
+        "trusted_keys": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     }
   }
 }

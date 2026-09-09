@@ -161,9 +161,9 @@ assertions = ["assert!(!report.passed);", "step.label == \"secret scan\" && !ste
 [paths.source]
 path = "src/verify/mod.rs"
 symbol = "run_selected"
-start = 180
-end = 325
-sha256 = "eaa204963ef62a0eb8029dbc5141ce4cadd337f3218069b3ac53c7c9d00af29b"
+start = 182
+end = 340
+sha256 = "3a99f94f4966cd1efe8ae0e48c0c2abd528e40088ac2fa399e48e728453a2594"
 [paths.test_source]
 path = "src/verify/tests.rs"
 symbol = "gate_failure_writes_compatible_report"
@@ -171,7 +171,7 @@ start = 552
 end = 574
 sha256 = "edeed13483430222bd9b95eca498d38e739c96896f15c8f14a87c040e9382f29"
 [[paths.probes]]
-line = 307
+line = 322
 column = 5
 text = "publish_report(&report, &invocation_project, project, &mut progress)?;"
 
@@ -248,9 +248,10 @@ assertions = ["assert!(matches!(error, VerifyError::Report { .. }));"]
 [paths.source]
 path = "src/verify/report.rs"
 symbol = "write_report_file"
-start = 1134
-end = 1144
-sha256 = "294f00ea6a36825fa1df8cd73ee53b80afd3d11032abac943f4a7ef093af6ccb"
+start = 1165
+end = 1175
+sha256 = "e7d42d13b07c42a30f5bc8848091934a0fce3abdce61d4937d5b9b228a47be37"
+
 [paths.test_source]
 path = "src/verify/tests.rs"
 symbol = "report_write_failure_returns_error"
@@ -258,7 +259,7 @@ start = 604
 end = 613
 sha256 = "edeed13483430222bd9b95eca498d38e739c96896f15c8f14a87c040e9382f29"
 [[paths.probes]]
-line = 1135
+line = 1166
 column = 5
 text = "report_target(project, relative)?;"
 
@@ -277,17 +278,19 @@ assertions = ["assert!(verify_manifest(&invocation_project).is_err());"]
 [paths.source]
 path = "src/verify/report.rs"
 symbol = "verify_manifest_without_result"
-start = 1688
-end = 1775
-sha256 = "294f00ea6a36825fa1df8cd73ee53b80afd3d11032abac943f4a7ef093af6ccb"
+start = 1738
+end = 1825
+sha256 = "e7d42d13b07c42a30f5bc8848091934a0fce3abdce61d4937d5b9b228a47be37"
+
 [paths.test_source]
 path = "src/verify/report.rs"
 symbol = "manifest_records_digests_and_detects_tampering"
-start = 2640
-end = 2693
-sha256 = "294f00ea6a36825fa1df8cd73ee53b80afd3d11032abac943f4a7ef093af6ccb"
+start = 2694
+end = 2747
+sha256 = "e7d42d13b07c42a30f5bc8848091934a0fce3abdce61d4937d5b9b228a47be37"
+
 [[paths.probes]]
-line = 1771
+line = 1821
 column = 13
 text = "bail!(\"artifact digest or size changed: {}\", artifact.path);"
 
