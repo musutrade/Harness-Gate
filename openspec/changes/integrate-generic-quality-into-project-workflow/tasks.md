@@ -45,11 +45,18 @@ checks. Hosted Required Quality Aggregate remains pending; later tasks are uncha
 
 ## 5. Integrate generic quality into verify and unified reporting
 
-- [ ] 5.1 Extend `harness-gate verify` phases to load quality config, resolve selection, run traditional gates, orchestrate applicable collectors, validate evidence, resolve baseline, compile trusted inputs, invoke the released Rust generic core, and emit one final status.
-- [ ] 5.2 Ensure traditional step exit codes cannot override generic policy authority; any required traditional or generic failure blocks final verify.
-- [ ] 5.3 Define/extend stable machine reporting to link execution outcomes, collector/capability state, evidence/artifact identities, component/local results, cross-component contracts, baseline/ratchet/debt, exceptions, authoritative project report, and final combined status.
-- [ ] 5.4 Improve human diagnostics, including CRAP failures with subject, base/head CRAP, threshold/ratchet state, supporting evidence, and remediation context.
-- [ ] 5.5 Preserve direct `quality evaluate` as the low-level advanced interface and prove report/decision equivalence with the verify path.
+- [x] 5.1 Extend `harness-gate verify` phases to load quality config, resolve selection, run traditional gates, orchestrate applicable collectors, validate evidence, resolve baseline, compile trusted inputs, invoke the released Rust generic core, and emit one final status.
+- [x] 5.2 Ensure traditional step exit codes cannot override generic policy authority; any required traditional or generic failure blocks final verify.
+- [x] 5.3 Define/extend stable machine reporting to link execution outcomes, collector/capability state, evidence/artifact identities, component/local results, cross-component contracts, baseline/ratchet/debt, exceptions, authoritative project report, and final combined status.
+- [x] 5.4 Improve human diagnostics, including CRAP failures with subject, base/head CRAP, threshold/ratchet state, supporting evidence, and remediation context.
+- [x] 5.5 Preserve direct `quality evaluate` as the low-level advanced interface and prove report/decision equivalence with the verify path.
+
+Validation: [GH-183 evidence](../../../docs/quality/gh-183/validation.md) records
+360 passing Rust tests, the Python suite and architecture guard, full direct CLI
+report/decision equivalence, signed unknown-ecosystem collection with retained
+baseline, and independent execution/audit/quality blocking. Hosted Required
+Quality Aggregate is pending; tasks 6 onward and whole-change acceptance remain
+unchanged. See [ADR-0045](../../../docs/adr/0045-quality-verification-composition.md).
 
 ## 6. Enforce profile semantics and quality cost boundaries
 
