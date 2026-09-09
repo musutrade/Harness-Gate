@@ -1,0 +1,136 @@
+{
+  "issue": "GH-167",
+  "tasks": [
+    "4.1",
+    "4.2",
+    "4.3"
+  ],
+  "scope": "Local implementation validation; submitted-commit Required Quality Aggregate remains pending controller-owned CI",
+  "environment": {
+    "CARGO_TARGET_DIR": "/home/gem/symphony-workspaces/GH-167/target/gh-167"
+  },
+  "results": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 0,
+      "result": "332 passed; 0 skipped",
+      "log": "target/quality/gh-167/nextest.log",
+      "log_sha256": "c39e5b463e2e613e240b840b9f9afbf05885a1d3e59e056fee6e768057761909"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "target/quality/gh-167/fmt.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "target/quality/gh-167/clippy.log",
+      "log_sha256": "77693ce94100b4fe95ce04354d6ea37dfed9ba98c05570d8f81917a093e094a1"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 0,
+      "result": "322 tests passed",
+      "log": "target/quality/gh-167/python-tests.log",
+      "log_sha256": "2da98eff0684e4264b34a3089f19780cb0f5f80b199e56abba08ce2f9f9d3358"
+    },
+    {
+      "command": "openspec validate optimize-ci-execution-topology --strict",
+      "exit_code": 0,
+      "result": "valid",
+      "log": "target/quality/gh-167/openspec.log",
+      "log_sha256": "ee3f7dcabd71c1c486f8cec42ed1b962a3d3237e4a1845dcdbb9e1f1d7b3e278"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 0,
+      "result": "pass; four presets, migration, schema, policy, links and sandbox checks",
+      "log": "target/quality/gh-167/docs-final.log",
+      "log_sha256": "4f27ac380b22e1d975eee20ce727fa8cbc09061177f6253af0777fd4de7b7506"
+    }
+  ],
+  "not_applicable": [
+    {
+      "command": "harness-gate config check",
+      "reason": "Checkout has no .harness-gate/flow.toml and no declared project-local ci profile; no synthetic config created."
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "reason": "Checkout has no .harness-gate/flow.toml and no declared project-local ci profile; no synthetic config created."
+    }
+  ],
+  "docs_semantic_parity": {
+    "result": "All 11 semantic fields match before/after; environment metadata is excluded.",
+    "before_command": "python3 tools/quality/docs_consistency.py --output target/quality/gh-167/docs-before.json",
+    "before_exit_code": 0,
+    "before": {
+      "path": "target/quality/gh-167/docs-before.json",
+      "sha256": "c60d4e9a2c2263587460ee845205cb66ba291b25d51629817737d4eacd2f08a2"
+    },
+    "after": {
+      "path": "target/quality/docs-consistency.json",
+      "sha256": "536a8ac76624144503f6ee50d9cd5ba0ec6f2abd07448888d0c7e9438ae6fd1a"
+    },
+    "matching_values": {
+      "link_failures": [],
+      "examples": [
+        {
+          "path": "tools/harness-gate/presets/angular-only.flow.toml",
+          "status": "pass"
+        },
+        {
+          "path": "tools/harness-gate/presets/angular-rust-postgres.flow.toml",
+          "status": "pass"
+        },
+        {
+          "path": "tools/harness-gate/presets/generic.flow.toml",
+          "status": "pass"
+        },
+        {
+          "path": "tools/harness-gate/presets/rust-api.flow.toml",
+          "status": "pass"
+        }
+      ],
+      "migration": {
+        "path": "tools/quality/fixtures/v1-flow.toml",
+        "status": "pass"
+      },
+      "language_docs_valid": true,
+      "schema_synced": true,
+      "machine_schema_valid": true,
+      "manifest_schema_valid": true,
+      "registry_schema_valid": true,
+      "sandbox_wording": {
+        "failures": [],
+        "status": "pass"
+      },
+      "engineering_policy": {
+        "failures": [],
+        "status": "pass"
+      },
+      "status": "pass"
+    },
+    "removed_work": "11 cargo run invocations replaced by 1 locked cargo build and the same 11 CLI operations; ten fewer compilation-capable Cargo startups."
+  },
+  "assurance_tests": [
+    "All 13 CLI/migration/schema failure injections block docs validation.",
+    "Fresh binary discovery rejects failed, missing, ambiguous and wrong-manifest Cargo output.",
+    "Workflow requires a single quality collection owner and retained-artifact-only shadow consumption.",
+    "Historical replay preserves all values, identities and artifacts without collection.",
+    "Existing artifact transport, series mismatch, native reference equivalence and aggregate requiredness/state tests passed in the complete suite."
+  ],
+  "hosted_evidence": {
+    "audit": "docs/quality/ci-topology/repeated-work-hosted-audit.json",
+    "decision": "Reject Linux job merges and cross-job executable sharing: retained baseline does not establish compatible compilation savings or non-worsening after-state critical path.",
+    "submitted_commit_required_quality_aggregate": "pending controller-owned hosted CI; no hosted after-state speedup claimed"
+  },
+  "publication_environment": {
+    "blocked_command": "git add tools/quality/docs_consistency.py tools/quality/tests/test_docs_consistency.py tools/quality/tests/test_ci_state.py docs/quality/ci-topology/repeated-work.md docs/quality/ci-topology/repeated-work-hosted-audit.json docs/quality/ci-topology/repeated-work-validation.json openspec/changes/optimize-ci-execution-topology/design.md openspec/changes/optimize-ci-execution-topology/tasks.md",
+    "error": "fatal: Unable to create '/home/gem/symphony-workspaces/GH-167/.git/index.lock': Read-only file system",
+    "impact": "Original workspace Git metadata cannot advance. Commit and push use a copy at target/gh167-delivery.git with GIT_WORK_TREE pointing to this workspace; the same symphony/GH-167 branch and prepared baseline are preserved. No other workspace is accessed."
+  }
+}
