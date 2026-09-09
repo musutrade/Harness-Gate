@@ -433,6 +433,30 @@ fn configured_multiple_producers_combine_distinct_series_and_reject_overlap() {
             let collection = result.unwrap();
             assert_eq!(collection.evidence.as_array().unwrap().len(), 2);
             assert!(fixture.request.artifact_root.join("second.json").is_file());
+            // Reuse one authoritative producer and collect only the missing one.
+            fs::remove_file(fixture.request.artifact_root.join("second.json")).unwrap();
+            fixture.state.artifacts = inventory(&fixture.request.artifact_root).unwrap();
+            let path = ".harness-gate/retained-coverage.json";
+            write(&root.join(path), &collection.responses["coverage"]);
+            fixture.state.retained.insert(
+                "coverage".into(),
+                compiler::RetainedEvidence {
+                    path: path.into(),
+                    sha256: format!("{:x}", Sha256::digest(fs::read(root.join(path)).unwrap())),
+                },
+            );
+            second.nonce = "mixed-fresh-producer".into();
+            second.adapter.signature.value = BASE64.encode(
+                SigningKey::from_bytes(&[7; 32])
+                    .sign(&adapter::signing_payload(&second).unwrap())
+                    .to_bytes(),
+            );
+            write(&root.join(".harness-gate/second-request.json"), &second);
+            fixture.pin();
+            let mixed = fixture.collect().unwrap();
+            assert_eq!(mixed.evidence, collection.evidence);
+            assert_eq!(mixed.producers["coverage"], "retained");
+            assert_eq!(mixed.producers["second"], "collected");
         }
     }
 }
@@ -1131,4 +1155,222 @@ fn workflow_crap_diagnostics_preserve_base_head_ratchet_evidence_and_remediation
             .unwrap(),
     )
     .unwrap();
+}
+
+impl Fixture {
+    fn select_profile(&mut self, profile: &str, omit: bool) {
+        let root = self.dir.path().to_path_buf();
+        let mut flow: FlowConfig =
+            toml::from_str(&fs::read_to_string(root.join(DEFAULT_CONFIG_PATH)).unwrap()).unwrap();
+        flow.steps[0].profiles.insert(profile.into());
+        fs::write(
+            root.join(DEFAULT_CONFIG_PATH),
+            toml::to_string(&flow).unwrap(),
+        )
+        .unwrap();
+        let mut config = self.config();
+        let mut participation = config.profiles["full"].clone();
+        if omit {
+            participation.assurance = super::super::Assurance::Partial;
+            participation.collectors.clear();
+            participation.policies.clear();
+            self.state.series.clear();
+        }
+        config.profiles.insert(profile.into(), participation);
+        self.state.profile = profile.into();
+        fs::write(
+            root.join(".harness-gate/quality.toml"),
+            toml::to_string(&config).unwrap(),
+        )
+        .unwrap();
+        self.pin();
+        if !omit {
+            let inputs = compiler::compile(&root, &self.state).unwrap();
+            self.request.config_digest = binding_digest(&config, &self.state, &inputs).unwrap();
+            self.sign();
+        } else {
+            self.state
+                .config_files
+                .remove(".harness-gate/coverage-request.json");
+        }
+        write(&root.join(".harness-gate/workflow-state.json"), &self.state);
+        if root.join("base").exists() {
+            fs::remove_dir_all(root.join("base")).unwrap();
+            self.retained_base();
+        }
+    }
+
+    fn retain(&mut self) -> Collection {
+        let collection = self.collect().unwrap();
+        self.state.artifacts = inventory(&self.request.artifact_root).unwrap();
+        for (id, response) in &collection.responses {
+            let path = format!(".harness-gate/retained-{id}.json");
+            write(&self.dir.path().join(&path), response);
+            self.state.retained.insert(
+                id.clone(),
+                compiler::RetainedEvidence {
+                    sha256: format!(
+                        "{:x}",
+                        Sha256::digest(fs::read(self.dir.path().join(&path)).unwrap())
+                    ),
+                    path,
+                },
+            );
+        }
+        write(
+            &self.dir.path().join(".harness-gate/workflow-state.json"),
+            &self.state,
+        );
+        collection
+    }
+
+    fn quality_result(&self) -> Value {
+        let project =
+            crate::project::Project::discover(Some(self.dir.path().to_path_buf()), None).unwrap();
+        let report = crate::verify::run(
+            &project,
+            crate::scope::ScopeResult::all(&project),
+            &self.state.profile,
+            false,
+        )
+        .unwrap();
+        let unified: Value = serde_json::from_slice(
+            &fs::read(Path::new(&report.report_directory).join("test_result.json")).unwrap(),
+        )
+        .unwrap();
+        unified["quality"].clone()
+    }
+}
+
+#[test]
+fn partial_profiles_report_omissions_and_never_full_quality_pass() {
+    for profile in ["hook", "custom-fast"] {
+        let mut fixture = Fixture::workflow("crash", true, false);
+        fixture.select_profile(profile, true);
+        let quality = fixture.quality_result();
+        assert_eq!(quality["status"], "not_collected", "{quality:#}");
+        assert_eq!(quality["full_quality_status"], "not_collected");
+        assert_eq!(
+            quality["participation"]["policies"]["coverage"]["state"],
+            "not_collected"
+        );
+        assert_eq!(quality["evidence"], json!([]));
+        assert_eq!(quality["producers"], json!({}));
+        assert!(!fixture.request.artifact_root.join("raw.json").exists());
+    }
+}
+
+#[test]
+fn partial_profiles_evaluate_selected_policy_without_certifying_full_quality() {
+    for mode in ["pass", "crap"] {
+        let mut fixture = Fixture::workflow(mode, true, mode == "crap");
+        let mut config = fixture.config();
+        config.profiles.get_mut("full").unwrap().assurance = super::super::Assurance::Partial;
+        fs::write(
+            fixture.dir.path().join(".harness-gate/quality.toml"),
+            toml::to_string(&config).unwrap(),
+        )
+        .unwrap();
+        fixture.select_profile("custom-fast", false);
+        let quality = fixture.quality_result();
+        assert_eq!(
+            quality["status"],
+            if mode == "pass" { "pass" } else { "fail" },
+            "{quality:#}"
+        );
+        assert_eq!(quality["full_quality_status"], "not_collected");
+        assert_eq!(quality["participation"]["assurance"], "partial");
+    }
+}
+
+#[test]
+fn complete_profiles_enforce_crap_and_preserve_unsupported_capabilities() {
+    for profile in ["full", "ci"] {
+        for mode in ["crap", "unsupported", "not_collected"] {
+            let mut fixture = Fixture::workflow(mode, true, mode == "crap");
+            fixture.select_profile(profile, false);
+            let quality = fixture.quality_result();
+            assert_eq!(quality["status"], "fail", "{profile}/{mode}: {quality:#}");
+            assert_eq!(quality["full_quality_status"], "fail");
+            assert_eq!(
+                quality["participation"]["policies"]["coverage"]["state"],
+                "participating"
+            );
+            if mode != "crap" {
+                assert_eq!(quality["evidence"][0]["metrics"], json!([]));
+                assert_eq!(quality["evidence"][0]["capabilities"][0]["state"], mode);
+            }
+        }
+    }
+}
+
+#[test]
+fn ci_reuses_authoritative_responses_without_relaunching_or_changing_decisions() {
+    for mode in ["pass", "unsupported", "crap"] {
+        let mut fixture = Fixture::workflow(mode, true, mode == "crap");
+        fixture.select_profile("ci", false);
+        let original = fixture.retain();
+        fs::remove_file(&fixture.request.adapter.executable).unwrap();
+        let reused = fixture.collect().unwrap();
+        assert_eq!(original.evidence, reused.evidence);
+        assert_eq!(original.responses, reused.responses);
+        assert_eq!(reused.producers["stargazer"], "retained");
+        let quality = fixture.quality_result();
+        assert_eq!(
+            quality["status"],
+            if mode == "pass" { "pass" } else { "fail" },
+            "{quality:#}"
+        );
+        assert_eq!(quality["producers"]["stargazer"], "retained");
+    }
+}
+
+#[test]
+fn retained_evidence_rejects_stale_or_tampered_inputs_without_fallback() {
+    for mode in [
+        "digest", "binding", "schema", "run", "series", "subject", "artifact", "missing",
+        "inactive", "source",
+    ] {
+        let mut fixture = Fixture::workflow("pass", true, false);
+        fixture.select_profile("ci", false);
+        fixture.retain();
+        let pin = fixture.state.retained.get_mut("stargazer").unwrap();
+        let file = fixture.dir.path().join(&pin.path);
+        let mut envelope: Value = serde_json::from_slice(&fs::read(&file).unwrap()).unwrap();
+        match mode {
+            "binding" => envelope["binding_digest"] = json!("stale"),
+            "schema" => envelope["schema"] = json!("unknown/v1"),
+            "run" => envelope["response"]["invocation_id"] = json!("another-run"),
+            "series" => {
+                envelope["response"]["collection"]["evidence"][0]["series"]["id"] =
+                    json!("another-series")
+            }
+            "subject" => {
+                envelope["response"]["collection"]["evidence"][0]["subject"]["id"] =
+                    json!("another-subject")
+            }
+            _ => {}
+        }
+        write(&file, &envelope);
+        pin.sha256 = format!("{:x}", Sha256::digest(fs::read(&file).unwrap()));
+        match mode {
+            "digest" => pin.sha256 = "0".repeat(64),
+            "artifact" => {
+                fs::write(fixture.request.artifact_root.join("raw.json"), "tampered").unwrap()
+            }
+            "missing" => fs::remove_file(file).unwrap(),
+            "inactive" => {
+                let pin = fixture.state.retained.remove("stargazer").unwrap();
+                fixture.state.retained.insert("inactive".into(), pin);
+            }
+            "source" => fs::write(fixture.dir.path().join("src/lib.rs"), "tampered").unwrap(),
+            _ => {}
+        }
+        // If fallback were attempted, this valid executable would recreate raw.json.
+        let error = fixture.collect().unwrap_err();
+        assert!(
+            !format!("{error:#}").contains("replay"),
+            "{mode}: fallback attempted: {error:#}"
+        );
+    }
 }

@@ -32,6 +32,7 @@ collectors = ["coverage"]
 policies = ["coverage"]
 
 [profiles.hook]
+assurance = "partial"
 collectors = []
 policies = []
 
