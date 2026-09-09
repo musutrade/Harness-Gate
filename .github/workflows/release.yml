@@ -122,10 +122,13 @@ jobs:
       - name: Run strict Clippy
         run: cargo clippy --manifest-path tools/harness-gate/Cargo.toml --locked --all-targets --all-features -- -D warnings
 
+      - name: Install cargo-audit
+        uses: ./.github/actions/install-ci-tool
+        with:
+          tool: cargo-audit
+
       - name: Run dependency audit
-        run: |
-          cargo install cargo-audit --locked --force
-          cargo audit --file tools/harness-gate/Cargo.lock --deny warnings
+        run: cargo audit --file tools/harness-gate/Cargo.lock --deny warnings
 
       - name: Verify generated schema and release fixture
         run: |
