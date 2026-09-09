@@ -106,10 +106,22 @@ pub struct PolicyBinding {
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Participation {
+    /// Complete profiles enforce every configured required policy. Partial
+    /// profiles may omit work, but cannot certify complete project quality.
+    #[serde(default)]
+    pub assurance: Assurance,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub workflow: Option<Workflow>,
     pub collectors: BTreeSet<String>,
     pub policies: BTreeSet<String>,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum Assurance {
+    #[default]
+    Complete,
+    Partial,
 }
 
 /// Host-produced inputs for this profile; collectors cannot supply trust roots.

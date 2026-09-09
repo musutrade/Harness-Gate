@@ -1,0 +1,445 @@
+{
+  "status": "pass",
+  "threshold": "80.0",
+  "inventory_version": "production-source-2",
+  "gate_metric": "lines",
+  "aggregate": {
+    "functions": {
+      "count": 1507,
+      "covered": 1204,
+      "percent": 79.89382879893829
+    },
+    "lines": {
+      "count": 15026,
+      "covered": 13400,
+      "percent": 89.17875682150938
+    },
+    "regions": {
+      "count": 23939,
+      "covered": 20668,
+      "percent": 86.3361042650069
+    },
+    "status": "pass"
+  },
+  "boundaries": {
+    "app": {
+      "blocking": true,
+      "functions": {
+        "count": 53,
+        "covered": 42,
+        "percent": 79.24528301886792
+      },
+      "lines": {
+        "count": 643,
+        "covered": 577,
+        "percent": 89.73561430793157
+      },
+      "regions": {
+        "count": 1093,
+        "covered": 914,
+        "percent": 83.62305580969807
+      },
+      "status": "pass"
+    },
+    "audit": {
+      "blocking": true,
+      "functions": {
+        "count": 120,
+        "covered": 98,
+        "percent": 81.66666666666667
+      },
+      "lines": {
+        "count": 975,
+        "covered": 811,
+        "percent": 83.17948717948718
+      },
+      "regions": {
+        "count": 1630,
+        "covered": 1312,
+        "percent": 80.49079754601227
+      },
+      "status": "pass"
+    },
+    "cli": {
+      "blocking": false,
+      "functions": {
+        "count": 1,
+        "covered": 1,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 9,
+        "covered": 8,
+        "percent": 88.88888888888889
+      },
+      "regions": {
+        "count": 10,
+        "covered": 8,
+        "percent": 80.0
+      },
+      "status": "informational"
+    },
+    "compat": {
+      "blocking": false,
+      "functions": {
+        "count": 21,
+        "covered": 12,
+        "percent": 57.142857142857146
+      },
+      "lines": {
+        "count": 196,
+        "covered": 176,
+        "percent": 89.79591836734694
+      },
+      "regions": {
+        "count": 351,
+        "covered": 279,
+        "percent": 79.48717948717949
+      },
+      "status": "informational"
+    },
+    "config": {
+      "blocking": true,
+      "functions": {
+        "count": 291,
+        "covered": 271,
+        "percent": 93.12714776632302
+      },
+      "lines": {
+        "count": 3846,
+        "covered": 3518,
+        "percent": 91.47165886635466
+      },
+      "regions": {
+        "count": 5953,
+        "covered": 5317,
+        "percent": 89.31631110364522
+      },
+      "status": "pass"
+    },
+    "doctor": {
+      "blocking": true,
+      "functions": {
+        "count": 33,
+        "covered": 28,
+        "percent": 84.84848484848484
+      },
+      "lines": {
+        "count": 252,
+        "covered": 239,
+        "percent": 94.84126984126983
+      },
+      "regions": {
+        "count": 416,
+        "covered": 381,
+        "percent": 91.58653846153847
+      },
+      "status": "pass"
+    },
+    "error": {
+      "blocking": false,
+      "functions": {
+        "count": 2,
+        "covered": 2,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 13,
+        "covered": 13,
+        "percent": 100.0
+      },
+      "regions": {
+        "count": 19,
+        "covered": 19,
+        "percent": 100.0
+      },
+      "status": "informational"
+    },
+    "failure": {
+      "blocking": false,
+      "functions": {
+        "count": 4,
+        "covered": 4,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 23,
+        "covered": 23,
+        "percent": 100.0
+      },
+      "regions": {
+        "count": 41,
+        "covered": 39,
+        "percent": 95.1219512195122
+      },
+      "status": "informational"
+    },
+    "lib": {
+      "blocking": false,
+      "functions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "lines": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "regions": {
+        "count": 0,
+        "covered": 0,
+        "percent": null
+      },
+      "status": "informational"
+    },
+    "main": {
+      "blocking": false,
+      "functions": {
+        "count": 1,
+        "covered": 1,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 10,
+        "covered": 10,
+        "percent": 100.0
+      },
+      "regions": {
+        "count": 13,
+        "covered": 13,
+        "percent": 100.0
+      },
+      "status": "informational"
+    },
+    "net_policy": {
+      "blocking": false,
+      "functions": {
+        "count": 8,
+        "covered": 8,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 43,
+        "covered": 43,
+        "percent": 100.0
+      },
+      "regions": {
+        "count": 76,
+        "covered": 74,
+        "percent": 97.36842105263158
+      },
+      "status": "informational"
+    },
+    "preset": {
+      "blocking": false,
+      "functions": {
+        "count": 30,
+        "covered": 15,
+        "percent": 50.0
+      },
+      "lines": {
+        "count": 196,
+        "covered": 160,
+        "percent": 81.63265306122449
+      },
+      "regions": {
+        "count": 426,
+        "covered": 309,
+        "percent": 72.53521126760563
+      },
+      "status": "informational"
+    },
+    "process": {
+      "blocking": true,
+      "functions": {
+        "count": 135,
+        "covered": 88,
+        "percent": 65.18518518518519
+      },
+      "lines": {
+        "count": 1377,
+        "covered": 1184,
+        "percent": 85.9840232389252
+      },
+      "regions": {
+        "count": 1878,
+        "covered": 1581,
+        "percent": 84.185303514377
+      },
+      "status": "pass"
+    },
+    "project": {
+      "blocking": true,
+      "functions": {
+        "count": 57,
+        "covered": 40,
+        "percent": 70.17543859649123
+      },
+      "lines": {
+        "count": 424,
+        "covered": 352,
+        "percent": 83.01886792452831
+      },
+      "regions": {
+        "count": 694,
+        "covered": 546,
+        "percent": 78.6743515850144
+      },
+      "status": "pass"
+    },
+    "quality-core": {
+      "blocking": true,
+      "functions": {
+        "count": 243,
+        "covered": 221,
+        "percent": 90.94650205761317
+      },
+      "lines": {
+        "count": 1817,
+        "covered": 1763,
+        "percent": 97.02806824435883
+      },
+      "regions": {
+        "count": 3659,
+        "covered": 3472,
+        "percent": 94.8893140202241
+      },
+      "status": "pass"
+    },
+    "scope": {
+      "blocking": true,
+      "functions": {
+        "count": 8,
+        "covered": 6,
+        "percent": 75.0
+      },
+      "lines": {
+        "count": 113,
+        "covered": 98,
+        "percent": 86.72566371681415
+      },
+      "regions": {
+        "count": 157,
+        "covered": 137,
+        "percent": 87.26114649681529
+      },
+      "status": "pass"
+    },
+    "secrets": {
+      "blocking": true,
+      "functions": {
+        "count": 54,
+        "covered": 47,
+        "percent": 87.03703703703704
+      },
+      "lines": {
+        "count": 433,
+        "covered": 400,
+        "percent": 92.37875288683603
+      },
+      "regions": {
+        "count": 692,
+        "covered": 605,
+        "percent": 87.42774566473989
+      },
+      "status": "pass"
+    },
+    "service-adapters": {
+      "blocking": false,
+      "functions": {
+        "count": 13,
+        "covered": 9,
+        "percent": 69.23076923076923
+      },
+      "lines": {
+        "count": 110,
+        "covered": 94,
+        "percent": 85.45454545454545
+      },
+      "regions": {
+        "count": 143,
+        "covered": 111,
+        "percent": 77.62237762237763
+      },
+      "status": "informational"
+    },
+    "service-core": {
+      "blocking": true,
+      "functions": {
+        "count": 147,
+        "covered": 98,
+        "percent": 66.66666666666667
+      },
+      "lines": {
+        "count": 1367,
+        "covered": 1163,
+        "percent": 85.07681053401609
+      },
+      "regions": {
+        "count": 2093,
+        "covered": 1645,
+        "percent": 78.59531772575251
+      },
+      "status": "pass"
+    },
+    "ui": {
+      "blocking": false,
+      "functions": {
+        "count": 15,
+        "covered": 13,
+        "percent": 86.66666666666667
+      },
+      "lines": {
+        "count": 74,
+        "covered": 54,
+        "percent": 72.97297297297297
+      },
+      "regions": {
+        "count": 107,
+        "covered": 67,
+        "percent": 62.61682242990654
+      },
+      "status": "informational"
+    },
+    "utils": {
+      "blocking": false,
+      "functions": {
+        "count": 60,
+        "covered": 33,
+        "percent": 55.0
+      },
+      "lines": {
+        "count": 335,
+        "covered": 287,
+        "percent": 85.67164179104478
+      },
+      "regions": {
+        "count": 615,
+        "covered": 463,
+        "percent": 75.28455284552845
+      },
+      "status": "informational"
+    },
+    "verify": {
+      "blocking": true,
+      "functions": {
+        "count": 366,
+        "covered": 265,
+        "percent": 72.40437158469945
+      },
+      "lines": {
+        "count": 3779,
+        "covered": 3295,
+        "percent": 87.19237893622652
+      },
+      "regions": {
+        "count": 5674,
+        "covered": 4758,
+        "percent": 83.85618611209024
+      },
+      "status": "pass"
+    }
+  },
+  "failures": []
+}

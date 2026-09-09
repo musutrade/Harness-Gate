@@ -69,6 +69,13 @@
   },
   "additionalProperties": false,
   "definitions": {
+    "Assurance": {
+      "type": "string",
+      "enum": [
+        "complete",
+        "partial"
+      ]
+    },
     "Baseline": {
       "type": "object",
       "required": [
@@ -233,6 +240,15 @@
         "policies"
       ],
       "properties": {
+        "assurance": {
+          "description": "Complete profiles enforce every configured required policy. Partial profiles may omit work, but cannot certify complete project quality.",
+          "default": "complete",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Assurance"
+            }
+          ]
+        },
         "collectors": {
           "type": "array",
           "items": {

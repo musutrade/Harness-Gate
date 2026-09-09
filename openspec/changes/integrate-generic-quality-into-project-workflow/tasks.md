@@ -60,10 +60,24 @@ unchanged. See [ADR-0045](../../../docs/adr/0045-quality-verification-compositio
 
 ## 6. Enforce profile semantics and quality cost boundaries
 
-- [ ] 6.1 Define explicit hook/full/ci quality participation. Hook may omit expensive full coverage/CRAP collection but must not fabricate full-quality PASS.
-- [ ] 6.2 Make certified required Rust CRAP/risk/coverage participate by default in applicable `full`/`ci` preset policy without changing accepted thresholds or series.
-- [ ] 6.3 Keep uncertified Angular/TypeScript CRAP explicitly unsupported; do not derive an invented CRAP series from unrelated metrics.
-- [ ] 6.4 Ensure CI consumes existing authoritative retained quality evidence where available rather than launching duplicate equivalent collection; record any unavoidable new cost using the accepted CI topology evidence model.
+- [x] 6.1 Define explicit hook/full/ci quality participation. Hook may omit expensive full coverage/CRAP collection but must not fabricate full-quality PASS.
+- [x] 6.2 Make certified required Rust CRAP/risk/coverage participate by default in applicable `full`/`ci` preset policy without changing accepted thresholds or series.
+- [x] 6.3 Keep uncertified Angular/TypeScript CRAP explicitly unsupported; do not derive an invented CRAP series from unrelated metrics.
+- [x] 6.4 Ensure CI consumes existing authoritative retained quality evidence where available rather than launching duplicate equivalent collection; record any unavoidable new cost using the accepted CI topology evidence model.
+
+GH-184 local evidence (2026-09-09): 373 Rust tests and 335 Python tests passed;
+fmt, clippy, documentation/schema consistency and strict OpenSpec validation
+passed. Metadata-driven complete/partial assurance, honest omitted measurements,
+certified Rust policy/series parity, native TypeScript unsupported CRAP, an
+unknown ecosystem with cheap/expensive/custom profile selections, and all-retained
+and mixed-producer reuse are covered. Invalid retention fails before fallback.
+The architecture guard covers generic configuration and profile implementation.
+See `docs/quality/gh-184/validation.md`, `docs/quality-profiles.md` and ADR-0046 for
+actual commands, migration implications, trust constraints and CI cost boundaries.
+The accepted CI topology is unchanged; no new hosted job or collection is added.
+Hosted timing and Required Quality Aggregate/controller acceptance remain pending.
+Root config check and ci verify are not applicable without `.harness-gate/flow.toml`.
+This checks off only section 6; preset generation and hosted wiring remain below.
 
 ## 7. Upgrade presets and migration UX
 

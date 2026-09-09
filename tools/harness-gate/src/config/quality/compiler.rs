@@ -32,12 +32,23 @@ pub(crate) struct TrustedState {
     pub artifact_root: String,
     /// Paths relative to artifact_root; snapshots must not be silently refreshed.
     pub artifacts: BTreeMap<String, String>,
+    /// Host-authenticated producer responses for this exact run/config/series.
+    /// These pins come from the CI trust boundary, never the downloaded bundle.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub retained: BTreeMap<String, RetainedEvidence>,
     #[serde(default)]
     pub selection: Option<BTreeMap<String, BTreeSet<String>>>,
     #[serde(default)]
     pub mappings: Option<Value>,
     #[serde(default)]
     pub exceptions: Option<Value>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub(crate) struct RetainedEvidence {
+    pub path: String,
+    pub sha256: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -329,6 +340,11 @@ fn compile_policy(
     state: &TrustedState,
     project: &Value,
 ) -> Result<Value> {
+    // A profile with no policy has no evaluator input, not an empty policy
+    // purporting to certify the project. The released policy schema is unchanged.
+    if profile.policies.is_empty() {
+        return Ok(Value::Null);
+    }
     let mut rules = BTreeMap::new();
     for id in &profile.policies {
         let binding = &config.policies[id];
