@@ -1,5 +1,5 @@
-use crate::config::quality::collectors;
 use crate::config::quality::compiler::{self, TrustedState};
+use crate::config::quality::{baseline, collectors};
 use crate::process::adapter::{HostPolicy, TrustedKey};
 use anyhow::{Context, Result};
 use clap::{Args, Subcommand};
@@ -15,6 +15,23 @@ pub(crate) enum QualityAction {
     Compile(CompileArgs),
     /// Collect validated project measurements through configured signed adapters.
     Collect(CollectArgs),
+    /// Resolve a trusted baseline into a new directory outside the working tree.
+    Baseline(BaselineArgs),
+}
+
+#[derive(Debug, Args)]
+pub(crate) struct BaselineArgs {
+    #[arg(long)]
+    repository_root: PathBuf,
+    /// Trusted head state, as used by quality compile.
+    #[arg(long)]
+    state: PathBuf,
+    /// Host-pinned base state and authenticated retained manifest digest.
+    #[arg(long)]
+    request: Option<PathBuf>,
+    /// New directory; contains resolution.json and the evaluator base inputs.
+    #[arg(long)]
+    output: PathBuf,
 }
 
 #[derive(Debug, Args)]
@@ -95,6 +112,21 @@ pub(crate) fn run(action: &QualityAction) -> Result<bool> {
         QualityAction::Compile(args) => compile_inputs(args),
         QualityAction::Evaluate(args) => evaluate(args),
         QualityAction::Collect(args) => collect(args),
+        QualityAction::Baseline(args) => {
+            let state = read_state(&args.state)?;
+            let request = args
+                .request
+                .as_ref()
+                .map(|p| -> Result<baseline::Request> { Ok(serde_json::from_value(read(p)?)?) })
+                .transpose()?;
+            baseline::resolve(
+                &args.repository_root,
+                &state,
+                request.as_ref(),
+                &args.output,
+            )?;
+            Ok(true)
+        }
     }
 }
 
