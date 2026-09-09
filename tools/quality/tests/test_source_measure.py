@@ -11,7 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "tools/quality"))
-from source_measure import HOTSPOTS, SERIES, prepare, ast, closure_name, compare, complexity, digest, instrument, measure, original_point
+from source_measure import HOTSPOTS, SERIES, SOURCE_FILES, prepare, ast, closure_name, compare, complexity, digest, instrument, measure, original_point
 
 
 class SourceMeasureTests(unittest.TestCase):
@@ -28,6 +28,24 @@ class SourceMeasureTests(unittest.TestCase):
             file = Path(temp) / "input.rs"
             file.write_text(source)
             return ast(file, self.binary)
+
+    def test_quality_configuration_source_certification(self):
+        crate = ROOT / 'tools/harness-gate'
+        for name in ('mod', 'model', 'policy', 'validation'):
+            path = f'config/quality/{name}.rs'
+            with self.subTest(path=path):
+                self.assertIn(path, SOURCE_FILES)
+                symbols = ast(crate / 'src' / path, self.binary)['symbols']
+                production = [s for s in symbols if not s['test']]
+                if name == 'model':
+                    self.assertEqual(production, [])
+                else:
+                    self.assertTrue(production)
+                    source = (crate / 'src' / path).read_text()
+                    transformed, _ = instrument(source, {'symbols': symbols})
+                    self.assertEqual(len(self.inventory(transformed)['symbols']), len(symbols))
+        module = (crate / 'src/config/quality/mod.rs').read_text()
+        self.assertIn('#[cfg(test)]\nmod tests;', module)
 
     def test_ast_controls_and_nested_ownership(self):
         source = '''const N: usize = 2;

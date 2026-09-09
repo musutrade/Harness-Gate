@@ -43,3 +43,29 @@ remain later [OpenSpec tasks](../../openspec/changes/integrate-generic-quality-i
 Configuration validation cannot certify a collector or replace the existing Rust
 release gate. It does not amend CRAP, coverage, debt, ratchet, fail-closed or
 measurement-series semantics.
+
+## CI repair and measurement review
+
+PR #188's first candidate exposed noncanonical temporary roots on macOS and
+Windows. Quality loading and validation now canonicalize the repository root
+before containment checks. A symlink-root regression reproduces this on Linux
+and also checks that escaping child symlinks remain rejected.
+
+The bounded source-selection policy delta is `gh179-quality-configuration/1`:
+retain every GH-151 selected source and add `config/mod.rs` plus the four
+production `config/quality/` files. These validators must receive actual function
+risk evidence, rather than an unsupported-source exemption. Both base and head
+are remeasured under the same selection; old-selection reports cannot be compared
+as if compatible, and absent base files remain explicit and Git-verified.
+Analyzer, instrumentation, exact arithmetic, 80% line/region coverage, CRAP <=30,
+debt/ratchet rules and Rust authority remain unchanged. This is a review-only
+candidate, not automatic baseline acceptance.
+
+The analyzer contract test parses all four new sources, checks closure
+instrumentation, and confirms the model has no handwritten executable symbols.
+The model remains production in the coverage inventory with the same hash-pinned
+unmapped-declaration treatment as existing type-only files. Changes to that file
+require renewed mapping review. Only its existing `#[cfg(test)]` tests module is
+excluded from production risk. Required hosted platform tests and single-owner
+CI topology remain unchanged; the existing collection owner measures the added
+sources without another job or collection stage.
