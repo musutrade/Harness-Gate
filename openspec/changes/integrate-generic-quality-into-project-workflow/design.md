@@ -57,8 +57,9 @@ The bounded tasks 1.1–1.4 implementation is specified in
 `harness-policy/v1` rule files rather than duplicating requiredness or ratchet
 settings in collector declarations. `config check/print` validate both planes;
 `schema export --quality` exports the independent schema. Compilation and verify
-orchestration remain later tasks; schema export and existing presets never create
-an implicit quality configuration.
+orchestration are layered on this model. Schema export, `generic` and flow-only
+migration never create implicit quality configuration. New reference presets
+explicitly compose it as described in section 8.
 
 ### 2.3 Authority constraints in schema validation
 
@@ -220,7 +221,26 @@ Generate supported Angular/TypeScript collector/policy capabilities from the acc
 
 Model frontend/backend components and their relationship, execute ecosystem-specific collectors, and aggregate local plus cross-component quality into one project report. PostgreSQL remains an execution/service concern unless a quality capability explicitly requires it.
 
-The generic preset may either omit `quality.toml` or generate a minimal opt-in model; whichever choice is made must be explicit and backward compatible.
+The generic preset omits `quality.toml` and preserves any existing quality file.
+Flow-only migration remains execution-only. Adopters generate a reference in a
+separate directory and review/copy quality and policy files, align profiles and
+project identity, then provision trusted runtime inputs before verification.
+
+Reference combinations are UX, not core architecture. Declarative recipes select
+reusable ecosystem packs and independent capability packs with target/path
+bindings. Generic composition only expands, merges and validates data; collectors,
+series, policy and capability states live in pack/config data. Conflicting output
+and path escapes fail before writes. PostgreSQL contributes no implicit quality.
+A future `frontend=vue`, `backend=go`, `database=postgres` selection can compose
+packs without language-pair branches or redesigning the generic schema/compiler/
+verifier. Built-in catalog/flow templates are reference data; registry discovery,
+installation, version resolution and execution-pack composition remain future work.
+A synthetic unregistered ecosystem pack exercises the same composer and validator.
+
+Generated metadata pins accepted reference series; it cannot authenticate evidence
+or produce runtime state/signatures. Host provisioning and explicit series/baseline
+migration are required for actual installed toolchains. Baseline starts at `none`,
+with no implicit debt waiver. See ADR-0047 and `docs/quality-presets.md`.
 
 ## 9. Reporting
 

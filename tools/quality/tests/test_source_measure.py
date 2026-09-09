@@ -47,6 +47,23 @@ class SourceMeasureTests(unittest.TestCase):
         module = (crate / 'src/config/quality/mod.rs').read_text()
         self.assertIn('#[cfg(test)]\nmod tests;', module)
 
+    def test_preset_source_certification(self):
+        crate = ROOT / 'tools/harness-gate'
+        inventory = json.loads((ROOT / 'tools/quality/production-source.json').read_text())
+        declared = {path.removeprefix('src/') for path in inventory['boundaries']['preset']['files']}
+        self.assertEqual(declared, {path for path in SOURCE_FILES if path.startswith('preset/')})
+        for name in ('catalog', 'composition', 'filesystem', 'initialize', 'migration', 'mod'):
+            path = f'preset/{name}.rs'
+            with self.subTest(path=path):
+                self.assertIn(path, SOURCE_FILES)
+                source = crate / 'src' / path
+                symbols = ast(source, self.binary)['symbols']
+                if name != 'mod':
+                    self.assertTrue(any(not symbol['test'] for symbol in symbols))
+                transformed, _ = instrument(source.read_text(), {'symbols': symbols})
+                self.assertEqual(len(self.inventory(transformed)['symbols']), len(symbols))
+        self.assertIn('#[cfg(test)]\nmod tests;', (crate / 'src/preset/mod.rs').read_text())
+
     def test_verify_reporting_source_certification(self):
         crate = ROOT / 'tools/harness-gate'
         for path in ('verify/mod.rs', 'verify/quality.rs', 'verify/report.rs', 'failure.rs'):

@@ -179,7 +179,14 @@ Recommended integration order:
 
 `init` writes `.harness-gate/flow.toml`, `.harness-gate/audit.toml`, `.harness-gate/secrets.toml` and `.harness-gate/.gitignore` with same-directory temporary files and atomic rename, will not leave half-written files, and will not overwrite existing configuration unless explicitly passing `--force`. `config migrate` uses the same atomic write strategy for target configuration, and generates Secret Scan v2 default rules when missing. Newly created audit v2 files preset lexical configuration for Rust, TypeScript, JavaScript, SQL, TOML and YAML, and can directly append the first rule.
 
-Presets are starting points, not runtime branches. After initialization is complete, all behavior is determined by the project's internal TOML: you can rename components, add `ci` profiles, switch to MySQL/Redis, adjust directories or replace any steps without retaining preset original names. Audit configuration is project-local: the selected project's `flow.toml` determines a literal repository-relative `paths.audit_config`; use explicit `--project-root` and `--config` options when selecting a different project or workflow file.
+The three ecosystem reference presets also compose `.harness-gate/quality.toml`,
+policy/capability packs and `QUALITY.md`, with full/CI quality participation.
+Rust binds accepted CRAP policy; Angular CRAP remains unsupported; PostgreSQL
+remains an execution service. Provision trusted collector inputs before verify.
+`generic` and flow-only migration remain opt-in. See [quality presets and explicit
+migration](docs/quality-presets.md) for setup and the future composable pack model.
+
+Presets are starting points, not runtime branches. After initialization is complete, all behavior is determined by the project's internal TOML: you can rename components, customize profiles, switch to MySQL/Redis, adjust directories or replace any steps without retaining preset original names. Audit configuration is project-local: the selected project's `flow.toml` determines a literal repository-relative `paths.audit_config`; use explicit `--project-root` and `--config` options when selecting a different project or workflow file.
 
 ## Command Overview
 

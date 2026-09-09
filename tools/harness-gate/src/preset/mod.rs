@@ -1,4 +1,5 @@
 mod catalog;
+mod composition;
 mod filesystem;
 mod initialize;
 mod migration;
