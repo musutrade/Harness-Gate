@@ -8,13 +8,15 @@ All tasks inherit `docs/engineering-policy.md`. CRAP semantics and required assu
 - [x] 1.2 Capture normalized hosted timing/cost evidence from representative successful pre-change PR runs: workflow/job/step wall times, critical path, tool-install/setup time, quality collection time, and approximate runner wall minutes by OS.
 - [x] 1.3 Add regression fixtures/tests for aggregate event semantics so missing/failed/cancelled/skipped required children still fail closed before topology changes begin.
 
-Task 1 evidence: [frozen assurance contract and hosted baseline](../../../docs/quality/ci-topology/baseline.md), [validation record](../../../docs/quality/ci-topology/validation.md), and independent aggregate/topology fixtures. Native macOS/Windows tests remain PR-required; the stale aggregate classification was repaired without execution optimization. Submitted-commit hosted acceptance is owned by controller CI; tasks 2–7 remain open.
+Task 1 evidence: [frozen assurance contract and hosted baseline](../../../docs/quality/ci-topology/baseline.md), [validation record](../../../docs/quality/ci-topology/validation.md), and independent aggregate/topology fixtures. Native macOS/Windows tests remain PR-required; the stale aggregate classification was repaired without execution optimization. Submitted-commit hosted acceptance is owned by controller CI; subsequent tasks are tracked below.
 
 ## 2. Normalize pinned CI tool setup
 
-- [ ] 2.1 Replace repeated forced source installs of cargo-nextest/cargo-llvm-cov where appropriate with explicit pinned prebuilt installation or validated tool caches; retain effective version evidence and fail-closed installation behavior.
-- [ ] 2.2 Replace repeated cargo-audit source compilation with an explicit pinned/prebuilt or validated cached installation while preserving `cargo audit --deny warnings` semantics.
-- [ ] 2.3 Centralize repeated setup in transparent reusable CI primitives where useful; keep commands, versions, and failure diagnostics observable.
+- [x] 2.1 Replace repeated forced source installs of cargo-nextest/cargo-llvm-cov where appropriate with explicit pinned prebuilt installation or validated tool caches; retain effective version evidence and fail-closed installation behavior.
+- [x] 2.2 Replace repeated cargo-audit source compilation with an explicit pinned/prebuilt or validated cached installation while preserving `cargo audit --deny warnings` semantics.
+- [x] 2.3 Centralize repeated setup in transparent reusable CI primitives where useful; keep commands, versions, and failure diagnostics observable.
+
+Task 2 implementation evidence: [GH-165 setup and validation record](../../../docs/quality/ci-topology/tool-setup.md) and [checksummed Linux prebuilt smoke results](../../../docs/quality/ci-topology/tool-setup-smoke.json). Four setup regression tests pass, including invalid/missing/failed version evidence. Hosted setup reduction and submitted-commit Required Quality Aggregate acceptance remain controller-owned and pending; tasks 3–7 are not marked complete.
 
 ## 3. Normalize Cargo cache and build-state boundaries
 

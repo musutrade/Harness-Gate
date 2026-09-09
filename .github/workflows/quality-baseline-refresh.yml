@@ -20,7 +20,9 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install cargo-nextest
-        run: cargo install cargo-nextest --locked --force
+        uses: ./.github/actions/install-ci-tool
+        with:
+          tool: cargo-nextest
 
       - name: Capture candidate measurements
         run: |
