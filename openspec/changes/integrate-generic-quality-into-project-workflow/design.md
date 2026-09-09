@@ -91,7 +91,7 @@ quality.toml + repository state + verified collector outputs
         `--> Rust quality evaluator
 ```
 
-The compiler is deterministic and testable. `quality evaluate` remains the direct form of the same evaluation boundary. Given semantically equivalent compiled inputs, `verify` and direct `quality evaluate` must produce equivalent generic decisions/reports.
+The compiler is deterministic and testable. Its GH-180 transport and identity rules are specified in [the compiler reference](../../../docs/quality-compilation.md) and [ADR-0042](../../../docs/adr/0042-trusted-quality-compilation.md). Ecosystem identifiers and kind aliases are pack/configuration data; the generic compiler has no closed language or framework dispatch enum. `quality evaluate` remains the direct form of the same evaluation boundary. Given semantically equivalent compiled inputs, `verify` and direct `quality evaluate` must produce equivalent generic decisions/reports.
 
 ## 4. Verify orchestration
 

@@ -1,3 +1,4 @@
+pub(crate) mod compiler;
 mod model;
 mod policy;
 #[cfg(test)]
