@@ -248,9 +248,10 @@ assertions = ["assert!(matches!(error, VerifyError::Report { .. }));"]
 [paths.source]
 path = "src/verify/report.rs"
 symbol = "write_report_file"
-start = 1158
-end = 1168
-sha256 = "99b5fc9d38884e9cada1e512c12995d332f1f6d82a4fe6a6cf4979b5818a7470"
+start = 1165
+end = 1175
+sha256 = "e7d42d13b07c42a30f5bc8848091934a0fce3abdce61d4937d5b9b228a47be37"
+
 [paths.test_source]
 path = "src/verify/tests.rs"
 symbol = "report_write_failure_returns_error"
@@ -258,7 +259,7 @@ start = 604
 end = 613
 sha256 = "edeed13483430222bd9b95eca498d38e739c96896f15c8f14a87c040e9382f29"
 [[paths.probes]]
-line = 1159
+line = 1166
 column = 5
 text = "report_target(project, relative)?;"
 
@@ -277,17 +278,19 @@ assertions = ["assert!(verify_manifest(&invocation_project).is_err());"]
 [paths.source]
 path = "src/verify/report.rs"
 symbol = "verify_manifest_without_result"
-start = 1727
-end = 1814
-sha256 = "99b5fc9d38884e9cada1e512c12995d332f1f6d82a4fe6a6cf4979b5818a7470"
+start = 1738
+end = 1825
+sha256 = "e7d42d13b07c42a30f5bc8848091934a0fce3abdce61d4937d5b9b228a47be37"
+
 [paths.test_source]
 path = "src/verify/report.rs"
 symbol = "manifest_records_digests_and_detects_tampering"
-start = 2683
-end = 2736
-sha256 = "99b5fc9d38884e9cada1e512c12995d332f1f6d82a4fe6a6cf4979b5818a7470"
+start = 2694
+end = 2747
+sha256 = "e7d42d13b07c42a30f5bc8848091934a0fce3abdce61d4937d5b9b228a47be37"
+
 [[paths.probes]]
-line = 1810
+line = 1821
 column = 13
 text = "bail!(\"artifact digest or size changed: {}\", artifact.path);"
 
