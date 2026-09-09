@@ -180,7 +180,8 @@ impl Fixture {
             },
             invocation_id: state.expected.run.clone(),
             step_id: "coverage".into(),
-            timeout_ms: if mode == "timeout" { 50 } else { 5000 },
+            // Allow interpreter startup under hosted runner contention.
+            timeout_ms: if mode == "timeout" { 50 } else { 30000 },
             config_digest: String::new(),
             artifact_root: root.join("target/evidence"),
             nonce: "fixture-nonce".into(),
@@ -197,7 +198,7 @@ impl Fixture {
                 public_key: BASE64
                     .encode(SigningKey::from_bytes(&[7; 32]).verifying_key().as_bytes()),
             }],
-            max_timeout: Some(Duration::from_secs(10)),
+            max_timeout: Some(Duration::from_secs(30)),
             ..HostPolicy::default()
         };
         let mut fixture = Self {

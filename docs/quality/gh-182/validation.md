@@ -82,3 +82,36 @@ metadata remains unchanged; the handoff identifies the actual remote commit.
 Hosted Required Quality Aggregate is **CI pending**, owned by the controller.
 This change does not alter required jobs, measurement thresholds, historical
 baseline acceptance, or mark the remaining OpenSpec tasks complete.
+
+## PR #191 CI repair, attempt 1
+
+The aggregate for `6f46112c2179c5578d8c4857b4f6bca696f9e827` failed because
+`test-cross-platform` failed. The completed [CI run](https://github.com/musutrade/Harness-Gate/actions/runs/34345060772)
+identified two test-fixture issues:
+
+- Windows Git normalized generated CRLF configuration files at commit time.
+  The baseline correctly rejected `.harness-gate/coverage-request.json` because
+  its committed bytes differed from the trusted fixture hash. The fixture now
+  sets repository-local `core.autocrlf=false` before staging its exact bytes.
+- The macOS collector CLI test exceeded its 5,000 ms adapter timeout during
+  interpreter startup. Normal fixture requests now allow 30 seconds, with a
+  matching fixture host limit. The deliberate timeout case retains its 50 ms
+  deadline; production timeout defaults and enforcement are unchanged.
+
+The Windows failure was reproduced locally by generating CRLF files with Git
+normalization enabled. All 39 baseline cases then passed with the fix, simulated
+Windows text writes, and a global `core.autocrlf=true` setting. The existing
+native-platform test continues to exercise this corpus. Native Windows/macOS
+reruns and the new Required Quality Aggregate remain CI pending.
+
+Repair logs are retained under `target/quality/gh-182-repair/`, using the same
+writable Cargo environment listed above. No production logic, policy threshold,
+workflow requirement, or OpenSpec task scope changed.
+
+All five required local commands were rerun after the repair: nextest passed
+354 tests (0 skipped), Python unittest passed 329 tests, formatting and Clippy
+passed, and documentation consistency reported `pass`. The two project-local
+configuration commands remain not applicable because `flow.toml` is absent.
+The [repair evidence archive](repair-evidence.tar.xz) retains the complete logs,
+completed failed-CI log, Windows reproduction wrapper and 39-case result, and
+exact validation commands. Hosted acceptance for the repair is pending.

@@ -56,6 +56,8 @@ def setup(root, kind, lineage=None, unknown=True, required=True, custom=False):
         write(root / '.harness-gate/policy.json', direct['policy'])
     pin(root, state)
     git(root, 'init', '-q')
+    # Baseline identities bind file bytes, including native platform line endings.
+    git(root, 'config', 'core.autocrlf', 'false')
     git(root, 'config', 'user.email', 'fixture@example.invalid')
     git(root, 'config', 'user.name', 'Baseline Fixture')
     git(root, 'add', '.harness-gate', 'src')
