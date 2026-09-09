@@ -161,6 +161,10 @@ fn quality_rejects_unresolved_references_and_boundaries() {
 #[test]
 fn quality_profiles_enforce_single_compatible_required_producer() {
     invalid(
+        |q| q.profiles.get_mut("full").unwrap().policies.clear(),
+        "omits required policy",
+    );
+    invalid(
         |q| {
             q.profiles.insert("ci".into(), q.profiles["full"].clone());
         },
@@ -489,4 +493,131 @@ fn quality_rejects_malformed_policy_and_empty_intent() {
     );
     invalid(|q| q.profiles.clear(), "must not be empty");
     invalid(|q| q.reporting.formats.clear(), "must not be empty");
+}
+
+#[test]
+fn unknown_pack_configures_cheap_and_expensive_profiles_without_ecosystem_dispatch() {
+    let (root, mut flow, mut quality) = fixture();
+    let metadata: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../../quality/fixtures/workflow/collectors/unknown-profiles.json"
+    ))
+    .unwrap();
+    let mut policy: serde_json::Value = serde_json::from_str(POLICY).unwrap();
+    let rule = policy["rules"][0].clone();
+    quality.collectors.clear();
+    quality.policies.clear();
+    policy["rules"] = serde_json::json!([]);
+    let (_, _, template) = fixture();
+    for (name, metric) in metadata["capabilities"].as_object().unwrap() {
+        let mut collector = template.collectors["coverage"].clone();
+        collector.produces[0].capability = metric.as_str().unwrap().into();
+        let mut binding = template.policies["coverage"].clone();
+        binding.expectation = collector.produces[0].clone();
+        binding.rule = name.clone();
+        let mut rule = rule.clone();
+        rule["id"] = name.clone().into();
+        rule["metric"] = metric.clone();
+        rule["operator"] = "le".into();
+        rule["limit"] = if name == "cheap" {
+            serde_json::json!({"type":"size","value":10,"unit":"bytes"})
+        } else {
+            serde_json::json!({"type":"rational","numerator":30,"denominator":1})
+        };
+        policy["rules"].as_array_mut().unwrap().push(rule);
+        quality.collectors.insert(name.clone(), collector);
+        quality.policies.insert(name.clone(), binding);
+    }
+    fs::write(
+        root.join(".harness-gate/policy.json"),
+        serde_json::to_vec(&policy).unwrap(),
+    )
+    .unwrap();
+    quality.profiles = serde_json::from_value(metadata["profiles"].clone()).unwrap();
+    flow.steps[0]
+        .profiles
+        .extend(quality.profiles.keys().cloned());
+    quality.validate(&flow, &root).unwrap();
+    for profile in ["full", "ci"] {
+        assert_eq!(quality.profiles[profile].assurance, Assurance::Complete);
+        for id in ["cheap", "expensive"] {
+            assert_eq!(
+                quality.participation(profile)["policies"][id]["state"],
+                "participating"
+            );
+            let mut omitted = quality.clone();
+            omitted
+                .profiles
+                .get_mut(profile)
+                .unwrap()
+                .policies
+                .remove(id);
+            assert!(omitted
+                .validate(&flow, &root)
+                .unwrap_err()
+                .to_string()
+                .contains("omits required policy"));
+        }
+    }
+    assert_eq!(
+        quality.participation("hook")["policies"]["expensive"]["state"],
+        "not_collected"
+    );
+    assert_eq!(
+        quality.participation("custom-fast")["policies"]["cheap"]["state"],
+        "not_collected"
+    );
+    assert_eq!(
+        quality.participation("custom-fast")["policies"]["expensive"]["state"],
+        "participating"
+    );
+}
+
+#[test]
+fn certified_reference_policy_participates_in_complete_profiles_with_original_limits_and_series() {
+    let reference: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../../quality/fixtures/workflow/collectors/certified-rust-profiles.json"
+    ))
+    .unwrap();
+    let (root, mut flow, mut config) = fixture();
+    flow.steps[0].profiles.insert("ci".into());
+    let template = config.policies["coverage"].clone();
+    let mut producer = config.collectors["coverage"].clone();
+    producer.produces.clear();
+    config.policies.clear();
+    let mut rules = reference["rules"].as_array().unwrap().clone();
+    for rule in &mut rules {
+        // The pack maps its native boundary to the configured component. Metric,
+        // requiredness, limits and the full measurement series remain untouched.
+        rule["scope"] = serde_json::json!({"kind":"component", "component":"app"});
+        let mut binding = template.clone();
+        binding.rule = rule["id"].as_str().unwrap().into();
+        binding.expectation.capability = rule["metric"].as_str().unwrap().into();
+        binding.expectation.series = reference["series"]["id"].as_str().unwrap().into();
+        producer.produces.push(binding.expectation.clone());
+        config.policies.insert(binding.rule.clone(), binding);
+    }
+    config.collectors = std::collections::BTreeMap::from([("certified".into(), producer)]);
+    config.profiles = serde_json::from_value(reference["profiles"].clone()).unwrap();
+    fs::write(
+        root.join(".harness-gate/policy.json"),
+        serde_json::to_vec(&serde_json::json!({"schema":"harness-policy/v1", "rules":rules}))
+            .unwrap(),
+    )
+    .unwrap();
+    config.validate(&flow, &root).unwrap();
+    for name in ["full", "ci"] {
+        assert_eq!(config.profiles[name].assurance, Assurance::Complete);
+        for id in config.policies.keys() {
+            assert_eq!(
+                config.participation(name)["policies"][id]["state"],
+                "participating"
+            );
+            let mut omitted = config.clone();
+            omitted.profiles.get_mut(name).unwrap().policies.remove(id);
+            assert!(omitted.validate(&flow, &root).is_err());
+        }
+        let mut missing = config.clone();
+        missing.profiles.get_mut(name).unwrap().collectors.clear();
+        assert!(missing.validate(&flow, &root).is_err());
+    }
 }

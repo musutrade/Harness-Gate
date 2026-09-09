@@ -16,7 +16,8 @@ class VerifyQualityArchitectureTests(unittest.TestCase):
         closed_enum = re.compile(r'\benum\s+\w*(?:Ecosystem|Language)\w*\s*\{', re.I)
         ecosystem_variant = re.compile(r'\b(?:Ecosystem|Language)\w*::\w+')
         language_identifier = re.compile(r'\b(?:Rust|Angular|Go|Vue|TypeScript|JavaScript|Python)\b')
-        paths = sorted(VERIFY.rglob("*.rs")) + [
+        paths = sorted(VERIFY.rglob("*.rs")) + sorted(
+            (ROOT / "tools/harness-gate/src/config/quality").rglob("*.rs")) + [
             ROOT / "tools/harness-gate/quality-core/project_report.rs"]
         for path in paths:
             if "tests" in path.parts or path.stem == "tests":
