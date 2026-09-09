@@ -1,4 +1,6 @@
+use crate::config::quality::collectors;
 use crate::config::quality::compiler::{self, TrustedState};
+use crate::process::adapter::{HostPolicy, TrustedKey};
 use anyhow::{Context, Result};
 use clap::{Args, Subcommand};
 use harness_gate::quality::{evidence::ValidationContext, parse, policy, project_report};
@@ -11,6 +13,17 @@ pub(crate) enum QualityAction {
     Evaluate(Box<EvaluateArgs>),
     /// Compile validated configuration and host-owned state to generic contracts.
     Compile(CompileArgs),
+    /// Collect validated project measurements through configured signed adapters.
+    Collect(CollectArgs),
+}
+
+#[derive(Debug, Args)]
+pub(crate) struct CollectArgs {
+    #[command(flatten)]
+    inputs: CompileArgs,
+    /// Host-owned JSON array of trusted Ed25519 keys; never read from a collector.
+    #[arg(long)]
+    trusted_keys: PathBuf,
 }
 
 #[derive(Debug, Args)]
@@ -81,7 +94,49 @@ pub(crate) fn run(action: &QualityAction) -> Result<bool> {
     match action {
         QualityAction::Compile(args) => compile_inputs(args),
         QualityAction::Evaluate(args) => evaluate(args),
+        QualityAction::Collect(args) => collect(args),
     }
+}
+
+fn collect(args: &CollectArgs) -> Result<bool> {
+    let state = read_state(&args.inputs.state);
+    if let Ok(state) = &state {
+        protect_output(&args.inputs.output, &args.inputs.repository_root, state)?;
+        let root = args.inputs.repository_root.canonicalize()?;
+        let artifact_root = root.join(&state.artifact_root).canonicalize()?;
+        let parent = args
+            .inputs
+            .output
+            .parent()
+            .filter(|p| !p.as_os_str().is_empty())
+            .unwrap_or_else(|| std::path::Path::new("."))
+            .canonicalize()?;
+        anyhow::ensure!(
+            !parent.starts_with(artifact_root),
+            "collection output must be outside artifact root"
+        );
+    }
+    clear_output(
+        &args.inputs.output,
+        [Some(&args.inputs.state), Some(&args.trusted_keys)],
+    )?;
+    let trusted_keys: Vec<TrustedKey> = serde_json::from_value(read(&args.trusted_keys)?)?;
+    let policy = HostPolicy {
+        trusted_keys,
+        replay_state_dir: Some(
+            args.inputs
+                .repository_root
+                .join(".harness-gate/collector-nonces"),
+        ),
+        ..HostPolicy::default()
+    };
+    let collection = collectors::collect(&args.inputs.repository_root, &state?, &policy)?;
+    crate::utils::fs::atomic_write(
+        &args.inputs.output,
+        format!("{}\n", serde_json::to_string_pretty(&collection)?),
+        true,
+    )?;
+    Ok(true)
 }
 
 fn compile_inputs(args: &CompileArgs) -> Result<bool> {

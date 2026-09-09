@@ -53,6 +53,7 @@
         "src/config/path.rs",
         "src/config/quality/mod.rs",
         "src/config/quality/compiler.rs",
+        "src/config/quality/collectors.rs",
         "src/config/quality/model.rs",
         "src/config/quality/policy.rs",
         "src/config/quality/validation.rs",
@@ -288,6 +289,11 @@
       "path": "src/config/quality/tests.rs",
       "kind": "test",
       "reason": "Test-only module compiled under cfg(test)."
+    },
+    {
+      "path": "src/config/quality/collectors/tests.rs",
+      "kind": "test",
+      "reason": "Collector protocol fixtures and orchestration regression tests; compiled only under cfg(test) on Unix."
     }
   ],
   "external_exclusions": [
@@ -345,7 +351,7 @@
     {
       "path": "src/process/mod.rs",
       "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
-      "sha256": "31515d1f7356ab3ce2d0981c2eeec588c3181972d8610735a283ad3769d3b669"
+      "sha256": "96373822a3f5f1aa1d87bab33834f76d220b9485e885f535f638d2899218a7dc"
     },
     {
       "path": "src/scope/mod.rs",
