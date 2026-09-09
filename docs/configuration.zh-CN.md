@@ -1,5 +1,9 @@
 # harness-gate schema v2 配置参考
 
+可选的 `.harness-gate/quality.toml` v1 配置、采集器权限和跨配置校验见
+[质量配置参考](quality-configuration.md)。没有该文件时保留原有 flow 行为。
+
+
 本文档说明 `.harness-gate/flow.toml` 和审计规则文件的完整配置模型。首次接入请先阅读上一级的 [操作手册](../README.md)，再按需查阅本参考。
 
 ## 1. 文件与加载顺序

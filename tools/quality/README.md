@@ -57,12 +57,18 @@ GH-151 extends the inventory to `production-source-2`: `src/` and the linked
 an eleventh blocking boundary. Test-only modules retain explicit cfg(test)
 exclusions. The unpublished `quality-replay/` comparator is migration tooling.
 Declaration-only files without LLVM records remain production with pinned hashes;
-no executable counters are synthesized. The `gh151-generic-production/1` risk
-selection measures 23 sources on both commits with analyzer 0.3.0 / mccabe-rust-3,
+no executable counters are synthesized. The `gh179-quality-configuration/1` risk
+selection adds `config/mod.rs` and the four production `config/quality/` sources
+to the previous `gh151-generic-production/1` selection on both commits. It uses
+the unchanged analyzer 0.3.0 / mccabe-rust-3,
 including vec repetition expressions. Both workspace packages are covered on the
 base. Newly added sources are explicitly absent from its manifest and verified
 against Git. The original selected functions, 80% line/region and CRAP <=30
 thresholds, exact arithmetic, lineage and historical-debt rules are unchanged.
+The quality model's declaration-only mapping is hash-pinned and AST-tested;
+`config/quality/tests.rs` is an explicit test-only module, not production.
+See [ADR-0041](../../docs/adr/0041-quality-configuration-v1.md) for the bounded
+source-selection delta and its certification evidence requirements.
 
 Individual diagnostic commands use the same report formats:
 
