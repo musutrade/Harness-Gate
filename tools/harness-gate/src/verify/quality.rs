@@ -58,8 +58,11 @@ impl QualityResult {
 }
 
 fn read<T: for<'de> Deserialize<'de>>(root: &Path, name: &str) -> Result<T> {
+    let root = root
+        .canonicalize()
+        .context("resolve quality workflow root")?;
     let path =
-        crate::project::resolve_repo_path(root, Path::new(name), "quality workflow input", true)?;
+        crate::project::resolve_repo_path(&root, Path::new(name), "quality workflow input", true)?;
     Ok(serde_json::from_value(parse(&fs::read_to_string(path)?)?)?)
 }
 
@@ -276,4 +279,33 @@ pub(super) fn publish(report: &super::VerificationReport, project: &Project) -> 
         )?;
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    #[cfg(unix)]
+    use super::*;
+
+    #[cfg(unix)]
+    #[test]
+    fn workflow_input_accepts_aliased_root_but_rejects_escape() {
+        let directory = tempfile::tempdir().unwrap();
+        let root = directory.path().join("root");
+        fs::create_dir(&root).unwrap();
+        fs::write(root.join("resolution.json"), r#"{"status":"available"}"#).unwrap();
+        let alias = directory.path().join("alias");
+        std::os::unix::fs::symlink(&root, &alias).unwrap();
+        let value: Value = read(&alias, "resolution.json").unwrap();
+        assert_eq!(value["status"], "available");
+        fs::write(directory.path().join("outside.json"), "{}").unwrap();
+        std::os::unix::fs::symlink(
+            directory.path().join("outside.json"),
+            root.join("escape.json"),
+        )
+        .unwrap();
+        assert!(read::<Value>(&alias, "escape.json")
+            .unwrap_err()
+            .to_string()
+            .contains("escapes the repository"));
+    }
 }
