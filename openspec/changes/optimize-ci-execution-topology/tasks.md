@@ -4,9 +4,11 @@ All tasks inherit `docs/engineering-policy.md`. CRAP semantics and required assu
 
 ## 1. Freeze current assurance and hosted cost baseline
 
-- [ ] 1.1 Record the current PR/push event-to-job matrix, `Required Quality Aggregate` dependencies, stable check names, and every currently required semantic outcome. Explicitly record that macOS and Windows full tests remain PR-required in this change.
-- [ ] 1.2 Capture normalized hosted timing/cost evidence from representative successful pre-change PR runs: workflow/job/step wall times, critical path, tool-install/setup time, quality collection time, and approximate runner wall minutes by OS.
-- [ ] 1.3 Add regression fixtures/tests for aggregate event semantics so missing/failed/cancelled/skipped required children still fail closed before topology changes begin.
+- [x] 1.1 Record the current PR/push event-to-job matrix, `Required Quality Aggregate` dependencies, stable check names, and every currently required semantic outcome. Explicitly record that macOS and Windows full tests remain PR-required in this change.
+- [x] 1.2 Capture normalized hosted timing/cost evidence from representative successful pre-change PR runs: workflow/job/step wall times, critical path, tool-install/setup time, quality collection time, and approximate runner wall minutes by OS.
+- [x] 1.3 Add regression fixtures/tests for aggregate event semantics so missing/failed/cancelled/skipped required children still fail closed before topology changes begin.
+
+Task 1 evidence: [frozen assurance contract and hosted baseline](../../../docs/quality/ci-topology/baseline.md), [validation record](../../../docs/quality/ci-topology/validation.md), and independent aggregate/topology fixtures. Native macOS/Windows tests remain PR-required; the stale aggregate classification was repaired without execution optimization. Submitted-commit hosted acceptance is owned by controller CI; tasks 2–7 remain open.
 
 ## 2. Normalize pinned CI tool setup
 
