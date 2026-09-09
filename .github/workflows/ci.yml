@@ -517,6 +517,8 @@ jobs:
     name: Required Quality Aggregate
     if: ${{ always() }}
     # Keep this check name stable because it is required by the main ruleset.
+    # Evaluation only: no product compilation, tests, coverage/risk collection,
+    # or heavy Rust tool setup. The step allowlist is tested in test_ci_topology.py.
     # PRs and pushes require coverage, risk and isolated traceability evidence.
     # Full macOS/Windows tests are required on PRs and pushes. Additional
     # cross-platform builds/contracts and performance collection are push-only.
