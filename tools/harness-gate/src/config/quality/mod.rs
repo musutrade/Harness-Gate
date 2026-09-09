@@ -1,3 +1,4 @@
+pub(crate) mod baseline;
 pub(crate) mod collectors;
 pub(crate) mod compiler;
 mod model;
