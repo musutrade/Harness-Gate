@@ -1,10 +1,21 @@
 //! Differential tasks 3–4 tests. The Python process is a test oracle, never runtime.
+use super::tests::{cached_reference, Reference};
 use super::{evidence::ValidationContext, json, policy, project_report, ratchet, Result};
 use serde_json::{json, Value};
-use std::{fs, path::Path, process::Command, sync::LazyLock};
-use tempfile::TempDir;
+use std::{
+    fs,
+    path::Path,
+    process::Command,
+    sync::{Arc, Mutex, Weak},
+};
 
-static REFERENCE: LazyLock<(TempDir, Vec<Value>)> = LazyLock::new(|| {
+static REFERENCE: Mutex<Weak<Reference>> = Mutex::new(Weak::new());
+
+fn reference() -> Arc<Reference> {
+    cached_reference(&REFERENCE, load_reference)
+}
+
+fn load_reference() -> Reference {
     let temp = tempfile::tempdir().unwrap();
     let root = Path::new(env!("CARGO_MANIFEST_DIR"));
     let output = Command::new("python3")
@@ -21,7 +32,7 @@ static REFERENCE: LazyLock<(TempDir, Vec<Value>)> = LazyLock::new(|| {
     eprintln!("{}", String::from_utf8_lossy(&output.stdout));
     let cases = json::parse(&fs::read_to_string(temp.path().join("cases.json")).unwrap()).unwrap();
     (temp, cases.as_array().unwrap().clone())
-});
+}
 
 fn context(value: &Value) -> ValidationContext<'_> {
     ValidationContext {
@@ -108,8 +119,9 @@ fn difference(a: &Value, b: &Value, path: &str) -> Option<String> {
 
 #[test]
 fn frozen_policy_and_reference_acceptance_match_python() {
+    let reference = reference();
     let mut mismatches = Vec::new();
-    for case in &REFERENCE.1 {
+    for case in &reference.1 {
         let actual = match run(case) {
             Ok(value) => {
                 if let Some(expected) = case.get("project_report") {
@@ -143,7 +155,8 @@ fn frozen_policy_and_reference_acceptance_match_python() {
 
 #[test]
 fn green_local_gates_and_breaking_contract_block_project_with_provenance() {
-    let case = REFERENCE
+    let reference = reference();
+    let case = reference
         .1
         .iter()
         .find(|c| c["name"] == "contract-breaking")
