@@ -154,6 +154,12 @@ class ArtifactTests(unittest.TestCase):
 
 
 class WorkflowBoundaryTests(unittest.TestCase):
+    def test_unproductive_compiled_caches_are_disabled_for_all_callers(self):
+        action = (ROOT / '.github/actions/cargo-state/action.yml').read_text()
+        self.assertIn("default: 'false'", action.split('  cache-target:')[1].split('runs:')[0])
+        for workflow in (ROOT / '.github/workflows').glob('*.yml'):
+            self.assertNotRegex(workflow.read_text(), r'cache-target:\s*[\"\x27]?true')
+
     def test_quality_collection_has_one_owner_and_shadow_only_consumes_evidence(self):
         workflow = (ROOT / '.github/workflows/ci.yml').read_text()
         jobs = dict(re.findall(r'^  ([a-z][a-z-]+):\n(.*?)(?=^  [a-z][a-z-]+:|\Z)',

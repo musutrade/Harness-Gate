@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "issue": "GH-169",
+  "date": "2026-09-09",
+  "scope": "OpenSpec optimize-ci-execution-topology tasks 6.1\u20136.4 only",
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "environment": {},
+      "exit_code": 101,
+      "result": "Initial attempt failed: failed to open /home/gem/cargo-target/debug/.cargo-build-lock: Read-only file system (os error 30). No tests ran in this attempt.",
+      "local_log": "target/quality/gh169/nextest.log",
+      "log_sha256": "6ae1243d90746b546d3b2e8fcff2cce9b1fc70cd1bc336dabcc3976f5d642ff1"
+    },
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target/gh169-cargo"
+      },
+      "exit_code": 0,
+      "result": "332 tests passed, 0 skipped; 196.394 seconds. Workspace-local target avoids read-only default.",
+      "local_log": "target/quality/gh169/nextest-local-target.log",
+      "log_sha256": "4ec3b08913b4756968153cdf1a7ccdfde8894c25191348845f78c702cc2dc195"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "environment": {},
+      "exit_code": 0,
+      "result": "Passed.",
+      "local_log": "target/quality/gh169/fmt.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "environment": {},
+      "exit_code": 101,
+      "result": "Initial attempt failed: failed to open /home/gem/cargo-target/debug/.cargo-build-lock: Read-only file system (os error 30).",
+      "local_log": "target/quality/gh169/clippy.log",
+      "log_sha256": "1518f5efe4e6f2ab73a01b43187054665d70adad18be3c687269a0d7028ada40"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target/gh169-cargo"
+      },
+      "exit_code": 0,
+      "result": "Passed with workspace-local target; no warnings.",
+      "local_log": "target/quality/gh169/clippy-local-target.log",
+      "log_sha256": "49674372c3fe4dd4a4b28b2e036b22a84c82ad6f3a5b7d056d3038cf3da3e81d"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "environment": {},
+      "exit_code": 0,
+      "result": "Before final changes: 326 tests passed.",
+      "local_log": "target/quality/gh169/python-tests.log",
+      "log_sha256": "4cba3695fb00281c308fc26b336d9069a70806161895093aa7cf7db9fd81ef75"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "environment": {},
+      "exit_code": 1,
+      "result": "Intermediate attempt: 328 tests, one inventory failure for new ci_comparison.py. Corrected both maintained Python boundary inventories; no authority changed.",
+      "local_log": "target/quality/gh169/python-tests-final.log",
+      "log_sha256": "b58cf662c42378f3a9511cb039edaec1b47784127830bd93ea6724188bb60dfe"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "environment": {},
+      "exit_code": 0,
+      "result": "Final changes: 328 tests passed, including hosted reproduction/comparison, required topology failures, artifact tampering and all docs operation failures.",
+      "local_log": "target/quality/gh169/python-tests-accepted.log",
+      "log_sha256": "aa0ce267918e6c17eb6d0cf451495eaf46f03262ede8e7f70a8b91e9d2611169"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "environment": {},
+      "exit_code": 1,
+      "result": "Initial pre-rollback attempt failed: nested cargo build exited 101 because /home/gem/cargo-target/debug/.cargo-build-lock was read-only.",
+      "local_log": "target/quality/gh169/docs-consistency.log",
+      "log_sha256": "b238135006255489f075da1acfb3e2a381fbf6d5245dec8529a6e602ceb39261"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target/gh169-cargo"
+      },
+      "exit_code": 1,
+      "result": "Intermediate report failed because after-state.md linked to the not-yet-written after-validation.json. All other semantic checks passed; completed record before retry.",
+      "local_log": "target/quality/gh169/docs-consistency-local-target.log",
+      "log_sha256": "6fdde67acd13145abd556580c3ab8d9ea34bad99a09db00ccf28a3fbeabecb76"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target/gh169-cargo"
+      },
+      "exit_code": 0,
+      "result": "Passed: four presets, migration, schema synchronization, language/schema checks, links, policy and sandbox wording.",
+      "local_log": "target/quality/gh169/docs-consistency-accepted.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "openspec validate optimize-ci-execution-topology --strict",
+      "environment": {},
+      "exit_code": 0,
+      "result": "Change is valid; task 7 and whole-proposal acceptance remain unchecked.",
+      "local_log": "target/quality/gh169/openspec.log",
+      "log_sha256": "ee3f7dcabd71c1c486f8cec42ed1b962a3d3237e4a1845dcdbb9e1f1d7b3e278"
+    },
+    {
+      "command": "harness-gate config check",
+      "status": "not applicable",
+      "reason": "No .harness-gate/flow.toml with a declared ci profile in this source checkout; no configuration invented."
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "status": "not applicable",
+      "reason": "No .harness-gate/flow.toml with a declared ci profile in this source checkout; no configuration invented."
+    }
+  ],
+  "validated_file_sha256": {
+    ".github/actions/cargo-state/action.yml": "7299d43078fc4ff4ab72ec90f4b5468d990104399d215f16d941c16177b9e171",
+    "tools/quality/ci_timing.py": "0eb22dc0190f249a44c4873ad9cbd83041ed9def69a3029465f33506bf480887",
+    "tools/quality/ci_comparison.py": "8e4a17075ec7a75310b2cec9cc668ba9724b114b170aa673ea482a7b4201353a",
+    "tools/quality/docs_consistency.py": "2695dd0df1e3fc261ebaaf0f6970330142d939b11e3ed1a154c20cfab9c1ae46",
+    "tools/quality/tests/test_ci_state.py": "29eb0a98d5e42ea203ce201687835091d613a9466ebd514be86807fc9b40695b",
+    "tools/quality/tests/test_ci_timing.py": "78df5244c035d17dcc1f1daf07b196ab7036a0893285304e824ea972e4a1f262",
+    "tools/quality/tests/test_docs_consistency.py": "1b85bd2dcc3f4ba0b9e1160d199878b5f475fecfe6f6b7af90f48393c1230159",
+    "target/quality/docs-consistency.json": "d8f6abeeb906aa81e3f9777dddcb4b9713bfe7d1f0c90d9a43009c0d669624c4"
+  },
+  "hosted_acceptance": {
+    "sampled_required_quality_aggregate": "success in runs 34312685548 and 34311132169, attempt 1",
+    "performance": "Meaningful avoidable tool-install work reduction; no causal latency or total-runner speedup claimed. See after-state.md.",
+    "submitted_sha": "CI pending; historical samples precede GH-169 rollbacks. Controller owns new CI; no polling, merging or closure performed."
+  },
+  "delivery_environment": {
+    "initial_command": "git add .github/actions/cargo-state/action.yml docs/quality/ci-topology docs/quality/gh-146/python-boundary.json docs/quality/gh-152/python-boundary.json openspec/changes/optimize-ci-execution-topology/design.md openspec/changes/optimize-ci-execution-topology/tasks.md tools/quality/ci_timing.py tools/quality/ci_comparison.py tools/quality/docs_consistency.py tools/quality/tests/test_ci_state.py tools/quality/tests/test_ci_timing.py tools/quality/tests/test_docs_consistency.py",
+    "initial_error": "fatal: Unable to create '/home/gem/symphony-workspaces/GH-169/.git/index.lock': Read-only file system",
+    "impact": "Default Git metadata cannot be updated. Delivery uses target/gh169-delivery.git with the same current worktree, original branch and parent; no other checkout accessed. Original read-only .git HEAD remains at the prepared baseline."
+  }
+}

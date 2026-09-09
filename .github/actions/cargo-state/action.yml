@@ -8,8 +8,8 @@ inputs:
     description: Profiles and feature selection used by the job
     required: true
   cache-target:
-    description: Enable disposable compiled state; disabled for fresh measurements
-    default: 'true'
+    description: Experimental compiled cache; disabled after hosted misses (GH-169)
+    default: 'false'
 runs:
   using: composite
   steps:

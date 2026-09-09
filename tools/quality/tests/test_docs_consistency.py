@@ -14,39 +14,14 @@ import docs_consistency as docs
 
 
 class DocsExecutionTests(unittest.TestCase):
-    def test_build_uses_cargo_executable_and_never_falls_back_to_stale_binary(self):
-        with tempfile.TemporaryDirectory() as directory:
-            binary = Path(directory) / "redirected-target" / "harness-gate.exe"
-            binary.parent.mkdir()
-            binary.touch()
-            artifact = {"reason": "compiler-artifact", "target": {"name": "harness-gate", "kind": ["bin"]},
-                        "manifest_path": str(docs.CRATE / "Cargo.toml"), "executable": str(binary)}
-            built = subprocess.CompletedProcess([], 0, json.dumps(artifact))
-            with patch.object(docs.subprocess, "run", return_value=built) as cargo:
-                self.assertEqual(docs.build_binary(), binary)
-                self.assertIn("--locked", cargo.call_args.args[0])
-                self.assertTrue(cargo.call_args.kwargs["check"])
-                for stdout in ("", json.dumps({**artifact, "executable": None}),
-                               json.dumps({**artifact, "manifest_path": str(Path(directory) / "Cargo.toml")}),
-                               json.dumps(artifact) + "\n" + json.dumps(artifact)):
-                    built.stdout = stdout
-                    with self.subTest(stdout=stdout), self.assertRaises(SystemExit):
-                        docs.build_binary()
-                cargo.side_effect = subprocess.CalledProcessError(1, "cargo build")
-                with self.assertRaises(subprocess.CalledProcessError):
-                    docs.build_binary()
-                cargo.side_effect = None
-                built.stdout = json.dumps(artifact)
-                binary.unlink()
-                with self.assertRaises(SystemExit):
-                    docs.build_binary()
-
     def exercise(self, failure=""):
         calls = []
         roots = {}
 
         def execute(argv, **kwargs):
-            self.assertEqual(argv[0], "/compiled/harness-gate")
+            self.assertEqual(argv[:6], ["cargo", "run", "--quiet", "--locked", "--manifest-path",
+                                        str(docs.CRATE / "Cargo.toml")])
+            self.assertEqual(argv[6], "--")
             root = Path(argv[argv.index("--project-root") + 1])
             if "init" in argv:
                 preset = argv[argv.index("--preset") + 1]
@@ -66,7 +41,6 @@ class DocsExecutionTests(unittest.TestCase):
             return subprocess.CompletedProcess(argv, int(operation == failure))
 
         with tempfile.TemporaryDirectory() as directory, \
-                patch.object(docs, "build_binary", return_value=Path("/compiled/harness-gate")) as build, \
                 patch.object(docs.subprocess, "run", side_effect=execute), \
                 patch.object(docs, "metadata", return_value={}):
             output = Path(directory) / "report.json"
@@ -75,11 +49,10 @@ class DocsExecutionTests(unittest.TestCase):
                     docs.run(output)
             else:
                 self.assertEqual(docs.run(output), 0)
-            build.assert_called_once_with()
             report = json.loads(output.read_text())
         return calls, report
 
-    def test_all_presets_migration_and_schema_use_one_fresh_build(self):
+    def test_all_presets_migration_and_schema_use_locked_cargo(self):
         calls, report = self.exercise()
         # Independent inventory: a newly added preset must also be explicitly reviewed.
         presets = ["angular-only", "angular-rust-postgres", "generic", "rust-api"]
