@@ -1,5 +1,8 @@
 # harness-gate schema v2 configuration reference
 
+For generated quality defaults, composable packs and flow-only adoption, see
+[quality presets and migration](quality-presets.md).
+
 For optional `.harness-gate/quality.toml` v1, collector authority and flow/quality
 cross-validation, see the [quality configuration reference](quality-configuration.md).
 Repositories without that file retain existing flow-only behavior.

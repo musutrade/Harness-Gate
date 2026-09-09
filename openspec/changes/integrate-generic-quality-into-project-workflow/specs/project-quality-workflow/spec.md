@@ -221,6 +221,25 @@ Supported presets SHALL generate quality configuration consistent with their cer
 - **AND** their relationship/contract can participate in one project aggregate
 - **AND** PostgreSQL remains an execution service unless an explicit quality capability needs it
 
+#### Scenario: Reference recipes compose reusable pack data
+- **GIVEN** standalone and mixed reference presets
+- **WHEN** quality configuration is generated
+- **THEN** recipes reuse ecosystem packs and an independent contract capability pack
+- **AND** generic composition contains no language-specific policy or fixed language-pair dispatch
+- **AND** native series, requiredness and unsupported capability boundaries remain explicit in pack data
+
+#### Scenario: A future ecosystem supplies a pack
+- **GIVEN** an unregistered synthetic ecosystem with collector/capability/policy fragments
+- **WHEN** its pack is composed and its quality configuration cross-validates with flow
+- **THEN** no Rust/Angular branch or generic schema/compiler/verifier change is needed
+- **AND** future frontend, backend and database selections can supply equivalent pack data
+
+#### Scenario: Generic initialization and legacy migration remain opt-in
+- **GIVEN** a flow-only repository or a new generic project
+- **WHEN** generic initialization or execution configuration migration runs
+- **THEN** no quality file, collectors or thresholds are silently added
+- **AND** documented adoption requires review, aligned configuration and trusted runtime inputs
+
 ### Requirement: CI integration SHALL reuse authoritative measurement ownership and artifact trust
 
 Project workflow integration SHALL comply with the accepted optimized CI topology. If CI already owns authoritative provenance-sensitive coverage/risk/CRAP/critical-path evidence for the run, generic verify integration SHALL consume and validate retained evidence rather than launching a duplicate equivalent collection. New unavoidable hosted work SHALL be measured using the accepted CI cost evidence model.

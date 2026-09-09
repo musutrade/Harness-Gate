@@ -117,6 +117,7 @@ class Collector:
                        (p.startswith('tools/harness-gate/quality-core/tests/') or
                         p in ('tools/harness-gate/quality-core/tests.rs', 'tools/harness-gate/quality-core/policy_tests.rs',
                               'tools/harness-gate/src/config/quality/tests.rs',
+                              'tools/harness-gate/src/preset/tests.rs',
                               'tools/harness-gate/src/config/quality/collectors/tests.rs'))]
         require(not unsupported, 'production changes outside supported risk series; measurement review required: '
                 + ', '.join(unsupported))
@@ -168,7 +169,7 @@ class Collector:
         (self.directory / 'risk.md').write_text('# Candidate function risk\n\n'
             f'Base: `{base}`\n\nHead: `{head}`\n\n'
             f"Identities: {len(comparison['identities'])}; failures: {len(comparison['failures'])}.\n\n"
-            'Scope: GH-94 files, staged snapshot input, CLI dispatch, quality configuration and all linked generic-core production sources. Raw counters, exact rational CRAP and historical debt are retained in head-risk.json. '
+            'Scope: GH-94 files, staged snapshot input, CLI dispatch, quality configuration, preset composition and all linked generic-core production sources. Raw counters, exact rational CRAP and historical debt are retained in head-risk.json. '
             'Branch coverage is unsupported. This candidate is not an accepted baseline.\n')
 
     def matrix(self):

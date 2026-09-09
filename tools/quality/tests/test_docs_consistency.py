@@ -27,10 +27,18 @@ class DocsExecutionTests(unittest.TestCase):
                 preset = argv[argv.index("--preset") + 1]
                 roots[root] = preset
                 operation = f"init:{preset}"
+                if preset != "generic" and failure != "missing-preset-quality":
+                    (root / ".harness-gate").mkdir(exist_ok=True)
+                    (root / ".harness-gate/quality.toml").touch()
+                if preset == "generic" and failure == "implicit-generic-quality":
+                    (root / ".harness-gate").mkdir(exist_ok=True)
+                    (root / ".harness-gate/quality.toml").touch()
             elif "migrate" in argv:
                 operation = "migrate"
                 if failure != "missing-secrets":
                     (root / ".harness-gate/secrets.toml").touch()
+                if failure == "implicit-migration-quality":
+                    (root / ".harness-gate/quality.toml").touch()
             elif "export" in argv:
                 plane = "quality" if "--quality" in argv else "flow"
                 operation = "quality-schema" if plane == "quality" else "schema"
@@ -38,7 +46,7 @@ class DocsExecutionTests(unittest.TestCase):
                 content = (docs.ROOT / "schema" / filename).read_bytes()
                 (root / filename).write_bytes(b"changed" if failure == f"{operation}-drift" else content)
             else:
-                operation = "check:quality" if (root / ".harness-gate/quality.toml").exists() else f"check:{roots.get(root, 'migration')}"
+                operation = f"check:{roots[root]}" if root in roots else ("check:quality" if (root / ".harness-gate/quality.toml").exists() else "check:migration")
             calls.append(operation)
             return subprocess.CompletedProcess(argv, int(operation == failure))
 
@@ -72,7 +80,7 @@ class DocsExecutionTests(unittest.TestCase):
     def test_each_cli_failure_and_migration_schema_drift_still_blocks(self):
         for failure in ([op for preset in ("angular-only", "angular-rust-postgres", "generic", "rust-api")
                          for op in (f"init:{preset}", f"check:{preset}")]
-                        + ["migrate", "check:migration", "missing-secrets", "schema", "schema-drift", "check:quality", "quality-schema", "quality-schema-drift"]):
+                        + ["missing-preset-quality", "implicit-generic-quality", "implicit-migration-quality", "migrate", "check:migration", "missing-secrets", "schema", "schema-drift", "check:quality", "quality-schema", "quality-schema-drift"]):
             with self.subTest(failure=failure):
                 _, report = self.exercise(failure)
                 self.assertEqual(report["status"], "fail")
