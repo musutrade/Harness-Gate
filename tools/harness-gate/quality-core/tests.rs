@@ -5,7 +5,7 @@ use std::{
     fs,
     path::{Path, PathBuf},
     process::Command,
-    sync::LazyLock,
+    sync::{Arc, Mutex, Weak},
 };
 use tempfile::TempDir;
 
@@ -16,9 +16,29 @@ fn quality() -> PathBuf {
         .join("quality")
 }
 
-// Keep materialized bytes alive across tests; the Python helper is test-only and
-// never calls policy evaluation, reporting, or any collector.
-static REFERENCE: LazyLock<(TempDir, Vec<Value>)> = LazyLock::new(|| {
+// Active tests own the fixture. A static strong owner would never run TempDir's
+// destructor when the test process exits (including successful nextest runs).
+pub(super) type Reference = (TempDir, Vec<Value>);
+static REFERENCE: Mutex<Weak<Reference>> = Mutex::new(Weak::new());
+
+pub(super) fn cached_reference(
+    cache: &Mutex<Weak<Reference>>,
+    load: fn() -> Reference,
+) -> Arc<Reference> {
+    let mut weak = cache.lock().unwrap_or_else(|error| error.into_inner());
+    if let Some(reference) = weak.upgrade() {
+        return reference;
+    }
+    let reference = Arc::new(load());
+    *weak = Arc::downgrade(&reference);
+    reference
+}
+
+fn reference() -> Arc<Reference> {
+    cached_reference(&REFERENCE, load_reference)
+}
+
+fn load_reference() -> Reference {
     let temp = tempfile::tempdir().unwrap();
     let output = Command::new("python3")
         .arg(Path::new(env!("CARGO_MANIFEST_DIR")).join("quality-core/tests/reference.py"))
@@ -34,7 +54,7 @@ static REFERENCE: LazyLock<(TempDir, Vec<Value>)> = LazyLock::new(|| {
     let cases = json::parse(&fs::read_to_string(temp.path().join("cases.json")).unwrap()).unwrap();
     eprintln!("{}", String::from_utf8_lossy(&output.stdout));
     (temp, cases.as_array().unwrap().clone())
-});
+}
 
 fn context(case: &Value) -> evidence::ValidationContext<'_> {
     evidence::ValidationContext {
@@ -92,7 +112,8 @@ fn assert_outcome(case: &Value, result: Result<Value>) {
 
 #[test]
 fn frozen_evidence_and_integrity_matrix_matches_python() {
-    for case in REFERENCE.1.iter().filter(|c| c["kind"] == "evidence") {
+    let reference = reference();
+    for case in reference.1.iter().filter(|c| c["kind"] == "evidence") {
         let ctx = context(case);
         let result = evidence::validate_evidence(&case["records"], &ctx).map(|typed| {
             assert_eq!(
@@ -110,7 +131,8 @@ fn frozen_evidence_and_integrity_matrix_matches_python() {
 
 #[test]
 fn project_identity_ownership_and_relationships_match_python() {
-    for case in REFERENCE.1.iter().filter(|c| c["kind"] == "project") {
+    let reference = reference();
+    for case in reference.1.iter().filter(|c| c["kind"] == "project") {
         assert_outcome(
             case,
             project::validate_project(&case["project"]).map(|p| serde_json::to_value(p).unwrap()),
@@ -120,7 +142,8 @@ fn project_identity_ownership_and_relationships_match_python() {
 
 #[test]
 fn measurement_series_compatibility_matches_python() {
-    for case in REFERENCE.1.iter().filter(|c| c["kind"] == "series") {
+    let reference = reference();
+    for case in reference.1.iter().filter(|c| c["kind"] == "series") {
         assert_outcome(
             case,
             evidence::require_compatible_series(
@@ -134,7 +157,8 @@ fn measurement_series_compatibility_matches_python() {
 
 #[test]
 fn capability_availability_matches_python() {
-    for case in REFERENCE.1.iter().filter(|c| c["kind"] == "requirements") {
+    let reference = reference();
+    for case in reference.1.iter().filter(|c| c["kind"] == "requirements") {
         assert_outcome(
             case,
             evidence::evaluate_requirements(
@@ -199,7 +223,8 @@ fn json_boundary_rejects_duplicate_keys_and_malformed_values() {
 
 #[test]
 fn source_and_artifact_bytes_are_verified_at_the_boundary() {
-    let case = REFERENCE
+    let reference = reference();
+    let case = reference
         .1
         .iter()
         .find(|c| c["name"] == "polyglot")
@@ -282,4 +307,33 @@ fn typed_values_preserve_arbitrary_precision() {
             assert_eq!(serde_json::to_value(typed).unwrap(), raw);
         }
     }
+}
+
+#[test]
+fn oracle_cache_releases_files_after_last_owner_and_unwind() {
+    fn fixture() -> Reference {
+        let temp = tempfile::tempdir().unwrap();
+        fs::write(temp.path().join("fixture"), "owned bytes").unwrap();
+        (temp, Vec::new())
+    }
+    let cache = Mutex::new(Weak::new());
+    let first = cached_reference(&cache, fixture);
+    let path = first.0.path().to_owned();
+    let second = cached_reference(&cache, fixture);
+    assert!(Arc::ptr_eq(&first, &second));
+    drop(first);
+    assert!(path.join("fixture").is_file());
+    drop(second);
+    assert!(!path.exists());
+    assert!(cache.lock().unwrap().upgrade().is_none());
+
+    let next = cached_reference(&cache, fixture);
+    let next_path = next.0.path().to_owned();
+    let result = std::panic::catch_unwind(move || {
+        let _owner = next;
+        panic!("simulate failed test");
+    });
+    assert!(result.is_err());
+    assert!(!next_path.exists());
+    assert!(cache.lock().unwrap().upgrade().is_none());
 }
