@@ -60,6 +60,7 @@ We use a simplified version of the Michael Nygard ADR template:
 - [ADR-0039](0039-required-risk-and-traceability-gates.md) - Require coverage, risk and traceability evidence in CI
 
 - [ADR-0040](0040-language-agnostic-evidence-policy.md) - Keep language-agnostic evidence and policy behind a fail-closed migration boundary
+- [ADR-0041](0041-quality-configuration-v1.md) - Define quality configuration v1 and explicit flow/quality validation
 
 ## Creating New ADRs
 

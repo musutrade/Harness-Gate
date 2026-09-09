@@ -196,15 +196,35 @@ def run(output: Path) -> int:
             cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         ).returncode == 0
         migration_checked = migration_checked and (root / ".harness-gate" / "secrets.toml").is_file()
+    workflow_fixture = Path(__file__).with_name("fixtures") / "workflow"
+    with tempfile.TemporaryDirectory(prefix="harness-gate-quality-example-") as directory:
+        root = Path(directory)
+        config = root / ".harness-gate"
+        config.mkdir()
+        shutil.copy2(CRATE / "presets/rust-api.flow.toml", config / "flow.toml")
+        shutil.copy2(CRATE / "presets/empty.audit.toml", config / "audit.toml")
+        shutil.copy2(CRATE / "presets/default.secrets.toml", config / "secrets.toml")
+        for filename in ("quality.toml", "policy.json"):
+            shutil.copy2(workflow_fixture / filename, config / filename)
+        quality_checked = subprocess.run(
+            [*command, "config", "check", "--project-root", str(root)],
+            cwd=ROOT, capture_output=True, text=True,
+        ).returncode == 0
+    schemas_synced = {}
     with tempfile.TemporaryDirectory(prefix="harness-gate-schema-") as directory:
         schema_root = Path(directory)
-        generated = schema_root / "flow.schema.json"
-        schema = subprocess.run(
-            [*command, "--project-root", str(schema_root), "schema", "export", "--output", "flow.schema.json"],
-            cwd=ROOT, capture_output=True, text=True,
-        )
-        committed = ROOT / "schema" / "flow.schema.json"
-        schema_synced = schema.returncode == 0 and generated.read_bytes() == committed.read_bytes()
+        for plane in ("flow", "quality"):
+            filename = f"{plane}.schema.json"
+            args = ["--quality"] if plane == "quality" else []
+            schema = subprocess.run(
+                [*command, "--project-root", str(schema_root), "schema", "export", *args, "--output", filename],
+                cwd=ROOT, capture_output=True, text=True,
+            )
+            generated = schema_root / filename
+            committed = ROOT / "schema" / filename
+            schemas_synced[plane] = schema.returncode == 0 and generated.is_file() and generated.read_bytes() == committed.read_bytes()
+    schema_synced = schemas_synced["flow"]
+    quality_schema_synced = schemas_synced["quality"]
     machine_schema = ROOT / "schema" / "machine-result.schema.json"
     machine_schema_valid = False
     try:
@@ -241,10 +261,11 @@ def run(output: Path) -> int:
         **metadata(tool="docs-consistency"), "link_failures": link_failures, "examples": examples,
         "migration": {"path": str(migration_fixture.relative_to(ROOT)), "status": "pass" if migration_checked else "fail"},
         "language_docs_valid": language_docs_valid, "schema_synced": schema_synced,
+        "quality_schema_synced": quality_schema_synced, "quality_example_valid": quality_checked,
         "machine_schema_valid": machine_schema_valid, "manifest_schema_valid": manifest_schema_valid,
         "registry_schema_valid": registry_schema_valid, "sandbox_wording": sandbox_wording,
         "engineering_policy": engineering_policy,
-        "status": "pass" if not link_failures and language_docs_valid and schema_synced and machine_schema_valid and manifest_schema_valid and registry_schema_valid and migration_checked and all(item["status"] == "pass" for item in examples) and sandbox_wording["status"] == "pass" and engineering_policy["status"] == "pass" else "fail",
+        "status": "pass" if not link_failures and language_docs_valid and schema_synced and quality_schema_synced and quality_checked and machine_schema_valid and manifest_schema_valid and registry_schema_valid and migration_checked and all(item["status"] == "pass" for item in examples) and sandbox_wording["status"] == "pass" and engineering_policy["status"] == "pass" else "fail",
     }
     write_json(output, result)
     if result["status"] != "pass":

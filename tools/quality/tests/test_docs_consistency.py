@@ -32,11 +32,13 @@ class DocsExecutionTests(unittest.TestCase):
                 if failure != "missing-secrets":
                     (root / ".harness-gate/secrets.toml").touch()
             elif "export" in argv:
-                operation = "schema"
-                content = (docs.ROOT / "schema/flow.schema.json").read_bytes()
-                (root / "flow.schema.json").write_bytes(b"changed" if failure == "schema-drift" else content)
+                plane = "quality" if "--quality" in argv else "flow"
+                operation = "quality-schema" if plane == "quality" else "schema"
+                filename = f"{plane}.schema.json"
+                content = (docs.ROOT / "schema" / filename).read_bytes()
+                (root / filename).write_bytes(b"changed" if failure == f"{operation}-drift" else content)
             else:
-                operation = f"check:{roots.get(root, 'migration')}"
+                operation = "check:quality" if (root / ".harness-gate/quality.toml").exists() else f"check:{roots.get(root, 'migration')}"
             calls.append(operation)
             return subprocess.CompletedProcess(argv, int(operation == failure))
 
@@ -57,10 +59,10 @@ class DocsExecutionTests(unittest.TestCase):
         # Independent inventory: a newly added preset must also be explicitly reviewed.
         presets = ["angular-only", "angular-rust-postgres", "generic", "rust-api"]
         self.assertEqual(calls, [op for preset in presets for op in (f"init:{preset}", f"check:{preset}")]
-                         + ["migrate", "check:migration", "schema"])
+                         + ["migrate", "check:migration", "check:quality", "schema", "quality-schema"])
         self.assertEqual(report["status"], "pass")
         self.assertEqual(len(report["examples"]), 4)
-        for field in ("language_docs_valid", "schema_synced", "machine_schema_valid",
+        for field in ("language_docs_valid", "schema_synced", "quality_schema_synced", "quality_example_valid", "machine_schema_valid",
                       "manifest_schema_valid", "registry_schema_valid"):
             self.assertTrue(report[field])
         self.assertEqual(report["link_failures"], [])
@@ -70,7 +72,7 @@ class DocsExecutionTests(unittest.TestCase):
     def test_each_cli_failure_and_migration_schema_drift_still_blocks(self):
         for failure in ([op for preset in ("angular-only", "angular-rust-postgres", "generic", "rust-api")
                          for op in (f"init:{preset}", f"check:{preset}")]
-                        + ["migrate", "check:migration", "missing-secrets", "schema", "schema-drift"]):
+                        + ["migrate", "check:migration", "missing-secrets", "schema", "schema-drift", "check:quality", "quality-schema", "quality-schema-drift"]):
             with self.subTest(failure=failure):
                 _, report = self.exercise(failure)
                 self.assertEqual(report["status"], "fail")

@@ -3,6 +3,7 @@ mod loader;
 mod migration;
 mod model;
 mod path;
+pub(crate) mod quality;
 mod scope;
 mod validation;
 

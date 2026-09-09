@@ -1,5 +1,10 @@
 # harness-gate schema v2 configuration reference
 
+For optional `.harness-gate/quality.toml` v1, collector authority and flow/quality
+cross-validation, see the [quality configuration reference](quality-configuration.md).
+Repositories without that file retain existing flow-only behavior.
+
+
 This is the English reference for .harness-gate/flow.toml, secret scanning,
 and architecture auditing. The [JSON Schema catalog](../schema/README.md)
 lists every machine-readable contract. The Chinese reference is
