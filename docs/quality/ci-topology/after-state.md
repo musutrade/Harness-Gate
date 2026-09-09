@@ -44,7 +44,7 @@ python3 tools/quality/ci_timing.py --input docs/quality/ci-topology/hosted-stage
 python3 tools/quality/ci_comparison.py --output docs/quality/ci-topology/hosted-comparison.json
 ```
 
-Normalization remains GH-164 v1: PR creation to aggregate completion, active
+Normalization remains GH-164 v1: PR workflow run creation to aggregate completion, active
 job walls from start/end timestamps, and summed runner wall minutes without
 billing multipliers or queue time. Only new step-name classification was added:
 `Configure Cargo state` is setup; sealing and verifying artifacts are artifact
@@ -58,7 +58,7 @@ All figures below come from [the generated comparison](hosted-comparison.json).
 Seconds summed across concurrent steps are work, not elapsed PR latency.
 | Measure | Before median (range) | After median (range) |
 | --- | --- | --- |
-| PR creation → aggregate completion, seconds | 903.0 (846.0–1141.0) | 878.5 (875.0–882.0) |
+| PR workflow run creation → aggregate completion, seconds | 903.0 (846.0–1141.0) | 878.5 (875.0–882.0) |
 | Total runner wall minutes | 40.7 (37.5–43.2) | 39.3 (38.3–40.3) |
 | setup seconds | 195.0 (183.0–197.0) | 172.5 (170.0–175.0) |
 | tool install seconds | 423.0 (392.0–453.0) | 12.0 (12.0–12.0) |
