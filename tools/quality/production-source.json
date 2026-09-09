@@ -107,6 +107,7 @@
       "blocking": false,
       "files": [
         "src/preset/catalog.rs",
+        "src/preset/composition.rs",
         "src/preset/filesystem.rs",
         "src/preset/initialize.rs",
         "src/preset/migration.rs",
@@ -349,7 +350,7 @@
     {
       "path": "src/preset/mod.rs",
       "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
-      "sha256": "531faf071925e5cdbe7eca8bb6519fcde371e56fb41b425878c9aa2c6a5d9caf"
+      "sha256": "3cfa568dda542861132f4b739df8b1b4b5542e6a7eb31c7e20f631f74c410129"
     },
     {
       "path": "src/process/mod.rs",

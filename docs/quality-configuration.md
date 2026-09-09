@@ -9,14 +9,15 @@ produces `HGCFG-QUALITY` diagnostics in `config check --format json`.
 This is the configuration layer delivered by GH-179, OpenSpec tasks 1.1–1.4.
 GH-180 adds [trusted compilation](quality-compilation.md), tasks 2.1–2.3.
 [Collector execution](quality-collectors.md) and [baseline resolution](quality-baselines.md)
-are separate stages; verify/report integration remains a subsequent task.
+are separate stages; [verification](quality-verification.md) composes their results.
 A successful config check proves configuration consistency;
 it does not certify evidence or establish a quality PASS.
 
 ## File presence and commands
 
 A repository without this file retains existing flow-only behavior. Schema export
-and existing presets do not create it or enable collectors or policies. A present
+and the `generic` preset do not create it. New reference presets explicitly include
+quality; see [preset defaults and migration](quality-presets.md). A present
 malformed, unreadable or broken-symlink configuration fails config validation.
 The file is located under the execution root even when `--config` selects an
 alternate flow file.
@@ -44,7 +45,7 @@ a baseline.
 The complete [quality fixture](../tools/quality/fixtures/workflow/quality.toml)
 and its [policy document](../tools/quality/fixtures/workflow/policy.json) pair with
 the `rust-api` flow preset. Docs consistency checks this pair in a temporary
-project and also checks all legacy presets. Its illustrative series hash is not
+project and also cross-validates all generated reference presets and flow-only migration. Its illustrative series hash is not
 certified measurement evidence.
 
 | Table | Meaning and constraints |
