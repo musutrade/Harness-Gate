@@ -192,6 +192,7 @@
         "src/verify/mod.rs",
         "src/verify/parser.rs",
         "src/verify/plan.rs",
+        "src/verify/quality.rs",
         "src/verify/report.rs",
         "src/verify/scheduler.rs",
         "src/verify/steps.rs",
@@ -373,7 +374,7 @@
     {
       "path": "src/config/quality/model.rs",
       "reason": "Type declarations and derived implementations have no executable LLVM source mapping on this target; the AST inventory contains no handwritten functions or closures.",
-      "sha256": "3a1e9859b1254772b5b5d9211556c6e5b6b8e01644b48156310e4ce95107ee10"
+      "sha256": "11dc49817987fbfe8e1b2aabf81be4142de85756390a908e9373c649ba0a500e"
     }
   ],
   "source_roots": [

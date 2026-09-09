@@ -86,6 +86,31 @@ impl Fixture {
             rules["rules"][0]["limit"] = json!({"type":"size","value":10,"unit":"bytes"});
             rules["rules"][0]["operator"] = json!("le");
         }
+        if mode == "crap" {
+            let series = state.series.get_mut("coverage").unwrap();
+            let old = series.id.clone();
+            let mut value = serde_json::to_value(&series).unwrap();
+            value["metrics"] = json!([{"name":"risk.crap","type":"decimal"}]);
+            value["id"] = json!(evidence::series_id(&value).unwrap());
+            *series = serde_json::from_value(value).unwrap();
+            quality = quality
+                .replace(&old, &series.id)
+                .replace("bundle.size", "risk.crap");
+            record["capabilities"][0]["metric"] = json!("risk.crap");
+            record["metrics"][0]["name"] = json!("risk.crap");
+            record["metrics"][0]["value"] = json!({"type":"decimal","value":"40"});
+            quality = quality
+                .replace("required = false", "required = true")
+                .replace(
+                "provider = { kind = \"none\" }",
+                "provider = { kind = \"retained_artifact\", manifest = \"base/manifest.json\" }",
+            );
+            rules["rules"][0]["metric"] = json!("risk.crap");
+            rules["rules"][0]["limit"] = json!({"type":"decimal","value":"30"});
+            rules["rules"][0]["ratchet"] = json!({"deny_regression":true,"allow_legacy_debt":true});
+            rules["rules"][0]["remediation_classes"] =
+                json!(["reduce_complexity", "increase_meaningful_coverage"]);
+        }
         record["series"] = serde_json::to_value(&state.series["coverage"]).unwrap();
         record["collector"] = record["series"]["collector"].clone();
         match mode {
@@ -680,4 +705,430 @@ fn collection_cli_publishes_measurements_and_removes_stale_output_on_failure() {
             assert!(!output.exists());
         }
     }
+}
+
+// Full workflow fixtures deliberately use a pack identifier unknown to the host.
+impl Fixture {
+    fn workflow(mode: &str, execution_passes: bool, retained_base: bool) -> Self {
+        let mut fixture = Self::new(mode, true);
+        let root = fixture.dir.path().to_path_buf();
+        let mut flow: crate::config::FlowConfig =
+            toml::from_str(&fs::read_to_string(root.join(DEFAULT_CONFIG_PATH)).unwrap()).unwrap();
+        for name in ["empty.audit.toml", "default.secrets.toml"] {
+            let dest = if name.starts_with("empty") {
+                "audit.toml"
+            } else {
+                "secrets.toml"
+            };
+            fs::copy(
+                Path::new(env!("CARGO_MANIFEST_DIR"))
+                    .join("presets")
+                    .join(name),
+                root.join(".harness-gate").join(dest),
+            )
+            .unwrap();
+        }
+        flow.steps.truncate(1);
+        let step = &mut flow.steps[0];
+        step.id = "configured-check".into();
+        step.label = "Configured execution check".into();
+        step.program = "python3".into();
+        step.args = vec!["{root}/execution.py".into()];
+        fs::write(
+            root.join("execution.py"),
+            if execution_passes {
+                "raise SystemExit(0)"
+            } else {
+                "raise SystemExit(7)"
+            },
+        )
+        .unwrap();
+        step.log = "execution.log".into();
+        flow.policy.required_steps = vec![step.id.clone()].into_iter().collect();
+        fs::write(
+            root.join(DEFAULT_CONFIG_PATH),
+            toml::to_string(&flow).unwrap(),
+        )
+        .unwrap();
+        let mut config = fixture.config();
+        config.profiles.get_mut("full").unwrap().workflow = Some(super::super::model::Workflow {
+            state: ".harness-gate/workflow-state.json".into(),
+            trusted_keys: ".harness-gate/workflow-keys.json".into(),
+            baseline_request: retained_base.then(|| ".harness-gate/base-request.json".into()),
+        });
+        if retained_base {
+            config.baseline.required = true;
+            config.baseline.provider = super::super::model::BaselineProvider::RetainedArtifact {
+                manifest: "base/manifest.json".into(),
+            };
+        }
+        fs::write(
+            root.join(".harness-gate/quality.toml"),
+            toml::to_string(&config).unwrap(),
+        )
+        .unwrap();
+        fixture.pin();
+        let inputs = compiler::compile(&root, &fixture.state).unwrap();
+        let id = fixture.request.step_id.clone();
+        fixture.request.config_digest = binding_digest(&config, &fixture.state, &inputs).unwrap();
+        fixture.request.input = input(
+            &inputs,
+            &fixture.state,
+            &id,
+            &claims(&config, &fixture.state, &id).unwrap(),
+        );
+        fixture.sign();
+        write(
+            &root.join(".harness-gate/workflow-state.json"),
+            &fixture.state,
+        );
+        write(
+            &root.join(".harness-gate/workflow-keys.json"),
+            &json!([{
+                "key_id":fixture.policy.trusted_keys[0].key_id,
+                "public_key":fixture.policy.trusted_keys[0].public_key
+            }]),
+        );
+        if retained_base {
+            fixture.retained_base();
+        }
+        for args in [
+            vec!["init", "-q"],
+            vec![
+                "-c",
+                "user.name=Fixture",
+                "-c",
+                "user.email=fixture@example.invalid",
+                "commit",
+                "--allow-empty",
+                "-qm",
+                "fixture",
+            ],
+        ] {
+            assert!(std::process::Command::new("git")
+                .args(args)
+                .current_dir(&root)
+                .status()
+                .unwrap()
+                .success());
+        }
+        fixture
+    }
+
+    fn retained_base(&self) {
+        let root = self.dir.path();
+        let base = root.join("base");
+        fs::create_dir(&base).unwrap();
+        let mut state = self.state.clone();
+        state.expected.commit = state.expected.base_commit.clone();
+        state.expected.base_commit = "2222222222222222222222222222222222222222".into();
+        state.expected.run = "retained-base".into();
+        let raw = self.payload["raw"].as_str().unwrap();
+        state.artifacts.insert(
+            "raw.json".into(),
+            format!("{:x}", Sha256::digest(raw.as_bytes())),
+        );
+        let mut files = state.config_files.clone();
+        for subject in state.subjects.values().flatten() {
+            files.insert(subject.path.clone(), subject.source_sha256.clone());
+        }
+        for name in files.keys() {
+            let path = base.join(name);
+            fs::create_dir_all(path.parent().unwrap()).unwrap();
+            fs::copy(root.join(name), path).unwrap();
+        }
+        fs::create_dir_all(base.join(&state.artifact_root)).unwrap();
+        fs::write(base.join(&state.artifact_root).join("raw.json"), raw).unwrap();
+        files.insert(
+            format!("{}/raw.json", state.artifact_root),
+            state.artifacts["raw.json"].clone(),
+        );
+        let mut records = self.payload["response"]["collection"]["evidence"].clone();
+        for record in records.as_array_mut().unwrap() {
+            record["context"] = serde_json::to_value(&state.expected).unwrap();
+            if record["metrics"][0]["name"] == "risk.crap" {
+                record["metrics"][0]["value"]["value"] = json!("35");
+            }
+            for artifact in record["artifacts"].as_array_mut().unwrap() {
+                artifact["context"] = serde_json::to_value(&state.expected).unwrap();
+            }
+        }
+        let manifest = json!({"schema":"quality-baseline-manifest/v1","state":state,"evidence":records,"files":files});
+        write(&base.join("manifest.json"), &manifest);
+        write(
+            &root.join(".harness-gate/base-request.json"),
+            &json!({
+                "schema":"quality-baseline-request/v1", "state":state,
+                "manifest":"base/manifest.json", "manifest_sha256":format!("{:x}",Sha256::digest(fs::read(base.join("manifest.json")).unwrap()))
+            }),
+        );
+    }
+
+    fn verify(&self) -> crate::verify::VerificationReport {
+        let project =
+            crate::project::Project::discover(Some(self.dir.path().to_path_buf()), None).unwrap();
+        crate::verify::run(
+            &project,
+            crate::scope::ScopeResult::all(&project),
+            "full",
+            false,
+        )
+        .unwrap()
+    }
+}
+
+fn direct_equivalent(quality: &Value, root: &Path) {
+    use clap::Parser;
+    #[derive(Parser)]
+    struct Command {
+        #[command(subcommand)]
+        action: crate::app::quality::QualityAction,
+    }
+    let mut args = vec!["quality".to_owned(), "evaluate".to_owned()];
+    for (flag, value) in [
+        ("project", &quality["inputs"]["project"]),
+        ("policy", &quality["inputs"]["policy"]),
+        ("expected", &quality["inputs"]["expected"]),
+        ("evidence", &quality["evidence"]),
+        ("selection", &quality["inputs"]["selection"]),
+        ("mappings", &quality["inputs"]["mappings"]),
+        ("exceptions", &quality["inputs"]["exceptions"]),
+        ("base-project", &quality["baseline"]["inputs"]["project"]),
+        ("base-expected", &quality["baseline"]["inputs"]["expected"]),
+        ("base-evidence", &quality["baseline"]["evidence"]),
+    ] {
+        if value.is_null() {
+            continue;
+        }
+        let path = root.join(format!("direct-{flag}.json"));
+        write(&path, value);
+        args.extend([format!("--{flag}"), path.to_str().unwrap().into()]);
+    }
+    for (flag, value) in [
+        ("source-root", &quality["inputs"]["source_root"]),
+        ("artifact-root", &quality["inputs"]["artifact_root"]),
+        (
+            "base-source-root",
+            &quality["baseline"]["inputs"]["source_root"],
+        ),
+        (
+            "base-artifact-root",
+            &quality["baseline"]["inputs"]["artifact_root"],
+        ),
+        ("now", &quality["evaluation_time"]),
+    ] {
+        if let Some(value) = value.as_str() {
+            args.extend([format!("--{flag}"), value.into()]);
+        }
+    }
+    let output = root.join("direct-report.json");
+    args.extend(["--output".into(), output.to_str().unwrap().into()]);
+    let command = Command::try_parse_from(args).unwrap();
+    assert_eq!(
+        crate::app::quality::run(&command.action).unwrap(),
+        quality["status"] == "pass"
+    );
+    let direct: Value = serde_json::from_slice(&fs::read(output).unwrap()).unwrap();
+    assert_eq!(direct, quality["project_report"]);
+}
+
+#[test]
+fn unknown_ecosystem_verify_baseline_and_direct_evaluator_are_equivalent() {
+    let fixture = Fixture::workflow("pass", true, true);
+    let report = fixture.verify();
+    let unified: Value = serde_json::from_slice(
+        &fs::read(Path::new(&report.report_directory).join("test_result.json")).unwrap(),
+    )
+    .unwrap();
+    assert!(report.passed, "{unified:#}");
+    assert_eq!(unified["status"], "PASS");
+    assert_eq!(unified["evidence_complete"], true);
+    let quality = &unified["quality"];
+    assert_eq!(quality["baseline"]["status"], "available");
+    assert_eq!(
+        quality["inputs"]["project"]["components"][0]["metadata"]["ecosystem"],
+        "nebula-unregistered-2049"
+    );
+    assert_eq!(quality["selection"]["changed_subject"], json!(["module"]));
+    assert_eq!(
+        quality["project_report"]["components"]["app"]["aggregate"]["state"],
+        "pass"
+    );
+    let authoritative: Value = serde_json::from_slice(
+        &fs::read(quality["project_report_path"].as_str().unwrap()).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(authoritative, quality["project_report"]);
+    let mirrored: Value = serde_json::from_slice(
+        &fs::read(
+            fixture
+                .dir
+                .path()
+                .join("target/quality")
+                .join(&report.invocation_id)
+                .join("test_result.json"),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(mirrored, unified);
+    direct_equivalent(quality, fixture.dir.path());
+    fs::remove_dir_all(quality["baseline"]["retained_directory"].as_str().unwrap()).unwrap();
+}
+
+#[test]
+fn workflow_execution_and_quality_failures_have_independent_authority() {
+    for execution in [true, false] {
+        for mode in ["pass", "unsupported"] {
+            let fixture = Fixture::workflow(mode, execution, false);
+            let report = fixture.verify();
+            let value = serde_json::to_value(&report).unwrap();
+            assert_eq!(report.passed, execution && mode == "pass", "{value:#}");
+            assert_eq!(
+                value["quality"]["status"],
+                if mode == "pass" { "pass" } else { "fail" }
+            );
+            assert_eq!(
+                value["steps"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .find(|step| step["step_id"] == "configured-check")
+                    .unwrap()["passed"],
+                execution
+            );
+            direct_equivalent(&value["quality"], fixture.dir.path());
+        }
+    }
+}
+
+#[test]
+fn workflow_selection_follows_changed_files_and_component_scope() {
+    for mode in ["changed", "components"] {
+        let fixture = Fixture::workflow("pass", true, false);
+        let project =
+            crate::project::Project::discover(Some(fixture.dir.path().to_path_buf()), None)
+                .unwrap();
+        let mut scope = crate::scope::ScopeResult::all(&project);
+        scope.mode = mode.into();
+        scope.changed_files = vec!["src/lib.rs".into()];
+        let report = crate::verify::run(&project, scope, "full", false).unwrap();
+        assert!(report.passed, "{report:#?}");
+        direct_equivalent(
+            &serde_json::to_value(&report).unwrap()["quality"],
+            fixture.dir.path(),
+        );
+    }
+}
+
+#[test]
+fn workflow_invalid_evidence_selection_and_baseline_block_successful_execution() {
+    for mode in [
+        "malformed",
+        "selection",
+        "baseline",
+        "state",
+        "config-change",
+    ] {
+        let mut fixture = Fixture::workflow(
+            if mode == "malformed" || mode == "config-change" {
+                mode
+            } else {
+                "pass"
+            },
+            true,
+            mode == "baseline",
+        );
+        let root = fixture.dir.path();
+        match mode {
+            "selection" => {
+                fixture
+                    .state
+                    .selection
+                    .as_mut()
+                    .unwrap()
+                    .get_mut("changed_subject")
+                    .unwrap()
+                    .clear();
+                write(
+                    &root.join(".harness-gate/workflow-state.json"),
+                    &fixture.state,
+                );
+            }
+            "state" => {
+                fs::write(root.join(".harness-gate/workflow-state.json"), "{}").unwrap();
+            }
+            "baseline" => {
+                fs::write(root.join("base/manifest.json"), "{}").unwrap();
+            }
+            _ => {}
+        }
+        let report = fixture.verify();
+        let value = serde_json::to_value(&report).unwrap();
+        assert!(!report.passed, "{mode}: {value:#}");
+        assert_eq!(value["steps"][0]["passed"], true);
+        assert_eq!(value["quality"]["status"], "blocked");
+        assert!(value["quality"]["error"].is_string());
+    }
+}
+
+#[test]
+fn workflow_quality_success_cannot_override_audit_failure() {
+    let fixture = Fixture::workflow("pass", true, false);
+    let mut project =
+        crate::project::Project::discover(Some(fixture.dir.path().to_path_buf()), None).unwrap();
+    project.audit_config = fixture.dir.path().join(".harness-gate");
+    let error = crate::verify::run(
+        &project,
+        crate::scope::ScopeResult::all(&project),
+        "full",
+        false,
+    )
+    .unwrap_err();
+    assert!(matches!(error, crate::verify::VerifyError::Audit(_)));
+    let report: Value =
+        serde_json::from_slice(&fs::read(project.reports.join("test_result.json")).unwrap())
+            .unwrap();
+    assert_eq!(report["passed"], false);
+    assert_eq!(report["quality"]["status"], "pass");
+    assert!(report["steps"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|step| step["passed"] == false && step["label"] == "architecture audit"));
+}
+
+#[test]
+fn workflow_crap_diagnostics_preserve_base_head_ratchet_evidence_and_remediation() {
+    let fixture = Fixture::workflow("crap", true, true);
+    let report = fixture.verify();
+    assert!(!report.passed);
+    let value = serde_json::to_value(&report).unwrap();
+    assert_eq!(value["quality"]["status"], "fail");
+    let human =
+        fs::read_to_string(Path::new(&report.report_directory).join("test_result.md")).unwrap();
+    for expected in [
+        "risk.crap",
+        "src/lib.rs",
+        "base=",
+        "35",
+        "head=",
+        "40",
+        "threshold=",
+        "30",
+        "ratchet=",
+        "deny_regression",
+        "raw.json",
+        "reduce_complexity",
+        "increase_meaningful_coverage",
+    ] {
+        assert!(human.contains(expected), "missing {expected}: {human}");
+    }
+    direct_equivalent(&value["quality"], fixture.dir.path());
+    fs::remove_dir_all(
+        value["quality"]["baseline"]["retained_directory"]
+            .as_str()
+            .unwrap(),
+    )
+    .unwrap();
 }

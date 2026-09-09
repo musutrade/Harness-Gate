@@ -47,6 +47,17 @@ class SourceMeasureTests(unittest.TestCase):
         module = (crate / 'src/config/quality/mod.rs').read_text()
         self.assertIn('#[cfg(test)]\nmod tests;', module)
 
+    def test_verify_reporting_source_certification(self):
+        crate = ROOT / 'tools/harness-gate'
+        for path in ('verify/mod.rs', 'verify/quality.rs', 'verify/report.rs', 'failure.rs'):
+            with self.subTest(path=path):
+                self.assertIn(path, SOURCE_FILES)
+                source = crate / 'src' / path
+                symbols = ast(source, self.binary)['symbols']
+                self.assertTrue(any(not symbol['test'] for symbol in symbols))
+                transformed, _ = instrument(source.read_text(), {'symbols': symbols})
+                self.assertEqual(len(self.inventory(transformed)['symbols']), len(symbols))
+
     def test_ast_controls_and_nested_ownership(self):
         source = '''const N: usize = 2;
 fn outer(xs: &[bool]) -> bool {

@@ -49,6 +49,8 @@ struct MachineResult {
     failures: Vec<MachineFailure>,
     artifacts: Vec<MachineArtifact>,
     evidence_complete: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    quality: Option<serde_json::Value>,
     /// Kept for consumers of the pre-schema report while `status` is adopted.
     passed: bool,
     status: &'static str,
@@ -233,6 +235,15 @@ fn machine_result(report: &VerificationReport) -> MachineResult {
     let mut artifacts = Vec::new();
     let mut evidence_complete = true;
     let mut failures = Vec::new();
+    if let Some(quality) = &report.quality {
+        if !quality.passed() {
+            failures.push(MachineFailure {
+                step_id: None,
+                code: FailureCode::QualityBlocked.to_string(),
+                message: super::quality::diagnostics(quality),
+            });
+        }
+    }
     let steps = report
         .steps
         .iter()
@@ -393,6 +404,10 @@ fn machine_result(report: &VerificationReport) -> MachineResult {
         failures,
         artifacts,
         evidence_complete,
+        quality: report
+            .quality
+            .as_ref()
+            .map(|quality| serde_json::to_value(quality).expect("quality report serialization")),
         passed: report.passed && evidence_complete,
         status,
     }
@@ -767,7 +782,60 @@ fn next_invocation_id() -> String {
 /// Report output boundary. The verifier produces a report model; this module
 /// owns serialization and optional result delivery.
 pub(super) fn write(report: &VerificationReport, project: &Project) -> Result<()> {
+    if let Some(quality) = &report.quality {
+        if !quality.project_report.is_null() {
+            write_report_file(
+                project,
+                "quality-project-report.json",
+                serde_json::to_vec_pretty(&quality.project_report)?,
+            )?;
+        }
+    }
     redact_invocation_files(project)?;
+    let failures = write_report_documents(report, project);
+    if !failures.is_empty() {
+        return finish_incomplete_report(report, project, failures);
+    }
+
+    redact_invocation_files(project)?;
+    let assessment = assess_evidence(report, project)?;
+    if !assessment.complete() {
+        let details = format_failures(&assessment.failures);
+        write_machine_result(report, project, &assessment, true)?;
+        if report.passed {
+            bail!("evidence finalization failed: {details}");
+        }
+        return Ok(());
+    }
+
+    // The assessment has already validated the closed set. Publish the
+    // registry and manifest before the final machine result. That ordering
+    // leaves the preliminary result incomplete if publication is interrupted
+    // between control files.
+    if let Err(error) = write_registry(report, project, &assessment.bindings)
+        .and_then(|()| write_manifest(report, project, &assessment.bindings))
+        .and_then(|()| verify_manifest_without_result(project))
+        .and_then(|()| write_machine_result(report, project, &assessment, true))
+        .and_then(|()| verify_manifest(project))
+    {
+        let failure = EvidenceAssessment {
+            bindings: assessment.bindings.clone(),
+            failures: vec![MachineFailure {
+                step_id: None,
+                code: FailureCode::EvidenceFinalizationFailure.to_string(),
+                message: redact_text(&format!("{error:#}")),
+            }],
+        };
+        let _ = write_machine_result(report, project, &failure, true);
+        return Err(error);
+    }
+    prune_old_invocations(project, &report.invocation_id)?;
+    Ok(())
+}
+
+/// Render all configured formats, retaining every error before finalization.
+/// A preliminary machine result remains incomplete until evidence is validated.
+fn write_report_documents(report: &VerificationReport, project: &Project) -> Vec<anyhow::Error> {
     // Publish an explicitly incomplete machine result first. Only the closed-
     // set validation below is allowed to replace it with a complete result.
     let preliminary = EvidenceAssessment {
@@ -807,44 +875,7 @@ pub(super) fn write(report: &VerificationReport, project: &Project) -> Result<()
             failures.push(error);
         }
     }
-    if !failures.is_empty() {
-        return finish_incomplete_report(report, project, failures);
-    }
-
-    redact_invocation_files(project)?;
-    let assessment = assess_evidence(report, project)?;
-    if !assessment.complete() {
-        let details = format_failures(&assessment.failures);
-        write_machine_result(report, project, &assessment, true)?;
-        if report.passed {
-            bail!("evidence finalization failed: {details}");
-        }
-        return Ok(());
-    }
-
-    // The assessment has already validated the closed set. Publish the
-    // registry and manifest before the final machine result. That ordering
-    // leaves the preliminary result incomplete if publication is interrupted
-    // between control files.
-    if let Err(error) = write_registry(report, project, &assessment.bindings)
-        .and_then(|()| write_manifest(report, project, &assessment.bindings))
-        .and_then(|()| verify_manifest_without_result(project))
-        .and_then(|()| write_machine_result(report, project, &assessment, true))
-        .and_then(|()| verify_manifest(project))
-    {
-        let failure = EvidenceAssessment {
-            bindings: assessment.bindings.clone(),
-            failures: vec![MachineFailure {
-                step_id: None,
-                code: FailureCode::EvidenceFinalizationFailure.to_string(),
-                message: redact_text(&format!("{error:#}")),
-            }],
-        };
-        let _ = write_machine_result(report, project, &failure, true);
-        return Err(error);
-    }
-    prune_old_invocations(project, &report.invocation_id)?;
-    Ok(())
+    failures
 }
 
 fn finish_incomplete_report(
@@ -1254,25 +1285,13 @@ fn declare_artifact(
     }
 }
 
-fn assess_evidence(report: &VerificationReport, project: &Project) -> Result<EvidenceAssessment> {
-    let root = project.reports.canonicalize().with_context(|| {
-        format!(
-            "resolve invocation report root {}",
-            project.reports.display()
-        )
-    })?;
-    if !root.is_dir() {
-        bail!(
-            "invocation report root is not a directory: {}",
-            root.display()
-        );
-    }
-
-    let mut declarations = BTreeMap::<String, (String, Option<String>, bool)>::new();
-    let mut failures = Vec::new();
-
-    validate_invocation_metadata(&root, report, &mut failures);
-
+/// Bind step and retry logs to the current invocation before publication.
+fn declare_step_evidence(
+    root: &Path,
+    report: &VerificationReport,
+    declarations: &mut BTreeMap<String, (String, Option<String>, bool)>,
+    failures: &mut Vec<MachineFailure>,
+) {
     for step in &report.steps {
         let Some(step_id) = step.step_id.clone() else {
             failures.push(MachineFailure {
@@ -1294,9 +1313,9 @@ fn assess_evidence(report: &VerificationReport, project: &Project) -> Result<Evi
         }
         if !step.log.is_empty() {
             declare_artifact(
-                &root,
-                &mut declarations,
-                &mut failures,
+                root,
+                declarations,
+                failures,
                 &step.log,
                 "step-log",
                 Some(step_id.clone()),
@@ -1306,9 +1325,9 @@ fn assess_evidence(report: &VerificationReport, project: &Project) -> Result<Evi
         for attempt in &step.attempts {
             if !attempt.log.is_empty() {
                 declare_artifact(
-                    &root,
-                    &mut declarations,
-                    &mut failures,
+                    root,
+                    declarations,
+                    failures,
                     &attempt.log,
                     "step-log",
                     Some(step_id.clone()),
@@ -1317,28 +1336,52 @@ fn assess_evidence(report: &VerificationReport, project: &Project) -> Result<Evi
             }
         }
     }
+}
 
+/// Declare coordinator-owned outputs explicitly; unrelated files stay invalid.
+fn declare_report_outputs(
+    root: &Path,
+    report: &VerificationReport,
+    project: &Project,
+    declarations: &mut BTreeMap<String, (String, Option<String>, bool)>,
+    failures: &mut Vec<MachineFailure>,
+) {
     // These are deterministic outputs owned by the invocation coordinator.
     // They are declarations, not an implicit directory listing: an unrelated
     // file under the report root remains an evidence failure.
     declare_artifact(
-        &root,
-        &mut declarations,
-        &mut failures,
+        root,
+        declarations,
+        failures,
         "invocation.json",
         "invocation-metadata",
         None,
         true,
     );
     declare_artifact(
-        &root,
-        &mut declarations,
-        &mut failures,
+        root,
+        declarations,
+        failures,
         "test_result.md",
         "report",
         None,
         true,
     );
+    if report
+        .quality
+        .as_ref()
+        .is_some_and(|q| !q.project_report.is_null())
+    {
+        declare_artifact(
+            root,
+            declarations,
+            failures,
+            "quality-project-report.json",
+            "quality-project-report",
+            None,
+            true,
+        );
+    }
     let mut optional_outputs = vec![
         "changed_files.txt".to_string(),
         "scope.json".to_string(),
@@ -1353,30 +1396,37 @@ fn assess_evidence(report: &VerificationReport, project: &Project) -> Result<Evi
     for relative in optional_outputs {
         if root.join(&relative).exists() {
             let kind = manifest_kind(&relative);
-            declare_artifact(
-                &root,
-                &mut declarations,
-                &mut failures,
-                &relative,
-                &kind,
-                None,
-                false,
-            );
+            declare_artifact(root, declarations, failures, &relative, &kind, None, false);
         }
     }
     if let Some(junit) = &project.config.report_templates.junit {
         if root.join(junit).exists() {
-            declare_artifact(
-                &root,
-                &mut declarations,
-                &mut failures,
-                junit,
-                "report",
-                None,
-                false,
-            );
+            declare_artifact(root, declarations, failures, junit, "report", None, false);
         }
     }
+}
+
+fn assess_evidence(report: &VerificationReport, project: &Project) -> Result<EvidenceAssessment> {
+    let root = project.reports.canonicalize().with_context(|| {
+        format!(
+            "resolve invocation report root {}",
+            project.reports.display()
+        )
+    })?;
+    if !root.is_dir() {
+        bail!(
+            "invocation report root is not a directory: {}",
+            root.display()
+        );
+    }
+
+    let mut declarations = BTreeMap::<String, (String, Option<String>, bool)>::new();
+    let mut failures = Vec::new();
+
+    validate_invocation_metadata(&root, report, &mut failures);
+
+    declare_step_evidence(&root, report, &mut declarations, &mut failures);
+    declare_report_outputs(&root, report, project, &mut declarations, &mut failures);
     let disk = collect_publishable_files(&root, &root, &mut failures)?;
     let declared_paths = declarations.keys().cloned().collect::<BTreeSet<_>>();
     for path in declared_paths.difference(&disk) {
@@ -2192,6 +2242,9 @@ fn markdown(report: &VerificationReport) -> String {
             redact_text(&step.reason)
         ));
     }
+    if let Some(quality) = &report.quality {
+        output.push_str(&super::quality::diagnostics(quality));
+    }
     output.push_str(&format!(
         "\nTEST_SUMMARY: {}\n",
         if report.passed && report.steps.iter().any(|step| step.waived) {
@@ -2399,6 +2452,7 @@ mod tests {
 
     fn report() -> VerificationReport {
         VerificationReport {
+            quality: None,
             invocation_id: "inv-test".into(),
             executor_version: "0.3.3".into(),
             report_directory: "reports/invocations/inv-test".into(),
@@ -2690,6 +2744,89 @@ mod tests {
         std::fs::write(invocation.root.join("logs/unit.log"), "tampered\n").expect("tamper log");
         assert!(verify_manifest(&invocation_project).is_err());
         drop(invocation);
+    }
+
+    #[test]
+    fn configured_formats_are_declared_and_verified() {
+        let (workspace, _project, invocation, mut project, current) =
+            complete_invocation_fixture("report-all-formats");
+        let templates = workspace.root.join("templates");
+        std::fs::create_dir_all(&templates).unwrap();
+        std::fs::write(templates.join("report.html"), "<p>{{ summary }}</p>").unwrap();
+        project.config.report_templates.root = Some("templates".into());
+        project.config.report_templates.template = Some("templates/report.html".into());
+        project.config.report_templates.junit = Some("junit.xml".into());
+        write(&current, &project).expect("publish every configured format");
+        verify_manifest(&project).expect("all formats have valid bindings");
+        assert!(invocation.root.join("test_result.html").is_file());
+        assert!(std::fs::read_to_string(invocation.root.join("junit.xml"))
+            .unwrap()
+            .contains("<testsuite"));
+    }
+
+    #[test]
+    fn format_write_failures_leave_machine_result_incomplete() {
+        for path in ["test_result.md", "test_result.html", "junit.xml"] {
+            let (workspace, _project, invocation, mut project, current) =
+                complete_invocation_fixture("report-format-write-failure");
+            let templates = workspace.root.join("templates");
+            std::fs::create_dir_all(&templates).unwrap();
+            std::fs::write(templates.join("report.html"), "<p>{{ summary }}</p>").unwrap();
+            project.config.report_templates.root = Some("templates".into());
+            project.config.report_templates.template = Some("templates/report.html".into());
+            project.config.report_templates.junit = Some("junit.xml".into());
+            std::fs::create_dir(invocation.root.join(path)).unwrap();
+            assert!(write(&current, &project).is_err(), "{path}");
+            assert_incomplete_result(&project);
+            assert!(!invocation.root.join(MANIFEST_FILE).exists());
+        }
+    }
+
+    #[test]
+    fn control_file_publication_failure_cannot_leave_success() {
+        for path in [ARTIFACT_REGISTRY_FILE, MANIFEST_FILE] {
+            let (_workspace, _project, invocation, project, current) =
+                complete_invocation_fixture("report-control-write-failure");
+            std::fs::create_dir(invocation.root.join(path)).unwrap();
+            assert!(write(&current, &project).is_err(), "{path}");
+            assert_incomplete_result(&project);
+            let value: serde_json::Value = serde_json::from_slice(
+                &std::fs::read(invocation.root.join(MACHINE_RESULT_FILE)).unwrap(),
+            )
+            .unwrap();
+            assert!(value.to_string().contains("EVIDENCE_FINALIZATION_FAILURE"));
+        }
+    }
+
+    #[test]
+    fn invalid_step_bindings_cannot_publish_complete_evidence() {
+        for unbound in [true, false] {
+            let (_workspace, _project, invocation, project, mut current) =
+                complete_invocation_fixture("report-step-binding-failure");
+            let code = if unbound {
+                current.steps[0].step_id = None;
+                "EVIDENCE_STEP_UNBOUND"
+            } else {
+                current.steps[0].invocation_id = Some("another-invocation".into());
+                "EVIDENCE_INVOCATION_MISMATCH"
+            };
+            let error = write(&current, &project).expect_err("invalid step binding");
+            assert!(format!("{error:#}").contains(code));
+            assert_incomplete_result(&project);
+            assert!(!invocation.root.join(MANIFEST_FILE).exists());
+        }
+    }
+
+    #[test]
+    fn failed_execution_with_missing_evidence_stays_failed() {
+        let (_workspace, _project, invocation, project, mut current) =
+            complete_invocation_fixture("report-failed-missing-evidence");
+        current.passed = false;
+        current.steps[0].passed = false;
+        std::fs::remove_file(invocation.root.join("logs/unit.log")).unwrap();
+        write(&current, &project).expect("report an already failed execution");
+        assert_incomplete_result(&project);
+        assert!(!invocation.root.join(MANIFEST_FILE).exists());
     }
 
     #[test]
