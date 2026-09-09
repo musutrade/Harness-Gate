@@ -27,6 +27,8 @@ pub(crate) struct Collection {
     schema: &'static str,
     pub inputs: CompiledInputs,
     pub evidence: Value,
+    pub producers: BTreeMap<String, &'static str>,
+    pub responses: BTreeMap<String, Value>,
 }
 
 #[derive(Deserialize)]
@@ -45,6 +47,14 @@ struct Measurements {
     schema: String,
     evidence: Vec<Value>,
     error: Option<Value>,
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct RetainedResponse {
+    schema: String,
+    binding_digest: String,
+    response: Value,
 }
 
 type Claims = BTreeSet<(String, String, String)>;
@@ -208,30 +218,20 @@ fn response(
     Ok(response.collection.evidence)
 }
 
-/// All selected producers fail closed. Requiredness remains owned by policy;
-/// unavailable capabilities are preserved as evidence, never converted to values.
-pub(crate) fn collect(
-    root: &Path,
+type ProducerRequest = (String, AdapterRequest, Claims);
+type RetainedRecords = BTreeMap<String, (Vec<Value>, Value)>;
+
+fn prepare_requests(
+    config: &QualityConfig,
     state: &TrustedState,
-    policy: &HostPolicy,
-) -> Result<Collection> {
-    let inputs = compiler::compile(root, state)?;
+    inputs: &CompiledInputs,
+    digest: &str,
+) -> Result<Vec<ProducerRequest>> {
     let root = &inputs.source_root;
-    let flow = FlowConfig::load_with_diagnostics(&root.join(DEFAULT_CONFIG_PATH), Some(root))?;
-    let config = QualityConfig::load_optional(root, &flow)?.context("missing quality config")?;
-    ensure!(
-        state.artifacts.is_empty()
-            && fs::read_dir(&inputs.artifact_root)?
-                .next()
-                .transpose()?
-                .is_none(),
-        "collection requires a fresh artifact root"
-    );
-    let digest = binding_digest(&config, state, &inputs)?;
     let mut owners = BTreeSet::new();
     let mut requests = Vec::new();
     for id in &config.profiles[&state.profile].collectors {
-        let claims = claims(&config, state, id)?;
+        let claims = claims(config, state, id)?;
         for claim in &claims {
             ensure!(
                 owners.insert((claim.0.clone(), claim.1.clone())),
@@ -261,34 +261,136 @@ pub(crate) fn collect(
         );
         ensure!(
             request.artifact_root == inputs.artifact_root
-                && request.input == input(&inputs, state, id, &claims),
+                && request.input == input(inputs, state, id, &claims),
             "collector roots/selection/capability request mismatch"
         );
-        requests.push((id, request, claims));
+        requests.push((id.clone(), request, claims));
     }
-    let mut records = Vec::new();
+    Ok(requests)
+}
+
+fn validate_retained(
+    state: &TrustedState,
+    inputs: &CompiledInputs,
+    digest: &str,
+    requests: &[ProducerRequest],
+) -> Result<RetainedRecords> {
+    let root = &inputs.source_root;
+    // Validate all retained responses before launching any remaining producer.
+    // A missing or stale pin is a failure, never permission to recollect.
+    let mut retained = BTreeMap::new();
     for (id, request, claims) in requests {
+        if let Some(reference) = state.retained.get(id) {
+            let bytes = fs::read(path(root, &reference.path, "retained response", true)?)?;
+            ensure!(
+                format!("{:x}", Sha256::digest(&bytes)) == reference.sha256,
+                "retained response digest mismatch"
+            );
+            let envelope: RetainedResponse = serde_json::from_value(harness_gate::quality::parse(
+                std::str::from_utf8(&bytes)?,
+            )?)?;
+            ensure!(
+                envelope.schema == "quality-retained-response/v1"
+                    && envelope.binding_digest == digest,
+                "stale retained configuration/profile/selection identity"
+            );
+            let records = response(
+                envelope.response.clone(),
+                request,
+                claims,
+                &serde_json::to_value(&state.series[id])?,
+            )?;
+            evidence::validate_evidence(
+                &json!(records),
+                &ValidationContext {
+                    project: &inputs.project,
+                    source_root: root,
+                    artifact_root: &inputs.artifact_root,
+                    expected: &inputs.expected,
+                },
+            )?;
+            retained.insert(id.clone(), (records, serde_json::to_value(envelope)?));
+        }
+    }
+    Ok(retained)
+}
+
+/// All selected producers fail closed. Requiredness remains owned by policy;
+/// unavailable capabilities are preserved as evidence, never converted to values.
+pub(crate) fn collect(
+    root: &Path,
+    state: &TrustedState,
+    policy: &HostPolicy,
+) -> Result<Collection> {
+    let inputs = compiler::compile(root, state)?;
+    let root = &inputs.source_root;
+    let flow = FlowConfig::load_with_diagnostics(&root.join(DEFAULT_CONFIG_PATH), Some(root))?;
+    let config = QualityConfig::load_optional(root, &flow)?.context("missing quality config")?;
+    ensure!(
+        inventory(&inputs.artifact_root)? == state.artifacts
+            && (!state.retained.is_empty() || state.artifacts.is_empty()),
+        "collection requires a fresh artifact root or pinned retained artifacts"
+    );
+    ensure!(
+        state
+            .retained
+            .keys()
+            .all(|id| config.profiles[&state.profile].collectors.contains(id)),
+        "retained evidence references an inactive producer"
+    );
+    let digest = binding_digest(&config, state, &inputs)?;
+    let requests = prepare_requests(&config, state, &inputs, &digest)?;
+    let mut retained = validate_retained(state, &inputs, &digest, &requests)?;
+    let mut records = Vec::new();
+    let mut producers = BTreeMap::new();
+    let mut responses = BTreeMap::new();
+    for (id, request, claims) in requests {
+        if let Some((reused, response)) = retained.remove(&id) {
+            records.extend(reused);
+            producers.insert(id.clone(), "retained");
+            responses.insert(id.clone(), response);
+            continue;
+        }
         let outcome =
             adapter::run(request.clone(), policy).with_context(|| format!("collector {id}"))?;
         records.extend(response(
-            outcome.response,
+            outcome.response.clone(),
             &request,
             &claims,
-            &serde_json::to_value(&state.series[id])?,
+            &serde_json::to_value(&state.series[&id])?,
         )?);
+        producers.insert(id.clone(), "collected");
+        responses.insert(
+            id.clone(),
+            json!({
+                "schema":"quality-retained-response/v1", "binding_digest":digest,
+                "response":outcome.response
+            }),
+        );
     }
     let records = Value::Array(records);
-    evidence::validate_evidence(
-        &records,
-        &ValidationContext {
-            project: &inputs.project,
-            source_root: root,
-            artifact_root: &inputs.artifact_root,
-            expected: &inputs.expected,
-        },
-    )?;
+    // A profile with no selected producers has no measurement batch. Preserve
+    // that omission without weakening the nonempty core evidence contract.
+    if !config.profiles[&state.profile].collectors.is_empty() {
+        evidence::validate_evidence(
+            &records,
+            &ValidationContext {
+                project: &inputs.project,
+                source_root: root,
+                artifact_root: &inputs.artifact_root,
+                expected: &inputs.expected,
+            },
+        )?;
+    }
     let mut collected = state.clone();
     collected.artifacts = inventory(&inputs.artifact_root)?;
+    ensure!(
+        state
+            .artifacts
+            .iter()
+            .all(|(name, digest)| collected.artifacts.get(name) == Some(digest)),
+        "retained artifacts changed during collection"
+    );
     let referenced: BTreeSet<_> = records
         .as_array()
         .context("evidence array")?
@@ -309,6 +411,8 @@ pub(crate) fn collect(
         schema: "quality-collection/v1",
         inputs,
         evidence: records,
+        producers,
+        responses,
     })
 }
 

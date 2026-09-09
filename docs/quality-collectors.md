@@ -84,7 +84,7 @@ are rechecked after execution. No partial collection output is published on
 failure; an earlier output is removed after protecting input aliases.
 
 Successful output has schema `quality-collection/v1`, compiled `inputs` bound to
-the collected artifact inventory, and `evidence`. It is an inspectable measurement
+the collected artifact inventory, `evidence`, producer origins and reusable response envelopes. It is an inspectable measurement
 bundle, not an authenticated cache or delivery decision. The existing Rust policy
 evaluator owns requiredness, thresholds and approval. Unavailable capability
 states remain distinct; no numeric values or CRAP series are synthesized.
@@ -101,3 +101,5 @@ and a source guard reject introducing closed language dispatch into this path.
 [Verification composition](quality-verification.md) consumes host-prepared signed
 requests and combines the resulting quality decision with execution gates.
 Automatic request construction remains a host/pack responsibility.
+
+[Retained head evidence](quality-profiles.md#retained-head-collection) permits host-authenticated reuse before fresh producer launches; invalid retention fails closed.
