@@ -18,6 +18,13 @@ The current `CI` workflow fans out independent jobs for Linux tests, macOS/Windo
 
 Recent hosted PR evidence shows the full Windows test job at roughly 7.5 minutes and macOS at roughly 5 minutes in a representative successful run. Several Linux jobs are individually fast but independently repeat checkout/toolchain/tool installation or compilation. These figures are observations, not permanent budgets.
 
+Task 1 evidence is retained in [the GH-164 topology baseline](../../../docs/quality/ci-topology/baseline.md).
+The freeze found that native tests already execute on PRs but the aggregate's
+`PUSH_ONLY` constant still included them. Task 1.3 corrects that stale
+classification and tests the stated PR requirement; execution scheduling is
+unchanged. The record distinguishes this observed pre-change gap from the
+assurance contract and retains three comparable hosted runs before optimization.
+
 ## Design principles
 
 ### D1. Assurance topology is frozen for this change

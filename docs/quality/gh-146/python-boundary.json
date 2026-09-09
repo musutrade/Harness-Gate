@@ -34,6 +34,20 @@
       "sha256": "469dae4e2f74654a8c353f7be0f416b8d1abac0d64e3ae1d951c4f23548ace41"
     },
     {
+      "authoritative_status": "Non-authoritative hosted CI measurement tooling; no release or quality decision authority",
+      "callers": [
+        "tools/quality/tests/test_ci_timing.py",
+        "Manual CLI documented in docs/quality/ci-topology/baseline.md"
+      ],
+      "category": "A",
+      "ci_role": "Quality-scripts regression coverage; manual hosted baseline normalization",
+      "final_disposition": "Retain maintained Python CI/dev tooling; no authority transfer.",
+      "module": "tools/quality/ci_timing.py",
+      "purpose": "Normalize retained hosted run/job/step timing and approximate runner wall minutes by OS.",
+      "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
+      "sha256": "b0fb866f80f76eddd71243f4aa0df09aa3d4413bd762bae10558990e43443536"
+    },
+    {
       "authoritative_status": "Non-authoritative for release; generic shadow/reference or development tooling",
       "callers": [
         "Manual CLI documented in docs/quality/gh-133/README.md; no tracked automatic caller"
