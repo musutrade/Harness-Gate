@@ -21,7 +21,10 @@ fn write(path: &Path, value: &impl Serialize) {
 
 impl Fixture {
     fn new(mode: &str, custom: bool) -> Self {
-        let dir = tempdir().unwrap();
+        Self::in_dir(mode, custom, tempdir().unwrap())
+    }
+
+    fn in_dir(mode: &str, custom: bool, dir: TempDir) -> Self {
         let root = dir.path();
         let fixtures = Path::new(env!("CARGO_MANIFEST_DIR")).join("../quality/fixtures/workflow");
         fs::create_dir(root.join(".harness-gate")).unwrap();
@@ -233,6 +236,9 @@ impl Fixture {
             fixture.pin();
         }
         let inputs = compiler::compile(fixture.dir.path(), &fixture.state).unwrap();
+        // Bind the canonical root even when the temp directory uses a symlink
+        // (for example, /var -> /private/var on macOS).
+        fixture.request.artifact_root = inputs.artifact_root.clone();
         fixture.request.step_id = id.clone();
         fixture.request.config_digest = binding_digest(&config, &fixture.state, &inputs).unwrap();
         fixture.request.input = input(
@@ -403,6 +409,22 @@ fn configured_multiple_producers_combine_distinct_series_and_reject_overlap() {
             assert!(fixture.request.artifact_root.join("second.json").is_file());
         }
     }
+}
+
+#[test]
+#[cfg(unix)]
+fn configured_collector_launches_from_a_symlinked_workspace_root() {
+    let parent = tempdir().unwrap();
+    let real = parent.path().join("real");
+    let alias = parent.path().join("alias");
+    fs::create_dir(&real).unwrap();
+    std::os::unix::fs::symlink(&real, &alias).unwrap();
+    let dir = tempfile::tempdir_in(&alias).unwrap();
+    assert_ne!(dir.path(), dir.path().canonicalize().unwrap());
+    let fixture = Fixture::in_dir("pass", true, dir);
+    let collection = fixture.collect().unwrap();
+    assert_eq!(collection.evidence.as_array().unwrap().len(), 1);
+    assert!(fixture.request.artifact_root.join("raw.json").is_file());
 }
 
 #[test]
