@@ -19,13 +19,16 @@ def seconds(start, end):
 def category(name):
     if name.startswith('Install cargo-') or name == 'Install tarpaulin':
         return 'tool_install'
-    if name.startswith('Upload ') or name.startswith('Download '):
+    if (name.startswith(('Upload ', 'Download ')) or name in (
+            'Seal immutable quality evidence',
+            'Verify artifact identity and hashes before consumption')):
         return 'artifact'
     if name == 'Collect and require fresh coverage, risk and matrix evidence':
         return 'quality_collection'
     if name.startswith(('Post ', 'Complete job')):
         return 'cleanup'
-    if name.startswith(('Set up job', 'Run actions/checkout@', 'Install ', 'Cache ')):
+    if (name == 'Configure Cargo state' or
+            name.startswith(('Set up job', 'Run actions/checkout@', 'Install ', 'Cache '))):
         return 'setup'
     return 'execution'
 

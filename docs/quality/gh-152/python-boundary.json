@@ -36,6 +36,20 @@
       "authoritative_status": "Non-authoritative hosted CI measurement tooling; no release or quality decision authority",
       "callers": [
         "tools/quality/tests/test_ci_timing.py",
+        "Manual CLI documented in docs/quality/ci-topology/after-state.md"
+      ],
+      "category": "A",
+      "ci_role": "Quality-scripts regression coverage; offline hosted comparison",
+      "final_disposition": "Retain maintained Python CI/dev tooling; no authority transfer.",
+      "module": "tools/quality/ci_comparison.py",
+      "purpose": "Compare retained hosted timing distributions and cache/artifact overhead without granting quality authority.",
+      "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
+      "sha256": "8e4a17075ec7a75310b2cec9cc668ba9724b114b170aa673ea482a7b4201353a"
+    },
+    {
+      "authoritative_status": "Non-authoritative hosted CI measurement tooling; no release or quality decision authority",
+      "callers": [
+        "tools/quality/tests/test_ci_timing.py",
         "Manual CLI documented in docs/quality/ci-topology/baseline.md"
       ],
       "category": "A",
@@ -44,7 +58,7 @@
       "module": "tools/quality/ci_timing.py",
       "purpose": "Normalize retained hosted run/job/step timing and approximate runner wall minutes by OS.",
       "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
-      "sha256": "b0fb866f80f76eddd71243f4aa0df09aa3d4413bd762bae10558990e43443536"
+      "sha256": "0eb22dc0190f249a44c4873ad9cbd83041ed9def69a3029465f33506bf480887"
     },
     {
       "authoritative_status": "Non-authoritative for release; generic shadow/reference or development tooling",
@@ -175,7 +189,7 @@
       "module": "tools/quality/docs_consistency.py",
       "purpose": "Check Markdown links, embedded examples, and generated Schema sync.",
       "release_impact": "Not packaged in release binary. Existing required CI can block release eligibility; preserve behavior.",
-      "sha256": "191b567ba7d98cfc26473bf9aa7dccc2ac2b0e98d09646814fb1d1602f33e473"
+      "sha256": "2695dd0df1e3fc261ebaaf0f6970330142d939b11e3ed1a154c20cfab9c1ae46"
     },
     {
       "authoritative_status": "Repository Rust required-path helper; authoritative within its existing CI responsibility",

@@ -1,0 +1,953 @@
+{
+  "schema_version": 1,
+  "input_sha256": {
+    "hosted-baseline.json": "4edb92a8693a66a52fb9b5a76c0e6cd09e29f6f4052f26712abc630a934fe6b0",
+    "hosted-after.json": "4cbf7e091c3524fade2e1fe88221607fdada85af2e1d0087c69fe91f586ee314",
+    "hosted-stages.json": "d1dc4165a9813a686e7bbffa65123a8fb3d8f1e7459687d33e90976f1b22d6d9",
+    "hosted-after-log-audit.json": "4be7c4a782e5b90785c123f6336e80f2e376aa813de837e748a0bf2fb3d4f4fb"
+  },
+  "before": {
+    "run_ids": [
+      34303413318,
+      34301967575,
+      34291282719
+    ],
+    "critical_path_seconds": {
+      "median": 903.0,
+      "min": 846.0,
+      "max": 1141.0
+    },
+    "category_seconds": {
+      "setup": {
+        "median": 195.0,
+        "min": 183.0,
+        "max": 197.0
+      },
+      "tool_install": {
+        "median": 423.0,
+        "min": 392.0,
+        "max": 453.0
+      },
+      "quality_collection": {
+        "median": 600.0,
+        "min": 560.0,
+        "max": 821.0
+      },
+      "execution": {
+        "median": 1071.0,
+        "min": 997.0,
+        "max": 1175.0
+      },
+      "artifact": {
+        "median": 10.0,
+        "min": 8.0,
+        "max": 11.0
+      },
+      "cleanup": {
+        "median": 11.0,
+        "min": 9.0,
+        "max": 67.0
+      }
+    },
+    "runner_wall_minutes_by_os": {
+      "Linux": {
+        "median": 28.6,
+        "min": 28.25,
+        "max": 33.3
+      },
+      "macOS": {
+        "median": 4.2667,
+        "min": 3.25,
+        "max": 4.9333
+      },
+      "Windows": {
+        "median": 5.7,
+        "min": 5.65,
+        "max": 7.5
+      }
+    },
+    "total_runner_wall_minutes": {
+      "median": 40.68333333333333,
+      "min": 37.55,
+      "max": 43.21666666666667
+    },
+    "job_wall_seconds": {
+      "Build": {
+        "median": 153.0,
+        "min": 140.0,
+        "max": 154.0
+      },
+      "Clippy": {
+        "median": 47.0,
+        "min": 42.0,
+        "max": 48.0
+      },
+      "Documentation Consistency": {
+        "median": 55.0,
+        "min": 52.0,
+        "max": 59.0
+      },
+      "Format": {
+        "median": 14.0,
+        "min": 13.0,
+        "max": 15.0
+      },
+      "Generic Quality Shadow": {
+        "median": 22.0,
+        "min": 22.0,
+        "max": 27.0
+      },
+      "Quality CLI Contracts": {
+        "median": 59.0,
+        "min": 56.0,
+        "max": 62.0
+      },
+      "Quality Coverage and Critical Paths": {
+        "median": 858.0,
+        "min": 796.0,
+        "max": 1127.0
+      },
+      "Quality Script Tests": {
+        "median": 108.0,
+        "min": 99.0,
+        "max": 120.0
+      },
+      "Release Governance Contracts": {
+        "median": 7.0,
+        "min": 7.0,
+        "max": 8.0
+      },
+      "Required Quality Aggregate": {
+        "median": 7.0,
+        "min": 6.0,
+        "max": 9.0
+      },
+      "Security Audit": {
+        "median": 193.0,
+        "min": 191.0,
+        "max": 200.0
+      },
+      "Test": {
+        "median": 222.0,
+        "min": 185.0,
+        "max": 226.0
+      },
+      "Test (macos-latest)": {
+        "median": 256.0,
+        "min": 195.0,
+        "max": 296.0
+      },
+      "Test (windows-latest)": {
+        "median": 342.0,
+        "min": 339.0,
+        "max": 450.0
+      }
+    }
+  },
+  "after": {
+    "run_ids": [
+      34312685548,
+      34311132169
+    ],
+    "critical_path_seconds": {
+      "median": 878.5,
+      "min": 875.0,
+      "max": 882.0
+    },
+    "category_seconds": {
+      "setup": {
+        "median": 172.5,
+        "min": 170.0,
+        "max": 175.0
+      },
+      "tool_install": {
+        "median": 12.0,
+        "min": 12.0,
+        "max": 12.0
+      },
+      "quality_collection": {
+        "median": 836.5,
+        "min": 828.0,
+        "max": 845.0
+      },
+      "execution": {
+        "median": 1243.0,
+        "min": 1189.0,
+        "max": 1297.0
+      },
+      "artifact": {
+        "median": 10.5,
+        "min": 10.0,
+        "max": 11.0
+      },
+      "cleanup": {
+        "median": 49.0,
+        "min": 47.0,
+        "max": 51.0
+      }
+    },
+    "runner_wall_minutes_by_os": {
+      "Linux": {
+        "median": 26.875,
+        "min": 26.2167,
+        "max": 27.5333
+      },
+      "macOS": {
+        "median": 5.09165,
+        "min": 4.85,
+        "max": 5.3333
+      },
+      "Windows": {
+        "median": 7.3667,
+        "min": 7.2667,
+        "max": 7.4667
+      }
+    },
+    "total_runner_wall_minutes": {
+      "median": 39.333333333333336,
+      "min": 38.333333333333336,
+      "max": 40.333333333333336
+    },
+    "job_wall_seconds": {
+      "Build": {
+        "median": 157.5,
+        "min": 149.0,
+        "max": 166.0
+      },
+      "Clippy": {
+        "median": 46.5,
+        "min": 39.0,
+        "max": 54.0
+      },
+      "Documentation Consistency": {
+        "median": 73.0,
+        "min": 65.0,
+        "max": 81.0
+      },
+      "Format": {
+        "median": 15.5,
+        "min": 15.0,
+        "max": 16.0
+      },
+      "Generic Quality Shadow": {
+        "median": 22.0,
+        "min": 21.0,
+        "max": 23.0
+      },
+      "Quality CLI Contracts": {
+        "median": 66.0,
+        "min": 64.0,
+        "max": 68.0
+      },
+      "Quality Coverage and Critical Paths": {
+        "median": 863.0,
+        "min": 856.0,
+        "max": 870.0
+      },
+      "Quality Script Tests": {
+        "median": 112.5,
+        "min": 101.0,
+        "max": 124.0
+      },
+      "Release Governance Contracts": {
+        "median": 9.0,
+        "min": 8.0,
+        "max": 10.0
+      },
+      "Required Quality Aggregate": {
+        "median": 7.0,
+        "min": 7.0,
+        "max": 7.0
+      },
+      "Security Audit": {
+        "median": 16.5,
+        "min": 11.0,
+        "max": 22.0
+      },
+      "Test": {
+        "median": 224.0,
+        "min": 187.0,
+        "max": 261.0
+      },
+      "Test (macos-latest)": {
+        "median": 305.5,
+        "min": 291.0,
+        "max": 320.0
+      },
+      "Test (windows-latest)": {
+        "median": 442.0,
+        "min": 436.0,
+        "max": 448.0
+      }
+    }
+  },
+  "stage_diagnostics_excluded_from_comparison": {
+    "run_ids": [
+      34309500125,
+      34307555998
+    ],
+    "critical_path_seconds": {
+      "median": 701.5,
+      "min": 666.0,
+      "max": 737.0
+    },
+    "category_seconds": {
+      "setup": {
+        "median": 195.0,
+        "min": 186.0,
+        "max": 204.0
+      },
+      "tool_install": {
+        "median": 11.5,
+        "min": 11.0,
+        "max": 12.0
+      },
+      "quality_collection": {
+        "median": 662.5,
+        "min": 629.0,
+        "max": 696.0
+      },
+      "execution": {
+        "median": 1102.0,
+        "min": 997.0,
+        "max": 1207.0
+      },
+      "artifact": {
+        "median": 9.5,
+        "min": 9.0,
+        "max": 10.0
+      },
+      "cleanup": {
+        "median": 29.5,
+        "min": 10.0,
+        "max": 49.0
+      }
+    },
+    "runner_wall_minutes_by_os": {
+      "Linux": {
+        "median": 23.65,
+        "min": 23.15,
+        "max": 24.15
+      },
+      "macOS": {
+        "median": 4.8667,
+        "min": 4.7167,
+        "max": 5.0167
+      },
+      "Windows": {
+        "median": 5.6,
+        "min": 4.65,
+        "max": 6.55
+      }
+    },
+    "total_runner_wall_minutes": {
+      "median": 34.11666666666667,
+      "min": 32.81666666666667,
+      "max": 35.416666666666664
+    },
+    "job_wall_seconds": {
+      "Build": {
+        "median": 139.0,
+        "min": 120.0,
+        "max": 158.0
+      },
+      "Clippy": {
+        "median": 49.0,
+        "min": 48.0,
+        "max": 50.0
+      },
+      "Documentation Consistency": {
+        "median": 60.5,
+        "min": 58.0,
+        "max": 63.0
+      },
+      "Format": {
+        "median": 16.0,
+        "min": 15.0,
+        "max": 17.0
+      },
+      "Generic Quality Shadow": {
+        "median": 20.5,
+        "min": 18.0,
+        "max": 23.0
+      },
+      "Quality CLI Contracts": {
+        "median": 67.0,
+        "min": 67.0,
+        "max": 67.0
+      },
+      "Quality Coverage and Critical Paths": {
+        "median": 688.5,
+        "min": 652.0,
+        "max": 725.0
+      },
+      "Quality Script Tests": {
+        "median": 123.0,
+        "min": 121.0,
+        "max": 125.0
+      },
+      "Release Governance Contracts": {
+        "median": 8.0,
+        "min": 7.0,
+        "max": 9.0
+      },
+      "Required Quality Aggregate": {
+        "median": 7.5,
+        "min": 7.0,
+        "max": 8.0
+      },
+      "Security Audit": {
+        "median": 22.0,
+        "min": 22.0,
+        "max": 22.0
+      },
+      "Test": {
+        "median": 218.0,
+        "min": 171.0,
+        "max": 265.0
+      },
+      "Test (macos-latest)": {
+        "median": 292.0,
+        "min": 283.0,
+        "max": 301.0
+      },
+      "Test (windows-latest)": {
+        "median": 336.0,
+        "min": 279.0,
+        "max": 393.0
+      }
+    }
+  },
+  "supplemental_log_audit": [
+    {
+      "run_id": 34312685548,
+      "jobs": [
+        {
+          "job_name": "Quality Coverage and Critical Paths",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 1,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.683,
+          "uploaded_zip_bytes": 32255359
+        },
+        {
+          "job_name": "Documentation Consistency",
+          "target_cache_hits": 0,
+          "target_cache_misses": 1,
+          "source_cache_hits": 1,
+          "target_cache_restore_and_save_seconds": 16.939,
+          "nested_boundary_upload_seconds": 1.303,
+          "uploaded_zip_bytes": 1386
+        },
+        {
+          "job_name": "Build",
+          "target_cache_hits": 0,
+          "target_cache_misses": 1,
+          "source_cache_hits": 1,
+          "target_cache_restore_and_save_seconds": 2.81,
+          "nested_boundary_upload_seconds": 0.722,
+          "uploaded_zip_bytes": 5047053
+        },
+        {
+          "job_name": "Test (windows-latest)",
+          "target_cache_hits": 0,
+          "target_cache_misses": 1,
+          "source_cache_hits": 1,
+          "target_cache_restore_and_save_seconds": 4.976,
+          "nested_boundary_upload_seconds": 0.728,
+          "uploaded_zip_bytes": 713
+        },
+        {
+          "job_name": "Quality CLI Contracts",
+          "target_cache_hits": 0,
+          "target_cache_misses": 1,
+          "source_cache_hits": 1,
+          "target_cache_restore_and_save_seconds": 3.469,
+          "nested_boundary_upload_seconds": 0.72,
+          "uploaded_zip_bytes": 10088
+        },
+        {
+          "job_name": "Format",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 0
+        },
+        {
+          "job_name": "Release Governance Contracts",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 0
+        },
+        {
+          "job_name": "Clippy",
+          "target_cache_hits": 0,
+          "target_cache_misses": 1,
+          "source_cache_hits": 1,
+          "target_cache_restore_and_save_seconds": 3.056,
+          "nested_boundary_upload_seconds": 0.701,
+          "uploaded_zip_bytes": 729
+        },
+        {
+          "job_name": "Security Audit",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 0
+        },
+        {
+          "job_name": "Test",
+          "target_cache_hits": 0,
+          "target_cache_misses": 1,
+          "source_cache_hits": 1,
+          "target_cache_restore_and_save_seconds": 5.846,
+          "nested_boundary_upload_seconds": 1.319,
+          "uploaded_zip_bytes": 717
+        },
+        {
+          "job_name": "Test (macos-latest)",
+          "target_cache_hits": 0,
+          "target_cache_misses": 1,
+          "source_cache_hits": 1,
+          "target_cache_restore_and_save_seconds": 4.868,
+          "nested_boundary_upload_seconds": 0.731,
+          "uploaded_zip_bytes": 711
+        },
+        {
+          "job_name": "Quality Script Tests",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 1,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.843,
+          "uploaded_zip_bytes": 748
+        },
+        {
+          "job_name": "Generic Quality Shadow",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 1558984
+        },
+        {
+          "job_name": "Required Quality Aggregate",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 0
+        }
+      ]
+    },
+    {
+      "run_id": 34311132169,
+      "jobs": [
+        {
+          "job_name": "Test",
+          "target_cache_hits": 0,
+          "target_cache_misses": 1,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 4.565,
+          "nested_boundary_upload_seconds": 1.077,
+          "uploaded_zip_bytes": 717
+        },
+        {
+          "job_name": "Build",
+          "target_cache_hits": 0,
+          "target_cache_misses": 1,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 4.383,
+          "nested_boundary_upload_seconds": 1.336,
+          "uploaded_zip_bytes": 5047053
+        },
+        {
+          "job_name": "Security Audit",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 0
+        },
+        {
+          "job_name": "Quality Script Tests",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.878,
+          "uploaded_zip_bytes": 748
+        },
+        {
+          "job_name": "Clippy",
+          "target_cache_hits": 0,
+          "target_cache_misses": 1,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 3.803,
+          "nested_boundary_upload_seconds": 0.965,
+          "uploaded_zip_bytes": 729
+        },
+        {
+          "job_name": "Quality Coverage and Critical Paths",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 1.376,
+          "uploaded_zip_bytes": 32253220
+        },
+        {
+          "job_name": "Test (windows-latest)",
+          "target_cache_hits": 0,
+          "target_cache_misses": 1,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 6.224,
+          "nested_boundary_upload_seconds": 0.987,
+          "uploaded_zip_bytes": 711
+        },
+        {
+          "job_name": "Documentation Consistency",
+          "target_cache_hits": 0,
+          "target_cache_misses": 1,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 4.315,
+          "nested_boundary_upload_seconds": 0.931,
+          "uploaded_zip_bytes": 1386
+        },
+        {
+          "job_name": "Format",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 0
+        },
+        {
+          "job_name": "Test (macos-latest)",
+          "target_cache_hits": 0,
+          "target_cache_misses": 1,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 5.885,
+          "nested_boundary_upload_seconds": 0.769,
+          "uploaded_zip_bytes": 712
+        },
+        {
+          "job_name": "Release Governance Contracts",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 0
+        },
+        {
+          "job_name": "Quality CLI Contracts",
+          "target_cache_hits": 0,
+          "target_cache_misses": 1,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 3.733,
+          "nested_boundary_upload_seconds": 0.681,
+          "uploaded_zip_bytes": 10089
+        },
+        {
+          "job_name": "Generic Quality Shadow",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 1558907
+        },
+        {
+          "job_name": "Required Quality Aggregate",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 0
+        }
+      ]
+    },
+    {
+      "run_id": 34309500125,
+      "jobs": [
+        {
+          "job_name": "Test (macos-latest)",
+          "target_cache_hits": 0,
+          "target_cache_misses": 1,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 8.5,
+          "nested_boundary_upload_seconds": 1.059,
+          "uploaded_zip_bytes": 710
+        },
+        {
+          "job_name": "Test (windows-latest)",
+          "target_cache_hits": 0,
+          "target_cache_misses": 1,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 5.705,
+          "nested_boundary_upload_seconds": 0.872,
+          "uploaded_zip_bytes": 712
+        },
+        {
+          "job_name": "Security Audit",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 0
+        },
+        {
+          "job_name": "Clippy",
+          "target_cache_hits": 0,
+          "target_cache_misses": 1,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 2.977,
+          "nested_boundary_upload_seconds": 0.651,
+          "uploaded_zip_bytes": 728
+        },
+        {
+          "job_name": "Test",
+          "target_cache_hits": 0,
+          "target_cache_misses": 1,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 5.544,
+          "nested_boundary_upload_seconds": 1.143,
+          "uploaded_zip_bytes": 716
+        },
+        {
+          "job_name": "Documentation Consistency",
+          "target_cache_hits": 0,
+          "target_cache_misses": 1,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 3.846,
+          "nested_boundary_upload_seconds": 0.72,
+          "uploaded_zip_bytes": 1384
+        },
+        {
+          "job_name": "Format",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 0
+        },
+        {
+          "job_name": "Build",
+          "target_cache_hits": 0,
+          "target_cache_misses": 1,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 3.686,
+          "nested_boundary_upload_seconds": 1.124,
+          "uploaded_zip_bytes": 5047052
+        },
+        {
+          "job_name": "Quality Coverage and Critical Paths",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 1.112,
+          "uploaded_zip_bytes": 32247745
+        },
+        {
+          "job_name": "Quality Script Tests",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.672,
+          "uploaded_zip_bytes": 747
+        },
+        {
+          "job_name": "Release Governance Contracts",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 0
+        },
+        {
+          "job_name": "Quality CLI Contracts",
+          "target_cache_hits": 0,
+          "target_cache_misses": 1,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 3.74,
+          "nested_boundary_upload_seconds": 0.919,
+          "uploaded_zip_bytes": 10089
+        },
+        {
+          "job_name": "Generic Quality Shadow",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 1558610
+        },
+        {
+          "job_name": "Required Quality Aggregate",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 0
+        }
+      ]
+    },
+    {
+      "run_id": 34307555998,
+      "jobs": [
+        {
+          "job_name": "Format",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 0
+        },
+        {
+          "job_name": "Test (macos-latest)",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 0
+        },
+        {
+          "job_name": "Clippy",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 0
+        },
+        {
+          "job_name": "Security Audit",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 0
+        },
+        {
+          "job_name": "Release Governance Contracts",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 0
+        },
+        {
+          "job_name": "Test (windows-latest)",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 0
+        },
+        {
+          "job_name": "Quality Script Tests",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 0
+        },
+        {
+          "job_name": "Build",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 5046334
+        },
+        {
+          "job_name": "Test",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 0
+        },
+        {
+          "job_name": "Quality Coverage and Critical Paths",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 32236692
+        },
+        {
+          "job_name": "Quality CLI Contracts",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 9360
+        },
+        {
+          "job_name": "Documentation Consistency",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 670
+        },
+        {
+          "job_name": "Required Quality Aggregate",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 0
+        },
+        {
+          "job_name": "Generic Quality Shadow",
+          "target_cache_hits": 0,
+          "target_cache_misses": 0,
+          "source_cache_hits": 0,
+          "target_cache_restore_and_save_seconds": 0.0,
+          "nested_boundary_upload_seconds": 0.0,
+          "uploaded_zip_bytes": 1557573
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Two after runs; changing commits, hosted contention and compiler versions are not controlled.",
+    "Nested cache/upload timings overlap normalized setup/cleanup; never add them to runner time.",
+    "Compiled-cache rollback and restored docs Cargo calls are not timed by this cohort.",
+    "No causal critical-path or total-runner reduction is established; see after-state.md."
+  ]
+}
