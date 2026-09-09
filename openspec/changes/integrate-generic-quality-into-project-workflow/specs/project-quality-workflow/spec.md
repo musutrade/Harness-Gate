@@ -86,6 +86,25 @@ Project-level collector orchestration SHALL execute compatible collectors throug
 
 Collectors SHALL measure only; they SHALL NOT approve delivery.
 
+#### Scenario: Unknown ecosystem launches through configured metadata
+- **GIVEN** trusted metadata for an arbitrary ecosystem with a custom collector binding, package, tool and series using a supported generic capability contract
+- **WHEN** project collection runs through the signed adapter host
+- **THEN** the same generic orchestration validates the request and normalized evidence without inspecting the ecosystem identifier
+- **AND** a regression guard rejects closed language dispatch in that path
+- **AND** successful collection supplies measurements without delivery approval or synthesized CRAP
+
+#### Scenario: Custom capability reaches generic evidence validation
+- **GIVEN** an arbitrary ecosystem and custom capability identifier resolved from validated configuration and signed pack metadata
+- **WHEN** its configured collector launches and returns measurements through the same generic boundary
+- **THEN** the released Rust core rejects an unsupported metric contract without a language-specific dispatch branch
+- **AND** orchestration does not silently certify the metric or replace it with a favorable value
+
+#### Scenario: Project collector evidence is incomplete or mixed
+- **GIVEN** a signed project collector request with exact subject/capability/series expectations
+- **WHEN** its response omits a claim, adds a duplicate or incompatible producer, lies about a capability, changes source/config bytes, or mixes artifact identities
+- **THEN** collection fails closed before evidence is published
+- **AND** the advanced low-level adapter interface remains available independently
+
 #### Scenario: Required collector crashes
 - **GIVEN** policy requires a capability expected from a configured collector
 - **WHEN** the collector times out, crashes, fails signature/protocol validation, or returns malformed evidence

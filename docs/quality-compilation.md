@@ -1,5 +1,7 @@
 # Trusted quality compilation v1
 
+Project-level signed execution is described in [Trusted project collectors](quality-collectors.md).
+
 GH-180 implements OpenSpec tasks 2.1–2.3. The compiler translates validated
 quality configuration and host-owned state into the existing generic Rust
 contracts. It resolves references; the Rust generic core evaluates policy.
