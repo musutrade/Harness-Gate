@@ -1,0 +1,255 @@
+{
+  "schema_version": 1,
+  "issue": 167,
+  "source": "docs/quality/ci-topology/hosted-baseline.json",
+  "source_sha256": "4edb92a8693a66a52fb9b5a76c0e6cd09e29f6f4052f26712abc630a934fe6b0",
+  "normalization": "ci_timing.py v1; see baseline.md",
+  "purpose": "Task 4.3 audit input; pre-optimization evidence, not a hosted after-state or speedup claim",
+  "runs": [
+    {
+      "run_id": 34303413318,
+      "attempt": 1,
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34303413318",
+      "pr_head_sha": "aa6f4b41b0ea0e0612fb1b96e1050623cf0987d1",
+      "workflow_blob_sha": "dfcf4b07f4e9f73762622fda4cec939bb8a3c5e2",
+      "critical_path_seconds": 1141.0,
+      "last_required_child": "Quality Coverage and Critical Paths"
+    },
+    {
+      "run_id": 34301967575,
+      "attempt": 1,
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34301967575",
+      "pr_head_sha": "3669b760fc1a42a8d8a040a96fc285fdd7f821ef",
+      "workflow_blob_sha": "dfcf4b07f4e9f73762622fda4cec939bb8a3c5e2",
+      "critical_path_seconds": 903.0,
+      "last_required_child": "Quality Coverage and Critical Paths"
+    },
+    {
+      "run_id": 34291282719,
+      "attempt": 1,
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34291282719",
+      "pr_head_sha": "ce5cf81ad0a2526c019977e75a0a00a4df473e3a",
+      "workflow_blob_sha": "dfcf4b07f4e9f73762622fda4cec939bb8a3c5e2",
+      "critical_path_seconds": 846.0,
+      "last_required_child": "Quality Coverage and Critical Paths"
+    }
+  ],
+  "jobs": {
+    "Test": {
+      "wall_seconds": {
+        "median": 222.0,
+        "min": 185.0,
+        "max": 226.0
+      },
+      "samples": [
+        {
+          "wall_seconds": 222.0,
+          "category_seconds": {
+            "setup": 20.0,
+            "tool_install": 1.0,
+            "execution": 198.0,
+            "cleanup": 1.0
+          }
+        },
+        {
+          "wall_seconds": 185.0,
+          "category_seconds": {
+            "setup": 17.0,
+            "tool_install": 1.0,
+            "execution": 165.0,
+            "cleanup": 1.0
+          }
+        },
+        {
+          "wall_seconds": 226.0,
+          "category_seconds": {
+            "setup": 21.0,
+            "tool_install": 1.0,
+            "execution": 200.0,
+            "cleanup": 1.0
+          }
+        }
+      ]
+    },
+    "Build": {
+      "wall_seconds": {
+        "median": 153.0,
+        "min": 140.0,
+        "max": 154.0
+      },
+      "samples": [
+        {
+          "wall_seconds": 154.0,
+          "category_seconds": {
+            "setup": 12.0,
+            "execution": 138.0,
+            "artifact": 2.0,
+            "cleanup": 0.0
+          }
+        },
+        {
+          "wall_seconds": 153.0,
+          "category_seconds": {
+            "setup": 15.0,
+            "execution": 134.0,
+            "artifact": 1.0,
+            "cleanup": 1.0
+          }
+        },
+        {
+          "wall_seconds": 140.0,
+          "category_seconds": {
+            "setup": 13.0,
+            "execution": 123.0,
+            "artifact": 1.0,
+            "cleanup": 1.0
+          }
+        }
+      ]
+    },
+    "Clippy": {
+      "wall_seconds": {
+        "median": 47.0,
+        "min": 42.0,
+        "max": 48.0
+      },
+      "samples": [
+        {
+          "wall_seconds": 42.0,
+          "category_seconds": {
+            "setup": 13.0,
+            "execution": 27.0,
+            "cleanup": 0.0
+          }
+        },
+        {
+          "wall_seconds": 48.0,
+          "category_seconds": {
+            "setup": 14.0,
+            "execution": 29.0,
+            "cleanup": 0.0
+          }
+        },
+        {
+          "wall_seconds": 47.0,
+          "category_seconds": {
+            "setup": 15.0,
+            "execution": 28.0,
+            "cleanup": 1.0
+          }
+        }
+      ]
+    },
+    "Quality CLI Contracts": {
+      "wall_seconds": {
+        "median": 59.0,
+        "min": 56.0,
+        "max": 62.0
+      },
+      "samples": [
+        {
+          "wall_seconds": 56.0,
+          "category_seconds": {
+            "setup": 13.0,
+            "execution": 41.0,
+            "artifact": 0.0,
+            "cleanup": 1.0
+          }
+        },
+        {
+          "wall_seconds": 62.0,
+          "category_seconds": {
+            "setup": 14.0,
+            "execution": 45.0,
+            "artifact": 1.0,
+            "cleanup": 0.0
+          }
+        },
+        {
+          "wall_seconds": 59.0,
+          "category_seconds": {
+            "setup": 11.0,
+            "execution": 45.0,
+            "artifact": 0.0,
+            "cleanup": 1.0
+          }
+        }
+      ]
+    },
+    "Documentation Consistency": {
+      "wall_seconds": {
+        "median": 55.0,
+        "min": 52.0,
+        "max": 59.0
+      },
+      "samples": [
+        {
+          "wall_seconds": 55.0,
+          "category_seconds": {
+            "setup": 6.0,
+            "execution": 44.0,
+            "artifact": 2.0,
+            "cleanup": 0.0
+          }
+        },
+        {
+          "wall_seconds": 52.0,
+          "category_seconds": {
+            "setup": 15.0,
+            "execution": 34.0,
+            "artifact": 1.0,
+            "cleanup": 0.0
+          }
+        },
+        {
+          "wall_seconds": 59.0,
+          "category_seconds": {
+            "setup": 13.0,
+            "execution": 42.0,
+            "artifact": 1.0,
+            "cleanup": 0.0
+          }
+        }
+      ]
+    },
+    "Quality Coverage and Critical Paths": {
+      "wall_seconds": {
+        "median": 858.0,
+        "min": 796.0,
+        "max": 1127.0
+      },
+      "samples": [
+        {
+          "wall_seconds": 1127.0,
+          "category_seconds": {
+            "setup": 20.0,
+            "tool_install": 279.0,
+            "quality_collection": 821.0,
+            "artifact": 4.0,
+            "cleanup": 0.0
+          }
+        },
+        {
+          "wall_seconds": 858.0,
+          "category_seconds": {
+            "setup": 16.0,
+            "tool_install": 236.0,
+            "quality_collection": 600.0,
+            "artifact": 3.0,
+            "cleanup": 0.0
+          }
+        },
+        {
+          "wall_seconds": 796.0,
+          "category_seconds": {
+            "setup": 16.0,
+            "tool_install": 215.0,
+            "quality_collection": 560.0,
+            "artifact": 3.0,
+            "cleanup": 0.0
+          }
+        }
+      ]
+    }
+  }
+}
