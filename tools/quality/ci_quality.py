@@ -18,9 +18,9 @@ from production_coverage import require
 from quality_common import ROOT, git_sha, metadata, sha256, write_json
 from source_measure import SOURCE_FILES
 
-COMMON = ('test', 'security-audit', 'fmt', 'clippy', 'build', 'quality-coverage',
+COMMON = ('test', 'test-cross-platform', 'security-audit', 'fmt', 'clippy', 'build', 'quality-coverage',
           'quality-contracts', 'docs-consistency', 'release-contracts', 'quality-scripts')
-PUSH_ONLY = ('test-cross-platform', 'build-cross-platform', 'coverage',
+PUSH_ONLY = ('build-cross-platform', 'coverage',
              'quality-contracts-cross-platform', 'quality-baseline')
 STAGES = ('legacy', 'production', 'risk', 'matrix')
 REPLAY_RELOCATION = ('tools/harness-gate/quality-core/examples/differential_replay.rs',
