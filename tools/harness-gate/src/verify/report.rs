@@ -49,6 +49,8 @@ struct MachineResult {
     failures: Vec<MachineFailure>,
     artifacts: Vec<MachineArtifact>,
     evidence_complete: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    quality: Option<serde_json::Value>,
     /// Kept for consumers of the pre-schema report while `status` is adopted.
     passed: bool,
     status: &'static str,
@@ -233,6 +235,15 @@ fn machine_result(report: &VerificationReport) -> MachineResult {
     let mut artifacts = Vec::new();
     let mut evidence_complete = true;
     let mut failures = Vec::new();
+    if let Some(quality) = &report.quality {
+        if !quality.passed() {
+            failures.push(MachineFailure {
+                step_id: None,
+                code: FailureCode::QualityBlocked.to_string(),
+                message: super::quality::diagnostics(quality),
+            });
+        }
+    }
     let steps = report
         .steps
         .iter()
@@ -393,6 +404,10 @@ fn machine_result(report: &VerificationReport) -> MachineResult {
         failures,
         artifacts,
         evidence_complete,
+        quality: report
+            .quality
+            .as_ref()
+            .map(|quality| serde_json::to_value(quality).expect("quality report serialization")),
         passed: report.passed && evidence_complete,
         status,
     }
@@ -767,6 +782,15 @@ fn next_invocation_id() -> String {
 /// Report output boundary. The verifier produces a report model; this module
 /// owns serialization and optional result delivery.
 pub(super) fn write(report: &VerificationReport, project: &Project) -> Result<()> {
+    if let Some(quality) = &report.quality {
+        if !quality.project_report.is_null() {
+            write_report_file(
+                project,
+                "quality-project-report.json",
+                serde_json::to_vec_pretty(&quality.project_report)?,
+            )?;
+        }
+    }
     redact_invocation_files(project)?;
     // Publish an explicitly incomplete machine result first. Only the closed-
     // set validation below is allowed to replace it with a complete result.
@@ -1339,6 +1363,21 @@ fn assess_evidence(report: &VerificationReport, project: &Project) -> Result<Evi
         None,
         true,
     );
+    if report
+        .quality
+        .as_ref()
+        .is_some_and(|q| !q.project_report.is_null())
+    {
+        declare_artifact(
+            &root,
+            &mut declarations,
+            &mut failures,
+            "quality-project-report.json",
+            "quality-project-report",
+            None,
+            true,
+        );
+    }
     let mut optional_outputs = vec![
         "changed_files.txt".to_string(),
         "scope.json".to_string(),
@@ -2192,6 +2231,9 @@ fn markdown(report: &VerificationReport) -> String {
             redact_text(&step.reason)
         ));
     }
+    if let Some(quality) = &report.quality {
+        output.push_str(&super::quality::diagnostics(quality));
+    }
     output.push_str(&format!(
         "\nTEST_SUMMARY: {}\n",
         if report.passed && report.steps.iter().any(|step| step.waived) {
@@ -2399,6 +2441,7 @@ mod tests {
 
     fn report() -> VerificationReport {
         VerificationReport {
+            quality: None,
             invocation_id: "inv-test".into(),
             executor_version: "0.3.3".into(),
             report_directory: "reports/invocations/inv-test".into(),
