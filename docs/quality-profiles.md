@@ -25,8 +25,9 @@ policies = ["cheap", "expensive"]
 The identifiers above refer to pack-supplied collectors and policy bindings, not
 built-in capabilities. Any custom profile can use either assurance level. A
 complete profile that removes a required binding or producer fails configuration
-validation. Existing flow-only presets retain their opt-in behavior; generation
-of coherent quality configuration remains OpenSpec tasks 7.1–7.5.
+validation. Existing flow-only repositories and `generic` retain opt-in behavior.
+[Reference presets](quality-presets.md) now compose coherent quality configuration
+from reusable ecosystem and capability packs (OpenSpec tasks 7.1–7.5).
 
 The certified Rust reference fixture binds required line/region coverage and
 CRAP in both complete profiles. Its retained-reference regression compares exact

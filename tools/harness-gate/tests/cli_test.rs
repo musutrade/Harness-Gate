@@ -359,7 +359,8 @@ fn test_color_never_keeps_human_readable_output_plain() {
 #[test]
 fn quality_config_commands_cross_validate_both_planes() {
     let ctx = TestContext::new();
-    ctx.init_preset("rust-api");
+    // Start flow-only; the reference ecosystem presets now explicitly enable quality.
+    ctx.init_preset("generic");
     ctx.write_file(
         ".harness-gate/flow.toml",
         include_str!("../presets/rust-api.flow.toml"),

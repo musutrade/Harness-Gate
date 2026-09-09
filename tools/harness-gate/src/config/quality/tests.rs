@@ -166,7 +166,8 @@ fn quality_profiles_enforce_single_compatible_required_producer() {
     );
     invalid(
         |q| {
-            q.profiles.insert("ci".into(), q.profiles["full"].clone());
+            q.profiles
+                .insert("undeclared".into(), q.profiles["full"].clone());
         },
         "not declared",
     );
