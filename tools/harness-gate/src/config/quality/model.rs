@@ -106,8 +106,19 @@ pub struct PolicyBinding {
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Participation {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub workflow: Option<Workflow>,
     pub collectors: BTreeSet<String>,
     pub policies: BTreeSet<String>,
+}
+
+/// Host-produced inputs for this profile; collectors cannot supply trust roots.
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct Workflow {
+    pub state: String,
+    pub trusted_keys: String,
+    pub baseline_request: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]

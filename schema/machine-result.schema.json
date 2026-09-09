@@ -57,10 +57,31 @@
     "failures": {"type": "array", "items": {"$ref": "#/definitions/failure"}},
     "artifacts": {"type": "array", "items": {"$ref": "#/definitions/artifact"}},
     "evidence_complete": {"type": "boolean"},
+    "quality": {"$ref": "#/definitions/quality"},
     "passed": {"type": "boolean"},
     "status": {"enum": ["PASS", "WAIVED", "FAIL", "SKIPPED", "CANCELLED"]}
   },
   "definitions": {
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "status", "phase", "error", "selection", "inputs", "evidence", "baseline", "project_report", "project_report_path", "output", "formats", "evaluation_time"],
+      "properties": {
+        "schema": {"const": "quality-verification/v1"},
+        "status": {"enum": ["pass", "fail", "blocked"]},
+        "phase": {"enum": ["configuration", "baseline", "collection", "evaluation", "complete"]},
+        "error": {"type": ["string", "null"]},
+        "selection": {"type": ["object", "null"]},
+        "inputs": {"type": ["object", "null"]},
+        "evidence": {"type": ["array", "null"]},
+        "baseline": {"type": ["object", "null"]},
+        "project_report": {"type": ["object", "null"], "description": "Complete authoritative harness-project-report/v1, validated by the released generic core."},
+        "project_report_path": {"type": ["string", "null"]},
+        "output": {"type": ["string", "null"]},
+        "formats": {"type": "array", "uniqueItems": true, "items": {"enum": ["json", "human"]}},
+        "evaluation_time": {"type": ["string", "null"], "format": "date-time"}
+      }
+    },
     "step": {
       "type": "object",
       "additionalProperties": false,
@@ -241,6 +262,7 @@
         "SCHEDULER_FAILURE",
         "SECRET_SCAN_FAILURE",
         "ARCHITECTURE_AUDIT_FAILURE",
+        "QUALITY_BLOCKED",
         "STEP_EXECUTION_FAILURE",
         "STEP_SKIPPED",
         "OUTPUT_LIMIT_EXCEEDED",

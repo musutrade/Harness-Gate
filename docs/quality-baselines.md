@@ -1,7 +1,7 @@
 # Trusted quality baselines
 
 `harness-gate quality baseline` resolves configured baseline providers independently
-of the later `verify` integration. It exports the existing evaluator's five base
+of [verification composition](quality-verification.md). It exports the existing evaluator's five base
 inputs without changing policy, thresholds, debt or ratchet calculations.
 
 ```bash
