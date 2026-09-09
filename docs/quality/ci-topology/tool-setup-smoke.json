@@ -1,0 +1,33 @@
+{
+  "installer_commit": "d438492cf8a250514fa2d34b30bc3c0dc37c65ff",
+  "environment": "local Linux x86_64; not hosted timing evidence",
+  "tools": [
+    {
+      "tool": "cargo-nextest",
+      "version": "0.9.143",
+      "url": "https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.143/cargo-nextest-0.9.143-x86_64-unknown-linux-gnu.tar.gz",
+      "sha256": "66786b9abe23920d022a182d1416b1bbc8130dd4872a9553d76985a1708dcd1e",
+      "exit_code": 0,
+      "stdout": "cargo-nextest 0.9.143 (60fa45f63 2026-08-04)\nrelease: 0.9.143\ncommit-hash: 60fa45f638ffc3f35e74afa65737f45fcd32db2a\ncommit-date: 2026-08-04\nhost: x86_64-unknown-linux-gnu\n",
+      "stderr": ""
+    },
+    {
+      "tool": "cargo-llvm-cov",
+      "version": "0.9.0",
+      "url": "https://github.com/taiki-e/cargo-llvm-cov/releases/download/v0.9.0/cargo-llvm-cov-x86_64-unknown-linux-musl.tar.gz",
+      "sha256": "bc2122fd7bd9b6d3eb371690ed085f82e5a8bf1851f4645ef521d12ed04b2616",
+      "exit_code": 0,
+      "stdout": "cargo-llvm-cov 0.9.0\n",
+      "stderr": ""
+    },
+    {
+      "tool": "cargo-audit",
+      "version": "0.22.2",
+      "url": "https://github.com/rustsec/rustsec/releases/download/cargo-audit/v0.22.2/cargo-audit-x86_64-unknown-linux-musl-v0.22.2.tgz",
+      "sha256": "7fb9497f8594b389e5fce5ef9b92db08432996895b2e0c5a0167a69ed445c428",
+      "exit_code": 0,
+      "stdout": "cargo-audit-audit 0.22.2\n",
+      "stderr": ""
+    }
+  ]
+}

@@ -39,7 +39,9 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Install cargo-nextest
-        uses: taiki-e/install-action@cargo-nextest
+        uses: ./.github/actions/install-ci-tool
+        with:
+          tool: cargo-nextest
 
       - name: Run tests
         run: cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked
@@ -74,7 +76,9 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Install cargo-nextest
-        uses: taiki-e/install-action@cargo-nextest
+        uses: ./.github/actions/install-ci-tool
+        with:
+          tool: cargo-nextest
 
       - name: Run tests
         run: cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked --no-fail-fast
@@ -88,14 +92,10 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Cache cargo-audit
-        uses: actions/cache@v5
-        with:
-          path: ~/.cargo/bin/cargo-audit
-          key: ${{ runner.os }}-cargo-audit
-
       - name: Install cargo-audit
-        run: cargo install cargo-audit --locked --force
+        uses: ./.github/actions/install-ci-tool
+        with:
+          tool: cargo-audit
 
       - name: Run security audit
         run: cargo audit --deny warnings
@@ -226,10 +226,15 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install cargo-nextest and cargo-llvm-cov
-        run: |
-          cargo install cargo-nextest --locked --force
-          cargo install cargo-llvm-cov --locked --version 0.9.0 --force
+      - name: Install cargo-nextest
+        uses: ./.github/actions/install-ci-tool
+        with:
+          tool: cargo-nextest
+
+      - name: Install cargo-llvm-cov
+        uses: ./.github/actions/install-ci-tool
+        with:
+          tool: cargo-llvm-cov
 
       - name: Collect and require fresh coverage, risk and matrix evidence
         env:
@@ -380,7 +385,9 @@ jobs:
           python-version: '3.x'
 
       - name: Install cargo-nextest
-        run: cargo install cargo-nextest --locked --force
+        uses: ./.github/actions/install-ci-tool
+        with:
+          tool: cargo-nextest
 
       - name: Capture benchmark and size baseline
         run: python tools/quality/benchmarks.py --output target/quality/benchmarks.json --samples 5
