@@ -13,6 +13,28 @@ fn fixture() -> (TestWorkspace, FlowConfig, QualityConfig) {
     (root, flow, toml::from_str(QUALITY).unwrap())
 }
 
+#[cfg(unix)]
+#[test]
+fn quality_accepts_aliased_repository_roots_but_rejects_escaping_children() {
+    let (root, flow, quality) = fixture();
+    let alias_parent = TestWorkspace::new("quality-root-alias");
+    let alias = alias_parent.join("repo");
+    std::os::unix::fs::symlink(&*root, &alias).unwrap();
+    fs::write(root.join(QUALITY_CONFIG_PATH), QUALITY).unwrap();
+    quality.validate(&flow, &alias).unwrap();
+    assert!(QualityConfig::load_optional(&alias, &flow)
+        .unwrap()
+        .is_some());
+
+    std::os::unix::fs::symlink(&*alias_parent, root.join("src")).unwrap();
+    assert!(quality
+        .validate(&flow, &alias)
+        .unwrap_err()
+        .to_string()
+        .contains("escapes"));
+    assert!(QualityConfig::load_optional(&alias, &flow).is_err());
+}
+
 fn invalid(change: impl FnOnce(&mut QualityConfig), expected: &str) {
     let (root, flow, mut quality) = fixture();
     change(&mut quality);
