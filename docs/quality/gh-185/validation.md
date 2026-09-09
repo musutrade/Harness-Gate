@@ -39,6 +39,32 @@ passed, and documentation consistency passed. Their logs are `repair-nextest.log
 `repair-docs-consistency.log` under the same artifact directory. Root config check
 and CI verification remain not applicable because project-local flow.toml is absent.
 
+### Preset risk measurement repair
+
+The subsequent required quality run `34414069797` failed before risk collection:
+`preset/catalog.rs`, `composition.rs`, `initialize.rs`, `mod.rs` and `tests.rs`
+were outside the supported risk inventory. The CLI snapshot repair did not
+address this independent failure.
+
+The measurement selection advances to `gh185-quality-presets/1`, adding all six
+preset production modules. The existing test-only module is classified separately;
+a regression test verifies its `cfg(test)` linkage and requires the preset
+production manifest and risk inventory to agree. No coverage or CRAP threshold,
+production boundary requiredness, or accepted baseline changes.
+
+Local `Collector.risk()` measured main `cc1dcd1` and repair commit `d63d537`
+with the same tool and inventory. Base coverage ran 374 tests; head coverage ran
+378 tests, all passing with none skipped. The comparison accepted all 901 function
+identities with zero failures. Raw source archives, instrumentation manifests,
+coverage exports, function-risk reports and command logs are retained locally at
+`/mnt/dev-ssd/dev-tmp/gh185-risk-verified/`. This is a targeted risk-stage result,
+not a complete quality candidate or hosted CI acceptance. The final follow-up
+only strengthens the inventory regression assertion and records these results;
+production and measurement tool sources are identical to the measured commit.
+
+The source measurement, CI policy, risk bundle and function-risk Python suites
+passed 56 tests in total. Hosted CI must independently measure the final PR head.
+
 ### Implementation validation
 
 The commands below ran from the GH-185 workspace on Linux x86_64 with Rust
