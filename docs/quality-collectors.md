@@ -52,6 +52,9 @@ The signed `input` is exactly:
 `selection` is the compiled selection contract or null. Bindings are sorted by
 subject, capability and series; they exactly resolve the configured targets.
 Overlapping authoritative producer claims are rejected before launch.
+The outer adapter `artifact_root` must equal the compiled canonical artifact
+root as well; sign this resolved path when the workspace uses a symlink alias
+(including macOS temporary directories).
 
 `config_digest` is SHA-256 of canonical generic JSON containing `schema` equal to
 `quality-collector-binding/v1`, `config_files`, compiled `project`, `policy`,
