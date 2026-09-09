@@ -72,6 +72,8 @@ Registry/git caches and compiled target caches have different invalidation and t
 
 Tasks 3.1–3.3 select and metadata-check OS/architecture/job-class target paths,
 separate source and compiled caches, and keep measurement targets uncached.
+Task 6 disables compiled caching for every caller after repeated hosted misses;
+only source download caches remain enabled in the final model.
 The [GH-166 boundary record](../../../docs/quality/ci-topology/cargo-artifacts.md)
 defines the cache identities and retained diagnostic evidence.
 
@@ -100,8 +102,10 @@ Coverage/risk/CRAP/critical-path collection already has provenance-sensitive sem
 
 No optimization may merge incompatible measurement series merely because both are called coverage or complexity.
 
-Tasks 4.1–4.3 build the docs executable once and preserve every preset, migration,
-schema, policy and link/wording check. The retained producer/consumer boundary
+Tasks 4.1–4.3 evaluated building the docs executable once, preserving every
+preset, migration, schema, policy and link/wording check. Task 6 reverted that
+experiment after neutral hosted timing; all eleven locked Cargo operations
+remain, with within-job Cargo freshness reuse. The retained producer/consumer boundary
 already satisfies the collection ownership audit; a workflow regression guards
 against adding a second collector. The [GH-167 repeated-work audit](../../../docs/quality/ci-topology/repeated-work.md)
 records hosted input and rejects unproven Linux job merges or binary sharing.
@@ -197,3 +201,16 @@ compiled caches after repeated misses; restore docs Cargo calls after neutral
 hosted execution timing. No timing is extrapolated for the rollback commit.
 Tasks 6.1–6.4 are evidenced separately from task 7 and overall proposal closure;
 the controller owns the submitted SHA’s hosted aggregate result.
+
+## Task 7 documentation and closure (GH-170)
+
+The [current operating guide](../../../docs/quality/ci-topology/README.md)
+documents the final execution model, tool pins, cache/artifact diagnostics and
+separate critical-path/runner-cost interpretation. The
+[closure record](../../../docs/quality/ci-topology/closure.md) retains GH-169's
+final rollback commit's green required-CI evidence and GH-170 local validation.
+Earlier stage-specific pending statements describe their submission time.
+GH-170 submitted-SHA CI and final proposal acceptance remain controller-owned;
+the proposal is not archived or declared wholly accepted before that result.
+Future risk-driven conditional cross-platform execution requires a separate
+normative Engineering Policy delta and was not implemented here.
