@@ -49,6 +49,9 @@ class SourceMeasureTests(unittest.TestCase):
 
     def test_preset_source_certification(self):
         crate = ROOT / 'tools/harness-gate'
+        inventory = json.loads((ROOT / 'tools/quality/production-source.json').read_text())
+        declared = {path.removeprefix('src/') for path in inventory['boundaries']['preset']['files']}
+        self.assertEqual(declared, {path for path in SOURCE_FILES if path.startswith('preset/')})
         for name in ('catalog', 'composition', 'filesystem', 'initialize', 'migration', 'mod'):
             path = f'preset/{name}.rs'
             with self.subTest(path=path):
