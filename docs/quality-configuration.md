@@ -8,8 +8,9 @@ produces `HGCFG-QUALITY` diagnostics in `config check --format json`.
 
 This is the configuration layer delivered by GH-179, OpenSpec tasks 1.1–1.4.
 GH-180 adds [trusted compilation](quality-compilation.md), tasks 2.1–2.3.
-Collector execution, baseline retrieval and verify/report integration remain
-subsequent tasks. A successful config check proves configuration consistency;
+[Collector execution](quality-collectors.md) and [baseline resolution](quality-baselines.md)
+are separate stages; verify/report integration remains a subsequent task.
+A successful config check proves configuration consistency;
 it does not certify evidence or establish a quality PASS.
 
 ## File presence and commands
@@ -104,7 +105,7 @@ A required baseline cannot use `none`. A policy enabling `deny_regression` or
 `allow_legacy_debt` requires a required provider; relationship policies cannot use
 debt ratchets. Config checking validates provider intent and path containment,
 without asserting availability, source freshness or series compatibility of an
-unloaded baseline. Those checks belong to baseline orchestration.
+unloaded baseline. The [baseline provider](quality-baselines.md) performs those checks.
 
 The [Engineering Policy](engineering-policy.md),
 [optimized CI topology](quality/ci-topology/README.md), and

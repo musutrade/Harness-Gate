@@ -54,6 +54,8 @@
         "src/config/quality/mod.rs",
         "src/config/quality/compiler.rs",
         "src/config/quality/collectors.rs",
+        "src/config/quality/baseline.rs",
+        "src/config/quality/baseline/git.rs",
         "src/config/quality/model.rs",
         "src/config/quality/policy.rs",
         "src/config/quality/validation.rs",
