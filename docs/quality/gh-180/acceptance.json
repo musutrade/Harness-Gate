@@ -1,0 +1,226 @@
+{
+  "cases": [
+    {
+      "case": "pass",
+      "equivalent": true,
+      "passed": true
+    },
+    {
+      "case": "threshold-fail",
+      "equivalent": true,
+      "passed": false
+    },
+    {
+      "case": "missing-evidence",
+      "equivalent": true,
+      "passed": false
+    },
+    {
+      "case": "stale-context",
+      "equivalent": true,
+      "passed": false
+    },
+    {
+      "case": "malformed-value",
+      "equivalent": true,
+      "passed": false
+    },
+    {
+      "case": "duplicate-evidence",
+      "equivalent": true,
+      "passed": false
+    },
+    {
+      "case": "required-unsupported",
+      "equivalent": true,
+      "passed": false
+    },
+    {
+      "case": "invalid-exception",
+      "equivalent": true,
+      "passed": false
+    },
+    {
+      "case": "ratchet-pass",
+      "equivalent": true,
+      "passed": true
+    },
+    {
+      "case": "ratchet-regression",
+      "equivalent": true,
+      "passed": false
+    },
+    {
+      "case": "missing-base",
+      "equivalent": true,
+      "passed": false
+    },
+    {
+      "case": "subject-policy",
+      "equivalent": true,
+      "passed": true
+    },
+    {
+      "case": "unknown-ecosystem",
+      "equivalent": true,
+      "passed": false
+    },
+    {
+      "case": "unknown-supported",
+      "equivalent": true,
+      "passed": true
+    },
+    {
+      "case": "discovery",
+      "equivalent": true,
+      "passed": true
+    },
+    {
+      "case": "multiple-subjects",
+      "equivalent": true,
+      "passed": true
+    },
+    {
+      "case": "relationship",
+      "equivalent": true,
+      "passed": true
+    },
+    {
+      "case": "ratchet-mapping",
+      "equivalent": true,
+      "passed": true
+    },
+    {
+      "case": "ratchet-invalid-mapping",
+      "equivalent": true,
+      "passed": false
+    },
+    {
+      "case": "no-optionals",
+      "equivalent": true,
+      "passed": true
+    },
+    {
+      "case": "reject-config",
+      "rejected": true
+    },
+    {
+      "case": "reject-source",
+      "rejected": true
+    },
+    {
+      "case": "reject-artifact",
+      "rejected": true
+    },
+    {
+      "case": "reject-tool",
+      "rejected": true
+    },
+    {
+      "case": "reject-profile",
+      "rejected": true
+    },
+    {
+      "case": "reject-inventory",
+      "rejected": true
+    },
+    {
+      "case": "reject-series",
+      "rejected": true
+    },
+    {
+      "case": "reject-subject",
+      "rejected": true
+    },
+    {
+      "case": "reject-selection",
+      "rejected": true
+    },
+    {
+      "case": "reject-root",
+      "rejected": true
+    },
+    {
+      "case": "reject-bindings",
+      "rejected": true
+    },
+    {
+      "case": "reject-artifact-binding",
+      "rejected": true
+    },
+    {
+      "case": "reject-subject-kind",
+      "rejected": true
+    },
+    {
+      "case": "reject-subject-path",
+      "rejected": true
+    },
+    {
+      "case": "reject-subject-target",
+      "rejected": true
+    },
+    {
+      "case": "reject-source-boundary",
+      "rejected": true
+    },
+    {
+      "case": "reject-config-inventory",
+      "rejected": true
+    },
+    {
+      "case": "reject-collector-inventory",
+      "rejected": true
+    },
+    {
+      "case": "reject-kind-inventory",
+      "rejected": true
+    },
+    {
+      "case": "reject-unknown-selection",
+      "rejected": true
+    },
+    {
+      "case": "reject-malformed-state",
+      "rejected": true
+    },
+    {
+      "case": "reject-malformed-evidence",
+      "rejected": true
+    },
+    {
+      "case": "reject-missing-state",
+      "rejected": true
+    },
+    {
+      "case": "reject-missing-config",
+      "rejected": true
+    },
+    {
+      "case": "reject-schema",
+      "rejected": true
+    },
+    {
+      "case": "output-alias-state.json",
+      "rejected": true
+    },
+    {
+      "case": "output-alias-.harness-gate/quality.toml",
+      "rejected": true
+    },
+    {
+      "case": "output-alias-src/lib.rs",
+      "rejected": true
+    },
+    {
+      "case": "output-alias-target/evidence/raw.json",
+      "rejected": true
+    },
+    {
+      "case": "digest-context",
+      "identity_changed": true
+    }
+  ],
+  "schema": "quality-compilation-acceptance/v1",
+  "unexplained_mismatches": 0
+}

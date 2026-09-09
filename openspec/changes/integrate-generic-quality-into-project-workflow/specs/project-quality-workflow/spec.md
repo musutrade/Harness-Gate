@@ -48,6 +48,18 @@ The project workflow SHALL compile validated quality configuration and trusted r
 - **THEN** compilation/evaluation fails closed
 - **AND** no favorable project decision is emitted
 
+#### Scenario: Arbitrary ecosystem follows the generic compiler path
+- **GIVEN** validated configuration and trusted pack state with an unknown ecosystem identifier and custom collector, capability and series identifiers
+- **WHEN** generic contracts are compiled
+- **THEN** compilation resolves metadata and references without an ecosystem enum or language-specific branch
+- **AND** support for the custom metric is decided by the existing Rust core during evaluation
+
+#### Scenario: Stable compilation binds immutable input identity
+- **GIVEN** equivalent trusted state with reordered resolved subject sets
+- **WHEN** compilation repeats against unchanged pinned configuration, source and artifacts
+- **THEN** the generic contracts and versioned canonical digest are identical
+- **AND** stale config/source/artifact hashes or canonical subject/tool/series identities fail closed
+
 ### Requirement: Verify SHALL orchestrate generic quality and emit one final project status
 
 When valid quality configuration is enabled, `harness-gate verify` SHALL execute the selected traditional workflow gates and applicable quality orchestration, invoke the released Rust generic core, and produce one final blocking status plus linked machine/human reporting.
