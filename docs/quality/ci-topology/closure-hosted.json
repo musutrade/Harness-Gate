@@ -1,0 +1,745 @@
+{
+  "schema_version": 1,
+  "captured_on": "2026-09-09",
+  "purpose": "GH-169 final rollback commit acceptance; historical evidence, not GH-170 submitted-SHA CI",
+  "source_urls": [
+    "https://github.com/musutrade/Harness-Gate/actions/runs/34315031483",
+    "https://github.com/musutrade/Harness-Gate/pull/176",
+    "https://api.github.com/repos/musutrade/Harness-Gate/actions/runs/34315031483/attempts/1/jobs?per_page=100"
+  ],
+  "pull_request": {
+    "number": 176,
+    "head_sha": "855b310caa58d6361a984609a36e531c95a0bbf8",
+    "merge_commit_sha": "7777511ec62c609aa664789a05d6dc376df30aa7",
+    "merged": true,
+    "merged_at": "2026-09-09T05:43:22Z"
+  },
+  "run": {
+    "id": 34315031483,
+    "attempt": 1,
+    "head_sha": "855b310caa58d6361a984609a36e531c95a0bbf8",
+    "event": "pull_request",
+    "status": "completed",
+    "conclusion": "success",
+    "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34315031483"
+  },
+  "total_count": 18,
+  "jobs": [
+    {
+      "id": 102349347975,
+      "name": "Format",
+      "head_sha": "855b310caa58d6361a984609a36e531c95a0bbf8",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-09-09T05:28:45Z",
+      "completed_at": "2026-09-09T05:29:00Z",
+      "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34315031483/job/102349347975",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install Rust",
+          "conclusion": "success"
+        },
+        {
+          "name": "Check formatting",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 102349348090,
+      "name": "Clippy",
+      "head_sha": "855b310caa58d6361a984609a36e531c95a0bbf8",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-09-09T05:28:44Z",
+      "completed_at": "2026-09-09T05:29:41Z",
+      "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34315031483/job/102349348090",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install Rust",
+          "conclusion": "success"
+        },
+        {
+          "name": "Configure Cargo state",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run clippy",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Configure Cargo state",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 102349348096,
+      "name": "Build",
+      "head_sha": "855b310caa58d6361a984609a36e531c95a0bbf8",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-09-09T05:28:45Z",
+      "completed_at": "2026-09-09T05:31:20Z",
+      "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34315031483/job/102349348096",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install Rust",
+          "conclusion": "success"
+        },
+        {
+          "name": "Configure Cargo state",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Upload artifact",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Configure Cargo state",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 102349348097,
+      "name": "Test (windows-latest)",
+      "head_sha": "855b310caa58d6361a984609a36e531c95a0bbf8",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-09-09T05:28:44Z",
+      "completed_at": "2026-09-09T05:35:32Z",
+      "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34315031483/job/102349348097",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install Rust",
+          "conclusion": "success"
+        },
+        {
+          "name": "Configure Cargo state",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install cargo-nextest",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run tests",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Configure Cargo state",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 102349348098,
+      "name": "Documentation Consistency",
+      "head_sha": "855b310caa58d6361a984609a36e531c95a0bbf8",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-09-09T05:28:44Z",
+      "completed_at": "2026-09-09T05:29:33Z",
+      "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34315031483/job/102349348098",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install Rust",
+          "conclusion": "success"
+        },
+        {
+          "name": "Configure Cargo state",
+          "conclusion": "success"
+        },
+        {
+          "name": "Check documentation, examples, and schema",
+          "conclusion": "success"
+        },
+        {
+          "name": "Upload documentation evidence",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Configure Cargo state",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 102349348108,
+      "name": "Quality Coverage and Critical Paths",
+      "head_sha": "855b310caa58d6361a984609a36e531c95a0bbf8",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-09-09T05:28:45Z",
+      "completed_at": "2026-09-09T05:42:47Z",
+      "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34315031483/job/102349348108",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install Rust",
+          "conclusion": "success"
+        },
+        {
+          "name": "Configure Cargo state",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install cargo-nextest",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install cargo-llvm-cov",
+          "conclusion": "success"
+        },
+        {
+          "name": "Collect and require fresh coverage, risk and matrix evidence",
+          "conclusion": "success"
+        },
+        {
+          "name": "Seal immutable quality evidence",
+          "conclusion": "success"
+        },
+        {
+          "name": "Upload quality evidence",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Install Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Configure Cargo state",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 102349348109,
+      "name": "Test",
+      "head_sha": "855b310caa58d6361a984609a36e531c95a0bbf8",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-09-09T05:28:44Z",
+      "completed_at": "2026-09-09T05:32:58Z",
+      "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34315031483/job/102349348109",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install Rust",
+          "conclusion": "success"
+        },
+        {
+          "name": "Configure Cargo state",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install cargo-nextest",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run tests",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify generated configuration schema",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Configure Cargo state",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 102349348141,
+      "name": "Quality Script Tests",
+      "head_sha": "855b310caa58d6361a984609a36e531c95a0bbf8",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-09-09T05:28:44Z",
+      "completed_at": "2026-09-09T05:30:50Z",
+      "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34315031483/job/102349348141",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install Rust coverage tools for measurement contract tests",
+          "conclusion": "success"
+        },
+        {
+          "name": "Configure Cargo state",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Test and compile quality scripts",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Install Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Configure Cargo state",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 102349348152,
+      "name": "Security Audit",
+      "head_sha": "855b310caa58d6361a984609a36e531c95a0bbf8",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-09-09T05:28:44Z",
+      "completed_at": "2026-09-09T05:29:05Z",
+      "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34315031483/job/102349348152",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install Rust",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install cargo-audit",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run security audit",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 102349348179,
+      "name": "Quality CLI Contracts",
+      "head_sha": "855b310caa58d6361a984609a36e531c95a0bbf8",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-09-09T05:28:45Z",
+      "completed_at": "2026-09-09T05:29:54Z",
+      "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34315031483/job/102349348179",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install Rust",
+          "conclusion": "success"
+        },
+        {
+          "name": "Configure Cargo state",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run CLI contract snapshots",
+          "conclusion": "success"
+        },
+        {
+          "name": "Upload contract evidence",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Install Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Configure Cargo state",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 102349348183,
+      "name": "Test (macos-latest)",
+      "head_sha": "855b310caa58d6361a984609a36e531c95a0bbf8",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-09-09T05:28:50Z",
+      "completed_at": "2026-09-09T05:34:22Z",
+      "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34315031483/job/102349348183",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install Rust",
+          "conclusion": "success"
+        },
+        {
+          "name": "Configure Cargo state",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install cargo-nextest",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run tests",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Configure Cargo state",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 102349348196,
+      "name": "Release Governance Contracts",
+      "head_sha": "855b310caa58d6361a984609a36e531c95a0bbf8",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-09-09T05:28:45Z",
+      "completed_at": "2026-09-09T05:28:53Z",
+      "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34315031483/job/102349348196",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run release policy and inventory contracts",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Install Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 102349348547,
+      "name": "Build (${{ matrix.os }})",
+      "head_sha": "855b310caa58d6361a984609a36e531c95a0bbf8",
+      "status": "completed",
+      "conclusion": "skipped",
+      "started_at": "2026-09-09T05:28:42Z",
+      "completed_at": "2026-09-09T05:28:42Z",
+      "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34315031483/job/102349348547",
+      "steps": []
+    },
+    {
+      "id": 102349348561,
+      "name": "Code Coverage",
+      "head_sha": "855b310caa58d6361a984609a36e531c95a0bbf8",
+      "status": "completed",
+      "conclusion": "skipped",
+      "started_at": "2026-09-09T05:28:42Z",
+      "completed_at": "2026-09-09T05:28:42Z",
+      "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34315031483/job/102349348561",
+      "steps": []
+    },
+    {
+      "id": 102349348591,
+      "name": "Quality Performance Baseline",
+      "head_sha": "855b310caa58d6361a984609a36e531c95a0bbf8",
+      "status": "completed",
+      "conclusion": "skipped",
+      "started_at": "2026-09-09T05:28:43Z",
+      "completed_at": "2026-09-09T05:28:42Z",
+      "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34315031483/job/102349348591",
+      "steps": []
+    },
+    {
+      "id": 102349348712,
+      "name": "Quality CLI Contracts (${{ matrix.os }})",
+      "head_sha": "855b310caa58d6361a984609a36e531c95a0bbf8",
+      "status": "completed",
+      "conclusion": "skipped",
+      "started_at": "2026-09-09T05:28:43Z",
+      "completed_at": "2026-09-09T05:28:42Z",
+      "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34315031483/job/102349348712",
+      "steps": []
+    },
+    {
+      "id": 102352193925,
+      "name": "Required Quality Aggregate",
+      "head_sha": "855b310caa58d6361a984609a36e531c95a0bbf8",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-09-09T05:42:50Z",
+      "completed_at": "2026-09-09T05:42:57Z",
+      "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34315031483/job/102352193925",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Require every quality gate",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Install Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 102352194006,
+      "name": "Generic Quality Shadow",
+      "head_sha": "855b310caa58d6361a984609a36e531c95a0bbf8",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-09-09T05:42:50Z",
+      "completed_at": "2026-09-09T05:43:10Z",
+      "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34315031483/job/102352194006",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Download this run's retained Rust candidate",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify artifact identity and hashes before consumption",
+          "conclusion": "success"
+        },
+        {
+          "name": "Project and compare retained evidence",
+          "conclusion": "success"
+        },
+        {
+          "name": "Upload generic projection and compatibility evidence",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Install Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ]
+}

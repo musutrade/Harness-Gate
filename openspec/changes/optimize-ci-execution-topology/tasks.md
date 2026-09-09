@@ -2,6 +2,13 @@
 
 All tasks inherit `docs/engineering-policy.md`. CRAP semantics and required assurance remain unchanged throughout this change.
 
+Stage evidence below is historical: pending statements reflect each submission.
+The [GH-170 closure record](../../../docs/quality/ci-topology/closure.md) records
+the final GH-169 rollback commit's successful hosted CI and the remaining
+controller-owned submitted-SHA acceptance boundary. The
+[operating guide](../../../docs/quality/ci-topology/README.md) describes the final
+model; compiled caching and docs build-once execution were reverted in task 6.
+
 ## 1. Freeze current assurance and hosted cost baseline
 
 - [x] 1.1 Record the current PR/push event-to-job matrix, `Required Quality Aggregate` dependencies, stable check names, and every currently required semantic outcome. Explicitly record that macOS and Windows full tests remain PR-required in this change.
@@ -55,7 +62,17 @@ Both sampled aggregates are green. Submitted-SHA CI and overall closure remain p
 
 ## 7. Documentation and closure
 
-- [ ] 7.1 Document the optimized CI execution model, cache/artifact trust boundaries, pinned tool versions, and how to diagnose cache/artifact failures.
-- [ ] 7.2 Document the hosted performance comparison and remaining bottlenecks, separating developer critical path from total runner cost.
-- [ ] 7.3 Identify any future risk-driven conditional cross-platform proposal as a separate Engineering Policy delta; do not implement it here.
+- [x] 7.1 Document the optimized CI execution model, cache/artifact trust boundaries, pinned tool versions, and how to diagnose cache/artifact failures.
+- [x] 7.2 Document the hosted performance comparison and remaining bottlenecks, separating developer critical path from total runner cost.
+- [x] 7.3 Identify any future risk-driven conditional cross-platform proposal as a separate Engineering Policy delta; do not implement it here.
 - [ ] 7.4 Strict-validate this OpenSpec, run all repository required checks, and record final acceptance/rollback evidence before closure.
+
+Tasks 7.1–7.3: [current operating guide](../../../docs/quality/ci-topology/README.md),
+reviewed against workflow/actions, the hosted comparison and task 6 rollbacks.
+Task 7.4 local checks and retained required-CI/rollback evidence are recorded in
+[closure.md](../../../docs/quality/ci-topology/closure.md) and
+[closure-validation.json](../../../docs/quality/ci-topology/closure-validation.json).
+Its checkbox remains open until the controller accepts GH-170's final submitted
+SHA with all event-applicable Required Quality Aggregate checks green. Historical
+green CI and local tests do not substitute for that result. Overall proposal
+acceptance and archival remain pending; no product workflow integration is added.
