@@ -62,6 +62,8 @@ We use a simplified version of the Michael Nygard ADR template:
 - [ADR-0040](0040-language-agnostic-evidence-policy.md) - Keep language-agnostic evidence and policy behind a fail-closed migration boundary
 - [ADR-0041](0041-quality-configuration-v1.md) - Define quality configuration v1 and explicit flow/quality validation
 
+- [ADR-0043](0043-trusted-project-collectors.md) - Orchestrate configuration-driven project collectors through the signed adapter host
+
 ## Creating New ADRs
 
 When making a significant architectural decision:

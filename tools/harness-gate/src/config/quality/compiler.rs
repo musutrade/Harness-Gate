@@ -75,7 +75,7 @@ fn pinned(root: &Path, name: &str, digest: &str) -> Result<()> {
     Ok(())
 }
 
-fn target_subjects(
+pub(super) fn target_subjects(
     target: &Target,
     config: &QualityConfig,
     state: &TrustedState,

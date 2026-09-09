@@ -646,7 +646,11 @@ pub fn read_request(path: &Path) -> Result<AdapterRequest, AdapterError> {
             MAX_REQUEST_BYTES
         )));
     }
-    serde_json::from_slice(&bytes).map_err(|error| AdapterError::Request(anyhow::Error::new(error)))
+    let text = std::str::from_utf8(&bytes)
+        .map_err(|error| AdapterError::Request(anyhow::Error::new(error)))?;
+    let value =
+        harness_gate::quality::parse(text).map_err(|error| AdapterError::Request(error.into()))?;
+    serde_json::from_value(value).map_err(|error| AdapterError::Request(anyhow::Error::new(error)))
 }
 
 fn validate_request(request: &AdapterRequest, policy: &HostPolicy) -> Result<(), AdapterError> {
@@ -857,7 +861,7 @@ struct UnsignedRequest<'a> {
     input: &'a Value,
 }
 
-fn signing_payload(request: &AdapterRequest) -> Result<Vec<u8>, AdapterError> {
+pub(crate) fn signing_payload(request: &AdapterRequest) -> Result<Vec<u8>, AdapterError> {
     serde_json::to_vec(&UnsignedRequest {
         domain: SIGNING_DOMAIN,
         protocol_version: request.protocol_version,
@@ -1010,17 +1014,8 @@ fn map_reader_error(
 fn parse_response(stdout: &[u8]) -> Result<Value, AdapterError> {
     let text = std::str::from_utf8(stdout)
         .map_err(|error| AdapterError::Protocol(format!("adapter stdout is not UTF-8: {error}")))?;
-    let mut stream = serde_json::Deserializer::from_str(text).into_iter::<Value>();
-    let response = stream
-        .next()
-        .transpose()
-        .map_err(|error| AdapterError::Protocol(format!("malformed adapter response: {error}")))?
-        .ok_or_else(|| AdapterError::Protocol("adapter returned no JSON response".into()))?;
-    if stream.next().is_some() {
-        return Err(AdapterError::Protocol(
-            "adapter returned more than one JSON response".into(),
-        ));
-    }
+    let response = harness_gate::quality::parse(text)
+        .map_err(|error| AdapterError::Protocol(format!("malformed adapter response: {error}")))?;
     let object = response
         .as_object()
         .ok_or_else(|| AdapterError::Protocol("adapter response must be a JSON object".into()))?;
