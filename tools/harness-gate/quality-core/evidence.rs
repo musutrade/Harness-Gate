@@ -46,6 +46,21 @@ pub fn series_id(series: &Value) -> Result<String> {
 }
 
 pub fn validate_series(series: &Value) -> Result<model::Series> {
+    let model = validate_series_transport(series)?;
+    for contract in array(&series["metrics"]) {
+        let name = string(&contract["name"]);
+        let expected =
+            metric_type(name).ok_or_else(|| error(format!("unknown generic metric: {name}")))?;
+        require(
+            contract["type"] == expected || (name == "risk.crap" && contract["type"] == "rational"),
+            format!("wrong metric type: {name}"),
+        )?;
+    }
+    Ok(model)
+}
+
+// Transport checks identities and typed facts without certifying metric semantics.
+fn validate_series_transport(series: &Value) -> Result<model::Series> {
     shape(series, Some("Series"))?;
     let contracts = index(&series["metrics"], "name", "series metric")?;
     require(
@@ -55,14 +70,6 @@ pub fn validate_series(series: &Value) -> Result<model::Series> {
             .eq(contracts.keys().copied()),
         "series metrics must be sorted by name",
     )?;
-    for (name, contract) in contracts {
-        let expected =
-            metric_type(name).ok_or_else(|| error(format!("unknown generic metric: {name}")))?;
-        require(
-            contract["type"] == expected || (name == "risk.crap" && contract["type"] == "rational"),
-            format!("wrong metric type: {name}"),
-        )?;
-    }
     require(
         series["id"] == series_id(series)?,
         "noncanonical measurement series identity",
@@ -105,7 +112,11 @@ pub struct ValidationContext<'a> {
     pub expected: &'a Value,
 }
 
-fn record(record: &Value, context: &ValidationContext<'_>) -> Result<()> {
+fn record(
+    record: &Value,
+    context: &ValidationContext<'_>,
+    series_validator: fn(&Value) -> Result<model::Series>,
+) -> Result<()> {
     let ValidationContext {
         project,
         source_root,
@@ -114,7 +125,7 @@ fn record(record: &Value, context: &ValidationContext<'_>) -> Result<()> {
     } = context;
     shape(record, None)?;
     shape(expected, Some("Context"))?;
-    validate_series(&record["series"])?;
+    series_validator(&record["series"])?;
     let subject = &record["subject"];
     require(record["project"] == project["id"], "project mismatch")?;
     require(
@@ -161,6 +172,13 @@ fn record(record: &Value, context: &ValidationContext<'_>) -> Result<()> {
             Some(&artifact["bytes"]),
         )?;
     }
+    validate_capabilities(record, &artifacts)
+}
+
+fn validate_capabilities(
+    record: &Value,
+    artifacts: &std::collections::BTreeMap<&str, &Value>,
+) -> Result<()> {
     let capabilities = index(&record["capabilities"], "metric", "capability")?;
     let metrics = index(&record["metrics"], "name", "metric")?;
     let contracts = index(&record["series"]["metrics"], "name", "series metric")?;
@@ -189,28 +207,7 @@ fn record(record: &Value, context: &ValidationContext<'_>) -> Result<()> {
         used.extend(linked.iter().copied());
         if supported {
             let metric = metrics[name];
-            let value = &metric["value"];
-            let definition = match value["type"].as_str() {
-                Some("ratio") => "Ratio",
-                Some("count") => "Count",
-                Some("boolean") => "Boolean",
-                Some("duration") => "Duration",
-                Some("size") => "Size",
-                Some("decimal") => "Decimal",
-                Some("rational") => "Rational",
-                _ => return Err(error("unknown metric value type")),
-            };
-            shape(value, Some(definition))?;
-            require(
-                value["type"] == contracts[name]["type"],
-                "metric value/series type mismatch",
-            )?;
-            if definition == "Ratio" {
-                require(
-                    json::integer_cmp(&value["covered"], &value["total"]).is_le(),
-                    "covered exceeds total",
-                )?;
-            }
+            validate_value(&metric["value"], &contracts[name]["type"])?;
             let refs: BTreeSet<_> = array(&metric["artifacts"]).iter().map(string).collect();
             require(
                 refs.len() == array(&metric["artifacts"]).len() && refs.is_subset(&linked),
@@ -236,9 +233,52 @@ fn record(record: &Value, context: &ValidationContext<'_>) -> Result<()> {
     )
 }
 
+fn validate_value(value: &Value, expected_type: &Value) -> Result<()> {
+    let definition = match value["type"].as_str() {
+        Some("ratio") => "Ratio",
+        Some("count") => "Count",
+        Some("boolean") => "Boolean",
+        Some("duration") => "Duration",
+        Some("size") => "Size",
+        Some("decimal") => "Decimal",
+        Some("rational") => "Rational",
+        _ => return Err(error("unknown metric value type")),
+    };
+    shape(value, Some(definition))?;
+    require(
+        value["type"] == *expected_type,
+        "metric value/series type mismatch",
+    )?;
+    if definition == "Ratio" {
+        require(
+            json::integer_cmp(&value["covered"], &value["total"]).is_le(),
+            "covered exceeds total",
+        )?;
+    }
+    Ok(())
+}
+
 pub fn validate_evidence(
     records: &Value,
     context: &ValidationContext<'_>,
+) -> Result<Vec<model::EvidenceRecord>> {
+    validate_batch(records, context, validate_series)
+}
+
+/// Validate immutable baseline transport, including arbitrary declared capability
+/// names. This does not certify metrics or approve quality; evaluation continues
+/// to use `validate_evidence` and its supported metric registry.
+pub fn validate_evidence_transport(
+    records: &Value,
+    context: &ValidationContext<'_>,
+) -> Result<Vec<model::EvidenceRecord>> {
+    validate_batch(records, context, validate_series_transport)
+}
+
+fn validate_batch(
+    records: &Value,
+    context: &ValidationContext<'_>,
+    series_validator: fn(&Value) -> Result<model::Series>,
 ) -> Result<Vec<model::EvidenceRecord>> {
     let result = (|| {
         project::validate_project(context.project)?;
@@ -249,7 +289,7 @@ pub fn validate_evidence(
         let mut ids = BTreeSet::new();
         let mut subjects = BTreeSet::new();
         for r in array(records) {
-            record(r, context)?;
+            record(r, context, series_validator)?;
             require(ids.insert(string(&r["id"])), "duplicate evidence ID")?;
             require(
                 subjects.insert((string(&r["subject"]["id"]), string(&r["series"]["id"]))),

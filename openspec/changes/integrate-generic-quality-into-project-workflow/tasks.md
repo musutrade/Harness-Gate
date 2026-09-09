@@ -34,10 +34,14 @@ GH-181 CI repair (2026-09-09): PR #190 at `34469e034cc6056f89f4631c5513dbd3c2881
 
 ## 4. Implement trusted baseline providers
 
-- [ ] 4.1 Implement a deterministic Git base-ref/merge-base provider that materializes exact source identity without mutating the working tree and supplies compatible base context required by the Rust evaluator.
-- [ ] 4.2 Implement/define retained CI artifact baseline resolution with exact base commit/config/tool/series identity plus manifest/hash validation under the accepted CI artifact trust model.
-- [ ] 4.3 Enforce existing debt/ratchet lineage semantics: missing/incompatible baseline cannot silently reset debt or create a favorable fresh baseline.
-- [ ] 4.4 Add positive/negative tests for rename/move lineage, missing base, incompatible series, stale artifact, changed config/tool identity, and optional-vs-required baseline policy.
+- [x] 4.1 Implement a deterministic Git base-ref/merge-base provider that materializes exact source identity without mutating the working tree and supplies compatible base context required by the Rust evaluator.
+- [x] 4.2 Implement/define retained CI artifact baseline resolution with exact base commit/config/tool/series identity plus manifest/hash validation under the accepted CI artifact trust model.
+- [x] 4.3 Enforce existing debt/ratchet lineage semantics: missing/incompatible baseline cannot silently reset debt or create a favorable fresh baseline.
+- [x] 4.4 Add positive/negative tests for rename/move lineage, missing base, incompatible series, stale artifact, changed config/tool identity, and optional-vs-required baseline policy.
+
+Validation: [GH-182 evidence](../../../docs/quality/gh-182/validation.md) records the
+39-case baseline corpus, 354 passing Rust tests, 329 passing Python tests and local
+checks. Hosted Required Quality Aggregate remains pending; later tasks are unchanged.
 
 ## 5. Integrate generic quality into verify and unified reporting
 

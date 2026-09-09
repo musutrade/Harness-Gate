@@ -98,5 +98,5 @@ This preserves the GH-180 boundary without certifying a new metric or ecosystem.
 and a source guard reject introducing closed language dispatch into this path.
 
 `adapter run` remains available for advanced/debug use. Automatic request
-construction during `verify`, baseline providers and final workflow aggregation
+construction during `verify` and final workflow aggregation
 remain later OpenSpec tasks.
