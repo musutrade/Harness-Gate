@@ -16,13 +16,15 @@ Task 1 evidence: [frozen assurance contract and hosted baseline](../../../docs/q
 - [x] 2.2 Replace repeated cargo-audit source compilation with an explicit pinned/prebuilt or validated cached installation while preserving `cargo audit --deny warnings` semantics.
 - [x] 2.3 Centralize repeated setup in transparent reusable CI primitives where useful; keep commands, versions, and failure diagnostics observable.
 
-Task 2 implementation evidence: [GH-165 setup and validation record](../../../docs/quality/ci-topology/tool-setup.md) and [checksummed Linux prebuilt smoke results](../../../docs/quality/ci-topology/tool-setup-smoke.json). Four setup regression tests pass, including invalid/missing/failed version evidence. Hosted setup reduction and submitted-commit Required Quality Aggregate acceptance remain controller-owned and pending; tasks 3–7 are not marked complete.
+Task 2 implementation evidence: [GH-165 setup and validation record](../../../docs/quality/ci-topology/tool-setup.md) and [checksummed Linux prebuilt smoke results](../../../docs/quality/ci-topology/tool-setup-smoke.json). Four setup regression tests pass, including invalid/missing/failed version evidence. Hosted setup reduction and submitted-commit Required Quality Aggregate acceptance remain controller-owned and pending; tasks 3–7 were not part of that delivery.
 
 ## 3. Normalize Cargo cache and build-state boundaries
 
-- [ ] 3.1 Define explicit CI Cargo target/cache conventions per OS/job class; verify caches point at the target directory Cargo actually uses and include sufficient invalidation identity.
-- [ ] 3.2 Separate immutable reusable artifacts from mutable compilation caches. Add fail-closed identity/hash validation for any artifact that participates in authoritative quality/contract consumption.
-- [ ] 3.3 Evaluate Linux build reuse for compatible consumers and adopt only cases that preserve the existing contract; do not reuse instrumented coverage builds for release/performance claims or replace native cross-platform execution.
+- [x] 3.1 Define explicit CI Cargo target/cache conventions per OS/job class; verify caches point at the target directory Cargo actually uses and include sufficient invalidation identity.
+- [x] 3.2 Separate immutable reusable artifacts from mutable compilation caches. Add fail-closed identity/hash validation for any artifact that participates in authoritative quality/contract consumption.
+- [x] 3.3 Evaluate Linux build reuse for compatible consumers and adopt only cases that preserve the existing contract; do not reuse instrumented coverage builds for release/performance claims or replace native cross-platform execution.
+
+Task 3 implementation evidence: [GH-166 Cargo and artifact boundaries](../../../docs/quality/ci-topology/cargo-artifacts.md) and [local validation record](../../../docs/quality/ci-topology/cargo-artifacts-validation.json). Eleven regression tests cover cache identity/path mismatches, stale executable handling and fail-closed artifact transport. The real redirected-target CLI contract run passes. Linux binary reuse was evaluated and no new sharing adopted across incompatible profiles. Hosted Required Quality Aggregate acceptance remains controller-owned and pending; tasks 4–7 and overall proposal acceptance remain open.
 
 ## 4. Remove avoidable repeated work
 

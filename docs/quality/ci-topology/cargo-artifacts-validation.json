@@ -1,0 +1,132 @@
+{
+  "issue": "GH-166",
+  "tasks": [
+    "3.1",
+    "3.2",
+    "3.3"
+  ],
+  "scope": "Local implementation validation; hosted acceptance remains pending",
+  "environment": {
+    "CARGO_TARGET_DIR": "/home/gem/symphony-workspaces/GH-166/target/local-validation",
+    "TMPDIR": "/home/gem/symphony-workspaces/GH-166/target/local-tmp",
+    "reason": "Keep all validation builds and test fixtures inside the current Symphony workspace."
+  },
+  "results": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 0,
+      "result": "332 passed; 0 skipped",
+      "log": "target/quality/gh166-validation/nextest.log",
+      "log_sha256": "20d6b3256150d66df28473683e7c45de273f9a036e8e9c107bc44060f94408d5"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "target/quality/gh166-validation/fmt.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "target/quality/gh166-validation/clippy.log",
+      "log_sha256": "e37847438f2108d2249018d6893acca22dee9e7aa8adbd79653ecad07d4d98bd"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -p test_ci_state.py -v",
+      "exit_code": 0,
+      "result": "11 passed",
+      "log": "target/quality/gh166-validation/ci-state.log",
+      "log_sha256": "e28b347429e0835b31880fad6b76657980822d4712ec2f59bcc12f824c6ff49c"
+    },
+    {
+      "command": "python3 tools/quality/contracts.py --output target/quality/gh166-validation/contracts.json",
+      "exit_code": 0,
+      "result": "passed; locked build and CLI snapshot contracts using redirected Cargo target",
+      "log": "target/quality/gh166-validation/contracts.log",
+      "log_sha256": "a41051563a4cb5fc1b1bcdd9aa0ba28ca80f7736d629d90cc138218756e8e3a9"
+    },
+    {
+      "command": "openspec validate optimize-ci-execution-topology --strict",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "target/quality/gh166-validation/openspec.log",
+      "log_sha256": "ee3f7dcabd71c1c486f8cec42ed1b962a3d3237e4a1845dcdbb9e1f1d7b3e278"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 0,
+      "result": "318 passed",
+      "log": "target/quality/gh166-validation/python-tests.log",
+      "log_sha256": "66050141e47469e4c9e9c84daee6f55bddc347df1343d18a638252cfe4d33770"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 0,
+      "result": "passed; report status pass",
+      "log": "target/quality/gh166-validation/docs-consistency.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "not_applicable": [
+    {
+      "command": "harness-gate config check",
+      "reason": "No .harness-gate/flow.toml with declared ci profile in this source checkout."
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "reason": "No .harness-gate/flow.toml with declared ci profile in this source checkout."
+    }
+  ],
+  "hosted": {
+    "required_quality_aggregate": "pending; controller owned",
+    "native_macos_windows": "pending; required jobs retained",
+    "cache_hit_transfer_and_speedup": "not measured locally; no speedup claimed"
+  },
+  "trust_boundaries": [
+    "Cargo metadata must match explicit OS/architecture/job-class target before cache restore.",
+    "Compiled caches are disposable and keyed by effective tools/configuration/profile/flags; contracts always invoke Cargo before executing a cached binary.",
+    "Measurement jobs do not restore compiled targets; instrumented evidence is never release or performance build input.",
+    "Retained artifact manifest digest is anchored in the producer job output; source/run/attempt/configuration identity and exact file inventory must verify before consumption.",
+    "No new Linux binary sharing; current consumers use incompatible profiles or lack an equivalent injection contract."
+  ],
+  "cargo_metadata_smoke": {
+    "command": "RUNNER_OS=Linux RUNNER_ARCH=X64 GITHUB_ENV=target/quality/gh166-validation/github-env GITHUB_OUTPUT=target/quality/gh166-validation/github-output python3 tools/quality/ci_cargo.py --class test --profiles 'test,dev;default'",
+    "exit_code": 0,
+    "identity": {
+      "schema": 1,
+      "os": "Linux",
+      "arch": "X64",
+      "class": "test",
+      "profiles": "test,dev;default",
+      "target_directory": "/home/gem/symphony-workspaces/GH-166/target/ci/Linux/X64/test",
+      "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6",
+      "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+      "configuration_sha256": "a74e4ef9b5e9ec93bcefcc7a90e3d8b33ff8ad087170f27bc7b6acea201afad5",
+      "lock_sha256": "a61b4af4ef6caa6d295ad3e7e17c80015991d63160fca38d3cdde28204e178be",
+      "cargo_home_configuration": {
+        "config.toml": "501a4d940ecd4ccfb4f01c7362ce311bb30f1e8088f519b9eb4fc6c6fdb89b4f"
+      },
+      "build_environment": {
+        "RUSTFLAGS": "",
+        "CARGO_ENCODED_RUSTFLAGS": "",
+        "CARGO_BUILD_TARGET": "",
+        "RUSTDOCFLAGS": "",
+        "CARGO_INCREMENTAL": "",
+        "CARGO_LLVM_COV_TARGET_DIR": ""
+      },
+      "cache_identity": "b70ab190844022fa5633a9099686471ba5fa267946bdfc66d0825b6cbf049da2"
+    },
+    "note": "Used staged delivery metadata through GIT_DIR and GIT_WORK_TREE so identity includes the new tracked helpers."
+  },
+  "yaml_validation": {
+    "result": "passed; workflow and composite action parse with PyYAML; 12 jobs configure Cargo state",
+    "log": "target/quality/gh166-validation/workflow-yaml.log"
+  },
+  "publication_environment": {
+    "blocked_command": "git add .github/actions/cargo-state/action.yml .github/workflows/ci.yml tools/quality/ci_cargo.py tools/quality/ci_artifact.py tools/quality/contracts.py tools/quality/tests/test_ci_state.py tools/quality/tests/test_rust_equivalence.py docs/quality/gh-146/python-boundary.json docs/quality/ci-topology/cargo-artifacts.md docs/quality/ci-topology/cargo-artifacts-validation.json openspec/changes/optimize-ci-execution-topology/design.md openspec/changes/optimize-ci-execution-topology/tasks.md",
+    "error": "fatal: Unable to create '/home/gem/symphony-workspaces/GH-166/.git/index.lock': Read-only file system",
+    "impact": "Original workspace Git metadata cannot advance. Commit and push use a copy of that metadata at target/gh166-delivery.git with GIT_WORK_TREE pointing to this workspace; the same symphony/GH-166 branch and prepared baseline are preserved. No other workspace is accessed."
+  }
+}

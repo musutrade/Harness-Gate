@@ -51,8 +51,11 @@ class ShadowWorkflowTests(unittest.TestCase):
             self.assertIn(identity, collection)
         self.assertIn('--candidate target/quality/candidate/candidate.json', shadow)
         self.assertIn('--output target/quality/generic-shadow', shadow)
-        self.assertIn('path: target/quality/generic-shadow/*.json', shadow)
-        self.assertEqual(shadow.count('if: ${{ always() }}'), 3)
+        self.assertIn('target/quality/generic-shadow/*.json', shadow)
+        self.assertIn('target/quality/artifact-validation.json', shadow)
+        self.assertIn('needs.quality-coverage.outputs.manifest-sha256', shadow)
+        self.assertLess(shadow.index('ci_artifact.py verify'), shadow.index('rust_reference.py'))
+        self.assertEqual(shadow.count('if: ${{ always() }}'), 2)
         self.assertNotIn('continue-on-error', shadow)
         for expensive in ('cargo ', 'ci_quality.py collect', 'source_measure.py', 'critical_paths.py'):
             self.assertNotIn(expensive, shadow)

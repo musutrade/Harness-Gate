@@ -70,6 +70,11 @@ Do not assume `tools/harness-gate/target` when Cargo may resolve another target 
 
 Registry/git caches and compiled target caches have different invalidation and trust characteristics. A single broad cache should not be used merely for convenience if it causes stale/mutable build-state ambiguity.
 
+Tasks 3.1–3.3 select and metadata-check OS/architecture/job-class target paths,
+separate source and compiled caches, and keep measurement targets uncached.
+The [GH-166 boundary record](../../../docs/quality/ci-topology/cargo-artifacts.md)
+defines the cache identities and retained diagnostic evidence.
+
 ### D5. Immutable artifacts may be reused; mutable workspaces may not be shared as authority
 
 A producer may publish an immutable artifact for another job when:
@@ -81,6 +86,13 @@ A producer may publish an immutable artifact for another job when:
 - reuse does not erase a required independent platform execution.
 
 Examples of suitable reuse include retained normalized quality evidence and a release binary consumed only by compatible Linux contract checks if the contract explicitly allows that binary identity. Cross-platform binaries/tests remain platform-native.
+
+The existing retained quality transfer now seals its file inventory and identity
+with a manifest whose digest is passed independently through producer job outputs.
+Consumer transport validation precedes the existing candidate/policy checks.
+No Linux binary sharing is adopted in task 3.3: current contracts use debug,
+Build emits release, and performance uses release-small. No equivalence or hosted
+critical-path evidence supports changing those consumers in this task.
 
 ### D6. Measure once when measurement semantics require one owner
 
