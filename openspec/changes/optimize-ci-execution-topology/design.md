@@ -100,6 +100,13 @@ Coverage/risk/CRAP/critical-path collection already has provenance-sensitive sem
 
 No optimization may merge incompatible measurement series merely because both are called coverage or complexity.
 
+Tasks 4.1–4.3 build the docs executable once and preserve every preset, migration,
+schema, policy and link/wording check. The retained producer/consumer boundary
+already satisfies the collection ownership audit; a workflow regression guards
+against adding a second collector. The [GH-167 repeated-work audit](../../../docs/quality/ci-topology/repeated-work.md)
+records hosted input and rejects unproven Linux job merges or binary sharing.
+No scheduling dependency, required outcome or measurement series changes.
+
 ### D7. Aggregate stays cheap and stable
 
 `Required Quality Aggregate` retains its exact check name and `always()` behavior. It should:
