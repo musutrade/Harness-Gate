@@ -1,0 +1,26 @@
+name: Install pinned CI tool
+description: Install a checksummed prebuilt tool, with locked source fallback and required version evidence.
+inputs:
+  tool:
+    description: cargo-nextest, cargo-llvm-cov, or cargo-audit
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Resolve pinned version
+      id: pin
+      shell: bash
+      env:
+        CI_TOOL: ${{ inputs.tool }}
+      run: bash "$GITHUB_ACTION_PATH/tool.sh" resolve "$CI_TOOL" >> "$GITHUB_OUTPUT"
+    - name: Install pinned prebuilt (locked source fallback)
+      uses: taiki-e/install-action@d438492cf8a250514fa2d34b30bc3c0dc37c65ff # v2
+      with:
+        tool: ${{ steps.pin.outputs.spec }}
+        checksum: 'true'
+        fallback: cargo-install
+    - name: Verify effective tool version
+      shell: bash
+      env:
+        CI_TOOL: ${{ inputs.tool }}
+      run: bash "$GITHUB_ACTION_PATH/tool.sh" verify "$CI_TOOL"
