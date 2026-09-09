@@ -29,6 +29,13 @@ tarpaulin and performance candidates retain their explicit push-only schedule.
 Their intentional absence on PRs is not a waiver for any PR-required job.
 No repository ruleset, branch protection or publication permission changes.
 
+Current-contract clarification (GH-164): the later CI workflow runs full macOS
+and Windows tests on PRs as well as pushes. The
+[frozen topology record](../quality/ci-topology/baseline.md) retains that requirement
+and repairs the stale push-only aggregate classification for native tests.
+Cross-platform builds/contracts, tarpaulin and performance remain push-only.
+This clarification does not alter measurement or release authority.
+
 ### Thresholds and measurement limits
 
 - The original six-module gate still requires 80% per module and aggregate.
