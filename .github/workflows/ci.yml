@@ -27,16 +27,11 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Cache cargo
-        uses: actions/cache@v5
+      - name: Configure Cargo state
+        uses: ./.github/actions/cargo-state
         with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            tools/harness-gate/target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          class: test
+          profiles: 'test,dev;default'
 
       - name: Install cargo-nextest
         uses: ./.github/actions/install-ci-tool
@@ -64,16 +59,11 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Cache cargo
-        uses: actions/cache@v5
+      - name: Configure Cargo state
+        uses: ./.github/actions/cargo-state
         with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            tools/harness-gate/target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          class: test
+          profiles: 'test;default'
 
       - name: Install cargo-nextest
         uses: ./.github/actions/install-ci-tool
@@ -126,11 +116,11 @@ jobs:
         with:
           components: clippy
 
-      - name: Cache cargo registry
-        uses: actions/cache@v5
+      - name: Configure Cargo state
+        uses: ./.github/actions/cargo-state
         with:
-          path: ~/.cargo/registry
-          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          class: clippy
+          profiles: 'dev,test;all-features'
 
       - name: Run clippy
         run: cargo clippy --manifest-path tools/harness-gate/Cargo.toml --locked --all-targets --all-features -- -D warnings
@@ -144,6 +134,12 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Configure Cargo state
+        uses: ./.github/actions/cargo-state
+        with:
+          class: release
+          profiles: 'release;default'
+
       - name: Build
         run: cargo build --manifest-path tools/harness-gate/Cargo.toml --locked --release
 
@@ -151,10 +147,9 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: harness-gate-ubuntu-latest
-          path: |
-            tools/harness-gate/target/release/harness-gate
-            tools/harness-gate/target/release/harness-gate.exe
-          if-no-files-found: ignore
+          # Informational output only; no quality, release or performance consumer.
+          path: ${{ env.CARGO_TARGET_DIR }}/release/harness-gate
+          if-no-files-found: error
 
   build-cross-platform:
     name: Build (${{ matrix.os }})
@@ -170,6 +165,12 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Configure Cargo state
+        uses: ./.github/actions/cargo-state
+        with:
+          class: release
+          profiles: 'release;default'
+
       - name: Build
         run: cargo build --manifest-path tools/harness-gate/Cargo.toml --locked --release
 
@@ -183,16 +184,12 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Cache cargo
-        uses: actions/cache@v5
+      - name: Configure Cargo state
+        uses: ./.github/actions/cargo-state
         with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            tools/harness-gate/target/
-          key: ${{ runner.os }}-cargo-coverage-${{ hashFiles('**/Cargo.lock') }}
+          class: tarpaulin
+          profiles: 'instrumented;default'
+          cache-target: 'false'
 
       - name: Install tarpaulin
         run: cargo install cargo-tarpaulin --locked --force
@@ -211,6 +208,8 @@ jobs:
   quality-coverage:
     name: Quality Coverage and Critical Paths
     runs-on: ubuntu-latest
+    outputs:
+      manifest-sha256: ${{ steps.seal.outputs.manifest-sha256 }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -220,6 +219,13 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           components: llvm-tools-preview
+
+      - name: Configure Cargo state
+        uses: ./.github/actions/cargo-state
+        with:
+          class: quality
+          profiles: 'isolated-instrumented;default'
+          cache-target: 'false'
 
       - name: Install Python
         uses: actions/setup-python@v7
@@ -246,11 +252,16 @@ jobs:
             --base-sha "$BASE_SHA" --head-sha "$HEAD_SHA" --run-id "$RUN_ID" \
             --output target/quality/candidate
 
+      - name: Seal immutable quality evidence
+        id: seal
+        run: python3 tools/quality/ci_artifact.py seal --root target/quality/candidate
+
       - name: Upload quality evidence
         if: ${{ always() }}
         uses: actions/upload-artifact@v6
         with:
           name: quality-coverage-${{ github.run_id }}-${{ github.run_attempt }}
+          include-hidden-files: true
           path: |
             target/quality/candidate
             !target/quality/candidate/build
@@ -277,8 +288,15 @@ jobs:
           name: quality-coverage-${{ github.run_id }}-${{ github.run_attempt }}
           path: target/quality/candidate
 
+      - name: Verify artifact identity and hashes before consumption
+        env:
+          EXPECTED_MANIFEST_SHA256: ${{ needs.quality-coverage.outputs.manifest-sha256 }}
+        run: |
+          python3 tools/quality/ci_artifact.py verify --root target/quality/candidate \
+            --manifest-sha256 "$EXPECTED_MANIFEST_SHA256" \
+            --output target/quality/artifact-validation.json
+
       - name: Project and compare retained evidence
-        if: ${{ always() }}
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
           HEAD_SHA: ${{ github.sha }}
@@ -294,7 +312,9 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: quality-generic-shadow-${{ github.run_id }}-${{ github.run_attempt }}
-          path: target/quality/generic-shadow/*.json
+          path: |
+            target/quality/generic-shadow/*.json
+            target/quality/artifact-validation.json
           if-no-files-found: error
 
   quality-contracts:
@@ -305,6 +325,12 @@ jobs:
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Configure Cargo state
+        uses: ./.github/actions/cargo-state
+        with:
+          class: contracts
+          profiles: 'dev;default'
 
       - name: Install Python
         uses: actions/setup-python@v7
@@ -344,6 +370,12 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Configure Cargo state
+        uses: ./.github/actions/cargo-state
+        with:
+          class: contracts
+          profiles: 'dev;default'
+
       - name: Install Python
         uses: actions/setup-python@v7
         with:
@@ -379,6 +411,13 @@ jobs:
         with:
           components: llvm-tools-preview
 
+      - name: Configure Cargo state
+        uses: ./.github/actions/cargo-state
+        with:
+          class: performance
+          profiles: 'release-small,test;default;cold'
+          cache-target: 'false'
+
       - name: Install Python
         uses: actions/setup-python@v7
         with:
@@ -408,6 +447,12 @@ jobs:
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Configure Cargo state
+        uses: ./.github/actions/cargo-state
+        with:
+          class: docs
+          profiles: 'dev;default'
 
       - name: Check documentation, examples, and schema
         run: python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json
@@ -448,6 +493,13 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           components: llvm-tools-preview
+
+      - name: Configure Cargo state
+        uses: ./.github/actions/cargo-state
+        with:
+          class: quality-scripts
+          profiles: 'fixture-owned'
+          cache-target: 'false'
 
       - name: Install Python
         uses: actions/setup-python@v7
