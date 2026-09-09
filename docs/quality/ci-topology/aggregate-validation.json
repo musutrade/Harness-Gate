@@ -1,0 +1,122 @@
+{
+  "issue": "GH-168",
+  "tasks": [
+    "5.1",
+    "5.2",
+    "5.3"
+  ],
+  "policy": "Engineering Policy, CRAP semantics and required assurance unchanged.",
+  "aggregate_fixtures": {
+    "before": {
+      "command": "python3 -m unittest discover -s tools/quality/tests -p 'test_ci_topology.py' -v",
+      "result": "3 tests passed",
+      "log": "target/quality/gh-168/aggregate-before.log",
+      "log_sha256": "399ee11ac154fd87cf2cdf4718204e2d0500e10a04a905b2f9c8aa5d58c55805"
+    },
+    "negative_before": {
+      "result": "Expanded fixtures reproduced 135 malformed-input subcase errors",
+      "log": "target/quality/gh-168/aggregate-negative-before.log",
+      "log_sha256": "8eab8e70ac74fe31904c6acc6828ec335912319ebe6b5f5a98519e5e5de743ad"
+    },
+    "after": {
+      "result": "7 tests passed",
+      "log": "target/quality/gh-168/aggregate-after.log",
+      "log_sha256": "e5d8d0a81e6bf43a7d451f9dec8cfb272a18aa532d2ae3427f9f540e08da94bb"
+    }
+  },
+  "not_applicable": [
+    {
+      "command": "harness-gate config check",
+      "reason": "No .harness-gate/flow.toml exists in this checkout; no declared ci profile and no synthetic config created."
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "reason": "No .harness-gate/flow.toml exists in this checkout; no declared ci profile and no synthetic config created."
+    }
+  ],
+  "environment_limitations": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "error": "failed to open: /home/gem/cargo-target/debug/.cargo-build-lock: Read-only file system (os error 30)",
+      "impact": "Initial exit 101; retry uses a workspace-local CARGO_TARGET_DIR."
+    },
+    {
+      "command": "git add .github/workflows/ci.yml tools/quality/ci_quality.py tools/quality/tests/test_ci_topology.py",
+      "error": "fatal: Unable to create '/home/gem/symphony-workspaces/GH-168/.git/index.lock': Read-only file system",
+      "impact": "Use a copy of this workspace Git metadata at target/gh168-delivery.git with GIT_WORK_TREE pointing to this workspace, preserving the prepared symphony/GH-168 branch and baseline. No other checkout or workspace accessed."
+    }
+  ],
+  "hosted_required_quality_aggregate": "Pending controller-owned CI; not polled or claimed green.",
+  "proposal_acceptance": "Tasks 6\u20137 and overall acceptance remain open.",
+  "baseline_sha": "89ed94f8ca7b657cc2e8a6a0eaa34c6f309f4e28",
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 101,
+      "log": "target/quality/gh-168/nextest.log",
+      "log_sha256": "6ae1243d90746b546d3b2e8fcff2cce9b1fc70cd1bc336dabcc3976f5d642ff1"
+    },
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "environment": {
+        "CARGO_TARGET_DIR": "/home/gem/symphony-workspaces/GH-168/target/gh-168-cargo"
+      },
+      "exit_code": 0,
+      "log": "target/quality/gh-168/nextest-local.log",
+      "log_sha256": "b490baf615cbf77e1d0ed1109d0b361eccff8b3e03433bdca6ca77148a07282b",
+      "result": "332 passed, 0 skipped"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "exit_code": 0,
+      "log": "target/quality/gh-168/fmt.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "environment": {
+        "CARGO_TARGET_DIR": "/home/gem/symphony-workspaces/GH-168/target/gh-168-cargo"
+      },
+      "exit_code": 0,
+      "log": "target/quality/gh-168/clippy.log",
+      "log_sha256": "30cfe5a8f45948fb0dcf49494c731eed51b042acfa0734d153baf49c11d31db6"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 0,
+      "log": "target/quality/gh-168/python.log",
+      "log_sha256": "3cc33031aa652f9768e9b4330356e79f347ac9aab3eb5f645c3bb18eec329eda",
+      "result": "326 tests passed"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "environment": {
+        "CARGO_TARGET_DIR": "/home/gem/symphony-workspaces/GH-168/target/gh-168-cargo"
+      },
+      "exit_code": 0,
+      "log": "target/quality/gh-168/docs.log",
+      "log_sha256": "b738296336b221e3672920d7a1192bbec044fcfd14ee45602fb79cf4b8cf209d",
+      "result": "Report status pass"
+    },
+    {
+      "command": "openspec validate optimize-ci-execution-topology --strict",
+      "exit_code": 0,
+      "result": "Change 'optimize-ci-execution-topology' is valid",
+      "log": "target/quality/gh-168/openspec.log"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "docs_report": {
+    "path": "target/quality/docs-consistency.json",
+    "sha256": "1fa361a268d8cc9a239b63ef33c14c3e99385855e6280a278dad7c43ec896561",
+    "status": "pass"
+  },
+  "tested_sources": {
+    ".github/workflows/ci.yml": "b9867aa0389d5b5e7fd8ec43933e93239660620b9340483c42f612b9ac880eba",
+    "tools/quality/ci_quality.py": "c0781da38fdb29059b1efc75d991e321cb807b67b805a2e532e11915bd89c8ee",
+    "tools/quality/tests/test_ci_topology.py": "3343920c228a717edf41a649fd9984a5cfed72a0d84599c4d5336c5797e6f61e"
+  }
+}
