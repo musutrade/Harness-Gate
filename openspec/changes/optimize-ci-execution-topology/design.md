@@ -59,6 +59,11 @@ Requirements:
 - cache miss/failure falls back to a trustworthy installation path, not to skipping the check;
 - untrusted PR content cannot poison a cache that later grants authority without normal GitHub cache isolation/validation.
 
+Tasks 2.1–2.3 use a commit-pinned prebuilt installer with checksums, explicit
+nextest/llvm-cov/audit versions, locked source fallback for unsupported binaries,
+and mandatory effective-version checks. See the [GH-165 tool setup record](../../../docs/quality/ci-topology/tool-setup.md)
+for trust boundaries, local evidence, and pending controller-hosted acceptance.
+
 ### D4. Cargo cache and target paths are explicit
 
 Do not assume `tools/harness-gate/target` when Cargo may resolve another target directory. CI should deliberately select its target directory or query Cargo metadata where needed. Cache configuration must match the actual directory used.
