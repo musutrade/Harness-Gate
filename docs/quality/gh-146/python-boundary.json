@@ -17,6 +17,36 @@
       "sha256": "10264b7f3f132dc9d01c019b77e365f60dd15023fc4611f65d4dbdfd9bb184dd"
     },
     {
+      "module": "tools/quality/ci_artifact.py",
+      "category": "A",
+      "purpose": "Seal and fail-closed validate retained quality artifact identity and file hashes before cross-job consumption.",
+      "callers": [
+        ".github/workflows/ci.yml",
+        "tools/quality/tests/test_ci_state.py"
+      ],
+      "ci_role": "Required quality producer transport seal and advisory generic-shadow consumer validation; existing native quality policy unchanged",
+      "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
+      "authoritative_status": "CI infrastructure only; no transfer of generic or release decision authority.",
+      "final_disposition": "Retain Python CI tooling; preserve native quality policy and required assurance.",
+      "sha256": "c81c676ffb8f420dee474278e636849910cfc9376a3bf2fa7dba17877ee92b6c"
+    },
+    {
+      "module": "tools/quality/ci_cargo.py",
+      "category": "A",
+      "purpose": "Resolve and record CI Cargo target paths and mutable cache compatibility identity.",
+      "callers": [
+        ".github/actions/cargo-state/action.yml",
+        "tools/quality/ci_artifact.py",
+        "tools/quality/contracts.py",
+        "tools/quality/tests/test_ci_state.py"
+      ],
+      "ci_role": "Required CI infrastructure; cache optimization only, no quality policy authority",
+      "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
+      "authoritative_status": "CI infrastructure only; no transfer of generic or release decision authority.",
+      "final_disposition": "Retain Python CI tooling; preserve native quality policy and required assurance.",
+      "sha256": "74afdfc3b558d1bf72e0fa7cfc172f3d1f69fcc25e11f15e687af70c8ce9a777"
+    },
+    {
       "authoritative_status": "Repository Rust required-path helper; authoritative within its existing CI responsibility",
       "callers": [
         ".github/workflows/ci.yml",
@@ -109,7 +139,7 @@
       "notes": "",
       "purpose": "Exercise the public CLI contract and compare normalized golden snapshots.",
       "release_impact": "Not packaged in release binary. Existing required CI can block release eligibility; preserve behavior.",
-      "sha256": "a8ab2f39ecf8d414d609438b19663eab7cf843050b17a9aa55143f9c9413b227"
+      "sha256": "dff62bf5c07d2310a8f67ac1fed92d9820d38fcc936b794631dad39d718b938b"
     },
     {
       "authoritative_status": "Repository Rust required-path helper; authoritative within its existing CI responsibility",
