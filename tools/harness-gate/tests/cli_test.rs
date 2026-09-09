@@ -366,6 +366,12 @@ fn quality_config_commands_cross_validate_both_planes() {
     );
     let legacy = ctx.run_harness_gate(&["config", "print", "--resolved"]);
     assert_success(&legacy);
+    let raw_flow = ctx.run_harness_gate(&["config", "print"]);
+    assert_success(&raw_flow);
+    assert_eq!(
+        stdout_str(&raw_flow),
+        include_str!("../presets/rust-api.flow.toml")
+    );
     assert_failure(&ctx.run_harness_gate(&["config", "print", "--quality"]));
     let quality = include_str!("../../quality/fixtures/workflow/quality.toml");
     ctx.write_file(".harness-gate/quality.toml", quality);
@@ -383,6 +389,9 @@ fn quality_config_commands_cross_validate_both_planes() {
         stdout_str(&legacy),
         stdout_str(&ctx.run_harness_gate(&["config", "print", "--resolved"]))
     );
+    let raw_flow_with_quality = ctx.run_harness_gate(&["config", "print"]);
+    assert_success(&raw_flow_with_quality);
+    assert_eq!(stdout_str(&raw_flow), stdout_str(&raw_flow_with_quality));
     for invalid in [
         quality.replace(
             "flow_components = [\"app\"]",

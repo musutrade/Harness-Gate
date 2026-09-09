@@ -69,3 +69,8 @@ require renewed mapping review. Only its existing `#[cfg(test)]` tests module is
 excluded from production risk. Required hosted platform tests and single-owner
 CI topology remain unchanged; the existing collection owner measures the added
 sources without another job or collection stage.
+
+Isolated base/head archives also retain the committed `schema/` directory because
+the configuration schema synchronization test includes that compilation input.
+The schema bytes come from the same commit as the measured source, never from a
+different checkout or the current worktree.
