@@ -6,15 +6,17 @@ This change includes an explicit normative Engineering Policy delta for project-
 
 - [ ] 1.1 Add the project-owned validation principle to `docs/engineering-policy.md`.
 - [ ] 1.2 Document the three extension layers: command hooks, structured result adapters, and quality collector plugins.
-- [ ] 1.3 Add a regression/consistency guard ensuring application test frameworks are not required as generic-core special cases merely to execute project-owned commands.
+- [x] 1.3 Add a regression/consistency guard ensuring application test frameworks are not required as generic-core special cases merely to execute project-owned commands.
 - [ ] 1.4 Record the decision in ADR-0049 and strict-validate this OpenSpec.
 
 ## 2. Freeze Arc-Admin assurance baseline
 
-- [ ] 2.1 Inventory every existing required Arc-Admin step, component, scope rule, service, parser, timeout, environment rule and CI route.
-- [ ] 2.2 Record current `cargo flow` hook/full behavior and required delivery semantics.
-- [ ] 2.3 Capture current self-hosted CI cost/timing and evidence/artifact behavior as the before state.
-- [ ] 2.4 Mark project-specific E2E/API/full-stack/generation/deployment checks explicitly as project-owned validations, not Harness-Gate missing built-ins.
+- [x] 2.1 Inventory every existing required Arc-Admin step, component, scope rule, service, parser, timeout, environment rule and CI route.
+- [x] 2.2 Record current `cargo flow` hook/full behavior and required delivery semantics.
+- [x] 2.3 Capture current self-hosted CI cost/timing and evidence/artifact behavior as the before state.
+- [x] 2.4 Mark project-specific E2E/API/full-stack/generation/deployment checks explicitly as project-owned validations, not Harness-Gate missing built-ins.
+
+GH-201 evidence: [frozen source/inventory, semantics, CI timing/artifacts and ownership](../../../docs/dogfood/arc-admin/README.md), reproduced by `python3 docs/dogfood/arc-admin/reproduce.py` and its three passing quality-script tests. Task 1.3 is exercised by the passing `project_owned_runner_replacement_preserves_generic_command_gate` integration test (two unknown runners, success/failure, logs and sealed evidence) and the Engineering Policy anchors in documentation consistency. Strict validation: `openspec validate dogfood-harness-gate-on-arc-admin --strict`. Only the task IDs authorized by GH-201 are checked here; migration, shadow parity and acceptance of the complete proposal remain outstanding.
 
 ## 3. Import/migrate the execution plane
 
