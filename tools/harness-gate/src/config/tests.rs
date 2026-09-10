@@ -574,6 +574,7 @@ timeout_secs = 60
 #[test]
 fn unordered_steps_reusing_a_service_are_rejected_with_field_paths() {
     let mut config = repository_config();
+    config.execution.parallel = true;
     config.services.insert(
         "test-db".into(),
         ServiceConfig::Environment {
@@ -602,6 +603,7 @@ fn unordered_steps_reusing_a_service_are_rejected_with_field_paths() {
 #[test]
 fn dependency_order_allows_service_reuse_but_not_log_reuse() {
     let mut config = repository_config();
+    config.execution.parallel = true;
     config.services.insert(
         "test-db".into(),
         ServiceConfig::Environment {
@@ -696,6 +698,7 @@ fn independent_services_with_the_same_injection_are_rejected() {
 #[test]
 fn repeated_service_references_emit_one_shared_resource_diagnostic_per_pair() {
     let mut config = repository_config();
+    config.execution.parallel = true;
     config.services.insert(
         "test-db".into(),
         ServiceConfig::Environment {
@@ -721,6 +724,7 @@ fn repeated_service_references_emit_one_shared_resource_diagnostic_per_pair() {
 #[test]
 fn transitive_dependency_allows_service_reuse() {
     let mut config = repository_config();
+    config.execution.parallel = true;
     config.services.insert(
         "test-db".into(),
         ServiceConfig::Environment {
@@ -1409,4 +1413,28 @@ fn flow_config_accessors_and_schema_cover_the_public_configuration_surface() {
     assert!(config.allowed_placeholder("reports"));
     assert!(config.diagnostics_report().valid);
     assert!(schema_json().expect("schema JSON").contains("FlowConfig"));
+}
+
+#[test]
+fn serial_shared_service_consumers_load_without_added_dependencies() {
+    for (parallel, max_parallel) in [(false, None), (false, Some(8)), (true, Some(1))] {
+        let mut config = repository_config();
+        config.execution.parallel = parallel;
+        config.execution.max_parallel = max_parallel;
+        config.services.insert(
+            "test-db".into(),
+            ServiceConfig::Environment {
+                source_env: "DATABASE_URL".into(),
+                inject_env: "TEST_DATABASE_URL".into(),
+            },
+        );
+        config.steps[0].services = vec!["test-db".into()];
+        config.steps[1].services = vec!["test-db".into()];
+        let source = toml::to_string_pretty(&config).expect("serialize");
+        let loaded = FlowConfig::from_source_with_diagnostics(&source, None, None)
+            .expect("single-worker dispatch safely orders shared consumers");
+        assert!(loaded.steps[1].depends_on.is_empty());
+        config.steps[1].log = config.steps[0].log.clone();
+        assert_diagnostic(&config, "steps[1].log", "HGCFG-DUPLICATE-LOG");
+    }
 }
