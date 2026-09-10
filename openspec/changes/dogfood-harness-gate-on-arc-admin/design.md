@@ -6,6 +6,12 @@ Tasks 5.1–5.4 are evidenced by the [shadow matrix](../../../docs/dogfood/arc-a
 
 An observation can complete with classified blocked comparisons. Unselected/unexecuted gates must retain NOT_RUN, and component selection stopped before computation must retain NOT_COMPUTED. Neither declaration parity nor another engine's existing report establishes runtime parity. Source identities, configuration hashes, command exits, native reports, service observations and explicit isolation limits accompany the matrix. Harness-Gate validation results have no workflow/lifecycle or merge authority. Remediation, controlled negatives and authority-transfer decisions remain in tasks 6–9.
 
+## GH-206 cost and ownership design
+
+The [cost record](../../../docs/dogfood/arc-admin/cost/README.md) and reproducible ledger map all 25 existing command hooks and nine declared quality capabilities to single proposed owners. The target uses one execution plan, one producer per compatible supported measurement identity, immutable artifact fan-out, authenticated baseline reuse and evaluation-only aggregation. Project commands, prelude semantics, service isolation, CI-only/security checks, profile requiredness and accepted quality policies remain obligations. Angular CRAP remains unsupported. No gate is removed and no replacement is deployed.
+
+The before self-hosted CI sample records 799 seconds execution span and 1,077 runner-seconds. GH-204 only supplies local step timers and pre-dispatch failures; neither added shadow CI cost nor target savings is measured. Task 7.1 remains open pending matched self-hosted trials after task-8 remediation and host provisioning. Tasks 7.2–7.4 establish the inventory, conditional topology and retention hold, not successful parity or authority transfer. See the cost record for attribution formulas, exact remaining evidence and the assurance mapping to ADR-0040/ADR-0044.
+
 ## 1. Durable architecture boundary
 
 Harness-Gate is a gate orchestration, evidence ingestion and quality-decision platform. It is not an application test framework.
@@ -191,3 +197,10 @@ Authority-transfer recommendations should identify which old jobs/steps can be r
 ## 9. Long-term ecosystem implication
 
 This boundary is intentionally ecosystem-neutral. A future Go + Vue project should be able to keep its Go tests, Vue/Playwright E2E, API tests and custom scripts project-owned while Harness-Gate provides generic command hooks and separately binds certified Go/Vue collectors/packs. No application test framework belongs in Generic Core solely to make its command executable.
+
+
+### GH-206 remediation and bounded CI follow-up
+
+[ADR-0050](../../../docs/adr/0050-serial-shared-service-ordering.md) recognizes guaranteed single-worker dispatch for same-service consumers while retaining parallel conflict checks. [Three self-hosted workload pairs](../../../docs/dogfood/arc-admin/cost/selfhosted.md) now execute the unchanged imported flow: every one of the 25 project steps and two preludes matches and passes. Historical GH-204/205 receipts remain unchanged. This resolves HG-CAP-001 for serial dispatch; it does not establish complete runtime quality parity.
+
+GH-207 must still address trusted native collector/state/key and baseline provisioning. The actual `QUALITY_BLOCKED` failure for missing `.harness-gate/runtime/full-state.json`, and the null profile name in that early-failure diagnostic, are retained. Complete-quality cost and original-topology savings remain unknown; no authority transfer or gate removal is permitted from the bounded cost series.

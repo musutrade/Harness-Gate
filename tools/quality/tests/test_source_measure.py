@@ -64,6 +64,17 @@ class SourceMeasureTests(unittest.TestCase):
                 self.assertEqual(len(self.inventory(transformed)['symbols']), len(symbols))
         self.assertIn('#[cfg(test)]\nmod tests;', (crate / 'src/preset/mod.rs').read_text())
 
+    def test_resource_validation_source_certification(self):
+        path = 'config/validation/mod.rs'
+        self.assertIn(path, SOURCE_FILES)
+        symbols = ast(ROOT / 'tools/harness-gate/src' / path, self.binary)['symbols']
+        names = {symbol['name'] for symbol in symbols if not symbol['test']}
+        self.assertTrue({'validate_resource_conflicts', 'validate_shared_services',
+                         'validate_log_conflicts', 'validate_service_injections'} <= names)
+        for module in ('config', 'verify'):
+            source = (ROOT / f'tools/harness-gate/src/{module}/mod.rs').read_text()
+            self.assertIn('#[cfg(test)]\nmod tests;', source)
+
     def test_verify_reporting_source_certification(self):
         crate = ROOT / 'tools/harness-gate'
         for path in ('verify/mod.rs', 'verify/quality.rs', 'verify/report.rs', 'failure.rs', 'config/import.rs'):
