@@ -1,0 +1,529 @@
+{
+  "schema": "quality-hosted-closure/v1",
+  "issue": 198,
+  "recorded_at": "2026-09-10",
+  "openspec": "integrate-generic-quality-into-project-workflow",
+  "status": "Hosted prerequisites accepted; formal closure requires green GH-198 PR and controller merge.",
+  "cohorts": {
+    "baseline": {
+      "run_ids": [
+        34303413318,
+        34301967575,
+        34291282719
+      ],
+      "critical_path_seconds": {
+        "median": 903.0,
+        "min": 846.0,
+        "max": 1141.0
+      },
+      "category_seconds": {
+        "setup": {
+          "median": 195.0,
+          "min": 183.0,
+          "max": 197.0
+        },
+        "tool_install": {
+          "median": 423.0,
+          "min": 392.0,
+          "max": 453.0
+        },
+        "quality_collection": {
+          "median": 600.0,
+          "min": 560.0,
+          "max": 821.0
+        },
+        "execution": {
+          "median": 1071.0,
+          "min": 997.0,
+          "max": 1175.0
+        },
+        "artifact": {
+          "median": 10.0,
+          "min": 8.0,
+          "max": 11.0
+        },
+        "cleanup": {
+          "median": 11.0,
+          "min": 9.0,
+          "max": 67.0
+        }
+      },
+      "runner_wall_minutes_by_os": {
+        "Linux": {
+          "median": 28.6,
+          "min": 28.25,
+          "max": 33.3
+        },
+        "macOS": {
+          "median": 4.2667,
+          "min": 3.25,
+          "max": 4.9333
+        },
+        "Windows": {
+          "median": 5.7,
+          "min": 5.65,
+          "max": 7.5
+        }
+      },
+      "total_runner_wall_minutes": {
+        "median": 40.68333333333333,
+        "min": 37.55,
+        "max": 43.21666666666667
+      },
+      "job_wall_seconds": {
+        "Build": {
+          "median": 153.0,
+          "min": 140.0,
+          "max": 154.0
+        },
+        "Clippy": {
+          "median": 47.0,
+          "min": 42.0,
+          "max": 48.0
+        },
+        "Documentation Consistency": {
+          "median": 55.0,
+          "min": 52.0,
+          "max": 59.0
+        },
+        "Format": {
+          "median": 14.0,
+          "min": 13.0,
+          "max": 15.0
+        },
+        "Generic Quality Shadow": {
+          "median": 22.0,
+          "min": 22.0,
+          "max": 27.0
+        },
+        "Quality CLI Contracts": {
+          "median": 59.0,
+          "min": 56.0,
+          "max": 62.0
+        },
+        "Quality Coverage and Critical Paths": {
+          "median": 858.0,
+          "min": 796.0,
+          "max": 1127.0
+        },
+        "Quality Script Tests": {
+          "median": 108.0,
+          "min": 99.0,
+          "max": 120.0
+        },
+        "Release Governance Contracts": {
+          "median": 7.0,
+          "min": 7.0,
+          "max": 8.0
+        },
+        "Required Quality Aggregate": {
+          "median": 7.0,
+          "min": 6.0,
+          "max": 9.0
+        },
+        "Security Audit": {
+          "median": 193.0,
+          "min": 191.0,
+          "max": 200.0
+        },
+        "Test": {
+          "median": 222.0,
+          "min": 185.0,
+          "max": 226.0
+        },
+        "Test (macos-latest)": {
+          "median": 256.0,
+          "min": 195.0,
+          "max": 296.0
+        },
+        "Test (windows-latest)": {
+          "median": 342.0,
+          "min": 339.0,
+          "max": 450.0
+        }
+      }
+    },
+    "accepted_after": {
+      "run_ids": [
+        34312685548,
+        34311132169
+      ],
+      "critical_path_seconds": {
+        "median": 878.5,
+        "min": 875.0,
+        "max": 882.0
+      },
+      "category_seconds": {
+        "setup": {
+          "median": 172.5,
+          "min": 170.0,
+          "max": 175.0
+        },
+        "tool_install": {
+          "median": 12.0,
+          "min": 12.0,
+          "max": 12.0
+        },
+        "quality_collection": {
+          "median": 836.5,
+          "min": 828.0,
+          "max": 845.0
+        },
+        "execution": {
+          "median": 1243.0,
+          "min": 1189.0,
+          "max": 1297.0
+        },
+        "artifact": {
+          "median": 10.5,
+          "min": 10.0,
+          "max": 11.0
+        },
+        "cleanup": {
+          "median": 49.0,
+          "min": 47.0,
+          "max": 51.0
+        }
+      },
+      "runner_wall_minutes_by_os": {
+        "Linux": {
+          "median": 26.875,
+          "min": 26.2167,
+          "max": 27.5333
+        },
+        "macOS": {
+          "median": 5.09165,
+          "min": 4.85,
+          "max": 5.3333
+        },
+        "Windows": {
+          "median": 7.3667,
+          "min": 7.2667,
+          "max": 7.4667
+        }
+      },
+      "total_runner_wall_minutes": {
+        "median": 39.333333333333336,
+        "min": 38.333333333333336,
+        "max": 40.333333333333336
+      },
+      "job_wall_seconds": {
+        "Build": {
+          "median": 157.5,
+          "min": 149.0,
+          "max": 166.0
+        },
+        "Clippy": {
+          "median": 46.5,
+          "min": 39.0,
+          "max": 54.0
+        },
+        "Documentation Consistency": {
+          "median": 73.0,
+          "min": 65.0,
+          "max": 81.0
+        },
+        "Format": {
+          "median": 15.5,
+          "min": 15.0,
+          "max": 16.0
+        },
+        "Generic Quality Shadow": {
+          "median": 22.0,
+          "min": 21.0,
+          "max": 23.0
+        },
+        "Quality CLI Contracts": {
+          "median": 66.0,
+          "min": 64.0,
+          "max": 68.0
+        },
+        "Quality Coverage and Critical Paths": {
+          "median": 863.0,
+          "min": 856.0,
+          "max": 870.0
+        },
+        "Quality Script Tests": {
+          "median": 112.5,
+          "min": 101.0,
+          "max": 124.0
+        },
+        "Release Governance Contracts": {
+          "median": 9.0,
+          "min": 8.0,
+          "max": 10.0
+        },
+        "Required Quality Aggregate": {
+          "median": 7.0,
+          "min": 7.0,
+          "max": 7.0
+        },
+        "Security Audit": {
+          "median": 16.5,
+          "min": 11.0,
+          "max": 22.0
+        },
+        "Test": {
+          "median": 224.0,
+          "min": 187.0,
+          "max": 261.0
+        },
+        "Test (macos-latest)": {
+          "median": 305.5,
+          "min": 291.0,
+          "max": 320.0
+        },
+        "Test (windows-latest)": {
+          "median": 442.0,
+          "min": 436.0,
+          "max": 448.0
+        }
+      }
+    }
+  },
+  "runs": [
+    {
+      "issue": 186,
+      "pr": 196,
+      "run_id": 34419625673,
+      "attempt": 1,
+      "pr_head_sha": "024f775904eb6bd50639092d3779d9e2f8dad035",
+      "tested_sha": "ffe3bc0e5f7dea4f864ceab653b26debb78d235d",
+      "base_sha": "9fcc319d976aed1aad4311355cece60df798ff96",
+      "input": "hosted-prerequisite-input.json",
+      "timing": "hosted-prerequisite-timing.json",
+      "receipt": "hosted-prerequisite-receipt.json.gz",
+      "summary": "hosted-prerequisite-summary.json",
+      "critical_path_seconds": 979.0,
+      "total_runner_wall_minutes": 39.583333333333336,
+      "runner_wall_minutes_by_os": {
+        "Linux": 29.6333,
+        "macOS": 2.3667,
+        "Windows": 7.5833
+      },
+      "linux_test_seconds": 215.0,
+      "quality_job_seconds": 965.0,
+      "quality_collection_seconds": 934.0,
+      "last_required_child": "Quality Coverage and Critical Paths",
+      "acceptance_test_seconds": 20.101651443,
+      "acceptance_steps_seconds": {
+        "Validate configured workflow acceptance": 0.0,
+        "Upload configured workflow acceptance": 2.0
+      },
+      "successful_jobs": [
+        {
+          "id": 102692016821,
+          "name": "Test (windows-latest)",
+          "conclusion": "success"
+        },
+        {
+          "id": 102692016912,
+          "name": "Format",
+          "conclusion": "success"
+        },
+        {
+          "id": 102692016928,
+          "name": "Build",
+          "conclusion": "success"
+        },
+        {
+          "id": 102692016976,
+          "name": "Quality CLI Contracts",
+          "conclusion": "success"
+        },
+        {
+          "id": 102692017035,
+          "name": "Security Audit",
+          "conclusion": "success"
+        },
+        {
+          "id": 102692017050,
+          "name": "Release Governance Contracts",
+          "conclusion": "success"
+        },
+        {
+          "id": 102692017055,
+          "name": "Documentation Consistency",
+          "conclusion": "success"
+        },
+        {
+          "id": 102692017075,
+          "name": "Quality Script Tests",
+          "conclusion": "success"
+        },
+        {
+          "id": 102692017082,
+          "name": "Clippy",
+          "conclusion": "success"
+        },
+        {
+          "id": 102692017100,
+          "name": "Test",
+          "conclusion": "success"
+        },
+        {
+          "id": 102692017106,
+          "name": "Quality Coverage and Critical Paths",
+          "conclusion": "success"
+        },
+        {
+          "id": 102692017261,
+          "name": "Test (macos-latest)",
+          "conclusion": "success"
+        },
+        {
+          "id": 102695650692,
+          "name": "Required Quality Aggregate",
+          "conclusion": "success"
+        },
+        {
+          "id": 102695650716,
+          "name": "Generic Quality Shadow",
+          "conclusion": "success"
+        }
+      ],
+      "matrix_cases": 12,
+      "negative_cases": 40,
+      "receipt_sha256": "6fd58e4aa747fb4a28e07735fac618ae4309b95cdec80085830795de0d8bf6d0",
+      "difference_from_accepted_after_median": {
+        "critical_path_seconds": 100.5,
+        "total_runner_wall_minutes": 0.25,
+        "runner_wall_minutes_by_os": {
+          "Linux": 2.7582999999999984,
+          "macOS": -2.7249499999999998,
+          "Windows": 0.21660000000000057
+        }
+      }
+    },
+    {
+      "issue": 187,
+      "pr": 197,
+      "run_id": 34422630969,
+      "attempt": 1,
+      "pr_head_sha": "0d2dfc23481cde02c3adc3f6659d00ca001ce3d8",
+      "tested_sha": "a75928522eb714bc569aaef5928c8e94411107ee",
+      "base_sha": "fd0d040fad1f051c64adb18b9a644fbe3c3dd24a",
+      "input": "hosted-closure-input.json",
+      "timing": "hosted-closure-timing.json",
+      "receipt": "hosted-closure-receipt.json.gz",
+      "summary": "hosted-closure-summary.json",
+      "critical_path_seconds": 964.0,
+      "total_runner_wall_minutes": 41.46666666666667,
+      "runner_wall_minutes_by_os": {
+        "Linux": 29.6833,
+        "macOS": 4.8333,
+        "Windows": 6.95
+      },
+      "linux_test_seconds": 253.0,
+      "quality_job_seconds": 953.0,
+      "quality_collection_seconds": 928.0,
+      "last_required_child": "Quality Coverage and Critical Paths",
+      "acceptance_test_seconds": 20.623483927,
+      "acceptance_steps_seconds": {
+        "Validate configured workflow acceptance": 1.0,
+        "Upload configured workflow acceptance": 0.0
+      },
+      "successful_jobs": [
+        {
+          "id": 102701156362,
+          "name": "Security Audit",
+          "conclusion": "success"
+        },
+        {
+          "id": 102701156513,
+          "name": "Format",
+          "conclusion": "success"
+        },
+        {
+          "id": 102701156525,
+          "name": "Documentation Consistency",
+          "conclusion": "success"
+        },
+        {
+          "id": 102701156544,
+          "name": "Quality CLI Contracts",
+          "conclusion": "success"
+        },
+        {
+          "id": 102701156569,
+          "name": "Build",
+          "conclusion": "success"
+        },
+        {
+          "id": 102701156587,
+          "name": "Quality Coverage and Critical Paths",
+          "conclusion": "success"
+        },
+        {
+          "id": 102701156589,
+          "name": "Release Governance Contracts",
+          "conclusion": "success"
+        },
+        {
+          "id": 102701156608,
+          "name": "Test",
+          "conclusion": "success"
+        },
+        {
+          "id": 102701156615,
+          "name": "Test (windows-latest)",
+          "conclusion": "success"
+        },
+        {
+          "id": 102701156663,
+          "name": "Clippy",
+          "conclusion": "success"
+        },
+        {
+          "id": 102701156666,
+          "name": "Test (macos-latest)",
+          "conclusion": "success"
+        },
+        {
+          "id": 102701156826,
+          "name": "Quality Script Tests",
+          "conclusion": "success"
+        },
+        {
+          "id": 102704478218,
+          "name": "Required Quality Aggregate",
+          "conclusion": "success"
+        },
+        {
+          "id": 102704478234,
+          "name": "Generic Quality Shadow",
+          "conclusion": "success"
+        }
+      ],
+      "matrix_cases": 12,
+      "negative_cases": 40,
+      "receipt_sha256": "c9abaf222801407558043ae7c202da6648c9edec5380b744d3bb623c6469636f",
+      "difference_from_accepted_after_median": {
+        "critical_path_seconds": 85.5,
+        "total_runner_wall_minutes": 2.133333333333333,
+        "runner_wall_minutes_by_os": {
+          "Linux": 2.808299999999999,
+          "macOS": -0.2583499999999992,
+          "Windows": -0.4166999999999996
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Single run per head, changing sources/test corpus and uncontrolled compiler/cache/runner contention; no causal speedup or integration-only cost estimate.",
+    "Unweighted runner occupancy, not billed minutes; test/validation/upload times are nested and must not be added again.",
+    "Acceptance also executes under existing production coverage; its separately instrumented duration is not isolated."
+  ],
+  "controller_acceptance": {
+    "source": "GH-198 issue: controller-confirmed hosted facts for merged PRs #196 and #197",
+    "required_children_and_aggregate": "success at both exact retained heads",
+    "matrix_cases": 12,
+    "fail_closed_negatives": 40,
+    "path": "Same generic/configuration-driven compiler, collector, verify, evaluator and reporting path",
+    "native_macos_windows": "required; successful at both heads",
+    "authoritative_collection": "No duplicate CRAP/coverage/risk collection or per-ecosystem CI job",
+    "required_quality_aggregate": "Unchanged and fail-closed",
+    "extension": "New ecosystem names remain configuration/pack data; collector + capability/policy pack + certification, without generic-core redesign",
+    "rollback": "Revert reconciliation only; any integration rollback retains low-level Rust authority, evidence, thresholds, series and required native/aggregate contract"
+  }
+}

@@ -1,5 +1,9 @@
 # GH-187: Configured workflow documentation and closure evidence
 
+Historical submission record. GH-198's [final hosted reconciliation](hosted-closure.md)
+supersedes the pending-at-submission status below with current-head run
+34422630969, attempt 1, and successful Required Quality Aggregate job 102704478218.
+
 Scope: OpenSpec [tasks 9.1–9.4](../../../openspec/changes/integrate-generic-quality-into-project-workflow/tasks.md)
 of `integrate-generic-quality-into-project-workflow`, following merged
 [GH-186 / PR #196](https://github.com/musutrade/Harness-Gate/pull/196).
