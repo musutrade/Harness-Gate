@@ -4,6 +4,9 @@
 
 **Accepted with renderer follow-up** (2026-08-29)
 
+The same-service preflight is refined for guaranteed serial dispatch by
+[ADR-0050](0050-serial-shared-service-ordering.md). Other safeguards remain unchanged.
+
 ## Context
 
 ADR-0023 established the v2 JSON Schema and deterministic `${NAME}` / `${NAME:-default}`

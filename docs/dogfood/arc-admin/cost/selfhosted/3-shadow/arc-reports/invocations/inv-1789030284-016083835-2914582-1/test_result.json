@@ -1,0 +1,1223 @@
+{
+  "schema_version": "1",
+  "invocation_id": "inv-1789030284-016083835-2914582-1",
+  "executor_version": "0.3.7",
+  "report_directory": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1",
+  "timestamp": "2026-09-10T08:56:14.955917355+00:00",
+  "profile": "full",
+  "input_mode": "all",
+  "project_identity": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source",
+  "source_identity": "working-tree:9982ed556eaf997910824d7b682946147c81a16a",
+  "execution_root": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source",
+  "configuration_digest": "sha256:cf7d181395a2a71827cc50fccfd5cba93ebe9c103cd9ae488ff491335cb393dc",
+  "scope": {
+    "mode": "all",
+    "changed_files": [],
+    "components": [
+      "backend",
+      "frontend",
+      "workflow"
+    ],
+    "unmatched_files": []
+  },
+  "services": [
+    {
+      "id": "test-postgres",
+      "status": "CLEANED"
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "builtin.secret-scan",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "secret scan",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 13367,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/secret_scan.json",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": null,
+          "finished_at": null,
+          "duration_ms": 13367,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/secret_scan.json",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "builtin.architecture-audit",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "architecture audit",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 400,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/review_context.json",
+      "detail": "0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)",
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": null,
+          "finished_at": null,
+          "duration_ms": 400,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/review_context.json",
+          "detail": "0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)"
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "backend.format",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "backend format",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 239,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/backend_fmt.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:51:37.851376977+00:00",
+          "finished_at": "2026-09-10T08:51:38.090764459+00:00",
+          "duration_ms": 239,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/backend_fmt.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "backend.clippy",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "backend Clippy",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 19626,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/backend_clippy.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:51:38.091628387+00:00",
+          "finished_at": "2026-09-10T08:51:57.718402266+00:00",
+          "duration_ms": 19626,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/backend_clippy.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "backend.compile",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "backend compile",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 2245,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/backend_check.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:51:57.719721414+00:00",
+          "finished_at": "2026-09-10T08:51:59.965366616+00:00",
+          "duration_ms": 2245,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/backend_check.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "backend.tests",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "backend tests",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 172137,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/backend_tests.log",
+      "detail": "31 result(s)",
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:51:59.966298220+00:00",
+          "finished_at": "2026-09-10T08:54:52.103853430+00:00",
+          "duration_ms": 172137,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/backend_tests.log",
+          "detail": "31 result(s)"
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": {
+        "mode": "regex",
+        "version": 1,
+        "observed": 31,
+        "minimum": 1,
+        "complete": true
+      }
+    },
+    {
+      "step_id": "frontend.lint",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "frontend lint",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 2961,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/frontend_lint.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:54:52.415654475+00:00",
+          "finished_at": "2026-09-10T08:54:55.377369910+00:00",
+          "duration_ms": 2961,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/frontend_lint.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "frontend.format",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "frontend format",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 3444,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/frontend_format.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:54:55.378702468+00:00",
+          "finished_at": "2026-09-10T08:54:58.822830303+00:00",
+          "duration_ms": 3444,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/frontend_format.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "frontend.tests",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "frontend tests",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 11951,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/frontend_tests.log",
+      "detail": "85 result(s)",
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:54:58.824115718+00:00",
+          "finished_at": "2026-09-10T08:55:10.775929111+00:00",
+          "duration_ms": 11951,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/frontend_tests.log",
+          "detail": "85 result(s)"
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": {
+        "mode": "regex",
+        "version": 1,
+        "observed": 85,
+        "minimum": 1,
+        "complete": true
+      }
+    },
+    {
+      "step_id": "frontend.e2e",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "frontend end-to-end tests",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 24605,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/frontend_e2e.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:55:10.781586685+00:00",
+          "finished_at": "2026-09-10T08:55:35.387394439+00:00",
+          "duration_ms": 24605,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/frontend_e2e.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "frontend.fullstack-smoke",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "frontend real full-stack smoke test",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 21400,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/frontend_fullstack_smoke.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:55:38.610948513+00:00",
+          "finished_at": "2026-09-10T08:56:00.011367794+00:00",
+          "duration_ms": 21400,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/frontend_fullstack_smoke.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "frontend.build",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "frontend production build",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 9704,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/frontend_build.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:56:00.420392146+00:00",
+          "finished_at": "2026-09-10T08:56:10.124943666+00:00",
+          "duration_ms": 9704,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/frontend_build.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.hook-syntax",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "Git hook syntax",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 9,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/git_hook_syntax.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:56:10.126092963+00:00",
+          "finished_at": "2026-09-10T08:56:10.135735361+00:00",
+          "duration_ms": 9,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/git_hook_syntax.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.project-init-tests",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "project initializer tests",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 481,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/project_init_tests.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:56:10.136263914+00:00",
+          "finished_at": "2026-09-10T08:56:10.617711118+00:00",
+          "duration_ms": 481,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/project_init_tests.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.framework-release-config",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "framework release configuration gate",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 79,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/framework_release_config.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:56:10.618850916+00:00",
+          "finished_at": "2026-09-10T08:56:10.698758582+00:00",
+          "duration_ms": 79,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/framework_release_config.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.framework-upgrade-tests",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "framework upgrade tests",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 962,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/framework_upgrade_tests.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:56:10.699799346+00:00",
+          "finished_at": "2026-09-10T08:56:11.662358170+00:00",
+          "duration_ms": 962,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/framework_upgrade_tests.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.template-quality",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "template quality gate",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 480,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/template_quality.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:56:11.663522482+00:00",
+          "finished_at": "2026-09-10T08:56:12.143741051+00:00",
+          "duration_ms": 480,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/template_quality.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.template-quality-tests",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "template quality gate tests",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 640,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/template_quality_tests.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:56:12.144228258+00:00",
+          "finished_at": "2026-09-10T08:56:12.784288697+00:00",
+          "duration_ms": 640,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/template_quality_tests.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.observability-config",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "observability configuration gate",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 79,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/observability_config.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:56:12.785459504+00:00",
+          "finished_at": "2026-09-10T08:56:12.865041643+00:00",
+          "duration_ms": 79,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/observability_config.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.tracing-config",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "optional tracing and compliance configuration gate",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 79,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/tracing_config.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:56:12.866012427+00:00",
+          "finished_at": "2026-09-10T08:56:12.945938740+00:00",
+          "duration_ms": 79,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/tracing_config.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.production-deployment-config",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "production deployment configuration gate",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 79,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/production_deployment_config.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:56:12.946546702+00:00",
+          "finished_at": "2026-09-10T08:56:13.026250363+00:00",
+          "duration_ms": 79,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/production_deployment_config.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.audit-retention-config",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "audit retention and archive configuration gate",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 79,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/audit_retention_config.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:56:13.026986413+00:00",
+          "finished_at": "2026-09-10T08:56:13.106338846+00:00",
+          "duration_ms": 79,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/audit_retention_config.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.api-generation",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "Rust OpenAPI and Angular client generation gate",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 720,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/api_generation.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:56:13.106893729+00:00",
+          "finished_at": "2026-09-10T08:56:13.827556258+00:00",
+          "duration_ms": 720,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/api_generation.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.supply-chain-config",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "supply chain security configuration gate",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 78,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/supply_chain_config.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:56:13.828163591+00:00",
+          "finished_at": "2026-09-10T08:56:13.907025953+00:00",
+          "duration_ms": 78,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/supply_chain_config.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.format",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "arc-flow format",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 239,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/arc_flow_fmt.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:56:13.907633776+00:00",
+          "finished_at": "2026-09-10T08:56:14.147106044+00:00",
+          "duration_ms": 239,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/arc_flow_fmt.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.clippy",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "arc-flow Clippy",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 239,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/arc_flow_clippy.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:56:14.148145830+00:00",
+          "finished_at": "2026-09-10T08:56:14.387786135+00:00",
+          "duration_ms": 239,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/arc_flow_clippy.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.tests",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "label": "arc-flow tests",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 560,
+      "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/arc_flow_tests.log",
+      "detail": "58 result(s)",
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T08:56:14.388486008+00:00",
+          "finished_at": "2026-09-10T08:56:14.948718958+00:00",
+          "duration_ms": 560,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789030284-016083835-2914582-1/logs/arc_flow_tests.log",
+          "detail": "58 result(s)"
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": {
+        "mode": "regex",
+        "version": 1,
+        "observed": 58,
+        "minimum": 1,
+        "complete": true
+      }
+    }
+  ],
+  "skipped_steps": [],
+  "warnings": [],
+  "failures": [
+    {
+      "step_id": null,
+      "code": "QUALITY_BLOCKED",
+      "message": "Quality profile null: blocked (configuration); full quality: blocked\nquality workflow input is missing: /mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/.harness-gate/runtime/full-state.json\n"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "changed_files.txt",
+      "kind": "artifact",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "invocation.json",
+      "kind": "invocation-metadata",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "size_bytes": 779,
+      "sha256": "5c33c7328d5101f3170532c9ea0e185ee8501f3b0352ca2954054550fb6ac6cc"
+    },
+    {
+      "path": "logs/api_generation.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "workflow.api-generation",
+      "size_bytes": 69,
+      "sha256": "121508a10d21348d1ed2a1846def6077810a5470397bd0213b78952ea8104097"
+    },
+    {
+      "path": "logs/arc_flow_clippy.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "workflow.clippy",
+      "size_bytes": 72,
+      "sha256": "f0788aa36d1c86b6ccdfb7f4042a5574102d82061c046422a2d42e008a1e4710"
+    },
+    {
+      "path": "logs/arc_flow_fmt.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "workflow.format",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/arc_flow_tests.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "workflow.tests",
+      "size_bytes": 6888,
+      "sha256": "a98fa816a41f9da2c07ae9832b8a250210f87b9a5d7fd6f641075b0ef8e92029"
+    },
+    {
+      "path": "logs/audit_retention_config.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "workflow.audit-retention-config",
+      "size_bytes": 46,
+      "sha256": "a03fd67491bb40b9ed25b1b741316ce69ff28bdeb53af3e167da7a85ea966ef4"
+    },
+    {
+      "path": "logs/backend_check.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "backend.compile",
+      "size_bytes": 211,
+      "sha256": "9a9d4267984da55839f91fba5950555b264dd8554da5a4dcec0f8d96ebabecaf"
+    },
+    {
+      "path": "logs/backend_clippy.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "backend.clippy",
+      "size_bytes": 463,
+      "sha256": "12933eea040ad4b23a03fe42beff3c6cc47b772307e6f61b9bd7e7803278bc74"
+    },
+    {
+      "path": "logs/backend_fmt.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "backend.format",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/backend_tests.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "backend.tests",
+      "size_bytes": 5642,
+      "sha256": "d21a6eaa6796d240df70e90204b686796f460798c2b947b7c9b091eae00c28bb"
+    },
+    {
+      "path": "logs/framework_release_config.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "workflow.framework-release-config",
+      "size_bytes": 72,
+      "sha256": "5fbe2bdd0f06dbfd25bb64209ce0b103d147b8d78cb6bdc750eb03715a71809f"
+    },
+    {
+      "path": "logs/framework_upgrade_tests.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "workflow.framework-upgrade-tests",
+      "size_bytes": 685,
+      "sha256": "affd1eb1fdfa1dd237e2871a819a617c0c57ad8846a14df027fc9cb9d0ab9a6c"
+    },
+    {
+      "path": "logs/frontend_build.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "frontend.build",
+      "size_bytes": 1901,
+      "sha256": "20f5b57ab793a4a10cd1fcfeef643104dad6d2ae12038d966350612b513c67c4"
+    },
+    {
+      "path": "logs/frontend_e2e.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "frontend.e2e",
+      "size_bytes": 1461,
+      "sha256": "5ad2b89249de3574efe7380e562cc8980cc81c3d16688ba168993539f567ddbf"
+    },
+    {
+      "path": "logs/frontend_format.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "frontend.format",
+      "size_bytes": 182,
+      "sha256": "572030ab498ed6707869f472eefa9dd5d80b6da7108de24d53c0c712ee25c8da"
+    },
+    {
+      "path": "logs/frontend_fullstack_smoke.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "frontend.fullstack-smoke",
+      "size_bytes": 3076,
+      "sha256": "1cb26a6aaa9705d15b1b0cedaf7a38f71518aa08b47ed5ad5255b44be5b41f13"
+    },
+    {
+      "path": "logs/frontend_lint.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "frontend.lint",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/frontend_tests.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "frontend.tests",
+      "size_bytes": 14890,
+      "sha256": "effbb6616e71cee757a534fe2855001d1317d14b2e15753970922ed9289a885b"
+    },
+    {
+      "path": "logs/git_hook_syntax.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "workflow.hook-syntax",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/observability_config.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "workflow.observability-config",
+      "size_bytes": 37,
+      "sha256": "c2496d8287bc4b621eb370b876d852e40d6cc12bb81ea78fdab2b55e7f8c026f"
+    },
+    {
+      "path": "logs/production_deployment_config.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "workflow.production-deployment-config",
+      "size_bytes": 37,
+      "sha256": "3278d12e74187d2050167583f815a693333906425911d1ea88323ff7e831ad5b"
+    },
+    {
+      "path": "logs/project_init_tests.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "workflow.project-init-tests",
+      "size_bytes": 673,
+      "sha256": "9c216a1f2000ea44be72bf6d749eba71fafc5897fd3cafd10a141dbfa0c0b25a"
+    },
+    {
+      "path": "logs/supply_chain_config.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "workflow.supply-chain-config",
+      "size_bytes": 34,
+      "sha256": "6150a76f1a143bf92bb1e3b15be7231da150a9e1504ed91bbfc50e46a963a823"
+    },
+    {
+      "path": "logs/template_quality.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "workflow.template-quality",
+      "size_bytes": 68,
+      "sha256": "3c085d8eed8e9bbb140af81959acff5983cd819355a6503b8b5c4c48e330d902"
+    },
+    {
+      "path": "logs/template_quality_tests.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "workflow.template-quality-tests",
+      "size_bytes": 522,
+      "sha256": "514f03127fba5cc5602a0178b007dfa4bcb3e9816ec3bacf2fb604c332dc7d00"
+    },
+    {
+      "path": "logs/tracing_config.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "workflow.tracing-config",
+      "size_bytes": 49,
+      "sha256": "ad0c4492ac4327d5d6ec4686628748a0566bc10d553c93311414919f81e089e3"
+    },
+    {
+      "path": "review_context.json",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "builtin.architecture-audit",
+      "size_bytes": 2444,
+      "sha256": "4047c4c96fe06014d721cdbf667e6ecd7e778191ac46030dab394a68c8a68713"
+    },
+    {
+      "path": "review_context.md",
+      "kind": "report",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "size_bytes": 1002,
+      "sha256": "e568d1b9876c943e924bbd7e79e0110068b55dbc58ef2344b1b463f287714709"
+    },
+    {
+      "path": "scope.json",
+      "kind": "report",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "size_bytes": 136,
+      "sha256": "392e0ac4200cbd3678df793197c30fc2ee6eca5049b2582c50f3cfd1f88f89fc"
+    },
+    {
+      "path": "secret_scan.json",
+      "kind": "step-log",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "step_id": "builtin.secret-scan",
+      "size_bytes": 100,
+      "sha256": "830b0308eb7a2394a3d394a560054e70cc9105d690db081c2c5c83bdc25325ba"
+    },
+    {
+      "path": "test_result.md",
+      "kind": "report",
+      "invocation_id": "inv-1789030284-016083835-2914582-1",
+      "size_bytes": 1636,
+      "sha256": "ccfcb449195b714ada5d25f180bc98466b67b1bc16f7a032071da8bc03146713"
+    }
+  ],
+  "evidence_complete": true,
+  "quality": {
+    "baseline": null,
+    "error": "quality workflow input is missing: /mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/.harness-gate/runtime/full-state.json",
+    "evaluation_time": null,
+    "evidence": null,
+    "formats": [],
+    "full_quality_status": "blocked",
+    "inputs": null,
+    "output": null,
+    "participation": null,
+    "phase": "configuration",
+    "producers": null,
+    "project_report": null,
+    "project_report_path": null,
+    "schema": "quality-verification/v1",
+    "selection": null,
+    "status": "blocked"
+  },
+  "passed": false,
+  "status": "FAIL"
+}
