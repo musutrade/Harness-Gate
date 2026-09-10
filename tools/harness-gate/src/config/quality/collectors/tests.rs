@@ -7,6 +7,10 @@ use ed25519_dalek::{Signer, SigningKey};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use tempfile::{tempdir, TempDir};
 
+#[path = "ci_acceptance.rs"]
+#[cfg(target_os = "linux")]
+mod ci_acceptance;
+
 struct Fixture {
     dir: TempDir,
     state: TrustedState,
