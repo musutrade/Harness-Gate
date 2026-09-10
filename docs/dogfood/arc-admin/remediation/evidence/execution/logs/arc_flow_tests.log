@@ -1,0 +1,88 @@
+
+running 58 tests
+test audit::tests::audit_schema_accepts_current_config_and_rejects_incompatible_inputs ... ok
+test audit::tests::invalid_rule_regex_returns_an_error ... ok
+test audit::tests::legacy_audit_shapes_receive_actionable_migration_errors ... ok
+test audit::tests::literal_allowlist_is_a_path_prefix_not_a_substring ... ok
+test audit::tests::log_parser_keeps_the_error_in_a_long_trace ... ok
+test audit::tests::log_parser_keeps_the_error_trace ... ok
+test audit::tests::log_parser_reads_trace_id_from_the_current_span ... ok
+test audit::tests::architecture_rule_scans_every_configured_root ... ok
+test audit::tests::configured_comment_syntax_handles_strings_and_block_comments ... ok
+test audit::tests::hard_rule_scans_every_configured_root ... ok
+test audit::tests::architecture_rule_detects_multiline_raw_sql_and_query_builder ... ok
+test audit::tests::missing_rule_root_fails_closed ... ok
+test audit::tests::regex_allowlist_is_explicit ... ok
+test audit::tests::rule_extension_requires_configured_comment_syntax ... ok
+test audit::tests::rule_root_cannot_escape_project ... ok
+Initialized preset "generic" in /mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/tmp/arc-flow-auditor-initialized-first-rule-14965-1789034326042465379/.arc-flow
+Next: arc-flow --project-root /mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/tmp/arc-flow-auditor-initialized-first-rule-14965-1789034326042465379 config check
+test config::tests::duplicate_service_injection_variables_are_rejected ... ok
+test config::tests::components_and_profiles_are_not_hard_coded ... ok
+test config::tests::existing_v2_config_defaults_the_secret_rule_path ... ok
+test config::tests::policy_steps_cannot_be_missing ... ok
+test config::tests::version_one_configuration_can_be_migrated ... ok
+test config::tests::repository_configuration_is_valid ... ok
+test config::tests::shell_command_strings_are_rejected ... ok
+test preset::tests::existing_symlink_cannot_escape_project ... ok
+test audit::tests::initialized_project_can_add_and_run_its_first_audit_rule ... ok
+test config::tests::unknown_fields_are_rejected ... ok
+test preset::tests::project_names_become_portable_ids ... ok
+test audit::tests::hard_rule_detects_multiline_and_dynamic_sql_surfaces ... ok
+test preset::tests::atomic_write_replaces_complete_content ... ok
+test audit::tests::hard_rule_detects_multiline_sensitive_logging ... ok
+test preset::tests::every_embedded_preset_is_valid ... ok
+test project::tests::repository_path_rejects_symlink_escape ... ok
+test scope::tests::frontend_change_only_selects_frontend ... ok
+test scope::tests::unmatched_paths_are_reported ... ok
+Initialized preset "generic" in /mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/tmp/arc-flow-init-test-1789034326079659472/.arc-flow
+Next: arc-flow --project-root /mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/tmp/arc-flow-init-test-1789034326079659472 config check
+test preset::tests::init_writes_required_security_configs ... ok
+test scope::tests::workflow_changes_force_all_components ... ok
+test secrets::tests::default_preset_secret_config_is_valid ... ok
+test doctor::tests::git_remote_check_rejects_non_git_directory ... ok
+test secrets::tests::invalid_secret_config_fails_closed ... ok
+test secrets::tests::local_test_database_policy_is_configurable ... ok
+test secrets::tests::placeholder_prefixes_are_configurable ... ok
+Initialized preset "generic" in /mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/tmp/arc-flow-staged-secrets-1789034326130107003/.arc-flow
+Next: arc-flow --project-root /mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/tmp/arc-flow-staged-secrets-1789034326130107003 config check
+test process::tests::timeout_terminates_the_task ... ok
+test service::tests::accepts_an_explicitly_allowed_remote_test_database ... ok
+test service::tests::accepts_an_ipv6_loopback_database ... ok
+test service::tests::accepts_an_isolated_loopback_database ... ok
+test secrets::tests::detects_named_jwt_and_enterprise_messaging_secrets ... ok
+test service::tests::rejects_a_database_without_a_test_suffix ... ok
+test service::tests::rejects_a_remote_database_without_an_explicit_override ... ok
+test service::tests::rejects_the_configured_runtime_database ... ok
+test verify::tests::a_new_test_framework_can_supply_its_own_pattern ... ok
+test verify::tests::configurable_regex_parser_counts_multiple_outputs ... ok
+test verify::tests::regex_parser_ignores_ansi_color_sequences ... ok
+Initialized preset "generic" in /mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/tmp/arc-flow-verify-1789034326139366398/.arc-flow
+Next: arc-flow --project-root /mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/tmp/arc-flow-verify-1789034326139366398 config check
+test secrets::tests::detects_direct_tokens_without_matching_placeholders ... ok
+test secrets::tests::detects_postgres_credentials_and_secret_bearing_webhooks ... ok
+test process::tests::task_can_remove_an_inherited_environment_variable ... ok
+test process::tests::task_runs_in_an_isolated_session ... ok
+arc-flow verify
+Scope: all
+Components: project
+
+test secrets::tests::staged_scan_uses_the_staged_secret_config ... ok
+test process::tests::captured_command_has_a_hard_timeout ... ok
+[PASS] secret scan (88 ms)
+[PASS] architecture audit (2 ms)
+[FAIL] Git whitespace check: service missing-service setup (0 ms)
+[RUN ] staged Git whitespace check ... PASS (101 ms)
+
+Verification report: /mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/tmp/arc-flow-verify-1789034326139366398/.arc-flow/reports/test_result.md
+TEST_SUMMARY: FAIL
+test verify::tests::service_failure_does_not_skip_unrelated_steps ... ok
+
+test result: ok. 58 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running unittests src/main.rs (/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/cargo-target/debug/deps/arc_flow-395788e7bcd139b5)
+✅ 结构化日志已提取: /mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/tmp/arc-flow-auditor-parse-long-logs-14965-1789034326050541325/output.json (30 条, trace_id=long-trace)
+✅ 结构化日志已提取: /mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/tmp/arc-flow-auditor-parse-logs-14965-1789034326053029466/output.json (2 条, trace_id=failed)
+✅ 结构化日志已提取: /mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/tmp/arc-flow-auditor-parse-span-logs-14965-1789034326053600482/output.json (2 条, trace_id=span-trace)

@@ -1,0 +1,9 @@
+   Compiling harness-gate v0.3.7 (/mnt/dev-ssd/workspaces/symphony/GH-207/tools/harness-gate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.50s
+────────────
+ Nextest run ID ec95637f-8c11-4437-805b-320f2456eedf with nextest profile: default
+    Starting 2 tests across 10 binaries (390 tests skipped)
+        PASS [   0.011s] (1/2) harness-gate::bin/harness-gate config::import::tests::import_checks_generic_resource_conflicts_without_changing_serial_flows
+        PASS [   0.763s] (2/2) harness-gate::bin/harness-gate config::quality::collectors::tests::dogfood_acceptance::quality_preparation_failure_retains_requested_profile_and_blocks
+────────────
+     Summary [   0.765s] 2 tests run: 2 passed, 390 skipped
