@@ -29,10 +29,12 @@ GH-202 evidence: [deterministic import, loss detection, full declaration parity 
 
 ## 4. Configure Arc-Admin generic quality
 
-- [ ] 4.1 Add Arc-Admin Harness-Gate quality configuration for Angular frontend, Rust backend and relevant component relationships.
-- [ ] 4.2 Bind the accepted Rust coverage/risk/CRAP series and trusted baseline provider without changing thresholds or lineage semantics.
-- [ ] 4.3 Keep Angular/TypeScript CRAP explicitly unsupported unless separately certified.
-- [ ] 4.4 Keep E2E/API/smoke/generation checks as execution hooks rather than fake quality collectors.
+- [x] 4.1 Add Arc-Admin Harness-Gate quality configuration for Angular frontend, Rust backend and relevant component relationships.
+- [x] 4.2 Bind the accepted Rust coverage/risk/CRAP series and trusted baseline provider without changing thresholds or lineage semantics.
+- [x] 4.3 Keep Angular/TypeScript CRAP explicitly unsupported unless separately certified.
+- [x] 4.4 Keep E2E/API/smoke/generation checks as execution hooks rather than fake quality collectors.
+
+GH-203 evidence: [separate quality configuration and trust prerequisites](../../../docs/dogfood/arc-admin/quality/README.md), [actual validation results](../../../docs/dogfood/arc-admin/quality/validation.json). The production validator accepts the imported flow plus quality bindings and rejects four binding-loss cases. Five Python regressions compare unchanged packs to certified sources, preserve all 25 execution hooks, and assert Angular CRAP remains unsupported. JSON Schema and strict OpenSpec validation pass; the existing certified workflow acceptance records 12 validated cases. These checkboxes do not claim Arc-Admin runtime parity, hosted Required Quality Aggregate success or acceptance of the complete proposal.
 
 ## 5. Run observation and shadow parity
 
