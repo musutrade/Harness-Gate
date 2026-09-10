@@ -9,7 +9,7 @@ use std::{fs, path::PathBuf};
 
 #[derive(Debug, Subcommand)]
 pub(crate) enum QualityAction {
-    /// Evaluate generic evidence and produce the authoritative project decision in Rust.
+    /// Advanced: evaluate explicit trusted inputs in Rust; ordinary projects use verify.
     Evaluate(Box<EvaluateArgs>),
     /// Compile validated configuration and host-owned state to generic contracts.
     Compile(CompileArgs),
