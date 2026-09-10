@@ -1,0 +1,37 @@
+harness-gate verify
+Scope: all
+Components: backend, frontend, workflow
+
+[PASS] secret scan (14466 ms)
+[PASS] architecture audit (479 ms)
+[RUN ] backend format ... PASS (237 ms)
+[RUN ] backend Clippy ... PASS (559 ms)
+[RUN ] backend compile ... PASS (399 ms)
+[RUN ] backend tests ... PASS (165743 ms)
+[RUN ] frontend lint ... PASS (3602 ms)
+[RUN ] frontend format ... PASS (3442 ms)
+[RUN ] frontend tests ... PASS (13714 ms)
+[RUN ] frontend end-to-end tests ... PASS (23265 ms)
+[RUN ] frontend real full-stack smoke test ... PASS (20031 ms)
+[RUN ] frontend production build ... PASS (6808 ms)
+[RUN ] Git hook syntax ... PASS (8 ms)
+[RUN ] project initializer tests ... PASS (481 ms)
+[RUN ] framework release configuration gate ... PASS (80 ms)
+[RUN ] framework upgrade tests ... PASS (1122 ms)
+[RUN ] template quality gate ... PASS (481 ms)
+[RUN ] template quality gate tests ... PASS (646 ms)
+[RUN ] observability configuration gate ... PASS (79 ms)
+[RUN ] optional tracing and compliance configuration gate ... PASS (79 ms)
+[RUN ] production deployment configuration gate ... PASS (81 ms)
+[RUN ] audit retention and archive configuration gate ... PASS (82 ms)
+[RUN ] Rust OpenAPI and Angular client generation gate ... PASS (721 ms)
+[RUN ] supply chain security configuration gate ... PASS (79 ms)
+[RUN ] arc-flow format ... PASS (243 ms)
+[RUN ] arc-flow Clippy ... PASS (320 ms)
+[RUN ] arc-flow tests ... PASS (645 ms)
+Quality profile "full": blocked (configuration); full quality: blocked
+quality workflow input is missing: /mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/.harness-gate/runtime/full-state.json
+
+
+Verification report: /mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/test_result.md
+TEST_SUMMARY: FAIL

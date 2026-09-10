@@ -285,7 +285,7 @@ fn run_selected(
         &mut progress,
         cleanup_error.as_ref(),
     );
-    let quality = quality::run(&invocation_project, quality_inputs);
+    let quality = quality::run(&invocation_project, profile, quality_inputs);
     if let Some(result) = &quality {
         println!("{}", quality::diagnostics(result));
     }

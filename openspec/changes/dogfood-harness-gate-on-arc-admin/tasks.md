@@ -62,14 +62,16 @@ GH-205 evidence: [controlled negative corpus and replay](../../../docs/dogfood/a
 - [x] 7.3 Define a no-duplication authority-transfer topology that preserves current assurance.
 - [x] 7.4 Do not delete existing CI/arc-flow gates until replacement ownership and fail-closed behavior are evidenced.
 
-GH-206 evidence: [before/shadow/target cost and ownership analysis](../../../docs/dogfood/arc-admin/cost/README.md), [reproducible 25-command / nine-capability ledger](../../../docs/dogfood/arc-admin/cost/report.json), and [validation](../../../docs/dogfood/arc-admin/cost/validation.json). Tasks 7.2–7.4 preserve all existing gates and make the target conditional on actual runtime parity, fail-closed evidence and trusted quality provisioning. Task 7.1 remains blocked: the pinned self-hosted CI sample measures only the before topology; GH-204's local pre-dispatch failures have no elapsed timings and there is no paired self-hosted shadow run. Unknown cost is not zero. Timing capture and the exact follow-up measurement protocol are supplied, without claiming a completed trial, authority transfer, Required Quality Aggregate green or complete proposal acceptance.
+GH-206 evidence: [before/shadow/target cost and ownership analysis](../../../docs/dogfood/arc-admin/cost/README.md), [reproducible 25-command / nine-capability ledger](../../../docs/dogfood/arc-admin/cost/report.json), and [three bounded self-hosted pairs](../../../docs/dogfood/arc-admin/cost/selfhosted.md). The final GH-206 series supersedes the earlier lack of paired measurements: every shadow invocation passes all 27 traditional results and fails closed on missing native quality state. Tasks 7.2–7.4 preserve all existing gates and make the target conditional on trusted quality provisioning and complete assurance evidence. Complete-quality cost and original-topology savings remain unknown; the bounded series does not authorize transfer or accept the complete proposal.
 
 ## 8. Product gap remediation
 
-- [ ] 8.1 Fix or separately track any Harness-Gate capability gap revealed by Arc-Admin rather than weakening Arc-Admin.
-- [ ] 8.2 Fix or separately track migration/configuration/diagnostic UX gaps that make compatible project validation unnecessarily difficult.
-- [ ] 8.3 Add regression fixtures/tests for every generic product gap fixed through dogfood.
-- [ ] 8.4 Re-run parity and negative evidence after any Harness-Gate remediation.
+- [x] 8.1 Fix or separately track any Harness-Gate capability gap revealed by Arc-Admin rather than weakening Arc-Admin.
+- [x] 8.2 Fix or separately track migration/configuration/diagnostic UX gaps that make compatible project validation unnecessarily difficult.
+- [x] 8.3 Add regression fixtures/tests for every generic product gap fixed through dogfood.
+- [x] 8.4 Re-run parity and negative evidence after any Harness-Gate remediation.
+
+  Evidence: [GH-207 remediation ledger](../../../docs/dogfood/arc-admin/remediation/README.md), [validation](../../../docs/dogfood/arc-admin/remediation/validation.json) and hashed rerun receipts. All 27 application results pass in each of three local runs; both Harness-Gate paths retain the missing-native-state block. Six CLI controls and seventeen signed quality cases retain expected outcomes. Remaining native integration, host/hook/routing and complete cost evidence are explicitly tracked with rationale in [GH-215](https://github.com/musutrade/Harness-Gate/issues/215); task 9 and proposal-wide acceptance remain pending.
 
 ## 9. Authority-transfer recommendation and closure
 

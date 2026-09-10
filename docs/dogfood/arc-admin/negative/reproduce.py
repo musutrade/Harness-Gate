@@ -15,7 +15,8 @@ ERRORS = {
 }
 
 
-def verify(root=ROOT):
+def verify(root=ROOT, source_root=None):
+    source_root = root.parent if source_root is None else source_root
     manifest = json.loads((root / 'manifest.json').read_text())
     assert set(manifest['artifacts']) == {'evidence/commands.json', 'evidence/quality.json'}
     for name, sha in manifest['artifacts'].items():
@@ -23,7 +24,7 @@ def verify(root=ROOT):
     commands = json.loads((root / 'evidence/commands.json').read_text())
     assert commands['frozen_sources_unchanged'] and commands['disposable_fixtures_removed']
     for name, sha in commands['frozen_source_hashes'].items():
-        assert hashlib.sha256((root.parent / name).read_bytes()).hexdigest() == sha, name
+        assert hashlib.sha256((source_root / name).read_bytes()).hexdigest() == sha, name
     ids = {'frontend.e2e', 'backend.tests', 'frontend.fullstack-smoke'}
     assert len(commands['cases']) == 6
     assert {c['id'] for c in commands['cases']} == {f'{i}-{s}' for i in ids for s in [0, 7]}
