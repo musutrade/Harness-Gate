@@ -1,5 +1,5 @@
 //! Offline import: never resolve environment values or execute project commands.
-use super::FlowConfig;
+use super::{diagnostic::SourceMap, FlowConfig};
 use anyhow::{bail, Context, Result};
 use serde_json::{json, Value as Json};
 use sha2::{Digest, Sha256};
@@ -135,12 +135,12 @@ pub(crate) fn import_execution(source: &str) -> Result<ExecutionImport> {
         .clone()
         .try_into()
         .context("unsupported execution mapping")?;
+    let output = toml::to_string_pretty(&migrated)?;
     config
-        .validate()
+        .validate_with_diagnostics(&SourceMap::from_source(&output), None, None)
         .context("imported execution configuration is invalid")?;
     let typed = Value::try_from(&config).context("serialize validated execution configuration")?;
     preserve_fields(&migrated, &typed, "$")?;
-    let output = toml::to_string_pretty(&migrated)?;
     let step_inventory: Vec<Json> = config
         .steps
         .iter()
@@ -240,5 +240,55 @@ fn scalar_count(value: &Value) -> usize {
         Value::Table(table) => table.values().map(scalar_count).sum(),
         Value::Array(array) => array.iter().map(scalar_count).sum(),
         _ => 1,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn import_checks_generic_resource_conflicts_without_changing_serial_flows() {
+        let source = r#"version = 2
+[project]
+name = "resource-fixture"
+default_profile = "full"
+hook_profile = "full"
+[paths]
+reports = ".harness-gate/reports"
+audit_config = ".harness-gate/audit.toml"
+[scope]
+unmatched = "fail"
+rules = [{ patterns = ["**"], components = ["custom"] }]
+[[steps]]
+id = "one"
+label = "One"
+component = "custom"
+program = "custom-runner"
+args = []
+cwd = "{root}"
+timeout_secs = 5
+profiles = ["full"]
+log = "shared.log"
+[[steps]]
+id = "two"
+label = "Two"
+component = "custom"
+program = "custom-runner"
+args = []
+cwd = "{root}"
+timeout_secs = 5
+profiles = ["full"]
+log = "shared.log"
+"#;
+        let error = import_execution(source).err().unwrap();
+        assert!(
+            format!("{error:#}").contains("HGCFG-DUPLICATE-LOG"),
+            "{error:#}"
+        );
+        let valid = source.replacen("log = \"shared.log\"", "log = \"one.log\"", 1);
+        let imported = import_execution(&valid).unwrap();
+        FlowConfig::from_source(&imported.source).unwrap();
+        assert_eq!(imported.report["steps"].as_array().unwrap().len(), 2);
     }
 }

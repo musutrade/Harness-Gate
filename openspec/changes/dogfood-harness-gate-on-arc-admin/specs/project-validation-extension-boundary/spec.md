@@ -135,6 +135,13 @@ overwrite source or existing output files.
 - **AND** execution-only output, if explicitly requested, still records blocked authority transfer
 - **AND** no quality configuration, CI profile or replacement authority is invented
 
+#### Scenario: Offline import encounters a static resource conflict
+- **GIVEN** supported execution declarations contain a duplicate log destination
+- **WHEN** execution-only import runs
+- **THEN** it uses the production loader's static semantic/resource validation and rejects the conflict before publishing either output
+- **AND** host environment values do not influence validation or imported bytes
+- **AND** valid serial configurations remain compatible without invented dependencies
+
 ### Requirement: Import SHALL expose migration effort and configuration duplication metrics
 
 The deterministic import report SHALL count import operations, re-entered steps,
@@ -219,3 +226,14 @@ For consumers of the same service identity, the production loader SHALL recogniz
 - **THEN** the actual workload segment and job occupancy costs are retained with failed quality exit codes
 - **AND** full-quality cost, original-topology savings and authority transfer remain unestablished
 - **AND** the missing host provisioning is tracked for integration remediation rather than fabricated or waived
+
+### Requirement: Early quality failures SHALL identify the requested profile
+
+Quality preparation failures SHALL retain the requested profile in machine and human diagnostics. They SHALL remain blocked in the configuration phase without inventing policy participation, native measurements, a project quality report or baseline acceptance.
+
+#### Scenario: Trusted workflow state or keys are unavailable
+- **GIVEN** a selected quality workflow requires trusted state and keys
+- **WHEN** either input is missing during preparation
+- **THEN** verification fails with the requested profile and the concrete input error
+- **AND** overall and full-quality outcomes remain blocked with no project quality report
+- **AND** static configuration success is not presented as successful runtime quality collection
