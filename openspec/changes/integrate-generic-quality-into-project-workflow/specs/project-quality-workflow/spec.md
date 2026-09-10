@@ -256,6 +256,15 @@ Project workflow integration SHALL comply with the accepted optimized CI topolog
 - **THEN** required generic quality fails closed
 - **AND** does not fall back to stale/reference evidence or an untracked duplicate collection as PASS
 
+#### Scenario: Configured CI acceptance includes an unregistered ecosystem
+- **GIVEN** arbitrary configured ecosystem metadata, producer and series identities, and supported capability contracts
+- **WHEN** the shared hosted/local acceptance runner selects the CI profile
+- **THEN** Rust, Angular/reference, mixed and unregistered shapes traverse the same retained evidence validation, verify aggregate and report path
+- **AND** selection adds no language branches or ecosystem-specific CI jobs
+- **AND** missing or mutated evidence fails closed without another producer launch
+- **AND** exact inputs, direct/verify parity reports, negative results and elapsed test time are retained with the hosted checkout/run/attempt identity
+- **AND** unsupported custom metric semantics remain rejected rather than silently certified
+
 ### Requirement: Advanced low-level interfaces SHALL remain available
 
 `harness-gate quality evaluate` and `harness-gate adapter run` SHALL remain available as explicit advanced/debug/integration interfaces during this change. Normal preset users SHALL NOT need to construct their low-level request/evaluation JSON manually for ordinary `verify`.
