@@ -22,7 +22,7 @@ def seconds(start, end):
 
 def derive(root):
     manifest = read(root, 'sha256.json')
-    assert set(manifest) == {str(p.relative_to(root)) for p in root.rglob('*') if p.is_file() and p.name != 'sha256.json'}, 'incomplete artifact manifest'
+    assert set(manifest) == {str(p.relative_to(root)) for p in root.rglob('*') if p.is_file() and p != root / 'sha256.json'}, 'incomplete artifact manifest'
     for relative, digest in manifest.items():
         path = (root / relative).resolve()
         assert path.is_relative_to(root.resolve()), 'artifact escape'
@@ -65,7 +65,22 @@ def derive(root):
                              'commands_passed': receipt['passed']}
             assert pair[f'{mode}_seconds'] == receipt['elapsed_seconds']
         assert pair['added_seconds'] == timings['shadow']['segment_seconds'] - timings['before']['segment_seconds']
-        rows.append({'sample': sample, **timings, 'added_segment_seconds': pair['added_seconds']})
+        native = read(root, f'{sample}-shadow/arc-reports/test_result.json')
+        harness = read(root, f'{sample}-shadow/harness-reports/test_result.json')
+        assert harness['source_identity'] == 'working-tree:' + context['source_sha']
+        assert native['profile'] == harness['profile'] == 'full'
+        assert native['scope']['mode'] == harness['scope']['mode'] == 'all'
+        inventory = json.loads((HERE.parent / 'inventory.json').read_text())
+        expected = {step['label'] for step in inventory['flow']['steps']} | set(inventory['always_blocking_prelude'])
+        native_steps = {step['label']: step['passed'] for step in native['steps']}
+        harness_steps = {step['label']: step['passed'] for step in harness['steps']}
+        assert set(native_steps) == set(harness_steps) == expected
+        assert len(native['steps']) == len(harness['steps']) == len(expected)
+        rows.append({'sample': sample, **timings, 'added_segment_seconds': pair['added_seconds'],
+                     'traditional_checks': len(expected), 'traditional_results_match': native_steps == harness_steps,
+                     'traditional_checks_all_passed': all(native_steps.values()) and all(harness_steps.values()),
+                     'quality_status': harness['quality']['status'], 'quality_error': harness['quality']['error'],
+                     'harness_failures': harness['failures']})
     assert sorted(row['sample'] for row in rows) == [1, 2, 3]
     return {'source_sha': context['source_sha'], 'harness_sha': context['harness_sha'],
             'run_url': run['html_url'], 'job_url': job['html_url'], 'samples': rows,

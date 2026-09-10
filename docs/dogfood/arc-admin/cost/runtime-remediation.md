@@ -1,8 +1,9 @@
 # GH-206 shared-service remediation
 
-The production loader previously rejected shared consumers even when the scheduler
+The future-concurrency preflight previously rejected shared consumers even when the scheduler
 was configured to dispatch one step at a time. Resource diagnostics now honor
 that serial execution contract (`parallel = false`, or a single configured worker).
+[ADR-0050](../../../adr/0050-serial-shared-service-ordering.md) records this refinement of ADR-0026.
 Parallel unordered consumers remain rejected. Dependency ordering, duplicate logs,
 service injection conflicts and all quality thresholds remain enforced.
 
@@ -29,7 +30,7 @@ archives, LLVM exports, counters and command logs are retained locally under
 
 Configuration regressions (55 tests), serial execution regressions (2 tests),
 source measurement certification (13 tests), CI policy (12 tests), the historical
-cost ledger (1 test), and self-hosted receipt handling (2 tests) passed. Clippy and
+cost ledger (1 test), and self-hosted receipt handling and provenance (3 tests) passed. Clippy and
 documentation consistency passed. These suites overlap with the full coverage
 run and are not additive claims of unique tests.
 

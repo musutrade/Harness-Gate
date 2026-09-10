@@ -1,5 +1,5 @@
 {
-  "status": "local validation passed; task 7.1 blocked",
+  "status": "bounded self-hosted workload measurements and traditional runtime comparison complete; full-quality integration and authority transfer pending",
   "environment": {
     "CARGO_TARGET_DIR": "$PWD/target",
     "TMPDIR": "$PWD/target/quality/gh-206/tmp",
@@ -88,10 +88,9 @@
   },
   "hosted_required_quality_aggregate": "CI pending at submission; controller owns result",
   "limitations": [
-    "Task 7.1 remains unchecked: no paired self-hosted shadow CI trial or target trial exists in the retained evidence.",
-    "GH-204 Harness runs fail before dispatch with HGCFG-SHARED-SERVICE and have no elapsed-time receipts. Exact command and error are retained in ../shadow/observation.json and its linked logs.",
-    "The timing instrumentation is smoke-checked locally; no new Arc-Admin application run or self-hosted workflow was executed.",
-    "The authority topology is a conditional design. Shared-service compatibility, trusted native collector provisioning, baseline integration and runtime assurance parity remain prerequisites."
+    "The measured topology is a bounded sequential full-workload job, not the original Arc-Admin multijob CI.",
+    "All three Harness-Gate full runs retain QUALITY_BLOCKED due to missing runtime/full-state.json; native producers, trusted state/keys and baseline provisioning remain GH-207 prerequisites.",
+    "Complete-quality cost and target savings remain unknown. Required Quality Aggregate must independently pass for the final PR head."
   ],
   "initial_failures": [
     {
@@ -114,5 +113,35 @@
     "exit_code": 128,
     "error": "fatal: Unable to create '/mnt/dev-ssd/workspaces/symphony/GH-206/.git/index.lock': Read-only file system",
     "impact": "Local index, commit and push cannot be updated through this read-only Git directory. Publish the validated workspace files using the GitHub Git API on symphony/GH-206; leave local Git metadata unchanged."
+  },
+  "initial_status": "local validation passed; task 7.1 blocked",
+  "initial_limitations": [
+    "Task 7.1 remains unchecked: no paired self-hosted shadow CI trial or target trial exists in the retained evidence.",
+    "GH-204 Harness runs fail before dispatch with HGCFG-SHARED-SERVICE and have no elapsed-time receipts. Exact command and error are retained in ../shadow/observation.json and its linked logs.",
+    "The timing instrumentation is smoke-checked locally; no new Arc-Admin application run or self-hosted workflow was executed.",
+    "The authority topology is a conditional design. Shared-service compatibility, trusted native collector provisioning, baseline integration and runtime assurance parity remain prerequisites."
+  ],
+  "follow_up": {
+    "source_remediation": "runtime-remediation.md",
+    "architecture": "../../../adr/0050-serial-shared-service-ordering.md",
+    "risk_base": "ba69cd5",
+    "risk_head": "e6de28d",
+    "base_tests": 388,
+    "head_tests": 390,
+    "risk_identities": 973,
+    "risk_failures": 0,
+    "clippy": "passed",
+    "docs_consistency": "passed after final evidence documentation",
+    "openspec_strict": "passed",
+    "selfhosted_report": "selfhosted-report.json",
+    "ci_run": "https://github.com/musutrade/Harness-Gate/actions/runs/34454586298",
+    "paired_trials": 3,
+    "traditional_checks_per_trial": 27,
+    "traditional_checks_all_passed": true,
+    "quality_acceptance": false,
+    "artifact_downloaded_files": 753,
+    "artifact_bytes_match_runner": true,
+    "arc_admin_python_tests": 28,
+    "critical_path_tests": 17
   }
 }

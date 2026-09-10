@@ -57,7 +57,7 @@ GH-205 evidence: [controlled negative corpus and replay](../../../docs/dogfood/a
 
 ## 7. Evaluate CI topology and cost
 
-- [ ] 7.1 Measure shadow-mode added wall/runner cost on Arc-Admin's self-hosted CI.
+- [x] 7.1 Measure shadow-mode added wall/runner cost on Arc-Admin's self-hosted CI. — Three bounded self-hosted full-workload pairs are retained in `docs/dogfood/arc-admin/cost/selfhosted.md`; complete-quality and original-topology savings remain unknown and authority transfer stays blocked.
 - [x] 7.2 Identify duplicate command execution and duplicate authoritative measurement collection.
 - [x] 7.3 Define a no-duplication authority-transfer topology that preserves current assurance.
 - [x] 7.4 Do not delete existing CI/arc-flow gates until replacement ownership and fail-closed behavior are evidenced.

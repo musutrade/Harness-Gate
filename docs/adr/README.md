@@ -86,3 +86,5 @@ When an ADR is superseded:
 - [ADR-0046: Capability-driven quality profiles and retained head evidence](0046-capability-driven-quality-profiles.md)
 
 - [ADR-0047: Composable quality preset packs and explicit adoption](0047-composable-quality-preset-packs.md)
+
+- [ADR-0050: Guaranteed serial dispatch and shared-service ordering](0050-serial-shared-service-ordering.md)

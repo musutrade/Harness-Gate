@@ -1,0 +1,10 @@
+   Compiling ring v0.17.14
+   Compiling rustls v0.23.43
+    Checking rustls-webpki v0.103.13
+    Checking sqlx-core v0.9.0
+    Checking sqlx-postgres v0.9.0
+   Compiling sqlx-macros-core v0.9.0
+   Compiling sqlx-macros v0.9.0
+    Checking sqlx v0.9.0
+    Checking arc-admin-backend v0.1.0 (/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/backend)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 21.08s
