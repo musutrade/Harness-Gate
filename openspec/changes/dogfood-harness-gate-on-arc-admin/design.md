@@ -157,6 +157,8 @@ Use temporary/dedicated branches or fixtures, never permanent broken main code, 
 - unsupported Angular CRAP is not invented;
 - scope/profile omission is represented honestly.
 
+GH-205 retains the [controlled negative corpus](../../../docs/dogfood/arc-admin/negative/README.md), with paired CLI command controls, signed synthetic quality fixtures and explicit expected failure diagnostics. Frozen application/configuration sources remain unchanged. This phase proves generic boundaries without claiming native Arc-Admin measurements or resolving the phase B shared-service/provisioning gaps; full proposal acceptance and authority transfer remain pending.
+
 ### Phase E — authority-transfer decision
 
 Only after accepted parity and cost evidence may a follow-up change transfer Arc-Admin required authority to Harness-Gate and remove duplicated old infrastructure. This OpenSpec may recommend that follow-up but SHALL NOT silently delete `cargo flow` as part of initial dogfood.
