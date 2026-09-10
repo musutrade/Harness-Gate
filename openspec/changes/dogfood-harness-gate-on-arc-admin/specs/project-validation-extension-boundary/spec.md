@@ -2,6 +2,32 @@
 
 ## ADDED Requirements
 
+### Requirement: Authority-transfer recommendations SHALL preserve evidence and withhold unsafe closure
+
+The dogfood recommendation SHALL explicitly decide transfer or no transfer using
+retained migration-effort, parity, controlled-negative, CI-cost and product-gap
+evidence and an explicit rollback boundary. Unknown measurements SHALL remain
+unknown. When transfer is unsafe, existing required authority and bounded shadow
+mode SHALL remain, exact blockers SHALL be identified, and proposal closure SHALL
+be withheld. Safe transfer SHALL require a separate follow-up change for removal
+or consolidation of old workflow infrastructure. Harness-Gate Result SHALL remain
+validation evidence, not an application/workflow lifecycle state source.
+
+#### Scenario: Traditional parity succeeds while native quality remains blocked
+- **GIVEN** retained full-workload command parity and synthetic negative evidence
+- **AND** missing trusted native quality inputs and incomplete host/routing/cost evidence
+- **WHEN** the authority-transfer recommendation is produced
+- **THEN** it records no transfer with exact blockers and a rollback boundary
+- **AND** retains existing gates, requiredness, thresholds and baseline/ratchet lineage
+- **AND** does not infer native quality success or lifecycle state from Result
+- **AND** retains evidence and strict validation without closing the unsupported proposal
+
+#### Scenario: Later evidence supports safe transfer
+- **GIVEN** accepted parity, native fail-closed quality, complete cost and rollback evidence
+- **WHEN** a subsequent recommendation supports transfer
+- **THEN** removal or consolidation of old infrastructure requires a separate follow-up change
+- **AND** the initial dogfood does not silently delete existing workflow infrastructure
+
 ### Requirement: Project-owned validation SHALL remain project-owned
 
 Harness-Gate SHALL treat application- and repository-specific test or validation implementations as project-owned behavior. The project SHALL remain responsible for test code, domain assertions, fixtures, request flows, browser automation, load scenarios, migration checks, generation checks and other application-specific validation logic.
