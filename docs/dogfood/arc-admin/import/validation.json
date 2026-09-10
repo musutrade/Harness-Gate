@@ -114,5 +114,72 @@
   },
   "required_quality_aggregate": "CI pending; local checks do not claim hosted aggregate success",
   "proposal_acceptance": "Only execution import tasks 3.1\u20133.4; complete proposal and ADR acceptance remain outstanding",
-  "status": "local validation passed; CI pending"
+  "status": "local validation passed; CI pending",
+  "ci_repair": {
+    "attempt": 1,
+    "failed_head": "f9f253a1306df184b0d75257e168cee7aeabd00d",
+    "pr": 210,
+    "cause": "Quality risk snapshots omitted docs, so head coverage compilation could not resolve three include_str! documentation fixtures. Coverage evidence sealing and downstream required aggregation could not complete.",
+    "fix": "Archive docs from each measured commit alongside the crate, quality tools and schema. Regression verifies committed base/head fixture contents despite deleted working-tree files.",
+    "checks": [
+      {
+        "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+        "status": "pass",
+        "result": "385 passed; 0 skipped",
+        "local_log": "target/quality/gh-202-repair/nextest.log"
+      },
+      {
+        "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+        "status": "pass",
+        "result": "exit 0",
+        "local_log": "target/quality/gh-202-repair/fmt.log"
+      },
+      {
+        "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+        "status": "pass",
+        "result": "exit 0",
+        "local_log": "target/quality/gh-202-repair/clippy.log"
+      },
+      {
+        "command": "python3 -m unittest discover -s tools/quality/tests -v",
+        "status": "pass",
+        "result": "352 passed",
+        "local_log": "target/quality/gh-202-repair/python-tests.log"
+      },
+      {
+        "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+        "status": "pass",
+        "result": "exit 0; status pass",
+        "local_log": "target/quality/gh-202-repair/docs-consistency.log"
+      },
+      {
+        "command": "openspec validate dogfood-harness-gate-on-arc-admin --strict",
+        "status": "pass",
+        "result": "exit 0; valid",
+        "local_log": "target/quality/gh-202-repair/openspec.log"
+      },
+      {
+        "command": "python3 -m unittest discover -s tools/quality/tests -p test_ci_quality.py -v",
+        "status": "pass",
+        "result": "12 passed; regression also confirmed to fail without docs in the archive",
+        "local_log": "target/quality/gh-202-repair/snapshot-tests.log"
+      },
+      {
+        "command": "python3 target/quality/gh-202-repair/run-risk.py",
+        "status": "pass",
+        "result": "Collector.risk(): base and head instrumented coverage, measurement and comparison passed; no risk failures",
+        "local_log": "target/quality/gh-202-repair/risk.log"
+      }
+    ],
+    "risk_base_sha": "dad6958b3c649d045b3c4019899e3cddc3adfefe",
+    "risk_measured_head_sha": "a417eb5ffcb53d4f0829e8a4fdecbf9a3c323cb2",
+    "risk_artifacts": "target/quality/gh-202-repair/risk/",
+    "environment": "Cargo and Python checks use CARGO_TARGET_DIR=$PWD/target. The read-only .git is preserved; alternate Git metadata under target/quality/gh-202-repair/git is used for snapshot commits and publication within this workspace.",
+    "not_applicable": [
+      "harness-gate config check",
+      "harness-gate verify --profile ci --all"
+    ],
+    "not_applicable_reason": "No project-local .harness-gate/flow.toml exists.",
+    "required_quality_aggregate": "CI pending; local risk comparison success does not claim hosted aggregate success"
+  }
 }
