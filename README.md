@@ -7,7 +7,7 @@
 
 [English](https://github.com/musutrade/Harness-Gate/blob/main/README.md) | [简体中文](https://github.com/musutrade/Harness-Gate/blob/main/README.zh-CN.md)
 
-`Harness-Gate` is a reusable Rust development workflow and architecture guard CLI. This is an independent tool providing complete quality gate and workflow management capabilities.
+`Harness-Gate` is a configuration-driven project verification CLI, implemented in Rust. Its primary workflow is **`init -> verify -> one project decision`**: declare execution and quality intent, then combine security, architecture, command and evidence-based quality gates in one blocking result.
 
 It handles changed paths, secret scanning, architecture auditing, environment validation, external command orchestration, test result counting, timeout and interrupt handling, and temporary service lifecycle. Git hooks only keep launchers, and flow decisions do not depend on Shell scripts.
 
@@ -21,7 +21,12 @@ It handles changed paths, secret scanning, architecture auditing, environment va
 
 ## Working Model
 
-`harness-gate` breaks project flow into four types of data:
+`init` generates configuration; `verify` selects a profile and scope, runs execution
+gates and configured collectors, and asks the Rust evaluator for the quality
+decision. The unified report combines every required gate. See the
+[quality workflow and architecture](docs/quality-workflow.md) for setup and trust.
+
+Execution uses four types of data:
 
 1. **scope rule**: Maps Git changed paths to components
 2. **profile**: Selects different intensity steps from the same component, such as `hook`, `full`, `ci`
@@ -38,11 +43,17 @@ Git changed files
   -> secret scan
   -> architecture audit
   -> execute steps in configured order
-  -> JSON / Markdown / optional HTML/JUnit reports
+  -> configured quality collectors + trusted baseline + Rust policy evaluation
+  -> one project decision + JSON / Markdown / optional HTML/JUnit reports
   -> optional HTTP(S) Webhook notification
 ```
 
-Components, profiles, commands, paths, parsers and services all come from TOML. Regular project migration does not need to add enums or modify match branches in Rust.
+Execution mechanics live in `flow.toml`; quality intent lives in `quality.toml`.
+Ecosystem, language and framework identity is configuration/pack data. A new
+language name requires no change to the generic schema, compiler, orchestrator,
+baseline, profile, verify, report or CI layers. Extension follows **collector +
+capability/policy pack + certification**; support claims require evidence for the
+actual collector/series. New metric semantics require separate contract review.
 
 ## Installation
 
@@ -145,26 +156,30 @@ harness-gate --version
 harness-gate presets
 ```
 
-Initialize in target project:
+Initialize in an existing Git project (run `git init` first for a new directory):
 
 ```bash
 harness-gate --project-root /path/to/new-project init --preset rust-api
 harness-gate --project-root /path/to/new-project config check
 harness-gate --project-root /path/to/new-project doctor
-harness-gate --project-root /path/to/new-project cleanup --dry-run
-harness-gate --project-root /path/to/new-project verify --all
+# Review generated QUALITY.md; provision trusted state, signed requests and keys.
+harness-gate --project-root /path/to/new-project verify --profile ci --all
 ```
 
 Recommended integration order:
 
 1. Select the preset closest to the tech stack
-2. Modify paths, components, scope and steps in `.harness-gate/flow.toml`
+2. Review execution in `.harness-gate/flow.toml` and quality, policies and profiles in `.harness-gate/quality.toml`
 3. Add project-specific architecture rules in `.harness-gate/audit.toml`
 4. Add business or vendor-specific credential rules in `.harness-gate/secrets.toml`
 5. Run `config check` to resolve reference and schema errors first
 6. Run `doctor` to fill in local tools, dependencies, images or environment variables
-7. Run `verify --all` in clean repository to confirm all components can run
+7. Provision the host inputs described in generated `QUALITY.md`, then run `verify --profile ci --all` for one project decision
 8. Use the same command in CI, and optionally install thin hooks that only call `harness-gate hook`
+
+Reference presets do not install collectors, sign requests or create trusted runtime
+state. Until those inputs exist, quality verification fails closed. Follow the
+[quality quick start](docs/quality-workflow.md#quick-start) for the setup boundary.
 
 `init` creates the target directory, but `scope` and `verify` require the target directory to be a Git worktree. Refuses to overwrite when the project already has configuration; only use `--force` when confirming the target content is replaceable.
 
@@ -193,14 +208,14 @@ Presets are starting points, not runtime branches. After initialization is compl
 | Command                                                      | Purpose                                   |
 | ------------------------------------------------------------ | ----------------------------------------- |
 | `harness-gate presets`                                       | List built-in project presets             |
-| `harness-gate init --preset <name>`                          | Generate schema v2 configuration          |
+| `harness-gate init --preset <name>`                          | Generate execution configuration and reference quality packs |
 | `harness-gate doctor [--strict] [--json]`                    | Execute environment checks declared in config |
 | `harness-gate cleanup [--dry-run] [--json]`                 | Inspect or reclaim stale resource leases  |
 | `harness-gate scope [--staged\|--base REF\|--all] [--json]`  | List changes and selected components      |
 | `harness-gate secrets [--staged] [--json]`                   | Scan tracked file contents for high-confidence credential patterns; report filenames only |
 | `harness-gate audit [--json]`                                | Execute regex architecture rules and generate audit report |
 | `harness-gate verify`                                        | Execute default profile based on workspace changes |
-| `harness-gate verify --profile ci --all`                     | Execute specified profile for all components |
+| `harness-gate verify --profile ci --all`                     | Produce one project decision for all configured components |
 | `harness-gate hook`                                          | Execute hook profile on a private staged snapshot |
 | `harness-gate step <id>`                                     | Run a single step after passing secrets/audit |
 | `harness-gate config check`                                  | Validate schema, references, paths, environment overrides, and resource safety |
@@ -208,7 +223,8 @@ Presets are starting points, not runtime branches. After initialization is compl
 | `harness-gate config print --resolved`                       | Output final effective configuration      |
 | `harness-gate config migrate`                                | Convert schema v1 to v2                   |
 | `harness-gate schema export`                                 | Generate JSON Schema for flow.toml         |
-| `harness-gate adapter run --request <PATH> --trusted-key <PATH>` | Validate and execute one signed out-of-process adapter request |
+| `harness-gate adapter run --request <PATH> --trusted-key <PATH>` | Advanced: execute a signed measurement request; no policy approval |
+| `harness-gate quality evaluate --help`                        | Advanced: explicit trusted inputs to the same Rust evaluator |
 | `harness-gate parse-logs`                                    | Extract JSON Lines ERROR trace context    |
 
 All commands support global `--project-root <PATH>` and `--config <PATH>`. Commands return 0 on success; configuration errors, gate failures, step failures, timeouts or interrupts return non-zero, suitable for direct use in CI.
@@ -321,14 +337,22 @@ review.
 
 ## Evidence architecture and adapter support
 
-The released Rust core owns generic evidence validation, project identity, policy,
-ratchets, contracts and project reports through `harness-gate quality evaluate`.
-Collectors may remain Python or another language; they measure while Rust decides.
-The existing required CI aggregate retains release responsibility. Python generic
-modules are [frozen reference code](docs/quality/python-retention.md).
-Rust and the bounded TypeScript/Angular reference adapter retain their accepted
-support limits; this consolidation adds no ecosystem certification. See the
-[support and closure record](docs/quality/architecture-closure.md).
+`verify` compiles validated configuration and trusted runtime state, orchestrates
+collectors and baselines, and invokes the released Rust evaluator for policy,
+ratchets, contracts and project reports. Its combined status blocks on any
+required execution or quality failure. Collectors measure; Rust decides. The
+Required Quality Aggregate checks required CI children and retains release
+responsibility. `quality evaluate` and `adapter run` remain advanced replay,
+debugging and integration interfaces. Python generic modules are
+[frozen reference code](docs/quality/python-retention.md).
+
+Rust and TypeScript/Angular are current reference presets with bounded
+[certification evidence](docs/quality-workflow.md#capabilities-and-certification),
+not an ecosystem allowlist. Future Vue + Go + PostgreSQL combinations compose
+packs; registry installation and new ecosystem certification are future work.
+See [architecture and extension](docs/quality-workflow.md#architecture-and-extension)
+and [workflow closure evidence](docs/quality/gh-187/validation.md), including the
+synthetic unknown-ecosystem end-to-end fixture.
 
 ## Features
 

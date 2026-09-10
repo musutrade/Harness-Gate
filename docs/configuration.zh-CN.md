@@ -1,5 +1,7 @@
 # harness-gate schema v2 配置参考
 
+主流程为 **`init -> verify -> one project decision`**。先阅读[质量快速开始与架构](quality-workflow.md)，了解 capability 状态、认证范围、baseline/profile、artifact 信任、迁移与故障排查。生态/语言/框架名称属于配置与 pack 数据，通用层不需要为新增语言名称修改核心代码；`quality evaluate` 和 `adapter run` 保留为高级接口。
+
 可选的 `.harness-gate/quality.toml` v1 配置、采集器权限和跨配置校验见
 [质量配置参考](quality-configuration.md)。没有该文件时保留原有 flow 行为。
 

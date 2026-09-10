@@ -1,5 +1,11 @@
 # harness-gate schema v2 configuration reference
 
+The primary workflow is **`init -> verify -> one project decision`**. Start with
+the [quality quick start and architecture](quality-workflow.md), including
+capability states, certification, baseline/profile behavior, artifact trust and
+troubleshooting. Execution mechanics below compose with quality policy;
+`quality evaluate` and `adapter run` are advanced interfaces.
+
 For generated quality defaults, composable packs and flow-only adoption, see
 [quality presets and migration](quality-presets.md).
 

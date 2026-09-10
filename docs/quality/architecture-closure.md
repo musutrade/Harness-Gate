@@ -1,5 +1,13 @@
 # Language-agnostic architecture closure record (GH-119)
 
+**Configured project workflow (GH-187):** [init → verify → one project decision](../quality-workflow.md)
+now documents the normal product entry point. Ecosystem identity is configuration/pack
+data across the generic schema, compiler, orchestrator, baseline, profile, verify,
+report and CI layers. The [workflow closure evidence](gh-187/validation.md) retains
+unknown-ecosystem end-to-end acceptance and current certification boundaries.
+Extension follows collector + capability/policy pack + certification; current
+reference presets do not limit future composition such as Vue + Go + PostgreSQL.
+
 **Current boundary (GH-152):** GH-151's merged PR #158 transfers generic decisions
 and reports to the released Rust core. The [Python retention policy](python-retention.md)
 and [consolidation closure record](gh-152/README.md) supersede the historical
