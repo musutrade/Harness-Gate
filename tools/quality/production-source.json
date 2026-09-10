@@ -298,6 +298,11 @@
       "path": "src/config/quality/collectors/tests.rs",
       "kind": "test",
       "reason": "Collector protocol fixtures and orchestration regression tests; compiled only under cfg(test) on Unix."
+    },
+    {
+      "path": "src/config/quality/collectors/ci_acceptance.rs",
+      "kind": "test",
+      "reason": "Linux-only synthetic CI acceptance fixtures reached through collectors/tests.rs under cfg(all(test, unix))."
     }
   ],
   "external_exclusions": [
