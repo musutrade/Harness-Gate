@@ -219,6 +219,7 @@ Presets are starting points, not runtime branches. After initialization is compl
 | `harness-gate hook`                                          | Execute hook profile on a private staged snapshot |
 | `harness-gate step <id>`                                     | Run a single step after passing secrets/audit |
 | `harness-gate config check`                                  | Validate schema, references, paths, environment overrides, and resource safety |
+| `harness-gate config import --execution-only`                | Import compatible Arc-Flow v2 declarations with a parity/UX report; [runtime limits](docs/dogfood/arc-admin/import/README.md) remain explicit |
 | `harness-gate config check --format json`                    | Emit stable field-path diagnostics for editors and CI          |
 | `harness-gate config print --resolved`                       | Output final effective configuration      |
 | `harness-gate config migrate`                                | Convert schema v1 to v2                   |
