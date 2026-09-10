@@ -46,7 +46,7 @@ impl QualityResult {
         self.status == "pass" || (self.status == "not_collected" && self.phase == "complete")
     }
 
-    fn pending() -> Self {
+    fn pending(profile: &str) -> Self {
         Self {
             schema: "quality-verification/v1",
             status: "blocked",
@@ -61,7 +61,7 @@ impl QualityResult {
             output: None,
             formats: BTreeSet::new(),
             evaluation_time: None,
-            participation: Value::Null,
+            participation: json!({ "profile": profile }),
             full_quality_status: "blocked",
             producers: Value::Null,
         }
@@ -145,8 +145,12 @@ fn validate_selection(
     Ok(())
 }
 
-pub(super) fn run(project: &Project, prepared: Result<Option<Prepared>>) -> Option<QualityResult> {
-    let mut result = QualityResult::pending();
+pub(super) fn run(
+    project: &Project,
+    profile: &str,
+    prepared: Result<Option<Prepared>>,
+) -> Option<QualityResult> {
+    let mut result = QualityResult::pending(profile);
     let work = match prepared {
         Ok(None) => return None,
         Ok(Some(work)) => work,
