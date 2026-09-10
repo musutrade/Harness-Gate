@@ -1,5 +1,10 @@
 # Arc-Admin assurance before state
 
+GH-208 [final recommendation and rollback boundary](decision/README.md): **no
+authority transfer**. Retain `cargo flow` and bounded shadow mode; native quality,
+host/hook/CI parity and complete cost acceptance remain blocked. The complete
+OpenSpec remains active.
+
 Follow-on records: [execution import (GH-202)](import/README.md), [generic quality configuration (GH-203)](quality/README.md), [shadow observation (GH-204)](shadow/README.md) [controlled negatives (GH-205)](negative/README.md) and [bounded self-hosted cost/parity trials (GH-206)](cost/selfhosted.md). These preserve this frozen baseline; traditional execution now matches, while full-quality integration and authority transfer remain pending.
 
 This freezes OpenSpec `dogfood-harness-gate-on-arc-admin` tasks 2.1–2.4 for GH-201, before import, shadow execution or transfer of authority. The source is **musutrade/arc-admin at `9982ed556eaf997910824d7b682946147c81a16a`**, the main-branch merge of PR #30 on 2026-08-24. Evidence was captured read-only through GitHub on 2026-09-10. No Arc-Admin checkout was executed or modified. Source inspection confirms execution semantics; historical Actions records provide observed CI outcomes and timing. This is not a fresh local Arc-Admin verification or parity claim.
