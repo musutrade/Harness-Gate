@@ -129,6 +129,8 @@ class Collector:
                        (p.startswith('tools/harness-gate/quality-core/tests/') or
                         p in ('tools/harness-gate/quality-core/tests.rs', 'tools/harness-gate/quality-core/policy_tests.rs',
                               'tools/harness-gate/src/config/quality/tests.rs',
+                              'tools/harness-gate/src/config/tests.rs',
+                              'tools/harness-gate/src/verify/tests.rs',
                               'tools/harness-gate/src/preset/tests.rs',
                               'tools/harness-gate/src/config/quality/collectors/tests.rs',
                               'tools/harness-gate/src/config/quality/collectors/tests/dogfood_acceptance.rs',
