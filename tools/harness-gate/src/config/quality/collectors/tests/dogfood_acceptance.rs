@@ -198,3 +198,21 @@ fn arc_admin_controlled_quality_negatives_retain_truthful_outcomes() {
         );
     }
 }
+
+#[test]
+fn quality_preparation_failure_retains_requested_profile_and_blocks() {
+    for name in ["workflow-state.json", "workflow-keys.json"] {
+        let fixture = Fixture::workflow("pass", true, false);
+        fs::remove_file(fixture.dir.path().join(".harness-gate").join(name)).unwrap();
+        let case = receipt(&fixture, name, "blocked", false);
+        let quality = &case["report"]["quality"];
+        assert_eq!(quality["participation"]["profile"], "full");
+        assert_eq!(quality["phase"], "configuration");
+        assert_eq!(quality["full_quality_status"], "blocked");
+        assert!(quality["project_report"].is_null());
+        assert!(case["human"]
+            .as_str()
+            .unwrap()
+            .contains("Quality profile \"full\": blocked"));
+    }
+}

@@ -1,0 +1,6 @@
+
+> arc-admin@0.0.0 format:check
+> prettier --check "src/**/*.{ts,html,scss}" "e2e/**/*.ts" "playwright*.config.ts"
+
+Checking formatting...
+All matched files use Prettier code style!
