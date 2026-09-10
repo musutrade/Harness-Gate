@@ -1,5 +1,24 @@
 # Design: Project-Owned Validation Boundary and Arc-Admin Dogfood
 
+## GH-208 authority-transfer disposition
+
+The [final recommendation](../../../docs/dogfood/arc-admin/decision/README.md)
+is **NO TRANSFER**: retain `cargo flow` required authority and bounded shadow mode.
+GH-207 establishes bounded 27-result full-command parity, but native quality
+remains blocked. Native trust/lineage integration, hook/environment/service/CI
+parity, native negatives and rollback rehearsal, and complete-quality/topology
+cost acceptance remain exact blockers tracked in GH-215. The recommendation
+retains migration-effort, parity, negative, cost and product-gap receipts plus
+the rollback boundary. Repaired historical gaps are distinguished from current
+blockers; unmeasured work and costs remain unknown.
+
+Harness-Gate Result is validation evidence, not application/workflow lifecycle
+state. No existing infrastructure is removed. Task 9.3's safe-transfer condition
+is false; any future removal/consolidation requires a separate accepted change.
+Evidence retention and strict validation do not accept the entire proposal:
+task 9.4 closure remains withheld, as do the separately scoped pending policy/ADR
+tasks. Required Quality Aggregate must be green through controller verification.
+
 ## GH-204 observation record
 
 Tasks 5.1–5.4 are evidenced by the [shadow matrix](../../../docs/dogfood/arc-admin/shadow/README.md). Arc-Admin at the pinned/current revision passed all 25 command gates plus secret/audit prelude. Complete Harness-Gate loading rejects the unchanged import's unordered shared PostgreSQL consumers, both with and without quality composition. This is a capability gap; the narrower success of structural import/quality-binding validation is a separate UX gap. No execution order or blocker was edited to obtain a PASS.
