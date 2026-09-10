@@ -179,3 +179,22 @@ Shadow comparison SHALL retain equivalent source identities, unchanged blocker c
 - **AND** PostgreSQL and environment runtime parity remain unestablished rather than inferred from preserved declarations
 - **AND** pre-existing Arc-Admin reports are never attributed to Harness-Gate
 - **AND** the complete classified observation does not claim successful parity or authorize lifecycle advancement
+
+### Requirement: CI cost and authority design SHALL preserve assurance and distinguish unmeasured work
+
+The Arc-Admin cost record SHALL distinguish before, observed shadow and proposed target topology, retain source/run identities and timestamp-based wall/runner evidence, and inventory duplicate command execution separately from duplicate authoritative measurement production. Unmeasured shadow or target cost SHALL remain unknown. Each selected project command and supported authoritative measurement identity SHALL have a single proposed owner; evidence consumers SHALL reuse compatible authenticated artifacts rather than recollect equivalent authoritative facts. Project-owned test implementations and all existing blocking obligations SHALL remain intact until a separately accepted replacement proves runtime parity and fail-closed behavior.
+
+#### Scenario: Only the before CI run and blocked local shadow receipts exist
+- **GIVEN** retained self-hosted before job timestamps and local Harness-Gate pre-dispatch failures without elapsed timings
+- **WHEN** the cost ledger is reproduced
+- **THEN** before wall and runner occupancy are derived from the retained CI timestamps
+- **AND** local native step durations are explicitly distinguished from CI occupancy
+- **AND** added shadow cost and target savings remain unmeasured, with task 7.1 pending
+
+#### Scenario: Proposed topology removes duplicate ownership without weakening gates
+- **GIVEN** all 25 project hooks, prelude and CI-only checks plus required generic-quality policies
+- **WHEN** a single-execution and single-measurement-producer topology is designed
+- **THEN** project commands, requiredness, scope/profile semantics, service isolation and baseline/ratchet contracts remain obligations
+- **AND** structured results and aggregate jobs consume existing evidence without taking measurement authority or recollecting equivalent facts
+- **AND** Angular CRAP remains unsupported without a numeric producer
+- **AND** existing CI/arc-flow gates remain until replacement ownership, runtime parity and fail-closed evidence are accepted separately

@@ -127,3 +127,7 @@ Task 1.3 is enforced by `project_owned_runner_replacement_preserves_generic_comm
 ## Shadow observation (GH-204)
 
 [Full shadow comparison](shadow/README.md) records all 25 Arc-Admin blockers and two prelude checks passing, both Harness-Gate variants rejected before dispatch, and two classified product gaps. Runtime parity remains blocked and merge authority remains unchanged.
+
+## CI cost and topology (GH-206)
+
+[Cost and ownership analysis](cost/README.md) retains the measured before CI cost, inventories duplicate commands and measurement risks, and defines a conditional single-owner target with an assurance parity argument. Added self-hosted shadow cost remains unmeasured (task 7.1 blocked); no existing gate or authority is removed.
