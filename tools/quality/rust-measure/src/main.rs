@@ -56,6 +56,7 @@ struct Inventory {
     errors: Vec<String>,
     test_depth: usize,
     native: bool,
+    provenance: Vec<Value>,
 }
 
 impl Inventory {
@@ -92,6 +93,14 @@ impl Inventory {
 }
 
 impl<'ast> Visit<'ast> for Inventory {
+    fn visit_attribute(&mut self, node: &'ast syn::Attribute) {
+        if self.native {
+            self.provenance
+                .push(json!({"kind": "attribute", "span": span(node.span()),
+                "syntax": node.to_token_stream().to_string(), "compiler_resolved": false}));
+        }
+        visit::visit_attribute(self, node);
+    }
     fn visit_item_mod(&mut self, node: &'ast syn::ItemMod) {
         let test = Self::attributes_test(&node.attrs);
         self.test_depth += usize::from(test);
@@ -114,6 +123,9 @@ impl<'ast> Visit<'ast> for Inventory {
         self.modules.pop();
     }
     fn visit_item_fn(&mut self, node: &'ast syn::ItemFn) {
+        for attribute in &node.attrs {
+            self.visit_attribute(attribute);
+        }
         self.count("nested_functions", 1);
         let test = Self::attributes_test(&node.attrs);
         self.test_depth += usize::from(test);
@@ -129,6 +141,9 @@ impl<'ast> Visit<'ast> for Inventory {
         self.test_depth -= usize::from(test);
     }
     fn visit_impl_item_fn(&mut self, node: &'ast syn::ImplItemFn) {
+        for attribute in &node.attrs {
+            self.visit_attribute(attribute);
+        }
         self.enter(
             node.sig.ident.to_string(),
             "function",
@@ -140,6 +155,9 @@ impl<'ast> Visit<'ast> for Inventory {
         self.stack.pop();
     }
     fn visit_trait_item_fn(&mut self, node: &'ast syn::TraitItemFn) {
+        for attribute in &node.attrs {
+            self.visit_attribute(attribute);
+        }
         if let Some(body) = &node.default {
             self.enter(
                 node.sig.ident.to_string(),
@@ -198,6 +216,10 @@ impl<'ast> Visit<'ast> for Inventory {
     }
     fn visit_macro(&mut self, node: &'ast syn::Macro) {
         if self.native {
+            self.provenance
+                .push(json!({"kind": "macro", "span": span(node.span()),
+                "path": node.path.to_token_stream().to_string(),
+                "syntax": node.tokens.to_string(), "compiler_resolved": false}));
             match native::expressions(node) {
                 Ok(Some(parsed)) => {
                     self.count("select_decisions", parsed.decisions);
@@ -298,8 +320,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!(
             "{}",
             json!({"analyzer": "harness-gate-rust-native-inventory",
-            "version": "0.1.0", "rule": "source-decisions-native-1",
-            "certified_llvm_mapping": false, "symbols": inventory.symbols})
+            "version": "0.2.0", "rule": "source-decisions-native-2",
+            "certified_llvm_mapping": false, "symbols": inventory.symbols,
+            "provenance": inventory.provenance})
         );
         return Ok(());
     }
