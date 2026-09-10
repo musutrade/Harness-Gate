@@ -48,6 +48,22 @@ pub(crate) fn run() -> Result<bool, CliError> {
         } => export_schema(standalone_root(&cli)?, output.as_deref(), *quality),
         Commands::Config {
             action:
+                ConfigAction::Import {
+                    input,
+                    output,
+                    execution_only,
+                },
+        } => {
+            crate::preset::import_arc_flow(
+                &standalone_root(&cli)?,
+                input,
+                output,
+                *execution_only,
+            )?;
+            Ok(true)
+        }
+        Commands::Config {
+            action:
                 ConfigAction::Migrate {
                     input,
                     output,

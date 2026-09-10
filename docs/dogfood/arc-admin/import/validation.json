@@ -1,0 +1,118 @@
+{
+  "issue": "GH-202",
+  "scope": [
+    "3.1",
+    "3.2",
+    "3.3",
+    "3.4"
+  ],
+  "baseline_commit": "dad6958b3c649d045b3c4019899e3cddc3adfefe",
+  "cargo_environment": {
+    "CARGO_TARGET_DIR": "$PWD/target",
+    "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-202/workflow-acceptance (nextest only)"
+  },
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "status": "pass",
+      "result": "385 passed; 0 skipped",
+      "local_log": "target/quality/gh-202/nextest.log"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "status": "pass",
+      "result": "exit 0",
+      "local_log": "target/quality/gh-202/fmt.log"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "status": "pass",
+      "result": "exit 0",
+      "local_log": "target/quality/gh-202/clippy.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "status": "pass",
+      "result": "351 passed. Earlier runs exposed missing production coverage and source measurement inventory entries; both were corrected before this final run.",
+      "local_log": "target/quality/gh-202/python-tests-complete.log"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "status": "pass",
+      "result": "exit 0; status pass",
+      "local_log": "target/quality/gh-202/docs-consistency.log"
+    },
+    {
+      "command": "openspec validate dogfood-harness-gate-on-arc-admin --strict",
+      "status": "pass",
+      "result": "exit 0",
+      "local_log": "target/quality/gh-202/openspec.log"
+    },
+    {
+      "command": "python3 docs/dogfood/arc-admin/reproduce.py",
+      "status": "pass",
+      "result": "exit 0; frozen GH-201 inventory reproduced",
+      "local_log": "target/quality/gh-202/baseline.log"
+    },
+    {
+      "command": "cargo run --manifest-path tools/harness-gate/Cargo.toml --locked -- config import --execution-only --input docs/dogfood/arc-admin/sources/.arc-flow/flow.toml.txt --output target/quality/arc-admin-import/flow.toml",
+      "status": "pass",
+      "result": "exit 0; generated configuration and report",
+      "local_log": "target/quality/gh-202/reproduce-import.log"
+    },
+    {
+      "command": "cmp target/quality/arc-admin-import/flow.toml docs/dogfood/arc-admin/import/flow.toml && cmp target/quality/arc-admin-import/flow.import.json docs/dogfood/arc-admin/import/flow.import.json",
+      "status": "pass",
+      "result": "exit 0; both fixtures byte-identical"
+    },
+    {
+      "command": "python3 tools/quality/ci_acceptance.py --directory target/quality/gh-202/workflow-acceptance",
+      "status": "pass",
+      "result": "12 cases; 40.769 seconds",
+      "local_log": "target/quality/gh-202/ci-acceptance.log"
+    },
+    {
+      "command": "harness-gate config check",
+      "status": "not-applicable",
+      "result": "No project-local .harness-gate/flow.toml in this checkout."
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "status": "not-applicable",
+      "result": "No project-local .harness-gate/flow.toml with a declared ci profile."
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -p test_source_measure.py -v",
+      "status": "pass",
+      "result": "12 passed, including production AST/instrumentation checks for both import modules",
+      "local_log": "target/quality/gh-202/source-measure-tests.log"
+    }
+  ],
+  "environment_limitations": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 101,
+      "error": "failed to open: /home/gem/cargo-target/debug/.cargo-build-lock; Read-only file system (os error 30)",
+      "impact": "Resolved by setting CARGO_TARGET_DIR=$PWD/target for Cargo and Python checks.",
+      "local_log": "target/quality/gh-202/default-target.log"
+    },
+    {
+      "command": "git add tools/harness-gate/src/config/import.rs",
+      "exit_code": 128,
+      "error": "fatal: Unable to create '/mnt/dev-ssd/workspaces/symphony/GH-202/.git/index.lock': Read-only file system",
+      "impact": "Local Git metadata cannot be updated. Publish the validated workspace tree as a commit and branch via GitHub Git Database API.",
+      "local_log": "target/quality/gh-202/git-add.log"
+    }
+  ],
+  "parity": {
+    "declared_commands": 25,
+    "required_list": 23,
+    "additional_selected_blockers": 2,
+    "hook_commands": 17,
+    "scope_rules": 7,
+    "runtime_shadow": "not performed; existing Arc-Admin gates remain authoritative"
+  },
+  "required_quality_aggregate": "CI pending; local checks do not claim hosted aggregate success",
+  "proposal_acceptance": "Only execution import tasks 3.1\u20133.4; complete proposal and ADR acceptance remain outstanding",
+  "status": "local validation passed; CI pending"
+}
