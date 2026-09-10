@@ -1,0 +1,123 @@
+{
+  "status": "local validation passed",
+  "environment": {
+    "CARGO_TARGET_DIR": "$PWD/target",
+    "reason": "The environment default cargo target directory is read-only; all successful cargo-dependent checks use the workspace target directory."
+  },
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 0,
+      "result": "388 passed; 0 skipped",
+      "evidence": "validation/nextest.log"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "exit_code": 0,
+      "result": "passed",
+      "evidence": "validation/fmt.log"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 0,
+      "result": "passed",
+      "evidence": "validation/clippy.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 0,
+      "result": "371 passed",
+      "evidence": "validation/python-final.log"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 0,
+      "result": "status pass; no failures",
+      "evidence": "validation/docs-consistency.json"
+    },
+    {
+      "command": "openspec validate dogfood-harness-gate-on-arc-admin --strict",
+      "exit_code": 0,
+      "result": "valid",
+      "evidence": "validation/openspec.log"
+    },
+    {
+      "command": "python3 docs/dogfood/arc-admin/negative/reproduce.py",
+      "exit_code": 0,
+      "result": "PASS: 6 command receipts; 17 quality receipts",
+      "evidence": "validation/corpus.log"
+    },
+    {
+      "command": "cargo build --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 0,
+      "result": "passed with workspace target directory",
+      "evidence": "validation/build-local.log"
+    },
+    {
+      "command": "python3 docs/dogfood/arc-admin/negative/run.py --harness-gate target/debug/harness-gate --output docs/dogfood/arc-admin/negative/evidence",
+      "exit_code": 0,
+      "result": "6 command controls/negatives passed; disposable fixtures removed",
+      "evidence": "validation/commands.log"
+    },
+    {
+      "command": "HARNESS_GATE_DOGFOOD_NEGATIVES=\"$PWD/docs/dogfood/arc-admin/negative/evidence\" cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked -E 'test(arc_admin_controlled_quality)'",
+      "exit_code": 0,
+      "result": "1 passed; retained 17 quality outcomes",
+      "evidence": "validation/quality-export.log"
+    }
+  ],
+  "initial_failures": [
+    {
+      "command": "cargo build --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 101,
+      "error": "failed to open: /home/gem/cargo-target/debug/.cargo-build-lock; Read-only file system (os error 30)",
+      "impact": "Default target cannot build. Repeated successfully with CARGO_TARGET_DIR=\"$PWD/target\".",
+      "evidence": "validation/build-default.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 1,
+      "result": "371 tests; 1 failure, 2 errors",
+      "repairs": [
+        "Created missing linked validation record.",
+        "Registered the new Rust module as test-only in the production source inventory.",
+        "Moved the test module under collectors/tests/ so the architecture guard correctly excludes test data."
+      ],
+      "evidence": "validation/python.log",
+      "final_evidence": "validation/python-final.log"
+    }
+  ],
+  "project_local_commands": {
+    "harness-gate config check": "not applicable: root .harness-gate/flow.toml absent",
+    "harness-gate verify --profile ci --all": "not applicable: root .harness-gate/flow.toml absent; no declared ci profile"
+  },
+  "hosted_required_quality_aggregate": "CI pending at submission; controller owns result",
+  "limitations": [
+    "Live negative runners require Linux.",
+    "Signed quality evidence is synthetic transport data, not native Arc-Admin measurements.",
+    "GH-204 shared-service ordering and missing trusted collector provisioning remain unresolved; runtime parity and authority transfer are not established."
+  ],
+  "artifacts": {
+    "validation/build-default.log": "1518f5efe4e6f2ab73a01b43187054665d70adad18be3c687269a0d7028ada40",
+    "validation/build-local.log": "ae659b00d3ce58a6a036228770bbcb4d0203596b72a3a6b999224d8bb448684b",
+    "validation/clippy.log": "d388270aa76eb3421323e572440c29010f1c5faea032fafe3f29f1c1235a0706",
+    "validation/commands.log": "b96da3af7d3a2d29e4fff9701ad684e984535d019c738c42c43c4f0750ca4f38",
+    "validation/corpus.log": "ef4df7eca3f56775f137aed036235a01481810dd261b53e87f4a5a6cce6f26bc",
+    "validation/docs-consistency.json": "0152541550fb05e7505a90d94d82bcdd60679c0d5620c6892132dd46e46a6b36",
+    "validation/fmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "validation/nextest.log": "c15630dc2067a4d9032719a70d9a6761e8b28f407dcdbcc35dc6dbf4bbcfa250",
+    "validation/openspec.log": "86efd3d17a58c3f38812fedc1c24b83296301901d87f908d1098925d766b65da",
+    "validation/python-docs-recheck.log": "a3b9379b127bb3e8c99c814c13f6a85325f02ccdc2c3cb7ad8d7cff597218d44",
+    "validation/python-final.log": "3c6b95faa722b88437ce872e5b649fc8c2b115f6f18af74eba363eeec7c47804",
+    "validation/python-inventory-recheck.log": "99b2a84bba1f110c2b6f61003e93a7dd4a39e97f9dc0fe4e6abf99dbed495d72",
+    "validation/python.log": "82d4c5876bfe1a68687394a4ef65e29c4657e74a690f510f986098a424c65a94",
+    "validation/quality-export.log": "6dd531a68c592eb17a3ac3beb4c0aff0091d81182381671bd4eda502dec0301d"
+  },
+  "delivery_environment": {
+    "command": "git add <issue files>",
+    "exit_code": 128,
+    "error": "fatal: Unable to create '/mnt/dev-ssd/workspaces/symphony/GH-205/.git/index.lock': Read-only file system",
+    "impact": "Original workspace Git metadata cannot be updated. A bare clone of this workspace under target/quality/gh-205/submission.git supplies temporary metadata for staging, committing and pushing the same branch and working tree. Original .git remains unchanged."
+  },
+  "log_retention": "Initial Python log trailing whitespace is trimmed; command results and diagnostics are preserved."
+}

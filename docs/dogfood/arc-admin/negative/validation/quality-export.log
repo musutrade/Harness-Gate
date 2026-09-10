@@ -1,0 +1,8 @@
+   Compiling harness-gate v0.3.7 (/mnt/dev-ssd/workspaces/symphony/GH-205/tools/harness-gate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.14s
+────────────
+ Nextest run ID 9ca2da87-ca41-437b-8e3d-b43e602ccbe4 with nextest profile: default
+    Starting 1 test across 10 binaries (386 tests skipped)
+        PASS [   8.000s] (1/1) harness-gate::bin/harness-gate config::quality::collectors::tests::dogfood_acceptance::arc_admin_controlled_quality_negatives_retain_truthful_outcomes
+────────────
+     Summary [   8.002s] 1 test run: 1 passed, 386 skipped
