@@ -116,6 +116,8 @@ Arc-Admin should model at least:
 
 Project-owned E2E/API/smoke steps remain in `flow.toml`; they do not become fake collector capabilities merely to appear in the generic quality report.
 
+GH-203 supplies the reviewable [Arc-Admin quality configuration](../../../docs/dogfood/arc-admin/quality/README.md), composing unchanged Rust, TypeScript and API-contract packs. It binds the certified Rust series and required Git merge-base baseline provider, while keeping Angular CRAP unsupported. The pinned GH-202 flow declares `full` and `hook`, so quality uses those profiles and does not invent `ci`. Host-provisioned subjects, signed requests, trusted keys and baseline evidence remain runtime prerequisites; this configuration does not claim completed Arc-Admin runtime integration or shadow parity.
+
 ## 6. Dogfood phases
 
 ### Phase A — observation
