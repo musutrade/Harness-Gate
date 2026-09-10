@@ -47,11 +47,13 @@ GH-204 evidence: [reproducible shadow matrix and classifications](../../../docs/
 
 ## 6. Exercise controlled negative scenarios
 
-- [ ] 6.1 Prove a required project-owned E2E/API/smoke command failure blocks through the generic command-hook path.
-- [ ] 6.2 Prove required collector/evidence failure fails closed.
-- [ ] 6.3 Prove stale/incompatible baseline cannot reset ratchet/debt lineage.
-- [ ] 6.4 Prove accepted Rust CRAP regressions block and Angular unsupported CRAP remains non-fabricated.
-- [ ] 6.5 Prove hook/full/ci omissions remain honest and do not become fake PASS.
+- [x] 6.1 Prove a required project-owned E2E/API/smoke command failure blocks through the generic command-hook path.
+- [x] 6.2 Prove required collector/evidence failure fails closed.
+- [x] 6.3 Prove stale/incompatible baseline cannot reset ratchet/debt lineage.
+- [x] 6.4 Prove accepted Rust CRAP regressions block and Angular unsupported CRAP remains non-fabricated.
+- [x] 6.5 Prove hook/full/ci omissions remain honest and do not become fake PASS.
+
+GH-205 evidence: [controlled negative corpus and replay](../../../docs/dogfood/arc-admin/negative/README.md), six command receipts and seventeen synthetic quality receipts, with [actual validation](../../../docs/dogfood/arc-admin/negative/validation.json). These fixtures preserve project-owned application logic and prove the boundary failures; they do not establish Arc-Admin runtime parity or accept the entire proposal.
 
 ## 7. Evaluate CI topology and cost
 

@@ -305,6 +305,11 @@
       "path": "src/config/quality/collectors/ci_acceptance.rs",
       "kind": "test",
       "reason": "Linux-only synthetic CI acceptance fixtures reached through collectors/tests.rs under cfg(all(test, unix))."
+    },
+    {
+      "path": "src/config/quality/collectors/tests/dogfood_acceptance.rs",
+      "kind": "test",
+      "reason": "Linux-only controlled dogfood fixtures reached through collectors/tests.rs under cfg(all(test, unix)); no production measurement or application logic."
     }
   ],
   "external_exclusions": [
