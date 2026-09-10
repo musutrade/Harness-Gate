@@ -1,6 +1,9 @@
-# GH-220: partial implementation and native evidence
+# GH-220: historical prototype checkpoint
 
-**GH-220 is not complete.** This evidence does not release GH-221 or complete
+The following is the retained initial checkpoint. The subsequent compiler implementation
+and full backend results are in [production.md](production.md); original failure
+records below remain unchanged. At this checkpoint GH-220 was not complete.
+This historical evidence does not release GH-221 or complete
 GH-215. No production collector, threshold, accepted baseline or Arc-Admin test
 was changed. The new adapter is an opt-in experiment, not an authoritative gate.
 
