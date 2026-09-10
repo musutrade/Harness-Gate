@@ -1,5 +1,7 @@
 # Arc-Admin execution configuration import (GH-202)
 
+GH-203 adds the separate [generic quality configuration](../quality/README.md) beside this unchanged execution import. Runtime blockers below still apply.
+
 OpenSpec tasks 3.1–3.4 add an offline, deterministic import of the execution
 declarations frozen by [GH-201](../README.md). This is not runtime shadow parity
 or authority transfer. Existing Arc-Admin gates remain required.
