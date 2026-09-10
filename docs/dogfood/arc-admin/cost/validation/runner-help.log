@@ -1,0 +1,10 @@
+usage: run.py [-h] --output OUTPUT
+
+Repeat full shadow commands in a fresh disposable snapshot inside this
+workspace. Requires authenticated gh, git, cargo, npm, Docker and a built
+harness-gate. Retains raw outputs/exit codes; never changes authority or
+rewrites flow steps.
+
+options:
+  -h, --help       show this help message and exit
+  --output OUTPUT  new directory under workspace target/

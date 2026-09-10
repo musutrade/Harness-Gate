@@ -1,0 +1,13 @@
+{
+  "name": "git-checkout",
+  "argv": [
+    "git",
+    "checkout",
+    "--detach",
+    "FETCH_HEAD"
+  ],
+  "started_at": "2026-09-10T08:25:36.708986+00:00",
+  "completed_at": "2026-09-10T08:25:36.760966+00:00",
+  "elapsed_seconds": 0.051996582,
+  "exit_code": 0
+}

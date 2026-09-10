@@ -1,0 +1,894 @@
+{
+  "schema_version": 1,
+  "source_commit": "9982ed556eaf997910824d7b682946147c81a16a",
+  "inputs_sha256": {
+    "source-manifest.json": "45b56298777feed95eece8810936a63bf27dd5ac3022fc9aaf1489295c3a50d9",
+    "ci-capture.json": "9bd2b9d36acb55a03e4a9a81511ff4d3141d044d3bdadb997975f25453c722a3",
+    "inventory.json": "e4b6b05c40b196b2d5563d7aa1bec2d68b011669d1cdd08883315c461a9e7ff8",
+    "cost-summary.json": "618fd4519870fc58dd1af6ef64c0fa07e42ad51271e4a97a2f6b849be3754a17",
+    "shadow/observation.json": "a3528d7bf88d4881f41105b5c81eafe684abf263917da8a123b993ee659412d8",
+    "shadow/evidence/arc/test_result.json": "66b89c956dd0be9988e006bfdfea3a226514b3bdd263215d551bfe1c2a862050",
+    "quality/quality.toml": "e6c69e54df8bcd64ebf0514462a98cd69664fb0f09c37de47a20cd949b6fbc47",
+    "import/flow.toml": "5096719c1c5ecea970411f0df823eb81af92dd39add56c1764f8059cb602ea5e",
+    "cost/ci-run-index.json": "a90abb320ed3c02324d685d8895a3d1ca0e9bb0bc0f0ee3b1b1070edaecb73b6"
+  },
+  "before_self_hosted_ci": {
+    "run_id": 32701649122,
+    "url": "https://github.com/musutrade/arc-admin/actions/runs/32701649122",
+    "name": "CI",
+    "head_sha": "9982ed556eaf997910824d7b682946147c81a16a",
+    "conclusion": "success",
+    "created_to_updated_seconds": 1152,
+    "first_job_wait_seconds": 352,
+    "execution_span_seconds": 799,
+    "runner_seconds": 1077,
+    "jobs": [
+      {
+        "name": "Detect change scope",
+        "conclusion": "success",
+        "labels": [
+          "self-hosted"
+        ],
+        "runner_seconds": 41,
+        "step_seconds": {
+          "project_commands": 0,
+          "scope": 31,
+          "artifacts": 2,
+          "setup_and_teardown": 4
+        },
+        "job_overhead_seconds": 4
+      },
+      {
+        "name": "Dependency review",
+        "conclusion": "skipped",
+        "labels": [
+          "self-hosted"
+        ],
+        "runner_seconds": 0,
+        "step_seconds": {
+          "project_commands": 0,
+          "scope": 0,
+          "artifacts": 0,
+          "setup_and_teardown": 0
+        },
+        "job_overhead_seconds": 0
+      },
+      {
+        "name": "Frontend verification",
+        "conclusion": "success",
+        "labels": [
+          "self-hosted"
+        ],
+        "runner_seconds": 311,
+        "step_seconds": {
+          "project_commands": 227,
+          "scope": 0,
+          "artifacts": 3,
+          "setup_and_teardown": 73
+        },
+        "job_overhead_seconds": 8
+      },
+      {
+        "name": "Quality gate",
+        "conclusion": "success",
+        "labels": [
+          "self-hosted"
+        ],
+        "runner_seconds": 285,
+        "step_seconds": {
+          "project_commands": 228,
+          "scope": 0,
+          "artifacts": 2,
+          "setup_and_teardown": 51
+        },
+        "job_overhead_seconds": 4
+      },
+      {
+        "name": "Backend verification",
+        "conclusion": "success",
+        "labels": [
+          "self-hosted"
+        ],
+        "runner_seconds": 440,
+        "step_seconds": {
+          "project_commands": 423,
+          "scope": 0,
+          "artifacts": 1,
+          "setup_and_teardown": 13
+        },
+        "job_overhead_seconds": 3
+      }
+    ],
+    "artifacts": [
+      {
+        "id": 9511228753,
+        "name": "backend-report",
+        "size_in_bytes": 10045,
+        "expired": true,
+        "created_at": "2026-08-24T07:47:35Z",
+        "expires_at": "2026-09-07T07:47:34Z",
+        "digest": "sha256:0d83b159bc14070bf30ead56520f76134c84a9ae1f6a35871ce61d052996db2b"
+      },
+      {
+        "id": 9511195071,
+        "name": "quality-reports",
+        "size_in_bytes": 10083,
+        "expired": true,
+        "created_at": "2026-08-24T07:46:22Z",
+        "expires_at": "2026-09-07T07:46:21Z",
+        "digest": "sha256:51667c29b282b2d09aa58abd9d982dda53c302a8d25042a80a96e9cac5ec8aeb"
+      },
+      {
+        "id": 9511147874,
+        "name": "frontend-report",
+        "size_in_bytes": 9742,
+        "expired": true,
+        "created_at": "2026-08-24T07:44:38Z",
+        "expires_at": "2026-09-07T07:44:35Z",
+        "digest": "sha256:0108e07a6245e9aa021435f3ec29faf6125d06b81f97376e7b2adff53bd69e49"
+      },
+      {
+        "id": 9510889111,
+        "name": "scope-report",
+        "size_in_bytes": 282,
+        "expired": true,
+        "created_at": "2026-08-24T07:34:56Z",
+        "expires_at": "2026-09-07T07:34:55Z",
+        "digest": "sha256:32d4122496e20888c3f8f3f9e2524ba3fa3352619219af44cd41ab03604937e3"
+      }
+    ],
+    "monetary_cost": null,
+    "measurement_and_parsing_seconds": null
+  },
+  "shadow_self_hosted_ci": {
+    "status": "NOT_MEASURED",
+    "added_wall_seconds": null,
+    "added_runner_seconds": null,
+    "reason": "No paired self-hosted shadow run; GH-204 stopped before dispatch and has no command elapsed timestamps."
+  },
+  "local_observation": {
+    "arc_sum_step_seconds": 447.239,
+    "arc_command_step_seconds": 415.231,
+    "arc_prelude_seconds": 32.008,
+    "harness_elapsed_seconds": null,
+    "ci_runner_seconds": null,
+    "qualification": "Sum of native step timers; neither workflow wall time nor runner occupancy."
+  },
+  "target": {
+    "status": "DESIGN_ONLY",
+    "wall_seconds": null,
+    "runner_seconds": null,
+    "monetary_cost": null,
+    "authority_transfer_permitted": false
+  },
+  "command_inventory": [
+    {
+      "id": "backend.format",
+      "command": [
+        "cargo",
+        "fmt",
+        "--manifest-path",
+        "{backend}/Cargo.toml",
+        "--",
+        "--check"
+      ],
+      "cwd": "{root}",
+      "profiles": [
+        "full",
+        "hook"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/backend",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 401,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "backend.clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--manifest-path",
+        "{backend}/Cargo.toml",
+        "--locked",
+        "--all-targets",
+        "--all-features",
+        "--",
+        "-D",
+        "warnings",
+        "-D",
+        "clippy::allow_attributes_without_reason"
+      ],
+      "cwd": "{root}",
+      "profiles": [
+        "full",
+        "hook"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/backend",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 84442,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "backend.compile",
+      "command": [
+        "cargo",
+        "check",
+        "--manifest-path",
+        "{backend}/Cargo.toml",
+        "--locked",
+        "--all-targets"
+      ],
+      "cwd": "{root}",
+      "profiles": [
+        "full"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/backend",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 8612,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "backend.tests",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "{backend}/Cargo.toml",
+        "--locked",
+        "--",
+        "--nocapture"
+      ],
+      "cwd": "{root}",
+      "profiles": [
+        "full"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/backend",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 223407,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "frontend.lint",
+      "command": [
+        "npm",
+        "exec",
+        "--offline",
+        "eslint",
+        "--",
+        "src",
+        "--max-warnings=0"
+      ],
+      "cwd": "{frontend}",
+      "profiles": [
+        "full",
+        "hook"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/frontend",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 3905,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "frontend.format",
+      "command": [
+        "npm",
+        "run",
+        "format:check"
+      ],
+      "cwd": "{frontend}",
+      "profiles": [
+        "full",
+        "hook"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/frontend",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 3404,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "frontend.tests",
+      "command": [
+        "npm",
+        "test",
+        "--",
+        "--watch=false",
+        "--runner=vitest"
+      ],
+      "cwd": "{frontend}",
+      "profiles": [
+        "full"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/frontend",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 14233,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "frontend.e2e",
+      "command": [
+        "npm",
+        "run",
+        "e2e"
+      ],
+      "cwd": "{frontend}",
+      "profiles": [
+        "full"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/frontend",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 26544,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "frontend.fullstack-smoke",
+      "command": [
+        "npm",
+        "run",
+        "e2e:fullstack"
+      ],
+      "cwd": "{frontend}",
+      "profiles": [
+        "full"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/frontend",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 20125,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "frontend.build",
+      "command": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "cwd": "{frontend}",
+      "profiles": [
+        "full"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/frontend",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 10118,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "workflow.hook-syntax",
+      "command": [
+        "sh",
+        "-n",
+        "{root}/codex-audit-pipeline/hooks/pre-commit"
+      ],
+      "cwd": "{root}",
+      "profiles": [
+        "full",
+        "hook"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/workflow",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 101,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "workflow.project-init-tests",
+      "command": [
+        "node",
+        "--test",
+        "{root}/scripts/init-project.test.mjs"
+      ],
+      "cwd": "{root}",
+      "profiles": [
+        "full",
+        "hook"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/workflow",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 501,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "workflow.framework-release-config",
+      "command": [
+        "node",
+        "{root}/scripts/check-framework-release.mjs"
+      ],
+      "cwd": "{root}",
+      "profiles": [
+        "full",
+        "hook"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": false,
+      "before_owner": "cargo-flow/workflow",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 101,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "workflow.framework-upgrade-tests",
+      "command": [
+        "node",
+        "--test",
+        "{root}/scripts/upgrade-framework.test.mjs"
+      ],
+      "cwd": "{root}",
+      "profiles": [
+        "full",
+        "hook"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": false,
+      "before_owner": "cargo-flow/workflow",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 901,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "workflow.template-quality",
+      "command": [
+        "node",
+        "{root}/scripts/check-templates.mjs"
+      ],
+      "cwd": "{root}",
+      "profiles": [
+        "full",
+        "hook"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/workflow",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 501,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "workflow.template-quality-tests",
+      "command": [
+        "node",
+        "--test",
+        "{root}/scripts/check-templates.test.mjs"
+      ],
+      "cwd": "{root}",
+      "profiles": [
+        "full",
+        "hook"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/workflow",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 601,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "workflow.observability-config",
+      "command": [
+        "node",
+        "{root}/scripts/check-observability.mjs"
+      ],
+      "cwd": "{root}",
+      "profiles": [
+        "full",
+        "hook"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/workflow",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 101,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "workflow.tracing-config",
+      "command": [
+        "node",
+        "{root}/scripts/check-tracing.mjs"
+      ],
+      "cwd": "{root}",
+      "profiles": [
+        "full",
+        "hook"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/workflow",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 100,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "workflow.production-deployment-config",
+      "command": [
+        "node",
+        "{root}/scripts/check-production-deployment.mjs"
+      ],
+      "cwd": "{root}",
+      "profiles": [
+        "full",
+        "hook"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/workflow",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 101,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "workflow.audit-retention-config",
+      "command": [
+        "node",
+        "{root}/scripts/check-audit-retention.mjs"
+      ],
+      "cwd": "{root}",
+      "profiles": [
+        "full",
+        "hook"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/workflow",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 101,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "workflow.api-generation",
+      "command": [
+        "node",
+        "{root}/scripts/check-api-generation.mjs"
+      ],
+      "cwd": "{root}",
+      "profiles": [
+        "full"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/workflow",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 701,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "workflow.supply-chain-config",
+      "command": [
+        "node",
+        "{root}/scripts/check-supply-chain.mjs"
+      ],
+      "cwd": "{root}",
+      "profiles": [
+        "full",
+        "hook"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/workflow",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 101,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "workflow.format",
+      "command": [
+        "cargo",
+        "fmt",
+        "--manifest-path",
+        "{tool_manifest}",
+        "--",
+        "--check"
+      ],
+      "cwd": "{root}",
+      "profiles": [
+        "full",
+        "hook"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/workflow",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 201,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "workflow.clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--manifest-path",
+        "{tool_manifest}",
+        "--locked",
+        "--all-targets",
+        "--all-features",
+        "--",
+        "-D",
+        "warnings",
+        "-D",
+        "clippy::allow_attributes_without_reason"
+      ],
+      "cwd": "{root}",
+      "profiles": [
+        "full"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/workflow",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 8515,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    },
+    {
+      "id": "workflow.tests",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "{tool_manifest}",
+        "--locked",
+        "--",
+        "--nocapture"
+      ],
+      "cwd": "{root}",
+      "profiles": [
+        "full",
+        "hook"
+      ],
+      "blocks_when_selected": true,
+      "explicit_policy_required": true,
+      "before_owner": "cargo-flow/workflow",
+      "observed_local_arc_executions": 1,
+      "observed_local_harness_executions": 0,
+      "local_arc_duration_ms": 7413,
+      "naive_full_shadow_extra_executions": 1,
+      "target_owner": "harness-gate/execution",
+      "target_executions": 1,
+      "project_owned": true
+    }
+  ],
+  "measurement_inventory": [
+    {
+      "collector": "backend",
+      "capability": "coverage.line",
+      "series": "measurement-series/v1:4fa98f3128d8c3ac0dd5279ba9b4f4f9ae83cc3538575cfd5a6be1599a95dd98",
+      "target": {
+        "kind": "component",
+        "id": "backend"
+      },
+      "before_authoritative_producers": 0,
+      "observed_shadow_authoritative_producers": 0,
+      "target_owner": "harness-gate/collector/backend",
+      "target_producers": 1,
+      "status": "requires host provisioning"
+    },
+    {
+      "collector": "backend",
+      "capability": "coverage.region",
+      "series": "measurement-series/v1:4fa98f3128d8c3ac0dd5279ba9b4f4f9ae83cc3538575cfd5a6be1599a95dd98",
+      "target": {
+        "kind": "component",
+        "id": "backend"
+      },
+      "before_authoritative_producers": 0,
+      "observed_shadow_authoritative_producers": 0,
+      "target_owner": "harness-gate/collector/backend",
+      "target_producers": 1,
+      "status": "requires host provisioning"
+    },
+    {
+      "collector": "backend",
+      "capability": "risk.crap",
+      "series": "measurement-series/v1:4fa98f3128d8c3ac0dd5279ba9b4f4f9ae83cc3538575cfd5a6be1599a95dd98",
+      "target": {
+        "kind": "component",
+        "id": "backend"
+      },
+      "before_authoritative_producers": 0,
+      "observed_shadow_authoritative_producers": 0,
+      "target_owner": "harness-gate/collector/backend",
+      "target_producers": 1,
+      "status": "requires host provisioning"
+    },
+    {
+      "collector": "frontend",
+      "capability": "coverage.line",
+      "series": "measurement-series/v1:aafce3307210d37f5a1a09f98a7b33b04dfb34e4a269a4d2b78feadf349ff6f1",
+      "target": {
+        "kind": "component",
+        "id": "frontend"
+      },
+      "before_authoritative_producers": 0,
+      "observed_shadow_authoritative_producers": 0,
+      "target_owner": "harness-gate/collector/frontend",
+      "target_producers": 1,
+      "status": "requires host provisioning"
+    },
+    {
+      "collector": "frontend",
+      "capability": "coverage.function",
+      "series": "measurement-series/v1:aafce3307210d37f5a1a09f98a7b33b04dfb34e4a269a4d2b78feadf349ff6f1",
+      "target": {
+        "kind": "component",
+        "id": "frontend"
+      },
+      "before_authoritative_producers": 0,
+      "observed_shadow_authoritative_producers": 0,
+      "target_owner": "harness-gate/collector/frontend",
+      "target_producers": 1,
+      "status": "requires host provisioning"
+    },
+    {
+      "collector": "frontend",
+      "capability": "risk.crap",
+      "series": "measurement-series/v1:aafce3307210d37f5a1a09f98a7b33b04dfb34e4a269a4d2b78feadf349ff6f1",
+      "target": {
+        "kind": "component",
+        "id": "frontend"
+      },
+      "before_authoritative_producers": 0,
+      "observed_shadow_authoritative_producers": 0,
+      "target_owner": "harness-gate/collector/frontend",
+      "target_producers": 0,
+      "status": "unsupported"
+    },
+    {
+      "collector": "frontend-api",
+      "capability": "contract.breaking_changes",
+      "series": "measurement-series/v1:0b7ab5d8cf69f7a5fcd4df7e7ffe8acb0483d92a67cabcf3eafc3c05adce78ae",
+      "target": {
+        "kind": "relationship",
+        "id": "frontend-api"
+      },
+      "before_authoritative_producers": 0,
+      "observed_shadow_authoritative_producers": 0,
+      "target_owner": "harness-gate/collector/frontend-api",
+      "target_producers": 1,
+      "status": "requires host provisioning"
+    },
+    {
+      "collector": "frontend-api",
+      "capability": "contract.client_drift",
+      "series": "measurement-series/v1:0b7ab5d8cf69f7a5fcd4df7e7ffe8acb0483d92a67cabcf3eafc3c05adce78ae",
+      "target": {
+        "kind": "relationship",
+        "id": "frontend-api"
+      },
+      "before_authoritative_producers": 0,
+      "observed_shadow_authoritative_producers": 0,
+      "target_owner": "harness-gate/collector/frontend-api",
+      "target_producers": 1,
+      "status": "requires host provisioning"
+    },
+    {
+      "collector": "frontend-api",
+      "capability": "contract.compatible",
+      "series": "measurement-series/v1:0b7ab5d8cf69f7a5fcd4df7e7ffe8acb0483d92a67cabcf3eafc3c05adce78ae",
+      "target": {
+        "kind": "relationship",
+        "id": "frontend-api"
+      },
+      "before_authoritative_producers": 0,
+      "observed_shadow_authoritative_producers": 0,
+      "target_owner": "harness-gate/collector/frontend-api",
+      "target_producers": 1,
+      "status": "requires host provisioning"
+    }
+  ]
+}

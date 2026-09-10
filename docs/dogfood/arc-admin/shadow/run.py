@@ -5,6 +5,7 @@ Requires authenticated gh, git, cargo, npm, Docker and a built harness-gate.
 Retains raw outputs/exit codes; never changes authority or rewrites flow steps.
 """
 import argparse
+from datetime import datetime, timezone
 import hashlib
 import json
 import os
@@ -12,6 +13,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import tarfile
+import time
 
 ROOT = Path(__file__).resolve().parents[4]
 ARC = Path(__file__).resolve().parent.parent
@@ -36,11 +38,26 @@ def main():
                GIT_CEILING_DIRECTORIES=str(output / "tmp"))
     (output / "tmp").mkdir()
     receipts = []
+    # Whitelist CI identity only; never retain the runner's full environment.
+    (output / "timing-context.json").write_text(json.dumps({
+        "source_commit": COMMIT,
+        "clock": "time.monotonic_ns",
+        "unit": "seconds",
+        "ci_identity": {key: os.environ.get(key) for key in (
+            "GITHUB_REPOSITORY", "GITHUB_RUN_ID", "GITHUB_RUN_ATTEMPT",
+            "GITHUB_JOB", "GITHUB_SHA", "RUNNER_OS", "RUNNER_ARCH")},
+        "limitation": "Command elapsed time only. Obtain job occupancy and queue times from Actions job timestamps; local receipts do not establish self-hosted CI cost.",
+    }, indent=2) + "\n")
 
     def run(name, command, cwd=ROOT, required=False):
+        started_at = datetime.now(timezone.utc).isoformat()
+        started_ns = time.monotonic_ns()
         with (output / (name + ".log")).open("wb") as log:
             result = subprocess.run(command, cwd=cwd, env=env, stdout=log, stderr=subprocess.STDOUT, check=False)
-        receipts.append({"name": name, "command": command, "cwd": str(cwd), "exit_code": result.returncode})
+        elapsed_seconds = (time.monotonic_ns() - started_ns) / 1_000_000_000
+        receipts.append({"name": name, "command": command, "cwd": str(cwd), "exit_code": result.returncode,
+                         "started_at": started_at, "completed_at": datetime.now(timezone.utc).isoformat(),
+                         "elapsed_seconds": elapsed_seconds})
         (output / "commands.json").write_text(json.dumps(receipts, indent=2) + "\n")
         if required and result.returncode:
             raise SystemExit(f"prerequisite failed: {name}; see {output / (name + '.log')}")

@@ -1,0 +1,24 @@
+
+> arc-admin@0.0.0 e2e
+> playwright test
+
+[WebServer] Prebundling has been configured but will not be used because caching has been disabled.
+[WebServer] 
+[WebServer] Warning: This is a simple server for use in testing or debugging Angular applications
+[WebServer] locally. It hasn't been reviewed for security issues.
+[WebServer] 
+[WebServer] Binding this server to an open connection can result in compromising your application or
+[WebServer] computer. Using a different host than the one passed to the "--host" flag might result in
+[WebServer] websocket connection issues.
+[WebServer]     
+
+Running 6 tests using 4 workers
+
+  ✓  1 [chromium] › e2e/authenticated-user-flow.spec.ts:730:5 › redirects an unauthenticated deep link to login (1.2s)
+  ✓  4 [chromium] › e2e/authenticated-user-flow.spec.ts:736:5 › renders the public error page with one main landmark (1.2s)
+  ✓  5 [mobile-chromium] › e2e/authenticated-user-flow.spec.ts:730:5 › redirects an unauthenticated deep link to login (808ms)
+  ✓  6 [mobile-chromium] › e2e/authenticated-user-flow.spec.ts:736:5 › renders the public error page with one main landmark (773ms)
+  ✓  2 [chromium] › e2e/authenticated-user-flow.spec.ts:69:5 › logs in, uses permission-aware navigation, and creates a user (12.0s)
+  ✓  3 [mobile-chromium] › e2e/authenticated-user-flow.spec.ts:69:5 › logs in, uses permission-aware navigation, and creates a user (13.3s)
+
+  6 passed (23.5s)

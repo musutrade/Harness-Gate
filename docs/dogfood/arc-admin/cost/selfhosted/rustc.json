@@ -1,0 +1,11 @@
+{
+  "name": "rustc",
+  "argv": [
+    "rustc",
+    "-vV"
+  ],
+  "started_at": "2026-09-10T08:26:35.687764+00:00",
+  "completed_at": "2026-09-10T08:26:35.730432+00:00",
+  "elapsed_seconds": 0.042687253,
+  "exit_code": 0
+}
