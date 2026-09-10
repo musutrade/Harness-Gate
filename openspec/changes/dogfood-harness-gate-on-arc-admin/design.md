@@ -79,6 +79,27 @@ Any unsupported field or behavior must be reported explicitly. The importer SHAL
 
 Manual edits after import should be limited to documented incompatibilities or intentional Harness-Gate additions. Migration effort is a product metric and must be recorded.
 
+GH-202 implements `harness-gate config import --execution-only` before project
+configuration discovery. It reads Arc-Flow v2 TOML without environment expansion,
+validates the compatible projection through the existing execution model, and
+rejects unknown or lossy declarations before publishing configuration and a
+deterministic JSON parity/UX report. Existing outputs are never overwritten.
+All source declarations and step order are retained; explicit dependencies use
+the existing dependency validator. Arc's omitted secret path is materialized and
+each command receives `input = "repository"` to retain working-tree access.
+
+Full migration fails visibly without the explicit execution-only boundary:
+global Arc environment overrides, audit/secret prelude behavior, services and
+CI/hook integration still require project work and shadow evidence. The report
+always blocks authority transfer; no quality policy or `ci` profile is invented.
+The [import record](../../../docs/dogfood/arc-admin/import/README.md) compares all
+25 selected-step blockers against GH-201, including the two outside the policy
+list. Its metrics count one import command, zero re-entered steps/config edits,
+491 preserved scalar values and 25 duplicated step definitions across the retained
+source and generated configuration. Human elapsed time and runtime integration
+effort remain explicitly unmeasured. This implements tasks 3.1–3.4 only and does
+not establish runtime parity or acceptance of this complete proposal.
+
 ## 5. Quality configuration
 
 Add `.harness-gate/quality.toml` separately from migrated execution config.

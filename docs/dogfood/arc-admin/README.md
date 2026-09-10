@@ -6,6 +6,9 @@ The assurance boundary includes every selected command, both prelude checks, env
 
 ## Reproduce and inspect
 
+GH-202 adds the [deterministic execution import, parity inventory and UX metrics](import/README.md).
+The frozen before state below remains unchanged; the import does not establish runtime parity.
+
 - [Source manifest](source-manifest.json): original paths, pinned Git blob IDs, SHA-256 hashes and local `.txt` snapshots. These are inert evidence, not installed configuration.
 - [Inventory](inventory.json): complete parsed flow, architecture audit and secret-scanner configuration, all components, profiles, scope patterns, services, parsers, doctor rules, environment declarations and step ownership.
 - [Execution table](steps.md): all 25 commands, arguments, working directories, profiles, timeouts, parsers, services and log names.
