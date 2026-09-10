@@ -75,7 +75,21 @@ GH-206 evidence: [before/shadow/target cost and ownership analysis](../../../doc
 
 ## 9. Authority-transfer recommendation and closure
 
-- [ ] 9.1 Produce an evidence-backed recommendation on whether Arc-Admin can transfer required workflow authority from `cargo flow` to Harness-Gate.
-- [ ] 9.2 If transfer is not yet safe, keep shadow mode and list exact blockers; do not force closure.
-- [ ] 9.3 If transfer is safe, create a separate follow-up change for removal/consolidation of old Arc-Admin workflow infrastructure.
-- [ ] 9.4 Retain final migration effort, parity, negative, cost, rollback and product-gap evidence; strict-validate and close this dogfood change only when all claims are supported.
+- [x] 9.1 Produce an evidence-backed recommendation on whether Arc-Admin can transfer required workflow authority from `cargo flow` to Harness-Gate.
+- [x] 9.2 If transfer is not yet safe, keep shadow mode and list exact blockers; do not force closure.
+- [ ] 9.3 If transfer is safe, create a separate follow-up change for removal/consolidation of old Arc-Admin workflow infrastructure. — Not applicable to the current no-transfer decision; safe-transfer condition is false and no removal change is authorized.
+- [ ] 9.4 Retain final migration effort, parity, negative, cost, rollback and product-gap evidence; strict-validate and close this dogfood change only when all claims are supported. — Evidence retention and strict validation are recorded below; proposal closure remains blocked, so this combined task is not marked complete.
+
+GH-208 evidence: [no-transfer recommendation, final evidence index, exact blockers
+B1–B5 and rollback boundary](../../../docs/dogfood/arc-admin/decision/README.md),
+[actual validation](../../../docs/dogfood/arc-admin/decision/validation.json).
+Retained GH-207 semantic replay confirms 27 passing traditional results per engine,
+six command controls and seventeen synthetic quality cases, with both Harness-Gate
+full workflows still blocked on missing native state. Self-hosted receipt replay
+confirms bounded cost evidence, not complete-quality success or target savings.
+GH-215 tracks integration/host/routing/cost remediation. Existing gates, authority,
+quality policy and lineage remain intact; Result is validation evidence only.
+Strict OpenSpec validation passes; full local check results and hosted CI limits
+are retained in the validation record. Tasks 1.1, 1.2 and 1.4 and whole-proposal
+acceptance remain outside this issue's completion claim. Required Quality Aggregate
+remains CI pending at submission; the controller owns acceptance and issue closure.
