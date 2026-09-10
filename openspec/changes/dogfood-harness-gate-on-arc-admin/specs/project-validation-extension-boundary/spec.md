@@ -198,3 +198,24 @@ The Arc-Admin cost record SHALL distinguish before, observed shadow and proposed
 - **AND** structured results and aggregate jobs consume existing evidence without taking measurement authority or recollecting equivalent facts
 - **AND** Angular CRAP remains unsupported without a numeric producer
 - **AND** existing CI/arc-flow gates remain until replacement ownership, runtime parity and fail-closed evidence are accepted separately
+
+
+### Requirement: Guaranteed serial execution SHALL preserve shared-service compatibility
+
+For consumers of the same service identity, the production loader SHALL recognize guaranteed single-worker dispatch as ordering, as specified in ADR-0050. It SHALL NOT insert dependencies or alter project scope, profiles, commands or requiredness to obtain compatibility. A configuration that permits multiple workers SHALL retain the dependency-based shared-service conflict check. Duplicate logs and existing injection safeguards SHALL remain enforced.
+
+#### Scenario: Serial consumers execute without inferred dependencies
+- **GIVEN** two project steps share a service and have no dependency path
+- **WHEN** execution is explicitly serial or has only one worker
+- **THEN** production loading succeeds and selected consumers execute one at a time
+- **AND** no dependency is added and no unselected step is pulled into scope
+- **WHEN** the same configuration enables multiple workers
+- **THEN** production loading rejects unordered sharing before execution
+
+
+#### Scenario: Bounded self-hosted workloads complete with a retained quality failure
+- **GIVEN** paired before/shadow workloads run on a self-hosted runner at pinned source and tool revisions
+- **WHEN** all traditional steps pass but trusted quality workflow inputs are absent
+- **THEN** the actual workload segment and job occupancy costs are retained with failed quality exit codes
+- **AND** full-quality cost, original-topology savings and authority transfer remain unestablished
+- **AND** the missing host provisioning is tracked for integration remediation rather than fabricated or waived

@@ -197,3 +197,10 @@ Authority-transfer recommendations should identify which old jobs/steps can be r
 ## 9. Long-term ecosystem implication
 
 This boundary is intentionally ecosystem-neutral. A future Go + Vue project should be able to keep its Go tests, Vue/Playwright E2E, API tests and custom scripts project-owned while Harness-Gate provides generic command hooks and separately binds certified Go/Vue collectors/packs. No application test framework belongs in Generic Core solely to make its command executable.
+
+
+### GH-206 remediation and bounded CI follow-up
+
+[ADR-0050](../../../docs/adr/0050-serial-shared-service-ordering.md) recognizes guaranteed single-worker dispatch for same-service consumers while retaining parallel conflict checks. [Three self-hosted workload pairs](../../../docs/dogfood/arc-admin/cost/selfhosted.md) now execute the unchanged imported flow: every one of the 25 project steps and two preludes matches and passes. Historical GH-204/205 receipts remain unchanged. This resolves HG-CAP-001 for serial dispatch; it does not establish complete runtime quality parity.
+
+GH-207 must still address trusted native collector/state/key and baseline provisioning. The actual `QUALITY_BLOCKED` failure for missing `.harness-gate/runtime/full-state.json`, and the null profile name in that early-failure diagnostic, are retained. Complete-quality cost and original-topology savings remain unknown; no authority transfer or gate removal is permitted from the bounded cost series.
