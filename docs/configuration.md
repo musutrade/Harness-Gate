@@ -9,6 +9,10 @@ troubleshooting. Execution mechanics below compose with quality policy;
 For generated quality defaults, composable packs and flow-only adoption, see
 [quality presets and migration](quality-presets.md).
 
+For compatible Arc-Flow v2 execution declarations, `harness-gate config import --execution-only`
+generates configuration and a deterministic parity/UX report. See
+[Arc-Admin import and runtime limitations](dogfood/arc-admin/import/README.md).
+
 For optional `.harness-gate/quality.toml` v1, collector authority and flow/quality
 cross-validation, see the [quality configuration reference](quality-configuration.md).
 Repositories without that file retain existing flow-only behavior.
