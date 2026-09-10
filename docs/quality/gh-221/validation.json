@@ -1,0 +1,295 @@
+{
+  "environment": {
+    "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-221/target/gh-221/tmp",
+    "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-221/target/gh-221/harness",
+    "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-221/target/gh-221/tmp",
+    "HARNESS_GATE_CI_ACCEPTANCE": "/mnt/dev-ssd/workspaces/symphony/GH-221/target/quality/workflow-acceptance",
+    "HARNESS_GATE_NATIVE_POLICY_BINARY": "/mnt/dev-ssd/workspaces/symphony/GH-221/target/gh-221/harness/debug/harness-gate",
+    "NATIVE_DRIVER": "/mnt/dev-ssd/workspaces/symphony/GH-221/target/gh-221/native-driver/build/debug/harness-gate-rust-native-driver",
+    "NATIVE_DRIVER_SYSROOT": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu"
+  },
+  "checks": [
+    {
+      "name": "nextest",
+      "command": [
+        "cargo",
+        "nextest",
+        "run",
+        "--manifest-path",
+        "tools/harness-gate/Cargo.toml",
+        "--locked"
+      ],
+      "environment_override": {},
+      "exit_code": 0,
+      "seconds": 222.22,
+      "log": "nextest.log"
+    },
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--manifest-path",
+        "tools/harness-gate/Cargo.toml",
+        "--",
+        "--check"
+      ],
+      "environment_override": {},
+      "exit_code": 0,
+      "seconds": 0.711,
+      "log": "fmt.log"
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--manifest-path",
+        "tools/harness-gate/Cargo.toml",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "environment_override": {},
+      "exit_code": 0,
+      "seconds": 25.087,
+      "log": "clippy.log"
+    },
+    {
+      "name": "build-cli",
+      "command": [
+        "cargo",
+        "build",
+        "--manifest-path",
+        "tools/harness-gate/Cargo.toml",
+        "--locked"
+      ],
+      "environment_override": {},
+      "exit_code": 0,
+      "seconds": 0.199,
+      "log": "build-cli.log"
+    },
+    {
+      "name": "python",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/quality/tests",
+        "-v"
+      ],
+      "environment_override": {},
+      "exit_code": 1,
+      "seconds": 219.33,
+      "log": "python.log"
+    },
+    {
+      "name": "lifecycle",
+      "command": [
+        "python3",
+        "tools/quality/ci_acceptance.py",
+        "--directory",
+        "target/quality/workflow-acceptance"
+      ],
+      "environment_override": {},
+      "exit_code": 0,
+      "seconds": 0.093,
+      "log": "lifecycle.log"
+    },
+    {
+      "name": "native-fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--manifest-path",
+        "tools/quality/rust-native-driver/Cargo.toml",
+        "--",
+        "--check"
+      ],
+      "environment_override": {},
+      "exit_code": 0,
+      "seconds": 0.08,
+      "log": "native-fmt.log"
+    },
+    {
+      "name": "native-clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--manifest-path",
+        "tools/quality/rust-native-driver/Cargo.toml",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "environment_override": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-221/target/gh-221/native-driver/build",
+        "RUSTC_BOOTSTRAP": "1",
+        "RUSTFLAGS": "--sysroot /mnt/dev-ssd/workspaces/symphony/GH-221/target/gh-221/native-driver/sysroot"
+      },
+      "exit_code": 0,
+      "seconds": 4.111,
+      "log": "native-clippy.log"
+    },
+    {
+      "name": "native-test",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "tools/quality/rust-native-driver/Cargo.toml",
+        "--locked"
+      ],
+      "environment_override": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-221/target/gh-221/native-driver/build",
+        "RUSTC_BOOTSTRAP": "1",
+        "RUSTFLAGS": "--sysroot /mnt/dev-ssd/workspaces/symphony/GH-221/target/gh-221/native-driver/sysroot"
+      },
+      "exit_code": 0,
+      "seconds": 1.651,
+      "log": "native-test.log"
+    },
+    {
+      "name": "python-final",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/quality/tests",
+        "-v"
+      ],
+      "environment_override": {},
+      "exit_code": 0,
+      "seconds": 208.835,
+      "log": "python-final.log",
+      "resolves": "python: registered the new module in the complete Python boundary inventory"
+    },
+    {
+      "name": "docs-consistency-final",
+      "command": [
+        "python3",
+        "tools/quality/docs_consistency.py",
+        "--output",
+        "target/quality/docs-consistency.json"
+      ],
+      "environment_override": {},
+      "exit_code": 0,
+      "seconds": 3.298,
+      "log": "docs-consistency-final.log"
+    },
+    {
+      "name": "openspec-final",
+      "command": [
+        "openspec",
+        "validate",
+        "--all",
+        "--strict",
+        "--no-interactive"
+      ],
+      "environment_override": {},
+      "exit_code": 0,
+      "seconds": 1.296,
+      "log": "openspec-final.log"
+    },
+    {
+      "name": "inventory-final",
+      "command": [
+        "python3",
+        "-c",
+        "import sys,json,tomllib; sys.path.insert(0,'tools/quality'); import critical_paths as c; c.validate_inventory(tomllib.loads(c.INVENTORY.read_text()),json.loads(c.POLICY.read_text())); print('Complete critical_paths inventory valid')"
+      ],
+      "environment_override": {},
+      "exit_code": 0,
+      "seconds": 1.631,
+      "log": "inventory-final.log"
+    }
+  ],
+  "summary": {
+    "nextest": {
+      "passed": 392,
+      "skipped": 0
+    },
+    "python_final": {
+      "passed": 407,
+      "skipped": 0,
+      "new_native_tests": 8
+    },
+    "lifecycle_cases": 12,
+    "openspec": {
+      "passed": 57,
+      "failed": 0
+    },
+    "docs_consistency": "pass",
+    "critical_paths_inventory": "pass",
+    "native_rust_unit_tests": 0,
+    "acceptance": "local implementation evidence only; hosted CI and proposal acceptance pending"
+  },
+  "prior_environment_failure": {
+    "command": [
+      "python3",
+      "tools/quality/docs_consistency.py",
+      "--output",
+      "target/quality/docs-consistency.json"
+    ],
+    "environment": "CARGO_TARGET_DIR not overridden; inherited host Cargo target configuration",
+    "report_status": "fail",
+    "process_exit_code": null,
+    "process_exit_note": "Retained JSON report records failure; original process status was not separately recorded.",
+    "report": "docs-consistency-initial.json",
+    "error_reproduction": {
+      "command": [
+        "cargo",
+        "run",
+        "--quiet",
+        "--locked",
+        "--manifest-path",
+        "tools/harness-gate/Cargo.toml",
+        "--",
+        "--version"
+      ],
+      "exit_code": 101,
+      "log": "docs-initial-cargo-error.log",
+      "error": "/home/gem/cargo-target/debug/.cargo-build-lock: Read-only file system (os error 30)"
+    },
+    "resolved_by": "docs-consistency-final with workspace-local CARGO_TARGET_DIR; no external cache modified"
+  },
+  "not_applicable": [
+    {
+      "command": [
+        "harness-gate",
+        "config",
+        "check"
+      ],
+      "reason": "No project-local .harness-gate/flow.toml with declared ci profile."
+    },
+    {
+      "command": [
+        "harness-gate",
+        "verify",
+        "--profile",
+        "ci",
+        "--all"
+      ],
+      "reason": "No project-local .harness-gate/flow.toml with declared ci profile."
+    }
+  ],
+  "backend_reproduction": {
+    "command": [
+      "python3",
+      "docs/quality/gh-221/reproduce.py",
+      "--output",
+      "target/gh-221/input"
+    ],
+    "exit_code": 0,
+    "log": "reproduce.log",
+    "source_archive_gzip_exit": 1,
+    "source_archive_impact": "Whole archive is truncated; all 47 required backend members independently reconcile.",
+    "mode": "reviewed-archive-replay; seven original backend binaries unavailable; historical LLVM file-summary remains measurement_error"
+  }
+}

@@ -657,13 +657,15 @@
       "purpose": "Compile pinned Rust compiler provenance and independent MIR/LLVM counters; verify complete declared production ownership and retain raw facts.",
       "callers": [
         "tools/quality/rust_native_policy.py",
-        "tools/quality/tests/test_rust_native_driver.py"
+        "tools/quality/tests/test_rust_native_driver.py",
+        "tools/quality/rust_native_classify.py",
+        "tools/quality/tests/test_rust_native_classify.py"
       ],
       "ci_role": "Opt-in development measurement and real native regression; no Arc-Admin gate switch.",
       "release_impact": "Not packaged in release binary; cannot approve a release or accept a baseline.",
       "authoritative_status": "Native measurement facts only; released Rust Core retains policy authority.",
       "final_disposition": "Retain ecosystem measurement tooling outside Generic Core (ADR-0040/0044/0049).",
-      "sha256": "634ac8195f6dfd57f2e489828bdbfe1b761629f7ec326bf32c4bb660d7290b7a"
+      "sha256": "88657a0654e7d1c0376a1697c27d03b226ccf4efe212eb892b3369d8de2573ae"
     },
     {
       "module": "tools/quality/rust_native_policy.py",
@@ -677,6 +679,21 @@
       "authoritative_status": "Native measurement facts only; released Rust Core retains policy authority.",
       "final_disposition": "Retain ecosystem measurement tooling outside Generic Core (ADR-0040/0044/0049).",
       "sha256": "72872de33986555d44c2ae99beecbf71a7e851352da37db60815ac9eab4b192b"
+    },
+    {
+      "module": "tools/quality/rust_native_classify.py",
+      "category": "A",
+      "purpose": "Classify every declared Rust source from authenticated complete native production ownership, configuration and raw LLVM evidence.",
+      "callers": [
+        "tools/quality/tests/test_rust_native_classify.py",
+        "docs/quality/gh-221/reproduce.py",
+        "Manual CLI documented in tools/quality/rust-native-driver/README.md"
+      ],
+      "ci_role": "Opt-in development measurement and real native regression; no Arc-Admin gate switch.",
+      "release_impact": "Not packaged in release binary; cannot approve a release or accept a baseline.",
+      "authoritative_status": "Native measurement facts only; released Rust Core retains policy authority.",
+      "final_disposition": "Retain ecosystem measurement tooling outside Generic Core (ADR-0040/0044/0049).",
+      "sha256": "b83b1c799dea5e68b24e4b5aaff3db6947e12cda464e66532804285a9010b6f6"
     }
   ],
   "schema": "python-product-boundary/v1",

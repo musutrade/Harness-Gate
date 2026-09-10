@@ -1,0 +1,112 @@
+{
+  "schema": "gh-221-artifact-index/1",
+  "base_commit": "bc06455814f03a5a87e4f2340f1f026387851690",
+  "scope": "Development classification only; no baseline acceptance or official gate switch.",
+  "fixture_origin": "target/gh-221/file-tests/tmpbufsoy6q",
+  "fixture_artifacts": {
+    "default": {
+      "anchor": "996d4a88c93035c1830526b0dbdc8e215180f3e7693ba39418ccdbdf233f21c9",
+      "sealed_files_verified": 74
+    },
+    "extra": {
+      "anchor": "4431b2c2fd9662fdd27e7c6265a72d9b63e21d025e7461f002c06b55b3d291ba",
+      "sealed_files_verified": 75
+    }
+  },
+  "code": [
+    {
+      "path": "tools/quality/rust_native_classify.py",
+      "sha256": "b83b1c799dea5e68b24e4b5aaff3db6947e12cda464e66532804285a9010b6f6",
+      "bytes": 12985
+    },
+    {
+      "path": "tools/quality/rust_native_driver.py",
+      "sha256": "88657a0654e7d1c0376a1697c27d03b226ccf4efe212eb892b3369d8de2573ae",
+      "bytes": 39517
+    },
+    {
+      "path": "tools/quality/tests/test_rust_native_classify.py",
+      "sha256": "ab61b2e7331b3a0df5209ad2584814916ec0b1a2d28b9d90dc60da6413193d1b",
+      "bytes": 10453
+    },
+    {
+      "path": "docs/quality/gh-221/reproduce.py",
+      "sha256": "3d44cbf53a55cb6e7348f828c9f57c1de84d7651b23f5a1edb7fd71c113ba6c0",
+      "bytes": 8154
+    }
+  ],
+  "native_driver": {
+    "path": "target/gh-221/native-driver/build/debug/harness-gate-rust-native-driver",
+    "sha256": "e5be9a21767c7c448fac53b74dcd6568a187737885b89607fcab97b6879d3524",
+    "bytes": 36439352
+  },
+  "committed_files": [
+    {
+      "path": "docs/quality/gh-221/README.md",
+      "sha256": "4f965eebae7722ea303f352119016692313fc16a1b09f6657f0967a18a137e17",
+      "bytes": 9085
+    },
+    {
+      "path": "docs/quality/gh-221/backend-classification.json.gz",
+      "sha256": "043f8dd2c0bacbbcc624abb5c1c4c88e03e6f65edc8479373d89150210c4b560",
+      "bytes": 599796
+    },
+    {
+      "path": "docs/quality/gh-221/file-summary.json",
+      "sha256": "565da39f47efdb3cc8102b28b02ca1fdb3143fe89b46c316cfbd44cfd00036c9",
+      "bytes": 21898
+    },
+    {
+      "path": "docs/quality/gh-221/five-file-provenance.json.gz",
+      "sha256": "2a3ecdd484b56bb3023acb373ffbdc28aa23e172b7f80d75695a4404298b5ba2",
+      "bytes": 80356
+    },
+    {
+      "path": "docs/quality/gh-221/native-bootstrap.json",
+      "sha256": "66c31c2946e27ee0cf23c1fada9e4cccea779f08b6d25f0f7b4455765df9aa97",
+      "bytes": 935
+    },
+    {
+      "path": "docs/quality/gh-221/native-fixtures.tar.xz",
+      "sha256": "b931e8da90565f222d85ab40323cb890d7b019db97df06e27620eed29906c000",
+      "bytes": 5875400
+    },
+    {
+      "path": "docs/quality/gh-221/reproduce.py",
+      "sha256": "3d44cbf53a55cb6e7348f828c9f57c1de84d7651b23f5a1edb7fd71c113ba6c0",
+      "bytes": 8154
+    },
+    {
+      "path": "docs/quality/gh-221/source-reconciliation.json",
+      "sha256": "1a3ae974ecf9d74f8e16a522ddc09af736383acb4a3b45f1383fa1393a1ef298",
+      "bytes": 44613
+    },
+    {
+      "path": "docs/quality/gh-221/validation-logs.tar.xz",
+      "sha256": "3ef97221ecc4fc5b724e0b23c3fce1e1a9903377b84e616a793060c24509e822",
+      "bytes": 74500
+    },
+    {
+      "path": "docs/quality/gh-221/validation.json",
+      "sha256": "630028ef9e4a9958e423ccb9c2243752d1dd262f622b79bf84ff92572c8e472b",
+      "bytes": 8080
+    }
+  ],
+  "input_artifacts": [
+    {
+      "bytes": 48553348,
+      "path": "docs/quality/gh-220/production-raw.tar.xz",
+      "sha256": "96e5ad870e4606de809bd4508611e0f70746e4f6802fc821123f6601151f4acb"
+    },
+    {
+      "bytes": 2421013,
+      "path": "docs/quality/gh-220/production-report.json.gz",
+      "sha256": "8464f732540ac476ee20cada1afa4cd36c8a16fa80fb741991c7239a12612a2b"
+    },
+    {
+      "bytes": 4033463,
+      "path": "docs/quality/gh-220/arc-admin-e5a1ee5.tar.gz",
+      "sha256": "b913a6028dafe8f98b9baac6a3c72806622aae5caf2c0785680fbdbae3fc61c6"
+    }
+  ]
+}
