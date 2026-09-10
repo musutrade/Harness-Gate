@@ -270,6 +270,7 @@
         "tools/quality/policy_engine.py",
         "tools/quality/policy_ratchet.py",
         "tools/quality/project_report.py",
+        "tools/quality/rust_native_policy.py",
         "tools/quality/rust_reference.py",
         "tools/quality/tests/test_collector_runner.py",
         "tools/quality/tests/test_harness_evidence.py",
@@ -292,7 +293,7 @@
       "ci_role": "Quality-scripts regression coverage; advisory/shadow or manual execution only",
       "final_disposition": "Migrate generic rules to Rust, then freeze this Python implementation as a non-authoritative compatibility oracle after task 6.2 acceptance; remove release-approval callers in task 7.1.",
       "module": "tools/quality/harness_evidence.py",
-      "notes": "",
+      "notes": "GH-220 native projection reuses frozen identity helpers only; module source and policy authority are unchanged.",
       "purpose": "Standalone normalized evidence contracts; no release decision or collector.",
       "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
       "sha256": "98a84b640bf5628e09bd96772cf1f3a7174e37f79bfa4cd6cc1abc2ed0fbac0e"
@@ -395,6 +396,7 @@
         "tools/quality/policy_engine.py",
         "tools/quality/policy_ratchet.py",
         "tools/quality/project_report.py",
+        "tools/quality/rust_native_policy.py",
         "tools/quality/rust_reference.py",
         "tools/quality/tests/test_policy_ratchet.py",
         "tools/quality/tests/test_project_model.py",
@@ -408,7 +410,7 @@
       "ci_role": "Quality-scripts regression coverage; advisory/shadow or manual execution only",
       "final_disposition": "Migrate generic rules to Rust, then freeze this Python implementation as a non-authoritative compatibility oracle after task 6.2 acceptance; remove release-approval callers in task 7.1.",
       "module": "tools/quality/project_model.py",
-      "notes": "",
+      "notes": "GH-220 native projection reuses frozen identity helpers only; module source and policy authority are unchanged.",
       "purpose": "Shadow project/subject contracts; no collector or release-policy authority.",
       "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
       "sha256": "0c4eef77ef31ef511bd414e5b3002f0988ba16c044195ae6e81e6f379cc4059f"
@@ -648,6 +650,33 @@
       "final_disposition": "Retain ecosystem-specific experiment pending complete production provenance and acceptance.",
       "notes": "GH-220: experimental, not integrated with production debt or baseline.",
       "sha256": "a09d13ec1ae36919a9622e518d21c3fa37ac693f031b2a6bfc3ae9425d03bee9"
+    },
+    {
+      "module": "tools/quality/rust_native_driver.py",
+      "category": "A",
+      "purpose": "Compile pinned Rust compiler provenance and independent MIR/LLVM counters; verify complete declared production ownership and retain raw facts.",
+      "callers": [
+        "tools/quality/rust_native_policy.py",
+        "tools/quality/tests/test_rust_native_driver.py"
+      ],
+      "ci_role": "Opt-in development measurement and real native regression; no Arc-Admin gate switch.",
+      "release_impact": "Not packaged in release binary; cannot approve a release or accept a baseline.",
+      "authoritative_status": "Native measurement facts only; released Rust Core retains policy authority.",
+      "final_disposition": "Retain ecosystem measurement tooling outside Generic Core (ADR-0040/0044/0049).",
+      "sha256": "634ac8195f6dfd57f2e489828bdbfe1b761629f7ec326bf32c4bb660d7290b7a"
+    },
+    {
+      "module": "tools/quality/rust_native_policy.py",
+      "category": "A",
+      "purpose": "Project certified native facts and unchanged 80/80/30 plus debt/delta policy into the released language-neutral Rust evaluator.",
+      "callers": [
+        "tools/quality/tests/test_rust_native_driver.py"
+      ],
+      "ci_role": "Opt-in development measurement and real native regression; no Arc-Admin gate switch.",
+      "release_impact": "Not packaged in release binary; cannot approve a release or accept a baseline.",
+      "authoritative_status": "Native measurement facts only; released Rust Core retains policy authority.",
+      "final_disposition": "Retain ecosystem measurement tooling outside Generic Core (ADR-0040/0044/0049).",
+      "sha256": "72872de33986555d44c2ae99beecbf71a7e851352da37db60815ac9eab4b192b"
     }
   ],
   "schema": "python-product-boundary/v1",

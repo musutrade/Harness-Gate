@@ -44,22 +44,28 @@ implementation chunk in tasks.md is bounded to less than four hours; unresolved
 compiler boundaries require further design and cannot be marked accepted on time
 spent. Acceptance requires all four requirements above, not only the prototype.
 
-Example of a bounded experiment (paths remain inside the current workspace):
-```sh
-python3 tools/quality/rust_native.py collect \
-  --source tools/quality/fixtures/rust-native/complete.rs \
-  --analyzer target/gh-220/analyzer/debug/harness-gate-rust-measure \
-  --output target/gh-220/example-native
-```
-The output is an evidence-manifest SHA, not a gate pass. `certify --evidence ...
---expected-sha256 ... --output ...` recomputes the bounded report and returns failure
-for unchanged threshold violations. It cannot certify a complete Cargo backend.
+The production development collector is `tools/quality/rust_native_driver.py`.
+Its pinned compiler driver retains all post-analysis definitions, constant MIR,
+recursive expansion edges and independent MIR block counters. See
+[design](../../design.md) and [reproduction instructions](../../../../../tools/quality/rust-native-driver/README.md).
+The previous `rust_native.py` fixture adapter remains explicitly experimental;
+its old reports do not gain production authority.
+
+#### Scenario: Generated methods disabled by stock coverage
+- **WHEN** a derive marks a method coverage(off), or a macro generates a constant/type
+- **THEN** independent method counters or retained compile-time MIR/declarations establish its compiler role
+- **AND** no declaration or owner is silently removed from the inventory
+
+#### Scenario: Unchanged debt and new regression
+- **WHEN** compatible real captures have unchanged historical CRAP debt
+- **THEN** the existing Rust evaluator reports and retains that debt
+- **AND** newly introduced debt or regression still fails without resetting the baseline
 
 Alternatives rejected: source AST absence as proof, arbitrary expression fallback,
 parent counters for closures, unfiltered file summaries relabeled as production,
-and invented JSON positives. A compiler-integrated DefId/expansion collector remains
-a possible next implementation; this prototype does not pretend to provide it.
+and invented JSON positives. Stock coverage omits generated owners; the pinned
+compiler driver provides independent counters instead of waiving those omissions.
 
-Rollback: remove the opt-in experimental adapter and native syntax version without
-changing the old reference series or any accepted baseline. Keep raw evidence and
-failure records for review even if the experiment is rolled back.
+Rollback: remove the opt-in production adapter/driver without changing the old
+reference series, accepted baseline or project gates. Retain raw evidence and
+failure records even if the development collector is rolled back.

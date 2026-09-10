@@ -6,8 +6,8 @@
   "committed_files": [
     {
       "path": "docs/quality/gh-220/README.md",
-      "bytes": 9578,
-      "sha256": "fa691f5406235fe88caa7effaa3cd6d5bc3d48411a77a5ab33b4cc5441ab0561"
+      "bytes": 9796,
+      "sha256": "9f81300821338187404dd6652551e8574bb972d2600f3690d0d50fc1ac86c843"
     },
     {
       "path": "docs/quality/gh-220/analyzer-binaries.json",
