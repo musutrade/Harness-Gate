@@ -1,0 +1,9 @@
+{
+  "result": "PASS",
+  "application_results_per_engine": 27,
+  "application_command_parity": "PASS",
+  "native_quality": "blocked; tracked in GH-215",
+  "controlled_commands": 6,
+  "controlled_quality": 17,
+  "authority_transfer_permitted": false
+}

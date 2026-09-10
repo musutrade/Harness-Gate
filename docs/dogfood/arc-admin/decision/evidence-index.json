@@ -1,0 +1,21 @@
+{
+  "issue": 208,
+  "arc_admin_commit": "9982ed556eaf997910824d7b682946147c81a16a",
+  "harness_gate_checkout_base": "19894adbdc32f131370dbb8d55994de758d1185f",
+  "authority_transfer_permitted": false,
+  "evidence_sha256": {
+    "source-manifest.json": "45b56298777feed95eece8810936a63bf27dd5ac3022fc9aaf1489295c3a50d9",
+    "inventory.json": "e4b6b05c40b196b2d5563d7aa1bec2d68b011669d1cdd08883315c461a9e7ff8",
+    "import/flow.import.json": "c1140cc1cda9099e729aefd6c42de09167c8e2c499864d818043b3084a0284f3",
+    "quality/quality.toml": "e6c69e54df8bcd64ebf0514462a98cd69664fb0f09c37de47a20cd949b6fbc47",
+    "shadow/observation.json": "a3528d7bf88d4881f41105b5c81eafe684abf263917da8a123b993ee659412d8",
+    "negative/manifest.json": "93563fd0a68a7ec38f63d02366f3bc25203fef5005aba36bcb5df39fb2bd43e5",
+    "cost/report.json": "cb71197af8f9a66ce28dac242e7d97be0547dd81adb7612a5f23ec4b78d7d6a0",
+    "cost/selfhosted-report.json": "dac2cf4e89327f3855583a649aaa51c258d4cb959344f35c19d84d1ab978b0cb",
+    "cost/selfhosted/sha256.json": "d88f5d6ccf4baefbaf61165a5d1421b822ffb7dce9896a5814f540ca2812f386",
+    "remediation/manifest.json": "31c24ee32b77040b244d54184762041d2f533e7658520d2345f3779a714845bd",
+    "remediation/evidence/receipt.json": "a9d9c85ffcb066ab8ac50ecc7ba82541bd8cc3d4b44674b27e6247415442540d",
+    "remediation/negative/manifest.json": "2538a02328cfe43343ffc148522c963245b49cf26302a30cb4de10530e3909b9"
+  },
+  "qualification": "Paths are relative to docs/dogfood/arc-admin; manifests bind retained raw artifacts. Hash identity and semantic replay are not new native runs or CI acceptance."
+}

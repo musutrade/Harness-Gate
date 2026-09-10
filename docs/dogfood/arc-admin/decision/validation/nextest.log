@@ -1,0 +1,576 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.24
+   Compiling cfg-if v1.0.4
+   Compiling memchr v2.8.3
+   Compiling libc v0.2.189
+   Compiling stable_deref_trait v1.2.1
+   Compiling typenum v1.20.1
+   Compiling siphasher v1.0.3
+   Compiling serde_core v1.0.229
+   Compiling crossbeam-utils v0.8.22
+   Compiling phf_shared v0.11.3
+   Compiling regex-syntax v0.8.11
+   Compiling rand_core v0.6.4
+   Compiling find-msvc-tools v0.1.9
+   Compiling crossbeam-epoch v0.9.20
+   Compiling shlex v2.0.1
+   Compiling rand v0.8.8
+   Compiling cc v1.4.0
+   Compiling version_check v0.9.5
+   Compiling litemap v0.8.2
+   Compiling regex-automata v0.4.18
+   Compiling syn v2.0.119
+   Compiling syn v3.0.3
+   Compiling writeable v0.6.3
+   Compiling crossbeam-deque v0.8.7
+   Compiling zeroize v1.9.0
+   Compiling getrandom v0.2.17
+   Compiling log v0.4.33
+   Compiling phf_generator v0.11.3
+   Compiling ring v0.17.14
+   Compiling generic-array v0.14.7
+   Compiling hybrid-array v0.4.14
+   Compiling aho-corasick v1.1.4
+   Compiling icu_properties_data v2.2.0
+   Compiling icu_normalizer_data v2.2.0
+   Compiling autocfg v1.5.1
+   Compiling zerocopy v0.8.56
+   Compiling regex v1.13.1
+   Compiling itoa v1.0.18
+   Compiling utf8_iter v1.0.4
+   Compiling parse-zoneinfo v0.3.1
+   Compiling num-traits v0.2.19
+   Compiling phf_codegen v0.11.3
+   Compiling phf v0.11.3
+   Compiling ucd-trie v0.1.7
+   Compiling semver v1.0.28
+   Compiling zmij v1.0.23
+   Compiling pest v2.9.0
+   Compiling rustc_version v0.4.1
+   Compiling chrono-tz-build v0.3.0
+   Compiling synstructure v0.13.2
+   Compiling block-buffer v0.12.1
+   Compiling crypto-common v0.2.2
+   Compiling rustls-pki-types v1.15.1
+   Compiling bstr v1.13.0
+   Compiling displaydoc v0.2.7
+   Compiling httparse v1.10.1
+   Compiling serde_json v1.0.151
+   Compiling crc32fast v1.5.1
+   Compiling serde v1.0.229
+   Compiling smallvec v1.15.2
+   Compiling libm v0.2.16
+   Compiling percent-encoding v2.3.2
+   Compiling same-file v1.0.6
+   Compiling subtle v2.6.1
+   Compiling bitflags v2.13.1
+   Compiling untrusted v0.9.0
+   Compiling walkdir v2.5.0
+   Compiling globset v0.4.20
+   Compiling digest v0.11.3
+   Compiling serde_derive v1.0.229
+   Compiling pest_meta v2.9.0
+   Compiling zerofrom-derive v0.1.7
+   Compiling yoke-derive v0.8.2
+   Compiling zerovec-derive v0.11.3
+   Compiling zerofrom v0.1.8
+   Compiling chrono-tz v0.9.0
+   Compiling curve25519-dalek v5.0.0
+   Compiling yoke v0.8.3
+   Compiling zerotrie v0.2.4
+   Compiling adler2 v2.0.1
+   Compiling rustix v1.1.4
+   Compiling cpufeatures v0.3.1
+   Compiling bytes v1.12.1
+   Compiling getrandom v0.4.3
+   Compiling zerovec v0.11.6
+   Compiling ppv-lite86 v0.2.21
+   Compiling rayon-core v1.13.0
+   Compiling rustls v0.23.43
+   Compiling once_cell v1.21.4
+   Compiling iana-time-zone v0.1.65
+   Compiling simd-adler32 v0.3.10
+   Compiling chrono v0.4.45
+   Compiling rand_chacha v0.3.1
+   Compiling miniz_oxide v0.9.1
+   Compiling http v1.5.0
+   Compiling tinystr v0.8.3
+   Compiling potential_utf v0.1.5
+   Compiling icu_collections v2.2.0
+   Compiling icu_locale_core v2.2.0
+   Compiling rustls-webpki v0.103.15
+   Compiling pest_generator v2.9.0
+   Compiling icu_provider v2.2.0
+   Compiling curve25519-dalek-derive v0.1.1
+   Compiling icu_properties v2.2.0
+   Compiling icu_normalizer v2.2.0
+   Compiling ignore v0.4.33
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling serde_derive_internals v0.29.1
+   Compiling schemars v0.8.22
+   Compiling signature v3.0.0
+   Compiling base64 v0.23.1
+   Compiling tinyvec_macros v0.1.1
+   Compiling heck v0.5.0
+   Compiling anstyle v1.0.14
+   Compiling anyhow v1.0.104
+   Compiling winnow v1.0.4
+   Compiling clap_lex v1.1.0
+   Compiling linux-raw-sys v0.12.1
+   Compiling thiserror v2.0.20
+   Compiling deunicode v1.6.2
+   Compiling toml_parser v1.1.3+spec-1.1.0
+   Compiling slug v0.1.6
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling clap_builder v4.6.6
+   Compiling schemars_derive v0.8.22
+   Compiling humansize v2.1.3
+   Compiling globwalk v0.9.1
+   Compiling clap_derive v4.6.4
+   Compiling ureq-proto v0.6.1
+   Compiling tinyvec v1.13.2
+   Compiling ed25519 v3.0.0
+   Compiling digest v0.10.7
+   Compiling flate2 v1.1.10
+   Compiling pest_derive v2.9.0
+   Compiling sha2 v0.11.0
+   Compiling form_urlencoded v1.2.2
+   Compiling webpki-roots v1.0.9
+   Compiling thiserror-impl v2.0.20
+   Compiling serde_spanned v1.1.1
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling unicode-segmentation v1.13.3
+   Compiling dyn-clone v1.0.20
+   Compiling toml_writer v1.1.2+spec-1.1.0
+   Compiling utf8-zero v0.8.1
+   Compiling cpufeatures v0.2.17
+   Compiling fastrand v2.5.0
+   Compiling lazy_static v1.5.0
+   Compiling either v1.17.0
+   Compiling sha2 v0.10.9
+   Compiling toml v1.1.4+spec-1.1.0
+   Compiling rayon v1.12.0
+   Compiling tempfile v3.27.0
+   Compiling ed25519-dalek v3.0.0
+   Compiling clap v4.6.6
+   Compiling url v2.5.8
+   Compiling unicode-normalization v0.1.25
+   Compiling tera v1.20.1
+   Compiling quick-xml v0.41.0
+   Compiling ureq v3.4.0
+   Compiling harness-gate v0.3.7 (/mnt/dev-ssd/workspaces/symphony/GH-208/tools/harness-gate)
+   Compiling harness-gate-quality-core v0.1.0 (/mnt/dev-ssd/workspaces/symphony/GH-208/tools/harness-gate/quality-replay)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 08s
+────────────
+ Nextest run ID 40565ac7-bf0a-4cab-9e7f-c1b4e98dcc86 with nextest profile: default
+    Starting 392 tests across 10 binaries
+        PASS [   0.007s] (  1/392) harness-gate quality::replay::tests::differences_preserve_all_fields_and_exact_values
+        PASS [   0.010s] (  2/392) harness-gate quality::replay::tests::transport_rejects_missing_context_and_empty_batches
+        PASS [   0.014s] (  3/392) harness-gate quality::replay::tests::only_known_missing_file_wording_is_classified
+        PASS [   0.027s] (  4/392) harness-gate quality::tests::embedded_contracts_match_frozen_reference
+        PASS [   0.018s] (  5/392) harness-gate quality::tests::json_boundary_rejects_duplicate_keys_and_malformed_values
+        PASS [   0.012s] (  6/392) harness-gate quality::tests::oracle_cache_releases_files_after_last_owner_and_unwind
+        PASS [  35.335s] (  7/392) harness-gate quality::tests::source_and_artifact_bytes_are_verified_at_the_boundary
+        PASS [   0.019s] (  8/392) harness-gate quality::tests::typed_values_preserve_arbitrary_precision
+        PASS [   0.137s] (  9/392) harness-gate::ci_adoption_test compatibility_cli_preserves_comparison_and_rollback_evidence
+        PASS [   0.252s] ( 10/392) harness-gate::ci_adoption_test config_cli_discovers_nested_project_and_rejects_file_root
+        PASS [   0.163s] ( 11/392) harness-gate::ci_adoption_test migration_cli_preserves_source_and_refuses_overwrite
+        PASS [  36.457s] ( 12/392) harness-gate quality::tests::project_identity_ownership_and_relationships_match_python
+        PASS [   0.215s] ( 13/392) harness-gate::cli_test quality_schema_exports_without_project_or_enabling_quality
+        PASS [   0.159s] ( 14/392) harness-gate::cli_test test_audit_reports_a_typed_configuration_error
+        PASS [   0.084s] ( 15/392) harness-gate::cli_test test_cleanup_dry_run_writes_machine_readable_evidence
+        PASS [   0.067s] ( 16/392) harness-gate::cli_test test_color_always_styles_human_readable_output
+        PASS [   0.072s] ( 17/392) harness-gate::cli_test test_color_never_keeps_human_readable_output_plain
+        PASS [   0.015s] ( 18/392) harness-gate::cli_test test_config_check_without_config
+        PASS [   0.076s] ( 19/392) harness-gate::cli_test test_doctor_basic
+        PASS [   1.246s] ( 20/392) harness-gate::cli_test quality_config_commands_cross_validate_both_planes
+        PASS [   0.028s] ( 21/392) harness-gate::cli_test test_help_command
+        PASS [   0.016s] ( 22/392) harness-gate::cli_test test_invalid_subcommand
+        PASS [   0.026s] ( 23/392) harness-gate::cli_test test_init_with_invalid_preset
+        PASS [   0.025s] ( 24/392) harness-gate::cli_test test_presets_command
+        PASS [  37.251s] ( 25/392) harness-gate quality::tests::capability_availability_matches_python
+        PASS [   0.025s] ( 26/392) harness-gate::cli_test test_schema_export_writes_the_flow_schema_without_a_project_config
+        PASS [   0.205s] ( 27/392) harness-gate::cli_test test_legacy_report_dir_alias_warns_and_new_namespace_wins
+        PASS [   0.148s] ( 28/392) harness-gate::cli_test test_scope_without_git
+        PASS [  37.428s] ( 29/392) harness-gate quality::tests::measurement_series_compatibility_matches_python
+        PASS [   0.015s] ( 30/392) harness-gate::cli_test test_verify_without_project
+        PASS [   0.012s] ( 31/392) harness-gate::cli_test test_version_command
+        PASS [   0.099s] ( 32/392) harness-gate::cli_test test_verify_reports_a_typed_selection_error
+        PASS [   0.307s] ( 33/392) harness-gate::cli_test test_rust_and_python_projects_use_their_own_audit_configuration
+        PASS [   0.167s] ( 34/392) harness-gate::cli_test test_secrets_reports_a_typed_configuration_error
+        PASS [   0.752s] ( 35/392) harness-gate::failure_paths_test compatibility_dispatch_retains_request_identity_and_shadow_failure
+        PASS [   1.238s] ( 36/392) harness-gate::critical_paths_test json_false_positive_cli_fails_with_incomplete_parser_report
+        PASS [   1.261s] ( 37/392) harness-gate::failure_paths_test cli_selection_profile_alias_and_discovery_boundaries
+        PASS [   1.285s] ( 38/392) harness-gate::failure_paths_test extracted_cli_handlers_preserve_text_json_and_hook_snapshot_contracts
+        PASS [   2.918s] ( 39/392) harness-gate::failure_paths_test arc_admin_required_commands_fail_through_generic_hooks
+        PASS [   1.553s] ( 40/392) harness-gate::failure_paths_test project_owned_runner_replacement_preserves_generic_command_gate
+        PASS [   3.631s] ( 41/392) harness-gate::failure_paths_test configured_runner_service_isolation_and_shards_match_the_executed_process
+        PASS [   0.095s] ( 42/392) harness-gate::import_test arc_admin_import_matches_frozen_config_and_inventory_without_host_environment
+        PASS [   0.037s] ( 43/392) harness-gate::import_test arc_import_refuses_runtime_migration_and_existing_outputs
+        PASS [   0.015s] ( 44/392) harness-gate::import_test arc_import_rejects_destination_escape
+        PASS [   3.612s] ( 45/392) harness-gate::failure_paths_test doctor_kinds_execute_success_required_failure_and_optional_warning
+        PASS [   0.211s] ( 46/392) harness-gate::import_test arc_import_rejects_loss_unknown_fields_and_broken_blockers_before_writing
+        PASS [   1.894s] ( 47/392) harness-gate::failure_paths_test staged_content_controls_result_and_snapshots_are_cleaned_after_failure
+        PASS [   0.066s] ( 48/392) harness-gate::import_test compatible_dependencies_and_arc_defaults_are_preserved
+        PASS [   0.070s] ( 49/392) harness-gate::integration_test test_config_check_invalid
+        PASS [   0.059s] ( 50/392) harness-gate::integration_test test_init_creates_gitignore_entry
+        PASS [   0.147s] ( 51/392) harness-gate::integration_test test_config_check_json_is_machine_readable_for_success_and_failure
+        PASS [   0.054s] ( 52/392) harness-gate::integration_test test_init_twice_fails
+        PASS [   0.136s] ( 53/392) harness-gate::integration_test test_config_check_valid
+        PASS [   0.016s] ( 54/392) harness-gate::integration_test test_presets_lists_available
+        PASS [   0.057s] ( 55/392) harness-gate::integration_test test_init_with_rust_api_preset
+        PASS [   0.133s] ( 56/392) harness-gate::integration_test test_scope_detection_all
+        PASS [   0.166s] ( 57/392) harness-gate::integration_test test_verify_fails_without_git
+        PASS [   1.192s] ( 58/392) harness-gate::integration_test test_verify_cancellation_stops_the_child_process
+        PASS [   0.012s] ( 59/392) harness-gate::quality_cli_test partial_base_context_is_rejected_before_evaluation
+        PASS [   1.230s] ( 60/392) harness-gate::integration_test test_secrets_scan_basic
+        PASS [   2.843s] ( 61/392) harness-gate::failure_paths_test verification_cleanup_cancel_and_report_precedence_retains_resource_evidence
+        PASS [   0.044s] ( 62/392) harness-gate::bin/harness-gate audit::tests::architecture_rule_detects_multiline_raw_sql_and_query_builder
+        PASS [   0.046s] ( 63/392) harness-gate::bin/harness-gate audit::tests::architecture_rule_scans_every_configured_root
+        PASS [   0.037s] ( 64/392) harness-gate::bin/harness-gate audit::tests::audit_rejects_an_oversized_source_before_reading_it
+        PASS [   0.044s] ( 65/392) harness-gate::bin/harness-gate audit::tests::audit_reports_redact_violation_content_in_json_and_markdown
+        PASS [   0.027s] ( 66/392) harness-gate::bin/harness-gate audit::tests::audit_schema_accepts_current_config_and_rejects_incompatible_inputs
+        PASS [   0.027s] ( 67/392) harness-gate::bin/harness-gate audit::tests::audit_skips_file_symlinks
+        PASS [   0.027s] ( 68/392) harness-gate::bin/harness-gate audit::tests::configured_comment_syntax_handles_strings_and_block_comments
+        PASS [   0.056s] ( 69/392) harness-gate::bin/harness-gate audit::tests::hard_rule_detects_multiline_and_dynamic_sql_surfaces
+        PASS [   0.093s] ( 70/392) harness-gate::bin/harness-gate audit::tests::hard_rule_detects_multiline_sensitive_logging
+        PASS [   0.035s] ( 71/392) harness-gate::bin/harness-gate audit::tests::hard_rule_scans_every_configured_root
+        PASS [   0.114s] ( 72/392) harness-gate::bin/harness-gate audit::tests::initialized_project_can_add_and_run_its_first_audit_rule
+        PASS [   0.013s] ( 73/392) harness-gate::bin/harness-gate audit::tests::invalid_rule_regex_returns_an_error
+        PASS [   0.017s] ( 74/392) harness-gate::bin/harness-gate audit::tests::legacy_audit_shapes_receive_actionable_migration_errors
+        PASS [   0.020s] ( 75/392) harness-gate::bin/harness-gate audit::tests::literal_allowlist_is_a_path_prefix_not_a_substring
+        PASS [   0.071s] ( 76/392) harness-gate::bin/harness-gate audit::tests::log_parser_falls_back_to_the_last_thirty_raw_lines
+        PASS [   0.068s] ( 77/392) harness-gate::bin/harness-gate audit::tests::log_parser_keeps_the_error_in_a_long_trace
+        PASS [   0.069s] ( 78/392) harness-gate::bin/harness-gate audit::tests::log_parser_keeps_the_error_trace
+        PASS [   0.046s] ( 79/392) harness-gate::bin/harness-gate audit::tests::log_parser_reads_trace_id_from_the_current_span
+        PASS [   0.067s] ( 80/392) harness-gate::bin/harness-gate audit::tests::log_parser_redacts_structured_and_fallback_output
+        PASS [   0.031s] ( 81/392) harness-gate::bin/harness-gate audit::tests::log_parser_rejects_an_oversized_line_before_retaining_it
+        PASS [   0.028s] ( 82/392) harness-gate::bin/harness-gate audit::tests::missing_rule_root_fails_closed
+        PASS [   0.019s] ( 83/392) harness-gate::bin/harness-gate audit::tests::regex_allowlist_is_explicit
+        PASS [   0.076s] ( 84/392) harness-gate::bin/harness-gate audit::tests::report_keeps_rule_names_with_shared_prefixes_separate
+        PASS [   0.032s] ( 85/392) harness-gate::bin/harness-gate audit::tests::rule_extension_requires_configured_comment_syntax
+        PASS [   0.022s] ( 86/392) harness-gate::bin/harness-gate audit::tests::rule_root_cannot_escape_project
+        PASS [   0.027s] ( 87/392) harness-gate::bin/harness-gate compat::tests::canary_enable_and_rollback_are_auditable
+        PASS [   0.022s] ( 88/392) harness-gate::bin/harness-gate compat::tests::comparison_correlates_distinct_invocations_and_artifact_roots
+        PASS [   0.018s] ( 89/392) harness-gate::bin/harness-gate compat::tests::comparison_ignores_volatile_fields_but_keeps_status_differences
+        PASS [   0.022s] ( 90/392) harness-gate::bin/harness-gate config::import::tests::import_checks_generic_resource_conflicts_without_changing_serial_flows
+        PASS [   5.632s] ( 91/392) harness-gate::quality_cli_test compiled_configuration_matches_direct_rust_and_rejects_stale_inputs
+        PASS [   7.119s] ( 92/392) harness-gate::bin/harness-gate config::quality::collectors::tests::ci_reuses_authoritative_responses_without_relaunching_or_changing_decisions
+        PASS [   0.461s] ( 93/392) harness-gate::bin/harness-gate config::quality::collectors::tests::collection_cli_publishes_measurements_and_removes_stale_output_on_failure
+        PASS [  13.429s] ( 94/392) harness-gate::quality_cli_test trusted_baselines_preserve_lineage_and_reject_stale_unknown_ecosystem_inputs
+        PASS [   1.109s] ( 95/392) harness-gate::bin/harness-gate config::quality::collectors::tests::collector_signed_binding_failures
+        PASS [   3.559s] ( 96/392) harness-gate::bin/harness-gate config::quality::collectors::tests::collector_protocol_and_evidence_fail_closed
+        PASS [   0.166s] ( 97/392) harness-gate::bin/harness-gate config::quality::collectors::tests::configured_collector_launches_from_a_symlinked_workspace_root
+        SLOW [> 60.000s] (───────) harness-gate quality::policy_tests::frozen_policy_and_reference_acceptance_match_python
+        SLOW [> 60.000s] (───────) harness-gate quality::replay::acceptance::retained_corpora_and_consolidated_negative_matrix
+        SLOW [> 60.000s] (───────) harness-gate quality::policy_tests::green_local_gates_and_breaking_contract_block_project_with_provenance
+        SLOW [> 60.000s] (───────) harness-gate quality::tests::frozen_evidence_and_integrity_matrix_matches_python
+        PASS [   2.064s] ( 98/392) harness-gate::bin/harness-gate config::quality::collectors::tests::configured_ecosystems_launch_through_same_boundary_and_preserve_capability_states
+        PASS [   0.556s] ( 99/392) harness-gate::bin/harness-gate config::quality::collectors::tests::configured_multiple_producers_combine_distinct_series_and_reject_overlap
+        PASS [   5.851s] (100/392) harness-gate::bin/harness-gate config::quality::collectors::tests::complete_profiles_enforce_crap_and_preserve_unsupported_capabilities
+        PASS [   1.127s] (101/392) harness-gate::bin/harness-gate config::quality::collectors::tests::dogfood_acceptance::quality_preparation_failure_retains_requested_profile_and_blocks
+        PASS [   0.045s] (102/392) harness-gate::bin/harness-gate config::quality::collectors::tests::generic_orchestration_has_no_closed_language_dispatch
+        PASS [   1.883s] (103/392) harness-gate::bin/harness-gate config::quality::collectors::tests::partial_profiles_evaluate_selected_policy_without_certifying_full_quality
+        PASS [   1.433s] (104/392) harness-gate::bin/harness-gate config::quality::collectors::tests::partial_profiles_report_omissions_and_never_full_quality_pass
+        PASS [   2.663s] (105/392) harness-gate::bin/harness-gate config::quality::collectors::tests::retained_evidence_rejects_stale_or_tampered_inputs_without_fallback
+        PASS [   0.893s] (106/392) harness-gate::bin/harness-gate config::quality::collectors::tests::unknown_ecosystem_verify_baseline_and_direct_evaluator_are_equivalent
+        PASS [   1.239s] (107/392) harness-gate::bin/harness-gate config::quality::collectors::tests::workflow_crap_diagnostics_preserve_base_head_ratchet_evidence_and_remediation
+        PASS [  14.072s] (108/392) harness-gate::bin/harness-gate config::quality::collectors::tests::dogfood_acceptance::arc_admin_controlled_quality_negatives_retain_truthful_outcomes
+        PASS [   5.072s] (109/392) harness-gate::bin/harness-gate config::quality::collectors::tests::workflow_execution_and_quality_failures_have_independent_authority
+        PASS [   1.168s] (110/392) harness-gate::bin/harness-gate config::quality::collectors::tests::workflow_quality_success_cannot_override_audit_failure
+        PASS [   5.297s] (111/392) harness-gate::bin/harness-gate config::quality::collectors::tests::workflow_invalid_evidence_selection_and_baseline_block_successful_execution
+        PASS [   0.061s] (112/392) harness-gate::bin/harness-gate config::quality::tests::arc_admin_quality_validates_with_imported_flow_and_rejects_binding_loss
+        PASS [   0.083s] (113/392) harness-gate::bin/harness-gate config::quality::tests::certified_reference_policy_participates_in_complete_profiles_with_original_limits_and_series
+        PASS [   0.020s] (114/392) harness-gate::bin/harness-gate config::quality::tests::quality_accepts_aliased_repository_roots_but_rejects_escaping_children
+        PASS [   0.019s] (115/392) harness-gate::bin/harness-gate config::quality::tests::quality_accepts_exact_subject_and_relationship_policy_bindings
+        PASS [   0.029s] (116/392) harness-gate::bin/harness-gate config::quality::tests::quality_broken_links_and_boundary_symlinks_are_not_opt_out
+        PASS [   0.113s] (117/392) harness-gate::bin/harness-gate config::quality::tests::quality_policy_and_baseline_contradictions_fail_closed
+        PASS [   0.097s] (118/392) harness-gate::bin/harness-gate config::quality::tests::quality_profiles_enforce_single_compatible_required_producer
+        PASS [   2.713s] (119/392) harness-gate::bin/harness-gate config::quality::collectors::tests::workflow_selection_follows_changed_files_and_component_scope
+        PASS [   0.083s] (120/392) harness-gate::bin/harness-gate config::quality::tests::quality_rejects_malformed_policy_and_empty_intent
+        PASS [   0.306s] (121/392) harness-gate::bin/harness-gate config::quality::tests::quality_rejects_authority_at_every_collector_nesting_level
+        PASS [   0.057s] (122/392) harness-gate::bin/harness-gate config::quality::tests::quality_relationships_and_discovery_resolve_in_active_profiles
+        PASS [   0.079s] (123/392) harness-gate::bin/harness-gate config::quality::tests::quality_rejects_unresolved_references_and_boundaries
+        PASS [   0.029s] (124/392) harness-gate::bin/harness-gate config::quality::tests::quality_schema_closes_collector_authority_and_tagged_variants
+        PASS [   0.053s] (125/392) harness-gate::bin/harness-gate config::quality::tests::quality_validates_and_round_trips_without_enabling_legacy_flow
+        PASS [   0.046s] (126/392) harness-gate::bin/harness-gate config::quality::tests::unknown_pack_configures_cheap_and_expensive_profiles_without_ecosystem_dispatch
+        PASS [   0.025s] (127/392) harness-gate::bin/harness-gate config::tests::both_builtin_gate_declarations_can_coexist_without_log_conflicts
+        PASS [   0.037s] (128/392) harness-gate::bin/harness-gate config::tests::audit_configuration_path_rejects_environment_interpolation
+        PASS [   0.019s] (129/392) harness-gate::bin/harness-gate config::tests::built_in_gate_declarations_are_validated_as_typed_steps
+        PASS [   0.043s] (130/392) harness-gate::bin/harness-gate config::tests::components_and_profiles_are_not_hard_coded
+        PASS [   0.047s] (131/392) harness-gate::bin/harness-gate config::tests::dependency_order_allows_service_reuse_but_not_log_reuse
+        PASS [   0.029s] (132/392) harness-gate::bin/harness-gate config::tests::diagnostics_serialize_typed_retry_class_without_message_inference
+        PASS [   0.134s] (133/392) harness-gate::bin/harness-gate config::tests::builtin_gate_diagnostics_preserve_typed_field_paths
+        PASS [   0.026s] (134/392) harness-gate::bin/harness-gate config::tests::discovery_errors_keep_configuration_field_paths_in_json_reports
+        PASS [   0.039s] (135/392) harness-gate::bin/harness-gate config::tests::diagnostics_truncate_at_the_documented_maximum
+        PASS [   0.071s] (136/392) harness-gate::bin/harness-gate config::tests::duplicate_logs_use_a_conservative_case_normalized_identity
+        PASS [   0.030s] (137/392) harness-gate::bin/harness-gate config::tests::duplicate_service_injection_variables_are_rejected
+        PASS [   0.146s] (138/392) harness-gate::bin/harness-gate config::tests::doctor_parser_alias_and_scope_diagnostics_keep_configuration_paths
+        PASS [   0.044s] (139/392) harness-gate::bin/harness-gate config::tests::environment_interpolation_requires_defined_variables
+        PASS [   0.041s] (140/392) harness-gate::bin/harness-gate config::tests::environment_interpolation_supports_defaults
+        PASS [   0.050s] (141/392) harness-gate::bin/harness-gate config::tests::execution_and_webhook_contracts_reject_unknown_or_unsafe_inputs
+        PASS [   0.043s] (142/392) harness-gate::bin/harness-gate config::tests::execution_policy_defaults_to_serial_and_four_workers_when_enabled
+        PASS [   0.051s] (143/392) harness-gate::bin/harness-gate config::tests::execution_policy_diagnostic_points_to_max_parallel
+        PASS [   0.040s] (144/392) harness-gate::bin/harness-gate config::tests::execution_policy_rejects_zero_and_values_above_the_bound
+        PASS [   0.043s] (145/392) harness-gate::bin/harness-gate config::tests::existing_v2_config_defaults_the_secret_rule_path
+        PASS [   0.077s] (146/392) harness-gate::bin/harness-gate config::tests::execution_retry_diagnostic_points_to_the_attempt_limit
+        PASS [   0.113s] (147/392) harness-gate::bin/harness-gate config::tests::external_step_diagnostics_cover_closed_field_contract
+        PASS [   0.041s] (148/392) harness-gate::bin/harness-gate config::tests::external_steps_reject_gate_fields
+        PASS [   0.032s] (149/392) harness-gate::bin/harness-gate config::tests::flow_config_accessors_and_schema_cover_the_public_configuration_surface
+        PASS [   0.204s] (150/392) harness-gate::bin/harness-gate config::tests::external_step_diagnostics_cover_paths_logs_timeouts_and_references
+        PASS [   0.049s] (151/392) harness-gate::bin/harness-gate config::tests::generic_runner_requires_an_explicit_thread_environment
+        PASS [   0.065s] (152/392) harness-gate::bin/harness-gate config::tests::human_diagnostic_location_has_one_closing_parenthesis
+        PASS [   0.076s] (153/392) harness-gate::bin/harness-gate config::tests::independent_semantic_errors_are_aggregated_with_precise_paths
+        PASS [   0.087s] (154/392) harness-gate::bin/harness-gate config::tests::independent_services_with_the_same_injection_are_rejected
+        PASS [   0.078s] (155/392) harness-gate::bin/harness-gate config::tests::junit_report_path_must_stay_relative_to_the_report_directory
+        PASS [   0.063s] (156/392) harness-gate::bin/harness-gate config::tests::policy_steps_cannot_be_missing
+        PASS [   0.070s] (157/392) harness-gate::bin/harness-gate config::tests::repeated_service_references_emit_one_shared_resource_diagnostic_per_pair
+        PASS [   0.038s] (158/392) harness-gate::bin/harness-gate config::tests::repository_configuration_is_valid
+        PASS [   0.081s] (159/392) harness-gate::bin/harness-gate config::tests::report_template_diagnostics_cover_pair_paths_and_extensions
+        PASS [   0.074s] (160/392) harness-gate::bin/harness-gate config::tests::runner_contract_rejects_invalid_fields
+        PASS [   0.142s] (161/392) harness-gate::bin/harness-gate config::tests::runner_diagnostics_cover_version_kind_program_and_thread_contracts
+        PASS [   0.197s] (162/392) harness-gate::bin/harness-gate config::tests::runner_diagnostics_cover_environment_isolation_and_arguments
+        PASS [   0.050s] (163/392) harness-gate::bin/harness-gate config::tests::runner_rejects_shared_isolation_for_multiple_workers
+        PASS [   0.054s] (164/392) harness-gate::bin/harness-gate config::tests::runner_thread_environment_cannot_shadow_service_injection
+        PASS [   0.107s] (165/392) harness-gate::bin/harness-gate config::tests::serial_shared_service_consumers_load_without_added_dependencies
+        PASS [   0.104s] (166/392) harness-gate::bin/harness-gate config::tests::service_diagnostics_cover_duplicates_references_and_environment_collisions
+        PASS [   0.048s] (167/392) harness-gate::bin/harness-gate config::tests::shell_command_strings_are_rejected
+        PASS [   0.101s] (168/392) harness-gate::bin/harness-gate config::tests::service_diagnostics_cover_runner_and_multi_service_injection_collisions
+        PASS [   0.062s] (169/392) harness-gate::bin/harness-gate config::tests::step_dependency_cycles_are_rejected
+        PASS [   0.038s] (170/392) harness-gate::bin/harness-gate config::tests::step_logs_reject_windows_and_path_like_names_on_every_platform
+        PASS [   0.052s] (171/392) harness-gate::bin/harness-gate config::tests::template_paths_must_stay_inside_a_disjoint_repository_root
+        PASS [   0.048s] (172/392) harness-gate::bin/harness-gate config::tests::template_symlink_escape_is_rejected
+        PASS [   0.045s] (173/392) harness-gate::bin/harness-gate config::tests::transitive_dependency_allows_service_reuse
+        PASS [   0.030s] (174/392) harness-gate::bin/harness-gate config::tests::unknown_built_in_gate_types_fail_closed
+        PASS [   0.030s] (175/392) harness-gate::bin/harness-gate config::tests::unknown_fields_are_rejected
+        PASS [   0.051s] (176/392) harness-gate::bin/harness-gate config::tests::unordered_steps_reusing_a_service_are_rejected_with_field_paths
+        PASS [   0.030s] (177/392) harness-gate::bin/harness-gate config::tests::version_one_configuration_can_be_migrated
+        PASS [   0.037s] (178/392) harness-gate::bin/harness-gate config::tests::versioned_runner_contract_accepts_explicit_isolation
+        PASS [   0.050s] (179/392) harness-gate::bin/harness-gate config::tests::webhook_configuration_requires_http_url_and_an_enabled_result
+        PASS [   0.036s] (180/392) harness-gate::bin/harness-gate config::tests::windows_prefixed_paths_are_rejected_on_every_platform
+        PASS [   0.053s] (181/392) harness-gate::bin/harness-gate config::tests::windows_style_parent_traversal_is_rejected_on_every_platform
+        PASS [   0.079s] (182/392) harness-gate::bin/harness-gate doctor::tests::git_remote_check_rejects_non_git_directory
+        PASS [   0.026s] (183/392) harness-gate::bin/harness-gate failure::tests::failure_code_wire_names_are_stable_and_closed
+        PASS [   0.017s] (184/392) harness-gate::bin/harness-gate failure::tests::retry_class_wire_names_are_stable_and_closed
+        PASS [   0.026s] (185/392) harness-gate::bin/harness-gate net_policy::tests::normalizes_exact_hosts_without_wildcards
+        PASS [   0.026s] (186/392) harness-gate::bin/harness-gate net_policy::tests::rejects_local_address_matrix
+        PASS [   0.024s] (187/392) harness-gate::bin/harness-gate preset::tests::atomic_write_batch_cleans_staged_files_when_staging_fails
+        PASS [   0.167s] (188/392) harness-gate::bin/harness-gate doctor::tests::relative_glob_matches_paths_from_the_project_root
+        PASS [   0.029s] (189/392) harness-gate::bin/harness-gate preset::tests::atomic_write_batch_rejects_broken_symlink
+        PASS [   0.033s] (190/392) harness-gate::bin/harness-gate preset::tests::atomic_write_batch_restores_backups_when_commit_fails
+        PASS [   0.029s] (191/392) harness-gate::bin/harness-gate preset::tests::atomic_write_replaces_complete_content
+        PASS [   0.029s] (192/392) harness-gate::bin/harness-gate preset::tests::composition_rejects_conflicts_and_malformed_bindings
+        PASS [   0.072s] (193/392) harness-gate::bin/harness-gate preset::tests::atomic_write_batch_writes_all_entries
+        PASS [   0.026s] (194/392) harness-gate::bin/harness-gate preset::tests::existing_symlink_cannot_escape_project
+        PASS [   0.155s] (195/392) harness-gate::bin/harness-gate preset::tests::every_embedded_preset_is_valid
+        PASS [   0.153s] (196/392) harness-gate::bin/harness-gate preset::tests::init_writes_required_security_configs
+        PASS [   0.030s] (197/392) harness-gate::bin/harness-gate preset::tests::project_names_become_portable_ids
+        PASS [   0.102s] (198/392) harness-gate::bin/harness-gate preset::tests::quality_support_file_conflict_does_not_partially_initialize_project
+        PASS [   0.198s] (199/392) harness-gate::bin/harness-gate preset::tests::unknown_ecosystem_pack_composes_without_catalog_or_core_changes
+        PASS [   0.885s] (200/392) harness-gate::bin/harness-gate preset::tests::generated_reference_presets_cross_validate_quality_and_profile_boundaries
+        PASS [   2.871s] (201/392) harness-gate::bin/harness-gate process::adapter::tests::artifact_root_budget_counts_undeclared_files
+        PASS [   2.316s] (202/392) harness-gate::bin/harness-gate process::adapter::tests::capability_and_signature_fail_closed
+        PASS [   5.209s] (203/392) harness-gate::bin/harness-gate process::adapter::tests::blocked_stdin_writer_cannot_bypass_adapter_timeout
+        PASS [  52.092s] (204/392) harness-gate::bin/harness-gate config::quality::collectors::tests::ci_acceptance::configured_ci_acceptance_retains_parity_reuse_and_negative_evidence
+        PASS [   7.234s] (205/392) harness-gate::bin/harness-gate process::adapter::tests::durable_nonce_sidecar_rejects_replay_after_host_restart
+        PASS [  11.446s] (206/392) harness-gate::bin/harness-gate process::adapter::tests::crash_timeout_cancellation_and_escape_are_isolated
+        PASS [   5.245s] (207/392) harness-gate::bin/harness-gate process::adapter::tests::invalid_environment_entries_are_rejected_before_spawn
+        SLOW [> 60.000s] (───────) harness-gate::quality_cli_test shipped_cli_matches_both_corpora_and_negative_matrix_without_python_runtime
+        PASS [   2.169s] (208/392) harness-gate::bin/harness-gate process::adapter::tests::output_budget_fails_closed_with_a_truncation_marker
+        PASS [   1.333s] (209/392) harness-gate::bin/harness-gate process::adapter::tests::output_validation_retains_stream_precedence_and_combined_budget
+        PASS [   1.689s] (210/392) harness-gate::bin/harness-gate process::adapter::tests::request_and_response_validation_edges_fail_closed
+        PASS [   1.711s] (211/392) harness-gate::bin/harness-gate process::adapter::tests::signed_fixture_runs_and_publishes_artifact
+        PASS [   1.007s] (212/392) harness-gate::bin/harness-gate process::adapter::tests::waiter_terminates_on_writer_failure_and_observed_output_limits
+        PASS [   0.033s] (213/392) harness-gate::bin/harness-gate process::isolation::tests::allocation_has_unique_worker_ids_and_cleanup_state
+        PASS [   0.023s] (214/392) harness-gate::bin/harness-gate process::task::tests::wait_backoff_is_bounded_and_starts_short
+        PASS [   0.090s] (215/392) harness-gate::bin/harness-gate process::tests::abnormal_or_cancelled_worker_removes_isolation_state
+        PASS [   0.079s] (216/392) harness-gate::bin/harness-gate process::tests::captured_command_enforces_output_budget
+        PASS [   0.182s] (217/392) harness-gate::bin/harness-gate process::tests::captured_command_has_a_hard_timeout
+        PASS [   0.023s] (218/392) harness-gate::bin/harness-gate process::tests::process_tree_child_fixture
+        PASS [   0.021s] (219/392) harness-gate::bin/harness-gate process::tests::process_tree_parent_fixture
+        PASS [   0.053s] (220/392) harness-gate::bin/harness-gate process::tests::task_can_remove_an_inherited_environment_variable
+        PASS [   0.050s] (221/392) harness-gate::bin/harness-gate process::tests::task_runs_in_an_isolated_session
+        PASS [   5.032s] (222/392) harness-gate::bin/harness-gate process::adapter::tests::validity_window_and_nonce_replay_fail_closed
+        PASS [   0.086s] (223/392) harness-gate::bin/harness-gate process::tests::timeout_terminates_the_task
+        PASS [   0.118s] (224/392) harness-gate::bin/harness-gate project::tests::invocation_reports_resolve_their_stable_invocation_id
+        PASS [   0.255s] (225/392) harness-gate::bin/harness-gate project::tests::preparation_does_not_change_the_process_working_directory
+        PASS [   0.024s] (226/392) harness-gate::bin/harness-gate project::tests::repository_path_rejects_symlink_escape
+        PASS [   0.424s] (227/392) harness-gate::bin/harness-gate scope::tests::detects_changes_against_a_base_revision
+        PASS [   4.130s] (228/392) harness-gate::bin/harness-gate process::tests::timeout_terminates_process_tree_without_a_descendant_leak
+        PASS [   0.308s] (229/392) harness-gate::bin/harness-gate scope::tests::detects_staged_changes
+        PASS [   0.028s] (230/392) harness-gate::bin/harness-gate scope::tests::frontend_change_only_selects_frontend
+        PASS [  14.454s] (231/392) harness-gate::bin/harness-gate process::adapter::tests::full_request_signature_binds_mutable_fields
+        PASS [   0.028s] (232/392) harness-gate::bin/harness-gate scope::tests::unmatched_paths_are_reported
+        PASS [   0.309s] (233/392) harness-gate::bin/harness-gate scope::tests::rejects_a_missing_base_revision
+        PASS [   0.436s] (234/392) harness-gate::bin/harness-gate scope::tests::detects_working_tree_changes
+        PASS [   0.092s] (235/392) harness-gate::bin/harness-gate scope::tests::workflow_changes_force_all_components
+        PASS [   0.109s] (236/392) harness-gate::bin/harness-gate secrets::tests::default_preset_secret_config_is_valid
+        PASS [   0.109s] (237/392) harness-gate::bin/harness-gate secrets::tests::detects_direct_tokens_without_matching_placeholders
+        PASS [   0.125s] (238/392) harness-gate::bin/harness-gate secrets::tests::detects_named_jwt_and_enterprise_messaging_secrets
+        PASS [   0.115s] (239/392) harness-gate::bin/harness-gate secrets::tests::detects_postgres_credentials_and_secret_bearing_webhooks
+        PASS [   0.027s] (240/392) harness-gate::bin/harness-gate secrets::tests::invalid_secret_config_fails_closed
+        PASS [   0.377s] (241/392) harness-gate::bin/harness-gate scope::tests::unmatched_scope_can_fail_closed
+        PASS [   0.026s] (242/392) harness-gate::bin/harness-gate secrets::tests::local_test_database_policy_is_configurable
+        PASS [   0.027s] (243/392) harness-gate::bin/harness-gate secrets::tests::placeholder_prefixes_are_configurable
+        PASS [   0.291s] (244/392) harness-gate::bin/harness-gate secrets::tests::staged_scan_uses_the_staged_secret_config
+        PASS [   0.333s] (245/392) harness-gate::bin/harness-gate secrets::tests::working_tree_scan_rejects_an_oversized_file
+        PASS [   0.026s] (246/392) harness-gate::bin/harness-gate service::commands::tests::builds_deterministic_start_arguments
+        PASS [   0.035s] (247/392) harness-gate::bin/harness-gate service::commands::tests::builds_port_healthcheck_cleanup_and_info_arguments
+        PASS [   0.022s] (248/392) harness-gate::bin/harness-gate service::commands::tests::selects_the_expected_docker_compatible_executable
+        PASS [   0.030s] (249/392) harness-gate::bin/harness-gate service::inspection::tests::parses_docker_style_inspection
+        PASS [   0.027s] (250/392) harness-gate::bin/harness-gate service::inspection::tests::rejects_inspection_that_is_not_json
+        PASS [   0.035s] (251/392) harness-gate::bin/harness-gate service::inspection::tests::rejects_inspection_without_an_immutable_object_id
+        PASS [   0.233s] (252/392) harness-gate::bin/harness-gate secrets::tests::working_tree_scan_skips_file_symlinks
+        PASS [   0.023s] (253/392) harness-gate::bin/harness-gate service::lease::tests::expired_process_lease_is_stale
+        PASS [   0.024s] (254/392) harness-gate::bin/harness-gate service::lease::tests::current_process_identity_is_available_on_supported_platforms
+        PASS [   0.427s] (255/392) harness-gate::bin/harness-gate service::lease::tests::heartbeat_failure_blocks_release_and_retains_the_marker
+        PASS [   1.022s] (256/392) harness-gate::bin/harness-gate secrets::tests::staged_scan_rejects_an_oversized_blob_before_loading_it
+        PASS [   0.171s] (257/392) harness-gate::bin/harness-gate service::lease::tests::poisoned_lease_lock_fails_closed_and_retains_the_marker
+        PASS [   0.020s] (258/392) harness-gate::bin/harness-gate service::lease::tests::resource_keys_are_stable_and_path_safe
+        PASS [   0.422s] (259/392) harness-gate::bin/harness-gate service::lease::tests::lease_heartbeat_renews_marker_during_a_long_step
+        PASS [   0.314s] (260/392) harness-gate::bin/harness-gate service::lease::tests::runtime_removal_failure_retains_evidence_and_allows_a_proven_retry
+        PASS [   0.024s] (261/392) harness-gate::bin/harness-gate service::tests::accepts_an_explicitly_allowed_remote_test_database
+        PASS [   0.026s] (262/392) harness-gate::bin/harness-gate service::tests::accepts_an_ipv6_loopback_database
+        PASS [   0.030s] (263/392) harness-gate::bin/harness-gate service::tests::accepts_an_isolated_loopback_database
+        PASS [   0.200s] (264/392) harness-gate::bin/harness-gate service::lease::tests::uncertain_process_identity_is_retained_without_reclaim
+        PASS [   0.161s] (265/392) harness-gate::bin/harness-gate service::tests::check_available_reports_unknown_service_and_environment_service
+        PASS [   0.164s] (266/392) harness-gate::bin/harness-gate service::tests::check_available_rejects_empty_environment_service
+        PASS [   0.174s] (267/392) harness-gate::bin/harness-gate service::tests::cleanup_dry_run_lists_active_marked_resources_without_removing_them
+        PASS [   0.178s] (268/392) harness-gate::bin/harness-gate service::tests::cleanup_reclaims_a_stale_marked_lease
+        PASS [   0.168s] (269/392) harness-gate::bin/harness-gate service::tests::cleanup_surfaces_errors_recorded_by_a_service_resource
+        PASS [   0.188s] (270/392) harness-gate::bin/harness-gate service::tests::cross_process_resource_lease_reports_a_conflict_and_can_be_reacquired
+        PASS [   0.148s] (271/392) harness-gate::bin/harness-gate service::tests::environment_service_injects_configured_value
+        PASS [   0.189s] (272/392) harness-gate::bin/harness-gate service::tests::docker_service_uses_a_valid_external_value_without_docker
+        PASS [   0.145s] (273/392) harness-gate::bin/harness-gate service::tests::environment_service_rejects_missing_and_empty_values
+        PASS [   0.164s] (274/392) harness-gate::bin/harness-gate service::tests::exclusive_external_service_is_not_reused_after_its_last_lease
+        PASS [   0.159s] (275/392) harness-gate::bin/harness-gate service::tests::failed_service_startup_wakes_waiters_without_deadlock
+        PASS [   0.154s] (276/392) harness-gate::bin/harness-gate service::tests::failed_warmup_is_cached_for_the_first_real_lease
+        PASS [   0.153s] (277/392) harness-gate::bin/harness-gate service::tests::missing_service_is_cached_as_a_failure
+        PASS [   0.264s] (278/392) harness-gate::bin/harness-gate service::tests::managed_service_lease_excludes_concurrent_users
+        PASS [   0.023s] (279/392) harness-gate::bin/harness-gate service::tests::rejects_a_database_without_a_test_suffix
+        PASS [   0.023s] (280/392) harness-gate::bin/harness-gate service::tests::rejects_a_remote_database_without_an_explicit_override
+        PASS [   0.156s] (281/392) harness-gate::bin/harness-gate service::tests::podman_runtime_uses_external_service_without_starting_a_container
+        PASS [   0.025s] (282/392) harness-gate::bin/harness-gate service::tests::rejects_the_configured_runtime_database
+        PASS [   0.167s] (283/392) harness-gate::bin/harness-gate service::tests::shareable_environment_service_supports_concurrent_leases
+        PASS [   0.173s] (284/392) harness-gate::bin/harness-gate service::tests::releasing_a_lease_leaves_no_marker_file
+        PASS [   0.038s] (285/392) harness-gate::bin/harness-gate utils::fs::tests::atomic_write_honors_no_replace
+        PASS [   0.038s] (286/392) harness-gate::bin/harness-gate utils::fs::tests::confined_writer_creates_a_missing_output_root
+        PASS [   0.033s] (287/392) harness-gate::bin/harness-gate utils::fs::tests::confined_writer_publishes_complete_content
+        PASS [   0.013s] (288/392) harness-gate::bin/harness-gate utils::fs::tests::confined_writer_rejects_parent_and_target_symlinks
+        PASS [   0.013s] (289/392) harness-gate::bin/harness-gate utils::git::tests::index_paths_reject_parent_traversal
+        PASS [   0.014s] (290/392) harness-gate::bin/harness-gate utils::git::tests::index_paths_use_git_separators_on_every_platform
+        PASS [   0.160s] (291/392) harness-gate::bin/harness-gate service::tests::warmup_populates_resource_before_the_first_lease
+        PASS [   0.012s] (292/392) harness-gate::bin/harness-gate utils::git::tests::parses_nul_delimited_paths_without_splitting_newlines
+        PASS [   0.024s] (293/392) harness-gate::bin/harness-gate utils::git::tests::rejects_non_utf8_paths
+        PASS [   0.030s] (294/392) harness-gate::bin/harness-gate verify::parser::tests::ambiguous_standard_results_fail_closed
+        PASS [   0.066s] (295/392) harness-gate::bin/harness-gate utils::redaction::tests::removes_common_credential_shapes
+        PASS [   0.025s] (296/392) harness-gate::bin/harness-gate verify::parser::tests::auto_discovers_root_and_wrapped_supported_result_arrays
+        PASS [   0.024s] (297/392) harness-gate::bin/harness-gate verify::parser::tests::auto_discovery_rejects_ambiguous_candidates_even_when_lengths_match
+        PASS [   0.024s] (298/392) harness-gate::bin/harness-gate verify::parser::tests::auto_discovery_rejects_error_objects_and_unrelated_nested_arrays
+        PASS [   0.019s] (299/392) harness-gate::bin/harness-gate verify::parser::tests::malformed_standard_results_fail_closed
+        PASS [   0.024s] (300/392) harness-gate::bin/harness-gate verify::parser::tests::auto_discovery_rejects_non_array_supported_fields
+        PASS [   0.022s] (301/392) harness-gate::bin/harness-gate verify::parser::tests::parses_json_explicit_non_negative_integer_path
+        PASS [   0.023s] (302/392) harness-gate::bin/harness-gate verify::parser::tests::parses_json_explicit_array_path
+        PASS [   0.018s] (303/392) harness-gate::bin/harness-gate verify::parser::tests::parses_json_result_path
+        PASS [   0.012s] (304/392) harness-gate::bin/harness-gate verify::parser::tests::parses_nested_junit_suites_and_namespaces
+        PASS [   2.876s] (305/392) harness-gate::bin/harness-gate service::lease::tests::fake_docker_and_podman_cleanup_requires_fresh_complete_ownership
+        PASS [   0.024s] (306/392) harness-gate::bin/harness-gate verify::parser::tests::parses_trx_results
+        PASS [   0.025s] (307/392) harness-gate::bin/harness-gate verify::parser::tests::rejects_invalid_explicit_path_without_auto_discovery_fallback
+        PASS [   0.021s] (308/392) harness-gate::bin/harness-gate verify::parser::tests::shard_merge_is_deterministic
+        PASS [   0.076s] (309/392) harness-gate::bin/harness-gate verify::parser::tests::parses_junit_testcases
+        PASS [   0.022s] (310/392) harness-gate::bin/harness-gate verify::parser::tests::shard_merge_rejects_missing_and_duplicate_inputs
+        PASS [   0.044s] (311/392) harness-gate::bin/harness-gate verify::plan::tests::dependencies_are_stably_topologically_sorted
+        PASS [   0.157s] (312/392) harness-gate::bin/harness-gate verify::plan::tests::legacy_plan_synthesizes_mandatory_gate_chain
+        PASS [   0.161s] (313/392) harness-gate::bin/harness-gate verify::plan::tests::plan_rejects_duplicate_ids_before_building_nodes
+        PASS [   0.026s] (314/392) harness-gate::bin/harness-gate verify::quality::tests::workflow_input_accepts_aliased_root_but_rejects_escape
+        PASS [   0.146s] (315/392) harness-gate::bin/harness-gate verify::plan::tests::plan_rejects_duplicate_logs_at_execution_boundary
+        PASS [   0.224s] (316/392) harness-gate::bin/harness-gate verify::plan::tests::plan_rejects_missing_dependency_at_execution_boundary
+        PASS [   0.203s] (317/392) harness-gate::bin/harness-gate verify::report::tests::configured_html_ignores_unrelated_binary_assets
+        PASS [   0.097s] (318/392) harness-gate::bin/harness-gate verify::report::tests::configured_html_rejects_template_outside_root
+        PASS [   0.190s] (319/392) harness-gate::bin/harness-gate verify::report::tests::configured_html_rejects_external_symlink_templates
+        PASS [   0.639s] (320/392) harness-gate::bin/harness-gate verify::report::tests::configured_formats_are_declared_and_verified
+        PASS [   0.478s] (321/392) harness-gate::bin/harness-gate verify::report::tests::configured_html_supports_include_and_inheritance
+        PASS [   0.632s] (322/392) harness-gate::bin/harness-gate verify::report::tests::failed_execution_with_missing_evidence_stays_failed
+        PASS [   0.914s] (323/392) harness-gate::bin/harness-gate verify::report::tests::control_file_publication_failure_cannot_leave_success
+        PASS [   0.028s] (324/392) harness-gate::bin/harness-gate verify::report::tests::html_template_replaces_only_supported_fields
+        PASS [   0.079s] (325/392) harness-gate::bin/harness-gate verify::report::tests::junit_escapes_values_and_records_failures
+        PASS [   0.074s] (326/392) harness-gate::bin/harness-gate verify::report::tests::machine_result_keeps_cancellation_distinct_from_failure
+        PASS [   0.080s] (327/392) harness-gate::bin/harness-gate verify::report::tests::machine_result_rejects_artifacts_outside_the_invocation
+        PASS [   0.063s] (328/392) harness-gate::bin/harness-gate verify::report::tests::machine_result_uses_versioned_status_attempts_and_artifact_references
+        PASS [   0.082s] (329/392) harness-gate::bin/harness-gate verify::report::tests::machine_status_does_not_infer_cancellation_from_skip_wording
+        PASS [   0.977s] (330/392) harness-gate::bin/harness-gate verify::report::tests::format_write_failures_leave_machine_result_incomplete
+        PASS [   0.089s] (331/392) harness-gate::bin/harness-gate verify::report::tests::markdown_and_junit_expose_skipped_steps
+        PASS [   0.555s] (332/392) harness-gate::bin/harness-gate verify::report::tests::invalid_step_bindings_cannot_publish_complete_evidence
+        PASS [   0.046s] (333/392) harness-gate::bin/harness-gate verify::report::tests::markdown_keeps_legacy_summary_shape
+        PASS [   0.362s] (334/392) harness-gate::bin/harness-gate verify::report::tests::manifest_records_digests_and_detects_tampering
+        PASS [   0.246s] (335/392) harness-gate::bin/harness-gate verify::report::tests::optional_html_failure_preserves_base_reports
+        PASS [   0.062s] (336/392) harness-gate::bin/harness-gate verify::report::tests::redaction_removes_credentials_from_exported_text
+        PASS [   0.164s] (337/392) harness-gate::bin/harness-gate verify::report::tests::redaction_rejects_oversized_evidence_before_reading_it
+        PASS [   0.364s] (338/392) harness-gate::bin/harness-gate verify::report::tests::missing_required_log_blocks_complete_evidence
+        PASS [   0.161s] (339/392) harness-gate::bin/harness-gate verify::report::tests::report_target_rejects_existing_symlink_escape
+        PASS [   0.160s] (340/392) harness-gate::bin/harness-gate verify::report::tests::report_target_rejects_missing_directory_through_symlink_escape
+        PASS [   0.159s] (341/392) harness-gate::bin/harness-gate verify::report::tests::report_target_rejects_windows_style_traversal
+        PASS [   0.399s] (342/392) harness-gate::bin/harness-gate verify::report::tests::registry_and_machine_result_bindings_are_verified
+        PASS [   0.309s] (343/392) harness-gate::bin/harness-gate verify::report::tests::stale_invocation_metadata_blocks_publication
+        PASS [   0.022s] (344/392) harness-gate::bin/harness-gate verify::report::tests::unknown_machine_failure_contracts_fail_closed
+        PASS [   0.310s] (345/392) harness-gate::bin/harness-gate verify::report::tests::symlink_required_log_blocks_publication_without_touching_target
+        PASS [   0.026s] (346/392) harness-gate::bin/harness-gate verify::report::tests::unsupported_machine_result_versions_fail_closed
+        PASS [   0.031s] (347/392) harness-gate::bin/harness-gate verify::report::tests::webhook_accepts_success_response
+        PASS [   0.316s] (348/392) harness-gate::bin/harness-gate verify::report::tests::undeclared_file_blocks_publication
+        PASS [   0.022s] (349/392) harness-gate::bin/harness-gate verify::report::tests::webhook_policy_rechecks_every_resolution_and_fails_closed_on_rebinding
+        PASS [   0.027s] (350/392) harness-gate::bin/harness-gate verify::report::tests::webhook_policy_rejects_local_address_before_connecting
+        PASS [   0.023s] (351/392) harness-gate::bin/harness-gate verify::report::tests::webhook_policy_rejects_unlisted_hosts_without_exposing_secrets
+        PASS [   0.309s] (352/392) harness-gate::bin/harness-gate verify::report::tests::unlink_open_log_blocks_publication
+        PASS [   0.023s] (353/392) harness-gate::bin/harness-gate verify::report::tests::webhook_redirects_are_a_typed_policy_failure
+        PASS [   0.032s] (354/392) harness-gate::bin/harness-gate verify::report::tests::webhook_rejects_non_success_response
+        PASS [   0.202s] (355/392) harness-gate::bin/harness-gate verify::report::tests::webhook_filters_success_notifications_without_contacting_the_endpoint
+        PASS [   0.194s] (356/392) harness-gate::bin/harness-gate verify::report::tests::webhook_redacts_sensitive_report_details
+        PASS [   0.024s] (357/392) harness-gate::bin/harness-gate verify::scheduler::tests::cancellation_marks_queued_nodes_without_satisfying_dependencies
+        PASS [   0.026s] (358/392) harness-gate::bin/harness-gate verify::scheduler::tests::failed_ancestor_marks_descendant_skipped
+        PASS [   0.025s] (359/392) harness-gate::bin/harness-gate verify::scheduler::tests::indexed_readiness_preserves_plan_order_and_unblocks_once
+        PASS [   0.019s] (360/392) harness-gate::bin/harness-gate verify::scheduler::tests::indexed_readiness_skips_all_pending_descendants_after_failure
+        PASS [   0.217s] (361/392) harness-gate::bin/harness-gate verify::report::tests::webhook_reports_connection_failure
+        PASS [   0.022s] (362/392) harness-gate::bin/harness-gate verify::scheduler::tests::ready_queue_requires_all_dependencies_to_pass
+        PASS [   0.017s] (363/392) harness-gate::bin/harness-gate verify::scheduler::tests::ready_queue_respects_stable_order_and_limit
+        PASS [   0.215s] (364/392) harness-gate::bin/harness-gate verify::report::tests::webhook_stops_after_the_first_failure_in_configured_order
+        PASS [   0.027s] (365/392) harness-gate::bin/harness-gate verify::scheduler::tests::worker_panics_become_scheduler_failures_in_unwind_profiles
+        PASS [   0.021s] (366/392) harness-gate::bin/harness-gate verify::steps::tests::runner_arguments_and_environment_are_recorded
+        PASS [   0.025s] (367/392) harness-gate::bin/harness-gate verify::steps::tests::cargo_test_threads_are_inserted_after_the_test_separator
+        PASS [   0.026s] (368/392) harness-gate::bin/harness-gate verify::tests::a_new_test_framework_can_supply_its_own_pattern
+        PASS [   0.024s] (369/392) harness-gate::bin/harness-gate verify::tests::adapter_failures_choose_primary_by_plan_order
+        PASS [   0.035s] (370/392) harness-gate::bin/harness-gate verify::tests::configurable_regex_parser_counts_multiple_outputs
+        SLOW [>120.000s] (───────) harness-gate quality::replay::acceptance::retained_corpora_and_consolidated_negative_matrix
+        SLOW [>120.000s] (───────) harness-gate quality::policy_tests::frozen_policy_and_reference_acceptance_match_python
+        SLOW [>120.000s] (───────) harness-gate quality::policy_tests::green_local_gates_and_breaking_contract_block_project_with_provenance
+        SLOW [>120.000s] (───────) harness-gate quality::tests::frozen_evidence_and_integrity_matrix_matches_python
+        PASS [   0.511s] (371/392) harness-gate::bin/harness-gate verify::tests::builtin_adapter_failure_writes_report_before_returning_error
+        PASS [   0.583s] (372/392) harness-gate::bin/harness-gate verify::tests::explicit_builtin_labels_are_preserved_in_the_report
+        PASS [   0.652s] (373/392) harness-gate::bin/harness-gate verify::tests::failed_external_node_blocks_only_its_descendants
+        PASS [   0.538s] (374/392) harness-gate::bin/harness-gate verify::tests::gate_failure_writes_compatible_report
+        PASS [   0.655s] (375/392) harness-gate::bin/harness-gate verify::tests::independent_steps_run_in_parallel_and_publish_in_plan_order
+        PASS [   0.679s] (376/392) harness-gate::bin/harness-gate verify::tests::json_parser_explicit_numeric_path_preserves_count_and_minimum
+        PASS [   0.614s] (377/392) harness-gate::bin/harness-gate verify::tests::non_zero_step_retains_exit_detail_and_log
+        PASS [   0.037s] (378/392) harness-gate::bin/harness-gate verify::tests::regex_parser_ignores_ansi_color_sequences
+        PASS [   0.476s] (379/392) harness-gate::bin/harness-gate verify::tests::report_publication_error_precedes_gate_adapter_error_and_preserves_invocation_evidence
+        PASS [   0.680s] (380/392) harness-gate::bin/harness-gate verify::tests::parser_failure_marks_step_failed
+        PASS [   2.140s] (381/392) harness-gate::bin/harness-gate verify::tests::json_parser_compatibility_preserves_success_zero_partial_and_command_failures
+        PASS [   0.556s] (382/392) harness-gate::bin/harness-gate verify::tests::report_write_failure_returns_error
+        PASS [   0.780s] (383/392) harness-gate::bin/harness-gate verify::tests::service_failure_does_not_skip_unrelated_steps
+        PASS [   0.748s] (384/392) harness-gate::bin/harness-gate verify::tests::timeout_is_a_failed_step_with_timeout_evidence
+        PASS [   1.862s] (385/392) harness-gate::bin/harness-gate verify::tests::serial_shared_service_steps_execute_once_in_declaration_order
+        PASS [   0.599s] (386/392) harness-gate::bin/harness-gate verify::tests::webhook_connection_failure_maps_to_e1404
+        PASS [   0.971s] (387/392) harness-gate::bin/harness-gate verify::tests::verification_runs_use_distinct_invocation_evidence_directories
+        PASS [ 140.767s] (388/392) harness-gate quality::policy_tests::green_local_gates_and_breaking_contract_block_project_with_provenance
+        PASS [ 147.724s] (389/392) harness-gate quality::tests::frozen_evidence_and_integrity_matrix_matches_python
+        SLOW [>120.000s] (───────) harness-gate::quality_cli_test shipped_cli_matches_both_corpora_and_negative_matrix_without_python_runtime
+        SLOW [>180.000s] (───────) harness-gate quality::policy_tests::frozen_policy_and_reference_acceptance_match_python
+        SLOW [>180.000s] (───────) harness-gate quality::replay::acceptance::retained_corpora_and_consolidated_negative_matrix
+        PASS [ 156.071s] (390/392) harness-gate::quality_cli_test shipped_cli_matches_both_corpora_and_negative_matrix_without_python_runtime
+        PASS [ 223.649s] (391/392) harness-gate quality::policy_tests::frozen_policy_and_reference_acceptance_match_python
+        SLOW [>240.000s] (───────) harness-gate quality::replay::acceptance::retained_corpora_and_consolidated_negative_matrix
+        PASS [ 247.332s] (392/392) harness-gate quality::replay::acceptance::retained_corpora_and_consolidated_negative_matrix
+────────────
+     Summary [ 247.333s] 392 tests run: 392 passed (5 slow), 0 skipped
