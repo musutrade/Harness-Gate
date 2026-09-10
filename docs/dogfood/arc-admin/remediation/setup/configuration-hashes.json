@@ -1,0 +1,13 @@
+{
+  ".arc-flow/flow.toml": "6e254663c4a47b94ac8e85c263d34d24eb58f3afe5a14b02c7ef257b08f3ed5d",
+  ".arc-flow/.gitignore": "8f3de1e507d277f725b13858f0c46932e42bed12a7aeaf6adc57fb7089023581",
+  ".harness-gate/flow.toml": "5096719c1c5ecea970411f0df823eb81af92dd39add56c1764f8059cb602ea5e",
+  ".harness-gate/quality.toml": "e6c69e54df8bcd64ebf0514462a98cd69664fb0f09c37de47a20cd949b6fbc47",
+  ".harness-gate/packs/frontend-api/policy.json": "d78747bcd7a4c86aa3c7de056d2fb6fb77750bca27ab2d48ab86e8ef3ff99d7e",
+  ".harness-gate/packs/frontend-api/capabilities.json": "111356bb09c01006edcc412599ed88cd08416901f7182451e9872c2d34d867e8",
+  ".harness-gate/packs/backend/policy.json": "6bbdcc6332eadf0da8755923178f8c165a529106a583894db5c63152676d9b16",
+  ".harness-gate/packs/backend/capabilities.json": "17e5f0a3412c7b2283ad28d3520ef57b9fad9c59147a558ff3b7248fc6eed951",
+  ".harness-gate/packs/frontend/policy.json": "08ddce545c9a809d1a335c3c21f15ee05929d055998fc8a83a8b19abde3c0958",
+  ".harness-gate/packs/frontend/capabilities.json": "3a7b49321e2352fa7cc097ff9b61f7fc9346de85d0c9f3478e8f9d3261fcb84c",
+  ".shadow-execution/flow.toml": "5096719c1c5ecea970411f0df823eb81af92dd39add56c1764f8059cb602ea5e"
+}

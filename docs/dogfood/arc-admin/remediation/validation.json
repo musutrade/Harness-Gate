@@ -1,0 +1,128 @@
+{
+  "issue": 207,
+  "scope": "OpenSpec tasks 8.1\u20138.4 only; no authority transfer",
+  "environment": {
+    "CARGO_TARGET_DIR": "$PWD/target",
+    "reason": "The global /home/gem/cargo-target is outside the writable workspace; all builds and downloaded sources stay in workspace target."
+  },
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 0,
+      "result": "392 passed; 0 skipped",
+      "log": "validation/nextest.log"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "exit_code": 0,
+      "result": "PASS",
+      "log": "validation/fmt.log"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 0,
+      "result": "PASS",
+      "log": "validation/clippy.log"
+    },
+    {
+      "command": "openspec validate dogfood-harness-gate-on-arc-admin --strict",
+      "exit_code": 0,
+      "result": "PASS",
+      "log": "validation/openspec.log"
+    },
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked -E \"test(import_checks_generic_resource_conflicts) or test(quality_preparation_failure)\"",
+      "exit_code": 0,
+      "result": "2 generic regressions passed after reproduction before the fix",
+      "log": "validation/regressions-after.log"
+    },
+    {
+      "command": "python3 docs/dogfood/arc-admin/negative/run.py --harness-gate target/debug/harness-gate --output target/quality/gh-207/negative/evidence",
+      "exit_code": 0,
+      "result": "6 controlled command cases passed",
+      "log": "validation/negative-commands.log"
+    },
+    {
+      "command": "HARNESS_GATE_DOGFOOD_NEGATIVES=\"$PWD/target/quality/gh-207/negative/evidence\" cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked -E \"test(arc_admin_controlled_quality)\"",
+      "exit_code": 0,
+      "result": "17 signed synthetic cases retained; 1 test passed",
+      "log": "validation/negative-quality.log"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 0,
+      "result": "PASS with workspace-local CARGO_TARGET_DIR; initial run before validation record existed failed docs links and Cargo-backed probes",
+      "log": "validation/docs-consistency.json"
+    },
+    {
+      "command": "python3 docs/dogfood/arc-admin/remediation/run.py --prepared target/quality/gh-207/parity --harness-gate target/debug/harness-gate",
+      "exit_code": 0,
+      "result": "Collector completed: all 27 application results passed per engine; Arc exit 0, both Harness-Gate flow paths exit 1 on missing native quality state. No authority transfer.",
+      "receipt": "evidence/receipt.json"
+    },
+    {
+      "command": "python3 docs/dogfood/arc-admin/remediation/reproduce.py",
+      "exit_code": 0,
+      "result": "PASS: 27 application results per engine, six command controls, seventeen signed synthetic quality cases; native quality blocked GH-215",
+      "log": "validation/reproduce.json"
+    },
+    {
+      "command": "python3 target/quality/gh-207/check-risk.py",
+      "exit_code": 0,
+      "result": "PASS: 973 function identities, 0 failures; committed production-source comparison, before documentation-only final commit",
+      "script": "validation/check-risk.py",
+      "log": "validation/risk.json",
+      "base_sha": "ed0270a82be8b699f6bcb7916e7a03462f0a52c6",
+      "source_head_sha": "2fb418dd6fbdbe68f9a1d36a53d8436adf4af295"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 0,
+      "result": "Ran 380 tests in 178.855s; OK",
+      "log": "validation/python.log"
+    }
+  ],
+  "not_applicable": [
+    {
+      "command": "harness-gate config check",
+      "reason": "This source checkout has no .harness-gate/flow.toml and no declared ci profile."
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "reason": "This source checkout has no .harness-gate/flow.toml and no declared ci profile."
+    }
+  ],
+  "required_quality_aggregate": "CI pending; local checks do not establish hosted aggregate green",
+  "follow_up": "https://github.com/musutrade/Harness-Gate/issues/215",
+  "configuration_checks": [
+    {
+      "command": "target/debug/harness-gate --project-root target/quality/gh-207/parity/source --config .shadow-execution/flow.toml config check",
+      "exit_code": 0,
+      "scope": "Disposable Arc-Admin fixture, not source-repository project configuration",
+      "log": "validation/config-check-shadow-execution.log"
+    },
+    {
+      "command": "target/debug/harness-gate --project-root target/quality/gh-207/parity/source --config .harness-gate/flow.toml config check",
+      "exit_code": 0,
+      "scope": "Disposable Arc-Admin fixture, not source-repository project configuration",
+      "log": "validation/config-check-harness-gate.log"
+    }
+  ],
+  "import": {
+    "command": "target/debug/harness-gate config import --execution-only --input docs/dogfood/arc-admin/sources/.arc-flow/flow.toml.txt --output target/quality/gh-207/import/flow.toml",
+    "exit_code": 0,
+    "comparison": "flow.toml and flow.import.json match GH-202 frozen bytes",
+    "log": "validation/import.log"
+  },
+  "workspace_git": {
+    "initial_command": "git add tools/harness-gate/src/config/import.rs tools/harness-gate/src/config/quality/collectors/tests/dogfood_acceptance.rs tools/harness-gate/src/verify/mod.rs tools/harness-gate/src/verify/quality.rs tools/quality/critical_paths.toml",
+    "error": "fatal: Unable to create '/mnt/dev-ssd/workspaces/symphony/GH-207/.git/index.lock': Read-only file system",
+    "resolution": "Copied only current workspace .git to target/gh-207-git; continued the same symphony/GH-207 branch with explicit --git-dir and --work-tree. No source checkout or another workspace accessed."
+  },
+  "production_source_sha256": {
+    "tools/harness-gate/src/config/import.rs": "ade2594fc1f8a198a822b2eec06d65b5ff81bf6285a4e422bb071bfe6c808466",
+    "tools/harness-gate/src/verify/quality.rs": "eff99f6c2b50d216d154a040d75040c6387f252a64caf841644c62893a28aeac",
+    "tools/harness-gate/src/verify/mod.rs": "12d7fdce72abbd6d7692f8483dcb3bf990856be732d70920afb9dc964f136447"
+  },
+  "raw_logs": "Raw logs and generated reports retained verbatim, including original whitespace; git diff --check passes for authored files with evidence/, setup/ and *.log excluded."
+}
