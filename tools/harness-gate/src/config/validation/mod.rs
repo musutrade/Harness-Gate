@@ -866,6 +866,22 @@ fn validate_resource_conflicts(
     source_map: &SourceMap,
     diagnostics: &mut ConfigDiagnostics,
 ) {
+    validate_log_conflicts(config, source_map, diagnostics);
+    for left in 0..config.steps.len() {
+        for right in (left + 1)..config.steps.len() {
+            if dependency_reaches(config, left, right) || dependency_reaches(config, right, left) {
+                continue;
+            }
+            validate_service_pair(config, source_map, diagnostics, left, right);
+        }
+    }
+}
+
+fn validate_log_conflicts(
+    config: &FlowConfig,
+    source_map: &SourceMap,
+    diagnostics: &mut ConfigDiagnostics,
+) {
     let mut logs = std::collections::BTreeMap::<String, usize>::new();
     for (index, step) in config.steps.iter().enumerate() {
         // Built-in gates do not own external log files. Their empty `log`
@@ -893,146 +909,177 @@ fn validate_resource_conflicts(
             });
         }
     }
+}
 
-    let ids = config
-        .steps
-        .iter()
-        .map(|step| step.id.as_str())
-        .collect::<Vec<_>>();
-    let reachable = |from: usize, to: usize| -> bool {
-        let mut stack = vec![from];
-        let mut seen = std::collections::HashSet::new();
-        while let Some(index) = stack.pop() {
-            if !seen.insert(index) {
-                continue;
-            }
-            for dependency in &config.steps[index].depends_on {
-                if let Some(next) = ids.iter().position(|id| id == dependency) {
-                    if next == to {
-                        return true;
-                    }
-                    stack.push(next);
+fn dependency_reaches(config: &FlowConfig, from: usize, to: usize) -> bool {
+    let mut stack = vec![from];
+    let mut seen = std::collections::HashSet::new();
+    while let Some(index) = stack.pop() {
+        if !seen.insert(index) {
+            continue;
+        }
+        for dependency in &config.steps[index].depends_on {
+            if let Some(next) = config.steps.iter().position(|step| &step.id == dependency) {
+                if next == to {
+                    return true;
                 }
+                stack.push(next);
             }
         }
-        false
-    };
+    }
+    false
+}
 
-    for left in 0..config.steps.len() {
-        for right in (left + 1)..config.steps.len() {
-            if reachable(left, right) || reachable(right, left) {
+fn validate_service_pair(
+    config: &FlowConfig,
+    source_map: &SourceMap,
+    diagnostics: &mut ConfigDiagnostics,
+    left: usize,
+    right: usize,
+) {
+    let left_services = config.steps[left]
+        .services
+        .iter()
+        .enumerate()
+        .filter_map(|(index, id)| config.services.get(id).map(|service| (index, id, service)))
+        .collect::<Vec<_>>();
+    let right_services = config.steps[right]
+        .services
+        .iter()
+        .enumerate()
+        .filter_map(|(index, id)| config.services.get(id).map(|service| (index, id, service)))
+        .collect::<Vec<_>>();
+    // The scheduler dispatches one step at a time unless parallel execution
+    // has more than one worker. Shared consumers cannot overlap in serial mode.
+    if config.execution.parallel && config.execution.effective_max_parallel() > 1 {
+        validate_shared_services(
+            source_map,
+            diagnostics,
+            left,
+            right,
+            &left_services,
+            &right_services,
+        );
+    }
+    validate_service_injections(
+        source_map,
+        diagnostics,
+        left,
+        right,
+        &left_services,
+        &right_services,
+    );
+}
+
+type ServiceUse<'a> = (usize, &'a String, &'a ServiceConfig);
+
+fn validate_shared_services(
+    source_map: &SourceMap,
+    diagnostics: &mut ConfigDiagnostics,
+    left: usize,
+    right: usize,
+    left_services: &[ServiceUse<'_>],
+    right_services: &[ServiceUse<'_>],
+) {
+    let mut shared_service_ids = BTreeSet::new();
+    for (_, left_service, _) in left_services {
+        if right_services
+            .iter()
+            .any(|(_, right_service, _)| right_service == left_service)
+        {
+            shared_service_ids.insert(*left_service);
+        }
+    }
+    for service_id in shared_service_ids {
+        let (left_service_index, _, _) = left_services
+            .iter()
+            .find(|(_, id, _)| *id == service_id)
+            .expect("service appears in left step");
+        let (right_service_index, _, _) = right_services
+            .iter()
+            .find(|(_, id, _)| *id == service_id)
+            .expect("service appears in right step");
+        let path = format!("steps[{right}].services[{right_service_index}]");
+        let related_path = format!("steps[{left}].services[{left_service_index}]");
+        diagnostics.push(ConfigDiagnostic {
+            id: "HGCFG-SHARED-SERVICE".into(),
+            severity: DiagnosticSeverity::Error,
+            path: path.clone(),
+            message: format!("steps use shared service {service_id:?} without ordering"),
+            help: "add a dependency or define separate service resources".into(),
+            retry_class: None,
+            location: source_map.location(&path),
+            related: vec![
+                RelatedDiagnostic {
+                    path: related_path.clone(),
+                    relation: "conflicts-with".into(),
+                    location: source_map.location(&related_path),
+                },
+                RelatedDiagnostic {
+                    path: format!("services[\"{service_id}\"]"),
+                    relation: "shared-resource".into(),
+                    location: source_map.location(&format!("services[\"{service_id}\"]")),
+                },
+            ],
+        });
+    }
+}
+
+fn validate_service_injections(
+    source_map: &SourceMap,
+    diagnostics: &mut ConfigDiagnostics,
+    left: usize,
+    right: usize,
+    left_services: &[ServiceUse<'_>],
+    right_services: &[ServiceUse<'_>],
+) {
+    let mut seen_injections = BTreeSet::new();
+    for (left_service_index, left_service, left_config) in left_services {
+        for (right_service_index, right_service, right_config) in right_services {
+            if left_service == right_service
+                || service_inject_env(left_config) != service_inject_env(right_config)
+            {
                 continue;
             }
-            let left_services = config.steps[left]
-                .services
-                .iter()
-                .enumerate()
-                .filter_map(|(index, id)| {
-                    config.services.get(id).map(|service| (index, id, service))
-                })
-                .collect::<Vec<_>>();
-            let right_services = config.steps[right]
-                .services
-                .iter()
-                .enumerate()
-                .filter_map(|(index, id)| {
-                    config.services.get(id).map(|service| (index, id, service))
-                })
-                .collect::<Vec<_>>();
-
-            let mut shared_service_ids = BTreeSet::new();
-            for (_, left_service, _) in &left_services {
-                if right_services
-                    .iter()
-                    .any(|(_, right_service, _)| right_service == left_service)
-                {
-                    shared_service_ids.insert(*left_service);
-                }
+            let key = (
+                *left_service,
+                *right_service,
+                service_inject_env(left_config),
+            );
+            if !seen_injections.insert(key) {
+                continue;
             }
-            for service_id in shared_service_ids {
-                let (left_service_index, _, _) = left_services
-                    .iter()
-                    .find(|(_, id, _)| *id == service_id)
-                    .expect("service appears in left step");
-                let (right_service_index, _, _) = right_services
-                    .iter()
-                    .find(|(_, id, _)| *id == service_id)
-                    .expect("service appears in right step");
-                let path = format!("steps[{right}].services[{right_service_index}]");
-                let related_path = format!("steps[{left}].services[{left_service_index}]");
-                diagnostics.push(ConfigDiagnostic {
-                    id: "HGCFG-SHARED-SERVICE".into(),
-                    severity: DiagnosticSeverity::Error,
-                    path: path.clone(),
-                    message: format!("steps use shared service {service_id:?} without ordering"),
-                    help: "add a dependency or define separate service resources".into(),
-                    retry_class: None,
-                    location: source_map.location(&path),
-                    related: vec![
-                        RelatedDiagnostic {
-                            path: related_path.clone(),
-                            relation: "conflicts-with".into(),
-                            location: source_map.location(&related_path),
-                        },
-                        RelatedDiagnostic {
-                            path: format!("services[\"{service_id}\"]"),
-                            relation: "shared-resource".into(),
-                            location: source_map.location(&format!("services[\"{service_id}\"]")),
-                        },
-                    ],
-                });
-            }
-
-            let mut seen_injections = BTreeSet::new();
-            for (left_service_index, left_service, left_config) in &left_services {
-                for (right_service_index, right_service, right_config) in &right_services {
-                    if left_service == right_service
-                        || service_inject_env(left_config) != service_inject_env(right_config)
-                    {
-                        continue;
-                    }
-                    let key = (
-                        *left_service,
-                        *right_service,
-                        service_inject_env(left_config),
-                    );
-                    if !seen_injections.insert(key) {
-                        continue;
-                    }
-                    let path = format!("steps[{right}].services[{right_service_index}]");
-                    let related_path = format!("steps[{left}].services[{left_service_index}]");
-                    diagnostics.push(ConfigDiagnostic {
-                        id: "HGCFG-SERVICE-INJECT-COLLISION".into(),
-                        severity: DiagnosticSeverity::Error,
-                        path: path.clone(),
-                        message: "independent services inject the same environment variable".into(),
-                        help:
-                            "add a dependency, use distinct inject_env names, or split the workflow"
-                                .into(),
-                        retry_class: None,
-                        location: source_map.location(&path),
-                        related: vec![
-                            RelatedDiagnostic {
-                                path: related_path.clone(),
-                                relation: "conflicts-with".into(),
-                                location: source_map.location(&related_path),
-                            },
-                            RelatedDiagnostic {
-                                path: format!("services[\"{left_service}\"].inject_env"),
-                                relation: "injects".into(),
-                                location: source_map
-                                    .location(&format!("services[\"{left_service}\"].inject_env")),
-                            },
-                            RelatedDiagnostic {
-                                path: format!("services[\"{right_service}\"].inject_env"),
-                                relation: "injects".into(),
-                                location: source_map
-                                    .location(&format!("services[\"{right_service}\"].inject_env")),
-                            },
-                        ],
-                    });
-                }
-            }
+            let path = format!("steps[{right}].services[{right_service_index}]");
+            let related_path = format!("steps[{left}].services[{left_service_index}]");
+            diagnostics.push(ConfigDiagnostic {
+                id: "HGCFG-SERVICE-INJECT-COLLISION".into(),
+                severity: DiagnosticSeverity::Error,
+                path: path.clone(),
+                message: "independent services inject the same environment variable".into(),
+                help: "add a dependency, use distinct inject_env names, or split the workflow"
+                    .into(),
+                retry_class: None,
+                location: source_map.location(&path),
+                related: vec![
+                    RelatedDiagnostic {
+                        path: related_path.clone(),
+                        relation: "conflicts-with".into(),
+                        location: source_map.location(&related_path),
+                    },
+                    RelatedDiagnostic {
+                        path: format!("services[\"{left_service}\"].inject_env"),
+                        relation: "injects".into(),
+                        location: source_map
+                            .location(&format!("services[\"{left_service}\"].inject_env")),
+                    },
+                    RelatedDiagnostic {
+                        path: format!("services[\"{right_service}\"].inject_env"),
+                        relation: "injects".into(),
+                        location: source_map
+                            .location(&format!("services[\"{right_service}\"].inject_env")),
+                    },
+                ],
+            });
         }
     }
 }
