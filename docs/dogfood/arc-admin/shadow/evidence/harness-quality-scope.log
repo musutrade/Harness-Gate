@@ -1,0 +1,4 @@
+ERROR [E1000]: command failed: ${ARC_SOURCE}/.harness-gate/flow.toml: error [HGCFG-SHARED-SERVICE] at steps[8].services[0]: steps use shared service "test-postgres" without ordering (line 439, column 1)
+  shared-resource: services["test-postgres"] (line 236, column 1)
+  conflicts-with: steps[3].services[0] (line 347, column 1)
+  help: add a dependency or define separate service resources

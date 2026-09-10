@@ -1,0 +1,212 @@
+[
+  {
+    "path": "frontend/test-results/.last-run.json",
+    "bytes": 45,
+    "sha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903",
+    "retained": false
+  },
+  {
+    "path": "frontend/playwright-report/index.html",
+    "bytes": 547439,
+    "sha256": "fe5c4257341f65f4ddb0de6c9592c0dfa1df76f07843774861aeee3549bbe798",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/3rdpartylicenses.txt",
+    "bytes": 27467,
+    "sha256": "bda249ce2d0fac7c4f31a4f55cad1618d42d2510c798f8781354ca10ba05b2fe",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/chunk-AOvOsJtc.js",
+    "bytes": 21524,
+    "sha256": "f3a143c29a80e22b8416be2e31f94add44586a86d6debe1310d2975ea64747f4",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/chunk-B38fwnyR.js",
+    "bytes": 4925,
+    "sha256": "f30a02b50e0e6d9dbfd6c1eb4645b975fd0e1f16de14bd48d15bb365ef5ded3b",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/chunk-B9ubCX1H.js",
+    "bytes": 15858,
+    "sha256": "cf7da58f70923436c18e48b5b9137207639d5857a435eabb6cf9bf9d71ddffa6",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/chunk-BZrngzna.js",
+    "bytes": 9188,
+    "sha256": "d2fdf76bd125a7d59d61462f72e7b6ce2477dfc6160391619ffc62dcb220fd8f",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/chunk-BlL5dfAA.js",
+    "bytes": 126467,
+    "sha256": "a55e90243f97e5336009541c6e6cee82475b0df81ad4d1e4c37ec7d0aeda11dd",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/chunk-BoWJkE2v.js",
+    "bytes": 758,
+    "sha256": "0d6bd950ba7a7759805c0609630b52b20f506f671a79ee0390eab9a5e77efb1d",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/chunk-CTnYaXD4.js",
+    "bytes": 50619,
+    "sha256": "558e0234ba076151f2d3a9712988c5eb3cd24d1225735cf804731db5102b546f",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/chunk-CZ8BFIU9.js",
+    "bytes": 19496,
+    "sha256": "1809913ceff9a7a05a2c876aa721915698228b33cb1a4e67be7de7b6a04e2f42",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/chunk-DKN5TQSA.js",
+    "bytes": 64258,
+    "sha256": "841073d442c72faf4312f3f5b5f664a12cbcffa46e52a35c68df8507c8848bbd",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/chunk-DN-NrpBu.js",
+    "bytes": 22852,
+    "sha256": "f66caa1f46e49ff4f57f284348b8fd07bee35d5eb1bf659b6d3242fd94909347",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/chunk-DV2hrsBK.js",
+    "bytes": 7869,
+    "sha256": "a15a4b3f9e771af84ffd987ef28ada1ff29b59b1d24e42e0535b1ef79a2ab1d8",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/chunk-DzXs__Vp.js",
+    "bytes": 67882,
+    "sha256": "0fd305af469371d48f45d32024a9f6d80f66ecef6148ef156d318bcb5ec6fcd5",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/chunk-eGbkb2TN.js",
+    "bytes": 8276,
+    "sha256": "1a9d72d18857f04ab09f4cd747c166ef2eb0b261b2e88c78e2e5f6c9fd23c8c1",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/chunk-jcuVwhdk.js",
+    "bytes": 34773,
+    "sha256": "e4f01b582ac15c8febf8486d0aa68947815a5771380ac707c45e29cbb02aeef2",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/chunk-k4CY2pSQ.js",
+    "bytes": 15412,
+    "sha256": "bc1f2d57a37463ff6fc2b7b3d3c1dce2eac73d4dd64f1bf76ee4eabd55673465",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/chunk-kihMOZHk.js",
+    "bytes": 1711,
+    "sha256": "6ee1a91a4cfdd43b1788c467e690f195c31e27a07a2c3bf3f0df85c9de2cce5e",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/chunk-oRzmRFbg.js",
+    "bytes": 169827,
+    "sha256": "6900fe86de5bd64a267fbeb63ba29fb933461d44f1dd82221dcfdb9d72771c46",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/chunk-ovJF7CjV.js",
+    "bytes": 10116,
+    "sha256": "ed01456d01ec8a1eacb7d0545cf7cf95f2e996ee125e1679298f6e528cc20e6c",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/config.js",
+    "bytes": 289,
+    "sha256": "47ed5784e52eb937aa90a42cb3b5d79ae093ee573a9db54ea668064e26971f66",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/favicon.ico",
+    "bytes": 15086,
+    "sha256": "f9102be80297c0529207607be5277b4f90bca89d65988fa1771b91c7894e815f",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/index.html",
+    "bytes": 6956,
+    "sha256": "56c565465c7f053345a4e1732978aa5edab44acaee069d270245fed3e8aebbfe",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/main-X5BJFLYF.js",
+    "bytes": 437451,
+    "sha256": "468b3ef0d711694602970f7ea71644209018fb4556f02d96db4314386f471c04",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/media/material-symbols-outlined-latin-100-normal-AVA6RH5R.woff2",
+    "bytes": 335380,
+    "sha256": "30489f105a1edd772464e12476422521d9b6408c9dc757f4d22fcd4cb2b6c2c5",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/media/material-symbols-outlined-latin-100-normal-X5VZ7FVY.woff",
+    "bytes": 407380,
+    "sha256": "e5116f50ba49963774b0c2c28902a279bd29211a54fa1c50d5631fcb68d40c74",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/media/material-symbols-outlined-latin-200-normal-DRCBLHEF.woff2",
+    "bytes": 348004,
+    "sha256": "e78ea4bbfdfd4d5ca57caf1ef0146917ac5a97536f51d2edc2c6b339de543b0e",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/media/material-symbols-outlined-latin-200-normal-SX4GDRD3.woff",
+    "bytes": 419140,
+    "sha256": "521e057886a966e0fb5bfce5af514b42f48859725173f52230663b12215475b6",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/media/material-symbols-outlined-latin-300-normal-7RGF4TGP.woff",
+    "bytes": 418540,
+    "sha256": "7860e95e2f3d2e8a16257471fc285e65430b55a921ff1c6617359452a24ff39a",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/media/material-symbols-outlined-latin-300-normal-IHHLPZWJ.woff2",
+    "bytes": 347736,
+    "sha256": "3592f559053bd3be47e2fcbcafa064d6723c69ee3ea125a71a364a2cdb476033",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/media/material-symbols-outlined-latin-400-normal-QBTUHKMK.woff2",
+    "bytes": 319588,
+    "sha256": "ec21c3dab68129db63b878969e1e9a6124834c97b30f1197d39624bf3b090777",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/media/material-symbols-outlined-latin-400-normal-TQGWZ2NT.woff",
+    "bytes": 375760,
+    "sha256": "dd11f2b7d430b2974c0340a2de1ae8d1a4b0d0cd78abc593ff884fb3c65c1f94",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/browser/styles-CSVVTZFT.css",
+    "bytes": 24158,
+    "sha256": "24b93b15dcdcc9d2f2522e99b1faeeced41438038930e09b09e113c463fd5400",
+    "retained": false
+  },
+  {
+    "path": "frontend/dist/arc-admin/prerendered-routes.json",
+    "bytes": 18,
+    "sha256": "a79ddcc8a115190e9c19479ed36914741a7d1db74f0a1153529efc80725505fe",
+    "retained": false
+  }
+]
