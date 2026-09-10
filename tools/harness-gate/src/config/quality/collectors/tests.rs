@@ -11,6 +11,10 @@ use tempfile::{tempdir, TempDir};
 #[cfg(target_os = "linux")]
 mod ci_acceptance;
 
+#[path = "tests/dogfood_acceptance.rs"]
+#[cfg(target_os = "linux")]
+mod dogfood_acceptance;
+
 struct Fixture {
     dir: TempDir,
     state: TrustedState,

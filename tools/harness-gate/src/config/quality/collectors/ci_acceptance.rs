@@ -5,7 +5,7 @@ use std::time::Instant;
 
 const MATRIX: &str = include_str!("../../../../../quality/fixtures/workflow/ci-matrix.json");
 
-fn configured_fixture(shape: &Value, mode: &str, profile: &str) -> Fixture {
+pub(super) fn configured_fixture(shape: &Value, mode: &str, profile: &str) -> Fixture {
     let mut fixture = Fixture::workflow("pass", true, false);
     let root = fixture.dir.path().to_path_buf();
     let mut config = serde_json::to_value(fixture.config()).unwrap();
