@@ -1,0 +1,122 @@
+{
+  "environment": {
+    "CARGO_TARGET_DIR": "$PWD/target"
+  },
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 0,
+      "seconds": 224.625,
+      "log": "check-1.log",
+      "sha256": "cd5544b5556bc271ba419fef3e1f09c5e9f63d072d39bb59498be85d10995f96"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "exit_code": 0,
+      "seconds": 0.693,
+      "log": "check-2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 0,
+      "seconds": 25.598,
+      "log": "check-3.log",
+      "sha256": "7cbe63fcbea6c819b18577020dae80104b1e2128b14a3d0a6a82e8bafa4261c8"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 0,
+      "seconds": 174.119,
+      "log": "check-4.log",
+      "sha256": "8825a0aaae0e22626cbd5e60ff98a1e4b4c1f6104298c2860dab70cf727ffdf3"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 0,
+      "seconds": 3.306,
+      "log": "check-5.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "openspec validate integrate-generic-quality-into-project-workflow --strict",
+      "exit_code": 0,
+      "seconds": 1.2,
+      "log": "check-6.log",
+      "sha256": "1f8411c2801823ee344d88a0ed72c289d86b5f067dfb2f53b6095dc9418654e0"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "seconds": 0.009,
+      "log": "check-7.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 0,
+      "seconds": 3.219,
+      "log": "final-docs.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "context": "Final reconciliation text and task checkmarks; workspace-local CARGO_TARGET_DIR"
+    },
+    {
+      "command": "openspec validate integrate-generic-quality-into-project-workflow --strict",
+      "exit_code": 0,
+      "seconds": 1.23,
+      "log": "final-openspec.log",
+      "sha256": "1f8411c2801823ee344d88a0ed72c289d86b5f067dfb2f53b6095dc9418654e0",
+      "context": "Final reconciliation text and task checkmarks; workspace-local CARGO_TARGET_DIR"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "seconds": 0.01,
+      "log": "final-diff.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "context": "Final reconciliation text and task checkmarks; workspace-local CARGO_TARGET_DIR"
+    }
+  ],
+  "issue": 198,
+  "date": "2026-09-10",
+  "status": "passed",
+  "baseline_sha": "0eecd76f2193f98f793a355817ebb8d0a8fd6f47",
+  "scope": "Governance/evidence only; no product, workflow or generic-core changes.",
+  "results": {
+    "rust_tests_passed": 379,
+    "rust_tests_skipped": 0,
+    "python_tests_passed": 346,
+    "all_openspec_tasks_checked": true
+  },
+  "logs_archive": "validation-logs.tar.gz",
+  "hosted_validation": {
+    "exit_code": 0,
+    "log": "hosted-validation.log",
+    "sha256": "f143e381e091e4412290901c5e3036ef8a8b7aacc6b82a120d297dda88113ddf",
+    "results": "Both normalized timing outputs and validated 12-case/40-negative summaries reproduce byte-for-byte. GH-186 retained jobs match GitHub API; GH-187 artifact digest matches GitHub."
+  },
+  "not_applicable": [
+    {
+      "command": "harness-gate config check",
+      "reason": "No project-local .harness-gate/flow.toml with a declared ci profile exists; no configuration was invented."
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "reason": "No project-local .harness-gate/flow.toml with a declared ci profile exists; no configuration was invented."
+    }
+  ],
+  "limitations": [
+    "Single hosted run per head does not establish causal performance improvement or integration-only cost.",
+    "GH-198 hosted acceptance and formal closure remain controller-owned after submission."
+  ],
+  "resolved_validation_failures": [
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 1,
+      "log": "final-docs-default-target-failed.log",
+      "error": "quality gate failed: documentation, examples, or schema synchronization failed",
+      "cause": "Final recheck omitted CARGO_TARGET_DIR=$PWD/target; inherited target directory is outside workspace writable roots. Cargo-backed checks failed while links and policy checks passed.",
+      "resolution": "Repeat with the workspace-local CARGO_TARGET_DIR used by the full successful validation run; no product changes."
+    }
+  ]
+}
