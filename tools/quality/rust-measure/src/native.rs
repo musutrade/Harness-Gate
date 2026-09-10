@@ -103,6 +103,47 @@ fn select(input: ParseStream) -> syn::Result<Parsed> {
     Ok(parsed)
 }
 
+// These are deliberately separate grammars. Recognizing source syntax does not
+// resolve an imported macro or prove the contents of its compiler expansion.
+fn nonempty_expressions(input: ParseStream) -> syn::Result<Parsed> {
+    let expressions = syn::punctuated::Punctuated::<Expr, Token![,]>::parse_terminated(input)?;
+    if expressions.is_empty() {
+        return Err(input.error("expected at least one expression"));
+    }
+    Ok(Parsed {
+        expressions: expressions.into_iter().collect(),
+        ..Parsed::default()
+    })
+}
+
+fn try_join(input: ParseStream) -> syn::Result<Parsed> {
+    let fork = input.fork();
+    if fork.parse::<syn::Ident>().is_ok_and(|id| id == "biased") && fork.peek(Token![;]) {
+        input.parse::<syn::Ident>()?;
+        input.parse::<Token![;]>()?;
+    }
+    nonempty_expressions(input)
+}
+
+fn metrics(input: ParseStream) -> syn::Result<Parsed> {
+    let mut parsed = Parsed::default();
+    // Bounded name/labels grammar used by the pinned backend. Directives and
+    // ambiguous mixed forms fail; supporting them requires a new grammar rule.
+    parsed.expressions.push(input.parse()?);
+    while !input.is_empty() {
+        input.parse::<Token![,]>()?;
+        if input.is_empty() {
+            break;
+        }
+        parsed.expressions.push(input.parse()?);
+        if input.peek(Token![=>]) {
+            input.parse::<Token![=>]>()?;
+            parsed.expressions.push(input.parse()?);
+        }
+    }
+    Ok(parsed)
+}
+
 pub fn expressions(node: &syn::Macro) -> syn::Result<Option<Parsed>> {
     let path = node.path.to_token_stream().to_string().replace(' ', "");
     let path = path.strip_prefix("::").unwrap_or(&path);
@@ -125,6 +166,24 @@ pub fn expressions(node: &syn::Macro) -> syn::Result<Option<Parsed>> {
     }
     if path == "tokio::select" {
         return select.parse2(node.tokens.clone()).map(Some);
+    }
+    if path == "tokio::try_join" {
+        return try_join.parse2(node.tokens.clone()).map(Some);
+    }
+    if matches!(path, "anyhow::anyhow" | "anyhow" | "anyhow::bail" | "bail") {
+        return nonempty_expressions.parse2(node.tokens.clone()).map(Some);
+    }
+    let metric = path.strip_prefix("metrics::").unwrap_or(path);
+    if matches!(
+        metric,
+        "counter"
+            | "gauge"
+            | "histogram"
+            | "describe_counter"
+            | "describe_gauge"
+            | "describe_histogram"
+    ) {
+        return metrics.parse2(node.tokens.clone()).map(Some);
     }
     // Retain the existing supported expression grammars, but don't assume an
     // arbitrary macro with expression-looking tokens has equivalent semantics.
@@ -267,5 +326,43 @@ mod tests {
             inventory(source, true).symbols,
             inventory(source, false).symbols
         );
+    }
+
+    #[test]
+    fn explicit_expression_grammars_visit_nested_code() {
+        let result = inventory(
+            r#"async fn f() {
+            metrics::counter!("requests", "kind" => if a() { "a" } else { "b" });
+            describe_counter!("requests", "description");
+            anyhow::anyhow!("failed {}", work().map(|x| x && ready()));
+            anyhow::bail!("failed {}", other());
+            tokio::try_join!(biased; async { work()? }, async { other()? });
+        }"#,
+            true,
+        );
+        assert!(result.errors.is_empty(), "{:?}", result.errors);
+        assert_eq!(result.symbols[0]["raw"]["if"], 1);
+        assert_eq!(result.symbols[0]["raw"]["question_mark"], 2);
+        assert_eq!(result.symbols[1]["raw"]["and_and"], 1);
+    }
+
+    #[test]
+    fn expression_shape_is_not_a_fallback_certificate() {
+        for body in [
+            "unknown!(a(), b())",
+            "anyhow::anyhow!()",
+            "tokio::try_join!()",
+            "tokio::try_join!(biased;)",
+            "metrics::counter!()",
+            "metrics::counter!(\"x\", \"key\" =>)",
+            "other::counter!(\"x\")",
+        ] {
+            assert!(
+                !inventory(&format!("fn f() {{ {body}; }}"), true)
+                    .errors
+                    .is_empty(),
+                "{body}"
+            );
+        }
     }
 }

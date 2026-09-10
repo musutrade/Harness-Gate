@@ -1,0 +1,10 @@
+{
+  "active_task_build_sampling_processes": [],
+  "removed_only_task_build_caches": [
+    "backend",
+    "analyzer",
+    "harness",
+    "baseline-build"
+  ],
+  "raw_retention": "Native fixture bundles, backend diagnostics archive, backend binaries, analyzers and source copies retained; no other directories cleaned"
+}
