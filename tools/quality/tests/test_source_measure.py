@@ -29,6 +29,22 @@ class SourceMeasureTests(unittest.TestCase):
             file.write_text(source)
             return ast(file, self.binary)
 
+    def test_native_inventory_has_separate_identity_and_contracts(self):
+        subprocess.run(["cargo", "test", "--locked", "--manifest-path",
+                        str(ROOT / "tools/quality/rust-measure/Cargo.toml")],
+                       env={**os.environ, "CARGO_TARGET_DIR": str(ROOT / "target/gh-94-measure")},
+                       check=True, capture_output=True)
+        with tempfile.TemporaryDirectory() as temp:
+            file = Path(temp) / "input.rs"
+            file.write_text('fn f() { tracing::error!(value = %value); }')
+            run = subprocess.run([str(self.binary), "--native-inventory", str(file)],
+                                 text=True, capture_output=True, check=True)
+            result = json.loads(run.stdout)
+            self.assertEqual(result["analyzer"], "harness-gate-rust-native-inventory")
+            self.assertFalse(result["certified_llvm_mapping"])
+            with self.assertRaises(subprocess.CalledProcessError):
+                ast(file, self.binary)
+
     def test_quality_configuration_source_certification(self):
         crate = ROOT / 'tools/harness-gate'
         for name in ('mod', 'model', 'policy', 'validation', 'compiler', 'collectors', 'baseline', 'baseline/git'):
