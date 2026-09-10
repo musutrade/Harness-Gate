@@ -1,0 +1,160 @@
+{
+  "schema": "quality-implementation-validation/v1",
+  "issue": 186,
+  "baseline_sha": "9fcc319d976aed1aad4311355cece60df798ff96",
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target",
+        "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/workflow-acceptance"
+      },
+      "exit_code": 0,
+      "result": "379 passed, 0 skipped",
+      "log": "target/quality/gh-186/nextest.log",
+      "log_sha256": "a05cf08e266f6f1db8de9e441335b64887a5bd3e69778ab33d648fee759c9534"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target"
+      },
+      "exit_code": 0,
+      "result": "passed",
+      "log": "target/quality/gh-186/fmt.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target"
+      },
+      "exit_code": 0,
+      "result": "passed",
+      "log": "target/quality/gh-186/clippy.log",
+      "log_sha256": "27d00eb0b9a2b5aec61d00185e5486ff01769dafd3d6eadbd5a6d1008b90bfbf"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target"
+      },
+      "exit_code": 0,
+      "result": "346 passed",
+      "log": "target/quality/gh-186/python-tests.log",
+      "log_sha256": "0da26721dc4b8a6b26c7fd497a896005ac8c0da26fda3ffb8bd19553390d3cd3"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "environment": {},
+      "exit_code": 0,
+      "result": "passed",
+      "log": "target/quality/gh-186/docs-consistency.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "openspec validate integrate-generic-quality-into-project-workflow --strict",
+      "environment": {},
+      "exit_code": 0,
+      "result": "passed",
+      "log": "target/quality/gh-186/openspec.log",
+      "log_sha256": "1f8411c2801823ee344d88a0ed72c289d86b5f067dfb2f53b6095dc9418654e0"
+    },
+    {
+      "command": "python3 tools/quality/ci_acceptance.py --directory target/quality/workflow-acceptance",
+      "environment": {},
+      "exit_code": 0,
+      "result": "12 cases; 40 negative reports; exact parity; one launch and zero reuse launches per case",
+      "log": "target/quality/gh-186/receipt-validation.log",
+      "log_sha256": "145fa1f00f0c2f7911495bbde02461847fc39e7acf4cca0f2cd524346cb1e233"
+    },
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked -E 'test(configured_ci_acceptance)'",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target"
+      },
+      "exit_code": 0,
+      "result": "1 passed, 378 filtered out; final Linux-only test guard",
+      "log": "target/quality/gh-186/final-matrix.log",
+      "log_sha256": "30833521be83603b4f0ea09f3c4f68c6a3ec80895780684bef6e949c913e7d7e"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target"
+      },
+      "exit_code": 0,
+      "result": "passed after final test guard",
+      "log": "target/quality/gh-186/final-fmt.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target"
+      },
+      "exit_code": 0,
+      "result": "passed after final test guard",
+      "log": "target/quality/gh-186/final-clippy.log",
+      "log_sha256": "83397c2f781fcd6570522956d64e1894ecdbd918d7ee3697eab3d20ce8e78547"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "environment": {},
+      "exit_code": 0,
+      "result": "passed after final documentation",
+      "log": "target/quality/gh-186/final-docs-consistency.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "openspec validate integrate-generic-quality-into-project-workflow --strict",
+      "environment": {},
+      "exit_code": 0,
+      "result": "passed after final documentation",
+      "log": "target/quality/gh-186/final-openspec.log",
+      "log_sha256": "1f8411c2801823ee344d88a0ed72c289d86b5f067dfb2f53b6095dc9418654e0"
+    }
+  ],
+  "retained_artifacts": [
+    {
+      "path": "docs/quality/gh-186/local-acceptance.json.gz",
+      "sha256": "64c2f6127a11c623205a23718bfaa13d8e49e3f48b49e06861aa6b1159d81d15",
+      "bytes": 195654
+    },
+    {
+      "path": "docs/quality/gh-186/local-summary.json",
+      "sha256": "6b94ef5a302534bc3316845e1eec1e3cbe3ca6c378e71a9b5214c54a12d1356c",
+      "bytes": 2718
+    }
+  ],
+  "not_applicable": [
+    {
+      "command": "harness-gate config check",
+      "reason": "No .harness-gate/flow.toml declaring a ci profile in this checkout."
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "reason": "No .harness-gate/flow.toml declaring a ci profile in this checkout."
+    }
+  ],
+  "environment_failures": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked -E 'test(configured_ci_acceptance)'",
+      "error": "failed to open /home/gem/cargo-target/debug/.cargo-build-lock: Read-only file system (os error 30)",
+      "impact": "No tests ran. Successful retries use CARGO_TARGET_DIR=$PWD/target."
+    },
+    {
+      "command": "git add .github/workflows/ci.yml",
+      "error": "Unable to create .git/index.lock: Read-only file system",
+      "impact": "Commit/push use temporary Git metadata in target/quality/gh-186/delivery.git, with this workspace as work tree. Mounted local refs cannot update."
+    }
+  ],
+  "hosted_acceptance": {
+    "status": "pending-controller",
+    "tasks": [
+      "8.3",
+      "8.4"
+    ],
+    "limitations": "Local synthetic elapsed time is not hosted runner work. Required Quality Aggregate and new-head hosted timing have not been observed. Existing hosted cost records are comparison inputs only."
+  }
+}

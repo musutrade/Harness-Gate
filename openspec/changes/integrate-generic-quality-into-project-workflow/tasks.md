@@ -99,10 +99,27 @@ and sections 8–9 remain pending, not accepted by these local checks.
 
 ## 8. CI integration and hosted acceptance
 
-- [ ] 8.1 Integrate verify/generic orchestration with the optimized CI topology while preserving pinned tools, one-owner measurement series, immutable artifact validation, lightweight Required Quality Aggregate, and current native platform assurance.
-- [ ] 8.2 Prove no duplicate authoritative coverage/risk/CRAP collection is introduced for CI merely because verify now orchestrates generic quality.
+- [x] 8.1 Integrate verify/generic orchestration with the optimized CI topology while preserving pinned tools, one-owner measurement series, immutable artifact validation, lightweight Required Quality Aggregate, and current native platform assurance.
+- [x] 8.2 Prove no duplicate authoritative coverage/risk/CRAP collection is introduced for CI merely because verify now orchestrates generic quality.
 - [ ] 8.3 Capture hosted timing/runner-work impact for the new integration and reject/rework execution choices that add avoidable cost without assurance benefit; do not reintroduce previously reverted ineffective compiled-cache/build-once optimizations without new evidence.
 - [ ] 8.4 Run semantic parity/negative acceptance across Rust, Angular/reference, and mixed Angular+Rust project shapes; retain exact evidence and Required Quality Aggregate success.
+
+GH-186 local evidence (2026-09-09): the existing required Linux Test job now
+validates and uploads an identity-bound configured acceptance receipt. Twelve
+Rust, Angular/reference, mixed and unknown-ecosystem cases have exact direct Rust /
+verify project-report parity; forty identity/artifact/source negatives fail closed.
+Producer ledgers show one launch per case and zero reuse/fallback launches after
+removing the executable. Capability/profile/project metadata drives the same
+orchestration, validation, aggregate and report path with no ecosystem jobs or
+language dispatch. Pinned tools, production measurement ownership/seals, aggregate
+allowlist and existing native platform assurance are unchanged. Full local
+nextest (379 tests), Python (346 tests), fmt, Clippy and docs consistency pass;
+strict OpenSpec validation passes. See `docs/quality/gh-186/validation.md`, its
+retained receipt/log manifest and ADR-0048 for exact commands and limitations.
+Root config check / CI verify remain not applicable without project-local flow.toml.
+Tasks 8.3–8.4 are deliberately unchecked: this head's hosted runner-work comparison
+and Required Quality Aggregate are controller-owned and pending. Historical hosted
+cohorts are retained as comparison inputs, not presented as new-head acceptance.
 
 ## 9. Documentation, CLI positioning, and closure
 

@@ -17,6 +17,20 @@
       "sha256": "10264b7f3f132dc9d01c019b77e365f60dd15023fc4611f65d4dbdfd9bb184dd"
     },
     {
+      "module": "tools/quality/ci_acceptance.py",
+      "category": "A",
+      "purpose": "Validate retained configured CI acceptance receipt integrity without evaluating quality policy.",
+      "callers": [
+        ".github/workflows/ci.yml",
+        "tools/quality/tests/test_ci_acceptance.py"
+      ],
+      "ci_role": "Required Linux Test receipt validation and artifact retention.",
+      "release_impact": "Existing required Test job can block release eligibility; not packaged in release binary.",
+      "authoritative_status": "Test evidence integrity only; Rust retains generic policy authority.",
+      "final_disposition": "Retain maintained Python CI tooling.",
+      "sha256": "65a01b94e268accf563da2679fcd4a370c71082108a0a56ed91eb44b14f13f99"
+    },
+    {
       "module": "tools/quality/ci_artifact.py",
       "category": "A",
       "purpose": "Seal and fail-closed validate retained quality artifact identity and file hashes before cross-job consumption.",

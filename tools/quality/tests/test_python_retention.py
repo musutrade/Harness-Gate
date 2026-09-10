@@ -31,7 +31,7 @@ class PythonRetentionTests(unittest.TestCase):
         forbidden = {Path(r['module']).stem for r in rows if r['category'] == 'C'}
         # Required legacy complexity measurement validation is the explicit mixed-role exception.
         forbidden.remove('quality_evidence')
-        pending = ['ci_quality', 'coverage', 'critical_paths', 'critical_paths_collect',
+        pending = ['ci_quality', 'ci_acceptance', 'coverage', 'critical_paths', 'critical_paths_collect',
                    'production_coverage', 'risk', 'function_risk', 'contracts',
                    'docs_consistency']
         visited = set()
