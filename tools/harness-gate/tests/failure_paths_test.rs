@@ -7,6 +7,30 @@ use std::path::Path;
 use std::process::{Command, Output};
 use tempfile::TempDir;
 
+#[test]
+#[cfg(target_os = "linux")]
+fn arc_admin_required_commands_fail_through_generic_hooks() {
+    let output = TempDir::new().unwrap();
+    success(
+        Command::new("python3")
+            .arg(
+                Path::new(env!("CARGO_MANIFEST_DIR"))
+                    .join("../../docs/dogfood/arc-admin/negative/run.py"),
+            )
+            .args([
+                "--harness-gate",
+                env!("CARGO_BIN_EXE_harness-gate"),
+                "--output",
+            ])
+            .arg(output.path())
+            .output()
+            .unwrap(),
+    );
+    let cases: Value =
+        serde_json::from_slice(&fs::read(output.path().join("commands.json")).unwrap()).unwrap();
+    assert_eq!(cases["cases"].as_array().unwrap().len(), 6);
+}
+
 const FLOW: &str = r#"
 version = 2
 [project]
