@@ -148,3 +148,22 @@ integration effort SHALL remain explicitly unmeasured rather than reported as ze
 - **THEN** the report records zero re-entered steps and manual execution-config edits
 - **AND** one additional configuration duplicates all 25 step definitions
 - **AND** the report does not claim measured adoption time or completed runtime integration
+
+### Requirement: Arc-Admin quality configuration SHALL preserve accepted measurement and trust contracts
+
+Arc-Admin quality configuration SHALL bind the Angular frontend, Rust backend and frontend/backend API relationship using existing generic quality packs. It SHALL preserve accepted Rust coverage/risk/CRAP series, thresholds, lineage, debt, ratchet and fail-closed semantics, and require a trusted baseline provider. Angular/TypeScript CRAP SHALL remain explicitly unsupported unless separately certified. Project-owned E2E, API, smoke, generation and deployment commands SHALL remain execution hooks.
+
+#### Scenario: Configure quality beside the pinned execution import
+- **GIVEN** the imported Arc-Admin flow declares `full` and `hook`
+- **WHEN** the separate quality configuration is validated with that flow
+- **THEN** component bindings and the frontend-to-backend API relationship resolve
+- **AND** `full` includes required Rust coverage/CRAP and relationship policies while `hook` declares partial assurance
+- **AND** Angular CRAP is an unsupported diagnostic without a numeric substitute
+- **AND** the existing 25 execution steps remain unchanged and no `ci` profile is invented
+
+#### Scenario: Required Rust binding or baseline loses compatibility
+- **GIVEN** the accepted certified Rust series and required Git merge-base provider
+- **WHEN** the configured series changes incompatibly, a required policy is omitted or the required provider is removed
+- **THEN** configuration validation fails
+- **AND** runtime baseline evidence remains subject to the existing trusted provenance and lineage checks
+- **AND** reference pack metadata alone does not establish an Arc-Admin quality PASS

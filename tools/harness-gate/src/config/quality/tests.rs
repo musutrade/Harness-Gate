@@ -5,6 +5,61 @@ use std::fs;
 const QUALITY: &str = include_str!("../../../../quality/fixtures/workflow/quality.toml");
 const POLICY: &str = include_str!("../../../../quality/fixtures/workflow/policy.json");
 
+#[test]
+fn arc_admin_quality_validates_with_imported_flow_and_rejects_binding_loss() {
+    let root = TestWorkspace::new("arc-admin-quality");
+    let fixture =
+        std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../docs/dogfood/arc-admin");
+    root.child(".harness-gate");
+    for binding in ["backend", "frontend", "frontend-api"] {
+        let destination = format!(".harness-gate/packs/{binding}");
+        root.child(&destination);
+        for file in ["policy.json", "capabilities.json"] {
+            fs::copy(
+                fixture.join(format!("quality/packs/{binding}/{file}")),
+                root.join(format!("{destination}/{file}")),
+            )
+            .unwrap();
+        }
+    }
+    fs::copy(
+        fixture.join("quality/quality.toml"),
+        root.join(QUALITY_CONFIG_PATH),
+    )
+    .unwrap();
+    let flow: FlowConfig =
+        toml::from_str(&fs::read_to_string(fixture.join("import/flow.toml")).unwrap()).unwrap();
+    let quality = QualityConfig::load_optional(&root, &flow).unwrap().unwrap();
+    assert_eq!(quality.profiles.len(), 2);
+    assert_eq!(quality.profiles["hook"].assurance, Assurance::Partial);
+
+    for mutation in ["relationship", "series", "required-policy", "baseline"] {
+        let mut broken = quality.clone();
+        match mutation {
+            "relationship" => {
+                broken.relationships.get_mut("frontend-api").unwrap().to = Target::Component {
+                    id: "missing".into(),
+                }
+            }
+            "series" => {
+                broken.collectors.get_mut("backend").unwrap().produces[0].series =
+                    format!("measurement-series/v1:{}", "a".repeat(64))
+            }
+            "required-policy" => {
+                broken
+                    .profiles
+                    .get_mut("full")
+                    .unwrap()
+                    .policies
+                    .remove("backend.risk.crap");
+            }
+            "baseline" => broken.baseline.provider = BaselineProvider::None,
+            _ => unreachable!(),
+        }
+        assert!(broken.validate(&flow, &root).is_err(), "{mutation}");
+    }
+}
+
 fn fixture() -> (TestWorkspace, FlowConfig, QualityConfig) {
     let root = TestWorkspace::new("quality-config");
     root.child(".harness-gate");
