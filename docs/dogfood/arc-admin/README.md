@@ -123,3 +123,7 @@ All seven CI report artifacts in these two CI samples had expired by capture (14
 Structured result ingestion may reuse a machine format but does not acquire policy authority. Quality collectors supply normalized measurements; they do not turn browser/API/smoke exit statuses into CRAP or coverage, and Angular CRAP is not fabricated. Missing lossless import, service or result-format support would be a generic capability/UX gap to record, not permission to weaken one of these checks.
 
 Task 1.3 is enforced by `project_owned_runner_replacement_preserves_generic_command_gate` in Harness-Gate's failure-path integration tests: two previously unknown project executables use the same generic configuration path, both can pass, either can block, and logs/sealed Harness-Gate evidence remain valid. This test concerns the extension boundary only; it is not Arc-Admin shadow parity or completion of OpenSpec tasks 5/6. Documentation consistency also requires the three extension layers and the no-special-case principle in Engineering Policy. No production Generic Core branch or schema change is introduced.
+
+## Shadow observation (GH-204)
+
+[Full shadow comparison](shadow/README.md) records all 25 Arc-Admin blockers and two prelude checks passing, both Harness-Gate variants rejected before dispatch, and two classified product gaps. Runtime parity remains blocked and merge authority remains unchanged.

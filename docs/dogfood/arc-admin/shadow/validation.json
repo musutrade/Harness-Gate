@@ -1,0 +1,186 @@
+{
+  "issue": "GH-204",
+  "scope": [
+    "5.1",
+    "5.2",
+    "5.3",
+    "5.4"
+  ],
+  "status": "required local checks passed; observed runtime parity blocked; hosted CI pending",
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 0,
+      "result": "386 passed, 0 skipped",
+      "log": "validation-logs/nextest-final.log"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "exit_code": 0,
+      "result": "pass",
+      "log": "validation-logs/fmt-final.log"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 0,
+      "result": "pass",
+      "log": "validation-logs/clippy.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 0,
+      "result": "365 passed, including 8 shadow-evidence regressions",
+      "log": "validation-logs/python-tests-final.log"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 0,
+      "result": "pass",
+      "report": "validation-logs/docs-consistency-final.json"
+    },
+    {
+      "command": "openspec validate dogfood-harness-gate-on-arc-admin --strict",
+      "exit_code": 0,
+      "result": "change valid",
+      "log": "validation-logs/openspec.log"
+    },
+    {
+      "command": "python3 tools/quality/ci_acceptance.py --directory target/quality/gh-204/workflow-acceptance",
+      "exit_code": 0,
+      "result": "12 cases validated",
+      "log": "validation-logs/ci-acceptance.log"
+    },
+    {
+      "command": "python3 docs/dogfood/arc-admin/shadow/reproduce.py",
+      "exit_code": 0,
+      "result": "25 blockers and 2 prelude checks; zero unexplained discrepancies; exact matrix reproduction; runtime parity blocked"
+    },
+    {
+      "command": "python3 docs/dogfood/arc-admin/shadow/run.py --help",
+      "exit_code": 0,
+      "result": "CLI smoke only; equivalent live commands were executed manually for the retained observation. The new repeat runner was not separately rerun end to end."
+    }
+  ],
+  "not_applicable": [
+    {
+      "command": "harness-gate config check",
+      "reason": "No root .harness-gate/flow.toml with a declared ci profile."
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "reason": "No root .harness-gate/flow.toml with a declared ci profile."
+    }
+  ],
+  "hosted_required_quality_aggregate": "CI pending; controller owns evaluation; not claimed green",
+  "environment": {
+    "CARGO_TARGET_DIR": "${WORKSPACE}/target",
+    "TMPDIR": "${WORKSPACE}/target/quality/gh-204/tmp",
+    "GIT_CEILING_DIRECTORIES": "${WORKSPACE}/target/quality/gh-204/tmp",
+    "NEXTEST_TEST_THREADS": "2 (nextest only)",
+    "HARNESS_GATE_CI_ACCEPTANCE": "${WORKSPACE}/target/quality/gh-204/workflow-acceptance (nextest only)",
+    "note": "TMPDIR and Git ceiling apply to the final nextest, Python and docs checks. Formatting and Clippy only override CARGO_TARGET_DIR. Git ceiling prevents no-repository fixtures from discovering the enclosing workspace repository."
+  },
+  "retries": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 100,
+      "result": "385 passed, 1 failed: corpus CLI subprocess timed out after 30 seconds amid concurrent build/test activity",
+      "log": "validation-logs/nextest.log",
+      "resolution": "Final full suite passed with NEXTEST_TEST_THREADS=2."
+    },
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 100,
+      "result": "33 passed, 1 failed, 352 unrun: test_scope_without_git discovered the enclosing repository through the workspace-local TMPDIR",
+      "log": "validation-logs/nextest-retry.log",
+      "resolution": "Set GIT_CEILING_DIRECTORIES to TMPDIR. Targeted test and final full suite passed; no test or product logic weakened."
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 1,
+      "result": "364 tests run, 1 docs-consistency error before the eighth regression was added; child Cargo used a read-only external target",
+      "log": "validation-logs/python-tests.log",
+      "resolution": "Set CARGO_TARGET_DIR inside workspace; final 365-test suite passed."
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 1,
+      "result": "Cargo-backed preset, migration and schema checks failed using the default target",
+      "report": "validation-logs/docs-consistency-initial.json",
+      "resolution": "Workspace-local CARGO_TARGET_DIR; final report passes."
+    },
+    {
+      "command": "cargo run --quiet --locked --manifest-path tools/harness-gate/Cargo.toml -- --version",
+      "exit_code": 101,
+      "error": "failed to open: /home/gem/cargo-target/debug/.cargo-build-lock; Read-only file system (os error 30)",
+      "log": "validation-logs/cargo-default-target.log",
+      "impact": "Default-target Cargo subprocesses cannot run in this sandbox; workspace-local target resolves this without accessing another checkout."
+    }
+  ],
+  "artifact_hashes": {
+    "validation-logs/nextest.log": {
+      "sha256": "639dab1671601982dd8d813a3a9f845afdbca401217f3293b7a0b96d78c62c8b",
+      "raw_sha256": "5706487c431a75b627f0c712471b3fde112c443baa098644e8ca5d58b53060b0"
+    },
+    "validation-logs/nextest-retry.log": {
+      "sha256": "c1d632e50398a993fea16971b271a66fe0934189624e27c2bda228f0fb9ce14d",
+      "raw_sha256": "c1d632e50398a993fea16971b271a66fe0934189624e27c2bda228f0fb9ce14d"
+    },
+    "validation-logs/nextest-temp-isolation.log": {
+      "sha256": "f801936af4051166291899345e05d48d8a0fa484ea4508dddcf8b1113aaa369b",
+      "raw_sha256": "f801936af4051166291899345e05d48d8a0fa484ea4508dddcf8b1113aaa369b"
+    },
+    "validation-logs/nextest-final.log": {
+      "sha256": "ae3db5a07eecb33ac190c079321c93ddd9b2091a842ad7f66ef63234b2d52054",
+      "raw_sha256": "ae3db5a07eecb33ac190c079321c93ddd9b2091a842ad7f66ef63234b2d52054"
+    },
+    "validation-logs/fmt-final.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "validation-logs/clippy.log": {
+      "sha256": "024789c9d4d84373f79a178d85ca35d41fecabe2eec4c9a2215c4420b13a82f3",
+      "raw_sha256": "a24f7949bece3bb3b99ccea918363892d8ca35c61efb735a998a26fe3c168322"
+    },
+    "validation-logs/python-tests.log": {
+      "sha256": "7b436dd52d65a04a08b5f8d1e4b1cb1f5602d1630c309406bc373cade92adfe6",
+      "raw_sha256": "2a9ec550969d5c7c30f212e4037f7805070c984a7ea241d7ba1ae77b2d410dc4"
+    },
+    "validation-logs/python-tests-final.log": {
+      "sha256": "e980233d47ed8cfc294b308d54ae0cc3c0af7b9d04580d154555b1c27137b59f",
+      "raw_sha256": "fdf66d8b9fd5de110432c9befd09bade5cdd637bc0a018bffd89541042741e97"
+    },
+    "validation-logs/cargo-default-target.log": {
+      "sha256": "1518f5efe4e6f2ab73a01b43187054665d70adad18be3c687269a0d7028ada40",
+      "raw_sha256": "1518f5efe4e6f2ab73a01b43187054665d70adad18be3c687269a0d7028ada40"
+    },
+    "validation-logs/docs-consistency-initial.json": {
+      "sha256": "54a0fb268ad2598944468020740fe4381173e45408b33b31e59956bed8c22ac7",
+      "raw_sha256": "54a0fb268ad2598944468020740fe4381173e45408b33b31e59956bed8c22ac7"
+    },
+    "validation-logs/docs-final.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "validation-logs/openspec.log": {
+      "sha256": "86efd3d17a58c3f38812fedc1c24b83296301901d87f908d1098925d766b65da",
+      "raw_sha256": "86efd3d17a58c3f38812fedc1c24b83296301901d87f908d1098925d766b65da"
+    },
+    "validation-logs/ci-acceptance.log": {
+      "sha256": "e9b887f12bf4f07db8ad28b505f70d79c0f2062fa8a0e654f9958e3aba6b139d",
+      "raw_sha256": "e9b887f12bf4f07db8ad28b505f70d79c0f2062fa8a0e654f9958e3aba6b139d"
+    },
+    "validation-logs/workflow-acceptance/summary.json": {
+      "sha256": "8c8e60139d82c7344957da10c44a548073cf3602cd61d34c2ed039b37d215fe1",
+      "raw_sha256": "8c8e60139d82c7344957da10c44a548073cf3602cd61d34c2ed039b37d215fe1"
+    },
+    "validation-logs/workflow-acceptance/receipt.json": {
+      "sha256": "028fe5860359d74fd5084422773ae4aa4dafb826bed007efc85f6f281f11a2db",
+      "raw_sha256": "7b3cf32555e46bf11056d49a1a201dcdbd06661a2d848e8a2a7c61ae4c8c78ff"
+    },
+    "validation-logs/docs-consistency-final.json": {
+      "sha256": "151fbd783134e060773b22763f9ce7f53935eb26e89c40dd6670abc65a683ee2",
+      "raw_sha256": "151fbd783134e060773b22763f9ce7f53935eb26e89c40dd6670abc65a683ee2"
+    }
+  }
+}

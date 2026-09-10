@@ -167,3 +167,15 @@ Arc-Admin quality configuration SHALL bind the Angular frontend, Rust backend an
 - **THEN** configuration validation fails
 - **AND** runtime baseline evidence remains subject to the existing trusted provenance and lineage checks
 - **AND** reference pack metadata alone does not establish an Arc-Admin quality PASS
+
+### Requirement: Shadow observations SHALL distinguish runtime evidence from blocked comparisons
+
+Shadow comparison SHALL retain equivalent source identities, unchanged blocker configuration, exact commands and exits, every selected traditional gate including blockers outside the explicit required list, service/environment observation limits, diagnostics and hashed reports/artifacts. Each discrepancy SHALL have exactly one category: Arc-Admin issue, Harness-Gate capability gap, Harness-Gate UX gap, or expected stricter generic-quality difference. Validation PASS/FAIL/ERROR SHALL NOT imply workflow/lifecycle state or merge-authority transfer.
+
+#### Scenario: Complete production loading rejects the structurally imported flow
+- **GIVEN** both engines are invoked against the same pinned tracked source and all Arc-Admin blockers remain unchanged
+- **WHEN** Arc-Admin completes its full profile but Harness-Gate rejects shared-service ordering before scope or dispatch
+- **THEN** every traditional Harness-Gate gate is recorded as NOT_RUN and selection as NOT_COMPUTED with a classified explanation
+- **AND** PostgreSQL and environment runtime parity remain unestablished rather than inferred from preserved declarations
+- **AND** pre-existing Arc-Admin reports are never attributed to Harness-Gate
+- **AND** the complete classified observation does not claim successful parity or authorize lifecycle advancement
