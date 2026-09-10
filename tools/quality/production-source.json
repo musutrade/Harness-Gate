@@ -46,6 +46,7 @@
       "blocking": true,
       "files": [
         "src/config/diagnostic.rs",
+        "src/config/import.rs",
         "src/config/loader.rs",
         "src/config/migration.rs",
         "src/config/mod.rs",
@@ -109,6 +110,7 @@
         "src/preset/catalog.rs",
         "src/preset/composition.rs",
         "src/preset/filesystem.rs",
+        "src/preset/import.rs",
         "src/preset/initialize.rs",
         "src/preset/migration.rs",
         "src/preset/mod.rs"
@@ -340,7 +342,7 @@
     {
       "path": "src/config/mod.rs",
       "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
-      "sha256": "3c2683a75a13450f73c7f14dc0975fd220b343e6ab7dda873e0e4e59769a2ef7"
+      "sha256": "4876465b396edab32af061c509b5d0886e03d5826605fb585ad6f5213fc8739e"
     },
     {
       "path": "src/doctor/mod.rs",
@@ -355,7 +357,7 @@
     {
       "path": "src/preset/mod.rs",
       "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
-      "sha256": "3cfa568dda542861132f4b739df8b1b4b5542e6a7eb31c7e20f631f74c410129"
+      "sha256": "37585d515ee91c75fb5f8978f558d2ae93706558f166684cf6c73abff88cb70c"
     },
     {
       "path": "src/process/mod.rs",
