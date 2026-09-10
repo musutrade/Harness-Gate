@@ -599,7 +599,9 @@ connection = 'fixture:{host_port}'
         fs::write(
             root.path().join("probe.sh"),
             if cancel {
-                "echo $$ > started\nexec sleep 30\n"
+                // Publish readiness only after the PID is fully written. Shell
+                // redirection creates an empty file before echo writes to it.
+                "echo $$ > started.tmp\nmv started.tmp started\nexec sleep 30\n"
             } else {
                 "echo completed\n"
             },
