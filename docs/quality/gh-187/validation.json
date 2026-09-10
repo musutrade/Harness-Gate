@@ -1,0 +1,391 @@
+{
+  "schema": "quality-implementation-validation/v1",
+  "issue": 187,
+  "baseline_sha": "fd0d040fad1f051c64adb18b9a644fbe3c3dd24a",
+  "scope": "Documentation, CLI help and reviewed help snapshot only; final pushed identity is in the controller handoff and PR.",
+  "recorded_at": "2026-09-10T00:44:30.152860+00:00",
+  "checks": [
+    {
+      "name": "nextest",
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "started_at": "2026-09-10T00:30:36.352464+00:00",
+      "duration_seconds": 178.191,
+      "exit_code": 0,
+      "log": "nextest.log",
+      "log_sha256": "4c5aca9674bb4dd3cc13f0918e8e648dd89e5e7331219a0a6c6f104e27896683",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target",
+        "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-187/final-workflow-acceptance"
+      }
+    },
+    {
+      "name": "fmt",
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "started_at": "2026-09-10T00:33:34.543774+00:00",
+      "duration_seconds": 0.636,
+      "exit_code": 0,
+      "log": "fmt.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target",
+        "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-187/final-workflow-acceptance"
+      }
+    },
+    {
+      "name": "clippy",
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "started_at": "2026-09-10T00:33:35.180585+00:00",
+      "duration_seconds": 24.921,
+      "exit_code": 0,
+      "log": "clippy.log",
+      "log_sha256": "2b188cc6c2b3a0d00cb435e44377c141fcaf4ac198fc4c6f16faff43beb4d048",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target",
+        "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-187/final-workflow-acceptance"
+      }
+    },
+    {
+      "name": "quality-python",
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "started_at": "2026-09-10T00:34:00.101901+00:00",
+      "duration_seconds": 172.047,
+      "exit_code": 1,
+      "log": "quality-python.log",
+      "log_sha256": "b7855325937f44be1cd526b43e92aa5d527949bb7d4b18d3a7cd6d83e98cd9a4",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target",
+        "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-187/final-workflow-acceptance"
+      }
+    },
+    {
+      "name": "release-python",
+      "command": "python3 -m unittest discover -s tools/release/tests -v",
+      "started_at": "2026-09-10T00:36:52.148920+00:00",
+      "duration_seconds": 0.483,
+      "exit_code": 0,
+      "log": "release-python.log",
+      "log_sha256": "969c0da3851c51ef08cc6ce0c633852fef829c961fbaa7963ae341328851237f",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target",
+        "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-187/final-workflow-acceptance"
+      }
+    },
+    {
+      "name": "py-compile",
+      "command": "python3 -m py_compile tools/quality/*.py tools/quality/tests/*.py",
+      "started_at": "2026-09-10T00:36:52.632340+00:00",
+      "duration_seconds": 0.275,
+      "exit_code": 0,
+      "log": "py-compile.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target",
+        "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-187/final-workflow-acceptance"
+      }
+    },
+    {
+      "name": "build",
+      "command": "cargo build --manifest-path tools/harness-gate/Cargo.toml --locked --release",
+      "started_at": "2026-09-10T00:36:52.907853+00:00",
+      "duration_seconds": 167.798,
+      "exit_code": 0,
+      "log": "build.log",
+      "log_sha256": "bfd27da044713e12d432c56667385c73f41ba5db998acf9eb79a37737fb91490",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target",
+        "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-187/final-workflow-acceptance"
+      }
+    },
+    {
+      "name": "contracts",
+      "command": "python3 tools/quality/contracts.py --output target/quality/gh-187/contracts.json --structured",
+      "started_at": "2026-09-10T00:39:40.706314+00:00",
+      "duration_seconds": 2.407,
+      "exit_code": 0,
+      "log": "contracts.log",
+      "log_sha256": "a41051563a4cb5fc1b1bcdd9aa0ba28ca80f7736d629d90cc138218756e8e3a9",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target",
+        "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-187/final-workflow-acceptance"
+      }
+    },
+    {
+      "name": "security-audit",
+      "command": "cargo audit --deny warnings --file tools/harness-gate/Cargo.lock",
+      "started_at": "2026-09-10T00:39:43.113288+00:00",
+      "duration_seconds": 0.077,
+      "exit_code": 1,
+      "log": "security-audit.log",
+      "log_sha256": "6577f6686512d252298f7d8e7a068c4cbca7a56204c433e54f527ff280542ea0",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target",
+        "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-187/final-workflow-acceptance"
+      }
+    },
+    {
+      "name": "quality-python-final",
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "started_at": "2026-09-10T00:39:16.763999+00:00",
+      "duration_seconds": 164.746,
+      "exit_code": 0,
+      "log": "quality-python-final.log",
+      "log_sha256": "ab25a5c42dd8e3bab6234b582e75019f4892f280e8f80910a7032176b9d95718",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target",
+        "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-187/final-workflow-acceptance"
+      }
+    },
+    {
+      "name": "installer",
+      "command": "bash tools/release/tests/test_install.sh",
+      "started_at": "2026-09-10T00:42:01.510118+00:00",
+      "duration_seconds": 1.553,
+      "exit_code": 0,
+      "log": "installer.log",
+      "log_sha256": "9ded19064fc7914af9a3a0dc4586054cd709862cf0117677fbea335b5a653a7c",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target",
+        "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-187/final-workflow-acceptance"
+      }
+    },
+    {
+      "name": "contracts-linux",
+      "command": "python3 tools/quality/contracts.py --output target/quality/gh-187/contracts-linux.json",
+      "started_at": "2026-09-10T00:42:03.063249+00:00",
+      "duration_seconds": 3.021,
+      "exit_code": 1,
+      "log": "contracts-linux.log",
+      "log_sha256": "46f2efc8c33a9a5b243bfaa3ccd819f50585adaae61c6b061069f0613994c0b0",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target",
+        "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-187/final-workflow-acceptance"
+      }
+    },
+    {
+      "name": "security-audit-workspace",
+      "command": "cargo audit --deny warnings --file tools/harness-gate/Cargo.lock --db target/quality/gh-187/advisory-db",
+      "started_at": "2026-09-10T00:40:16.483872+00:00",
+      "duration_seconds": 13.47,
+      "exit_code": 0,
+      "log": "security-audit-workspace.log",
+      "log_sha256": "b9737345571adc6c74857a9d539ab10fe9d6cddf9831a5647c8ab5d882cd35eb",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target",
+        "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-187/final-workflow-acceptance"
+      }
+    },
+    {
+      "name": "security-audit-final",
+      "command": "CARGO_HOME=$PWD/target/quality/gh-187/cargo-audit-home cargo audit --deny warnings --file tools/harness-gate/Cargo.lock --db target/quality/gh-187/advisory-db",
+      "started_at": "2026-09-10T00:41:08.160998+00:00",
+      "duration_seconds": 4.395,
+      "exit_code": 0,
+      "log": "security-audit-final.log",
+      "log_sha256": "7d8477d2dc4b48203b4748eca3fb13fd488176b7155fe23c8d639c000ca04bef",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target",
+        "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-187/final-workflow-acceptance"
+      }
+    },
+    {
+      "name": "contracts-accept",
+      "command": "python3 tools/quality/contracts.py --output target/quality/gh-187/contracts-accepted.json --accept",
+      "started_at": "2026-09-10T00:42:34.268891+00:00",
+      "duration_seconds": 3.008,
+      "exit_code": 0,
+      "log": "contracts-accept.log",
+      "log_sha256": "fecede7c2157efe2f16c8c8b9dce94b0fb4dd384dca8207046c8bf7636eb0ffe",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target",
+        "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-187/final-workflow-acceptance"
+      }
+    },
+    {
+      "name": "contracts-linux-final",
+      "command": "python3 tools/quality/contracts.py --output target/quality/gh-187/contracts-linux-final.json",
+      "started_at": "2026-09-10T00:42:37.277134+00:00",
+      "duration_seconds": 3.031,
+      "exit_code": 0,
+      "log": "contracts-linux-final.log",
+      "log_sha256": "a41051563a4cb5fc1b1bcdd9aa0ba28ca80f7736d629d90cc138218756e8e3a9",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target",
+        "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-187/final-workflow-acceptance"
+      }
+    },
+    {
+      "name": "docs-consistency-final",
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "started_at": "2026-09-10T00:44:01.755351+00:00",
+      "duration_seconds": 3.238,
+      "exit_code": 0,
+      "log": "docs-consistency-final.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target",
+        "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-187/final-workflow-acceptance"
+      }
+    },
+    {
+      "name": "openspec-final",
+      "command": "openspec validate integrate-generic-quality-into-project-workflow --strict",
+      "started_at": "2026-09-10T00:44:04.994115+00:00",
+      "duration_seconds": 1.295,
+      "exit_code": 0,
+      "log": "openspec-final.log",
+      "log_sha256": "1f8411c2801823ee344d88a0ed72c289d86b5f067dfb2f53b6095dc9418654e0",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target",
+        "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-187/final-workflow-acceptance"
+      }
+    },
+    {
+      "name": "local-receipt-final",
+      "command": "python3 tools/quality/ci_acceptance.py --directory target/quality/gh-187/final-workflow-acceptance",
+      "started_at": "2026-09-10T00:44:06.289524+00:00",
+      "duration_seconds": 0.091,
+      "exit_code": 0,
+      "log": "local-receipt-final.log",
+      "log_sha256": "7c92ad6e8821e32a4e7e56d025e087a114b654b783bcbdf12332119aa326d50a",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target",
+        "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-187/final-workflow-acceptance"
+      }
+    },
+    {
+      "name": "hosted-receipt-final",
+      "command": "GITHUB_SHA=ffe3bc0e5f7dea4f864ceab653b26debb78d235d GITHUB_RUN_ID=34419625673 GITHUB_RUN_ATTEMPT=1 RUNNER_OS=Linux RUNNER_ARCH=X64 python3 tools/quality/ci_acceptance.py --directory target/quality/gh-187/hosted-prerequisite",
+      "started_at": "2026-09-10T00:44:06.381615+00:00",
+      "duration_seconds": 0.089,
+      "exit_code": 0,
+      "log": "hosted-receipt-final.log",
+      "log_sha256": "fc006ef55a4e396535e1fa95d6440a0038bdc2724b611ede350ea214f6b9a4c2",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target",
+        "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-187/final-workflow-acceptance"
+      }
+    },
+    {
+      "name": "diff-check-final",
+      "command": "git diff --check",
+      "started_at": "2026-09-10T00:44:06.471203+00:00",
+      "duration_seconds": 0.015,
+      "exit_code": 0,
+      "log": "diff-check-final.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "environment": {
+        "CARGO_TARGET_DIR": "$PWD/target",
+        "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-187/final-workflow-acceptance"
+      }
+    }
+  ],
+  "artifacts": {
+    "hosted-prerequisite-artifacts.json": {
+      "sha256": "9d1a63e800fb9de6bf0ad6fc87af72075c47283b361219ea9bec66a31ff1a567",
+      "size_bytes": 13363
+    },
+    "hosted-prerequisite-input.json": {
+      "sha256": "7f9848bb82917250bf0c7f9f2208d74e67634c1149b7635672be8fc152ca0f93",
+      "size_bytes": 74054
+    },
+    "hosted-prerequisite-receipt.json.gz": {
+      "sha256": "7726b74b6a734ea1e0cd4ebcaa16cd8599060d6b0d9573b48bfc98cd29e8e03c",
+      "size_bytes": 195022
+    },
+    "hosted-prerequisite-summary.json": {
+      "sha256": "21e5c53426e72dd4b901486267b48c924ceea5b7e7b3556fa0f16f025ed74b11",
+      "size_bytes": 2779
+    },
+    "hosted-prerequisite-timing.json": {
+      "sha256": "62e14c6356e014b31bb3614f9ab09a165f4d43268b507dac6834db12bf9d6314",
+      "size_bytes": 55968
+    },
+    "local-receipt.json.gz": {
+      "sha256": "a4dadc368dd920481da050250a87368efad3a1bec57bc2e3aeb50b98e0512ab4",
+      "size_bytes": 195486
+    },
+    "local-summary.json": {
+      "sha256": "ab69c6dd31f3aa65f0ba62fe2eed86ede8a94ab74079819e404a8a0b639c3925",
+      "size_bytes": 2720
+    },
+    "validation-logs.tar.gz": {
+      "sha256": "e9b88acd2f70a5ef4da054011b3963cf22173568d666c3ded670fd26add74cb9",
+      "size_bytes": 61248
+    }
+  },
+  "archive_members": {
+    "adapter-help.txt": "c36f1b449b258d38fc65eee9be9c8b5048dcb02feb0941589a8ac3934dfda5e5",
+    "build.log": "bfd27da044713e12d432c56667385c73f41ba5db998acf9eb79a37737fb91490",
+    "clippy.log": "2b188cc6c2b3a0d00cb435e44377c141fcaf4ac198fc4c6f16faff43beb4d048",
+    "confirm-acceptance.log": "181c945a4fd992dd2eba746312a3b778d618e359fa501d4035bc00f2c792254e",
+    "contracts-accept.log": "fecede7c2157efe2f16c8c8b9dce94b0fb4dd384dca8207046c8bf7636eb0ffe",
+    "contracts-linux-final.log": "a41051563a4cb5fc1b1bcdd9aa0ba28ca80f7736d629d90cc138218756e8e3a9",
+    "contracts-linux.log": "46f2efc8c33a9a5b243bfaa3ccd819f50585adaae61c6b061069f0613994c0b0",
+    "contracts.log": "a41051563a4cb5fc1b1bcdd9aa0ba28ca80f7736d629d90cc138218756e8e3a9",
+    "diff-check-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs-consistency-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs-consistency.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs-unit-recheck.log": "d7b5dda416e093bdfdef0263cbfd5a866d5d3c14fede5e837654ad213434bc46",
+    "download-prerequisite.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evaluate-help.txt": "006fc7f0cd2f64a8138b8448d59ea43b6bf079abebd61c3aab4d8baedc1ffdeb",
+    "fmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "hosted-quality.log": "6beafd0feb258bc134024d6d2348b8eacc423f23bc0f829846ea3f2570f1f8c6",
+    "hosted-receipt-final.log": "fc006ef55a4e396535e1fa95d6440a0038bdc2724b611ede350ea214f6b9a4c2",
+    "hosted-receipt-validation.log": "fc006ef55a4e396535e1fa95d6440a0038bdc2724b611ede350ea214f6b9a4c2",
+    "init-help.txt": "3e6dbc1287980b0bb66a6d0ea44b6493b68e085076fdc34b1749dfb251662ebb",
+    "installer.log": "9ded19064fc7914af9a3a0dc4586054cd709862cf0117677fbea335b5a653a7c",
+    "local-receipt-final.log": "7c92ad6e8821e32a4e7e56d025e087a114b654b783bcbdf12332119aa326d50a",
+    "local-receipt-validation.log": "7c92ad6e8821e32a4e7e56d025e087a114b654b783bcbdf12332119aa326d50a",
+    "nextest.log": "4c5aca9674bb4dd3cc13f0918e8e648dd89e5e7331219a0a6c6f104e27896683",
+    "openspec-final.log": "1f8411c2801823ee344d88a0ed72c289d86b5f067dfb2f53b6095dc9418654e0",
+    "openspec.log": "1f8411c2801823ee344d88a0ed72c289d86b5f067dfb2f53b6095dc9418654e0",
+    "py-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "quality-help.txt": "0424f81e434741d2419b20f05b6cfd3663cb9b39e0558a23d09a40277dd522a6",
+    "quality-python-final.log": "ab25a5c42dd8e3bab6234b582e75019f4892f280e8f80910a7032176b9d95718",
+    "quality-python.log": "b7855325937f44be1cd526b43e92aa5d527949bb7d4b18d3a7cd6d83e98cd9a4",
+    "release-python.log": "969c0da3851c51ef08cc6ce0c633852fef829c961fbaa7963ae341328851237f",
+    "retain-evidence.py": "c3f688199a76296e2c0e3204fbc09a0645bd8ccba89ca25c816a0257ed563878",
+    "root-help.txt": "19c5d75fcdc597db9b0eb55fd03908ab7d2332569adfb2ad0491e325a3e17b4b",
+    "run-additional.py": "133111040048d815b0c3f22e602654be0b6bb15b655316c7487ae754ae7f8e2d",
+    "run-audit-final.py": "dc3c684c2327221980f19d9f22f03da86666f77a208ee4d796f2fcf7cc2b16fe",
+    "run-audit.py": "4a6e20cceebb693435525181a982f396118bf466aede93dd20916445840d4ea6",
+    "run-checks.py": "992c7039131a1e8a8bfec1f09654d94f926177c34421cd511d7d77dc2518db6d",
+    "run-contract-final.py": "6886a4d7db8ed4ab9110ee691ac4e795a0343511f8d7a2c76efd2a9fec1f3005",
+    "run-final.py": "3f275b83703c185501cbcc79ceee14cd7515db7c7c426f2993a895ffd7f69445",
+    "security-audit-final.log": "7d8477d2dc4b48203b4748eca3fb13fd488176b7155fe23c8d639c000ca04bef",
+    "security-audit-workspace.log": "b9737345571adc6c74857a9d539ab10fe9d6cddf9831a5647c8ab5d882cd35eb",
+    "security-audit.log": "6577f6686512d252298f7d8e7a068c4cbca7a56204c433e54f527ff280542ea0",
+    "verify-help.txt": "ce85fc790d42a0ba1222f07687e255b6e3dcc0e004c30a4c61980c84f0ebd0cb",
+    "docs-consistency.json": "6b6255f277561aefa4b0b2c23ffcacd4cd32586b1226930344f6f6ffbe5a9635",
+    "contracts-linux-final.json": "d0139c8ca1744caa8fb6b9065d0b3efc16f03b8badae43f40e56d11aa83652e0",
+    "contracts.json": "9752992c18270bc34349b350427d0aaabe79740f89b8c7169780c3b410527daa"
+  },
+  "notes": [
+    "Initial Python suite: 346 tests, one documentation consistency error while closure links were being edited. Focused five-test recheck and final full 346-test suite passed after link correction.",
+    "Linux textual snapshot initially differed only in the intended root help stdout. Reviewed update accepted; fresh normal contract comparison passed. Structured contracts passed.",
+    "Initial cargo audit failed to lock read-only /home/gem/.cargo/advisory-db..lock. Relocating only the advisory DB returned zero with a crates.io index lock warning. Final audit relocates both DB and CARGO_HOME and passes without that warning. No advisory policy was relaxed.",
+    "Cargo target is inside the current workspace. Root project-local flow.toml is absent; config check and verify --profile ci --all are not applicable. Temporary configured fixtures are tested.",
+    "Current-head hosted native jobs, production quality collection and Required Quality Aggregate are pending; prerequisite run 34419625673 attempt 1 is historical success only.",
+    "Retained receipts include synthetic public fixture trust material, not application credentials. Receipt identity is empty for local execution and pinned to the tested merge for hosted execution.",
+    "Read-only current workspace Git index blocked normal staging. Delivery uses a metadata copy beneath this same workspace target directory and preserves the prepared branch/base; no other workspace is accessed."
+  ],
+  "not_applicable": [
+    {
+      "command": "harness-gate config check",
+      "reason": "No project-local .harness-gate/flow.toml."
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "reason": "No project-local .harness-gate/flow.toml or declared ci profile."
+    }
+  ],
+  "hosted_prerequisite": {
+    "run_id": 34419625673,
+    "attempt": 1,
+    "pr_number": 196,
+    "head_sha": "024f775904eb6bd50639092d3779d9e2f8dad035",
+    "tested_merge_sha": "ffe3bc0e5f7dea4f864ceab653b26debb78d235d",
+    "required_aggregate": "success",
+    "receipt_validator": "Exact hosted environment and content hashes checked by ci_acceptance.py; see command log."
+  }
+}

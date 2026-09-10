@@ -44,7 +44,7 @@ there is no implicit ecosystem-specific filtering or request generation.
 
 A configured profile without trusted workflow inputs fails closed.
 [Profile assurance](quality-profiles.md) defines omissions and retained reuse;
-preset-generated inputs remain subsequent OpenSpec tasks. The explicit `step run` interface continues to run its selected
+[reference presets](quality-presets.md) generate configuration but require host-provisioned runtime inputs. The explicit `step <id>` interface continues to run its selected
 execution step without invoking project quality.
 
 ## Machine contract
