@@ -7,9 +7,9 @@ use std::path::PathBuf;
 #[command(
     name = "harness-gate",
     version,
-    about = "Configurable development workflow and architecture guard",
+    about = "Configuration-driven project verification: init -> verify -> one project decision",
     arg_required_else_help = true,
-    after_help = "Examples:\n  harness-gate presets\n  harness-gate init --preset rust-api\n  harness-gate doctor\n  harness-gate cleanup --dry-run\n  harness-gate verify --all"
+    after_help = "Project workflow:\n  harness-gate init --preset rust-api\n  harness-gate config check\n  harness-gate verify --profile ci --all\n\nReference presets generate flow + quality configuration. Provision trusted collector\nstate, signed requests and keys before verify; see generated QUALITY.md.\nEcosystem identity is configuration/pack data; collectors measure, Rust decides.\nAdvanced interfaces: quality evaluate and adapter run (explicit trusted inputs)."
 )]
 pub(crate) struct Cli {
     /// Control colored terminal output.
@@ -30,7 +30,7 @@ pub(crate) struct Cli {
 
 #[derive(Debug, Subcommand)]
 pub(crate) enum Commands {
-    /// Evaluate normalized evidence with the Rust generic core.
+    /// Advanced evidence evaluation and integration; use verify for project decisions.
     Quality {
         #[command(subcommand)]
         action: crate::app::quality::QualityAction,
@@ -40,7 +40,7 @@ pub(crate) enum Commands {
         #[command(subcommand)]
         action: CompatAction,
     },
-    /// Execute a signed out-of-process adapter request.
+    /// Advanced signed adapter protocol; use verify for project orchestration.
     Adapter {
         #[command(subcommand)]
         action: AdapterAction,
@@ -89,7 +89,7 @@ pub(crate) enum Commands {
         #[arg(long)]
         json: bool,
     },
-    /// Run gates and configured steps for the selected profile and components.
+    /// Run configured execution and quality gates for one blocking project decision.
     #[command(visible_alias = "check")]
     Verify {
         #[command(flatten)]
@@ -115,7 +115,7 @@ pub(crate) enum Commands {
         #[arg(short, long)]
         output: PathBuf,
     },
-    /// Validate or inspect the repository workflow configuration.
+    /// Validate or inspect flow and optional quality configuration.
     Config {
         #[command(subcommand)]
         action: ConfigAction,
@@ -130,7 +130,7 @@ pub(crate) enum Commands {
         /// Step id from flow.toml, for example api.clippy.
         id: String,
     },
-    /// Initialize .harness-gate configuration from an embedded preset.
+    /// Initialize flow and reference quality packs; provision trusted inputs before verify.
     Init {
         #[arg(long, default_value = "generic")]
         preset: String,
@@ -179,7 +179,7 @@ pub(crate) enum CompatAction {
 
 #[derive(Debug, Subcommand)]
 pub(crate) enum AdapterAction {
-    /// Validate and execute one JSON adapter request.
+    /// Advanced: execute one signed request; collectors measure without policy authority.
     Run {
         #[arg(short, long, value_name = "PATH")]
         request: PathBuf,

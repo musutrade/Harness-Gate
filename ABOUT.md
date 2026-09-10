@@ -1,5 +1,15 @@
 # About Harness-Gate
 
+Harness-Gate is configuration-driven: **`init -> verify -> one project decision`**.
+Execution and quality configuration select collectors and policy; collectors
+measure and the Rust core decides. Ecosystem/language/framework identity is pack
+data, with no new language branches in generic schema, compilation,
+orchestration, baselines, profiles, verification, reporting or CI. Extend through
+collector + capability/policy pack + certification. See the
+[workflow and architecture](docs/quality-workflow.md) for reference certification
+limits and future composable combinations such as Vue + Go + PostgreSQL.
+`quality evaluate` and `adapter run` are advanced interfaces.
+
 ## What is Harness-Gate?
 
 Harness-Gate is a **reusable development workflow and architecture guard CLI** built in Rust. It provides a complete quality gate and workflow management system that keeps your codebase clean, secure, and maintainable.

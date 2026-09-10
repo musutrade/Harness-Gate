@@ -123,7 +123,24 @@ cohorts are retained as comparison inputs, not presented as new-head acceptance.
 
 ## 9. Documentation, CLI positioning, and closure
 
-- [ ] 9.1 Update README/quick start/architecture/configuration/CLI help so `init -> verify -> one project decision` is the primary product story and `quality evaluate` / `adapter run` are clearly advanced interfaces.
-- [ ] 9.2 Document quality.toml schema, capability states, collector-vs-policy authority, baseline providers, profile behavior, CRAP support boundaries, artifact trust, migration, and troubleshooting.
+- [x] 9.1 Update README/quick start/architecture/configuration/CLI help so `init -> verify -> one project decision` is the primary product story and `quality evaluate` / `adapter run` are clearly advanced interfaces.
+- [x] 9.2 Document quality.toml schema, capability states, collector-vs-policy authority, baseline providers, profile behavior, CRAP support boundaries, artifact trust, migration, and troubleshooting.
 - [ ] 9.3 Strict-validate this OpenSpec and run all required repository quality checks; record final equivalence, fail-closed, hosted CI, performance/cost, and rollback evidence.
-- [ ] 9.4 Keep Java/Python/third-ecosystem adapters, compat deprecation, risk-driven conditional hosted platforms, and real application dogfood outside this change; create separate follow-ups only after acceptance.
+- [x] 9.4 Keep Java/Python/third-ecosystem adapters, compat deprecation, risk-driven conditional hosted platforms, and real application dogfood outside this change; create separate follow-ups only after acceptance.
+
+GH-187 documentation evidence (2026-09-10): README/quick start, architecture,
+configuration and CLI help now lead with `init -> verify -> one project decision`;
+advanced interfaces and all configuration/trust/certification/migration boundaries
+are documented in `docs/quality-workflow.md`. Closure explicitly treats ecosystem,
+language and framework identity as configuration/pack data across every generic
+layer. The retained unknown-ecosystem matrix and companion pack/baseline/profile
+tests demonstrate the collector + capability/policy pack + certification extension
+path, without language dispatch or generic-core redesign. Future Vue + Go +
+PostgreSQL composition is distinguished from current bounded reference presets.
+See `docs/quality/gh-187/validation.md` and its retained command/receipt manifest
+for actual validation, equivalence, fail-closed, hosted prerequisite, timing and
+rollback evidence. Task 9.3 remains unchecked until this submission's required
+hosted checks and Required Quality Aggregate succeed under the controller; prior
+hosted evidence does not establish current-head acceptance. Section 8's historical
+pending annotations are unchanged by this task-9-only submission. No deferred
+adapters, deprecation, platform policy, dogfood or follow-up issues are added.
