@@ -7,7 +7,7 @@ closures and async bodies. Expression-shaped macros are not generic expressions.
 
 ## What Changes
 Execute N0–N6: reproduce pinned Arc-Admin sources; add explicit macro grammars and
-compiler evidence; certify bounded production mapping with independent series,
+compiler evidence; certify complete declared production mapping with independent series,
 raw-count coverage and exact CRAP; exercise positive and fail-closed negatives.
 
 ## Impact
@@ -42,7 +42,7 @@ be excluded by rustc coverage instrumentation. Pin the compiler and reject gaps.
 Medium: raw artifacts are large; retain compressed evidence and hash indices.
 Medium: macro aliases and dependency expansion require compiler identity, not
 spelling alone. Keep syntax inventory explicitly uncertified.
-The prototype invokes local LLVM only when auditing retained binaries; it does
+The production verifier invokes local LLVM only when auditing retained binaries; it does
 not execute archived programs. Its manifest anchor must come from trusted capture.
 
 References: [ADR-0040](../../../docs/adr/0040-language-agnostic-evidence-policy.md),
