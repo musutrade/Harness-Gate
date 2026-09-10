@@ -66,29 +66,44 @@ Quality is continuous, but not every measurement belongs in every latency tier.
 - Expensive cross-platform or ecosystem-certification work should be risk-driven by affected capabilities/paths when that can be done without weakening required assurance.
 - CI performance regressions are engineering regressions. New required work must state its expected profile/critical-path cost and avoid unnecessary recollection of equivalent evidence.
 
-## 7. OpenSpec and change governance
+## 7. Project-owned validation and extension boundaries
+
+Application- and repository-specific validation logic belongs to the project being verified. Harness-Gate orchestrates, ingests and decides at generic boundaries; it does not become the implementation home for every API, E2E, integration, smoke, migration, load, generation or framework-specific test system.
+
+Harness-Gate extensions are divided into three layers:
+
+- **Command hooks / execution gates** run project-owned validation commands. Harness-Gate owns generic orchestration semantics such as scope/profile selection, dependencies, services, environment handling, timeout, retry, requiredness, logs/artifacts and blocking composition. The project owns the test code, fixtures, domain assertions and tool invocation semantics.
+- **Structured result adapters** may ingest reusable machine formats such as JUnit, SARIF or versioned JSON contracts to improve diagnostics and reporting. Parsing a tool result does not transfer requiredness, threshold, ratchet or release authority to that tool or parser.
+- **Quality collector plugins** measure normalized facts intended for generic policy evaluation. Collectors remain measurement-only; the released Rust core retains requiredness, thresholds, baseline/ratchet/debt, cross-component aggregation and final generic quality decisions.
+
+A new application validation tool or framework must not require a Harness-Gate Generic Core code change merely to participate if its validation can be expressed through the generic command-hook contract. Native product support is justified only for a reusable protocol, structured-result format, service/execution primitive, ecosystem/capability pack, certification boundary or generic policy semantic—not merely because a particular test runner or framework is popular.
+
+When migrating an existing project with mature validation, current required assurance is the migration baseline until replacement parity and fail-closed behavior are evidenced. A migration must not obtain success by silently dropping, weakening or reclassifying valid project-owned gates. Unsupported migration semantics are product/capability gaps to surface and resolve, not reasons to weaken the project.
+
+## 8. OpenSpec and change governance
 
 Every OpenSpec, issue, PR, and agent task inherits this document.
 
-Changes touching quality, coverage, complexity, CRAP, collectors, evidence, policy, baseline, ratchet/debt, exceptions, CI profiles, presets, project aggregation, or release authority must explicitly state one of:
+Changes touching quality, coverage, complexity, CRAP, collectors, evidence, policy, baseline, ratchet/debt, exceptions, CI profiles, presets, project aggregation, release authority, project-validation ownership, structured-result ingestion, or extension boundaries must explicitly state one of:
 
 - the relevant engineering-policy semantics are unchanged; or
 - the change proposes a normative policy delta and identifies the exact rule being changed.
 
 A policy delta requires rationale, migration/compatibility impact, negative/fail-closed tests, and evidence demonstrating that the change is intentional rather than a workaround for a failing gate.
 
-## 8. Documentation and machine enforcement
+## 9. Documentation and machine enforcement
 
 This policy is the normative human/agent contract. ADRs provide decision history; OpenSpec provides change-specific deltas; Harness-Gate configuration and Rust policy code provide executable enforcement.
 
 Documentation and machine enforcement must not knowingly drift. Where a normative rule can be checked deterministically, repository consistency/contract tests should guard it. A documentation mismatch must not be resolved by weakening the machine gate without an approved policy delta.
 
-## 9. Source decisions
+## 10. Source decisions
 
 This policy consolidates durable rules already established by accepted repository decisions, especially:
 
 - ADR-0039, required coverage/risk/traceability gates;
 - ADR-0040, language-agnostic evidence/policy and fail-closed authority boundary;
+- ADR-0049, project-owned validation and generic extension boundaries;
 - the accepted Rust generic-core authority transfer and Python retention policy.
 
-Those records remain the detailed source for measurement identities, historical acceptance evidence, and migration chronology.
+Those records remain the detailed source for measurement identities, historical acceptance evidence, migration chronology, and extension-boundary rationale.
