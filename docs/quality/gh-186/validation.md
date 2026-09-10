@@ -1,5 +1,9 @@
 # GH-186: Configured CI integration evidence
 
+Historical submission record. GH-198's [final hosted reconciliation](../gh-187/hosted-closure.md)
+supersedes the pending-at-submission status below with run 34419625673, attempt 1,
+and successful Required Quality Aggregate job 102695650692.
+
 Scope: OpenSpec `integrate-generic-quality-into-project-workflow`, tasks 8.1–8.4.
 See [ADR-0048](../../adr/0048-configured-ci-workflow-acceptance.md). Tasks 8.1–8.2
 have local implementation evidence; hosted-dependent tasks 8.3–8.4 remain pending.

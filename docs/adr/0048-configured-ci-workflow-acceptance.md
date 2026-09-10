@@ -1,6 +1,9 @@
 # ADR-0048: Configured CI workflow acceptance
 
-**Status:** Proposed for GH-186; hosted timing and Required Quality Aggregate pending.
+**Status:** Accepted through GH-198 hosted reconciliation: GH-186 run 34419625673,
+attempt 1, Required Quality Aggregate job 102695650692 succeeded. The original
+submission's timing/aggregate prerequisites are resolved by the
+[final retained evidence](../quality/gh-187/hosted-closure.md).
 
 **Date:** 2026-09-09
 

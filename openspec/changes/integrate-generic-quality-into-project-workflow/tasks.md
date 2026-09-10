@@ -101,8 +101,8 @@ and sections 8–9 remain pending, not accepted by these local checks.
 
 - [x] 8.1 Integrate verify/generic orchestration with the optimized CI topology while preserving pinned tools, one-owner measurement series, immutable artifact validation, lightweight Required Quality Aggregate, and current native platform assurance.
 - [x] 8.2 Prove no duplicate authoritative coverage/risk/CRAP collection is introduced for CI merely because verify now orchestrates generic quality.
-- [ ] 8.3 Capture hosted timing/runner-work impact for the new integration and reject/rework execution choices that add avoidable cost without assurance benefit; do not reintroduce previously reverted ineffective compiled-cache/build-once optimizations without new evidence.
-- [ ] 8.4 Run semantic parity/negative acceptance across Rust, Angular/reference, and mixed Angular+Rust project shapes; retain exact evidence and Required Quality Aggregate success.
+- [x] 8.3 Capture hosted timing/runner-work impact for the new integration and reject/rework execution choices that add avoidable cost without assurance benefit; do not reintroduce previously reverted ineffective compiled-cache/build-once optimizations without new evidence. GH-186 run `34419625673`, attempt 1, head `024f775904eb6bd50639092d3779d9e2f8dad035`: [reproduced timing](../../../docs/quality/gh-187/hosted-prerequisite-timing.json) and [cost/assurance acceptance](../../../docs/quality/gh-187/hosted-closure.md).
+- [x] 8.4 Run semantic parity/negative acceptance across Rust, Angular/reference, and mixed Angular+Rust project shapes; retain exact evidence and Required Quality Aggregate success. GH-186 run `34419625673`, attempt 1: [Required Quality Aggregate job `102695650692`](https://github.com/musutrade/Harness-Gate/actions/runs/34419625673/job/102695650692) and every required child succeeded; the [validated hosted receipt](../../../docs/quality/gh-187/hosted-prerequisite-summary.json) retains the same 12 cases and 40 negatives, including the unknown ecosystem.
 
 GH-186 local evidence (2026-09-09): the existing required Linux Test job now
 validates and uploads an identity-bound configured acceptance receipt. Twelve
@@ -117,15 +117,15 @@ nextest (379 tests), Python (346 tests), fmt, Clippy and docs consistency pass;
 strict OpenSpec validation passes. See `docs/quality/gh-186/validation.md`, its
 retained receipt/log manifest and ADR-0048 for exact commands and limitations.
 Root config check / CI verify remain not applicable without project-local flow.toml.
-Tasks 8.3–8.4 are deliberately unchecked: this head's hosted runner-work comparison
-and Required Quality Aggregate are controller-owned and pending. Historical hosted
-cohorts are retained as comparison inputs, not presented as new-head acceptance.
+At GH-186 submission, tasks 8.3–8.4 awaited the controller-owned hosted comparison
+and Required Quality Aggregate. GH-198 now retains their final acceptance above;
+historical CI-topology cohorts remain comparison inputs, not new-head acceptance.
 
 ## 9. Documentation, CLI positioning, and closure
 
 - [x] 9.1 Update README/quick start/architecture/configuration/CLI help so `init -> verify -> one project decision` is the primary product story and `quality evaluate` / `adapter run` are clearly advanced interfaces.
 - [x] 9.2 Document quality.toml schema, capability states, collector-vs-policy authority, baseline providers, profile behavior, CRAP support boundaries, artifact trust, migration, and troubleshooting.
-- [ ] 9.3 Strict-validate this OpenSpec and run all required repository quality checks; record final equivalence, fail-closed, hosted CI, performance/cost, and rollback evidence.
+- [x] 9.3 Strict-validate this OpenSpec and run all required repository quality checks; record final equivalence, fail-closed, hosted CI, performance/cost, and rollback evidence. GH-187 run `34422630969`, attempt 1, head `0d2dfc23481cde02c3adc3f6659d00ca001ce3d8`: [Required Quality Aggregate job `102704478218`](https://github.com/musutrade/Harness-Gate/actions/runs/34422630969/job/102704478218) and all required children, including native macOS/Windows, succeeded. [Final reconciliation](../../../docs/quality/gh-187/hosted-closure.md) and [GH-198 local validation](../../../docs/quality/gh-198/validation.json) retain exact evidence.
 - [x] 9.4 Keep Java/Python/third-ecosystem adapters, compat deprecation, risk-driven conditional hosted platforms, and real application dogfood outside this change; create separate follow-ups only after acceptance.
 
 GH-187 documentation evidence (2026-09-10): README/quick start, architecture,
@@ -139,8 +139,19 @@ path, without language dispatch or generic-core redesign. Future Vue + Go +
 PostgreSQL composition is distinguished from current bounded reference presets.
 See `docs/quality/gh-187/validation.md` and its retained command/receipt manifest
 for actual validation, equivalence, fail-closed, hosted prerequisite, timing and
-rollback evidence. Task 9.3 remains unchecked until this submission's required
-hosted checks and Required Quality Aggregate succeed under the controller; prior
-hosted evidence does not establish current-head acceptance. Section 8's historical
-pending annotations are unchanged by this task-9-only submission. No deferred
+rollback evidence. At GH-187 submission, task 9.3 awaited that head's required
+hosted checks and Required Quality Aggregate; prior hosted evidence alone did not
+establish current-head acceptance. GH-198's final reconciliation retains that
+current-head acceptance. No deferred
 adapters, deprecation, platform policy, dogfood or follow-up issues are added.
+
+GH-198 final reconciliation (2026-09-10): retained both controller-confirmed
+hosted heads and reproduced normalized timing and the 12-case/40-negative
+acceptance receipts. Required local nextest (379 tests), Python (346 tests), fmt,
+Clippy, docs consistency, strict OpenSpec validation and diff checks pass.
+Root config check / CI verify remain not applicable without project-local
+flow.toml. The final record explicitly accepts measured cost against assurance,
+without a causal speedup claim, and preserves configuration/pack-driven extension,
+native requiredness and the unchanged fail-closed aggregate. All implementation
+tasks have acceptance evidence; formal closure follows green GH-198 CI and the
+controller's merge. This issue changes only governance/evidence records.
