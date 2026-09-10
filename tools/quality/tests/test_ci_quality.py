@@ -12,6 +12,44 @@ import ci_quality as gate
 from quality_common import ROOT, sha256
 
 
+class SnapshotTests(unittest.TestCase):
+    def test_documentation_fixtures_follow_measured_commit(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+
+            def git(*args):
+                return subprocess.check_output(['git', *args], cwd=root, stderr=subprocess.PIPE,
+                                               text=True).strip()
+
+            git('init')
+            git('config', 'user.name', 'Snapshot Test')
+            git('config', 'user.email', 'snapshot@example.invalid')
+            paths = ('tools/harness-gate/tests/import_test.rs', 'tools/quality/fixture.json',
+                     'schema/fixture.json', 'docs/dogfood/arc-admin/sources/.arc-flow/flow.toml.txt',
+                     'docs/dogfood/arc-admin/import/flow.toml',
+                     'docs/dogfood/arc-admin/import/flow.import.json')
+            for path in paths:
+                target = root / path
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text('base fixture\n')
+            git('add', '.')
+            git('commit', '-m', 'base fixtures')
+            base = git('rev-parse', 'HEAD')
+            for path in paths:
+                (root / path).write_text('head fixture\n')
+            git('commit', '-am', 'head fixtures')
+            head = git('rev-parse', 'HEAD')
+            for path in paths:
+                (root / path).unlink()
+            with patch.object(gate, 'ROOT', root):
+                collector = gate.Collector(root / 'candidate', base, head, 'snapshot-test')
+                for label, commit in (('base', base), ('head', head)):
+                    snapshot = collector.snapshot(label, commit)
+                    for path in paths:
+                        with self.subTest(label=label, path=path):
+                            self.assertEqual((snapshot / path).read_text(), f'{label} fixture\n')
+
+
 class AggregateTests(unittest.TestCase):
     def test_every_required_result_fails_closed_on_both_events(self):
         for event in ('push', 'pull_request'):

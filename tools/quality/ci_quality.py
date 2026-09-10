@@ -105,6 +105,18 @@ class Collector:
         self.python('production', 'coverage.py', '--production', '--raw', self.directory / 'coverage.raw.json',
                     '--lcov', self.directory / 'coverage.lcov', '--output', self.directory / 'production.json')
 
+    def snapshot(self, label: str, commit: str) -> Path:
+        snapshot = self.directory / 'snapshots' / label
+        snapshot.mkdir(parents=True)
+        archive = self.directory / f'{label}-source.tar'
+        # Integration tests embed documentation fixtures. Archive them from the
+        # measured commit too, preserving their repository-relative paths.
+        self.command(f'{label}-archive', ['git', 'archive', '--format=tar', f'--output={archive}',
+                                          commit, 'tools/harness-gate', 'tools/quality', 'schema', 'docs'])
+        with tarfile.open(archive) as source:
+            source.extractall(snapshot, filter='data')
+        return snapshot
+
     def risk(self):
         base, head = self.report['base_sha'], self.report['commit']
         changed = subprocess.check_output(['git', 'diff', '--name-only', base, head, '--',
@@ -126,13 +138,7 @@ class Collector:
                                       str(ROOT / 'tools/quality/rust-measure/Cargo.toml')])
         binary = Path(self.environment['CARGO_TARGET_DIR']) / 'debug/harness-gate-rust-measure'
         for label, commit in (('base', base), ('head', head)):
-            snapshot = self.directory / 'snapshots' / label
-            snapshot.mkdir(parents=True)
-            archive = self.directory / f'{label}-source.tar'
-            self.command(f'{label}-archive', ['git', 'archive', '--format=tar', f'--output={archive}',
-                                              commit, 'tools/harness-gate', 'tools/quality', 'schema'])
-            with tarfile.open(archive) as source:
-                source.extractall(snapshot, filter='data')
+            snapshot = self.snapshot(label, commit)
             crate = snapshot / 'tools/harness-gate'
             manifest = self.directory / f'{label}-manifest.json'
             self.python(f'{label}-prepare', 'source_measure.py', 'prepare', '--crate', crate,
