@@ -86,5 +86,6 @@ and the workflow baseline request. Removing quality.toml explicitly restores
 flow-only behavior; retain policy and evidence for review and rollback.
 
 This change adds no hosted collection job or duplicate collection owner. Required Quality Aggregate and hosted integration acceptance remain controller/CI owned;
-OpenSpec section 8 is separate work. A green configuration check is not a quality
-PASS or a claim of hosted acceptance.
+The [workflow closure record](quality/gh-187/validation.md) separates retained
+prerequisite hosted success from submitted-head acceptance. A green configuration
+check is not a quality PASS or a claim of hosted acceptance.

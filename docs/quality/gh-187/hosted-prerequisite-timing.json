@@ -1,0 +1,1627 @@
+{
+  "schema_version": 1,
+  "normalization": "ci_timing.py v1; see baseline.md",
+  "critical_path_seconds": {
+    "median": 979.0,
+    "min": 979.0,
+    "max": 979.0
+  },
+  "runs": [
+    {
+      "run_id": 34419625673,
+      "attempt": 1,
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34419625673",
+      "event": "pull_request",
+      "workflow_blob_sha": "502f79d8b6e9a3af43927569ca99b888c324a63c",
+      "pr_head_sha": "024f775904eb6bd50639092d3779d9e2f8dad035",
+      "collection_identity": {
+        "BASE_SHA": "9fcc319d976aed1aad4311355cece60df798ff96",
+        "HEAD_SHA": "ffe3bc0e5f7dea4f864ceab653b26debb78d235d",
+        "RUN_ID": "34419625673-1",
+        "log_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34419625673/job/102692017106",
+        "log_sha256": "6beafd0feb258bc134024d6d2348b8eacc423f23bc0f829846ea3f2570f1f8c6",
+        "log_excerpt": [
+          "2026-09-10T00:04:12.0276849Z   BASE_SHA: 9fcc319d976aed1aad4311355cece60df798ff96",
+          "2026-09-10T00:04:12.0277203Z   HEAD_SHA: ffe3bc0e5f7dea4f864ceab653b26debb78d235d",
+          "2026-09-10T00:04:12.0277507Z   RUN_ID: 34419625673-1"
+        ]
+      },
+      "workflow_wall_seconds": 1009.0,
+      "api_lifecycle_seconds": 1011.0,
+      "critical_path_seconds": 979.0,
+      "last_required_child": "Quality Coverage and Critical Paths",
+      "aggregate_wait_seconds": 971.0,
+      "aggregate_dispatch_gap_seconds": 3.0,
+      "aggregate_wall_seconds": 8.0,
+      "runner_wall_minutes_by_os": {
+        "Linux": 29.6333,
+        "macOS": 2.3667,
+        "Windows": 7.5833
+      },
+      "category_seconds": {
+        "setup": 180.0,
+        "tool_install": 12.0,
+        "quality_collection": 934.0,
+        "execution": 1181.0,
+        "artifact": 14.0,
+        "cleanup": 12.0
+      },
+      "jobs": [
+        {
+          "id": 102692016821,
+          "name": "Test (windows-latest)",
+          "conclusion": "success",
+          "started_at": "2026-09-10T00:03:49Z",
+          "completed_at": "2026-09-10T00:11:24Z",
+          "os": "Windows",
+          "wall_seconds": 455.0,
+          "steps": [
+            {
+              "completed_at": "2026-09-10T00:03:51Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "started_at": "2026-09-10T00:03:50Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:03:58Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v5",
+              "number": 2,
+              "started_at": "2026-09-10T00:03:51Z",
+              "status": "completed",
+              "wall_seconds": 7.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:05Z",
+              "conclusion": "success",
+              "name": "Install Rust",
+              "number": 3,
+              "started_at": "2026-09-10T00:03:58Z",
+              "status": "completed",
+              "wall_seconds": 7.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:18Z",
+              "conclusion": "success",
+              "name": "Configure Cargo state",
+              "number": 4,
+              "started_at": "2026-09-10T00:04:05Z",
+              "status": "completed",
+              "wall_seconds": 13.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:23Z",
+              "conclusion": "success",
+              "name": "Install cargo-nextest",
+              "number": 5,
+              "started_at": "2026-09-10T00:04:18Z",
+              "status": "completed",
+              "wall_seconds": 5.0,
+              "category": "tool_install"
+            },
+            {
+              "completed_at": "2026-09-10T00:11:20Z",
+              "conclusion": "success",
+              "name": "Run tests",
+              "number": 6,
+              "started_at": "2026-09-10T00:04:23Z",
+              "status": "completed",
+              "wall_seconds": 417.0,
+              "category": "execution"
+            },
+            {
+              "completed_at": "2026-09-10T00:11:20Z",
+              "conclusion": "success",
+              "name": "Post Configure Cargo state",
+              "number": 11,
+              "started_at": "2026-09-10T00:11:20Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:11:23Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v5",
+              "number": 12,
+              "started_at": "2026-09-10T00:11:20Z",
+              "status": "completed",
+              "wall_seconds": 3.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:11:23Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 13,
+              "started_at": "2026-09-10T00:11:23Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            }
+          ],
+          "category_seconds": {
+            "setup": 28.0,
+            "tool_install": 5.0,
+            "execution": 417.0,
+            "cleanup": 3.0
+          },
+          "unattributed_seconds": 2.0
+        },
+        {
+          "id": 102692016912,
+          "name": "Format",
+          "conclusion": "success",
+          "started_at": "2026-09-10T00:03:48Z",
+          "completed_at": "2026-09-10T00:04:05Z",
+          "os": "Linux",
+          "wall_seconds": 17.0,
+          "steps": [
+            {
+              "completed_at": "2026-09-10T00:03:50Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "started_at": "2026-09-10T00:03:49Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:03:53Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v5",
+              "number": 2,
+              "started_at": "2026-09-10T00:03:50Z",
+              "status": "completed",
+              "wall_seconds": 3.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:03Z",
+              "conclusion": "success",
+              "name": "Install Rust",
+              "number": 3,
+              "started_at": "2026-09-10T00:03:53Z",
+              "status": "completed",
+              "wall_seconds": 10.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:03Z",
+              "conclusion": "success",
+              "name": "Check formatting",
+              "number": 4,
+              "started_at": "2026-09-10T00:04:03Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "execution"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:03Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v5",
+              "number": 8,
+              "started_at": "2026-09-10T00:04:03Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:03Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 9,
+              "started_at": "2026-09-10T00:04:03Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            }
+          ],
+          "category_seconds": {
+            "setup": 14.0,
+            "execution": 0.0,
+            "cleanup": 0.0
+          },
+          "unattributed_seconds": 3.0
+        },
+        {
+          "id": 102692016928,
+          "name": "Build",
+          "conclusion": "success",
+          "started_at": "2026-09-10T00:03:49Z",
+          "completed_at": "2026-09-10T00:06:44Z",
+          "os": "Linux",
+          "wall_seconds": 175.0,
+          "steps": [
+            {
+              "completed_at": "2026-09-10T00:03:52Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "started_at": "2026-09-10T00:03:51Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:03:54Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v5",
+              "number": 2,
+              "started_at": "2026-09-10T00:03:52Z",
+              "status": "completed",
+              "wall_seconds": 2.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:03Z",
+              "conclusion": "success",
+              "name": "Install Rust",
+              "number": 3,
+              "started_at": "2026-09-10T00:03:54Z",
+              "status": "completed",
+              "wall_seconds": 9.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:07Z",
+              "conclusion": "success",
+              "name": "Configure Cargo state",
+              "number": 4,
+              "started_at": "2026-09-10T00:04:03Z",
+              "status": "completed",
+              "wall_seconds": 4.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:06:39Z",
+              "conclusion": "success",
+              "name": "Build",
+              "number": 5,
+              "started_at": "2026-09-10T00:04:07Z",
+              "status": "completed",
+              "wall_seconds": 152.0,
+              "category": "execution"
+            },
+            {
+              "completed_at": "2026-09-10T00:06:41Z",
+              "conclusion": "success",
+              "name": "Upload artifact",
+              "number": 6,
+              "started_at": "2026-09-10T00:06:39Z",
+              "status": "completed",
+              "wall_seconds": 2.0,
+              "category": "artifact"
+            },
+            {
+              "completed_at": "2026-09-10T00:06:41Z",
+              "conclusion": "success",
+              "name": "Post Configure Cargo state",
+              "number": 11,
+              "started_at": "2026-09-10T00:06:41Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:06:42Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v5",
+              "number": 12,
+              "started_at": "2026-09-10T00:06:41Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:06:42Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 13,
+              "started_at": "2026-09-10T00:06:42Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            }
+          ],
+          "category_seconds": {
+            "setup": 16.0,
+            "execution": 152.0,
+            "artifact": 2.0,
+            "cleanup": 1.0
+          },
+          "unattributed_seconds": 4.0
+        },
+        {
+          "id": 102692016976,
+          "name": "Quality CLI Contracts",
+          "conclusion": "success",
+          "started_at": "2026-09-10T00:03:48Z",
+          "completed_at": "2026-09-10T00:04:51Z",
+          "os": "Linux",
+          "wall_seconds": 63.0,
+          "steps": [
+            {
+              "completed_at": "2026-09-10T00:03:50Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "started_at": "2026-09-10T00:03:49Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:03:53Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v5",
+              "number": 2,
+              "started_at": "2026-09-10T00:03:50Z",
+              "status": "completed",
+              "wall_seconds": 3.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:03:53Z",
+              "conclusion": "success",
+              "name": "Install Rust",
+              "number": 3,
+              "started_at": "2026-09-10T00:03:53Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:03:59Z",
+              "conclusion": "success",
+              "name": "Configure Cargo state",
+              "number": 4,
+              "started_at": "2026-09-10T00:03:53Z",
+              "status": "completed",
+              "wall_seconds": 6.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:03:59Z",
+              "conclusion": "success",
+              "name": "Install Python",
+              "number": 5,
+              "started_at": "2026-09-10T00:03:59Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:47Z",
+              "conclusion": "success",
+              "name": "Run CLI contract snapshots",
+              "number": 6,
+              "started_at": "2026-09-10T00:03:59Z",
+              "status": "completed",
+              "wall_seconds": 48.0,
+              "category": "execution"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:48Z",
+              "conclusion": "success",
+              "name": "Upload contract evidence",
+              "number": 7,
+              "started_at": "2026-09-10T00:04:47Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "artifact"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:48Z",
+              "conclusion": "success",
+              "name": "Post Install Python",
+              "number": 12,
+              "started_at": "2026-09-10T00:04:48Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:49Z",
+              "conclusion": "success",
+              "name": "Post Configure Cargo state",
+              "number": 13,
+              "started_at": "2026-09-10T00:04:48Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:49Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v5",
+              "number": 14,
+              "started_at": "2026-09-10T00:04:49Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:49Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 15,
+              "started_at": "2026-09-10T00:04:49Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            }
+          ],
+          "category_seconds": {
+            "setup": 10.0,
+            "execution": 48.0,
+            "artifact": 1.0,
+            "cleanup": 1.0
+          },
+          "unattributed_seconds": 3.0
+        },
+        {
+          "id": 102692017035,
+          "name": "Security Audit",
+          "conclusion": "success",
+          "started_at": "2026-09-10T00:03:48Z",
+          "completed_at": "2026-09-10T00:04:09Z",
+          "os": "Linux",
+          "wall_seconds": 21.0,
+          "steps": [
+            {
+              "completed_at": "2026-09-10T00:03:50Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "started_at": "2026-09-10T00:03:49Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:03:52Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v5",
+              "number": 2,
+              "started_at": "2026-09-10T00:03:50Z",
+              "status": "completed",
+              "wall_seconds": 2.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:02Z",
+              "conclusion": "success",
+              "name": "Install Rust",
+              "number": 3,
+              "started_at": "2026-09-10T00:03:52Z",
+              "status": "completed",
+              "wall_seconds": 10.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:03Z",
+              "conclusion": "success",
+              "name": "Install cargo-audit",
+              "number": 4,
+              "started_at": "2026-09-10T00:04:02Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "tool_install"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:07Z",
+              "conclusion": "success",
+              "name": "Run security audit",
+              "number": 5,
+              "started_at": "2026-09-10T00:04:03Z",
+              "status": "completed",
+              "wall_seconds": 4.0,
+              "category": "execution"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:07Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v5",
+              "number": 10,
+              "started_at": "2026-09-10T00:04:07Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:07Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 11,
+              "started_at": "2026-09-10T00:04:07Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            }
+          ],
+          "category_seconds": {
+            "setup": 13.0,
+            "tool_install": 1.0,
+            "execution": 4.0,
+            "cleanup": 0.0
+          },
+          "unattributed_seconds": 3.0
+        },
+        {
+          "id": 102692017050,
+          "name": "Release Governance Contracts",
+          "conclusion": "success",
+          "started_at": "2026-09-10T00:03:48Z",
+          "completed_at": "2026-09-10T00:03:59Z",
+          "os": "Linux",
+          "wall_seconds": 11.0,
+          "steps": [
+            {
+              "completed_at": "2026-09-10T00:03:50Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "started_at": "2026-09-10T00:03:49Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:03:54Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v5",
+              "number": 2,
+              "started_at": "2026-09-10T00:03:50Z",
+              "status": "completed",
+              "wall_seconds": 4.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:03:54Z",
+              "conclusion": "success",
+              "name": "Install Python",
+              "number": 3,
+              "started_at": "2026-09-10T00:03:54Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:03:56Z",
+              "conclusion": "success",
+              "name": "Run release policy and inventory contracts",
+              "number": 4,
+              "started_at": "2026-09-10T00:03:54Z",
+              "status": "completed",
+              "wall_seconds": 2.0,
+              "category": "execution"
+            },
+            {
+              "completed_at": "2026-09-10T00:03:56Z",
+              "conclusion": "success",
+              "name": "Post Install Python",
+              "number": 7,
+              "started_at": "2026-09-10T00:03:56Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:03:57Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v5",
+              "number": 8,
+              "started_at": "2026-09-10T00:03:56Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:03:57Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 9,
+              "started_at": "2026-09-10T00:03:57Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            }
+          ],
+          "category_seconds": {
+            "setup": 5.0,
+            "execution": 2.0,
+            "cleanup": 1.0
+          },
+          "unattributed_seconds": 3.0
+        },
+        {
+          "id": 102692017055,
+          "name": "Documentation Consistency",
+          "conclusion": "success",
+          "started_at": "2026-09-10T00:03:48Z",
+          "completed_at": "2026-09-10T00:04:55Z",
+          "os": "Linux",
+          "wall_seconds": 67.0,
+          "steps": [
+            {
+              "completed_at": "2026-09-10T00:03:50Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "started_at": "2026-09-10T00:03:49Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:03:53Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v5",
+              "number": 2,
+              "started_at": "2026-09-10T00:03:50Z",
+              "status": "completed",
+              "wall_seconds": 3.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:02Z",
+              "conclusion": "success",
+              "name": "Install Rust",
+              "number": 3,
+              "started_at": "2026-09-10T00:03:53Z",
+              "status": "completed",
+              "wall_seconds": 9.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:05Z",
+              "conclusion": "success",
+              "name": "Configure Cargo state",
+              "number": 4,
+              "started_at": "2026-09-10T00:04:02Z",
+              "status": "completed",
+              "wall_seconds": 3.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:51Z",
+              "conclusion": "success",
+              "name": "Check documentation, examples, and schema",
+              "number": 5,
+              "started_at": "2026-09-10T00:04:05Z",
+              "status": "completed",
+              "wall_seconds": 46.0,
+              "category": "execution"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:52Z",
+              "conclusion": "success",
+              "name": "Upload documentation evidence",
+              "number": 6,
+              "started_at": "2026-09-10T00:04:51Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "artifact"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:53Z",
+              "conclusion": "success",
+              "name": "Post Configure Cargo state",
+              "number": 11,
+              "started_at": "2026-09-10T00:04:52Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:53Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v5",
+              "number": 12,
+              "started_at": "2026-09-10T00:04:53Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:53Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 13,
+              "started_at": "2026-09-10T00:04:53Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            }
+          ],
+          "category_seconds": {
+            "setup": 16.0,
+            "execution": 46.0,
+            "artifact": 1.0,
+            "cleanup": 1.0
+          },
+          "unattributed_seconds": 3.0
+        },
+        {
+          "id": 102692017075,
+          "name": "Quality Script Tests",
+          "conclusion": "success",
+          "started_at": "2026-09-10T00:03:48Z",
+          "completed_at": "2026-09-10T00:06:05Z",
+          "os": "Linux",
+          "wall_seconds": 137.0,
+          "steps": [
+            {
+              "completed_at": "2026-09-10T00:03:50Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "started_at": "2026-09-10T00:03:49Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:03:51Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v5",
+              "number": 2,
+              "started_at": "2026-09-10T00:03:50Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:03Z",
+              "conclusion": "success",
+              "name": "Install Rust coverage tools for measurement contract tests",
+              "number": 3,
+              "started_at": "2026-09-10T00:03:51Z",
+              "status": "completed",
+              "wall_seconds": 12.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:05Z",
+              "conclusion": "success",
+              "name": "Configure Cargo state",
+              "number": 4,
+              "started_at": "2026-09-10T00:04:03Z",
+              "status": "completed",
+              "wall_seconds": 2.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:05Z",
+              "conclusion": "success",
+              "name": "Install Python",
+              "number": 5,
+              "started_at": "2026-09-10T00:04:05Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:06:03Z",
+              "conclusion": "success",
+              "name": "Test and compile quality scripts",
+              "number": 6,
+              "started_at": "2026-09-10T00:04:05Z",
+              "status": "completed",
+              "wall_seconds": 118.0,
+              "category": "execution"
+            },
+            {
+              "completed_at": "2026-09-10T00:06:03Z",
+              "conclusion": "success",
+              "name": "Post Install Python",
+              "number": 10,
+              "started_at": "2026-09-10T00:06:03Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:06:03Z",
+              "conclusion": "success",
+              "name": "Post Configure Cargo state",
+              "number": 11,
+              "started_at": "2026-09-10T00:06:03Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:06:03Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v5",
+              "number": 12,
+              "started_at": "2026-09-10T00:06:03Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:06:03Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 13,
+              "started_at": "2026-09-10T00:06:03Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            }
+          ],
+          "category_seconds": {
+            "setup": 16.0,
+            "execution": 118.0,
+            "cleanup": 0.0
+          },
+          "unattributed_seconds": 3.0
+        },
+        {
+          "id": 102692017082,
+          "name": "Clippy",
+          "conclusion": "success",
+          "started_at": "2026-09-10T00:03:49Z",
+          "completed_at": "2026-09-10T00:04:49Z",
+          "os": "Linux",
+          "wall_seconds": 60.0,
+          "steps": [
+            {
+              "completed_at": "2026-09-10T00:03:51Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "started_at": "2026-09-10T00:03:50Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:03:54Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v5",
+              "number": 2,
+              "started_at": "2026-09-10T00:03:51Z",
+              "status": "completed",
+              "wall_seconds": 3.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:03:55Z",
+              "conclusion": "success",
+              "name": "Install Rust",
+              "number": 3,
+              "started_at": "2026-09-10T00:03:54Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:01Z",
+              "conclusion": "success",
+              "name": "Configure Cargo state",
+              "number": 4,
+              "started_at": "2026-09-10T00:03:55Z",
+              "status": "completed",
+              "wall_seconds": 6.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:46Z",
+              "conclusion": "success",
+              "name": "Run clippy",
+              "number": 5,
+              "started_at": "2026-09-10T00:04:01Z",
+              "status": "completed",
+              "wall_seconds": 45.0,
+              "category": "execution"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:46Z",
+              "conclusion": "success",
+              "name": "Post Configure Cargo state",
+              "number": 9,
+              "started_at": "2026-09-10T00:04:46Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:47Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v5",
+              "number": 10,
+              "started_at": "2026-09-10T00:04:46Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:47Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 11,
+              "started_at": "2026-09-10T00:04:47Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            }
+          ],
+          "category_seconds": {
+            "setup": 11.0,
+            "execution": 45.0,
+            "cleanup": 1.0
+          },
+          "unattributed_seconds": 3.0
+        },
+        {
+          "id": 102692017100,
+          "name": "Test",
+          "conclusion": "success",
+          "started_at": "2026-09-10T00:03:48Z",
+          "completed_at": "2026-09-10T00:07:23Z",
+          "os": "Linux",
+          "wall_seconds": 215.0,
+          "steps": [
+            {
+              "completed_at": "2026-09-10T00:03:50Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "started_at": "2026-09-10T00:03:49Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:03:53Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v5",
+              "number": 2,
+              "started_at": "2026-09-10T00:03:50Z",
+              "status": "completed",
+              "wall_seconds": 3.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:02Z",
+              "conclusion": "success",
+              "name": "Install Rust",
+              "number": 3,
+              "started_at": "2026-09-10T00:03:53Z",
+              "status": "completed",
+              "wall_seconds": 9.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:05Z",
+              "conclusion": "success",
+              "name": "Configure Cargo state",
+              "number": 4,
+              "started_at": "2026-09-10T00:04:02Z",
+              "status": "completed",
+              "wall_seconds": 3.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:07Z",
+              "conclusion": "success",
+              "name": "Install cargo-nextest",
+              "number": 5,
+              "started_at": "2026-09-10T00:04:05Z",
+              "status": "completed",
+              "wall_seconds": 2.0,
+              "category": "tool_install"
+            },
+            {
+              "completed_at": "2026-09-10T00:07:18Z",
+              "conclusion": "success",
+              "name": "Run tests",
+              "number": 6,
+              "started_at": "2026-09-10T00:04:07Z",
+              "status": "completed",
+              "wall_seconds": 191.0,
+              "category": "execution"
+            },
+            {
+              "completed_at": "2026-09-10T00:07:18Z",
+              "conclusion": "success",
+              "name": "Validate configured workflow acceptance",
+              "number": 7,
+              "started_at": "2026-09-10T00:07:18Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "execution"
+            },
+            {
+              "completed_at": "2026-09-10T00:07:20Z",
+              "conclusion": "success",
+              "name": "Upload configured workflow acceptance",
+              "number": 8,
+              "started_at": "2026-09-10T00:07:18Z",
+              "status": "completed",
+              "wall_seconds": 2.0,
+              "category": "artifact"
+            },
+            {
+              "completed_at": "2026-09-10T00:07:20Z",
+              "conclusion": "success",
+              "name": "Verify generated configuration schema",
+              "number": 9,
+              "started_at": "2026-09-10T00:07:20Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "execution"
+            },
+            {
+              "completed_at": "2026-09-10T00:07:20Z",
+              "conclusion": "success",
+              "name": "Post Configure Cargo state",
+              "number": 17,
+              "started_at": "2026-09-10T00:07:20Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:07:20Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v5",
+              "number": 18,
+              "started_at": "2026-09-10T00:07:20Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:07:20Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 19,
+              "started_at": "2026-09-10T00:07:20Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            }
+          ],
+          "category_seconds": {
+            "setup": 16.0,
+            "tool_install": 2.0,
+            "execution": 191.0,
+            "artifact": 2.0,
+            "cleanup": 0.0
+          },
+          "unattributed_seconds": 4.0
+        },
+        {
+          "id": 102692017106,
+          "name": "Quality Coverage and Critical Paths",
+          "conclusion": "success",
+          "started_at": "2026-09-10T00:03:49Z",
+          "completed_at": "2026-09-10T00:19:54Z",
+          "os": "Linux",
+          "wall_seconds": 965.0,
+          "steps": [
+            {
+              "completed_at": "2026-09-10T00:03:51Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "started_at": "2026-09-10T00:03:50Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:03:54Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v5",
+              "number": 2,
+              "started_at": "2026-09-10T00:03:51Z",
+              "status": "completed",
+              "wall_seconds": 3.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:06Z",
+              "conclusion": "success",
+              "name": "Install Rust",
+              "number": 3,
+              "started_at": "2026-09-10T00:03:54Z",
+              "status": "completed",
+              "wall_seconds": 12.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:10Z",
+              "conclusion": "success",
+              "name": "Configure Cargo state",
+              "number": 4,
+              "started_at": "2026-09-10T00:04:06Z",
+              "status": "completed",
+              "wall_seconds": 4.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:10Z",
+              "conclusion": "success",
+              "name": "Install Python",
+              "number": 5,
+              "started_at": "2026-09-10T00:04:10Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:11Z",
+              "conclusion": "success",
+              "name": "Install cargo-nextest",
+              "number": 6,
+              "started_at": "2026-09-10T00:04:10Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "tool_install"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:12Z",
+              "conclusion": "success",
+              "name": "Install cargo-llvm-cov",
+              "number": 7,
+              "started_at": "2026-09-10T00:04:11Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "tool_install"
+            },
+            {
+              "completed_at": "2026-09-10T00:19:46Z",
+              "conclusion": "success",
+              "name": "Collect and require fresh coverage, risk and matrix evidence",
+              "number": 8,
+              "started_at": "2026-09-10T00:04:12Z",
+              "status": "completed",
+              "wall_seconds": 934.0,
+              "category": "quality_collection"
+            },
+            {
+              "completed_at": "2026-09-10T00:19:47Z",
+              "conclusion": "success",
+              "name": "Seal immutable quality evidence",
+              "number": 9,
+              "started_at": "2026-09-10T00:19:46Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "artifact"
+            },
+            {
+              "completed_at": "2026-09-10T00:19:51Z",
+              "conclusion": "success",
+              "name": "Upload quality evidence",
+              "number": 10,
+              "started_at": "2026-09-10T00:19:47Z",
+              "status": "completed",
+              "wall_seconds": 4.0,
+              "category": "artifact"
+            },
+            {
+              "completed_at": "2026-09-10T00:19:51Z",
+              "conclusion": "success",
+              "name": "Post Install Python",
+              "number": 18,
+              "started_at": "2026-09-10T00:19:51Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:19:51Z",
+              "conclusion": "success",
+              "name": "Post Configure Cargo state",
+              "number": 19,
+              "started_at": "2026-09-10T00:19:51Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:19:52Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v5",
+              "number": 20,
+              "started_at": "2026-09-10T00:19:51Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:19:52Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 21,
+              "started_at": "2026-09-10T00:19:52Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            }
+          ],
+          "category_seconds": {
+            "setup": 20.0,
+            "tool_install": 2.0,
+            "quality_collection": 934.0,
+            "artifact": 5.0,
+            "cleanup": 1.0
+          },
+          "unattributed_seconds": 3.0
+        },
+        {
+          "id": 102692017261,
+          "name": "Test (macos-latest)",
+          "conclusion": "success",
+          "started_at": "2026-09-10T00:03:51Z",
+          "completed_at": "2026-09-10T00:06:13Z",
+          "os": "macOS",
+          "wall_seconds": 142.0,
+          "steps": [
+            {
+              "completed_at": "2026-09-10T00:03:53Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "started_at": "2026-09-10T00:03:52Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:03:56Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v5",
+              "number": 2,
+              "started_at": "2026-09-10T00:03:53Z",
+              "status": "completed",
+              "wall_seconds": 3.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:03:57Z",
+              "conclusion": "success",
+              "name": "Install Rust",
+              "number": 3,
+              "started_at": "2026-09-10T00:03:56Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:00Z",
+              "conclusion": "success",
+              "name": "Configure Cargo state",
+              "number": 4,
+              "started_at": "2026-09-10T00:03:57Z",
+              "status": "completed",
+              "wall_seconds": 3.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:04:02Z",
+              "conclusion": "success",
+              "name": "Install cargo-nextest",
+              "number": 5,
+              "started_at": "2026-09-10T00:04:00Z",
+              "status": "completed",
+              "wall_seconds": 2.0,
+              "category": "tool_install"
+            },
+            {
+              "completed_at": "2026-09-10T00:06:09Z",
+              "conclusion": "success",
+              "name": "Run tests",
+              "number": 6,
+              "started_at": "2026-09-10T00:04:02Z",
+              "status": "completed",
+              "wall_seconds": 127.0,
+              "category": "execution"
+            },
+            {
+              "completed_at": "2026-09-10T00:06:10Z",
+              "conclusion": "success",
+              "name": "Post Configure Cargo state",
+              "number": 11,
+              "started_at": "2026-09-10T00:06:09Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:06:10Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v5",
+              "number": 12,
+              "started_at": "2026-09-10T00:06:10Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:06:11Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 13,
+              "started_at": "2026-09-10T00:06:10Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "cleanup"
+            }
+          ],
+          "category_seconds": {
+            "setup": 8.0,
+            "tool_install": 2.0,
+            "execution": 127.0,
+            "cleanup": 2.0
+          },
+          "unattributed_seconds": 3.0
+        },
+        {
+          "id": 102692017641,
+          "name": "Build (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "started_at": "2026-09-10T00:03:47Z",
+          "completed_at": "2026-09-10T00:03:46Z",
+          "os": null,
+          "wall_seconds": 0,
+          "steps": [],
+          "category_seconds": {}
+        },
+        {
+          "id": 102692017749,
+          "name": "Quality Performance Baseline",
+          "conclusion": "skipped",
+          "started_at": "2026-09-10T00:03:47Z",
+          "completed_at": "2026-09-10T00:03:46Z",
+          "os": null,
+          "wall_seconds": 0,
+          "steps": [],
+          "category_seconds": {}
+        },
+        {
+          "id": 102692017795,
+          "name": "Quality CLI Contracts (${{ matrix.os }})",
+          "conclusion": "skipped",
+          "started_at": "2026-09-10T00:03:47Z",
+          "completed_at": "2026-09-10T00:03:46Z",
+          "os": null,
+          "wall_seconds": 0,
+          "steps": [],
+          "category_seconds": {}
+        },
+        {
+          "id": 102692017855,
+          "name": "Code Coverage",
+          "conclusion": "skipped",
+          "started_at": "2026-09-10T00:03:47Z",
+          "completed_at": "2026-09-10T00:03:46Z",
+          "os": null,
+          "wall_seconds": 0,
+          "steps": [],
+          "category_seconds": {}
+        },
+        {
+          "id": 102695650692,
+          "name": "Required Quality Aggregate",
+          "conclusion": "success",
+          "started_at": "2026-09-10T00:19:57Z",
+          "completed_at": "2026-09-10T00:20:05Z",
+          "os": "Linux",
+          "wall_seconds": 8.0,
+          "steps": [
+            {
+              "completed_at": "2026-09-10T00:19:58Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "started_at": "2026-09-10T00:19:57Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:20:01Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v5",
+              "number": 2,
+              "started_at": "2026-09-10T00:19:58Z",
+              "status": "completed",
+              "wall_seconds": 3.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:20:01Z",
+              "conclusion": "success",
+              "name": "Install Python",
+              "number": 3,
+              "started_at": "2026-09-10T00:20:01Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:20:02Z",
+              "conclusion": "success",
+              "name": "Require every quality gate",
+              "number": 4,
+              "started_at": "2026-09-10T00:20:01Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "execution"
+            },
+            {
+              "completed_at": "2026-09-10T00:20:02Z",
+              "conclusion": "success",
+              "name": "Post Install Python",
+              "number": 7,
+              "started_at": "2026-09-10T00:20:02Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:20:02Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v5",
+              "number": 8,
+              "started_at": "2026-09-10T00:20:02Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:20:02Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 9,
+              "started_at": "2026-09-10T00:20:02Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            }
+          ],
+          "category_seconds": {
+            "setup": 4.0,
+            "execution": 1.0,
+            "cleanup": 0.0
+          },
+          "unattributed_seconds": 3.0
+        },
+        {
+          "id": 102695650716,
+          "name": "Generic Quality Shadow",
+          "conclusion": "success",
+          "started_at": "2026-09-10T00:19:56Z",
+          "completed_at": "2026-09-10T00:20:35Z",
+          "os": "Linux",
+          "wall_seconds": 39.0,
+          "steps": [
+            {
+              "completed_at": "2026-09-10T00:19:58Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "started_at": "2026-09-10T00:19:57Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:20:00Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v5",
+              "number": 2,
+              "started_at": "2026-09-10T00:19:58Z",
+              "status": "completed",
+              "wall_seconds": 2.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:20:00Z",
+              "conclusion": "success",
+              "name": "Install Python",
+              "number": 3,
+              "started_at": "2026-09-10T00:20:00Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "setup"
+            },
+            {
+              "completed_at": "2026-09-10T00:20:01Z",
+              "conclusion": "success",
+              "name": "Download this run's retained Rust candidate",
+              "number": 4,
+              "started_at": "2026-09-10T00:20:00Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "artifact"
+            },
+            {
+              "completed_at": "2026-09-10T00:20:02Z",
+              "conclusion": "success",
+              "name": "Verify artifact identity and hashes before consumption",
+              "number": 5,
+              "started_at": "2026-09-10T00:20:01Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "artifact"
+            },
+            {
+              "completed_at": "2026-09-10T00:20:32Z",
+              "conclusion": "success",
+              "name": "Project and compare retained evidence",
+              "number": 6,
+              "started_at": "2026-09-10T00:20:02Z",
+              "status": "completed",
+              "wall_seconds": 30.0,
+              "category": "execution"
+            },
+            {
+              "completed_at": "2026-09-10T00:20:33Z",
+              "conclusion": "success",
+              "name": "Upload generic projection and compatibility evidence",
+              "number": 7,
+              "started_at": "2026-09-10T00:20:32Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "artifact"
+            },
+            {
+              "completed_at": "2026-09-10T00:20:33Z",
+              "conclusion": "success",
+              "name": "Post Install Python",
+              "number": 13,
+              "started_at": "2026-09-10T00:20:33Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:20:33Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v5",
+              "number": 14,
+              "started_at": "2026-09-10T00:20:33Z",
+              "status": "completed",
+              "wall_seconds": 0.0,
+              "category": "cleanup"
+            },
+            {
+              "completed_at": "2026-09-10T00:20:34Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 15,
+              "started_at": "2026-09-10T00:20:33Z",
+              "status": "completed",
+              "wall_seconds": 1.0,
+              "category": "cleanup"
+            }
+          ],
+          "category_seconds": {
+            "setup": 3.0,
+            "artifact": 3.0,
+            "execution": 30.0,
+            "cleanup": 1.0
+          },
+          "unattributed_seconds": 2.0
+        }
+      ]
+    }
+  ],
+  "input_sha256": "7f9848bb82917250bf0c7f9f2208d74e67634c1149b7635672be8fc152ca0f93"
+}

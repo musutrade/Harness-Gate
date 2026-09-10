@@ -7,7 +7,7 @@
 
 [English](https://github.com/musutrade/Harness-Gate/blob/main/README.md) | [简体中文](https://github.com/musutrade/Harness-Gate/blob/main/README.zh-CN.md)
 
-`Harness-Gate` 是可复用的 Rust 开发工作流与架构门禁 CLI。这是一个独立工具，提供完整的质量门禁和工作流管理能力。
+`Harness-Gate` 是用 Rust 实现的配置驱动项目验证 CLI。主流程是 **`init -> verify -> one project decision`**：声明执行与质量意图，让安全、架构、命令和证据质量门禁形成一个阻断式项目结论。
 
 它统一负责 changed paths、secret scan、architecture audit、环境体检、外部命令编排、测试结果计数、超时与中断处理，以及临时服务生命周期。Git hook 只保留启动器，流程判断不依赖 Shell 脚本。
 
@@ -21,7 +21,11 @@
 
 ## 工作模型
 
-`harness-gate` 把项目流程拆成四类数据：
+`init` 生成配置，`verify` 按 profile 和 scope 执行门禁与采集器，由 Rust 核心评估质量策略，再合并为一个项目结论。执行配置放在 `flow.toml`，质量意图放在 `quality.toml`。详见[质量工作流与架构](docs/quality-workflow.md)。
+
+生态、语言和框架名称是配置/pack 数据。新增语言名称不需要修改通用 schema、compiler、orchestrator、baseline、profile、verify、report 或 CI 层；扩展路径为 **collector + capability/policy pack + certification**。新的度量语义仍需单独评审，不能由名称或预设自动获得认证。
+
+执行流程使用四类数据：
 
 1. **scope rule**：把 Git 变更路径映射成 component；
 2. **profile**：从同一 component 中选择不同强度的步骤，例如 `hook`、`full`、`ci`；
@@ -38,7 +42,8 @@ Git 变更文件
   -> secret scan
   -> architecture audit
   -> 按配置顺序执行 steps
-  -> JSON / Markdown / 可选 HTML/JUnit 报告
+  -> 配置的质量采集 + 可信 baseline + Rust 策略评估
+  -> 一个项目决策 + JSON / Markdown / 可选 HTML/JUnit 报告
   -> 可选 HTTP(S) Webhook 通知
 ```
 
@@ -140,25 +145,29 @@ harness-gate --version
 harness-gate presets
 ```
 
-在目标项目中初始化：
+在已有 Git 项目中初始化（新目录先运行 `git init`）：
 
 ```bash
 harness-gate --project-root /path/to/new-project init --preset rust-api
 harness-gate --project-root /path/to/new-project config check
 harness-gate --project-root /path/to/new-project doctor
-harness-gate --project-root /path/to/new-project cleanup --dry-run
-harness-gate --project-root /path/to/new-project verify --all
+# 阅读生成的 QUALITY.md；由可信 host 配置 state、签名请求和密钥。
+harness-gate --project-root /path/to/new-project verify --profile ci --all
 ```
+
+参考预设生成 flow、quality 和策略配置，不安装采集器、不生成密钥或签名运行时输入。缺少这些输入时 `verify` 会 fail closed；完整接入步骤见[质量快速开始](docs/quality-workflow.md#quick-start)。`generic` 和旧 flow-only 仓库保持显式选择启用。
+
+当前 Rust/Angular 预设是有边界的参考实现，Angular CRAP 仍不支持。未来 Vue + Go + PostgreSQL 应组合可复用 pack；registry 安装和新的生态认证不在本次范围内。详见[认证边界](docs/quality-workflow.md#capabilities-and-certification)和[未知生态端到端验收证据](docs/quality/gh-187/validation.md)。`quality evaluate` / `adapter run` 是高级重放、调试和集成接口；普通项目使用 `verify`。
 
 推荐接入顺序：
 
 1. 选择最接近技术栈的预设；
-2. 修改 `.harness-gate/flow.toml` 中的路径、component、scope 和步骤；
+2. 审阅 `.harness-gate/flow.toml` 执行配置与 `.harness-gate/quality.toml` 的质量、策略和 profile；
 3. 在 `.harness-gate/audit.toml` 增加项目自己的架构规则；
 4. 在 `.harness-gate/secrets.toml` 增加业务或供应商特有的凭据规则；
 5. 执行 `config check`，先解决引用和 schema 错误；
 6. 执行 `doctor`，补齐本机工具、依赖、镜像或环境变量；
-7. 在干净仓库执行 `verify --all`，确认所有 component 都能运行；
+7. 按生成的 `QUALITY.md` 配置可信主机输入，然后执行 `verify --profile ci --all`，得到一个项目决策；
 8. 在 CI 中使用相同命令，并按需安装只负责调用 `harness-gate hook` 的薄 hook。
 
 `init` 会创建目标目录，但 `scope` 和 `verify` 需要目标目录是 Git worktree。项目已有配置时默认拒绝覆盖；只有确认目标内容可替换时才使用 `--force`。
@@ -181,13 +190,13 @@ harness-gate --project-root /path/to/new-project verify --all
 | 命令                                                         | 用途                                  |
 | ------------------------------------------------------------ | ------------------------------------- |
 | `harness-gate presets`                                       | 列出内置项目预设                      |
-| `harness-gate init --preset <name>`                          | 生成 schema v2 配置                   |
+| `harness-gate init --preset <name>`                          | 生成执行配置及参考质量 pack；generic 仅生成执行配置 |
 | `harness-gate doctor [--strict] [--json]`                    | 执行配置声明的环境检查                |
 | `harness-gate cleanup [--dry-run] [--json]`                 | 检查或回收过期的 Harness-Gate 资源租约 |
 | `harness-gate scope [--staged\|--base REF\|--all] [--json]`  | 列出变更和选择的 components           |
 | `harness-gate secrets [--staged] [--json]`                   | 扫描已追踪文件内容中的高置信凭据模式，只输出文件名  |
 | `harness-gate audit [--json]`                                | 执行正则架构规则并生成审计报告        |
-| `harness-gate verify`                                        | 按工作区变更执行默认 profile          |
+| `harness-gate verify`                                        | 按默认 profile 合并执行和质量门禁，输出一个项目决策 |
 | `harness-gate verify --profile ci --all`                     | 对全部 components 执行指定 profile    |
 | `harness-gate hook`                                          | 对暂存快照执行 hook profile           |
 | `harness-gate step <id>`                                     | 通过 secrets/audit 后单独运行一个步骤 |
@@ -196,7 +205,8 @@ harness-gate --project-root /path/to/new-project verify --all
 | `harness-gate config print --resolved`                       | 输出最终生效配置                      |
 | `harness-gate config migrate`                                | 将 schema v1 转换成 v2                |
 | `harness-gate schema export`                                 | 生成 flow.toml 的 JSON Schema          |
-| `harness-gate adapter run --request <PATH> --trusted-key <PATH>` | 校验并执行一个进程外签名 adapter 请求 |
+| `harness-gate adapter run --request <PATH> --trusted-key <PATH>` | 高级接口：校验并执行签名 adapter 请求；采集器没有策略裁决权 |
+| `harness-gate quality evaluate --help` | 高级接口：重放显式可信输入；普通项目使用 `verify` |
 | `harness-gate parse-logs`                                    | 提取 JSON Lines ERROR trace 上下文    |
 
 所有命令都支持全局 `--project-root <PATH>` 和 `--config <PATH>`。命令成功返回 0；配置错误、门禁失败、步骤失败、超时或中断返回非 0，适合直接用于 CI。
