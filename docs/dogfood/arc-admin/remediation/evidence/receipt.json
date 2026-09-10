@@ -1,0 +1,123 @@
+{
+  "source_sha": "9982ed556eaf997910824d7b682946147c81a16a",
+  "harness_binary_sha256": "23277d60b3dc09b2abd93ffcbaea9b8240c6003d29ca5b2c7cb0c24d57e38876",
+  "configuration_hashes": {
+    ".arc-flow/flow.toml": "6e254663c4a47b94ac8e85c263d34d24eb58f3afe5a14b02c7ef257b08f3ed5d",
+    ".arc-flow/.gitignore": "8f3de1e507d277f725b13858f0c46932e42bed12a7aeaf6adc57fb7089023581",
+    ".harness-gate/flow.toml": "5096719c1c5ecea970411f0df823eb81af92dd39add56c1764f8059cb602ea5e",
+    ".harness-gate/quality.toml": "e6c69e54df8bcd64ebf0514462a98cd69664fb0f09c37de47a20cd949b6fbc47",
+    ".harness-gate/packs/frontend-api/policy.json": "d78747bcd7a4c86aa3c7de056d2fb6fb77750bca27ab2d48ab86e8ef3ff99d7e",
+    ".harness-gate/packs/frontend-api/capabilities.json": "111356bb09c01006edcc412599ed88cd08416901f7182451e9872c2d34d867e8",
+    ".harness-gate/packs/backend/policy.json": "6bbdcc6332eadf0da8755923178f8c165a529106a583894db5c63152676d9b16",
+    ".harness-gate/packs/backend/capabilities.json": "17e5f0a3412c7b2283ad28d3520ef57b9fad9c59147a558ff3b7248fc6eed951",
+    ".harness-gate/packs/frontend/policy.json": "08ddce545c9a809d1a335c3c21f15ee05929d055998fc8a83a8b19abde3c0958",
+    ".harness-gate/packs/frontend/capabilities.json": "3a7b49321e2352fa7cc097ff9b61f7fc9346de85d0c9f3478e8f9d3261fcb84c",
+    ".shadow-execution/flow.toml": "5096719c1c5ecea970411f0df823eb81af92dd39add56c1764f8059cb602ea5e"
+  },
+  "tracked_source_unchanged": true,
+  "commands": [
+    {
+      "name": "arc-scope",
+      "argv": [
+        "cargo",
+        "flow",
+        "scope",
+        "--all"
+      ],
+      "started_at": "2026-09-10T09:45:47.054573+00:00",
+      "completed_at": "2026-09-10T09:45:47.190966+00:00",
+      "elapsed_seconds": 0.136385742,
+      "exit_code": 0
+    },
+    {
+      "name": "arc-full",
+      "argv": [
+        "cargo",
+        "flow",
+        "verify",
+        "--profile",
+        "full",
+        "--all"
+      ],
+      "started_at": "2026-09-10T09:45:47.191626+00:00",
+      "completed_at": "2026-09-10T09:53:26.808503+00:00",
+      "elapsed_seconds": 459.616898546,
+      "exit_code": 0
+    },
+    {
+      "name": "execution-scope",
+      "argv": [
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/debug/harness-gate",
+        "--project-root",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source",
+        "--config",
+        ".shadow-execution/flow.toml",
+        "scope",
+        "--all"
+      ],
+      "started_at": "2026-09-10T09:53:26.815900+00:00",
+      "completed_at": "2026-09-10T09:53:26.905160+00:00",
+      "elapsed_seconds": 0.089281132,
+      "exit_code": 0
+    },
+    {
+      "name": "execution-full",
+      "argv": [
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/debug/harness-gate",
+        "--project-root",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source",
+        "--config",
+        ".shadow-execution/flow.toml",
+        "verify",
+        "--profile",
+        "full",
+        "--all"
+      ],
+      "started_at": "2026-09-10T09:53:26.907605+00:00",
+      "completed_at": "2026-09-10T09:58:46.663979+00:00",
+      "elapsed_seconds": 319.759058841,
+      "exit_code": 1
+    },
+    {
+      "name": "quality-scope",
+      "argv": [
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/debug/harness-gate",
+        "--project-root",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source",
+        "--config",
+        ".harness-gate/flow.toml",
+        "scope",
+        "--all"
+      ],
+      "started_at": "2026-09-10T09:58:46.746170+00:00",
+      "completed_at": "2026-09-10T09:58:46.840426+00:00",
+      "elapsed_seconds": 0.094300574,
+      "exit_code": 0
+    },
+    {
+      "name": "quality-full",
+      "argv": [
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/debug/harness-gate",
+        "--project-root",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source",
+        "--config",
+        ".harness-gate/flow.toml",
+        "verify",
+        "--profile",
+        "full",
+        "--all"
+      ],
+      "started_at": "2026-09-10T09:58:46.844497+00:00",
+      "completed_at": "2026-09-10T10:03:08.837938+00:00",
+      "elapsed_seconds": 262.014862602,
+      "exit_code": 1
+    }
+  ],
+  "reports_present": {
+    "arc": true,
+    "execution": true,
+    "quality": true
+  },
+  "authority_transfer_permitted": false,
+  "scope": "Local full-command rerun; not hosted CI or original-topology cost evidence."
+}

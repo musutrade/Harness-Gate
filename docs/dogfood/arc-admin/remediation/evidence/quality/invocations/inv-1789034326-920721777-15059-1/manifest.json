@@ -1,0 +1,199 @@
+{
+  "schema_version": "1",
+  "invocation_id": "inv-1789034326-920721777-15059-1",
+  "generated_at": "2026-09-10T10:03:08.733907396+00:00",
+  "artifacts": [
+    {
+      "path": "changed_files.txt",
+      "kind": "artifact",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "invocation.json",
+      "kind": "invocation-metadata",
+      "size_bytes": 747,
+      "sha256": "21c1b5718a9e68c9f619fb95eb08df32c946a2f4fa92219bca798e52461f7794"
+    },
+    {
+      "path": "logs/api_generation.log",
+      "kind": "step-log",
+      "size_bytes": 69,
+      "sha256": "121508a10d21348d1ed2a1846def6077810a5470397bd0213b78952ea8104097"
+    },
+    {
+      "path": "logs/arc_flow_clippy.log",
+      "kind": "step-log",
+      "size_bytes": 72,
+      "sha256": "2b34696728dc82b03cbf6311d7e3a6a41658bbde097834c3010a78bc82842c1a"
+    },
+    {
+      "path": "logs/arc_flow_fmt.log",
+      "kind": "step-log",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/arc_flow_tests.log",
+      "kind": "step-log",
+      "size_bytes": 6683,
+      "sha256": "4b55316761d5b73b02f8e58a9b4d68046b460a9cccf8f745d7a890f361efc6d5"
+    },
+    {
+      "path": "logs/audit_retention_config.log",
+      "kind": "step-log",
+      "size_bytes": 46,
+      "sha256": "a03fd67491bb40b9ed25b1b741316ce69ff28bdeb53af3e167da7a85ea966ef4"
+    },
+    {
+      "path": "logs/backend_check.log",
+      "kind": "step-log",
+      "size_bytes": 72,
+      "sha256": "8b1fd2394f7b6f177ede882431154a419bd9f404f00add314c912e91a7fc0ec0"
+    },
+    {
+      "path": "logs/backend_clippy.log",
+      "kind": "step-log",
+      "size_bytes": 72,
+      "sha256": "29162d76fb109d9c6005d8544d63a4a438d15235d4f9b8e73d51adc9ba6e95d7"
+    },
+    {
+      "path": "logs/backend_fmt.log",
+      "kind": "step-log",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/backend_tests.log",
+      "kind": "step-log",
+      "size_bytes": 5114,
+      "sha256": "21414411b6c6faa295890816d544048de818a36f0e434662a29105195bc3ea83"
+    },
+    {
+      "path": "logs/framework_release_config.log",
+      "kind": "step-log",
+      "size_bytes": 72,
+      "sha256": "5fbe2bdd0f06dbfd25bb64209ce0b103d147b8d78cb6bdc750eb03715a71809f"
+    },
+    {
+      "path": "logs/framework_upgrade_tests.log",
+      "kind": "step-log",
+      "size_bytes": 688,
+      "sha256": "aebe2258d333bcd8b5122d77eaef0a4251adc0f60dfb51a83d1a27be401247de"
+    },
+    {
+      "path": "logs/frontend_build.log",
+      "kind": "step-log",
+      "size_bytes": 1886,
+      "sha256": "38ffccdeb0b35bd335f24962a6b9fbd97bfec2bf01e3562217b157107fc295f1"
+    },
+    {
+      "path": "logs/frontend_e2e.log",
+      "kind": "step-log",
+      "size_bytes": 2718,
+      "sha256": "8a270e1f139cd2ce8816fc0687229ebe5b6cb36f30325cd6f6e8015df7df13db"
+    },
+    {
+      "path": "logs/frontend_format.log",
+      "kind": "step-log",
+      "size_bytes": 182,
+      "sha256": "572030ab498ed6707869f472eefa9dd5d80b6da7108de24d53c0c712ee25c8da"
+    },
+    {
+      "path": "logs/frontend_fullstack_smoke.log",
+      "kind": "step-log",
+      "size_bytes": 3252,
+      "sha256": "4891b11a4a2391ff657c66284a3751bca025966eea28654acf44ea6c1643bf1d"
+    },
+    {
+      "path": "logs/frontend_lint.log",
+      "kind": "step-log",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/frontend_tests.log",
+      "kind": "step-log",
+      "size_bytes": 459,
+      "sha256": "68b1126873bc07e98663aefdb32fc18b3384bee22e3dae9b1790397fbdc87b17"
+    },
+    {
+      "path": "logs/git_hook_syntax.log",
+      "kind": "step-log",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/observability_config.log",
+      "kind": "step-log",
+      "size_bytes": 37,
+      "sha256": "c2496d8287bc4b621eb370b876d852e40d6cc12bb81ea78fdab2b55e7f8c026f"
+    },
+    {
+      "path": "logs/production_deployment_config.log",
+      "kind": "step-log",
+      "size_bytes": 37,
+      "sha256": "3278d12e74187d2050167583f815a693333906425911d1ea88323ff7e831ad5b"
+    },
+    {
+      "path": "logs/project_init_tests.log",
+      "kind": "step-log",
+      "size_bytes": 674,
+      "sha256": "8b0331de326e57f71b6e0afde9661d55ffc89b23eefa3d373c7e36155e28a547"
+    },
+    {
+      "path": "logs/supply_chain_config.log",
+      "kind": "step-log",
+      "size_bytes": 34,
+      "sha256": "6150a76f1a143bf92bb1e3b15be7231da150a9e1504ed91bbfc50e46a963a823"
+    },
+    {
+      "path": "logs/template_quality.log",
+      "kind": "step-log",
+      "size_bytes": 68,
+      "sha256": "3c085d8eed8e9bbb140af81959acff5983cd819355a6503b8b5c4c48e330d902"
+    },
+    {
+      "path": "logs/template_quality_tests.log",
+      "kind": "step-log",
+      "size_bytes": 522,
+      "sha256": "d95fa84b9bd5493858f2171afd823a26246bffbc977156662b28477b6e9ee59e"
+    },
+    {
+      "path": "logs/tracing_config.log",
+      "kind": "step-log",
+      "size_bytes": 49,
+      "sha256": "ad0c4492ac4327d5d6ec4686628748a0566bc10d553c93311414919f81e089e3"
+    },
+    {
+      "path": "review_context.json",
+      "kind": "step-log",
+      "size_bytes": 2444,
+      "sha256": "309aaccb416e5148474c0508cfd3c9c355328d5aa3b9d375d27173ba2431549b"
+    },
+    {
+      "path": "review_context.md",
+      "kind": "report",
+      "size_bytes": 1002,
+      "sha256": "e568d1b9876c943e924bbd7e79e0110068b55dbc58ef2344b1b463f287714709"
+    },
+    {
+      "path": "scope.json",
+      "kind": "report",
+      "size_bytes": 136,
+      "sha256": "392e0ac4200cbd3678df793197c30fc2ee6eca5049b2582c50f3cfd1f88f89fc"
+    },
+    {
+      "path": "secret_scan.json",
+      "kind": "step-log",
+      "size_bytes": 100,
+      "sha256": "dc1ea55f02828a34ade92c2fb48047c6ad57c86b1898a4a55cfe299bde5122ca"
+    },
+    {
+      "path": "test_result.md",
+      "kind": "report",
+      "size_bytes": 1621,
+      "sha256": "ce62834ef421b4393231a0fdea1b7d11db67b0c491705c7529cd0cd885ad1f35"
+    }
+  ]
+}
