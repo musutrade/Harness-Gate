@@ -1,0 +1,452 @@
+{
+  "artifact_anchor": "e4481cad305bd0be28bcdfc37f20f018b3927d5a40d36d0f5c80d49594f1d133",
+  "backend_complete": true,
+  "mapping_complete_for_declared_scope": true,
+  "passed": false,
+  "scope": "cargo-production-targets",
+  "coverage": {
+    "functions": {
+      "count": 1778,
+      "covered": 497
+    },
+    "lines": {
+      "count": 8025,
+      "covered": 725
+    },
+    "regions": {
+      "count": 46315,
+      "covered": 7680
+    }
+  },
+  "series": {
+    "complexity": "typed-normal-mir-cfg-common-exit/1",
+    "id": "rust-native-production-mir-block/1",
+    "instances": "same-owner-sum-distinct-llvm-symbols/1",
+    "lines": "all-local-span-origins-any-positive-block/1",
+    "ownership": "rustc-def-path-hash-expansion/1",
+    "regions": "independent-mir-basic-block-counter/1",
+    "selection": "cargo-production-targets-exclude-test-and-build/1"
+  },
+  "source_inventory": [
+    {
+      "compiler_loaded": true,
+      "relative": "src/access.rs",
+      "sha256": "b7435d0d8bfdecd7a7eb1c47e03dd0860a035f57933a1b8839d6bf4c3e24fd9f"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/app_metrics.rs",
+      "sha256": "3a50033fbd9199f2dcd91aea6dc5c3f1b6d8730a4fa59d4b8c91dfb2687096bf"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/auth.rs",
+      "sha256": "2e96693655b4a0e7ac694ebdd2f52ff3673609dca40df4b79d7b97db65f62095"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/bin/archive_audit_logs.rs",
+      "sha256": "8943ad51e50c832507b43330f5b05d4a9558460061639af43441ca34e174e40e"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/bin/bootstrap_admin.rs",
+      "sha256": "7aff1997cd1aa3c27cdf3cf82bc9b217a5c682ccfaf332ddda4d326f903be08e"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/bin/export_openapi.rs",
+      "sha256": "216bebb2a4ad7384bef35746f493c8f863edd8f39a4b095b9ff5bedb97ccec62"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/bin/migrate.rs",
+      "sha256": "95a58e3dea48f960e843a96793ab93a25a5c35c04c023e3abecbe5bf79fceeca"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/config.rs",
+      "sha256": "c3aca3740e1550d4b4392b7e18c98fefb302e1871f6c9752bbc9a69e5107af22"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/db.rs",
+      "sha256": "8d876c46be5f69b038a1b69a6c1290a7aa07d961cc4e734d9f27f2e6f3a95953"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/error.rs",
+      "sha256": "b4543b56633d7b35c01d0ff217c2347fe2b79ed47351692d238b530569aa39c7"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/handlers/audit_logs.rs",
+      "sha256": "6859553dec2780e2c87faed58f2f27acf41f62b09606d834941648fd2916143a"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/handlers/auth.rs",
+      "sha256": "a94d8079b8d38309285eb46f3ba83e64ecdee2cad61bd99880198d4ab113c7e9"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/handlers/dashboard.rs",
+      "sha256": "3120bdde53a93658deb0038182a051a3710d81d70812c382891aba62234585ed"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/handlers/departments.rs",
+      "sha256": "bf8735bd29590acd676cc9695aa6b4780f0079acd39ea690d772b55cd5dd88b1"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/handlers/mod.rs",
+      "sha256": "cac0665b703f8632abc54b8b407fbc31d3494930d3ce8c80a60832b23fecc3bc"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/handlers/permissions.rs",
+      "sha256": "89758826f05aa315657c299d095f3ce0884eb6d4cb4f2067da0a9bc10e5aa43d"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/handlers/roles.rs",
+      "sha256": "265a5ed338ff5dd9600258f9f55bd8b367e95c7eea9a0df76b149cd038b1ab14"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/handlers/users.rs",
+      "sha256": "986b9266b912d57cb610ddb1350ecd51574fe4ec39f6aa5f70ceff36d82b6a7c"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/lib.rs",
+      "sha256": "2a5a93e5784c8d6d56a2be1cbf353aba2eebebc5d7e8bf39ba9a0fcc1ec2fe59"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/main.rs",
+      "sha256": "349487123333cfdf6393c7dc53d46365ed79ae58b47cdb825fa537f994aac0f3"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/mfa.rs",
+      "sha256": "8cf859c48184375b8872e88368cfb6263cf4726bb02f9c855fc68f931abb915d"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/models.rs",
+      "sha256": "f0f302e1025a8d77c698282be61b6a9892d0206c21bf2f5f98c7c3181176a1cf"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/openapi.rs",
+      "sha256": "683c860cab2b042560142470e0709f6a44e8d704b624a4307c499c8a585bc9b8"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/permissions.rs",
+      "sha256": "407a58ff5cade409d1a42a11b99ca564c87e6aac12c93b032ad7aab72dd54017"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/permissions/departments.rs",
+      "sha256": "81410a125985c7128daaccd7a788e8896578e0db7062e9e8a386dc828b4e5523"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/repositories/audit_logs.rs",
+      "sha256": "ed9b98622b90da02e5781d1df575066940a11ad3576df5f7ec92a177375856bb"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/repositories/auth_sessions.rs",
+      "sha256": "f4bd8d29b190a7f1a19c75d06d3f29483107ff6c303bf67b891f6eae2206b783"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/repositories/departments.rs",
+      "sha256": "12f582f2c7304bb9218a53e414cea39b894581fa6d6363075a0aca3b9680896f"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/repositories/mfa.rs",
+      "sha256": "36408304e4c5fcbf4aa743f0fdc46e75b273831357cc6d2f83ecaedf1e855e6d"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/repositories/mod.rs",
+      "sha256": "706084a2789e781f73e303745a157567f77e82cee163a7f256aabcaafbf2f335"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/repositories/module_unlock.rs",
+      "sha256": "9505187f299b6bd992be8ed7142e7d3ff64180fa8c2c7e8eb9584840724736fb"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/repositories/organizations.rs",
+      "sha256": "88f2fab0dea1c14bfef86ee4985c0d2a5f4aa6054a939fa43059eadd64e94e65"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/repositories/permissions.rs",
+      "sha256": "5c38859b38cabfbd4fa402af922a3f19140ed58e37f31ef9721b25bb82164297"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/repositories/roles.rs",
+      "sha256": "89398de4a73f54ea3fe70d8f3346b8c3edfb4b67fef61c855395a49e92e26378"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/repositories/step_up.rs",
+      "sha256": "11d395fce7e52f2c569e494bfe77f18c64bff6e12f1b5988fd2669038e32fed5"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/repositories/users.rs",
+      "sha256": "036b221ca83a9276ab6a09db5ae0a55dd257ca6ac1632f96bed642b90edf16a2"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/services/audit_logs.rs",
+      "sha256": "778a45cd85b51c58b63bf5693378bfc057cdabfd516d38efbcee8c64c4379a52"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/services/auth.rs",
+      "sha256": "a177dced834ef9a82f4b33c04f4d6ed55d4318c1351fd1557bae96dbf6629af8"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/services/departments.rs",
+      "sha256": "f85340acab4b4db3c4a95e2e7aba0c2e7326229df0984d3a69d0bf66b7a2b69c"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/services/mfa.rs",
+      "sha256": "3ef4f82c25deffbedf5c93decb493a6e5a9f6735e98280aef8f733dc5c48ed97"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/services/mod.rs",
+      "sha256": "abe0c74f0c9d01093b5f293b9b36f05d4a2b5cd5a645f752b7332dc619fc5a94"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/services/module_unlock.rs",
+      "sha256": "47e305412295d3d3858360a61d37c86cd216937b976aedcafb214a51f693a484"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/services/permissions.rs",
+      "sha256": "3f9ed06a7b13c0f0d198781c0729e3a602058cd0145d56c99f539fe96996cdde"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/services/roles.rs",
+      "sha256": "b6a8fd8d72c0c0a53a2a93f92ef5057c9164971a81bf17ca6aacda3e669e2dc6"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/services/step_up.rs",
+      "sha256": "66eba53323b4edef5c34cb3c0e851649d0dbe8925ecd6a9253d430bd3f8af8c9"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/services/users.rs",
+      "sha256": "0e09f5fddee0b77a6cb644efbde939e1bc7d7bfdc154f46cb8c787420340e1bf"
+    },
+    {
+      "compiler_loaded": true,
+      "relative": "src/telemetry.rs",
+      "sha256": "c7f0c2865756dd6bdaa2e92ea37dfb8f700223425c2f7d706169108be5e98763"
+    }
+  ],
+  "tools": {
+    "driver": {
+      "sha256": "1723deb9be7597f11410c33971d668a1cc25d8ac65f8a59162afa9152f76f458"
+    },
+    "llvm-cov": {
+      "sha256": "bb415d8767d2ad73d72c01941f409ffc8f9478747ec7c18a7a69356735551ed9",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build.\n"
+    },
+    "llvm-profdata": {
+      "sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build.\n"
+    },
+    "rustc": {
+      "sha256": "d3a664c970a9fd8361b64194861bebc1ae37b9054e5ee3400dc1c9e691797eea",
+      "version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+    },
+    "rustc-driver-library": {
+      "sha256": "b0726217c199be52842c1318a340f0fc68a2c2ca0e3fa4886191dbf6ee192a58"
+    }
+  },
+  "source_commit": "e5a1ee5f7ec6dbae461355106d469384581d4607",
+  "source_hash_matches_committed_replay": 47,
+  "definition_roles": {
+    "test:declaration": 30,
+    "test:runtime": 26,
+    "test:compile-time": 13,
+    "production:declaration": 5172,
+    "production:runtime": 1778,
+    "production:compile-time": 367
+  },
+  "exclusions": 137212,
+  "function_threshold_failures": 1443,
+  "maximum_crap": {
+    "name": "services::mfa::verify_totp_enrollment::{closure#0}",
+    "exact": [
+      11990,
+      1
+    ]
+  },
+  "selected_targets": [
+    {
+      "id": "38e290a858602d591465a528c0239c9f58b80c425d72c356fc85866ce82d45e7",
+      "production": false,
+      "target": {
+        "crate_types": [
+          "bin"
+        ],
+        "doc": false,
+        "doctest": false,
+        "edition": "2021",
+        "kind": [
+          "test"
+        ],
+        "name": "openapi_contract",
+        "src_path": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/arc-admin/backend/tests/openapi_contract.rs",
+        "test": true
+      }
+    },
+    {
+      "id": "87c8d7919c1f9982e201d75760c722d737dc53a4c9ee67722431f7d3ae2d51b4",
+      "production": true,
+      "target": {
+        "crate_types": [
+          "bin"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2021",
+        "kind": [
+          "bin"
+        ],
+        "name": "migrate",
+        "src_path": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/arc-admin/backend/src/bin/migrate.rs",
+        "test": true
+      }
+    },
+    {
+      "id": "ad8bbc83db023791c4d246a3c82d6d6620ecfd23a908e06d4b03fb01c0ac0288",
+      "production": true,
+      "target": {
+        "crate_types": [
+          "bin"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2021",
+        "kind": [
+          "bin"
+        ],
+        "name": "arc-admin-backend",
+        "src_path": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/arc-admin/backend/src/main.rs",
+        "test": true
+      }
+    },
+    {
+      "id": "b776d4ea2d15aaf5c2853fe2d4e84e92ff2b2654fb55cd94545e48b07ebd4931",
+      "production": false,
+      "target": {
+        "crate_types": [
+          "bin"
+        ],
+        "doc": false,
+        "doctest": false,
+        "edition": "2021",
+        "kind": [
+          "test"
+        ],
+        "name": "permission_template_contract",
+        "src_path": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/arc-admin/backend/tests/permission_template_contract.rs",
+        "test": true
+      }
+    },
+    {
+      "id": "cb07f1de854c852399e1dde96a2d8918731652b8b85c3badf0ae6c7950c2f4b4",
+      "production": true,
+      "target": {
+        "crate_types": [
+          "bin"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2021",
+        "kind": [
+          "bin"
+        ],
+        "name": "bootstrap_admin",
+        "src_path": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/arc-admin/backend/src/bin/bootstrap_admin.rs",
+        "test": true
+      }
+    },
+    {
+      "id": "f6d8d8a713352fcbc07a66a4b167d64ba96eb43c6d7c034641c65fc3c15e71a5",
+      "production": true,
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": true,
+        "edition": "2021",
+        "kind": [
+          "lib"
+        ],
+        "name": "arc_admin_backend",
+        "src_path": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/arc-admin/backend/src/lib.rs",
+        "test": true
+      }
+    },
+    {
+      "id": "f9fe265a9012513c76bafabff0b7b4819a7c312f25600f1eba19872d9e365307",
+      "production": true,
+      "target": {
+        "crate_types": [
+          "bin"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2021",
+        "kind": [
+          "bin"
+        ],
+        "name": "export_openapi",
+        "src_path": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/arc-admin/backend/src/bin/export_openapi.rs",
+        "test": true
+      }
+    },
+    {
+      "id": "ff813895aae60c15f7f7eeae8aff6b9d2f393e1f1cf4a49284ad11e969eca4d6",
+      "production": true,
+      "target": {
+        "crate_types": [
+          "bin"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2021",
+        "kind": [
+          "bin"
+        ],
+        "name": "archive_audit_logs",
+        "src_path": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/arc-admin/backend/src/bin/archive_audit_logs.rs",
+        "test": true
+      }
+    }
+  ]
+}
