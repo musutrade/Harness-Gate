@@ -86,7 +86,7 @@ def main():
         path.write_text(json.dumps(result, indent=2) + "\n")
     else:
         check_report(json.loads(path.read_text()), result)
-    print("Cost ledger validated: 25 command owners; shadow CI cost NOT_MEASURED; transfer blocked.")
+    print("Historical pretrial ledger validated: 25 command owners; original shadow cost NOT_MEASURED. See ci_reproduce.py for the separate bounded self-hosted trial series; transfer remains blocked.")
 
 
 if __name__ == "__main__":

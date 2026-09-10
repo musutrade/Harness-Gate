@@ -1,0 +1,92 @@
+{
+  "source_sha": "9982ed556eaf997910824d7b682946147c81a16a",
+  "harness_sha": "19a264e2b1992a5355166ca46e87fba766fa30d8",
+  "run_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34454586298",
+  "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34454586298/job/102797907379",
+  "samples": [
+    {
+      "sample": 1,
+      "before": {
+        "segment_seconds": 399.286983389,
+        "actions_step_seconds": 400.0,
+        "commands_passed": true
+      },
+      "shadow": {
+        "segment_seconds": 546.235786931,
+        "actions_step_seconds": 547.0,
+        "commands_passed": false
+      },
+      "added_segment_seconds": 146.948803542,
+      "traditional_checks": 27,
+      "traditional_results_match": true,
+      "traditional_checks_all_passed": true,
+      "quality_status": "blocked",
+      "quality_error": "quality workflow input is missing: /mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/.harness-gate/runtime/full-state.json",
+      "harness_failures": [
+        {
+          "step_id": null,
+          "code": "QUALITY_BLOCKED",
+          "message": "Quality profile null: blocked (configuration); full quality: blocked\nquality workflow input is missing: /mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/.harness-gate/runtime/full-state.json\n"
+        }
+      ]
+    },
+    {
+      "sample": 2,
+      "before": {
+        "segment_seconds": 293.076245632,
+        "actions_step_seconds": 293.0,
+        "commands_passed": true
+      },
+      "shadow": {
+        "segment_seconds": 539.664262003,
+        "actions_step_seconds": 540.0,
+        "commands_passed": false
+      },
+      "added_segment_seconds": 246.58801637099998,
+      "traditional_checks": 27,
+      "traditional_results_match": true,
+      "traditional_checks_all_passed": true,
+      "quality_status": "blocked",
+      "quality_error": "quality workflow input is missing: /mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/.harness-gate/runtime/full-state.json",
+      "harness_failures": [
+        {
+          "step_id": null,
+          "code": "QUALITY_BLOCKED",
+          "message": "Quality profile null: blocked (configuration); full quality: blocked\nquality workflow input is missing: /mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/.harness-gate/runtime/full-state.json\n"
+        }
+      ]
+    },
+    {
+      "sample": 3,
+      "before": {
+        "segment_seconds": 293.653608518,
+        "actions_step_seconds": 294.0,
+        "commands_passed": true
+      },
+      "shadow": {
+        "segment_seconds": 536.45883798,
+        "actions_step_seconds": 536.0,
+        "commands_passed": false
+      },
+      "added_segment_seconds": 242.805229462,
+      "traditional_checks": 27,
+      "traditional_results_match": true,
+      "traditional_checks_all_passed": true,
+      "quality_status": "blocked",
+      "quality_error": "quality workflow input is missing: /mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/.harness-gate/runtime/full-state.json",
+      "harness_failures": [
+        {
+          "step_id": null,
+          "code": "QUALITY_BLOCKED",
+          "message": "Quality profile null: blocked (configuration); full quality: blocked\nquality workflow input is missing: /mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/.harness-gate/runtime/full-state.json\n"
+        }
+      ]
+    }
+  ],
+  "job_runner_seconds": 3010.0,
+  "initial_wait_seconds": 4.0,
+  "authority_transfer_permitted": false,
+  "quality_acceptance": "not established",
+  "scope": "Harness-Gate measurement workflow; workload is the pinned Arc-Admin source, not its original multijob CI topology.",
+  "cache_protocol": "Fresh workspace-local Cargo and npm caches at setup. All six sequential samples reuse those caches; sample 1 is initial-use, samples 2/3 are warm. No cold-cache or steady-state savings claim."
+}

@@ -79,6 +79,16 @@ class RetainedCostTests(unittest.TestCase):
                     steps.append({'name': f'{mode.title()} sample {sample}', 'status': 'completed',
                         'started_at': f'2026-09-10T00:0{len(steps)+1}:00Z',
                         'completed_at': f'2026-09-10T00:0{len(steps)+2}:00Z'})
+                inventory = json.loads((ROOT / 'docs/dogfood/arc-admin/inventory.json').read_text())
+                labels = [s['label'] for s in inventory['flow']['steps']] + inventory['always_blocking_prelude']
+                report = {'profile': 'full', 'scope': {'mode': 'all'}, 'steps': [{'label': label, 'passed': True} for label in labels]}
+                for owner in ('arc', 'harness'):
+                    directory = root / f'{sample}-shadow/{owner}-reports'
+                    directory.mkdir()
+                    if owner == 'harness':
+                        report.update(source_identity='working-tree:' + trial.SOURCE_SHA,
+                                      quality={'status': 'blocked', 'error': 'missing trusted input'}, failures=[])
+                    trial.write(directory / 'test_result.json', report)
                 pairs.append({'sample': sample, 'before_seconds': 10, 'shadow_seconds': 14, 'added_seconds': 4})
             trial.write(root / 'summary.json', {'pairs': pairs, 'authority_transfer_permitted': False})
             trial.write(root / 'actions-jobs.json', {'jobs': [{'name': 'measure', 'run_id': 42,
@@ -87,7 +97,7 @@ class RetainedCostTests(unittest.TestCase):
                 'completed_at': '2026-09-10T00:07:00Z'}]})
             def seal():
                 trial.write(root / 'sha256.json', {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
-                    for p in root.rglob('*') if p.is_file() and p.name != 'sha256.json'})
+                    for p in root.rglob('*') if p.is_file() and p != root / 'sha256.json'})
             seal()
             result = reproduce.derive(root)
             self.assertEqual(result['job_runner_seconds'], 360)

@@ -1,0 +1,34 @@
+arc-flow verify
+Scope: all
+Components: backend, frontend, workflow
+
+[PASS] secret scan (15443 ms)
+[PASS] architecture audit (442 ms)
+[RUN ] backend format ... PASS (201 ms)
+[RUN ] backend Clippy ... PASS (19722 ms)
+[RUN ] backend compile ... PASS (2204 ms)
+[RUN ] backend tests ... PASS (171881 ms)
+[RUN ] frontend lint ... PASS (3705 ms)
+[RUN ] frontend format ... PASS (3404 ms)
+[RUN ] frontend tests ... PASS (12024 ms)
+[RUN ] frontend end-to-end tests ... PASS (24352 ms)
+[RUN ] frontend real full-stack smoke test ... PASS (21425 ms)
+[RUN ] frontend production build ... PASS (9633 ms)
+[RUN ] Git hook syntax ... PASS (101 ms)
+[RUN ] project initializer tests ... PASS (502 ms)
+[RUN ] framework release configuration gate ... PASS (102 ms)
+[RUN ] framework upgrade tests ... PASS (1002 ms)
+[RUN ] template quality gate ... PASS (501 ms)
+[RUN ] template quality gate tests ... PASS (602 ms)
+[RUN ] observability configuration gate ... PASS (102 ms)
+[RUN ] optional tracing and compliance configuration gate ... PASS (101 ms)
+[RUN ] production deployment configuration gate ... PASS (101 ms)
+[RUN ] audit retention and archive configuration gate ... PASS (102 ms)
+[RUN ] Rust OpenAPI and Angular client generation gate ... PASS (702 ms)
+[RUN ] supply chain security configuration gate ... PASS (102 ms)
+[RUN ] arc-flow format ... PASS (201 ms)
+[RUN ] arc-flow Clippy ... PASS (201 ms)
+[RUN ] arc-flow tests ... PASS (601 ms)
+
+Verification report: /mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/test_result.md
+TEST_SUMMARY: PASS

@@ -1,8 +1,8 @@
 # Arc-Admin CI cost and authority topology (GH-206)
 
-Tasks 7.2–7.4 have a reviewable inventory and conditional design. **Task 7.1 is blocked: added shadow wall-clock and runner-work cost on self-hosted CI is not measured.** No existing gate or authority changes in this issue. The [ledger](report.json) reproduces the available costs and explicitly retains unknown values as `null`. Neither this design nor the GH-205 negative corpus establishes application runtime parity.
+Tasks 7.1–7.4 now have a reviewable inventory, conditional design and [three bounded self-hosted measurement pairs](selfhosted.md). The generic shared-service ordering gap is resolved; all 27 traditional checks match and pass in every pair. Full quality remains blocked by missing trusted runtime inputs, and complete-quality/original-topology savings remain unknown. No existing execution gate or authority changes in this issue. The [ledger](report.json) reproduces the available costs and explicitly retains unknown values as `null`. Neither this design nor the GH-205 negative corpus establishes application runtime parity.
 
-## Measured costs and limits
+## Historical observations before remediation
 
 | Observation | Wall/latency seconds | Runner-work seconds | Interpretation |
 | --- | --- | --- | --- |
@@ -11,7 +11,7 @@ Tasks 7.2–7.4 have a reviewable inventory and conditional design. **Task 7.1 i
 | Before: pinned CodeQL run 32701649194 | skipped | 0 | Event/repository condition, not evidence of a successful scan |
 | GH-204 local full Arc observation | 447.239 sum of step timers | unknown | 415.231 command seconds plus 32.008 prelude seconds; not CI occupancy or total wall time |
 | GH-204 Harness-Gate execution/quality variants | unknown | unknown | Both exit 1 before dispatch with `HGCFG-SHARED-SERVICE`; no elapsed-time receipt |
-| Added self-hosted shadow cost | **not measured** | **not measured** | No paired self-hosted shadow run |
+| GH-204 added self-hosted shadow cost | **not measured in that record** | **not measured in that record** | Superseded for the bounded workload series by [GH-206 CI receipts](selfhosted.md); full-quality cost remains unknown |
 | Target topology | **not measured** | **not measured** | Conditional design, no savings claim |
 
 The [before capture](../ci-capture.json) retains job/step timestamps, labels and artifact metadata. The [cost summary](../cost-summary.json) separates project commands, scope, artifact transfer, setup/teardown and residual job overhead. Job occupancy includes waits inside a job; it is not CPU time. Historical workflow timestamps have second resolution and `updated_at` is only a latency proxy. Host rates, energy, depreciation and billing allocations are unavailable; monetary cost is unknown. The predecessor CI sample has different topology and cannot be used to attribute savings.
@@ -40,7 +40,7 @@ Before, the scope job routes components into three jobs, each invoking `cargo fl
 
 Observed shadow is a local comparison, not an installed CI topology. A future full shadow run temporarily executes the selected traditional command set twice to compare engines while Arc remains authoritative. It needs an explicit finite measurement window and retained results. Harness quality collection has a single producer path even in shadow; a second copy of equivalent authoritative measurements is not justified by comparison. Engine execution-only and quality-composed diagnostic variants are not both permanent full CI lanes.
 
-Target has a single owner of the execution plan. Start with one job and a serialized service-safe plan, preserving Arc's ordering; parallelization is conditional on demonstrated isolation and dependencies. Do not deploy the current unchanged import: HG-CAP-001 must first be resolved in task 8, without bypassing shared-service validation. A scoped CI run retains all existing scope rules and full-profile semantics for selected components; `hook` remains partial. No `ci` profile is invented. One immutable run identity binds scope, source tree, configuration, tools, artifact digests, services and selected profile. Prelude results run once for that identity, after equivalence to Arc's secret/audit contracts is proved.
+Target has a single owner of the execution plan. Start with one job and a serialized service-safe plan, preserving Arc's ordering; parallelization is conditional on demonstrated isolation and dependencies. The unchanged import now executes under ADR-0050 serial ordering; deployment still requires trusted quality provisioning and complete integration acceptance. A scoped CI run retains all existing scope rules and full-profile semantics for selected components; `hook` remains partial. No `ci` profile is invented. One immutable run identity binds scope, source tree, configuration, tools, artifact digests, services and selected profile. Prelude results run once for that identity, after equivalence to Arc's secret/audit contracts is proved.
 
 ## Explicit duplicate-work inventory
 
@@ -60,7 +60,7 @@ The [machine ledger](report.json) maps **every one of the 25 hooks** to its exac
 | Baseline and final aggregate | Trusted Arc baseline still unprovisioned | Baseline job reruns candidate collectors; aggregate retries tests to recover a missing report | Authenticate/reuse compatible accepted baseline; aggregate only validates completeness and composes outcomes, with no tests, collectors or fallback recollection |
 | RustSec and cargo-deny advisories | Overlapping domain with different configuration and broader deny checks | Treating overlap as equivalent evidence | Keep both and their original exceptions/conditions; no equivalence proof supports deletion |
 
-No duplicate authoritative quality collection was observed: Arc's before flow has no certified generic producer, and both Harness variants stop before collection. The ledger enumerates all nine declared capabilities across three collectors; eight supported measurements have exactly one proposed producer, and frontend CRAP has zero numeric producers with an explicit unsupported diagnostic. A collector can emit several facts in one invocation. Policy evaluation and structured-result parsing reuse those facts, not rerun the producer.
+In the historical observation, no duplicate authoritative quality collection was observed: Arc's before flow has no certified generic producer, and both Harness variants stop before collection. The ledger enumerates all nine declared capabilities across three collectors; eight supported measurements have exactly one proposed producer, and frontend CRAP has zero numeric producers with an explicit unsupported diagnostic. A collector can emit several facts in one invocation. Policy evaluation and structured-result parsing reuse those facts, not rerun the producer.
 
 ## Assurance parity and transfer hold
 
@@ -75,13 +75,13 @@ No duplicate authoritative quality collection was observed: Arc's before flow ha
 
 For each selected obligation the proposed mapping preserves a blocker and an owner, while quality adds obligations. This is an assurance-preservation argument for the design, **not proof of implemented runtime parity**. Service/prelude compatibility, trusted native producer integration and measured self-hosted cost remain prerequisites. Task 7.4 is satisfied by retaining the existing workflow and gates; no authority changes are included. Any future removal requires a separate reviewed change after tasks 8–9, accepted real parity and negatives, and the required aggregate green. Rollback restores the complete prior authority topology and authenticated compatible baseline; it must not leave two producers authoritative for the same identity or silently waive the added quality requirements.
 
-## Finish the missing measurement
+## Remaining full-quality and original-topology measurements
 
-1. Resolve the task-8 loader/provisioning gaps. Freeze the same Arc SHA, imported flow/quality hashes, profile/scope, Harness SHA, runner labels/hardware, tool versions and baseline lineage for paired before/shadow trials. Do not replace the failing configuration to obtain timings in task 7.
+1. Resolve the task-8 loader/provisioning gaps. Freeze the same Arc SHA, imported flow/quality hashes, profile/scope, Harness SHA, runner labels/hardware, tool versions and baseline lineage for paired before/shadow trials. Preserve the unchanged imported configuration and the ADR-0050 serial execution contract.
 2. Use a new directory under the current workspace and the [shadow runner](../shadow/run.py). It now retains UTC start/end, monotonic elapsed seconds and a whitelist of Actions identity for every command. A local invocation remains local. Archive extraction, binary build and other uninstrumented setup must also be accounted for by CI step/job timestamps. The timing addition is not a completed CI trial.
 3. Capture self-hosted Actions run/attempt/job IDs, created/start/end timestamps, steps, logs, cache state and artifact sizes/hashes. Retain separate before and shadow execution/quality outputs, failed runs and cancelled runs. Use at least three paired repetitions for cold and warm cache conditions; report each sample and median/range separately, with queue effects explicit.
 4. Compute `runner_work = sum(completed_at - started_at)` for executed jobs (including failed/cancelled work; truly skipped jobs consume zero); `execution_span = max(job end) - min(job start)`; initial wait separately. Compute added wall/work as **matched shadow minus before**. Measure target independently after implementation. Do not sum overlapping workflow spans or extrapolate GH-204 native step timers into CI savings.
-5. Account for setup, scope/prelude, project commands, native collection, normalization/parsing, baseline retrieval/evaluation and artifact upload; unknown internal breakdown remains unknown. Confirm one producer per identity from execution receipts. Retain all evidence before checking 7.1 or accepting transfer.
+5. Account for setup, scope/prelude, project commands, native collection, normalization/parsing, baseline retrieval/evaluation and artifact upload; unknown internal breakdown remains unknown. Confirm one producer per identity from execution receipts. Retain all evidence before accepting complete-quality cost or authority transfer; the bounded task-7.1 workload receipts are recorded separately above.
 
 ## Validation and related records
 

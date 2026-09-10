@@ -1,0 +1,87 @@
+{
+  "timestamp": "2026-09-10T09:01:25.317267030+00:00",
+  "hard_violations": [
+    {
+      "rule": "SQL 写操作仅允许出现在 Repository/迁移/测试层",
+      "severity": "blocker",
+      "count": 0,
+      "occurrences": []
+    },
+    {
+      "rule": "代码模板不得引用过时框架",
+      "severity": "error",
+      "count": 0,
+      "occurrences": []
+    },
+    {
+      "rule": "日志不得记录完整请求头或显式敏感字段",
+      "severity": "blocker",
+      "count": 0,
+      "occurrences": []
+    }
+  ],
+  "arch_violations": [
+    {
+      "rule": "Service 层不应包含 SQL 查询",
+      "layer": "service",
+      "count": 0,
+      "suggestion": "请将 SQL 逻辑移至 Repository 层",
+      "occurrences": []
+    },
+    {
+      "rule": "Handler 层不应包含 SQL 查询",
+      "layer": "handler",
+      "count": 0,
+      "suggestion": "请将 SQL 逻辑移至 Repository 层",
+      "occurrences": []
+    },
+    {
+      "rule": "Model 层不应包含业务逻辑（允许常见 trait impl）",
+      "layer": "model",
+      "count": 0,
+      "suggestion": "Model 应仅为纯数据结构，业务逻辑应放在 Service 层",
+      "occurrences": []
+    },
+    {
+      "rule": "Component 不应直接注入 HttpClient",
+      "layer": "component",
+      "count": 0,
+      "suggestion": "请通过 Service 层调用 API",
+      "occurrences": []
+    },
+    {
+      "rule": "Service 层不应操作 DOM",
+      "layer": "service",
+      "count": 0,
+      "suggestion": "请将 DOM 操作逻辑移到 Component 层",
+      "occurrences": []
+    },
+    {
+      "rule": "前端 Core 不应依赖业务 Feature",
+      "layer": "frontend-core",
+      "count": 0,
+      "suggestion": "请将业务组合放在 app.routes.ts、app.navigation.ts 或对应 features/<domain> 内，Core 只能提供基础能力",
+      "occurrences": []
+    },
+    {
+      "rule": "Handler 层不应直接依赖 Repository",
+      "layer": "handler",
+      "count": 0,
+      "suggestion": "请由 Handler 调用 Service，再由 Service 调用 Repository",
+      "occurrences": []
+    },
+    {
+      "rule": "Repository 层不应依赖上层",
+      "layer": "repository",
+      "count": 0,
+      "suggestion": "Repository 只负责持久化，不得依赖 Handler 或 Service",
+      "occurrences": []
+    }
+  ],
+  "summary": {
+    "total_violations": 0,
+    "blocker_count": 0,
+    "error_count": 0,
+    "warning_count": 0
+  }
+}

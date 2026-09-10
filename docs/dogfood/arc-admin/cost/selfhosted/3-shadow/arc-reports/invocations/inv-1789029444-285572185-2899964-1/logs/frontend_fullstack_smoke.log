@@ -1,0 +1,57 @@
+
+> arc-admin@0.0.0 e2e:fullstack
+> playwright test --config playwright.fullstack.config.ts
+
+[WebServer] 数据库迁移完成：已应用 18，内置 18
+[WebServer] 管理员账号已就绪：fullstack_admin（id=2）
+[WebServer] 
+[WebServer] > arc-admin@0.0.0 start
+[WebServer] > ng serve --proxy-config proxy.conf.json --host 127.0.0.1 --port 4300 --proxy-config proxy.fullstack.conf.json
+[WebServer] 
+[WebServer] ❯ Building...
+[WebServer] ✔ Building...
+[WebServer] Initial chunk files | Names            |  Raw size
+[WebServer] chunk-2SDMPA2Q.js   | -                |   1.11 MB | 
+[WebServer] chunk-REI6HATN.js   | -                | 588.37 kB | 
+[WebServer] chunk-X2ZLPNVX.js   | -                | 335.67 kB | 
+[WebServer] main.js             | main             | 227.97 kB | 
+[WebServer] chunk-DOPORNYS.js   | -                | 212.38 kB | 
+[WebServer] chunk-5OZM273D.js   | -                | 195.92 kB | 
+[WebServer] chunk-6BBIQPBF.js   | -                |  43.76 kB | 
+[WebServer] styles.css          | styles           |  27.44 kB | 
+[WebServer] chunk-Z6ISVNYW.js   | -                |   1.00 kB | 
+[WebServer] chunk-Z2BY6HYM.js   | -                | 392 bytes | 
+[WebServer] 
+[WebServer]                     | Initial total    |   2.74 MB
+[WebServer] 
+[WebServer] Lazy chunk files    | Names            |  Raw size
+[WebServer] chunk-NQJ547SH.js   | -                | 291.45 kB | 
+[WebServer] chunk-ANCWWNUF.js   | browser          | 153.80 kB | 
+[WebServer] chunk-4HHQRI2I.js   | users            | 137.45 kB | 
+[WebServer] chunk-3M5HZV7O.js   | -                |  73.81 kB | 
+[WebServer] chunk-7B36ATLT.js   | departments      |  65.42 kB | 
+[WebServer] chunk-RM64IZZS.js   | roles            |  62.40 kB | 
+[WebServer] chunk-2S3JP2ST.js   | audit-logs       |  48.68 kB | 
+[WebServer] chunk-5T7G6TFI.js   | security         |  45.29 kB | 
+[WebServer] chunk-R24J3EYI.js   | permissions      |  29.70 kB | 
+[WebServer] chunk-BZD7KMZQ.js   | error-page       |  25.45 kB | 
+[WebServer] chunk-PT6VXJR5.js   | role-permissions |  23.61 kB | 
+[WebServer] chunk-UF4TEBGN.js   | -                |  21.40 kB | 
+[WebServer] chunk-5OCW5DDR.js   | -                |  12.53 kB | 
+[WebServer] chunk-DUBHI27H.js   | -                |   3.96 kB | 
+[WebServer] chunk-VXV4HWZY.js   | -                |   1.99 kB | 
+[WebServer] 
+[WebServer] Application bundle generation complete. [7.175 seconds] - 2026-09-10T08:41:57.740Z
+[WebServer] 
+[WebServer] Watch mode enabled. Watching for file changes...
+[WebServer] NOTE: Raw file sizes do not reflect development server per-request transformations.
+[WebServer]   ➜  Local:   http://127.0.0.1:4300/
+
+Running 1 test using 1 worker
+
+  ✓  1 [fullstack-chromium] › e2e/fullstack-smoke.spec.ts:5:5 › 通过真实 Angular、Axum 和 PostgreSQL 完成登录与用户创建 (7.7s)
+
+  1 passed (21.4s)
+
+[WebServer] Option 'proxy-config' has been specified multiple times. The value 'proxy.fullstack.conf.json' will be used.
+[WebServer] Prebundling has been configured but will not be used because caching has been disabled.
