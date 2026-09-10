@@ -102,6 +102,64 @@ fn assert_sealed_evidence(json: &Value) {
     }
 }
 
+/// ADR-0049: an unknown application runner participates without a core registry,
+/// framework parser, or quality collector. Renaming it must preserve blocking.
+#[test]
+fn project_owned_runner_replacement_preserves_generic_command_gate() {
+    for runner in ["nebula-e2e", "quasar-api"] {
+        for exit_code in [0, 7] {
+            let root = fixture();
+            let flow = FLOW
+                .replace("id = \"probe\"", &format!("id = \"{runner}\""))
+                .replace("program = \"sh\"", &format!("program = \"{runner}\""))
+                .replace(
+                    "args = [\"probe.sh\", \"original\"]",
+                    "args = [\"project-assertion\"]",
+                );
+            fs::write(root.path().join(".harness-gate/flow.toml"), flow).unwrap();
+            let executable = root.path().join(runner);
+            fs::write(
+                &executable,
+                format!("#!/bin/sh\n[ \"$1\" = project-assertion ] || exit 9\necho project-owned-result\nexit {exit_code}\n"),
+            )
+            .unwrap();
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(&executable, fs::Permissions::from_mode(0o755)).unwrap();
+            success(
+                command(root.path())
+                    .args(["config", "check"])
+                    .output()
+                    .unwrap(),
+            );
+            let output = command(root.path())
+                .env(
+                    "PATH",
+                    std::env::join_paths(std::iter::once(root.path().to_path_buf()).chain(
+                        std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()),
+                    ))
+                    .unwrap(),
+                )
+                .args(["verify", "--profile", "full", "--all"])
+                .output()
+                .unwrap();
+            assert_eq!(output.status.success(), exit_code == 0, "{runner}");
+            let json = report(root.path());
+            assert_eq!(json["passed"], exit_code == 0);
+            let step = json["steps"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|step| step["step_id"] == runner)
+                .expect("unknown project runner must execute and retain its identity");
+            assert_eq!(step["passed"], exit_code == 0);
+            assert!(fs::read_to_string(step["log"].as_str().unwrap())
+                .unwrap()
+                .contains("project-owned-result"));
+            assert_sealed_evidence(&json);
+        }
+    }
+}
+
 #[test]
 fn doctor_kinds_execute_success_required_failure_and_optional_warning() {
     let cases = [
