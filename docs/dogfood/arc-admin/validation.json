@@ -89,5 +89,106 @@
     "Arc-Admin evidence is pinned source inspection and historical Actions metadata, not a fresh execution or shadow parity result.",
     "Expired CI report payloads were unavailable; artifact metadata is captured. Monetary host cost and isolated measurement/parsing overhead are unknown.",
     "The workspace .git directory is read-only: git add failed with Unable to create .git/index.lock: Read-only file system. Publication uses GitHub Git Database API on symphony/GH-201 with the current local HEAD as parent; local protected Git metadata remains at the baseline."
-  ]
+  ],
+  "ci_repair": {
+    "attempt": 1,
+    "pr": 209,
+    "failed_sha": "dd5a56924db65bc01075bfc0f89ce9e7ed4c6b55",
+    "failed_job": "https://github.com/musutrade/Harness-Gate/actions/runs/34432144244/job/102729682144",
+    "error": "critical path evidence failed: tests/failure_paths_test.rs::verification_cleanup_cancel_and_report_precedence_retains_resource_evidence: missing/ambiguous/moved function",
+    "ci_stages": {
+      "legacy": {
+        "seconds": 235.16709355700002,
+        "status": "success"
+      },
+      "matrix": {
+        "error": "matrix exited 1; see matrix.log",
+        "seconds": 0.15892778199997792,
+        "status": "failure"
+      },
+      "production": {
+        "seconds": 2.091269748000002,
+        "status": "success"
+      },
+      "risk": {
+        "seconds": 419.691147809,
+        "status": "success"
+      }
+    },
+    "change": "Refresh only process.cancellation test_source line range and file hash. The existing cancellation test body is byte-for-byte unchanged; source probes, assertions, policy and production code are unchanged.",
+    "inventory_validation": {
+      "before": {
+        "path": "tests/failure_paths_test.rs",
+        "symbol": "verification_cleanup_cancel_and_report_precedence_retains_resource_evidence",
+        "start": 493,
+        "end": 640,
+        "sha256": "72492cf2d8bb7a27f8ed58682c588acbfdbfafea903b73dcb031ef4dd6c8b44d"
+      },
+      "after": {
+        "path": "tests/failure_paths_test.rs",
+        "symbol": "verification_cleanup_cancel_and_report_precedence_retains_resource_evidence",
+        "start": 551,
+        "end": 698,
+        "sha256": "e6cf2053208d63cb4366f6855f899e98b102a665d18c3885be87dc1ff37b869e"
+      },
+      "status": "pass",
+      "validated_rows": 12
+    },
+    "inventory_command": "PYTHONPATH=tools/quality python3 -c 'import json,tomllib,critical_paths as g; g.validate_inventory(tomllib.loads(g.INVENTORY.read_text()),json.loads(g.POLICY.read_text()))'",
+    "checks": [
+      {
+        "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+        "exit_code": 0,
+        "log": "target/quality/gh-201-repair/nextest.log"
+      },
+      {
+        "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+        "exit_code": 0,
+        "log": "target/quality/gh-201-repair/fmt.log"
+      },
+      {
+        "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+        "exit_code": 0,
+        "log": "target/quality/gh-201-repair/clippy.log"
+      },
+      {
+        "command": "python3 -m unittest discover -s tools/quality/tests -v",
+        "exit_code": 0,
+        "log": "target/quality/gh-201-repair/python-tests.log"
+      },
+      {
+        "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+        "exit_code": 0,
+        "log": "target/quality/gh-201-repair/docs-workspace-target.log",
+        "environment": {
+          "CARGO_TARGET_DIR": "$PWD/target"
+        }
+      },
+      {
+        "command": "openspec validate dogfood-harness-gate-on-arc-admin --strict",
+        "exit_code": 0,
+        "log": "target/quality/gh-201-repair/openspec.log"
+      },
+      {
+        "command": "python3 docs/dogfood/arc-admin/reproduce.py",
+        "exit_code": 0,
+        "log": "target/quality/gh-201-repair/baseline.log"
+      }
+    ],
+    "results": "380 Rust tests and 349 Python tests passed; fmt, clippy, docs consistency, strict OpenSpec and offline baseline reproduction passed.",
+    "resolved_local_failure": {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 1,
+      "log": "target/quality/gh-201-repair/docs.log",
+      "error": "quality gate failed: documentation, examples, or schema synchronization failed",
+      "resolution": "The initial invocation did not set the workspace Cargo target for child Cargo commands. Re-running with CARGO_TARGET_DIR=$PWD/target passed."
+    },
+    "collection_limitation": {
+      "command": "python3 tools/quality/critical_paths.py --collect --evidence target/quality/gh-201-repair/critical-path-runs/bundle.json --output target/quality/gh-201-repair/critical-paths.json",
+      "status": "blocked",
+      "error": "critical path evidence failed: source snapshot differs from commit: tools/harness-gate/tests/failure_paths_test.rs; commit source changes before collecting",
+      "impact": "Full isolated LLVM matrix collection cannot run against the protected local baseline Git metadata. The complete inventory validates, and the source identity guard remains enforced. Hosted Required Quality Aggregate is pending; no CI success is claimed."
+    },
+    "publication": "Fast-forward the same branch and PR through GitHub Git Database API, parenting the failed SHA. Local protected Git metadata remains unchanged; the runtime handoff identifies the pushed SHA."
+  }
 }
