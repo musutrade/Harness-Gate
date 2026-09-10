@@ -620,6 +620,34 @@
       "purpose": "TypeScript identity/measurement primitives; not a collector or policy engine.",
       "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
       "sha256": "71ac267b84ca2c2cb24f88ec0d03fd05df84d63d61687f40d3eea0cd642647bc"
+    },
+    {
+      "module": "tools/quality/rust_native.py",
+      "category": "B",
+      "purpose": "Opt-in bounded MIR/LLVM experiment; rejects incomplete owners and has no production authority.",
+      "callers": [
+        "tools/quality/tests/test_rust_native.py"
+      ],
+      "ci_role": "Quality-script regression only; not a required production collector.",
+      "release_impact": "Not packaged in release binary; no release approval authority.",
+      "authoritative_status": "Non-authoritative development experiment; GH-220 acceptance incomplete.",
+      "final_disposition": "Retain ecosystem-specific experiment pending complete production provenance and acceptance.",
+      "notes": "GH-220: experimental, not integrated with production debt or baseline.",
+      "sha256": "cafd5670a7d040f2beb7dbc5f5880825391bc19a6ccafece30e7bcd6b0ea5767"
+    },
+    {
+      "module": "tools/quality/rust_native_replay.py",
+      "category": "B",
+      "purpose": "Pinned-source syntax replay with per-file hashes; cannot supply coverage evidence.",
+      "callers": [
+        "manual GH-220 replay"
+      ],
+      "ci_role": "Quality-script regression only; not a required production collector.",
+      "release_impact": "Not packaged in release binary; no release approval authority.",
+      "authoritative_status": "Non-authoritative development experiment; GH-220 acceptance incomplete.",
+      "final_disposition": "Retain ecosystem-specific experiment pending complete production provenance and acceptance.",
+      "notes": "GH-220: experimental, not integrated with production debt or baseline.",
+      "sha256": "a09d13ec1ae36919a9622e518d21c3fa37ac693f031b2a6bfc3ae9425d03bee9"
     }
   ],
   "schema": "python-product-boundary/v1",

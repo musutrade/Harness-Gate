@@ -1,0 +1,64 @@
+[
+  {
+    "name": "complete",
+    "workspace_path": "target/gh-220/native-tests/tmps4u3czr1/complete",
+    "archive_member": "complete",
+    "evidence_sha256": "8ddb8b0fd9f5bd5c402e0754ec0846a54b6e5da8c13876462d1b28bb4479e683",
+    "coverage": {
+      "lines": {
+        "covered": 17,
+        "count": 19
+      },
+      "regions": {
+        "covered": 28,
+        "count": 36
+      },
+      "functions": {
+        "covered": 7,
+        "count": 8
+      }
+    },
+    "threshold_failures": [
+      "closure::{closure#0}",
+      "future::{closure#0}"
+    ],
+    "certified_llvm_mapping": true,
+    "backend_complete": false,
+    "source_provenance_complete": false
+  },
+  {
+    "name": "cfg",
+    "workspace_path": "target/gh-220/native-tests/tmps4u3czr1/cfg",
+    "archive_member": "cfg",
+    "evidence_sha256": "3cbd60517042f6f81f5acdc981c694f9b4e73eb044fef15ef8a5da53d1cd1214",
+    "coverage": {
+      "lines": {
+        "covered": 19,
+        "count": 21
+      },
+      "regions": {
+        "covered": 32,
+        "count": 40
+      },
+      "functions": {
+        "covered": 8,
+        "count": 9
+      }
+    },
+    "threshold_failures": [
+      "closure::{closure#0}",
+      "future::{closure#0}"
+    ],
+    "certified_llvm_mapping": true,
+    "backend_complete": false,
+    "source_provenance_complete": false
+  },
+  {
+    "name": "derived",
+    "workspace_path": "target/gh-220/native-tests/tmps4u3czr1/derived",
+    "archive_member": "derived",
+    "evidence_sha256": "c75d2548e18057b57c75a1dfdd7954e84f7991a5ca10917101f2fa56868f0080",
+    "certified_llvm_mapping": false,
+    "error": "MIR inventory omission/ambiguity"
+  }
+]
