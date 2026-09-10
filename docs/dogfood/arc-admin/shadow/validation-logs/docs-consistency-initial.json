@@ -1,0 +1,56 @@
+{
+  "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+  "commit": "4c787da3b0075de511f84eda3093f721845f7443",
+  "engineering_policy": {
+    "failures": [],
+    "status": "pass"
+  },
+  "examples": [
+    {
+      "path": "tools/harness-gate/presets/angular-only.flow.toml",
+      "quality_generated": false,
+      "status": "fail"
+    },
+    {
+      "path": "tools/harness-gate/presets/angular-rust-postgres.flow.toml",
+      "quality_generated": false,
+      "status": "fail"
+    },
+    {
+      "path": "tools/harness-gate/presets/generic.flow.toml",
+      "quality_generated": false,
+      "status": "fail"
+    },
+    {
+      "path": "tools/harness-gate/presets/rust-api.flow.toml",
+      "quality_generated": false,
+      "status": "fail"
+    }
+  ],
+  "language_docs_valid": true,
+  "link_failures": [],
+  "logical_cpus": 8,
+  "machine": "x86_64",
+  "machine_schema_valid": true,
+  "manifest_schema_valid": true,
+  "migration": {
+    "path": "tools/quality/fixtures/v1-flow.toml",
+    "status": "fail"
+  },
+  "os": "Linux-7.0.0-31-generic-x86_64-with-glibc2.43",
+  "processor": "",
+  "python": "3.14.4",
+  "quality_example_valid": false,
+  "quality_schema_synced": false,
+  "registry_schema_valid": true,
+  "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+  "sandbox_wording": {
+    "failures": [],
+    "status": "pass"
+  },
+  "schema_synced": false,
+  "status": "fail",
+  "target": "x86_64-unknown-linux-gnu",
+  "timestamp_utc": "2026-09-10T05:49:09.568116+00:00",
+  "tool": "docs-consistency"
+}

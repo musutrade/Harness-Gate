@@ -1,0 +1,86 @@
+[
+  {
+    "command": [
+      "rustc",
+      "--version"
+    ],
+    "exit_code": 0,
+    "stdout": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "cargo",
+      "--version"
+    ],
+    "exit_code": 0,
+    "stdout": "cargo 1.97.1 (c980f4866 2026-06-30)",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "cargo",
+      "nextest",
+      "--version"
+    ],
+    "exit_code": 0,
+    "stdout": "cargo-nextest 0.9.143 (60fa45f63 2026-08-04)\nrelease: 0.9.143\ncommit-hash: 60fa45f638ffc3f35e74afa65737f45fcd32db2a\ncommit-date: 2026-08-04\nhost: x86_64-unknown-linux-gnu",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "--version"
+    ],
+    "exit_code": 0,
+    "stdout": "v24.18.0",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "npm",
+      "--version"
+    ],
+    "exit_code": 0,
+    "stdout": "11.16.0",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "git",
+      "--version"
+    ],
+    "exit_code": 0,
+    "stdout": "git version 2.53.0",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "--version"
+    ],
+    "exit_code": 0,
+    "stdout": "Python 3.14.4",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "docker",
+      "version",
+      "--format",
+      "{{.Server.Version}}"
+    ],
+    "exit_code": 0,
+    "stdout": "29.6.2",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "${WORKSPACE}/target/debug/harness-gate",
+      "--version"
+    ],
+    "exit_code": 0,
+    "stdout": "harness-gate 0.3.7",
+    "stderr": ""
+  }
+]
