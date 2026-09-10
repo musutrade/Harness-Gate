@@ -1,6 +1,6 @@
 # Arc-Admin generic quality configuration (GH-203)
 
-This reviewable shadow configuration implements OpenSpec tasks 4.1–4.4 against the [frozen Arc-Admin baseline](../README.md) and [GH-202 execution import](../import/README.md). It has not been installed or executed against Arc-Admin source. Runtime integration, shadow parity, cost measurement and authority transfer remain pending.
+This reviewable shadow configuration implements OpenSpec tasks 4.1–4.4 against the [frozen Arc-Admin baseline](../README.md) and [GH-202 execution import](../import/README.md). GH-204 subsequently staged it in a disposable pinned Arc-Admin snapshot: [shadow observation](../shadow/README.md) records production loading rejection before execution. Successful runtime parity, cost measurement and authority transfer remain pending.
 
 To stage it in Arc-Admin, place `quality.toml` at `.harness-gate/quality.toml` and `packs/` at `.harness-gate/packs/`, beside the unchanged imported `flow.toml`. These files compose the existing `angular-rust-postgres` packs, with Arc-Admin identity, the imported profile vocabulary and a required baseline provider. They do not add a project-local flow to Harness-Gate's own repository.
 
@@ -26,6 +26,6 @@ See [quality compilation](../../../quality-compilation.md), [collectors](../../.
 
 ## Validation boundary
 
-[Validation evidence](validation.json) records the actual local results. The production configuration regression validates this configuration with the imported flow and rejects broken relationships, series, required policy selection and baseline providers. Python regressions compare every composed pack and execution step to the accepted sources, including the certified Rust fixture and explicit Angular unsupported state. Existing certified collector/compiler/baseline acceptance exercises the underlying trusted quality path.
+[Validation evidence](validation.json) records the actual local results. The quality-binding regression validates this configuration with the imported flow and rejects broken relationships, series, required policy selection and baseline providers. Python regressions compare every composed pack and execution step to the accepted sources, including the certified Rust fixture and explicit Angular unsupported state. Existing certified collector/compiler/baseline acceptance exercises the underlying trusted quality path.
 
 Those checks do not establish Arc-Admin source quality or runtime parity. Root `harness-gate config check` and `harness-gate verify --profile ci --all` are not applicable: this checkout has no `.harness-gate/flow.toml` and no declared `ci` profile. Hosted Required Quality Aggregate remains CI pending at submission.

@@ -1,0 +1,34 @@
+arc-flow verify
+Scope: all
+Components: backend, frontend, workflow
+
+[PASS] secret scan (31243 ms)
+[PASS] architecture audit (765 ms)
+[RUN ] backend format ... PASS (401 ms)
+[RUN ] backend Clippy ... PASS (84442 ms)
+[RUN ] backend compile ... PASS (8612 ms)
+[RUN ] backend tests ... PASS (223407 ms)
+[RUN ] frontend lint ... PASS (3905 ms)
+[RUN ] frontend format ... PASS (3404 ms)
+[RUN ] frontend tests ... PASS (14233 ms)
+[RUN ] frontend end-to-end tests ... PASS (26544 ms)
+[RUN ] frontend real full-stack smoke test ... PASS (20125 ms)
+[RUN ] frontend production build ... PASS (10118 ms)
+[RUN ] Git hook syntax ... PASS (101 ms)
+[RUN ] project initializer tests ... PASS (501 ms)
+[RUN ] framework release configuration gate ... PASS (101 ms)
+[RUN ] framework upgrade tests ... PASS (901 ms)
+[RUN ] template quality gate ... PASS (501 ms)
+[RUN ] template quality gate tests ... PASS (601 ms)
+[RUN ] observability configuration gate ... PASS (101 ms)
+[RUN ] optional tracing and compliance configuration gate ... PASS (100 ms)
+[RUN ] production deployment configuration gate ... PASS (101 ms)
+[RUN ] audit retention and archive configuration gate ... PASS (101 ms)
+[RUN ] Rust OpenAPI and Angular client generation gate ... PASS (701 ms)
+[RUN ] supply chain security configuration gate ... PASS (101 ms)
+[RUN ] arc-flow format ... PASS (201 ms)
+[RUN ] arc-flow Clippy ... PASS (8515 ms)
+[RUN ] arc-flow tests ... PASS (7413 ms)
+
+Verification report: ${ARC_SOURCE}/codex-audit-pipeline/.codex/reports/test_result.md
+TEST_SUMMARY: PASS
