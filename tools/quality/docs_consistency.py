@@ -136,6 +136,12 @@ def engineering_policy_failures() -> list[str]:
         "converted to PASS",
         "normative policy delta",
         "CI performance regressions are engineering regressions",
+        "Application- and repository-specific validation logic belongs to the project",
+        "Command hooks / execution gates",
+        "Structured result adapters",
+        "Quality collector plugins",
+        "A new application validation tool or framework must not require",
+        "ADR-0049",
     )
     failures = [f"engineering policy missing normative anchor: {phrase}" for phrase in required_phrases if phrase not in text]
     try:

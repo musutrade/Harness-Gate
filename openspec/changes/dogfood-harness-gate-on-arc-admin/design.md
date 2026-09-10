@@ -59,6 +59,8 @@ Arc-Admin currently owns a mature `.arc-flow/flow.toml` and `cargo flow` binary.
 
 The frozen inventory is the assurance oracle. A Harness-Gate migration may be stricter, but it must not omit an existing blocker without explicit reviewed rationale.
 
+GH-201 freezes the [Arc-Admin before state](../../../docs/dogfood/arc-admin/README.md) at commit `9982ed556eaf997910824d7b682946147c81a16a`, with hash-checked source snapshots, all 25 blocking steps, hook/full semantics and reproducible historical self-hosted CI timing/artifact metadata. The accompanying unknown-runner regression and Engineering Policy consistency anchors enforce the configuration-driven extension boundary. This evidence completes only tasks 1.3 and 2.1–2.4; it does not establish import support, shadow parity, generic quality configuration or authority transfer.
+
 ## 4. Migration/import strategy
 
 Arc-Admin's execution-plane config is structurally close to Harness-Gate flow schema. The dogfood SHALL prefer a deterministic import/migration mechanism over hand-copying steps.
