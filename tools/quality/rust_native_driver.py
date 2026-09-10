@@ -260,7 +260,7 @@ def finish_cargo(directory, manifest_path, driver, sysroot, samples):
     return seal(directory)
 
 
-def collect_cargo(manifest_path, directory, driver, sysroot, samples):
+def collect_cargo(manifest_path, directory, driver, sysroot, samples, features=()):
     directory, manifest_path = Path(directory).resolve(), Path(manifest_path).resolve()
     directory.mkdir(parents=True, exist_ok=False)
     raw = directory / 'raw'
@@ -270,6 +270,8 @@ def collect_cargo(manifest_path, directory, driver, sysroot, samples):
            'NATIVE_DRIVER': str(Path(driver).resolve()), 'NATIVE_DRIVER_LIB': str(Path(sysroot) / 'lib'),
            'LLVM_PROFILE_FILE': str(raw / 'compile-%p-%m.profraw')}
     command = ['cargo', 'test', '--locked', '--no-run', '--manifest-path', str(manifest_path), '--message-format=json']
+    if features:
+        command.extend(['--features', ','.join(features)])
     for sample in samples:
         command.extend(['--test', sample])
     run(raw, 'cargo', command, env)
@@ -644,6 +646,7 @@ def main():
         action.add_argument('--sysroot', type=Path, required=True)
         if kind == 'cargo':
             action.add_argument('--sample', action='append', required=True)
+            action.add_argument('--feature', action='append', default=[])
         else:
             action.add_argument('--cfg', action='append', default=[])
     action = sub.add_parser('certify')
@@ -658,7 +661,7 @@ def main():
     elif args.action == 'fixture':
         print(collect_fixture(args.source, args.output, args.driver, args.sysroot, args.cfg))
     else:
-        print(collect_cargo(args.source, args.output, args.driver, args.sysroot, args.sample))
+        print(collect_cargo(args.source, args.output, args.driver, args.sysroot, args.sample, args.feature))
     return 0
 
 

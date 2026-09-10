@@ -111,3 +111,31 @@ report an explicit skip. They retain each real compile/sample/export and the
 Rust policy outputs under `target/gh-220/driver-tests`. Small fixtures establish
 their own scope only. The pinned Arc-Admin report and scope limitations are indexed
 in [GH-220 evidence](../../../docs/quality/gh-220/README.md).
+
+## File classification
+
+`../rust_native_classify.py` projects a complete native mapping onto **every**
+production source. `--evidence RAW --anchor REVIEWED_SHA --output REPORT` performs
+native certification before classification. Runtime owners retain real counts;
+zero hits require positive measured denominators. Loaded declaration/CTFE-only
+files can be `not_applicable` for that compilation, with null metrics. Module
+exports do not imply parent machine code; macro calls can generate runtime owners.
+Neither a filename nor a missing LLVM row is an exclusion rule.
+
+For feature exclusions, compile the same project twice with the same `--sample`
+selection and optional Cargo `--feature NAME`. Pass the second raw capture as
+`--witness RAW --witness-anchor SHA`. Only an otherwise compatible complete mapping
+with executable origins for the absent source proves feature-scoped exclusion.
+Unexported sources, missing owners and incompatible configurations remain errors.
+The fixture test retains both real captures under `target/gh-221/file-tests`.
+
+Reviewed historical archives require **both** `--reviewed-report REPORT.json.gz`
+and its independently trusted `--report-sha256 SHA`, in addition to the original
+manifest anchor. This mode checks every retained artifact, replays Cargo selection
+and the full compiler-to-LLVM join against the accepted report, and records absent
+original binaries. It does not re-export LLVM or access recorded external paths.
+Classification success is exit 0 even if the preserved measurement fails coverage
+thresholds; this report never accepts a baseline or changes a gate.
+The [GH-221 evidence](../../../docs/quality/gh-221/README.md) includes all 47 backend
+files, the five historical omissions and reproducible retained-archive inspection.
+The old LLVM file-summary series remains separate and unresolved.
