@@ -34,14 +34,16 @@ GH-202 evidence: [deterministic import, loss detection, full declaration parity 
 - [x] 4.3 Keep Angular/TypeScript CRAP explicitly unsupported unless separately certified.
 - [x] 4.4 Keep E2E/API/smoke/generation checks as execution hooks rather than fake quality collectors.
 
-GH-203 evidence: [separate quality configuration and trust prerequisites](../../../docs/dogfood/arc-admin/quality/README.md), [actual validation results](../../../docs/dogfood/arc-admin/quality/validation.json). The production validator accepts the imported flow plus quality bindings and rejects four binding-loss cases. Five Python regressions compare unchanged packs to certified sources, preserve all 25 execution hooks, and assert Angular CRAP remains unsupported. JSON Schema and strict OpenSpec validation pass; the existing certified workflow acceptance records 12 validated cases. These checkboxes do not claim Arc-Admin runtime parity, hosted Required Quality Aggregate success or acceptance of the complete proposal.
+GH-203 evidence: [separate quality configuration and trust prerequisites](../../../docs/dogfood/arc-admin/quality/README.md), [actual validation results](../../../docs/dogfood/arc-admin/quality/validation.json). The quality-binding validator accepts the imported flow plus quality bindings and rejects four binding-loss cases; GH-204 separately exercises complete production loading. Five Python regressions compare unchanged packs to certified sources, preserve all 25 execution hooks, and assert Angular CRAP remains unsupported. JSON Schema and strict OpenSpec validation pass; the existing certified workflow acceptance records 12 validated cases. These checkboxes do not claim Arc-Admin runtime parity, hosted Required Quality Aggregate success or acceptance of the complete proposal.
 
 ## 5. Run observation and shadow parity
 
-- [ ] 5.1 Run Arc-Admin's current `cargo flow` and Harness-Gate against equivalent source states without transferring merge authority.
-- [ ] 5.2 Compare selected components and all required traditional gate outcomes.
-- [ ] 5.3 Compare PostgreSQL service behavior, environment isolation, diagnostics, reports and artifacts.
-- [ ] 5.4 Classify every discrepancy as Arc-Admin issue, Harness-Gate capability gap, Harness-Gate UX gap or expected stricter generic-quality difference.
+- [x] 5.1 Run Arc-Admin's current `cargo flow` and Harness-Gate against equivalent source states without transferring merge authority.
+- [x] 5.2 Compare selected components and all required traditional gate outcomes.
+- [x] 5.3 Compare PostgreSQL service behavior, environment isolation, diagnostics, reports and artifacts.
+- [x] 5.4 Classify every discrepancy as Arc-Admin issue, Harness-Gate capability gap, Harness-Gate UX gap or expected stricter generic-quality difference.
+
+GH-204 evidence: [reproducible shadow matrix and classifications](../../../docs/dogfood/arc-admin/shadow/README.md), [actual validation results](../../../docs/dogfood/arc-admin/shadow/validation.json). Arc-Admin at the frozen/current revision passed all 25 blockers and both prelude checks. Both unchanged Harness-Gate variants were invoked on the same tracked source and rejected by complete production configuration validation before scope or dispatch. Every unavailable runtime comparison is explicitly NOT_RUN and linked to HG-CAP-001; the narrower migration-readiness signal is HG-UX-001. PostgreSQL availability/cleanup, native environment-isolation tests, diagnostics and hashed reports/artifacts are retained with their observation limits. These checkboxes establish completed observation/classification, not successful runtime parity, authority transfer, hosted Required Quality Aggregate success or acceptance of the whole proposal. Tasks 6–9 remain pending.
 
 ## 6. Exercise controlled negative scenarios
 

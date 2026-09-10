@@ -1,5 +1,11 @@
 # Design: Project-Owned Validation Boundary and Arc-Admin Dogfood
 
+## GH-204 observation record
+
+Tasks 5.1–5.4 are evidenced by the [shadow matrix](../../../docs/dogfood/arc-admin/shadow/README.md). Arc-Admin at the pinned/current revision passed all 25 command gates plus secret/audit prelude. Complete Harness-Gate loading rejects the unchanged import's unordered shared PostgreSQL consumers, both with and without quality composition. This is a capability gap; the narrower success of structural import/quality-binding validation is a separate UX gap. No execution order or blocker was edited to obtain a PASS.
+
+An observation can complete with classified blocked comparisons. Unselected/unexecuted gates must retain NOT_RUN, and component selection stopped before computation must retain NOT_COMPUTED. Neither declaration parity nor another engine's existing report establishes runtime parity. Source identities, configuration hashes, command exits, native reports, service observations and explicit isolation limits accompany the matrix. Harness-Gate validation results have no workflow/lifecycle or merge authority. Remediation, controlled negatives and authority-transfer decisions remain in tasks 6–9.
+
 ## 1. Durable architecture boundary
 
 Harness-Gate is a gate orchestration, evidence ingestion and quality-decision platform. It is not an application test framework.
