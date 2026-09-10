@@ -1,0 +1,138 @@
+{
+  "repository": "musutrade/arc-admin",
+  "commit": "9982ed556eaf997910824d7b682946147c81a16a",
+  "files": [
+    {
+      "path": ".arc-flow/flow.toml",
+      "sha": "a9520036cd7a9c48c05edda21569e399e824c0b2",
+      "sha256": "6e254663c4a47b94ac8e85c263d34d24eb58f3afe5a14b02c7ef257b08f3ed5d",
+      "snapshot": "sources/.arc-flow/flow.toml.txt"
+    },
+    {
+      "path": ".cargo/config.toml",
+      "sha": "6c3b52021c7e599820de5049e7ce1d2ab4c81e58",
+      "sha256": "acc10e419afbd1dd327c5ce7f84ba71bb8d18777fd58500b09682c71e5fe2818",
+      "snapshot": "sources/.cargo/config.toml.txt"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha": "5518bf318d033bd50f1a46a4d8b4547f275b2924",
+      "sha256": "e58ce1db076ec0d75f061f6a50b348fc4a5d57a3f127514560bf828555609bb7",
+      "snapshot": "sources/AGENTS.md.txt"
+    },
+    {
+      "path": "codex-audit-pipeline/hooks/pre-commit",
+      "sha": "46546574d68f1d608e5763276dd995867bacce29",
+      "sha256": "2b3b3763cd1859d9dd82d39006f8cfb6cc35ff66bd73887798ead3481975a5aa",
+      "snapshot": "sources/codex-audit-pipeline/hooks/pre-commit.txt"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha": "5bcb2762233ae5ffd9fbadfafb0ead28030afa30",
+      "sha256": "6d4e1878f5e5945b4ced2c63b96f1dc9f32b60b146d7507d1812422a3c94d1d4",
+      "snapshot": "sources/.github/workflows/ci.yml.txt"
+    },
+    {
+      "path": ".github/workflows/codeql.yml",
+      "sha": "2f9ec49b5061f038c7adcadfbf83f34e22930c21",
+      "sha256": "901f7bab55a6bc161e6f9af0f8cd71dab963e2014fa717e9164f60089d76bf92",
+      "snapshot": "sources/.github/workflows/codeql.yml.txt"
+    },
+    {
+      "path": ".github/workflows/security.yml",
+      "sha": "f9e484d1dbe7f07d1e96e5321618af758b4e8cae",
+      "sha256": "bafa768da072f4d4894eeca93c953b4749aa26a6bafe35ed51b1384adddd2c5a",
+      "snapshot": "sources/.github/workflows/security.yml.txt"
+    },
+    {
+      "path": "codex-audit-pipeline/tools/arc-flow/src/verify.rs",
+      "sha": "8ad8caafc1b4b7db51c0829414aefa1d71d32152",
+      "sha256": "4d3a56ef08925681df4471998fee6d58854f35e6e4c542484fbe9727d1effce7",
+      "snapshot": "sources/codex-audit-pipeline/tools/arc-flow/src/verify.rs.txt"
+    },
+    {
+      "path": "codex-audit-pipeline/tools/arc-flow/src/config.rs",
+      "sha": "bcf0f6c609644dc57cc1c879d2843b076a2071ab",
+      "sha256": "1746aa00b87a39a49bdd24223cdd59c71b5a2c7ea58cb6a2c23775298376a09d",
+      "snapshot": "sources/codex-audit-pipeline/tools/arc-flow/src/config.rs.txt"
+    },
+    {
+      "path": "codex-audit-pipeline/tools/arc-flow/src/scope.rs",
+      "sha": "196f9268da976495f3d7c1c143dd56c4c7710532",
+      "sha256": "32d5141d3b87f0e39133d282ed53112ba4b4e3943bdf2f37fec6d9f94fbcfcf7",
+      "snapshot": "sources/codex-audit-pipeline/tools/arc-flow/src/scope.rs.txt"
+    },
+    {
+      "path": "codex-audit-pipeline/tools/arc-flow/src/main.rs",
+      "sha": "3c16b97245f7306456e9c137d210ffe5cf9cbdd8",
+      "sha256": "3075e7528d5dbe2e7ec15a49cbaa44af8b4307096e135631dd4408a8e5898111",
+      "snapshot": "sources/codex-audit-pipeline/tools/arc-flow/src/main.rs.txt"
+    },
+    {
+      "path": "codex-audit-pipeline/tools/arc-flow/src/process.rs",
+      "sha": "36228d30b6d44c0e2f0ce469e78405aa14aec3ac",
+      "sha256": "70cb7cbab8cdcb9de646279b42e886662f9de15d9d7904b41466f580e14db6a9",
+      "snapshot": "sources/codex-audit-pipeline/tools/arc-flow/src/process.rs.txt"
+    },
+    {
+      "path": "codex-audit-pipeline/tools/arc-flow/src/service.rs",
+      "sha": "f0b11fe5dee98d9d5bb726b8877f790e6e3bab9e",
+      "sha256": "1fba030b1d5a8662de0b64013a903c3d93a623cf921b59970dec97a46005c7d8",
+      "snapshot": "sources/codex-audit-pipeline/tools/arc-flow/src/service.rs.txt"
+    },
+    {
+      "path": "frontend/package.json",
+      "sha": "932f72bd160d29b431a07181ed93fb505d81814f",
+      "sha256": "9423b35bc194a309a96e20773d9efda329903d31ad8687bfe9238ea77eddf6e5",
+      "snapshot": "sources/frontend/package.json.txt"
+    },
+    {
+      "path": "codex-audit-pipeline/.codex/audit.toml",
+      "sha": "711d4fc1f783f1f378394aacdf97507d8149d8c0",
+      "sha256": "cef9985234a9e333fd89813496d2a452d3a10a63c1c4fb10501a61cea4cf28d2",
+      "snapshot": "sources/codex-audit-pipeline/.codex/audit.toml.txt"
+    },
+    {
+      "path": "codex-audit-pipeline/.codex/secrets.toml",
+      "sha": "f96b514e78b4e89ec6b3315224430a0056d129d8",
+      "sha256": "f50ee579024104cc20818cd628d1cad42404a6d3c53e11cdb85d464afefe3345",
+      "snapshot": "sources/codex-audit-pipeline/.codex/secrets.toml.txt"
+    },
+    {
+      "path": "codex-audit-pipeline/tools/arc-flow/src/project.rs",
+      "sha": "0f4f30647e6112e5c5b27434f697c267839bfb1d",
+      "sha256": "8f9b3c892cde51d7d0d9b89677ddc51a7437f201d8000b9ae04da10f3446605a",
+      "snapshot": "sources/codex-audit-pipeline/tools/arc-flow/src/project.rs.txt"
+    },
+    {
+      "path": "scripts/start-fullstack-smoke.sh",
+      "sha": "6c504a1097d84774a6da73050f954823b9a244f2",
+      "sha256": "6286909ed04a92fad1d0df8a7b7b2e8d561c054038400d5104a9017d53a117fb",
+      "snapshot": "sources/scripts/start-fullstack-smoke.sh.txt"
+    },
+    {
+      "path": "scripts/check-api-generation.mjs",
+      "sha": "77e3b58e8f2525665b3773713a6e563edcf5050c",
+      "sha256": "91401aa15379da404a1ea18cb312acd84225074e91e86873f4ede2fc3906825d",
+      "snapshot": "sources/scripts/check-api-generation.mjs.txt"
+    },
+    {
+      "path": "frontend/playwright.config.ts",
+      "sha": "7ceb4813fb3815a9b58f51e90e9f4b62179357fb",
+      "sha256": "53bb93ff2d36e5d175406b83364dee44a470a5455e0db0cb7dd198300551a349",
+      "snapshot": "sources/frontend/playwright.config.ts.txt"
+    },
+    {
+      "path": "frontend/playwright.fullstack.config.ts",
+      "sha": "4d42e8bcddba9e9d3413b8ef6e174ea82b5f0822",
+      "sha256": "7495e0a8f666ea70dec7a3897ee4cfc5f0926d6a17a51a036a442316465e8e14",
+      "snapshot": "sources/frontend/playwright.fullstack.config.ts.txt"
+    },
+    {
+      "path": "backend/tests/api_flow.rs",
+      "sha": "68d17a368c4ca6449df786525cc142b1e241ca13",
+      "sha256": "b10ba0564623b8a0d62ab383720eb14df0048de65d3268eab808b3043059c6ba",
+      "snapshot": "sources/backend/tests/api_flow.rs.txt"
+    }
+  ]
+}
