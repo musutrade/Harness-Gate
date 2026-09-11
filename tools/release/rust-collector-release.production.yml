@@ -36,7 +36,9 @@ jobs:
     needs: protection
     environment: rust-collector-release
     # Ephemeral operator-provisioned runner matching the approved exact ABI.
-    runs-on: [self-hosted, rust-collector-release]
+    runs-on:
+      group: harness-gate-rust-collector-release
+      labels: rust-collector-release
     permissions:
       contents: write
       actions: read

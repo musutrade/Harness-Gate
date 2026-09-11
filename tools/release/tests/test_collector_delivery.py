@@ -403,6 +403,14 @@ class EligibilityTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'stable promotion blocked'):
                 policy.verify(Path(temporary), path, 'rust-collector-v0.1.0', commit, client)
 
+    def test_production_template_uses_restricted_runner_group(self):
+        source = (RELEASE / 'rust-collector-release.production.yml').read_text()
+        self.assertIn('    runs-on:\n      group: harness-gate-rust-collector-release\n'
+                      '      labels: rust-collector-release', source)
+        self.assertIn('environment: rust-collector-release', source)
+        self.assertIn('needs: protection', source)
+        self.assertNotIn('runs-on: [self-hosted', source)
+
     def test_nonpublishing_workflow_remains_protected(self):
         source = (RELEASE.parents[1] / assets.WORKFLOW).read_text()
         self.assertIn('needs: protection', source)
