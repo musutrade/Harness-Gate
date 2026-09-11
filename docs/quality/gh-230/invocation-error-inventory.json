@@ -1,0 +1,122 @@
+[
+  {
+    "path": "target/gh-230/invocation-error-checks/docs_check.py",
+    "bytes": 1362,
+    "sha256": "b60e05001b69d9d45b4740c84623f7a7caaa972f34df4b3dba0cb8c6fd0577be"
+  },
+  {
+    "path": "target/gh-230/invocation-error-checks/logs/diff-check-final.command.json",
+    "bytes": 142,
+    "sha256": "d2000bc17696c6abe9f43d5b77ad545e359c2f098dc9dea2a718e2164a9e1a1b"
+  },
+  {
+    "path": "target/gh-230/invocation-error-checks/logs/diff-check-final.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "target/gh-230/invocation-error-checks/logs/diff-check-final.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "target/gh-230/invocation-error-checks/logs/docs-consistency-final.command.json",
+    "bytes": 225,
+    "sha256": "aed06e94f035c31359a820dd37ae825451906eeff9bf740932e49aadfd2dde68"
+  },
+  {
+    "path": "target/gh-230/invocation-error-checks/logs/docs-consistency-final.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "target/gh-230/invocation-error-checks/logs/docs-consistency-final.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "target/gh-230/invocation-error-checks/logs/openspec-final.command.json",
+    "bytes": 237,
+    "sha256": "b0fc772212a9e2963e0d94d154b5676e061bbf7bf16cad2bc911d9f204fc955c"
+  },
+  {
+    "path": "target/gh-230/invocation-error-checks/logs/openspec-final.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "target/gh-230/invocation-error-checks/logs/openspec-final.stdout",
+    "bytes": 75,
+    "sha256": "870eee9fc1789e7071418a7ad67af1f541507853598cc27efde127f090653be1"
+  },
+  {
+    "path": "target/gh-230/invocation-error-checks/logs/python.command.json",
+    "bytes": 524,
+    "sha256": "f6288a764a1833e05d18c2cf96e7e60fc5e957c1d2ecc0f52d96095f767cb4cf"
+  },
+  {
+    "path": "target/gh-230/invocation-error-checks/logs/python.stderr",
+    "bytes": 67544,
+    "sha256": "43a78ee03a9e46801bf6626a399793824d95cebbf6c8f1ab5ef6ddcbb8b58cd5"
+  },
+  {
+    "path": "target/gh-230/invocation-error-checks/logs/python.stdout",
+    "bytes": 1045,
+    "sha256": "f8aefdc60c4616e8ea5ddb8e096c466782388859bcb0e284563fc504b09b74cc"
+  },
+  {
+    "path": "target/gh-230/invocation-error-checks/logs/regression.command.json",
+    "bytes": 285,
+    "sha256": "0013c4797e7dff5337ae0fdae36d52345040ce3c558b77ef98be69c57eb84465"
+  },
+  {
+    "path": "target/gh-230/invocation-error-checks/logs/regression.stderr",
+    "bytes": 4686,
+    "sha256": "69f0269b45d3978ec7f9aca5e17838200bff478913ec2b88086426f1a19756cc"
+  },
+  {
+    "path": "target/gh-230/invocation-error-checks/provisioned-inputs.json",
+    "bytes": 792,
+    "sha256": "ae0bcbd1defe9a8de5da5f06e9dd3085583183a9f630b5ac601a62ee7815ed42"
+  },
+  {
+    "path": "target/gh-230/invocation-error-checks/python_check.py",
+    "bytes": 1171,
+    "sha256": "cae59062353024786d82f3aa3d04bb0f240124029880f8f53010c6bf8a259513"
+  },
+  {
+    "path": "target/gh-230/invocation-error-checks/reproduce.py",
+    "bytes": 1395,
+    "sha256": "5e2edd1e5a24bfef4498784691c182f6ddd2307817b4b838134a1930eee8f908"
+  },
+  {
+    "path": "target/gh-230/invocation-error-checks/retain.py",
+    "bytes": 1638,
+    "sha256": "8bfd75dff942105aef8c9fd20a3006e407abc151151b38cc19a51b13c0c1546c"
+  },
+  {
+    "path": "tools/quality/rust_collector_entry.py",
+    "bytes": 6296,
+    "sha256": "321302db2b7fec51a15fd3dd770233d3fdf8b9c171b92249a467d652e7fe1548"
+  },
+  {
+    "path": "tools/quality/tests/test_rust_collector_project.py",
+    "bytes": 12103,
+    "sha256": "a2d8d692b78f561f2ffcffe61b0087d7546748bb107fc0893d04bb55c4c587f6"
+  },
+  {
+    "path": "docs/quality/gh-146/python-boundary.json",
+    "bytes": 46555,
+    "sha256": "dfbce023fcb99f5569901c2062e5f13b2abc3053e32206989e1c37b2c8542a25"
+  },
+  {
+    "path": "docs/quality/gh-152/python-boundary.json",
+    "bytes": 38718,
+    "sha256": "4560187780180327c830fe4808a03b9a0094059fa63b028e0fe2460ae1503646"
+  },
+  {
+    "path": "docs/quality/gh-230/invocation-errors.md",
+    "bytes": 2887,
+    "sha256": "bef765656b689063b0213aa40508185d7edbffd2a7491db8d6cbdfffaca1fa8e"
+  }
+]

@@ -21,7 +21,8 @@ import tomllib
 
 ROOT = Path(__file__).resolve().parent
 MODULES = ('rust_collector_entry', 'rust_native_driver', 'rust_native_classify', 'rust_collector_contract',
-           'collector_runner', 'harness_evidence', 'project_model', 'quality_evidence')
+           'rust_collector_project', 'rust_collector_delivery', 'collector_runner', 'harness_evidence',
+           'project_model', 'quality_evidence')
 HOST_LIBS = {'libc.so.6', 'libm.so.6', 'libpthread.so.0', 'libdl.so.2',
              'librt.so.1', 'ld-linux-x86-64.so.2'}
 

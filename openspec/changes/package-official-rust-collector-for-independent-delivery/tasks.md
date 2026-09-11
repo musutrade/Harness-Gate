@@ -12,8 +12,9 @@ GH-228's original [dependency blocker](../../../docs/quality/gh-228/blocker.md)
 is resolved by the recorded operator inputs; its failures remain retained.
 P2/P3 completion covers the private runtime and local bundle, with exact observed
 host constraints and retained license notices. The empty compatibility matrix
-still rejects all installed-host collect requests pending P6; clean-host acceptance,
-distribution obligations, required CI and controller acceptance remain separate.
+still rejects unapproved shipped combinations. P6/P7 fixture evidence is frozen
+separately below; distribution obligations, required CI and controller acceptance
+remain separate.
 Each item is estimated 1–3 focused hours (M); split before execution if larger.
 Acceptance is the concrete output/test named in each item; logs must retain failures.
 
@@ -50,14 +51,24 @@ Acceptance is the concrete output/test named in each item; logs must retain fail
 
 ## P6 Integration
 
-- [ ] P6.1 [priority:P1] [effort:M, <=3h] Bind installed collector through existing generic configuration and trusted requests.
-- [ ] P6.2 [priority:P1] [effort:M, <=3h] Test Core evaluation, unsupported capabilities and no duplicate producer/fallback launches.
+GH-230's [local acceptance](../../../docs/quality/gh-230/acceptance.md) supersedes
+historical partial/blocker records and binds completion to fresh native captures,
+installed generic invocation, released-Core decisions and independent producer counts.
+The P6.1 subdivisions were authenticated request binding (<=3h), observed delivery
+preflight/native re-export (<=3h), and installed generic invocation (<=3h).
+P7 work was split into clean fixture/re-export, rejection/relocation probes, and
+cost/archive accounting (each <=3h focused implementation); dependency waits and
+failed environment attempts are retained separately. Controller CI/review and P8
+release authorization remain pending.
+
+- [x] P6.1 [priority:P1] [effort:M, <=3h] Bind installed collector through existing generic configuration and trusted requests.
+- [x] P6.2 [priority:P1] [effort:M, <=3h] Test Core evaluation, unsupported capabilities and no duplicate producer/fallback launches.
 
 ## P7 Acceptance
 
-- [ ] P7.1 [priority:P1] [effort:M, <=3h] Run real clean-host fixture capture and full retained-binary re-export.
-- [ ] P7.2 [priority:P1] [effort:M, <=3h] Run relocation, malformed output, stale context, wrong tools and missing owner negatives.
-- [ ] P7.3 [priority:P1] [effort:M, <=3h] Measure cold/warm costs and durable artifact completeness; retain actual logs.
+- [x] P7.1 [priority:P1] [effort:M, <=3h] Run real clean-host fixture capture and full retained-binary re-export.
+- [x] P7.2 [priority:P1] [effort:M, <=3h] Run relocation, malformed output, stale context, wrong tools and missing owner negatives.
+- [x] P7.3 [priority:P1] [effort:M, <=3h] Measure cold/warm costs and durable artifact completeness; retain actual logs.
 
 ## P8 Handoff
 
