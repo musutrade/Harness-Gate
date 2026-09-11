@@ -581,6 +581,34 @@
       "authoritative_status": "Delivery/transport preflight only; released Rust Core retains all generic policy decisions.",
       "final_disposition": "Retain development delivery contract helper; frozen helpers used solely for schema/transport validation.",
       "sha256": "4e5bf1a7fa874ebec1c900813c627db43d7e61d01721b2abee845b6bfd0757fb"
+    },
+    {
+      "module": "tools/quality/build_rust_collector.py",
+      "category": "A",
+      "purpose": "Inventory and assemble a private Linux Rust collector runtime from exact local inputs.",
+      "callers": [
+        "docs/quality/gh-228/runtime.md",
+        "tools/quality/tests/test_rust_collector_runtime.py"
+      ],
+      "ci_role": "Build-input rejection regression; real bundle assembly recorded separately.",
+      "release_impact": "Build candidate only; no signature, publication or policy authority.",
+      "authoritative_status": "Packaging input validation only.",
+      "final_disposition": "Retain bounded local bundle builder; lifecycle and release supply chain require separate acceptance.",
+      "sha256": "3adcc9126919eeea9c18cb3069d3a8cccdb621d085b5cdb29c1f4ef68f03ebbd"
+    },
+    {
+      "module": "tools/quality/rust_collector_entry.py",
+      "category": "B",
+      "purpose": "Private-runtime measurement certification and classification with typed completion/error separation.",
+      "callers": [
+        "tools/quality/rust-collector-runtime/harness-gate-rust-collector",
+        "tools/quality/tests/test_rust_collector_runtime.py"
+      ],
+      "ci_role": "Native tests require explicit private runtime; measure real fixtures and retain failures.",
+      "release_impact": "Independent runtime candidate; released Core retains all policy decisions.",
+      "authoritative_status": "Measurement integrity only; unknown Core/ABI combinations cannot sample.",
+      "final_disposition": "Retain measurement entry; trusted installed-host collect integration remains P6.",
+      "sha256": "9923d134ed91ba9ea25cb9234088b7ec306fce6fedc3f0b8541b1ee82376a90f"
     }
   ],
   "policy": "docs/quality/python-retention.md",
