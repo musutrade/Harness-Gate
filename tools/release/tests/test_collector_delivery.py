@@ -326,6 +326,50 @@ class DeliveryTests(unittest.TestCase):
 
 
 class EligibilityTests(unittest.TestCase):
+    def test_personal_approval_pins_owner_and_versions_the_receipt(self):
+        environment = {'name': policy.ENVIRONMENT, 'can_admins_bypass': False,
+                       'protection_rules': [{'type': 'required_reviewers',
+                           'prevent_self_review': False,
+                           'reviewers': [{'type': 'User', 'reviewer': dict(policy.PERSONAL_REVIEWER)}]}]}
+        manifest = fixture()[0]
+        manifest['collector']['version'] = '0.1.0-rc.1'
+        from unittest.mock import Mock
+        client = Mock(repository=assets.REPOSITORY)
+        client.get_json.return_value = environment
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / 'manifest.json'
+            assets.write(path, manifest)
+            original = receipt(manifest)
+            with patch.object(policy.core, 'verify_git_state', return_value=manifest['source_commit']), \
+                    patch.object(policy.core, 'verify_ci_run', return_value=original['ci']) as ci_check:
+                actual = policy.verify(Path(temporary), path, original['tag'], original['commit'], client)
+            self.assertEqual(actual['schema'], 'rust-collector-eligibility/v2')
+            self.assertEqual(actual['environment']['reviewer']['login'], 'higoalespn')
+            ci_check.assert_called_once_with(client, original['commit'], 'main')
+            policy.validate_receipt(actual, original['tag'], original['commit'])
+            for schema in ('rust-collector-eligibility/v1', 'rust-collector-eligibility/v3'):
+                bad = copy.deepcopy(actual)
+                bad['schema'] = schema
+                with self.assertRaises(ValueError):
+                    policy.validate_receipt(bad, original['tag'], original['commit'])
+            bad = copy.deepcopy(actual)
+            bad['environment']['reviewer']['id'] = 1
+            with self.assertRaises(ValueError):
+                policy.validate_receipt(bad, original['tag'], original['commit'])
+
+        for mutate in (lambda v: v.update(name='release'),
+                       lambda v: v.update(can_admins_bypass=True),
+                       lambda v: v['protection_rules'][0].update(reviewers=[]),
+                       lambda v: v['protection_rules'][0]['reviewers'][0].update(type='Team'),
+                       lambda v: v['protection_rules'][0]['reviewers'][0]['reviewer'].update(id=1),
+                       lambda v: v['protection_rules'][0]['reviewers'][0]['reviewer'].update(login='other'),
+                       lambda v: v['protection_rules'].append(copy.deepcopy(v['protection_rules'][0])),
+                       lambda v: v['protection_rules'][0]['reviewers'].append({'type': 'User', 'reviewer': {'id': 1}})):
+            bad = copy.deepcopy(environment)
+            mutate(bad)
+            with self.assertRaises(ValueError):
+                policy.protected_environment(bad)
+
     def test_independent_eligibility_reuses_exact_main_ci_without_core_version(self):
         manifest = fixture()[0]
         manifest['collector']['version'] = '0.1.0-rc.1'
