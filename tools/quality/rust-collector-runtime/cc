@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+root=$(CDPATH= cd -- "${0%/*}/.." && pwd)
+unset GCC_EXEC_PREFIX COMPILER_PATH LIBRARY_PATH
+exec "$root/link/bin/gcc" -B"$root/link/gcc/" --sysroot="$root/link/sysroot" -L"$root/link/sysroot/usr/lib/x86_64-linux-gnu" "$@"
