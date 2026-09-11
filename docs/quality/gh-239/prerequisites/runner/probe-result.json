@@ -1,0 +1,23 @@
+{
+  "status": "local-isolation-and-startup-pass",
+  "scope": "offline local container; no Actions job or production certification",
+  "host_libraries": {
+    "launcher-shell": "c626229526bb58ec2d0f585f3c3ae1412e6f973b4353385042d11c38d8426917",
+    "ld-linux-x86-64.so.2": "bda779ea9e9ad234f60315477d7cfd0bdde861cd8ddd9df8cdaf62f18c4cec14",
+    "libc.so.6": "85e64f97e348786a8fb4d9f3d52fec289e2fb86bba20f0731dfe61990525e0f7",
+    "libdl.so.2": "59d725ca30596a9863f4fa2552a7125f834842abc86b40890231c129358965d2",
+    "libm.so.6": "1c488db6f4fe8cecb72456bc018de000b7a9b539c2994864b0416b5e8371b3d8",
+    "libpthread.so.0": "1327fc40710691dbd94e88b6cf4efce27fefe8fbb93f7d1164a75b4dccaea696",
+    "librt.so.1": "9f3cc59207bcaaac74aaf7aca961f4816f0f4d945e4bd1c3cb98ec516becf161"
+  },
+  "kernel": "7.0.0-31-generic",
+  "uid": 1000,
+  "commands": {
+    "runner": "2.337.0",
+    "node": "v24.19.0",
+    "git": "git version 2.53.0",
+    "python": "Python 3.14.4",
+    "openssl": "OpenSSL 3.5.5 27 Jan 2026 (Library: OpenSSL 3.5.5 27 Jan 2026)",
+    "gh": "gh version 2.46.0 (2025-12-13 Ubuntu 2.46.0-4)\nhttps://github.com/cli/cli/releases/tag/v2.46.0"
+  }
+}

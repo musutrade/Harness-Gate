@@ -60,10 +60,13 @@ selector must use `group: harness-gate-rust-collector-release` and
 
 The runner download API currently supplies Linux x64 runner 2.337.0 with SHA-256
 70920811a4f8ad4328818682bca5c6469c1c942fab52448868071d0063816613.
-This is a metadata observation, not a verified local binary or runner acceptance.
+That initial metadata-only observation is superseded by the verified archive and
+local startup receipts in [runner preparation](runner/README.md).
 The local host has /dev/kvm, but no qemu-system-x86_64 or virsh executable was
-found and the current user is not in the kvm group. No disposable VM or production
-runner has been provisioned. The existing GH-239 container is acceptance-only.
+found and the current user is not in the kvm group. No disposable VM or registered production
+runner has been provisioned. A separate constrained runner image has now passed
+local offline startup/isolation checks; the existing GH-239 acceptance service
+remains unchanged. See [actual receipts](runner/README.md).
 
 
 
