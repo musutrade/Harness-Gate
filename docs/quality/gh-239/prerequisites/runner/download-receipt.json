@@ -1,0 +1,12 @@
+{
+  "architecture": "x64",
+  "download_url": "https://github.com/actions/runner/releases/download/v2.337.0/actions-runner-linux-x64-2.337.0.tar.gz",
+  "filename": "actions-runner-linux-x64-2.337.0.tar.gz",
+  "os": "linux",
+  "sha256_checksum": "70920811a4f8ad4328818682bca5c6469c1c942fab52448868071d0063816613",
+  "local_path": "/mnt/dev-ssd/symphony-inputs/gh239/actions-runner/actions-runner-linux-x64-2.337.0.tar.gz",
+  "verified_sha256": "70920811a4f8ad4328818682bca5c6469c1c942fab52448868071d0063816613",
+  "size": 226430031,
+  "status": "archive-verified-not-executed-or-registered",
+  "download_proxy": "http://192.168.0.34:7890"
+}
