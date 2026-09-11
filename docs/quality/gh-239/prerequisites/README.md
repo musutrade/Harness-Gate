@@ -1,6 +1,6 @@
 # GH-239 release prerequisites
 
-Status: prepared for operator review, not provisioned or release-approved.
+Status: runner-group access provisioned; execution and release approval pending.
 GH-239 remains open and unready. Relevant Engineering Policy semantics are
 unchanged. No publication, signature, tag, baseline or Arc-Admin transfer is
 approved by this document.
@@ -20,17 +20,28 @@ approval. The owner selected GitHub storage in the 2026-09-11 conversation; no e
 
 ## Production runner configuration
 
-### Provisioning attempt and exact remaining access
+### Provisioned runner-group access boundary
 
-The organization currently exposes runner groups but no dedicated collector group.
+The initial organization inspection exposed no dedicated collector group.
 The scoped create request in `runner-group.request.json` was submitted on
 2026-09-11 and rejected with HTTP 403, `Resource not accessible by personal access
 token`. The actual response is retained in `runner-group.create-failure.json`.
-No group or runner was created. Repository admin permission does not establish
+That initial attempt created no group or runner. Repository admin permission does not establish
 organization runner-management permission. An organization owner must execute the
 request using an appropriately scoped credential (organization self-hosted runners
 write permission) or create the identical group through GitHub settings. Do not
 send a token in a PR, issue, chat or evidence file.
+
+The owner subsequently updated the credential permissions. Retry succeeded:
+organization runner group **4**, `harness-gate-rust-collector-release`, is now
+provisioned. Independent GET readback verified exactly repository ID 1346842829
+and exactly the main collector workflow, selected visibility, and enforced
+workflow restrictions. `runner-group-readback.json`,
+`runner-group-repositories.json` and `runner-group-runners.json` retain the
+responses. The group has zero runners: this establishes scheduling access only,
+not production host, runner execution, signing or RC acceptance. The earlier 403
+remains retained history. Do not recreate group 4 or request the same permission
+again. The following create command is historical/recovery reference only.
 
 ```sh
 gh api --method POST orgs/musutrade/actions/runner-groups \
