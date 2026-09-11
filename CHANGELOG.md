@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-09-11
+
+### Added
+
+- Publish the accepted generic Rust quality Core, including `quality evaluate`,
+  collector invocation, capability states, baseline/lineage and debt decisions.
+- Include accepted generic project configuration and evidence contracts, native
+  Rust measurement tooling, and independent collector installation/release tooling.
+
+### Fixed
+
+- Scope crates.io publication to the public `harness-gate` package; the workspace
+  replay tool remains non-publishable.
+
+### Compatibility and scope
+
+- Adapter producers must use the accepted protocol v2 signed-request contract;
+  review existing integrations before upgrading from 0.3.x.
+- The Core release enables follow-up testing against an identifiable published
+  executable. It does not certify GH-230 clean-host acceptance, publish an
+  independent collector package, enable GH-215, or transfer Arc-Admin authority.
+- Relevant Engineering Policy semantics remain unchanged. No threshold,
+  capability, baseline, measurement-series or release gate is weakened.
+
 ### Security
 
 - Versioned adapter requests now use protocol v2 complete-request signatures,
