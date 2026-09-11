@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import subprocess
 import sys
 
 # -I -S excludes both ambient modules and the script directory.
@@ -14,6 +15,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import rust_native_driver as native
 import rust_native_classify as classifier
 import collector_runner as runner
+import rust_collector_project as project
+import rust_collector_delivery as delivery
 from rust_collector_contract import MeasurementComplete, MeasurementFailure
 
 
@@ -61,26 +64,40 @@ def main():
         action = sub.add_parser(kind)
         action.add_argument('--evidence', required=True, type=Path)
         action.add_argument('--anchor', required=True)
-    sub.add_parser('collect')
+    action = sub.add_parser('collect')
+    action.add_argument('--binding', type=Path)
+    action.add_argument('--binding-sha256')
     args = parser.parse_args()
     try:
+        if args.action == 'collect':
+            # Read the envelope before runtime validation so operational failures
+            # still use the caller's protocol and invocation identity.
+            request = json.load(sys.stdin, object_pairs_hook=runner.evidence._unique_object,
+                                parse_constant=runner._reject_constant)
         root = Path(__file__).resolve().parents[1]
         status = doctor(root)
         if args.action == 'doctor':
             print(json.dumps(status))
             return 0
         if args.action == 'collect':
-            request = json.load(sys.stdin, object_pairs_hook=runner.evidence._unique_object,
-                                parse_constant=runner._reject_constant)
-            runner._shape(request, 'Request')
-            # The reviewed delivery matrix is empty. P6 binds the installed
-            # runtime to host-authenticated requests and a tested released Core.
-            # A working native API alone cannot authorize product sampling.
+            if isinstance(request, dict) and 'protocol_version' in request:
+                project.validate_request(request)
+                if args.binding is None or args.binding_sha256 is None:
+                    raise ValueError('generic collection requires a host-pinned capture binding')
+                binding = project.load_binding(request, args.binding, args.binding_sha256)
+                delivery.preflight(root, binding)
+                directory = Path(binding['capture']['path'])
+                delivery.capture_paths(root, directory)
+                result = measure_capture(directory, binding['capture']['anchor'])
+                if isinstance(result, MeasurementFailure):
+                    raise ValueError(result.message)
+                print(json.dumps(project.project_report(result.records[0], binding)))
+                return 0
+            else:
+                runner._shape(request, 'Request')
+            # Legacy envelopes have no authenticated delivery binding.
             raise ValueError('unknown tested Core/protocol/ABI combination; sampling blocked')
-        capture = json.loads((args.evidence / 'capture.json').read_text())
-        paths = {row['path'] for row in capture['tools'].values()}
-        native.require(all(Path(p).resolve().is_relative_to(root) for p in paths),
-                       'capture uses tools outside this private runtime; no relocation equivalence')
+        delivery.capture_paths(root, args.evidence)
         if args.action == 'classify':
             loaded = classifier.load_evidence(args.evidence, args.anchor)
             result = classifier.classify(loaded)
@@ -94,11 +111,17 @@ def main():
             raise ValueError(result.message)
         print(json.dumps({'measurement': result.records[0], 'error': None}))
         return 0
-    except (ValueError, OSError, KeyError, TypeError, runner.CollectionError) as error:
+    except (ValueError, OSError, KeyError, TypeError, subprocess.SubprocessError,
+            runner.CollectionError) as error:
         print(str(error), file=sys.stderr)
         if args.action == 'collect':
             response = {'schema': 'harness-collector-response/v1', 'evidence': [], 'artifacts': [],
                         'error': {'code': 'adapter_error', 'message': str(error)}}
+            if isinstance(locals().get('request'), dict) and 'protocol_version' in request:
+                response = {'schema_version': '1', 'status': 'FAIL',
+                            'invocation_id': request.get('invocation_id', ''), 'artifacts': [],
+                            'collection': {'schema': 'harness-project-collector-response/v1',
+                                           'evidence': [], 'error': str(error)}}
         else:
             response = {'measurement': None, 'error': {'code': 'measurement_error', 'message': str(error)}}
         print(json.dumps(response))

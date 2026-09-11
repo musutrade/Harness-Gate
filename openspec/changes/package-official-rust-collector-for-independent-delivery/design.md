@@ -116,6 +116,16 @@ split any task exceeding that bound before execution. Estimates exclude external
 approvals, hosted build time and Arc-Admin owner scheduling; no calendar promise.
 
 ## Validation status
+GH-230's [configured Core continuation](../../../docs/quality/gh-230/configured-core-continuation.md)
+exercises the released generic configuration and trusted-request boundary with
+fresh native identities. Rejection and replay diagnostics do not establish a
+supported delivery combination; clean-host acceptance remains blocked by sandbox
+access to the provisioned container infrastructure. P6/P7 remain incomplete.
+The [malformed-output continuation](../../../docs/quality/gh-230/malformed-core-continuation.md)
+records released-Core rejection and replay behavior for a synthetic malformed
+producer, alongside ten passing local standalone native/Core tests. It does not
+change delivery support or the clean-host prerequisite.
+
 The original planning environment had no OpenSpec CLI and recorded NOT RUN.
 That historical state was superseded for exact planning head
 `7b6aeb46cd168746686bcc5e48945fcc34c95545` by the
@@ -149,3 +159,25 @@ bootstrap acceptance and production key provisioning remain explicit P7/P8
 prerequisites. P6 onward remains incomplete. Required CI and controller acceptance
 still apply to each implementation PR; planning acceptance is not native/runtime,
 baseline or release acceptance. Relevant Engineering Policy semantics are unchanged.
+
+GH-230's [generic projection progress](../../../docs/quality/gh-230/project-integration.md)
+records the incomplete integration stage and fresh native tests through a
+checkout-built Core. It establishes neither released-Core invocation nor a
+clean-host supported tuple; all P6/P7 completion boxes remain open.
+The [official Core continuation](../../../docs/quality/gh-230/core-0.4.0-continuation.md)
+uses the verified distributed v0.4.0 binary and supersedes that release prerequisite.
+Clean-host acceptance remains blocked by the sandbox's Docker socket denial;
+neither local diagnostics nor operator-host probes establish a supported tuple.
+
+
+### GH-230 installed generic integration and local acceptance
+
+[GH-230 acceptance](../../../docs/quality/gh-230/acceptance.md) supersedes the
+historical P6/P7 blocker status above. Existing generic configuration and signed
+requests bind native captures and exact observed delivery identities; only released
+Core evaluates policy. Fresh pinned-container captures, complete retained-binary
+re-exports, actual Core outcomes, independent execve counts, negatives and measured
+costs establish the exact fixture candidate tuple documented there. Original
+failures are preserved. Local P6/P7 completion does not approve publication, add
+platform claims, imply series equivalence, accept a baseline or enable GH-215.
+The shipped matrix remains unapproved; controller review/CI and P8 remain separate.
