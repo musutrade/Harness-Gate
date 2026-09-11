@@ -81,6 +81,9 @@ def probe_host(trust):
 
 
 def verify_signature(directory, trust):
+    if trust.get('schema') == 'rust-collector-host-trust/v2':
+        from collector_sigstore import verify
+        return verify(directory, trust)
     require(set(trust) == {'schema', 'openssl', 'openssl_sha256', 'public_key',
                           'public_key_sha256', 'rsa_signature_bytes', 'host_libraries'},
             'invalid host trust fields')
