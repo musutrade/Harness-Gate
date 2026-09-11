@@ -20,6 +20,42 @@ approval. The owner selected GitHub storage in the 2026-09-11 conversation; no e
 
 ## Production runner configuration
 
+### Provisioning attempt and exact remaining access
+
+The organization currently exposes runner groups but no dedicated collector group.
+The scoped create request in `runner-group.request.json` was submitted on
+2026-09-11 and rejected with HTTP 403, `Resource not accessible by personal access
+token`. The actual response is retained in `runner-group.create-failure.json`.
+No group or runner was created. Repository admin permission does not establish
+organization runner-management permission. An organization owner must execute the
+request using an appropriately scoped credential (organization self-hosted runners
+write permission) or create the identical group through GitHub settings. Do not
+send a token in a PR, issue, chat or evidence file.
+
+```sh
+gh api --method POST orgs/musutrade/actions/runner-groups \
+  --input docs/quality/gh-239/prerequisites/runner-group.request.json
+```
+
+First re-list groups to avoid duplicate creation on retry. Read back the created
+group and selected repositories: require exactly repository ID 1346842829,
+`visibility=selected`, `restricted_to_workflows=true`, and exactly the main
+collector workflow in the request. The public-repository allowance is necessary
+for this one selected public repository; it is not all-repository access. Register
+at organization scope with `--runnergroup harness-gate-rust-collector-release`,
+not as a repository-scoped runner outside the group. The future production job
+selector must use `group: harness-gate-rust-collector-release` and
+`labels: rust-collector-release` together.
+
+The runner download API currently supplies Linux x64 runner 2.337.0 with SHA-256
+70920811a4f8ad4328818682bca5c6469c1c942fab52448868071d0063816613.
+This is a metadata observation, not a verified local binary or runner acceptance.
+The local host has /dev/kvm, but no qemu-system-x86_64 or virsh executable was
+found and the current user is not in the kvm group. No disposable VM or production
+runner has been provisioned. The existing GH-239 container is acceptance-only.
+
+
+
 Provision a dedicated disposable host, with no mounts of the developer home,
 Symphony workspaces, Docker socket or other credentials. Do not register the
 existing developer host as a general repository runner. A one-job runner is
@@ -36,8 +72,8 @@ Download the runner using the repository's Actions runner download API, retain
 its version/URL/SHA-256 and verify the archive before execution. Register only
 when the reviewed main publication job is approved and ready, using a short-lived
 registration token, --ephemeral --disableupdate --no-default-labels and label
-rust-collector-release. Change the reviewed template selector to exactly
-[rust-collector-release] when using no-default-labels. Never claim a label is an
+rust-collector-release. Use the group-and-label selector above in the reviewed production template
+when using no-default-labels. Never claim a label is an
 authorization boundary. Before registration, inspect all queued and in-progress
 jobs and workflow selectors, refuse any competing/untrusted job, and restrict
 runner access to the approved workflow through runner-group policy where the

@@ -11,7 +11,13 @@ manifest_bytes = (base / 'manifest.json').read_bytes()
 manifest = json.loads(manifest_bytes)
 rows = []
 with tarfile.open(base / 'collector.tar') as archive:
-    members = {member.name: member for member in archive.getmembers()}
+    entries = archive.getmembers()
+    members = {member.name: member for member in entries}
+    if len(members) != len(entries):
+        raise ValueError('duplicate archive member')
+    paths = [payload['path'] for payload in manifest['payloads']]
+    if len(set(paths)) != len(paths):
+        raise ValueError('duplicate manifest payload')
     for payload in manifest['payloads']:
         member = members[payload['path']]
         if not member.isfile():
