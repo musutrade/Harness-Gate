@@ -79,6 +79,16 @@ Installation SHALL verify exact-tag origin, complete inventory, checksums and pr
 ### Requirement: Protected independent publication
 Publication SHALL use an explicit independent inventory, SBOM and protected release approval while preserving existing Core required checks.
 
+#### Scenario: Explicit single-maintainer approval
+- **GIVEN** the reviewed single-maintainer exception for the canonical collector environment and pinned owner `higoalespn` (GitHub user ID `23396976`)
+- **WHEN** that owner manually approves a run they triggered
+- **THEN** a v2 eligibility receipt SHALL record the single-maintainer mode and exact owner; required manual review, no administrator bypass, exact-main CI and all signature/inventory checks SHALL remain mandatory.
+
+#### Scenario: Personal approval identity or receipt mismatch
+- **GIVEN** an incorrect/additional reviewer, wrong environment, administrator bypass, or a personal-mode environment in a v1 receipt
+- **WHEN** release eligibility or installed provenance is checked
+- **THEN** verification SHALL reject; no general self-review fallback or independent-review claim SHALL be inferred.
+
 #### Scenario: Incomplete release assets
 - **GIVEN** a required signature, attestation or inventory subject is missing
 - **WHEN** RC publication is attempted
