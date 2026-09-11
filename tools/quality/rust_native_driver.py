@@ -226,12 +226,15 @@ def cargo_inputs(directory, metadata, replay=False):
     return result
 
 
-def finish_cargo(directory, manifest_path, driver, sysroot, samples):
+def finish_cargo(directory, manifest_path, driver, sysroot, samples, cargo='cargo', runtime=None):
     """Finish a captured build using only project-owned contract-test binaries."""
     directory, manifest_path = Path(directory).resolve(), Path(manifest_path).resolve()
     tools = tools_identity(directory, driver, sysroot)
-    metadata = json.loads(run(directory, 'metadata', ['cargo', 'metadata', '--locked', '--format-version=1',
-                           '--manifest-path', str(manifest_path)], {'CARGO_TARGET_DIR': str(directory.parent / 'build')}).read_text())
+    metadata_env = {'CARGO_TARGET_DIR': str(directory.parent / 'build')}
+    if runtime is not None:
+        metadata_env['RUSTC'] = str(runtime / 'rust/bin/rustc')
+    metadata = json.loads(run(directory, 'metadata', [cargo, 'metadata', '--locked', '--format-version=1',
+                           '--manifest-path', str(manifest_path)], metadata_env).read_text())
     messages = [json.loads(line) for line in (directory / 'cargo.stdout').read_text().splitlines()]
     units, sources, exclusions = cargo_selection(directory, metadata, messages, manifest_path)
     artifacts = [a for a in messages if a.get('executable')]
@@ -260,7 +263,7 @@ def finish_cargo(directory, manifest_path, driver, sysroot, samples):
     return seal(directory)
 
 
-def collect_cargo(manifest_path, directory, driver, sysroot, samples, features=()):
+def collect_cargo(manifest_path, directory, driver, sysroot, samples, features=(), *, runtime=None):
     directory, manifest_path = Path(directory).resolve(), Path(manifest_path).resolve()
     directory.mkdir(parents=True, exist_ok=False)
     raw = directory / 'raw'
@@ -269,13 +272,18 @@ def collect_cargo(manifest_path, directory, driver, sysroot, samples, features=(
            'RUSTC_WORKSPACE_WRAPPER': str(Path(__file__).resolve()), 'NATIVE_CAPTURE_ROOT': str(raw),
            'NATIVE_DRIVER': str(Path(driver).resolve()), 'NATIVE_DRIVER_LIB': str(Path(sysroot) / 'lib'),
            'LLVM_PROFILE_FILE': str(raw / 'compile-%p-%m.profraw')}
-    command = ['cargo', 'test', '--locked', '--no-run', '--manifest-path', str(manifest_path), '--message-format=json']
+    cargo = 'cargo'
+    if runtime is not None:
+        cargo = str(runtime / 'rust/bin/cargo')
+        env.update({'RUSTC': str(runtime / 'rust/bin/rustc'),
+                    'RUSTC_WORKSPACE_WRAPPER': str(runtime / 'bin/native-wrapper')})
+    command = [cargo, 'test', '--locked', '--no-run', '--manifest-path', str(manifest_path), '--message-format=json']
     if features:
         command.extend(['--features', ','.join(features)])
     for sample in samples:
         command.extend(['--test', sample])
     run(raw, 'cargo', command, env)
-    return finish_cargo(raw, manifest_path, driver, sysroot, samples)
+    return finish_cargo(raw, manifest_path, driver, sysroot, samples, cargo, runtime)
 
 
 def certify(directory, anchor):
