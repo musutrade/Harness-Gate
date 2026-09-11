@@ -1,0 +1,17 @@
+{
+  "issue": {
+    "number": 229,
+    "state": "closed",
+    "state_reason": "completed"
+  },
+  "pr": {
+    "number": 235,
+    "state": "closed",
+    "merged": true,
+    "merge_commit_sha": "e24aeb351168610c00c14032a473fad61659ec2b"
+  },
+  "acceptance": {
+    "url": "https://github.com/musutrade/Harness-Gate/issues/229#issuecomment-5630432249",
+    "body": "<!-- symphony-delivery:235:cd2a0458d796dafd83d3762354139b05c9ae3efa -->\nDelivered by Symphony: PR #235\nMerge commit: `e24aeb351168610c00c14032a473fad61659ec2b`\nValidated PR head: `cd2a0458d796dafd83d3762354139b05c9ae3efa`\n\nAgent-reported local validation:\nP4.1/P4.2/P5.1/P5.2 implemented; predecessor #228 accepted/merged via #234 at 9bdc203c21a75cc769fdb2adbafb897e4b96a30e. CARGO_TARGET_DIR=$PWD/target/gh-229/cargo; TMPDIR=$PWD/target/gh-229/tmp; Git-using suites use GIT_CEILING_DIRECTORIES=$PWD/target/gh-229/tmp; final nextest removes HTTP_PROXY/HTTPS_PROXY/ALL_PROXY and lowercase equivalents. cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked: exit 0, 392 passed. cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check: exit 0. cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings: exit 0. python3 -m unittest discover -s tools/quality/tests -v: exit 0, 402 tests, 3 skipped native classes (absent RUST_COLLECTOR_RUNTIME / NATIVE_DRIVER / NATIVE_DRIVER_SYSROOT); not native positive evidence. python3 -m unittest discover -s tools/release/tests -v: exit 0, 42 tests. bash tools/release/tests/test_install.sh: exit 0. python3 tools/release/collector_dry_run.py --output target/gh-229/dry-run-final: exit 0, synthetic only. python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json: exit 0. OPENSPEC_TELEMETRY=0 openspec validate package-official-rust-collector-for-independent-delivery --strict --no-interactive: exit 0, CLI 1.10.0. git diff --check and staged check: exit 0. Two archives / 40 members digest-verified. harness-gate config check and harness-gate verify --profile ci --all: N/A (no .harness-gate/flow.toml or declared ci profile). Complete evidence and genuine failures retained in docs/quality/gh-229/. Shell git push exit 128 due unavailable proxy; identical local tree/commit uploaded through authenticated GitHub Git Database API, SHA verified. Workspace-local publish.git used because original Git metadata is read-only. No tag/release publication or hosted protected approval attempted; P6/P7/P8 remain unchecked. Submitted; CI pending; controller owns acceptance/merge/completion.\n"
+  }
+}

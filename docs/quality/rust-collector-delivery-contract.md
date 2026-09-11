@@ -113,3 +113,20 @@ series or reset a baseline to obtain compatibility. The historical
 Related authority decisions: [ADR-0040](../adr/0040-language-agnostic-evidence-policy.md)
 and [ADR-0049](../adr/0049-project-owned-validation-extension-boundary.md).
 Validation and limitations are retained in [GH-227 evidence](gh-227/validation.md).
+
+
+## Installed generic invocation (GH-230)
+
+The [capture binding schema](../../tools/quality/schema/rust-project-collector-binding.schema.json)
+binds the authenticated generic request to native owners, the independent capture
+anchor and digest-pinned delivery manifest/matrix. The host signs the exact
+`collect --binding ABSOLUTE_PATH --binding-sha256 SHA256` arguments using existing
+Core configuration and trusted request machinery. The collector observes exact
+runtime/tool/Core/ABI identities before native re-export and normalized projection;
+Core remains the sole policy authority. See the
+[configuration fixture](../../tools/quality/tests/rust_collector_config_fixture.py)
+and [local acceptance receipt](gh-230/acceptance.md) for executable examples, the
+frozen candidate tuple, independent producer counts and retained original bytes.
+Earlier P6 future-tense descriptions above are historical contract milestones.
+Unknown shipped combinations still fail closed; fixture evidence does not authorize
+publication, baseline acceptance, relocation equivalence or Arc-Admin integration.

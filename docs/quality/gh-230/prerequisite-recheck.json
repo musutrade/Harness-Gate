@@ -1,0 +1,59 @@
+{
+  "checked_at_utc": "2026-09-11T06:47:14.497352+00:00",
+  "workspace": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+  "status": "environment_dependency_wait",
+  "checks": [
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD",
+        "origin/main"
+      ],
+      "exit_code": 0,
+      "stdout": "e24aeb351168610c00c14032a473fad61659ec2b\ne24aeb351168610c00c14032a473fad61659ec2b\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "branch",
+        "--show-current"
+      ],
+      "exit_code": 0,
+      "stdout": "symphony/GH-230\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "rustup",
+        "component",
+        "list",
+        "--installed"
+      ],
+      "exit_code": 0,
+      "stdout": "cargo-x86_64-unknown-linux-gnu\nclippy-x86_64-unknown-linux-gnu\nllvm-tools-x86_64-unknown-linux-gnu\nrust-docs-x86_64-unknown-linux-gnu\nrust-std-x86_64-pc-windows-msvc\nrust-std-x86_64-unknown-linux-gnu\nrustc-x86_64-unknown-linux-gnu\nrustfmt-x86_64-unknown-linux-gnu\n",
+      "stderr": ""
+    }
+  ],
+  "native_environment": {
+    "RUST_COLLECTOR_RUNTIME": null,
+    "NATIVE_DRIVER": null,
+    "NATIVE_DRIVER_SYSROOT": null
+  },
+  "workspace_scan": {
+    "follow_symlinks": false,
+    "excluded_directories": [
+      ".git",
+      "node_modules"
+    ],
+    "filenames": [
+      "rustc-dev-*",
+      "harness-gate-rust-native-driver",
+      "librustc_driver*"
+    ],
+    "matches": []
+  },
+  "network_retry": "Not attempted: retained policy denial unresolved; no alternate route used.",
+  "validation": "No implementation changes; prior validation results retained, not rerun or claimed passing."
+}

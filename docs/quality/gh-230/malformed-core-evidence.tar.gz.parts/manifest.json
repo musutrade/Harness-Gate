@@ -1,0 +1,44 @@
+{
+  "original_archive": "malformed-core-evidence.tar.gz",
+  "bytes": 18647677,
+  "sha256": "0a8949691bea1c272a1560ac253d0acc268a101fffc0722e334d3dc0cad8b982",
+  "parts": [
+    {
+      "file": "part-0000",
+      "bytes": 2880000,
+      "sha256": "2dc3fbfa037de0bcd7f9cda016dd2c0adfd4515eb0be5cedcf364c80e9d73299"
+    },
+    {
+      "file": "part-0001",
+      "bytes": 2880000,
+      "sha256": "4f8d47030b6527f6e24a376c2593a916e2f6b04656716a7d64ba4861d704fe47"
+    },
+    {
+      "file": "part-0002",
+      "bytes": 2880000,
+      "sha256": "d8e180fa29b0e9955a6a4ffd92a493cdb311c03bd278ece669473e47ac10c8d4"
+    },
+    {
+      "file": "part-0003",
+      "bytes": 2880000,
+      "sha256": "6947ccd7126b2bb549840fa8a74ee1ae1ed710ab7ed2e19f51279d1dc807ce1f"
+    },
+    {
+      "file": "part-0004",
+      "bytes": 2880000,
+      "sha256": "2dfb4738df401c677b6a6acf0096ba7d763c97f737fbd87dbdc113760c8d064b"
+    },
+    {
+      "file": "part-0005",
+      "bytes": 2880000,
+      "sha256": "152981798acc04ec29348e3ce6ec3a19b8607a472b9ee602ff61fc50df540fc7"
+    },
+    {
+      "file": "part-0006",
+      "bytes": 1367677,
+      "sha256": "bc3891b0c156c01f1fc2083c165f8b830cc318c5ede2457eca6c217a74e65713"
+    }
+  ],
+  "reconstruct_from_parts_directory": "cat part-* > ../malformed-core-evidence.tar.gz",
+  "verify": "Verify original archive SHA-256 before extraction; original per-file inventory remains unchanged."
+}

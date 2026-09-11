@@ -1,0 +1,72 @@
+{
+  "bytes": 11489,
+  "sha256": "988547779b8c1c175a14267d6ad3072f2411e54d841735cc8a1c533de2a1eb19",
+  "archive_member_sha256_verified": true,
+  "files": [
+    {
+      "path": "target/gh-230/malformed-continuation/diff.json",
+      "bytes": 1267,
+      "sha256": "6678f1b0c35d85edce70c3e9ab289906b4be3330c65f5db0a80b21aa29833b71"
+    },
+    {
+      "path": "target/gh-230/malformed-continuation/diff.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-230/malformed-continuation/docs-report.txt",
+      "bytes": 1488,
+      "sha256": "f47b5658e617832382fd7f684e2812623e5b9ef203183eb2385fd27a2ff4533c"
+    },
+    {
+      "path": "target/gh-230/malformed-continuation/docs.json",
+      "bytes": 1268,
+      "sha256": "8c35bd53ba10b3fcaab5116b38b4b970de14d4ba184386ef90861f8a740c9b50"
+    },
+    {
+      "path": "target/gh-230/malformed-continuation/docs.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-230/malformed-continuation/evidence-directories.json",
+      "bytes": 48,
+      "sha256": "b523ebd7d6e4c9aed0a852db5cc74b6ed994b7f310c368a0ef40e27675b5eb5e"
+    },
+    {
+      "path": "target/gh-230/malformed-continuation/native.json",
+      "bytes": 1228,
+      "sha256": "8b381da46018ae7deda052e3534f3a159e6e184027581e609d6fc4ed897dc82d"
+    },
+    {
+      "path": "target/gh-230/malformed-continuation/native.log",
+      "bytes": 2010,
+      "sha256": "e0eed65e1ff6c202e5981f1bd1d31b10f3cc8d2a38069a5857587ba07a5d6b2e"
+    },
+    {
+      "path": "target/gh-230/malformed-continuation/openspec.json",
+      "bytes": 1288,
+      "sha256": "7be986f70544a1f356a148ba38c66769b237050ef4d59016ffcc161392b6f47f"
+    },
+    {
+      "path": "target/gh-230/malformed-continuation/openspec.log",
+      "bytes": 75,
+      "sha256": "870eee9fc1789e7071418a7ad67af1f541507853598cc27efde127f090653be1"
+    },
+    {
+      "path": "target/gh-230/malformed-continuation/retain-validation.py",
+      "bytes": 1143,
+      "sha256": "cf5fb5775697e10377426648945712cd4403bc13cc4c53ba6969880bdfd837ae"
+    },
+    {
+      "path": "target/gh-230/malformed-continuation/tested-sources/rust_collector_config_fixture.py",
+      "bytes": 12160,
+      "sha256": "8f0b43d55bc2c33039db966f7e3dc03be87b7d1f07617d1dbd7b28f3df386d97"
+    },
+    {
+      "path": "target/gh-230/malformed-continuation/tested-sources/test_rust_collector_runtime.py",
+      "bytes": 26287,
+      "sha256": "a78a67dffdadca4c167346dc889ca4e8e1bc57b161feb23358c66e95086af9c2"
+    }
+  ]
+}
