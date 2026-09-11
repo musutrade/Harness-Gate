@@ -1,0 +1,38 @@
+{
+  "sysroot": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu",
+  "components": [
+    "clippy-preview-x86_64-unknown-linux-gnu",
+    "cargo-x86_64-unknown-linux-gnu",
+    "rust-docs-x86_64-unknown-linux-gnu",
+    "rust-std-x86_64-unknown-linux-gnu",
+    "rustfmt-preview-x86_64-unknown-linux-gnu",
+    "rustc-x86_64-unknown-linux-gnu",
+    "llvm-tools-preview-x86_64-unknown-linux-gnu",
+    "rust-std-x86_64-pc-windows-msvc"
+  ],
+  "rustc_driver": [
+    "lib/librustc_driver-832cf6cfb1386559.so"
+  ],
+  "rustc_middle": [],
+  "llvm_tools": [
+    "lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+    "lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-ar",
+    "lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-readobj",
+    "lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-objcopy",
+    "lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-nm",
+    "lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-as",
+    "lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-objdump",
+    "lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-link",
+    "lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-size",
+    "lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-strip",
+    "lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+    "lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-dis"
+  ],
+  "python": {
+    "executable": "/usr/bin/python3",
+    "version": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
+    "prefix": "/usr",
+    "config_args": "'--enable-shared' '--prefix=/usr' '--libdir=/usr/lib/x86_64-linux-gnu' '--enable-ipv6' '--enable-loadable-sqlite-extensions' '--with-dbmliborder=bdb:gdbm' '--with-computed-gotos' '--without-ensurepip' '--with-system-expat' '--with-dtrace' '--with-ssl-default-suites=openssl' '--with-system-libmpdec=no' '--with-wheel-pkg-dir=/usr/share/python-wheels/' 'MKDIR_P=/bin/mkdir -p' '--enable-experimental-jit=yes-off' 'CC=x86_64-linux-gnu-gcc'"
+  },
+  "bootstrap_stderr": "Traceback (most recent call last):\n  File \"/usr/lib/python3.14/urllib/request.py\", line 1321, in do_open\n    h.request(req.get_method(), req.selector, req.data, headers,\n    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n              encode_chunked=req.has_header('Transfer-encoding'))\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.14/http/client.py\", line 1367, in request\n    self._send_request(method, url, body, headers, encode_chunked)\n    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.14/http/client.py\", line 1413, in _send_request\n    self.endheaders(body, encode_chunked=encode_chunked)\n    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.14/http/client.py\", line 1362, in endheaders\n    self._send_output(message_body, encode_chunked=encode_chunked)\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.14/http/client.py\", line 1122, in _send_output\n    self.send(msg)\n    ~~~~~~~~~^^^^^\n  File \"/usr/lib/python3.14/http/client.py\", line 1066, in send\n    self.connect()\n    ~~~~~~~~~~~~^^\n  File \"/usr/lib/python3.14/http/client.py\", line 1501, in connect\n    super().connect()\n    ~~~~~~~~~~~~~~~^^\n  File \"/usr/lib/python3.14/http/client.py\", line 1042, in connect\n    self._tunnel()\n    ~~~~~~~~~~~~^^\n  File \"/usr/lib/python3.14/http/client.py\", line 1000, in _tunnel\n    (version, code, message) = response._read_status()\n                               ~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/usr/lib/python3.14/http/client.py\", line 305, in _read_status\n    raise RemoteDisconnected(\"Remote end closed connection without\"\n                             \" response\")\nhttp.client.RemoteDisconnected: Remote end closed connection without response\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/mnt/dev-ssd/workspaces/symphony/GH-228/tools/quality/rust-native-driver/bootstrap.py\", line 74, in <module>\n    main()\n    ~~~~^^\n  File \"/mnt/dev-ssd/workspaces/symphony/GH-228/tools/quality/rust-native-driver/bootstrap.py\", line 48, in main\n    with urllib.request.urlopen(URL, timeout=60) as source, archive.open('wb') as target:\n         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.14/urllib/request.py\", line 187, in urlopen\n    return opener.open(url, data, timeout)\n           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.14/urllib/request.py\", line 487, in open\n    response = self._open(req, data)\n  File \"/usr/lib/python3.14/urllib/request.py\", line 504, in _open\n    result = self._call_chain(self.handle_open, protocol, protocol +\n                              '_open', req)\n  File \"/usr/lib/python3.14/urllib/request.py\", line 464, in _call_chain\n    result = func(*args)\n  File \"/usr/lib/python3.14/urllib/request.py\", line 1369, in https_open\n    return self.do_open(http.client.HTTPSConnection, req,\n           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        context=self._context)\n                        ^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.14/urllib/request.py\", line 1324, in do_open\n    raise URLError(err)\nurllib.error.URLError: <urlopen error Remote end closed connection without response>\n"
+}
