@@ -1,0 +1,3 @@
+usage: production_installer.py --trust TRUST
+production_installer.py: error: the following arguments are required: --trust
+Container receipt: gh239-acceptance-57049d92497541ccb4f0cba3db8f88e6

@@ -207,3 +207,14 @@ license closure and real verification receipts before signing or publication.
 No successful eligibility record is fabricated to prepare unsigned bytes. Actual
 Sigstore and fresh-host acceptance, production trust, environment provisioning,
 durable artifact retention and explicit publication approval remain prerequisites.
+
+
+### GH-239 proposed personal-project delivery exception
+
+The owner confirmed there is no second maintainer. The explicit proposed delta
+allows only the pinned owner to manually approve their own collector run, with
+no admin bypass and all existing CI, exact-source, signatures and artifact checks.
+It uses a v2 eligibility receipt; v1 retains the separate-reviewer contract.
+See [operator preparation and rollback](../../../docs/quality/gh-239/operator-preparation.md).
+This is not publication approval or completed P8 acceptance. Core release and
+Engineering Policy quality/authority semantics remain unchanged.
