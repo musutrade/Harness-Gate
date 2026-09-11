@@ -49,6 +49,15 @@ Latest release evidence (2026-09-03):
   constitute DevRail staging, shadow/canary, rollback-authority, or R-07
   OS-sandbox acceptance.
 
+## Pending 0.4.0 Core publication
+
+The [0.4.0 release plan](../openspec/changes/release-0-4-0/proposal.md)
+publishes the accepted generic quality Core needed for released-binary
+validation in GH-230. Candidate/native compatibility must pass before the normal
+PR, exact-main CI, immutable tag and protected publication sequence. This does
+not publish an independent collector or certify GH-230/GH-215. Relevant
+Engineering Policy semantics and all release gates are unchanged.
+
 ## Release Procedure
 
 1. Merge the version, changelog, and release-record change through a pull
