@@ -1,0 +1,19 @@
+{
+  "original_archive": "trusted-invocation-evidence.tar.gz",
+  "bytes": 5625930,
+  "sha256": "6a0d475363679657fcf52b63a8b0e1f5f3f884eb6e1708ab64e55563bf58da8b",
+  "parts": [
+    {
+      "file": "part-0000",
+      "bytes": 2880000,
+      "sha256": "7345fcf1a6a039d0b440e53af3b659c0e2f121d16000e40d11ce58cf456f9f5a"
+    },
+    {
+      "file": "part-0001",
+      "bytes": 2745930,
+      "sha256": "ad033a7b2de504cf4ebc5a6333e31ea9e2fd128fc2b60e615acc2f65fb068fb7"
+    }
+  ],
+  "reconstruct_from_parts_directory": "cat part-* > ../trusted-invocation-evidence.tar.gz",
+  "verify": "Verify original archive SHA-256 before extraction; original per-file inventory remains unchanged."
+}

@@ -1,0 +1,3308 @@
+{
+  "method": "Independent strace execve success records; failed executable PATH probes retained separately; version/cfg probes are not producers",
+  "assertions": {
+    "collect-execve.log": {
+      "collector_invocation": 1,
+      "compiler_producer": 0,
+      "sample_producer": 0,
+      "coverage_export": 1
+    },
+    "malformed-execve.log": {
+      "malformed_invocation": 1,
+      "collector_invocation": 0,
+      "compiler_producer": 0,
+      "sample_producer": 0
+    },
+    "cost-execve.log": {
+      "compiler_producer": 1,
+      "sample_producer": 1,
+      "profile_merge": 3,
+      "coverage_export": 3
+    },
+    "relocation-execve.log": {
+      "collector_invocation": 1,
+      "compiler_producer": 0,
+      "sample_producer": 0,
+      "coverage_export": 0
+    },
+    "negatives-execve.log": {
+      "collector_invocation": 6,
+      "compiler_producer": 0,
+      "sample_producer": 0,
+      "coverage_export": 1
+    }
+  },
+  "traces": {
+    "collect-execve.log": {
+      "counts": {
+        "other": 2,
+        "core_collect": 3,
+        "collector_invocation": 1,
+        "identity_or_cfg_probe": 5,
+        "profile_merge": 1,
+        "coverage_export": 1
+      },
+      "successful_execs": [
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/work/driver/tools/quality/tests/rust_collector_clean_host.py",
+            "collect"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "quality",
+            "collect",
+            "--repository-root",
+            "/work/configured/project",
+            "--state",
+            "/work/configured/state.json",
+            "--trusted-keys",
+            "/work/configured/trusted-keys.json",
+            "--output",
+            "/work/configured/collection.json"
+          ],
+          "role": "core_collect"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "quality",
+            "collect",
+            "--repository-root",
+            "/work/configured/project",
+            "--state",
+            "/work/configured/state.json",
+            "--trusted-keys",
+            "/work/configured/trusted-keys.json",
+            "--output",
+            "/work/configured/collection.json"
+          ],
+          "role": "core_collect"
+        },
+        {
+          "executable": "/runtime/bin/harness-gate-rust-collector",
+          "args": [
+            "/runtime/bin/harness-gate-rust-collector",
+            "collect",
+            "--binding",
+            "/work/configured/binding.json",
+            "--binding-sha256",
+            "436733f7432ffc010fb226c89a00c600c0c2f8c2a48d0ec42e6e91405befb529"
+          ],
+          "role": "collector_invocation"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/runtime/app/rust_collector_entry.py",
+            "collect",
+            "--binding",
+            "/work/configured/binding.json",
+            "--binding-sha256",
+            "436733f7432ffc010fb226c89a00c600c0c2f8c2a48d0ec42e6e91405befb529"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/bin/rustc",
+          "args": [
+            "/runtime/rust/bin/rustc",
+            "-vV"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "merge",
+            "-sparse",
+            "/work/captures/native-replay-o3hb2let/sample.profraw",
+            "-o",
+            "/work/captures/native-replay-o3hb2let/native.profdata"
+          ],
+          "role": "profile_merge"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "export",
+            "/work/captures/native-replay-o3hb2let/native_driver_fixture",
+            "-instr-profile=/work/captures/native-replay-o3hb2let/native.profdata"
+          ],
+          "role": "coverage_export"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "quality",
+            "collect",
+            "--repository-root",
+            "/work/configured/project",
+            "--state",
+            "/work/configured/state.json",
+            "--trusted-keys",
+            "/work/configured/trusted-keys.json",
+            "--output",
+            "/work/configured/replay-collection.json"
+          ],
+          "role": "core_collect"
+        }
+      ],
+      "failed_path_lookups": []
+    },
+    "cost-execve.log": {
+      "counts": {
+        "other": 6,
+        "identity_or_cfg_probe": 4,
+        "compiler_producer": 1,
+        "sample_producer": 1,
+        "profile_merge": 3,
+        "coverage_export": 3
+      },
+      "successful_execs": [
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/work/driver/tools/quality/tests/rust_collector_clean_host.py",
+            "cost"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/rust/bin/rustc",
+          "args": [
+            "/runtime/rust/bin/rustc",
+            "-vV"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/bin/rustc",
+          "args": [
+            "/runtime/rust/bin/rustc",
+            "--sysroot",
+            "/runtime/rust",
+            "/work/cost/capture/fixture.rs",
+            "--edition=2021",
+            "--crate-name",
+            "native_driver_fixture",
+            "-C",
+            "instrument-coverage",
+            "-C",
+            "link-dead-code",
+            "-C",
+            "opt-level=0",
+            "-Z",
+            "mir-opt-level=0",
+            "--out-dir",
+            "/work/cost/capture",
+            "--print=cfg"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/bin/harness-gate-rust-native-driver",
+          "args": [
+            "/runtime/bin/harness-gate-rust-native-driver",
+            "--sysroot",
+            "/runtime/rust",
+            "/work/cost/capture/fixture.rs",
+            "--edition=2021",
+            "--crate-name",
+            "native_driver_fixture",
+            "-C",
+            "instrument-coverage",
+            "-C",
+            "link-dead-code",
+            "-C",
+            "opt-level=0",
+            "-Z",
+            "mir-opt-level=0",
+            "--out-dir",
+            "/work/cost/capture"
+          ],
+          "role": "compiler_producer"
+        },
+        {
+          "executable": "/runtime/bin/cc",
+          "args": [
+            "cc",
+            "-m64",
+            "/work/cost/capture/rustcjAaksP/symbols.o",
+            "/work/cost/capture/native_driver_fixture.native_driver_fixture.13ca7322dc53b32b-cgu.0.rcgu.o",
+            "/work/cost/capture/native_driver_fixture.chzqx0iemwjdpgo1y63739a3p.rcgu.o",
+            "-Wl,--as-needed",
+            "-Wl,-Bstatic",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libprofiler_builtins-3bb349696bf4ca2e.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd-c64e6e11aa24fc43.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libpanic_unwind-e8f3c569ec017ae8.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libobject-f810d9e1ec7b3602.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libmemchr-5338843b9da46083.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libaddr2line-02954dcf5cbc5891.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libgimli-34f31eace0d7245f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcfg_if-c966e4159bd8bc70.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_demangle-73bcb43673848f30.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd_detect-64da8f7c5e658436.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libhashbrown-51d9ae21a16391ba.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_alloc-99955b4d3549c390.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libminiz_oxide-24b69c27fbe9064f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libadler2-57de982d9269a3a4.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libunwind-d90fb703b61b002d.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liblibc-8da72b3f3dca3868.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_core-79f73bde78643b0a.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liballoc-e17b81f57125c74c.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-b5d59729c8525f07.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-085f534a869f02d5.rlib",
+            "-Wl,-Bdynamic",
+            "-lgcc_s",
+            "-lutil",
+            "-lrt",
+            "-lpthread",
+            "-lm",
+            "-ldl",
+            "-lc",
+            "-L",
+            "/work/cost/capture/rustcjAaksP/raw-dylibs",
+            "-B/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-B/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-fuse-ld=lld",
+            "-Wl,--eh-frame-hdr",
+            "-Wl,-z,noexecstack",
+            "-L",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+            "-o",
+            "/work/cost/capture/native_driver_fixture",
+            "-pie",
+            "-Wl,-z,relro,-z,now",
+            "-nodefaultlibs",
+            "-u",
+            "__llvm_profile_runtime"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/link/bin/gcc",
+          "args": [
+            "/runtime/link/bin/gcc",
+            "-B/runtime/link/gcc/",
+            "--sysroot=/runtime/link/sysroot",
+            "-L/runtime/link/sysroot/usr/lib/x86_64-linux-gnu",
+            "-m64",
+            "/work/cost/capture/rustcjAaksP/symbols.o",
+            "/work/cost/capture/native_driver_fixture.native_driver_fixture.13ca7322dc53b32b-cgu.0.rcgu.o",
+            "/work/cost/capture/native_driver_fixture.chzqx0iemwjdpgo1y63739a3p.rcgu.o",
+            "-Wl,--as-needed",
+            "-Wl,-Bstatic",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libprofiler_builtins-3bb349696bf4ca2e.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd-c64e6e11aa24fc43.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libpanic_unwind-e8f3c569ec017ae8.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libobject-f810d9e1ec7b3602.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libmemchr-5338843b9da46083.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libaddr2line-02954dcf5cbc5891.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libgimli-34f31eace0d7245f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcfg_if-c966e4159bd8bc70.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_demangle-73bcb43673848f30.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd_detect-64da8f7c5e658436.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libhashbrown-51d9ae21a16391ba.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_alloc-99955b4d3549c390.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libminiz_oxide-24b69c27fbe9064f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libadler2-57de982d9269a3a4.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libunwind-d90fb703b61b002d.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liblibc-8da72b3f3dca3868.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_core-79f73bde78643b0a.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liballoc-e17b81f57125c74c.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-b5d59729c8525f07.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-085f534a869f02d5.rlib",
+            "-Wl,-Bdynamic",
+            "-lgcc_s",
+            "-lutil",
+            "-lrt",
+            "-lpthread",
+            "-lm",
+            "-ldl",
+            "-lc",
+            "-L",
+            "/work/cost/capture/rustcjAaksP/raw-dylibs",
+            "-B/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-B/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-fuse-ld=lld",
+            "-Wl,--eh-frame-hdr",
+            "-Wl,-z,noexecstack",
+            "-L",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+            "-o",
+            "/work/cost/capture/native_driver_fixture",
+            "-pie",
+            "-Wl,-z,relro,-z,now",
+            "-nodefaultlibs",
+            "-u",
+            "__llvm_profile_runtime"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/link/gcc/collect2",
+          "args": [
+            "/runtime/link/gcc/collect2",
+            "-plugin",
+            "/runtime/link/gcc/liblto_plugin.so",
+            "-plugin-opt=/runtime/link/gcc/lto-wrapper",
+            "-plugin-opt=-fresolution=/work/tmp/ccQ6jclx.res",
+            "--sysroot=/runtime/link/sysroot",
+            "--build-id",
+            "--eh-frame-hdr",
+            "-m",
+            "elf_x86_64",
+            "--hash-style=gnu",
+            "--as-needed",
+            "-dynamic-linker",
+            "/lib64/ld-linux-x86-64.so.2",
+            "-pie",
+            "-z",
+            "now",
+            "-fuse-ld=lld",
+            "-z",
+            "relro",
+            "-o",
+            "/work/cost/capture/native_driver_fixture",
+            "-u",
+            "__llvm_profile_runtime",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/Scrt1.o",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/crti.o",
+            "/runtime/link/gcc/crtbeginS.o",
+            "-L/runtime/link/sysroot/usr/lib/x86_64-linux-gnu",
+            "-L/work/cost/capture/rustcjAaksP/raw-dylibs",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+            "-L/runtime/link/gcc",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-L/runtime/link/sysroot/usr/lib/x86_64-linux-gnu",
+            "-L/runtime/link/sysroot/usr/lib/../lib",
+            "-L/runtime/link/sysroot/usr/lib",
+            "/work/cost/capture/rustcjAaksP/symbols.o",
+            "/work/cost/capture/native_driver_fixture.native_driver_fixture.13ca7322dc53b32b-cgu.0.rcgu.o",
+            "/work/cost/capture/native_driver_fixture.chzqx0iemwjdpgo1y63739a3p.rcgu.o",
+            "--as-needed",
+            "-Bstatic",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libprofiler_builtins-3bb349696bf4ca2e.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd-c64e6e11aa24fc43.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libpanic_unwind-e8f3c569ec017ae8.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libobject-f810d9e1ec7b3602.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libmemchr-5338843b9da46083.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libaddr2line-02954dcf5cbc5891.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libgimli-34f31eace0d7245f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcfg_if-c966e4159bd8bc70.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_demangle-73bcb43673848f30.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd_detect-64da8f7c5e658436.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libhashbrown-51d9ae21a16391ba.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_alloc-99955b4d3549c390.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libminiz_oxide-24b69c27fbe9064f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libadler2-57de982d9269a3a4.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libunwind-d90fb703b61b002d.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liblibc-8da72b3f3dca3868.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_core-79f73bde78643b0a.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liballoc-e17b81f57125c74c.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-b5d59729c8525f07.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-085f534a869f02d5.rlib",
+            "-Bdynamic",
+            "-lgcc_s",
+            "-lutil",
+            "-lrt",
+            "-lpthread",
+            "-lm",
+            "-ldl",
+            "-lc",
+            "--eh-frame-hdr",
+            "-z",
+            "noexecstack",
+            "-z",
+            "relro",
+            "-z",
+            "now",
+            "/runtime/link/gcc/crtendS.o",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/crtn.o"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld/ld.lld",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld/ld.lld",
+            "-plugin",
+            "/runtime/link/gcc/liblto_plugin.so",
+            "-plugin-opt=/runtime/link/gcc/lto-wrapper",
+            "-plugin-opt=-fresolution=/work/tmp/ccQ6jclx.res",
+            "--sysroot=/runtime/link/sysroot",
+            "--build-id",
+            "--eh-frame-hdr",
+            "-m",
+            "elf_x86_64",
+            "--hash-style=gnu",
+            "--as-needed",
+            "-dynamic-linker",
+            "/lib64/ld-linux-x86-64.so.2",
+            "-pie",
+            "-z",
+            "now",
+            "-z",
+            "relro",
+            "-o",
+            "/work/cost/capture/native_driver_fixture",
+            "-u",
+            "__llvm_profile_runtime",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/Scrt1.o",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/crti.o",
+            "/runtime/link/gcc/crtbeginS.o",
+            "-L/runtime/link/sysroot/usr/lib/x86_64-linux-gnu",
+            "-L/work/cost/capture/rustcjAaksP/raw-dylibs",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+            "-L/runtime/link/gcc",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-L/runtime/link/sysroot/usr/lib/x86_64-linux-gnu",
+            "-L/runtime/link/sysroot/usr/lib/../lib",
+            "-L/runtime/link/sysroot/usr/lib",
+            "/work/cost/capture/rustcjAaksP/symbols.o",
+            "/work/cost/capture/native_driver_fixture.native_driver_fixture.13ca7322dc53b32b-cgu.0.rcgu.o",
+            "/work/cost/capture/native_driver_fixture.chzqx0iemwjdpgo1y63739a3p.rcgu.o",
+            "--as-needed",
+            "-Bstatic",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libprofiler_builtins-3bb349696bf4ca2e.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd-c64e6e11aa24fc43.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libpanic_unwind-e8f3c569ec017ae8.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libobject-f810d9e1ec7b3602.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libmemchr-5338843b9da46083.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libaddr2line-02954dcf5cbc5891.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libgimli-34f31eace0d7245f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcfg_if-c966e4159bd8bc70.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_demangle-73bcb43673848f30.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd_detect-64da8f7c5e658436.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libhashbrown-51d9ae21a16391ba.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_alloc-99955b4d3549c390.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libminiz_oxide-24b69c27fbe9064f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libadler2-57de982d9269a3a4.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libunwind-d90fb703b61b002d.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liblibc-8da72b3f3dca3868.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_core-79f73bde78643b0a.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liballoc-e17b81f57125c74c.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-b5d59729c8525f07.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-085f534a869f02d5.rlib",
+            "-Bdynamic",
+            "-lgcc_s",
+            "-lutil",
+            "-lrt",
+            "-lpthread",
+            "-lm",
+            "-ldl",
+            "-lc",
+            "--eh-frame-hdr",
+            "-z",
+            "noexecstack",
+            "-z",
+            "relro",
+            "-z",
+            "now",
+            "/runtime/link/gcc/crtendS.o",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/crtn.o"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/rust-lld",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/rust-lld",
+            "-flavor",
+            "gnu",
+            "-plugin",
+            "/runtime/link/gcc/liblto_plugin.so",
+            "-plugin-opt=/runtime/link/gcc/lto-wrapper",
+            "-plugin-opt=-fresolution=/work/tmp/ccQ6jclx.res",
+            "--sysroot=/runtime/link/sysroot",
+            "--build-id",
+            "--eh-frame-hdr",
+            "-m",
+            "elf_x86_64",
+            "--hash-style=gnu",
+            "--as-needed",
+            "-dynamic-linker",
+            "/lib64/ld-linux-x86-64.so.2",
+            "-pie",
+            "-z",
+            "now",
+            "-z",
+            "relro",
+            "-o",
+            "/work/cost/capture/native_driver_fixture",
+            "-u",
+            "__llvm_profile_runtime",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/Scrt1.o",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/crti.o",
+            "/runtime/link/gcc/crtbeginS.o",
+            "-L/runtime/link/sysroot/usr/lib/x86_64-linux-gnu",
+            "-L/work/cost/capture/rustcjAaksP/raw-dylibs",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+            "-L/runtime/link/gcc",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-L/runtime/link/sysroot/usr/lib/x86_64-linux-gnu",
+            "-L/runtime/link/sysroot/usr/lib/../lib",
+            "-L/runtime/link/sysroot/usr/lib",
+            "/work/cost/capture/rustcjAaksP/symbols.o",
+            "/work/cost/capture/native_driver_fixture.native_driver_fixture.13ca7322dc53b32b-cgu.0.rcgu.o",
+            "/work/cost/capture/native_driver_fixture.chzqx0iemwjdpgo1y63739a3p.rcgu.o",
+            "--as-needed",
+            "-Bstatic",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libprofiler_builtins-3bb349696bf4ca2e.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd-c64e6e11aa24fc43.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libpanic_unwind-e8f3c569ec017ae8.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libobject-f810d9e1ec7b3602.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libmemchr-5338843b9da46083.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libaddr2line-02954dcf5cbc5891.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libgimli-34f31eace0d7245f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcfg_if-c966e4159bd8bc70.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_demangle-73bcb43673848f30.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd_detect-64da8f7c5e658436.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libhashbrown-51d9ae21a16391ba.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_alloc-99955b4d3549c390.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libminiz_oxide-24b69c27fbe9064f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libadler2-57de982d9269a3a4.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libunwind-d90fb703b61b002d.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liblibc-8da72b3f3dca3868.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_core-79f73bde78643b0a.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liballoc-e17b81f57125c74c.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-b5d59729c8525f07.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-085f534a869f02d5.rlib",
+            "-Bdynamic",
+            "-lgcc_s",
+            "-lutil",
+            "-lrt",
+            "-lpthread",
+            "-lm",
+            "-ldl",
+            "-lc",
+            "--eh-frame-hdr",
+            "-z",
+            "noexecstack",
+            "-z",
+            "relro",
+            "-z",
+            "now",
+            "/runtime/link/gcc/crtendS.o",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/crtn.o"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/work/cost/capture/native_driver_fixture",
+          "args": [
+            "/work/cost/capture/native_driver_fixture"
+          ],
+          "role": "sample_producer"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "merge",
+            "-sparse",
+            "/work/cost/capture/sample.profraw",
+            "-o",
+            "/work/cost/capture/native.profdata"
+          ],
+          "role": "profile_merge"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "export",
+            "/work/cost/capture/native_driver_fixture",
+            "-instr-profile=/work/cost/capture/native.profdata"
+          ],
+          "role": "coverage_export"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "merge",
+            "-sparse",
+            "/work/cost/native-replay-sa4z0_23/sample.profraw",
+            "-o",
+            "/work/cost/native-replay-sa4z0_23/native.profdata"
+          ],
+          "role": "profile_merge"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "export",
+            "/work/cost/native-replay-sa4z0_23/native_driver_fixture",
+            "-instr-profile=/work/cost/native-replay-sa4z0_23/native.profdata"
+          ],
+          "role": "coverage_export"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "merge",
+            "-sparse",
+            "/work/cost/native-replay-_qv0roll/sample.profraw",
+            "-o",
+            "/work/cost/native-replay-_qv0roll/native.profdata"
+          ],
+          "role": "profile_merge"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "export",
+            "/work/cost/native-replay-_qv0roll/native_driver_fixture",
+            "-instr-profile=/work/cost/native-replay-_qv0roll/native.profdata"
+          ],
+          "role": "coverage_export"
+        }
+      ],
+      "failed_path_lookups": [
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/cc",
+          "status": "-1 ENOENT (No such file or directory)"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/self-contained/cc",
+          "status": "-1 ENOENT (No such file or directory)"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/cc",
+          "status": "-1 ENOENT (No such file or directory)"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/self-contained/cc",
+          "status": "-1 ENOENT (No such file or directory)"
+        }
+      ]
+    },
+    "evaluate-execve.log": {
+      "counts": {
+        "other": 2,
+        "collector_invocation": 1,
+        "profile_merge": 1,
+        "coverage_export": 1,
+        "core_evaluate": 1
+      },
+      "successful_execs": [
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/work/driver/tools/quality/tests/rust_collector_clean_host.py",
+            "evaluate"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/bin/harness-gate-rust-collector",
+          "args": [
+            "/runtime/bin/harness-gate-rust-collector",
+            "certify",
+            "--evidence",
+            "base",
+            "--anchor",
+            "6970ce81d7fcf29ccc1f0aa0d00bb40bcaa29a59ecaef86b2a357faeae241d1c"
+          ],
+          "role": "collector_invocation"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/runtime/app/rust_collector_entry.py",
+            "certify",
+            "--evidence",
+            "base",
+            "--anchor",
+            "6970ce81d7fcf29ccc1f0aa0d00bb40bcaa29a59ecaef86b2a357faeae241d1c"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "merge",
+            "-sparse",
+            "/work/captures/native-replay-j5smhr_s/sample.profraw",
+            "-o",
+            "/work/captures/native-replay-j5smhr_s/native.profdata"
+          ],
+          "role": "profile_merge"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "export",
+            "/work/captures/native-replay-j5smhr_s/native_driver_fixture",
+            "-instr-profile=/work/captures/native-replay-j5smhr_s/native.profdata"
+          ],
+          "role": "coverage_export"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "quality",
+            "evaluate",
+            "--output",
+            "/work/configured/installed-core-report.json",
+            "--policy",
+            "/work/configured/installed-policy.json",
+            "--mappings",
+            "/work/configured/installed-mappings.json",
+            "--base-project",
+            "/work/configured/installed-base-project.json",
+            "--base-evidence",
+            "/work/configured/installed-base-evidence.json",
+            "--base-expected",
+            "/work/configured/installed-base-expected.json",
+            "--base-source-root",
+            "/work/captures/base",
+            "--base-artifact-root",
+            "/work/configured/baseline-artifacts",
+            "--project",
+            "/work/configured/installed-project.json",
+            "--evidence",
+            "/work/configured/installed-evidence.json",
+            "--expected",
+            "/work/configured/installed-expected.json",
+            "--source-root",
+            "/work/configured/project",
+            "--artifact-root",
+            "/work/configured/project/target/evidence"
+          ],
+          "role": "core_evaluate"
+        }
+      ],
+      "failed_path_lookups": []
+    },
+    "initial-collect-execve.log": {
+      "counts": {
+        "other": 2,
+        "core_collect": 3,
+        "collector_invocation": 1,
+        "identity_or_cfg_probe": 5,
+        "profile_merge": 1,
+        "coverage_export": 1
+      },
+      "successful_execs": [
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/work/driver/tools/quality/tests/rust_collector_clean_host.py",
+            "collect"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "quality",
+            "collect",
+            "--repository-root",
+            "/work/configured/project",
+            "--state",
+            "/work/configured/state.json",
+            "--trusted-keys",
+            "/work/configured/trusted-keys.json",
+            "--output",
+            "/work/configured/collection.json"
+          ],
+          "role": "core_collect"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "quality",
+            "collect",
+            "--repository-root",
+            "/work/configured/project",
+            "--state",
+            "/work/configured/state.json",
+            "--trusted-keys",
+            "/work/configured/trusted-keys.json",
+            "--output",
+            "/work/configured/collection.json"
+          ],
+          "role": "core_collect"
+        },
+        {
+          "executable": "/runtime/bin/harness-gate-rust-collector",
+          "args": [
+            "/runtime/bin/harness-gate-rust-collector",
+            "collect",
+            "--binding",
+            "/work/configured/binding.json",
+            "--binding-sha256",
+            "436733f7432ffc010fb226c89a00c600c0c2f8c2a48d0ec42e6e91405befb529"
+          ],
+          "role": "collector_invocation"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/runtime/app/rust_collector_entry.py",
+            "collect",
+            "--binding",
+            "/work/configured/binding.json",
+            "--binding-sha256",
+            "436733f7432ffc010fb226c89a00c600c0c2f8c2a48d0ec42e6e91405befb529"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/bin/rustc",
+          "args": [
+            "/runtime/rust/bin/rustc",
+            "-vV"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "merge",
+            "-sparse",
+            "/work/captures/native-replay-tbb5al63/sample.profraw",
+            "-o",
+            "/work/captures/native-replay-tbb5al63/native.profdata"
+          ],
+          "role": "profile_merge"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "export",
+            "/work/captures/native-replay-tbb5al63/native_driver_fixture",
+            "-instr-profile=/work/captures/native-replay-tbb5al63/native.profdata"
+          ],
+          "role": "coverage_export"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "quality",
+            "collect",
+            "--repository-root",
+            "/work/configured/project",
+            "--state",
+            "/work/configured/state.json",
+            "--trusted-keys",
+            "/work/configured/trusted-keys.json",
+            "--output",
+            "/work/configured/collection.json"
+          ],
+          "role": "core_collect"
+        }
+      ],
+      "failed_path_lookups": []
+    },
+    "malformed-execve.log": {
+      "counts": {
+        "other": 1,
+        "core_collect": 2,
+        "malformed_invocation": 1
+      },
+      "successful_execs": [
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/work/driver/tools/quality/tests/rust_collector_clean_host.py",
+            "malformed"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "quality",
+            "collect",
+            "--repository-root",
+            "/work/configured/project",
+            "--state",
+            "/work/configured/state.json",
+            "--trusted-keys",
+            "/work/configured/malformed-sign/trusted-keys.json",
+            "--output",
+            "/work/configured/malformed-collection.json"
+          ],
+          "role": "core_collect"
+        },
+        {
+          "executable": "/work/configured/malformed-collector.sh",
+          "args": [
+            "/work/configured/malformed-collector.sh",
+            "collect",
+            "--binding",
+            "/work/configured/binding.json",
+            "--binding-sha256",
+            "436733f7432ffc010fb226c89a00c600c0c2f8c2a48d0ec42e6e91405befb529"
+          ],
+          "role": "malformed_invocation"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "quality",
+            "collect",
+            "--repository-root",
+            "/work/configured/project",
+            "--state",
+            "/work/configured/state.json",
+            "--trusted-keys",
+            "/work/configured/malformed-sign/trusted-keys.json",
+            "--output",
+            "/work/configured/malformed-collection.json"
+          ],
+          "role": "core_collect"
+        }
+      ],
+      "failed_path_lookups": []
+    },
+    "negatives-execve.log": {
+      "counts": {
+        "other": 7,
+        "collector_invocation": 6,
+        "identity_or_cfg_probe": 20,
+        "profile_merge": 1,
+        "coverage_export": 1
+      },
+      "successful_execs": [
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/work/driver/tools/quality/tests/rust_collector_clean_host.py",
+            "negatives"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/bin/harness-gate-rust-collector",
+          "args": [
+            "/runtime/bin/harness-gate-rust-collector",
+            "collect",
+            "--binding",
+            "/work/negatives/unknown-combination-binding.json",
+            "--binding-sha256",
+            "1a61d18c03b10530271594bfe6975f48bde3a160831ebd26798a385c193983cb"
+          ],
+          "role": "collector_invocation"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/runtime/app/rust_collector_entry.py",
+            "collect",
+            "--binding",
+            "/work/negatives/unknown-combination-binding.json",
+            "--binding-sha256",
+            "1a61d18c03b10530271594bfe6975f48bde3a160831ebd26798a385c193983cb"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/bin/rustc",
+          "args": [
+            "/runtime/rust/bin/rustc",
+            "-vV"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/bin/harness-gate-rust-collector",
+          "args": [
+            "/runtime/bin/harness-gate-rust-collector",
+            "collect",
+            "--binding",
+            "/work/negatives/wrong-core-binding.json",
+            "--binding-sha256",
+            "664d9522823027530b84561f0c7039e16e6631f547118e5670e785fdd001a9a3"
+          ],
+          "role": "collector_invocation"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/runtime/app/rust_collector_entry.py",
+            "collect",
+            "--binding",
+            "/work/negatives/wrong-core-binding.json",
+            "--binding-sha256",
+            "664d9522823027530b84561f0c7039e16e6631f547118e5670e785fdd001a9a3"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/bin/harness-gate-rust-collector",
+          "args": [
+            "/runtime/bin/harness-gate-rust-collector",
+            "collect",
+            "--binding",
+            "/work/negatives/wrong-tool-binding.json",
+            "--binding-sha256",
+            "55ab1cc8e886dfcae8cd1100de132828c1a88c5d6d8f3c63ae4949f4538e239a"
+          ],
+          "role": "collector_invocation"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/runtime/app/rust_collector_entry.py",
+            "collect",
+            "--binding",
+            "/work/negatives/wrong-tool-binding.json",
+            "--binding-sha256",
+            "55ab1cc8e886dfcae8cd1100de132828c1a88c5d6d8f3c63ae4949f4538e239a"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/bin/rustc",
+          "args": [
+            "/runtime/rust/bin/rustc",
+            "-vV"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/bin/harness-gate-rust-collector",
+          "args": [
+            "/runtime/bin/harness-gate-rust-collector",
+            "collect",
+            "--binding",
+            "/work/negatives/relocated-capture-binding.json",
+            "--binding-sha256",
+            "040332d1894ce115adcd1604beb97cd7f4cd210363bff1de70a6f84313e9755f"
+          ],
+          "role": "collector_invocation"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/runtime/app/rust_collector_entry.py",
+            "collect",
+            "--binding",
+            "/work/negatives/relocated-capture-binding.json",
+            "--binding-sha256",
+            "040332d1894ce115adcd1604beb97cd7f4cd210363bff1de70a6f84313e9755f"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/bin/rustc",
+          "args": [
+            "/runtime/rust/bin/rustc",
+            "-vV"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/bin/harness-gate-rust-collector",
+          "args": [
+            "/runtime/bin/harness-gate-rust-collector",
+            "collect",
+            "--binding",
+            "/work/negatives/missing-owner-binding.json",
+            "--binding-sha256",
+            "9c8bc438dbabe4f6625565da056cc2e37bd7c2651363e935ffbfc3b6f9d9db71"
+          ],
+          "role": "collector_invocation"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/runtime/app/rust_collector_entry.py",
+            "collect",
+            "--binding",
+            "/work/negatives/missing-owner-binding.json",
+            "--binding-sha256",
+            "9c8bc438dbabe4f6625565da056cc2e37bd7c2651363e935ffbfc3b6f9d9db71"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/bin/harness-gate-rust-collector",
+          "args": [
+            "/runtime/bin/harness-gate-rust-collector",
+            "collect",
+            "--binding",
+            "/work/negatives/absent-native-owner-binding.json",
+            "--binding-sha256",
+            "e1e4d22dd7bac94cede938ada2d8d6c6ed57e826d3fdbea50853c6ee4a4c060b"
+          ],
+          "role": "collector_invocation"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/runtime/app/rust_collector_entry.py",
+            "collect",
+            "--binding",
+            "/work/negatives/absent-native-owner-binding.json",
+            "--binding-sha256",
+            "e1e4d22dd7bac94cede938ada2d8d6c6ed57e826d3fdbea50853c6ee4a4c060b"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/bin/rustc",
+          "args": [
+            "/runtime/rust/bin/rustc",
+            "-vV"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "merge",
+            "-sparse",
+            "/work/captures/native-replay-78wvnn3h/sample.profraw",
+            "-o",
+            "/work/captures/native-replay-78wvnn3h/native.profdata"
+          ],
+          "role": "profile_merge"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "export",
+            "/work/captures/native-replay-78wvnn3h/native_driver_fixture",
+            "-instr-profile=/work/captures/native-replay-78wvnn3h/native.profdata"
+          ],
+          "role": "coverage_export"
+        }
+      ],
+      "failed_path_lookups": []
+    },
+    "prepare-execve.log": {
+      "counts": {
+        "other": 2,
+        "collector_invocation": 1,
+        "profile_merge": 1,
+        "coverage_export": 1,
+        "core_compile": 1,
+        "identity_or_cfg_probe": 5
+      },
+      "successful_execs": [
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/work/driver/tools/quality/tests/rust_collector_clean_host.py",
+            "prepare"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/bin/harness-gate-rust-collector",
+          "args": [
+            "/runtime/bin/harness-gate-rust-collector",
+            "certify",
+            "--evidence",
+            "head",
+            "--anchor",
+            "2ce1e5400697235c6d9111c4f5844e11248e92f588f2c7a4cf7eff75ef7d5411"
+          ],
+          "role": "collector_invocation"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/runtime/app/rust_collector_entry.py",
+            "certify",
+            "--evidence",
+            "head",
+            "--anchor",
+            "2ce1e5400697235c6d9111c4f5844e11248e92f588f2c7a4cf7eff75ef7d5411"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "merge",
+            "-sparse",
+            "/work/captures/native-replay-ojm3zmnf/sample.profraw",
+            "-o",
+            "/work/captures/native-replay-ojm3zmnf/native.profdata"
+          ],
+          "role": "profile_merge"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "export",
+            "/work/captures/native-replay-ojm3zmnf/native_driver_fixture",
+            "-instr-profile=/work/captures/native-replay-ojm3zmnf/native.profdata"
+          ],
+          "role": "coverage_export"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "quality",
+            "compile",
+            "--repository-root",
+            "/work/configured/project",
+            "--state",
+            "/work/configured/state.json",
+            "--output",
+            "/work/configured/compiled.json"
+          ],
+          "role": "core_compile"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/bin/rustc",
+          "args": [
+            "/runtime/rust/bin/rustc",
+            "-vV"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        }
+      ],
+      "failed_path_lookups": []
+    },
+    "relocation-execve.log": {
+      "counts": {
+        "other": 2,
+        "collector_invocation": 1,
+        "identity_or_cfg_probe": 5
+      },
+      "successful_execs": [
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/work/driver/tools/quality/tests/rust_collector_clean_host.py",
+            "relocation"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/work/relocated-runtime/bin/harness-gate-rust-collector",
+          "args": [
+            "/work/relocated-runtime/bin/harness-gate-rust-collector",
+            "collect",
+            "--binding",
+            "/work/relocation-binding.json",
+            "--binding-sha256",
+            "a2f0d1f2279e70c688ce96e571b5a244ef829f2e17990654d1f4778c7b85907c"
+          ],
+          "role": "collector_invocation"
+        },
+        {
+          "executable": "/work/relocated-runtime/python/bin/python3",
+          "args": [
+            "/work/relocated-runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/work/relocated-runtime/app/rust_collector_entry.py",
+            "collect",
+            "--binding",
+            "/work/relocation-binding.json",
+            "--binding-sha256",
+            "a2f0d1f2279e70c688ce96e571b5a244ef829f2e17990654d1f4778c7b85907c"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/work/relocated-runtime/rust/bin/rustc",
+          "args": [
+            "/work/relocated-runtime/rust/bin/rustc",
+            "-vV"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/work/relocated-runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/work/relocated-runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/work/relocated-runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/work/relocated-runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/work/relocated-runtime/python/bin/python3",
+          "args": [
+            "/work/relocated-runtime/python/bin/python3",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        }
+      ],
+      "failed_path_lookups": []
+    },
+    "seed-execve.log": {
+      "counts": {
+        "other": 23,
+        "identity_or_cfg_probe": 8,
+        "compiler_producer": 2,
+        "sample_producer": 2,
+        "profile_merge": 6,
+        "coverage_export": 6,
+        "collector_invocation": 5,
+        "core_evaluate": 6
+      },
+      "successful_execs": [
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/work/driver/tools/quality/tests/rust_collector_clean_host.py",
+            "seed"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/rust/bin/rustc",
+          "args": [
+            "/runtime/rust/bin/rustc",
+            "-vV"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/bin/rustc",
+          "args": [
+            "/runtime/rust/bin/rustc",
+            "--sysroot",
+            "/runtime/rust",
+            "/work/captures/base/fixture.rs",
+            "--edition=2021",
+            "--crate-name",
+            "native_driver_fixture",
+            "-C",
+            "instrument-coverage",
+            "-C",
+            "link-dead-code",
+            "-C",
+            "opt-level=0",
+            "-Z",
+            "mir-opt-level=0",
+            "--out-dir",
+            "/work/captures/base",
+            "--print=cfg"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/bin/harness-gate-rust-native-driver",
+          "args": [
+            "/runtime/bin/harness-gate-rust-native-driver",
+            "--sysroot",
+            "/runtime/rust",
+            "/work/captures/base/fixture.rs",
+            "--edition=2021",
+            "--crate-name",
+            "native_driver_fixture",
+            "-C",
+            "instrument-coverage",
+            "-C",
+            "link-dead-code",
+            "-C",
+            "opt-level=0",
+            "-Z",
+            "mir-opt-level=0",
+            "--out-dir",
+            "/work/captures/base"
+          ],
+          "role": "compiler_producer"
+        },
+        {
+          "executable": "/runtime/bin/cc",
+          "args": [
+            "cc",
+            "-m64",
+            "/work/captures/base/rustcttz4R5/symbols.o",
+            "/work/captures/base/native_driver_fixture.native_driver_fixture.13ca7322dc53b32b-cgu.0.rcgu.o",
+            "/work/captures/base/native_driver_fixture.chzqx0iemwjdpgo1y63739a3p.rcgu.o",
+            "-Wl,--as-needed",
+            "-Wl,-Bstatic",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libprofiler_builtins-3bb349696bf4ca2e.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd-c64e6e11aa24fc43.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libpanic_unwind-e8f3c569ec017ae8.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libobject-f810d9e1ec7b3602.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libmemchr-5338843b9da46083.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libaddr2line-02954dcf5cbc5891.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libgimli-34f31eace0d7245f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcfg_if-c966e4159bd8bc70.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_demangle-73bcb43673848f30.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd_detect-64da8f7c5e658436.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libhashbrown-51d9ae21a16391ba.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_alloc-99955b4d3549c390.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libminiz_oxide-24b69c27fbe9064f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libadler2-57de982d9269a3a4.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libunwind-d90fb703b61b002d.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liblibc-8da72b3f3dca3868.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_core-79f73bde78643b0a.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liballoc-e17b81f57125c74c.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-b5d59729c8525f07.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-085f534a869f02d5.rlib",
+            "-Wl,-Bdynamic",
+            "-lgcc_s",
+            "-lutil",
+            "-lrt",
+            "-lpthread",
+            "-lm",
+            "-ldl",
+            "-lc",
+            "-L",
+            "/work/captures/base/rustcttz4R5/raw-dylibs",
+            "-B/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-B/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-fuse-ld=lld",
+            "-Wl,--eh-frame-hdr",
+            "-Wl,-z,noexecstack",
+            "-L",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+            "-o",
+            "/work/captures/base/native_driver_fixture",
+            "-pie",
+            "-Wl,-z,relro,-z,now",
+            "-nodefaultlibs",
+            "-u",
+            "__llvm_profile_runtime"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/link/bin/gcc",
+          "args": [
+            "/runtime/link/bin/gcc",
+            "-B/runtime/link/gcc/",
+            "--sysroot=/runtime/link/sysroot",
+            "-L/runtime/link/sysroot/usr/lib/x86_64-linux-gnu",
+            "-m64",
+            "/work/captures/base/rustcttz4R5/symbols.o",
+            "/work/captures/base/native_driver_fixture.native_driver_fixture.13ca7322dc53b32b-cgu.0.rcgu.o",
+            "/work/captures/base/native_driver_fixture.chzqx0iemwjdpgo1y63739a3p.rcgu.o",
+            "-Wl,--as-needed",
+            "-Wl,-Bstatic",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libprofiler_builtins-3bb349696bf4ca2e.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd-c64e6e11aa24fc43.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libpanic_unwind-e8f3c569ec017ae8.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libobject-f810d9e1ec7b3602.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libmemchr-5338843b9da46083.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libaddr2line-02954dcf5cbc5891.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libgimli-34f31eace0d7245f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcfg_if-c966e4159bd8bc70.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_demangle-73bcb43673848f30.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd_detect-64da8f7c5e658436.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libhashbrown-51d9ae21a16391ba.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_alloc-99955b4d3549c390.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libminiz_oxide-24b69c27fbe9064f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libadler2-57de982d9269a3a4.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libunwind-d90fb703b61b002d.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liblibc-8da72b3f3dca3868.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_core-79f73bde78643b0a.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liballoc-e17b81f57125c74c.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-b5d59729c8525f07.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-085f534a869f02d5.rlib",
+            "-Wl,-Bdynamic",
+            "-lgcc_s",
+            "-lutil",
+            "-lrt",
+            "-lpthread",
+            "-lm",
+            "-ldl",
+            "-lc",
+            "-L",
+            "/work/captures/base/rustcttz4R5/raw-dylibs",
+            "-B/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-B/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-fuse-ld=lld",
+            "-Wl,--eh-frame-hdr",
+            "-Wl,-z,noexecstack",
+            "-L",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+            "-o",
+            "/work/captures/base/native_driver_fixture",
+            "-pie",
+            "-Wl,-z,relro,-z,now",
+            "-nodefaultlibs",
+            "-u",
+            "__llvm_profile_runtime"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/link/gcc/collect2",
+          "args": [
+            "/runtime/link/gcc/collect2",
+            "-plugin",
+            "/runtime/link/gcc/liblto_plugin.so",
+            "-plugin-opt=/runtime/link/gcc/lto-wrapper",
+            "-plugin-opt=-fresolution=/work/tmp/cciC5SCi.res",
+            "--sysroot=/runtime/link/sysroot",
+            "--build-id",
+            "--eh-frame-hdr",
+            "-m",
+            "elf_x86_64",
+            "--hash-style=gnu",
+            "--as-needed",
+            "-dynamic-linker",
+            "/lib64/ld-linux-x86-64.so.2",
+            "-pie",
+            "-z",
+            "now",
+            "-fuse-ld=lld",
+            "-z",
+            "relro",
+            "-o",
+            "/work/captures/base/native_driver_fixture",
+            "-u",
+            "__llvm_profile_runtime",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/Scrt1.o",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/crti.o",
+            "/runtime/link/gcc/crtbeginS.o",
+            "-L/runtime/link/sysroot/usr/lib/x86_64-linux-gnu",
+            "-L/work/captures/base/rustcttz4R5/raw-dylibs",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+            "-L/runtime/link/gcc",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-L/runtime/link/sysroot/usr/lib/x86_64-linux-gnu",
+            "-L/runtime/link/sysroot/usr/lib/../lib",
+            "-L/runtime/link/sysroot/usr/lib",
+            "/work/captures/base/rustcttz4R5/symbols.o",
+            "/work/captures/base/native_driver_fixture.native_driver_fixture.13ca7322dc53b32b-cgu.0.rcgu.o",
+            "/work/captures/base/native_driver_fixture.chzqx0iemwjdpgo1y63739a3p.rcgu.o",
+            "--as-needed",
+            "-Bstatic",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libprofiler_builtins-3bb349696bf4ca2e.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd-c64e6e11aa24fc43.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libpanic_unwind-e8f3c569ec017ae8.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libobject-f810d9e1ec7b3602.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libmemchr-5338843b9da46083.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libaddr2line-02954dcf5cbc5891.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libgimli-34f31eace0d7245f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcfg_if-c966e4159bd8bc70.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_demangle-73bcb43673848f30.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd_detect-64da8f7c5e658436.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libhashbrown-51d9ae21a16391ba.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_alloc-99955b4d3549c390.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libminiz_oxide-24b69c27fbe9064f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libadler2-57de982d9269a3a4.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libunwind-d90fb703b61b002d.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liblibc-8da72b3f3dca3868.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_core-79f73bde78643b0a.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liballoc-e17b81f57125c74c.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-b5d59729c8525f07.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-085f534a869f02d5.rlib",
+            "-Bdynamic",
+            "-lgcc_s",
+            "-lutil",
+            "-lrt",
+            "-lpthread",
+            "-lm",
+            "-ldl",
+            "-lc",
+            "--eh-frame-hdr",
+            "-z",
+            "noexecstack",
+            "-z",
+            "relro",
+            "-z",
+            "now",
+            "/runtime/link/gcc/crtendS.o",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/crtn.o"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld/ld.lld",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld/ld.lld",
+            "-plugin",
+            "/runtime/link/gcc/liblto_plugin.so",
+            "-plugin-opt=/runtime/link/gcc/lto-wrapper",
+            "-plugin-opt=-fresolution=/work/tmp/cciC5SCi.res",
+            "--sysroot=/runtime/link/sysroot",
+            "--build-id",
+            "--eh-frame-hdr",
+            "-m",
+            "elf_x86_64",
+            "--hash-style=gnu",
+            "--as-needed",
+            "-dynamic-linker",
+            "/lib64/ld-linux-x86-64.so.2",
+            "-pie",
+            "-z",
+            "now",
+            "-z",
+            "relro",
+            "-o",
+            "/work/captures/base/native_driver_fixture",
+            "-u",
+            "__llvm_profile_runtime",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/Scrt1.o",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/crti.o",
+            "/runtime/link/gcc/crtbeginS.o",
+            "-L/runtime/link/sysroot/usr/lib/x86_64-linux-gnu",
+            "-L/work/captures/base/rustcttz4R5/raw-dylibs",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+            "-L/runtime/link/gcc",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-L/runtime/link/sysroot/usr/lib/x86_64-linux-gnu",
+            "-L/runtime/link/sysroot/usr/lib/../lib",
+            "-L/runtime/link/sysroot/usr/lib",
+            "/work/captures/base/rustcttz4R5/symbols.o",
+            "/work/captures/base/native_driver_fixture.native_driver_fixture.13ca7322dc53b32b-cgu.0.rcgu.o",
+            "/work/captures/base/native_driver_fixture.chzqx0iemwjdpgo1y63739a3p.rcgu.o",
+            "--as-needed",
+            "-Bstatic",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libprofiler_builtins-3bb349696bf4ca2e.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd-c64e6e11aa24fc43.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libpanic_unwind-e8f3c569ec017ae8.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libobject-f810d9e1ec7b3602.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libmemchr-5338843b9da46083.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libaddr2line-02954dcf5cbc5891.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libgimli-34f31eace0d7245f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcfg_if-c966e4159bd8bc70.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_demangle-73bcb43673848f30.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd_detect-64da8f7c5e658436.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libhashbrown-51d9ae21a16391ba.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_alloc-99955b4d3549c390.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libminiz_oxide-24b69c27fbe9064f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libadler2-57de982d9269a3a4.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libunwind-d90fb703b61b002d.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liblibc-8da72b3f3dca3868.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_core-79f73bde78643b0a.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liballoc-e17b81f57125c74c.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-b5d59729c8525f07.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-085f534a869f02d5.rlib",
+            "-Bdynamic",
+            "-lgcc_s",
+            "-lutil",
+            "-lrt",
+            "-lpthread",
+            "-lm",
+            "-ldl",
+            "-lc",
+            "--eh-frame-hdr",
+            "-z",
+            "noexecstack",
+            "-z",
+            "relro",
+            "-z",
+            "now",
+            "/runtime/link/gcc/crtendS.o",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/crtn.o"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/rust-lld",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/rust-lld",
+            "-flavor",
+            "gnu",
+            "-plugin",
+            "/runtime/link/gcc/liblto_plugin.so",
+            "-plugin-opt=/runtime/link/gcc/lto-wrapper",
+            "-plugin-opt=-fresolution=/work/tmp/cciC5SCi.res",
+            "--sysroot=/runtime/link/sysroot",
+            "--build-id",
+            "--eh-frame-hdr",
+            "-m",
+            "elf_x86_64",
+            "--hash-style=gnu",
+            "--as-needed",
+            "-dynamic-linker",
+            "/lib64/ld-linux-x86-64.so.2",
+            "-pie",
+            "-z",
+            "now",
+            "-z",
+            "relro",
+            "-o",
+            "/work/captures/base/native_driver_fixture",
+            "-u",
+            "__llvm_profile_runtime",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/Scrt1.o",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/crti.o",
+            "/runtime/link/gcc/crtbeginS.o",
+            "-L/runtime/link/sysroot/usr/lib/x86_64-linux-gnu",
+            "-L/work/captures/base/rustcttz4R5/raw-dylibs",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+            "-L/runtime/link/gcc",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-L/runtime/link/sysroot/usr/lib/x86_64-linux-gnu",
+            "-L/runtime/link/sysroot/usr/lib/../lib",
+            "-L/runtime/link/sysroot/usr/lib",
+            "/work/captures/base/rustcttz4R5/symbols.o",
+            "/work/captures/base/native_driver_fixture.native_driver_fixture.13ca7322dc53b32b-cgu.0.rcgu.o",
+            "/work/captures/base/native_driver_fixture.chzqx0iemwjdpgo1y63739a3p.rcgu.o",
+            "--as-needed",
+            "-Bstatic",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libprofiler_builtins-3bb349696bf4ca2e.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd-c64e6e11aa24fc43.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libpanic_unwind-e8f3c569ec017ae8.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libobject-f810d9e1ec7b3602.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libmemchr-5338843b9da46083.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libaddr2line-02954dcf5cbc5891.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libgimli-34f31eace0d7245f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcfg_if-c966e4159bd8bc70.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_demangle-73bcb43673848f30.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd_detect-64da8f7c5e658436.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libhashbrown-51d9ae21a16391ba.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_alloc-99955b4d3549c390.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libminiz_oxide-24b69c27fbe9064f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libadler2-57de982d9269a3a4.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libunwind-d90fb703b61b002d.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liblibc-8da72b3f3dca3868.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_core-79f73bde78643b0a.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liballoc-e17b81f57125c74c.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-b5d59729c8525f07.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-085f534a869f02d5.rlib",
+            "-Bdynamic",
+            "-lgcc_s",
+            "-lutil",
+            "-lrt",
+            "-lpthread",
+            "-lm",
+            "-ldl",
+            "-lc",
+            "--eh-frame-hdr",
+            "-z",
+            "noexecstack",
+            "-z",
+            "relro",
+            "-z",
+            "now",
+            "/runtime/link/gcc/crtendS.o",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/crtn.o"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/work/captures/base/native_driver_fixture",
+          "args": [
+            "/work/captures/base/native_driver_fixture"
+          ],
+          "role": "sample_producer"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "merge",
+            "-sparse",
+            "/work/captures/base/sample.profraw",
+            "-o",
+            "/work/captures/base/native.profdata"
+          ],
+          "role": "profile_merge"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "export",
+            "/work/captures/base/native_driver_fixture",
+            "-instr-profile=/work/captures/base/native.profdata"
+          ],
+          "role": "coverage_export"
+        },
+        {
+          "executable": "/runtime/rust/bin/rustc",
+          "args": [
+            "/runtime/rust/bin/rustc",
+            "-vV"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "--version"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/rust/bin/rustc",
+          "args": [
+            "/runtime/rust/bin/rustc",
+            "--sysroot",
+            "/runtime/rust",
+            "/work/captures/head/fixture.rs",
+            "--edition=2021",
+            "--crate-name",
+            "native_driver_fixture",
+            "-C",
+            "instrument-coverage",
+            "-C",
+            "link-dead-code",
+            "-C",
+            "opt-level=0",
+            "-Z",
+            "mir-opt-level=0",
+            "--out-dir",
+            "/work/captures/head",
+            "--print=cfg"
+          ],
+          "role": "identity_or_cfg_probe"
+        },
+        {
+          "executable": "/runtime/bin/harness-gate-rust-native-driver",
+          "args": [
+            "/runtime/bin/harness-gate-rust-native-driver",
+            "--sysroot",
+            "/runtime/rust",
+            "/work/captures/head/fixture.rs",
+            "--edition=2021",
+            "--crate-name",
+            "native_driver_fixture",
+            "-C",
+            "instrument-coverage",
+            "-C",
+            "link-dead-code",
+            "-C",
+            "opt-level=0",
+            "-Z",
+            "mir-opt-level=0",
+            "--out-dir",
+            "/work/captures/head"
+          ],
+          "role": "compiler_producer"
+        },
+        {
+          "executable": "/runtime/bin/cc",
+          "args": [
+            "cc",
+            "-m64",
+            "/work/captures/head/rustc4RCUyG/symbols.o",
+            "/work/captures/head/native_driver_fixture.native_driver_fixture.13ca7322dc53b32b-cgu.0.rcgu.o",
+            "/work/captures/head/native_driver_fixture.chzqx0iemwjdpgo1y63739a3p.rcgu.o",
+            "-Wl,--as-needed",
+            "-Wl,-Bstatic",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libprofiler_builtins-3bb349696bf4ca2e.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd-c64e6e11aa24fc43.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libpanic_unwind-e8f3c569ec017ae8.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libobject-f810d9e1ec7b3602.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libmemchr-5338843b9da46083.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libaddr2line-02954dcf5cbc5891.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libgimli-34f31eace0d7245f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcfg_if-c966e4159bd8bc70.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_demangle-73bcb43673848f30.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd_detect-64da8f7c5e658436.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libhashbrown-51d9ae21a16391ba.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_alloc-99955b4d3549c390.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libminiz_oxide-24b69c27fbe9064f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libadler2-57de982d9269a3a4.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libunwind-d90fb703b61b002d.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liblibc-8da72b3f3dca3868.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_core-79f73bde78643b0a.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liballoc-e17b81f57125c74c.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-b5d59729c8525f07.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-085f534a869f02d5.rlib",
+            "-Wl,-Bdynamic",
+            "-lgcc_s",
+            "-lutil",
+            "-lrt",
+            "-lpthread",
+            "-lm",
+            "-ldl",
+            "-lc",
+            "-L",
+            "/work/captures/head/rustc4RCUyG/raw-dylibs",
+            "-B/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-B/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-fuse-ld=lld",
+            "-Wl,--eh-frame-hdr",
+            "-Wl,-z,noexecstack",
+            "-L",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+            "-o",
+            "/work/captures/head/native_driver_fixture",
+            "-pie",
+            "-Wl,-z,relro,-z,now",
+            "-nodefaultlibs",
+            "-u",
+            "__llvm_profile_runtime"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/link/bin/gcc",
+          "args": [
+            "/runtime/link/bin/gcc",
+            "-B/runtime/link/gcc/",
+            "--sysroot=/runtime/link/sysroot",
+            "-L/runtime/link/sysroot/usr/lib/x86_64-linux-gnu",
+            "-m64",
+            "/work/captures/head/rustc4RCUyG/symbols.o",
+            "/work/captures/head/native_driver_fixture.native_driver_fixture.13ca7322dc53b32b-cgu.0.rcgu.o",
+            "/work/captures/head/native_driver_fixture.chzqx0iemwjdpgo1y63739a3p.rcgu.o",
+            "-Wl,--as-needed",
+            "-Wl,-Bstatic",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libprofiler_builtins-3bb349696bf4ca2e.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd-c64e6e11aa24fc43.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libpanic_unwind-e8f3c569ec017ae8.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libobject-f810d9e1ec7b3602.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libmemchr-5338843b9da46083.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libaddr2line-02954dcf5cbc5891.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libgimli-34f31eace0d7245f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcfg_if-c966e4159bd8bc70.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_demangle-73bcb43673848f30.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd_detect-64da8f7c5e658436.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libhashbrown-51d9ae21a16391ba.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_alloc-99955b4d3549c390.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libminiz_oxide-24b69c27fbe9064f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libadler2-57de982d9269a3a4.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libunwind-d90fb703b61b002d.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liblibc-8da72b3f3dca3868.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_core-79f73bde78643b0a.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liballoc-e17b81f57125c74c.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-b5d59729c8525f07.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-085f534a869f02d5.rlib",
+            "-Wl,-Bdynamic",
+            "-lgcc_s",
+            "-lutil",
+            "-lrt",
+            "-lpthread",
+            "-lm",
+            "-ldl",
+            "-lc",
+            "-L",
+            "/work/captures/head/rustc4RCUyG/raw-dylibs",
+            "-B/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-B/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-fuse-ld=lld",
+            "-Wl,--eh-frame-hdr",
+            "-Wl,-z,noexecstack",
+            "-L",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+            "-o",
+            "/work/captures/head/native_driver_fixture",
+            "-pie",
+            "-Wl,-z,relro,-z,now",
+            "-nodefaultlibs",
+            "-u",
+            "__llvm_profile_runtime"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/link/gcc/collect2",
+          "args": [
+            "/runtime/link/gcc/collect2",
+            "-plugin",
+            "/runtime/link/gcc/liblto_plugin.so",
+            "-plugin-opt=/runtime/link/gcc/lto-wrapper",
+            "-plugin-opt=-fresolution=/work/tmp/cc69MZue.res",
+            "--sysroot=/runtime/link/sysroot",
+            "--build-id",
+            "--eh-frame-hdr",
+            "-m",
+            "elf_x86_64",
+            "--hash-style=gnu",
+            "--as-needed",
+            "-dynamic-linker",
+            "/lib64/ld-linux-x86-64.so.2",
+            "-pie",
+            "-z",
+            "now",
+            "-fuse-ld=lld",
+            "-z",
+            "relro",
+            "-o",
+            "/work/captures/head/native_driver_fixture",
+            "-u",
+            "__llvm_profile_runtime",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/Scrt1.o",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/crti.o",
+            "/runtime/link/gcc/crtbeginS.o",
+            "-L/runtime/link/sysroot/usr/lib/x86_64-linux-gnu",
+            "-L/work/captures/head/rustc4RCUyG/raw-dylibs",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+            "-L/runtime/link/gcc",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-L/runtime/link/sysroot/usr/lib/x86_64-linux-gnu",
+            "-L/runtime/link/sysroot/usr/lib/../lib",
+            "-L/runtime/link/sysroot/usr/lib",
+            "/work/captures/head/rustc4RCUyG/symbols.o",
+            "/work/captures/head/native_driver_fixture.native_driver_fixture.13ca7322dc53b32b-cgu.0.rcgu.o",
+            "/work/captures/head/native_driver_fixture.chzqx0iemwjdpgo1y63739a3p.rcgu.o",
+            "--as-needed",
+            "-Bstatic",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libprofiler_builtins-3bb349696bf4ca2e.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd-c64e6e11aa24fc43.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libpanic_unwind-e8f3c569ec017ae8.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libobject-f810d9e1ec7b3602.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libmemchr-5338843b9da46083.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libaddr2line-02954dcf5cbc5891.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libgimli-34f31eace0d7245f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcfg_if-c966e4159bd8bc70.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_demangle-73bcb43673848f30.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd_detect-64da8f7c5e658436.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libhashbrown-51d9ae21a16391ba.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_alloc-99955b4d3549c390.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libminiz_oxide-24b69c27fbe9064f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libadler2-57de982d9269a3a4.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libunwind-d90fb703b61b002d.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liblibc-8da72b3f3dca3868.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_core-79f73bde78643b0a.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liballoc-e17b81f57125c74c.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-b5d59729c8525f07.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-085f534a869f02d5.rlib",
+            "-Bdynamic",
+            "-lgcc_s",
+            "-lutil",
+            "-lrt",
+            "-lpthread",
+            "-lm",
+            "-ldl",
+            "-lc",
+            "--eh-frame-hdr",
+            "-z",
+            "noexecstack",
+            "-z",
+            "relro",
+            "-z",
+            "now",
+            "/runtime/link/gcc/crtendS.o",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/crtn.o"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld/ld.lld",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld/ld.lld",
+            "-plugin",
+            "/runtime/link/gcc/liblto_plugin.so",
+            "-plugin-opt=/runtime/link/gcc/lto-wrapper",
+            "-plugin-opt=-fresolution=/work/tmp/cc69MZue.res",
+            "--sysroot=/runtime/link/sysroot",
+            "--build-id",
+            "--eh-frame-hdr",
+            "-m",
+            "elf_x86_64",
+            "--hash-style=gnu",
+            "--as-needed",
+            "-dynamic-linker",
+            "/lib64/ld-linux-x86-64.so.2",
+            "-pie",
+            "-z",
+            "now",
+            "-z",
+            "relro",
+            "-o",
+            "/work/captures/head/native_driver_fixture",
+            "-u",
+            "__llvm_profile_runtime",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/Scrt1.o",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/crti.o",
+            "/runtime/link/gcc/crtbeginS.o",
+            "-L/runtime/link/sysroot/usr/lib/x86_64-linux-gnu",
+            "-L/work/captures/head/rustc4RCUyG/raw-dylibs",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+            "-L/runtime/link/gcc",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-L/runtime/link/sysroot/usr/lib/x86_64-linux-gnu",
+            "-L/runtime/link/sysroot/usr/lib/../lib",
+            "-L/runtime/link/sysroot/usr/lib",
+            "/work/captures/head/rustc4RCUyG/symbols.o",
+            "/work/captures/head/native_driver_fixture.native_driver_fixture.13ca7322dc53b32b-cgu.0.rcgu.o",
+            "/work/captures/head/native_driver_fixture.chzqx0iemwjdpgo1y63739a3p.rcgu.o",
+            "--as-needed",
+            "-Bstatic",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libprofiler_builtins-3bb349696bf4ca2e.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd-c64e6e11aa24fc43.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libpanic_unwind-e8f3c569ec017ae8.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libobject-f810d9e1ec7b3602.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libmemchr-5338843b9da46083.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libaddr2line-02954dcf5cbc5891.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libgimli-34f31eace0d7245f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcfg_if-c966e4159bd8bc70.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_demangle-73bcb43673848f30.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd_detect-64da8f7c5e658436.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libhashbrown-51d9ae21a16391ba.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_alloc-99955b4d3549c390.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libminiz_oxide-24b69c27fbe9064f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libadler2-57de982d9269a3a4.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libunwind-d90fb703b61b002d.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liblibc-8da72b3f3dca3868.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_core-79f73bde78643b0a.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liballoc-e17b81f57125c74c.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-b5d59729c8525f07.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-085f534a869f02d5.rlib",
+            "-Bdynamic",
+            "-lgcc_s",
+            "-lutil",
+            "-lrt",
+            "-lpthread",
+            "-lm",
+            "-ldl",
+            "-lc",
+            "--eh-frame-hdr",
+            "-z",
+            "noexecstack",
+            "-z",
+            "relro",
+            "-z",
+            "now",
+            "/runtime/link/gcc/crtendS.o",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/crtn.o"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/rust-lld",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/rust-lld",
+            "-flavor",
+            "gnu",
+            "-plugin",
+            "/runtime/link/gcc/liblto_plugin.so",
+            "-plugin-opt=/runtime/link/gcc/lto-wrapper",
+            "-plugin-opt=-fresolution=/work/tmp/cc69MZue.res",
+            "--sysroot=/runtime/link/sysroot",
+            "--build-id",
+            "--eh-frame-hdr",
+            "-m",
+            "elf_x86_64",
+            "--hash-style=gnu",
+            "--as-needed",
+            "-dynamic-linker",
+            "/lib64/ld-linux-x86-64.so.2",
+            "-pie",
+            "-z",
+            "now",
+            "-z",
+            "relro",
+            "-o",
+            "/work/captures/head/native_driver_fixture",
+            "-u",
+            "__llvm_profile_runtime",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/Scrt1.o",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/crti.o",
+            "/runtime/link/gcc/crtbeginS.o",
+            "-L/runtime/link/sysroot/usr/lib/x86_64-linux-gnu",
+            "-L/work/captures/head/rustc4RCUyG/raw-dylibs",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+            "-L/runtime/link/gcc",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-L/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld",
+            "-L/runtime/link/sysroot/usr/lib/x86_64-linux-gnu",
+            "-L/runtime/link/sysroot/usr/lib/../lib",
+            "-L/runtime/link/sysroot/usr/lib",
+            "/work/captures/head/rustc4RCUyG/symbols.o",
+            "/work/captures/head/native_driver_fixture.native_driver_fixture.13ca7322dc53b32b-cgu.0.rcgu.o",
+            "/work/captures/head/native_driver_fixture.chzqx0iemwjdpgo1y63739a3p.rcgu.o",
+            "--as-needed",
+            "-Bstatic",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libprofiler_builtins-3bb349696bf4ca2e.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd-c64e6e11aa24fc43.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libpanic_unwind-e8f3c569ec017ae8.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libobject-f810d9e1ec7b3602.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libmemchr-5338843b9da46083.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libaddr2line-02954dcf5cbc5891.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libgimli-34f31eace0d7245f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcfg_if-c966e4159bd8bc70.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_demangle-73bcb43673848f30.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd_detect-64da8f7c5e658436.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libhashbrown-51d9ae21a16391ba.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_alloc-99955b4d3549c390.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libminiz_oxide-24b69c27fbe9064f.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libadler2-57de982d9269a3a4.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libunwind-d90fb703b61b002d.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liblibc-8da72b3f3dca3868.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_core-79f73bde78643b0a.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/liballoc-e17b81f57125c74c.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-b5d59729c8525f07.rlib",
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-085f534a869f02d5.rlib",
+            "-Bdynamic",
+            "-lgcc_s",
+            "-lutil",
+            "-lrt",
+            "-lpthread",
+            "-lm",
+            "-ldl",
+            "-lc",
+            "--eh-frame-hdr",
+            "-z",
+            "noexecstack",
+            "-z",
+            "relro",
+            "-z",
+            "now",
+            "/runtime/link/gcc/crtendS.o",
+            "/runtime/link/sysroot/usr/lib/x86_64-linux-gnu/crtn.o"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/work/captures/head/native_driver_fixture",
+          "args": [
+            "/work/captures/head/native_driver_fixture"
+          ],
+          "role": "sample_producer"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "merge",
+            "-sparse",
+            "/work/captures/head/sample.profraw",
+            "-o",
+            "/work/captures/head/native.profdata"
+          ],
+          "role": "profile_merge"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "export",
+            "/work/captures/head/native_driver_fixture",
+            "-instr-profile=/work/captures/head/native.profdata"
+          ],
+          "role": "coverage_export"
+        },
+        {
+          "executable": "/runtime/bin/harness-gate-rust-collector",
+          "args": [
+            "/runtime/bin/harness-gate-rust-collector",
+            "certify",
+            "--evidence",
+            "head",
+            "--anchor",
+            "2ce1e5400697235c6d9111c4f5844e11248e92f588f2c7a4cf7eff75ef7d5411"
+          ],
+          "role": "collector_invocation"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/runtime/app/rust_collector_entry.py",
+            "certify",
+            "--evidence",
+            "head",
+            "--anchor",
+            "2ce1e5400697235c6d9111c4f5844e11248e92f588f2c7a4cf7eff75ef7d5411"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "merge",
+            "-sparse",
+            "/work/captures/native-replay-t6gc82wy/sample.profraw",
+            "-o",
+            "/work/captures/native-replay-t6gc82wy/native.profdata"
+          ],
+          "role": "profile_merge"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "export",
+            "/work/captures/native-replay-t6gc82wy/native_driver_fixture",
+            "-instr-profile=/work/captures/native-replay-t6gc82wy/native.profdata"
+          ],
+          "role": "coverage_export"
+        },
+        {
+          "executable": "/runtime/bin/harness-gate-rust-collector",
+          "args": [
+            "/runtime/bin/harness-gate-rust-collector",
+            "certify",
+            "--evidence",
+            "head",
+            "--anchor",
+            "2ce1e5400697235c6d9111c4f5844e11248e92f588f2c7a4cf7eff75ef7d5411"
+          ],
+          "role": "collector_invocation"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/runtime/app/rust_collector_entry.py",
+            "certify",
+            "--evidence",
+            "head",
+            "--anchor",
+            "2ce1e5400697235c6d9111c4f5844e11248e92f588f2c7a4cf7eff75ef7d5411"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "merge",
+            "-sparse",
+            "/work/captures/native-replay-sc8tmiwg/sample.profraw",
+            "-o",
+            "/work/captures/native-replay-sc8tmiwg/native.profdata"
+          ],
+          "role": "profile_merge"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "export",
+            "/work/captures/native-replay-sc8tmiwg/native_driver_fixture",
+            "-instr-profile=/work/captures/native-replay-sc8tmiwg/native.profdata"
+          ],
+          "role": "coverage_export"
+        },
+        {
+          "executable": "/runtime/bin/harness-gate-rust-collector",
+          "args": [
+            "/runtime/bin/harness-gate-rust-collector",
+            "certify",
+            "--evidence",
+            "base",
+            "--anchor",
+            "6970ce81d7fcf29ccc1f0aa0d00bb40bcaa29a59ecaef86b2a357faeae241d1c"
+          ],
+          "role": "collector_invocation"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/runtime/app/rust_collector_entry.py",
+            "certify",
+            "--evidence",
+            "base",
+            "--anchor",
+            "6970ce81d7fcf29ccc1f0aa0d00bb40bcaa29a59ecaef86b2a357faeae241d1c"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "merge",
+            "-sparse",
+            "/work/captures/native-replay-q6ou8q0w/sample.profraw",
+            "-o",
+            "/work/captures/native-replay-q6ou8q0w/native.profdata"
+          ],
+          "role": "profile_merge"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "export",
+            "/work/captures/native-replay-q6ou8q0w/native_driver_fixture",
+            "-instr-profile=/work/captures/native-replay-q6ou8q0w/native.profdata"
+          ],
+          "role": "coverage_export"
+        },
+        {
+          "executable": "/runtime/bin/harness-gate-rust-collector",
+          "args": [
+            "/runtime/bin/harness-gate-rust-collector",
+            "certify",
+            "--evidence",
+            "head",
+            "--anchor",
+            "2ce1e5400697235c6d9111c4f5844e11248e92f588f2c7a4cf7eff75ef7d5411"
+          ],
+          "role": "collector_invocation"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/runtime/app/rust_collector_entry.py",
+            "certify",
+            "--evidence",
+            "head",
+            "--anchor",
+            "2ce1e5400697235c6d9111c4f5844e11248e92f588f2c7a4cf7eff75ef7d5411"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "merge",
+            "-sparse",
+            "/work/captures/native-replay-h3alum_4/sample.profraw",
+            "-o",
+            "/work/captures/native-replay-h3alum_4/native.profdata"
+          ],
+          "role": "profile_merge"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "args": [
+            "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "export",
+            "/work/captures/native-replay-h3alum_4/native_driver_fixture",
+            "-instr-profile=/work/captures/native-replay-h3alum_4/native.profdata"
+          ],
+          "role": "coverage_export"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "-c",
+            "import sys,json; from pathlib import Path; sys.path.insert(0,str(Path(sys.argv[1])/\"app\")); import rust_collector_project as p; b=p.load_binding(json.loads(Path(sys.argv[2]).read_text()),Path(sys.argv[3]),sys.argv[4]); print(json.dumps(p.project_report(json.loads(Path(sys.argv[5]).read_text()),b)))",
+            "/runtime",
+            "/work/captures/generic-core/base-request.json",
+            "/work/captures/generic-core/base-binding.json",
+            "c5652cb67faa4da855f9982717e303834392d656d9535aea0ea138abbf662d70",
+            "/work/captures/generic-core/base-native.json"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "-c",
+            "import sys,json; from pathlib import Path; sys.path.insert(0,str(Path(sys.argv[1])/\"app\")); import rust_collector_project as p; b=p.load_binding(json.loads(Path(sys.argv[2]).read_text()),Path(sys.argv[3]),sys.argv[4]); print(json.dumps(p.project_report(json.loads(Path(sys.argv[5]).read_text()),b)))",
+            "/runtime",
+            "/work/captures/generic-core/head-request.json",
+            "/work/captures/generic-core/head-binding.json",
+            "bd495817c1231147db8463829ec041a2e6b56e34867d9f08a1631d636341c56b",
+            "/work/captures/generic-core/head-native.json"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "quality",
+            "evaluate",
+            "--output",
+            "/work/captures/generic-core/report.json",
+            "--policy",
+            "/work/captures/generic-core/policy.json",
+            "--mappings",
+            "/work/captures/generic-core/mappings.json",
+            "--base-project",
+            "/work/captures/generic-core/base-project.json",
+            "--base-evidence",
+            "/work/captures/generic-core/base-evidence.json",
+            "--base-expected",
+            "/work/captures/generic-core/base-expected.json",
+            "--base-source-root",
+            "/work/captures/base",
+            "--base-artifact-root",
+            "/work/captures/generic-core/base",
+            "--project",
+            "/work/captures/generic-core/project.json",
+            "--evidence",
+            "/work/captures/generic-core/evidence.json",
+            "--expected",
+            "/work/captures/generic-core/expected.json",
+            "--source-root",
+            "/work/captures/head",
+            "--artifact-root",
+            "/work/captures/generic-core/head"
+          ],
+          "role": "core_evaluate"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "-c",
+            "import sys,json; from pathlib import Path; sys.path.insert(0,str(Path(sys.argv[1])/\"app\")); import rust_collector_project as p; b=p.load_binding(json.loads(Path(sys.argv[2]).read_text()),Path(sys.argv[3]),sys.argv[4]); print(json.dumps(p.project_report(json.loads(Path(sys.argv[5]).read_text()),b)))",
+            "/runtime",
+            "/work/captures/generic-core/unsupported-request.json",
+            "/work/captures/generic-core/unsupported-binding.json",
+            "aaf9f8bd07a45b282eec9b06b133aad3c179c6868717951ac8cc8f19cbefdc34",
+            "/work/captures/generic-core/head-native.json"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "quality",
+            "evaluate",
+            "--output",
+            "/work/captures/generic-core/unsupported-report.json",
+            "--policy",
+            "/work/captures/generic-core/policy.json",
+            "--mappings",
+            "/work/captures/generic-core/mappings.json",
+            "--base-project",
+            "/work/captures/generic-core/base-project.json",
+            "--base-evidence",
+            "/work/captures/generic-core/base-evidence.json",
+            "--base-expected",
+            "/work/captures/generic-core/base-expected.json",
+            "--base-source-root",
+            "/work/captures/base",
+            "--base-artifact-root",
+            "/work/captures/generic-core/base",
+            "--project",
+            "/work/captures/generic-core/project.json",
+            "--evidence",
+            "/work/captures/generic-core/unsupported-evidence.json",
+            "--expected",
+            "/work/captures/generic-core/expected.json",
+            "--source-root",
+            "/work/captures/head",
+            "--artifact-root",
+            "/work/captures/generic-core/unsupported"
+          ],
+          "role": "core_evaluate"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "-c",
+            "import sys,json; from pathlib import Path; sys.path.insert(0,str(Path(sys.argv[1])/\"app\")); import rust_collector_project as p; b=p.load_binding(json.loads(Path(sys.argv[2]).read_text()),Path(sys.argv[3]),sys.argv[4]); print(json.dumps(p.project_report(json.loads(Path(sys.argv[5]).read_text()),b)))",
+            "/runtime",
+            "/work/captures/generic-core/not_configured-request.json",
+            "/work/captures/generic-core/not_configured-binding.json",
+            "9b67566f702d324afc95c74f6c260d23f8dd8a2f466eecb5951c805fb73006c0",
+            "/work/captures/generic-core/head-native.json"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "quality",
+            "evaluate",
+            "--output",
+            "/work/captures/generic-core/not_configured-report.json",
+            "--policy",
+            "/work/captures/generic-core/policy.json",
+            "--mappings",
+            "/work/captures/generic-core/mappings.json",
+            "--base-project",
+            "/work/captures/generic-core/base-project.json",
+            "--base-evidence",
+            "/work/captures/generic-core/base-evidence.json",
+            "--base-expected",
+            "/work/captures/generic-core/base-expected.json",
+            "--base-source-root",
+            "/work/captures/base",
+            "--base-artifact-root",
+            "/work/captures/generic-core/base",
+            "--project",
+            "/work/captures/generic-core/project.json",
+            "--evidence",
+            "/work/captures/generic-core/not_configured-evidence.json",
+            "--expected",
+            "/work/captures/generic-core/expected.json",
+            "--source-root",
+            "/work/captures/head",
+            "--artifact-root",
+            "/work/captures/generic-core/not_configured"
+          ],
+          "role": "core_evaluate"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "-c",
+            "import sys,json; from pathlib import Path; sys.path.insert(0,str(Path(sys.argv[1])/\"app\")); import rust_collector_project as p; b=p.load_binding(json.loads(Path(sys.argv[2]).read_text()),Path(sys.argv[3]),sys.argv[4]); print(json.dumps(p.project_report(json.loads(Path(sys.argv[5]).read_text()),b)))",
+            "/runtime",
+            "/work/captures/generic-core/not_collected-request.json",
+            "/work/captures/generic-core/not_collected-binding.json",
+            "7423dd5042630e3d94e0ca3002cd22473c1bcbca289d257dc6814f0a5300eee7",
+            "/work/captures/generic-core/head-native.json"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "quality",
+            "evaluate",
+            "--output",
+            "/work/captures/generic-core/not_collected-report.json",
+            "--policy",
+            "/work/captures/generic-core/policy.json",
+            "--mappings",
+            "/work/captures/generic-core/mappings.json",
+            "--base-project",
+            "/work/captures/generic-core/base-project.json",
+            "--base-evidence",
+            "/work/captures/generic-core/base-evidence.json",
+            "--base-expected",
+            "/work/captures/generic-core/base-expected.json",
+            "--base-source-root",
+            "/work/captures/base",
+            "--base-artifact-root",
+            "/work/captures/generic-core/base",
+            "--project",
+            "/work/captures/generic-core/project.json",
+            "--evidence",
+            "/work/captures/generic-core/not_collected-evidence.json",
+            "--expected",
+            "/work/captures/generic-core/expected.json",
+            "--source-root",
+            "/work/captures/head",
+            "--artifact-root",
+            "/work/captures/generic-core/not_collected"
+          ],
+          "role": "core_evaluate"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "-c",
+            "import sys,json; from pathlib import Path; sys.path.insert(0,str(Path(sys.argv[1])/\"app\")); import rust_collector_project as p; b=p.load_binding(json.loads(Path(sys.argv[2]).read_text()),Path(sys.argv[3]),sys.argv[4]); print(json.dumps(p.project_report(json.loads(Path(sys.argv[5]).read_text()),b)))",
+            "/runtime",
+            "/work/captures/generic-core/not_applicable-request.json",
+            "/work/captures/generic-core/not_applicable-binding.json",
+            "1caade9e47e9b1d25ef8ad4e644c894dd9c66b04d8fe43b0a5d40f45bdc92f0b",
+            "/work/captures/generic-core/head-native.json"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "quality",
+            "evaluate",
+            "--output",
+            "/work/captures/generic-core/not_applicable-report.json",
+            "--policy",
+            "/work/captures/generic-core/policy.json",
+            "--mappings",
+            "/work/captures/generic-core/mappings.json",
+            "--base-project",
+            "/work/captures/generic-core/base-project.json",
+            "--base-evidence",
+            "/work/captures/generic-core/base-evidence.json",
+            "--base-expected",
+            "/work/captures/generic-core/base-expected.json",
+            "--base-source-root",
+            "/work/captures/base",
+            "--base-artifact-root",
+            "/work/captures/generic-core/base",
+            "--project",
+            "/work/captures/generic-core/project.json",
+            "--evidence",
+            "/work/captures/generic-core/not_applicable-evidence.json",
+            "--expected",
+            "/work/captures/generic-core/expected.json",
+            "--source-root",
+            "/work/captures/head",
+            "--artifact-root",
+            "/work/captures/generic-core/not_applicable"
+          ],
+          "role": "core_evaluate"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "-c",
+            "import sys,json; from pathlib import Path; sys.path.insert(0,str(Path(sys.argv[1])/\"app\")); import rust_collector_project as p; b=p.load_binding(json.loads(Path(sys.argv[2]).read_text()),Path(sys.argv[3]),sys.argv[4]); print(json.dumps(p.project_report(json.loads(Path(sys.argv[5]).read_text()),b)))",
+            "/runtime",
+            "/work/captures/generic-core/measurement_error-request.json",
+            "/work/captures/generic-core/measurement_error-binding.json",
+            "4294e3ed54d82d7d818b83cffee92ee3912b0b76af2175efa98657f0f61081b2",
+            "/work/captures/generic-core/head-native.json"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "quality",
+            "evaluate",
+            "--output",
+            "/work/captures/generic-core/measurement_error-report.json",
+            "--policy",
+            "/work/captures/generic-core/policy.json",
+            "--mappings",
+            "/work/captures/generic-core/mappings.json",
+            "--base-project",
+            "/work/captures/generic-core/base-project.json",
+            "--base-evidence",
+            "/work/captures/generic-core/base-evidence.json",
+            "--base-expected",
+            "/work/captures/generic-core/base-expected.json",
+            "--base-source-root",
+            "/work/captures/base",
+            "--base-artifact-root",
+            "/work/captures/generic-core/base",
+            "--project",
+            "/work/captures/generic-core/project.json",
+            "--evidence",
+            "/work/captures/generic-core/measurement_error-evidence.json",
+            "--expected",
+            "/work/captures/generic-core/expected.json",
+            "--source-root",
+            "/work/captures/head",
+            "--artifact-root",
+            "/work/captures/generic-core/measurement_error"
+          ],
+          "role": "core_evaluate"
+        },
+        {
+          "executable": "/runtime/bin/harness-gate-rust-collector",
+          "args": [
+            "/runtime/bin/harness-gate-rust-collector",
+            "collect",
+            "--binding",
+            "/work/captures/generic-core/unknown-binding.json",
+            "--binding-sha256",
+            "12b2ffa2a1b2af442c1b9b0e843b33f05a0bbce08ba262e6b9fe97de35081e7c"
+          ],
+          "role": "collector_invocation"
+        },
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/runtime/app/rust_collector_entry.py",
+            "collect",
+            "--binding",
+            "/work/captures/generic-core/unknown-binding.json",
+            "--binding-sha256",
+            "12b2ffa2a1b2af442c1b9b0e843b33f05a0bbce08ba262e6b9fe97de35081e7c"
+          ],
+          "role": "other"
+        }
+      ],
+      "failed_path_lookups": [
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/cc",
+          "status": "-1 ENOENT (No such file or directory)"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/self-contained/cc",
+          "status": "-1 ENOENT (No such file or directory)"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/cc",
+          "status": "-1 ENOENT (No such file or directory)"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/self-contained/cc",
+          "status": "-1 ENOENT (No such file or directory)"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/cc",
+          "status": "-1 ENOENT (No such file or directory)"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/self-contained/cc",
+          "status": "-1 ENOENT (No such file or directory)"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/cc",
+          "status": "-1 ENOENT (No such file or directory)"
+        },
+        {
+          "executable": "/runtime/rust/lib/rustlib/x86_64-unknown-linux-gnu/bin/self-contained/cc",
+          "status": "-1 ENOENT (No such file or directory)"
+        }
+      ]
+    },
+    "seed-initial-execve.log": {
+      "counts": {
+        "other": 1
+      },
+      "successful_execs": [
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/work/driver/tools/quality/tests/rust_collector_clean_host.py",
+            "seed"
+          ],
+          "role": "other"
+        }
+      ],
+      "failed_path_lookups": []
+    },
+    "stale-execve.log": {
+      "counts": {
+        "other": 1,
+        "core_collect": 1
+      },
+      "successful_execs": [
+        {
+          "executable": "/runtime/python/bin/python3",
+          "args": [
+            "/runtime/python/bin/python3",
+            "-I",
+            "-S",
+            "-B",
+            "/work/driver/tools/quality/tests/rust_collector_clean_host.py",
+            "stale"
+          ],
+          "role": "other"
+        },
+        {
+          "executable": "/released-core/harness-gate-linux-amd64",
+          "args": [
+            "/released-core/harness-gate-linux-amd64",
+            "quality",
+            "collect",
+            "--repository-root",
+            "/work/configured/project",
+            "--state",
+            "/work/configured/state.json",
+            "--trusted-keys",
+            "/work/configured/trusted-keys.json",
+            "--output",
+            "/work/configured/stale-collection.json"
+          ],
+          "role": "core_collect"
+        }
+      ],
+      "failed_path_lookups": []
+    }
+  }
+}

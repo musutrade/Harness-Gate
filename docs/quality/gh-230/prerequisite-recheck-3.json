@@ -1,0 +1,72 @@
+{
+  "checked_at": "2026-09-11T08:14:37.283777+00:00",
+  "workspace": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+  "commands": [
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "stdout": "e24aeb351168610c00c14032a473fad61659ec2b\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "branch",
+        "--show-current"
+      ],
+      "exit_code": 0,
+      "stdout": "symphony/GH-230\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "rg",
+        "--files",
+        "--hidden",
+        "--no-ignore",
+        "target",
+        "-g",
+        "*released*core*",
+        "-g",
+        "*harness-gate-linux-amd64*",
+        "-g",
+        "*SHA256SUMS*",
+        "-g",
+        "*sigstore*"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "tail",
+        "-8",
+        "target/gh-230/operator-native-runtime/native-tests.log"
+      ],
+      "exit_code": 0,
+      "stdout": "test_real_generated_constructor_closure_async_and_instances (test_rust_native_driver.NativeDriverTests.test_real_generated_constructor_closure_async_and_instances) ... ok\ntest_released_rust_core_receives_real_native_debt (test_rust_native_driver.NativeDriverTests.test_released_rust_core_receives_real_native_debt) ... skipped 'HARNESS_GATE_NATIVE_POLICY_BINARY required for shipped CLI integration'\ntest_source_expansion_cfg_and_compiler_tampering (test_rust_native_driver.NativeDriverTests.test_source_expansion_cfg_and_compiler_tampering) ... ok\n\n----------------------------------------------------------------------\nRan 9 tests in 10.572s\n\nOK (skipped=1)\n",
+      "stderr": ""
+    }
+  ],
+  "provisioned_inputs": [
+    {
+      "path": "target/symphony-inputs/rustc-dev-1.97.1-x86_64-unknown-linux-gnu.tar.xz",
+      "bytes": 122286540,
+      "sha256": "0109304e1995cce9e3362208f5d4ec0944e52a2ddfbc0a85d4ce5bea5d3081ab"
+    }
+  ],
+  "native_driver": {
+    "path": "target/gh-230/operator-native-runtime/build/debug/harness-gate-rust-native-driver",
+    "exists": true,
+    "sha256": "5a51fee77e3f6453e41ad7146b14d7b31f9155302ff6982a4d0480938e638784"
+  },
+  "released_core_present": false,
+  "project_flow_present": false,
+  "impact": "Original released v0.3.7 Core and verification material are absent from provisioned inputs; workspace target filename search finds no released asset. P6/P7 acceptance remains incomplete. Existing checkout build is not substituted. Blocked network download was not retried. Native bootstrap blocker is resolved.",
+  "validation": "No source changes or test reruns in this prerequisite recheck. Earlier actual results remain in their original records; not reported as rerun."
+}
