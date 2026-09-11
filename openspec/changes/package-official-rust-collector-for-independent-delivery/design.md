@@ -45,6 +45,13 @@ A wrapper invoking Core must preserve its nonzero decision and must not implemen
 threshold/debt logic itself.
 
 ## Identity and installation
+GH-227's [measurement and delivery contract](../../../docs/quality/rust-collector-delivery-contract.md)
+inventories both existing protocol envelopes and native/legacy exits, defines the
+typed completion/error boundary, and specifies the strict manifest, exact tested
+matrix and conservative capture identity. The reviewed delivery matrix is empty;
+no tested independently delivered Core/ABI version is inferred from source pins.
+Its synthetic contract tests do not establish native positive measurement.
+
 Manifest binds collector version, source commit, dependency digests, supported Core
 versions, protocol versions, capabilities, measurement identities, compiler commit,
 LLVM, platform/ABI, normalization/classifier identity and runtime payload inventory.
@@ -109,12 +116,25 @@ split any task exceeding that bound before execution. Estimates exclude external
 approvals, hosted build time and Arc-Admin owner scheduling; no calendar promise.
 
 ## Validation status
-Planning environment: openspec CLI absent (command -v returned no path).
-Strict OpenSpec and repository docs consistency are NOT RUN; not passed.
-Required before leaving draft:
+The original planning environment had no OpenSpec CLI and recorded NOT RUN.
+That historical state was superseded for exact planning head
+`7b6aeb46cd168746686bcc5e48945fcc34c95545` by the
+[PR #226 validation receipt](https://github.com/musutrade/Harness-Gate/pull/226#issuecomment-5627974720):
 ```sh
-openspec validate package-official-rust-collector-for-independent-delivery --strict --no-interactive
+npx --yes @fission-ai/openspec@1.13.0 validate package-official-rust-collector-for-independent-delivery --strict --no-interactive
 ```
-Also run applicable repository documentation checks in a full checkout.
-No source/runtime/CI change, native sampling, release, baseline acceptance or
-quality pass is claimed by this planning PR.
+Exit 0, change valid, using an isolated copy of the exact four change files and
+openspec/config.yaml. This was change-scoped validation, not full-repository
+`validate --all` or native acceptance. Hosted Documentation Consistency and
+Required Quality Aggregate passed in [run 34550353785](https://github.com/musutrade/Harness-Gate/actions/runs/34550353785).
+The [controller planning review](https://github.com/musutrade/Harness-Gate/pull/226#issuecomment-5628146966)
+found no blockers; it was not an independent GitHub approval. PR #226 merged as
+`94b1243f25275b26b2edf3d11f0e12c28eb16eaa` on 2026-09-11.
+
+The later explicit execution handoff authorizes #227–#231 serially, superseding
+backlog-only activation wording without authorizing publication or GH-215.
+GH-227's actual checks and genuine failures are recorded in
+[validation evidence](../../../docs/quality/gh-227/validation.md).
+P2 onward remains incomplete here. Required CI and controller acceptance still
+apply to each implementation PR; planning acceptance is not native/runtime,
+baseline or release acceptance. Relevant Engineering Policy semantics are unchanged.

@@ -20,7 +20,9 @@ change. No existing protocol or measurement requirement is replaced.
 ## Non-goals
 No registry, marketplace, new repository, multi-repository orchestration, mandatory
 Python rewrite, additional platform certification, baseline acceptance, threshold
-change, or Arc-Admin gate transfer. No implementation or publication in this PR.
+change, or Arc-Admin gate transfer. Planning PR #226 contained no implementation
+or publication. The 2026-09-11 execution handoff authorizes the serial #227–#231
+implementation chain; release publication still requires separate authorization.
 
 ## Impact and policy
 All relevant Engineering Policy semantics remain unchanged; no normative policy
@@ -55,5 +57,7 @@ Low: keeping the source in this repository avoids a second maintenance workflow.
 - [ADR-0044](../../../docs/adr/0044-trusted-quality-baselines.md)
 - [ADR-0049](../../../docs/adr/0049-project-owned-validation-extension-boundary.md)
 
-Status: proposed; GH-225 remains open. See design.md for decisions and tasks.md
-for unchecked implementation and review prerequisites.
+Status: planning accepted and merged via PR #226 as
+94b1243f25275b26b2edf3d11f0e12c28eb16eaa; GH-225 remains the umbrella.
+GH-227 implements P0.1–P1.2 only. See design.md for planning receipts and tasks.md
+for evidenced completion and remaining implementation/acceptance prerequisites.
