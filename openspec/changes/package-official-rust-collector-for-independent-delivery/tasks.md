@@ -1,19 +1,22 @@
 # Implementation tasks
 
 Parent: [proposal](proposal.md), [design](design.md), [delivery requirements](specs/rust-collector-delivery/spec.md).
-All tasks remain unchecked. Planning approval is not implementation or publication authorization.
+Planning PR #226 is accepted and merged; see [receipts](design.md#validation-status).
+The explicit execution handoff authorizes #227–#231 serially, not publication.
+Only completed scoped tasks are checked with [GH-227 evidence](../../../docs/quality/gh-227/validation.md);
+later implementation and acceptance tasks remain unchecked.
 Each item is estimated 1–3 focused hours (M); split before execution if larger.
 Acceptance is the concrete output/test named in each item; logs must retain failures.
 
 ## P0 Contracts
 
-- [ ] P0.1 [priority:P1] [effort:M, <=3h] Inventory existing protocol, native exits and authority boundaries; retain source references.
-- [ ] P0.2 [priority:P1] [effort:M, <=3h] Define typed measurement success/error and legacy-exit compatibility tests.
+- [x] P0.1 [priority:P1] [effort:M, <=3h] Inventory existing protocol, native exits and authority boundaries; retain source references.
+- [x] P0.2 [priority:P1] [effort:M, <=3h] Define typed measurement success/error and legacy-exit compatibility tests.
 
 ## P1 Identity
 
-- [ ] P1.1 [priority:P1] [effort:M, <=3h] Specify manifest fields and exact compatibility matrix; unknown combinations reject.
-- [ ] P1.2 [priority:P1] [effort:M, <=3h] Specify relocation negatives and reviewed series transition requirements.
+- [x] P1.1 [priority:P1] [effort:M, <=3h] Specify manifest fields and exact compatibility matrix; unknown combinations reject.
+- [x] P1.2 [priority:P1] [effort:M, <=3h] Specify relocation negatives and reviewed series transition requirements.
 
 ## P2 Standalone runtime
 
@@ -55,5 +58,5 @@ Acceptance is the concrete output/test named in each item; logs must retain fail
 
 ## Planning acceptance
 
-- [ ] [priority:P0] [effort:S, <1h] Strict OpenSpec validation and applicable repository documentation checks pass with retained commands/results.
-- [ ] [priority:P0] [effort:S, <1h] Controller reviews planning PR; no automatic merge or symphony-ready label.
+- [x] [priority:P0] [effort:S, <1h] Strict OpenSpec validation and applicable repository documentation checks pass with retained commands/results. PR #226 exact-head validation and hosted documentation receipts are in design.md.
+- [x] [priority:P0] [effort:S, <1h] Controller reviews planning PR; no automatic merge or symphony-ready label. PR #226 controller review and authorized merge are recorded in design.md; later execution authorization is separate.

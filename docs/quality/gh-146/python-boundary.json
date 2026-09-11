@@ -694,6 +694,19 @@
       "authoritative_status": "Native measurement facts only; released Rust Core retains policy authority.",
       "final_disposition": "Retain ecosystem measurement tooling outside Generic Core (ADR-0040/0044/0049).",
       "sha256": "b83b1c799dea5e68b24e4b5aaff3db6947e12cda464e66532804285a9010b6f6"
+    },
+    {
+      "module": "tools/quality/rust_collector_contract.py",
+      "category": "A",
+      "purpose": "Define measurement completion/errors and exact Rust collector delivery preflight and capture identity contracts.",
+      "callers": [
+        "tools/quality/tests/test_rust_collector_contract.py"
+      ],
+      "ci_role": "Quality-script contract regression only; no producer launch or native positive certification.",
+      "release_impact": "Not packaged in released Core; no release approval or baseline acceptance authority.",
+      "authoritative_status": "Delivery/transport preflight only; released Rust Core retains all generic policy decisions.",
+      "final_disposition": "Retain development delivery contract helper; frozen helpers used solely for schema/transport validation.",
+      "sha256": "4e5bf1a7fa874ebec1c900813c627db43d7e61d01721b2abee845b6bfd0757fb"
     }
   ],
   "schema": "python-product-boundary/v1",
