@@ -180,3 +180,15 @@ private key is discarded; output retains the public test trust and signed bytes.
 The report labels production eligibility and protected approval as unevaluated,
 native measurement as unperformed, and publication as unattempted. Those test
 assets are never production release candidates.
+
+
+## Proposed single-maintainer collector approval (GH-239)
+
+The earlier no-self-review description remains the v1 eligibility contract.
+The [explicit personal-project exception](gh-239/operator-preparation.md) uses v2
+and permits only the pinned owner to approve their own run in the dedicated
+collector environment. Required manual review and no administrator bypass remain.
+Wrong/additional reviewers, wrong environments and v1/v2 mismatches reject.
+The final installer must be rebuilt to understand the v2 receipt; old installers
+reject it. Review and actual environment provisioning are still pending, and no
+collector publication or final host certification is claimed by this change.

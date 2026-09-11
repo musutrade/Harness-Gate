@@ -1,0 +1,71 @@
+{
+  "policy": {
+    "type": "workspaceWrite",
+    "networkAccess": true,
+    "writableRoots": [
+      "/home/gem/symphony-workspaces/GH-94/.git",
+      "/home/gem/symphony-workspaces/GH-151/.git",
+      "/mnt/dev-ssd/workspaces/symphony/GH-220/.git",
+      "/mnt/dev-ssd/workspaces/symphony/GH-221/.git"
+    ]
+  },
+  "commands": [
+    {
+      "command": [
+        "bash",
+        "/mnt/dev-ssd/workspaces/symphony/GH-239/target/gh-239/operator-acceptance/run-container.sh",
+        "/mnt/dev-ssd/workspaces/symphony/GH-239/target/gh-239/operator-acceptance/empty-runtime",
+        "/mnt/dev-ssd/workspaces/symphony/GH-239/target/gh-239/operator-acceptance/sandbox-preflight-20260911T144113554178Z",
+        "/bin/sh",
+        "/work/host-probe.sh"
+      ],
+      "response": {
+        "id": 2,
+        "result": {
+          "exitCode": 0,
+          "stdout": "no ambient Python, source checkout, Docker socket or writable runtime\n7.0.0-31-generic\nglibc 2.43\nharness-gate 0.4.0\n",
+          "stderr": "Container receipt: gh239-acceptance-0b3580ac3c21411f89b6b25afecc01ad\n"
+        }
+      }
+    },
+    {
+      "command": [
+        "bash",
+        "/mnt/dev-ssd/workspaces/symphony/GH-239/target/gh-239/operator-acceptance/run-container.sh",
+        "/mnt/dev-ssd/workspaces/symphony/GH-239/target/gh-239/operator-acceptance/trust-tools",
+        "/mnt/dev-ssd/workspaces/symphony/GH-239/target/gh-239/operator-acceptance/sandbox-preflight-20260911T144113554178Z",
+        "/runtime/cosign",
+        "verify-blob",
+        "--offline",
+        "--trusted-root",
+        "/runtime/trusted_root.json",
+        "--bundle",
+        "/runtime/cosign-linux-amd64.sigstore.json",
+        "--certificate-identity",
+        "keyless@projectsigstore.iam.gserviceaccount.com",
+        "--certificate-oidc-issuer",
+        "https://accounts.google.com",
+        "/runtime/cosign"
+      ],
+      "response": {
+        "id": 3,
+        "result": {
+          "exitCode": 0,
+          "stdout": "",
+          "stderr": "Flag --offline has been deprecated, To verify in an airgapped environment, provide a --bundle with the signature and verification material, and a --trusted-root file with the service keys and certificates\nVerified OK\nContainer receipt: gh239-acceptance-8bd7c07dab7e4f149c0a305f6f30540e\n"
+        }
+      }
+    }
+  ],
+  "codex_command": "codex --config 'model_provider=\"openai\"' --config 'model=\"gpt-6-astra\"' --config 'model_reasoning_effort=\"high\"' --config 'features.goals=false' --config 'model_auto_compact_token_limit=64000' --config 'tool_output_token_limit=2000' app-server",
+  "initialize": {
+    "id": 1,
+    "result": {
+      "userAgent": "gh239_preflight/0.154.0 (Ubuntu 26.4.0; x86_64) dumb (gh239_preflight; 1.0)",
+      "codexHome": "/home/gem/.codex",
+      "platformFamily": "unix",
+      "platformOs": "linux"
+    }
+  },
+  "status": "pass"
+}
