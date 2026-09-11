@@ -1,4 +1,6 @@
 """Standalone positives use real private tools; failures keep their original bytes."""
+import base64
+import copy
 import json
 import os
 from pathlib import Path
@@ -6,6 +8,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 
 QUALITY = Path(__file__).resolve().parents[1]
@@ -40,9 +43,11 @@ class StandaloneNativeTests(unittest.TestCase):
         if not runtime:
             raise unittest.SkipTest('RUST_COLLECTOR_RUNTIME required: assembled private Linux runtime')
         cls.runtime = Path(runtime).resolve(strict=True)
-        base = ROOT / 'target/gh-228/runtime-tests'
+        base = ROOT / 'target/gh-230/runtime-tests'
         base.mkdir(parents=True, exist_ok=True)
         cls.work = Path(tempfile.mkdtemp(dir=base))
+        cls.command_index = 0
+        (cls.work / 'commands').mkdir()
         (cls.work / 'tmp').mkdir()
         (cls.work / 'cargo-home').mkdir()
         cls.environment = {'PATH': str(cls.runtime / 'bin'),
@@ -65,13 +70,19 @@ class StandaloneNativeTests(unittest.TestCase):
 
     @classmethod
     def command(cls, name, args, data=None):
+        cls.command_index += 1
+        record = cls.work / 'commands' / f'{cls.command_index:04d}-{name}'
+        started = time.monotonic()
         result = subprocess.run(args, cwd=cls.work, env=cls.environment,
                                 input=data, text=True, capture_output=True)
-        (cls.work / (name + '.stdout')).write_text(result.stdout)
-        (cls.work / (name + '.stderr')).write_text(result.stderr)
-        (cls.work / (name + '.command.json')).write_text(json.dumps({
+        # Repeated certification must retain every original command and result.
+        # These records count direct test calls, not descendant producer launches.
+        Path(str(record) + '.stdout').write_text(result.stdout)
+        Path(str(record) + '.stderr').write_text(result.stderr)
+        Path(str(record) + '.command.json').write_text(json.dumps({
             'command': args, 'cwd': str(cls.work), 'environment': cls.environment,
-            'exit_code': result.returncode}, indent=2))
+            'stdin': data, 'exit_code': result.returncode,
+            'wall_seconds': time.monotonic() - started}, indent=2))
         return result
 
     def entry(self, name, *args, data=None):
@@ -189,3 +200,220 @@ class StandaloneNativeTests(unittest.TestCase):
         self.assertEqual(report['aggregate']['state'], 'fail')
         self.assertNotIn('measurement_error', {r['state'] for r in report['gates'].values()})
         self.assertTrue(any(r['record']['head'].get('numerator') == 56 for r in report['gates'].values()))
+
+    def test_private_generic_projection_is_decided_by_actual_core(self):
+        """Native diagnostic; unsigned preparation does not authorize a delivery tuple."""
+        from test_rust_collector_project import binding_for, request_for
+
+        binary = os.environ.get('HARNESS_GATE_NATIVE_POLICY_BINARY')
+        if not binary:
+            self.skipTest('HARNESS_GATE_NATIVE_POLICY_BINARY required for actual Core evaluation')
+        reports = [self.measurement(name) for name in ('base', 'head')]
+        output = self.work / 'generic-core'
+        output.mkdir()
+        projections = []
+        for name, report, commit, parent in zip(('base', 'head'), reports, ('a', 'c'), ('b', 'a')):
+            artifacts = output / name
+            artifacts.mkdir()
+            binding = binding_for(report, self.work / name, artifacts)
+            binding['input']['context'].update(commit=commit * 40, base_commit=parent * 40)
+            binding_path = output / (name + '-binding.json')
+            request, digest = request_for(binding, binding_path)
+            request_path = output / (name + '-request.json')
+            request_path.write_text(json.dumps(request))
+            report_path = output / (name + '-native.json')
+            report_path.write_text(json.dumps(report))
+            # Exercise the installed projection with private Python and certified
+            # fresh reports. The public collect entry remains blocked while the
+            # reviewed delivery matrix is empty; this is no substitute for it.
+            code = ('import sys,json; from pathlib import Path; '
+                    'sys.path.insert(0,str(Path(sys.argv[1])/"app")); '
+                    'import rust_collector_project as p; '
+                    'b=p.load_binding(json.loads(Path(sys.argv[2]).read_text()),'
+                    'Path(sys.argv[3]),sys.argv[4]); '
+                    'print(json.dumps(p.project_report(json.loads(Path(sys.argv[5]).read_text()),b)))')
+            result = self.command(name + '-generic-project', [str(self.runtime / 'python/bin/python3'),
+                '-I', '-S', '-B', '-c', code, str(self.runtime), str(request_path), str(binding_path),
+                digest, str(report_path)])
+            self.assertEqual(result.returncode, 0, result.stderr)
+            response = json.loads(result.stdout)
+            self.assertEqual(response['status'], 'PASS')
+            projections.append({'project': binding['project'], 'evidence': response['collection']['evidence'],
+                                'expected': binding['input']['context'],
+                                'source-root': str(self.work / name), 'artifact-root': str(artifacts)})
+        declared, mappings, _ = policy.policy_and_lineage(*reports, *projections, ['legacy_debt'])
+        command = [str(Path(binary).resolve()), 'quality', 'evaluate', '--output', str(output / 'report.json')]
+        for name, value in [('policy', declared), ('mappings', mappings)]:
+            path = output / (name + '.json')
+            path.write_text(json.dumps(value))
+            command.extend(['--' + name, str(path)])
+        for prefix, projection in zip(('base-', ''), projections):
+            for name, value in projection.items():
+                path = value if name.endswith('-root') else str(output / (prefix + name + '.json'))
+                if not name.endswith('-root'):
+                    Path(path).write_text(json.dumps(value))
+                command.extend(['--' + prefix + name, path])
+        result = self.command('generic-core-evaluate', command)
+        self.assertEqual(result.returncode, 1, result.stderr)
+        report = json.loads((output / 'report.json').read_text())
+        self.assertEqual(report['aggregate']['state'], 'fail')
+        self.assertNotIn('measurement_error', {r['state'] for r in report['gates'].values()})
+        self.assertTrue(any(r['record']['head'].get('numerator') == 56 and r['state'] == 'fail'
+                            for r in report['gates'].values()))
+        # Inject unavailable outcomes into the projection, then ask actual Core
+        # to decide requiredness. These are synthetic negatives over fresh native
+        # evidence, not successful captures of unsupported tool combinations.
+        for state, gate_state in [('unsupported', 'unsupported'),
+                                  ('not_configured', 'blocked'),
+                                  ('not_collected', 'skipped'),
+                                  ('not_applicable', 'not_applicable'),
+                                  ('measurement_error', 'measurement_error')]:
+            with self.subTest(capability=state):
+                artifacts = output / state
+                artifacts.mkdir()
+                unavailable = copy.deepcopy(binding)
+                unavailable['input']['output_root'] = str(artifacts)
+                for capability in unavailable['capabilities']:
+                    capability.update(state=state, reason='explicit synthetic capability diagnostic')
+                binding_path = output / (state + '-binding.json')
+                request, digest = request_for(unavailable, binding_path)
+                request_path = output / (state + '-request.json')
+                request_path.write_text(json.dumps(request))
+                result = self.command(state + '-generic-project',
+                    [str(self.runtime / 'python/bin/python3'), '-I', '-S', '-B', '-c', code,
+                     str(self.runtime), str(request_path), str(binding_path), digest, str(report_path)])
+                self.assertEqual(result.returncode, 0, result.stderr)
+                response = json.loads(result.stdout)
+                self.assertEqual(response['status'], 'PASS')
+                records = response['collection']['evidence']
+                self.assertTrue(records)
+                for record in records:
+                    self.assertEqual({c['state'] for c in record['capabilities']}, {state})
+                    self.assertEqual(record['metrics'], [])
+                evidence_path = output / (state + '-evidence.json')
+                evidence_path.write_text(json.dumps(records))
+                decision_path = output / (state + '-report.json')
+                unavailable_command = command.copy()
+                for option, value in [('--evidence', evidence_path), ('--artifact-root', artifacts),
+                                      ('--output', decision_path)]:
+                    unavailable_command[unavailable_command.index(option) + 1] = str(value)
+                result = self.command(state + '-core-evaluate', unavailable_command)
+                self.assertEqual(result.returncode, 1, result.stderr)
+                decision = json.loads(decision_path.read_text())
+                self.assertTrue(decision['gates'])
+                self.assertEqual({gate['state'] for gate in decision['gates'].values()}, {gate_state})
+                aggregate = 'measurement_error' if state == 'measurement_error' else 'blocked'
+                self.assertEqual(decision['aggregate']['state'], aggregate)
+        unknown_output = output / 'unknown-combination'
+        unknown_output.mkdir()
+        binding['input']['output_root'] = str(unknown_output)
+        binding_path = output / 'unknown-binding.json'
+        request, _ = request_for(binding, binding_path)
+        result = self.entry('generic-unknown-combination', *request['args'], data=json.dumps(request))
+        self.assertEqual(result.returncode, 1, result.stderr)
+        response = json.loads(result.stdout)
+        self.assertEqual(response['invocation_id'], request['invocation_id'])
+        self.assertEqual(response['status'], 'FAIL')
+        self.assertEqual(response['collection']['evidence'], [])
+        self.assertIn('unknown tested Core/protocol/ABI', response['collection']['error'])
+        self.assertEqual(list(unknown_output.iterdir()), [])
+
+    def test_actual_core_authenticates_private_collector_and_rejects_replay(self):
+        """A disposable test signer does not establish delivery or capture trust."""
+        from test_rust_collector_project import binding_for, request_for
+
+        binary = os.environ.get('HARNESS_GATE_NATIVE_POLICY_BINARY')
+        if not binary:
+            self.skipTest('HARNESS_GATE_NATIVE_POLICY_BINARY required for actual Core invocation')
+        openssl = shutil.which('openssl')
+        if not openssl:
+            self.skipTest('openssl required to sign the disposable trusted-request fixture')
+        output = self.work / 'authenticated-core'
+        output.mkdir()
+        artifacts = output / 'artifacts'
+        artifacts.mkdir()
+        binding = binding_for(self.measurement('head'), self.work / 'head', artifacts)
+        request, _ = request_for(binding, output / 'binding.json')
+        executable = self.runtime / 'bin/harness-gate-rust-collector'
+        request['adapter'].update(executable=str(executable), source_digest=builder.sha(executable),
+            signature={'algorithm': 'ed25519', 'key_id': 'disposable-integration-test', 'value': ''})
+        request.update(nonce='authenticated-core-test', timeout_ms=30000,
+                       issued_at_ms=int(time.time() * 1000))
+        request['expires_at_ms'] = request['issued_at_ms'] + 120000
+        private_key = output / 'disposable-test-key.pem'
+        public_key = output / 'disposable-test-key.der'
+        for name, args in (
+            ('generate', ['genpkey', '-algorithm', 'ED25519', '-out', str(private_key)]),
+            ('public', ['pkey', '-in', str(private_key), '-pubout', '-outform', 'DER', '-out', str(public_key)]),
+        ):
+            result = self.command('test-key-' + name, [openssl, *args])
+            self.assertEqual(result.returncode, 0, result.stderr)
+        public_bytes = public_key.read_bytes()
+        self.assertEqual(public_bytes[:12], bytes.fromhex('302a300506032b6570032100'))
+        self.assertEqual(len(public_bytes), 44)
+        trusted_key = output / 'trusted-key.json'
+        trusted_key.write_text(json.dumps({'key_id': 'disposable-integration-test',
+            'public_key': base64.b64encode(public_bytes[12:]).decode()}))
+        # Match the existing v2 signed struct order; JSON Value maps and
+        # BTreeMaps inside that struct have lexically sorted keys. Core itself
+        # verifies these bytes, so an incompatible encoding fails the test.
+        declaration = request['adapter']
+        unsigned = {'domain': 'harness-gate/adapter-request/v2',
+            'protocol_version': request['protocol_version'], 'result_schema_version': request['result_schema_version'],
+            'adapter': {key: declaration[key] for key in ('name', 'version', 'executable', 'source_digest')}}
+        unsigned['adapter']['signature'] = {key: declaration['signature'][key] for key in ('algorithm', 'key_id')}
+        for key in ('invocation_id', 'step_id', 'timeout_ms', 'config_digest', 'artifact_root',
+                    'nonce', 'issued_at_ms', 'expires_at_ms', 'args', 'environment', 'capabilities', 'input'):
+            unsigned[key] = request[key]
+        unsigned['input'] = json.loads(json.dumps(request['input'], sort_keys=True))
+        payload = output / 'signed-payload.json'
+        payload.write_bytes(json.dumps(unsigned, separators=(',', ':'), ensure_ascii=False).encode())
+        signature = output / 'signature.bin'
+        result = self.command('test-key-sign', [openssl, 'pkeyutl', '-sign', '-rawin',
+            '-inkey', str(private_key), '-in', str(payload), '-out', str(signature)])
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(len(signature.read_bytes()), 64)
+        request['adapter']['signature']['value'] = base64.b64encode(signature.read_bytes()).decode()
+        command = [str(Path(binary).resolve()), 'adapter', 'run', '--trusted-key', str(trusted_key), '--request']
+        tampered = copy.deepcopy(request)
+        tampered['input']['context']['commit'] = 'f' * 40
+        tampered_path = output / 'tampered-request.json'
+        tampered_path.write_text(json.dumps(tampered))
+        result = self.command('authenticated-tampered-context', command + [str(tampered_path)])
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('adapter signature verification failed', result.stderr)
+        self.assertFalse((output / '.harness-gate-adapter-replay').exists())
+        request_path = output / 'request.json'
+        request_path.write_text(json.dumps(request))
+        result = self.command('authenticated-unknown-combination', command + [str(request_path)])
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('adapter exited with', result.stderr)
+        # The public entry rejects an uncertified combination. A generic host
+        # treats its nonzero exit as an operational failure before parsing it.
+        direct = self.entry('authenticated-direct-response', *request['args'], data=json.dumps(request))
+        self.assertEqual(direct.returncode, 1, direct.stderr)
+        response = json.loads(direct.stdout)
+        self.assertEqual(response['invocation_id'], request['invocation_id'])
+        self.assertIn('unknown tested Core/protocol/ABI', response['collection']['error'])
+        self.assertEqual(response['collection']['evidence'], [])
+        self.assertEqual(response['artifacts'], [])
+        result = self.command('authenticated-replay', command + [str(request_path)])
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('nonce has already been used', result.stderr)
+        self.assertEqual(list(artifacts.iterdir()), [])
+
+    def test_actual_core_configures_installed_collector_once_and_rejects_replay(self):
+        from rust_collector_config_fixture import configured_rejection
+
+        binary = os.environ.get('HARNESS_GATE_NATIVE_POLICY_BINARY')
+        if not binary:
+            self.skipTest('HARNESS_GATE_NATIVE_POLICY_BINARY required for configured Core invocation')
+        configured_rejection(self, str(Path(binary).resolve(strict=True)))
+
+    def test_actual_core_rejects_malformed_output_once_and_consumes_nonce(self):
+        from rust_collector_config_fixture import configured_malformed_rejection
+
+        binary = os.environ.get('HARNESS_GATE_NATIVE_POLICY_BINARY')
+        if not binary:
+            self.skipTest('HARNESS_GATE_NATIVE_POLICY_BINARY required for configured Core invocation')
+        configured_malformed_rejection(self, str(Path(binary).resolve(strict=True)))
