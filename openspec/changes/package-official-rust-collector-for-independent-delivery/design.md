@@ -140,6 +140,12 @@ implement P2/P3 with [actual validation](../../../docs/quality/gh-228/validation
 The observed host is pinned exactly; repeated assembly is byte-identical, but
 compiler rebuild reproducibility and clean-host acceptance are unproven. The
 empty reviewed compatibility matrix continues to reject installed-host requests
-until P6. P4 onward remains incomplete. Required CI and controller acceptance
+until P6. GH-229 implements P4/P5's [verified lifecycle and independent release
+contract](../../../docs/quality/rust-collector-installation.md), with
+[actual validation](../../../docs/quality/gh-229/validation.md). Its disposable-key
+dry-run is nonpublishing and uses synthetic payloads. Administrator-provisioned
+host verifier/key trust is required before package code can execute; clean-host
+bootstrap acceptance and production key provisioning remain explicit P7/P8
+prerequisites. P6 onward remains incomplete. Required CI and controller acceptance
 still apply to each implementation PR; planning acceptance is not native/runtime,
 baseline or release acceptance. Relevant Engineering Policy semantics are unchanged.
