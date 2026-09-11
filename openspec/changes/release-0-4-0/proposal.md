@@ -32,3 +32,11 @@ policy failures. Required PR and exact protected-main CI must pass before tag
 v0.4.0. The existing release environment, multi-platform builds, signature,
 provenance and package checks remain mandatory. Verify published asset bytes and
 actual invocation before resuming GH-230. Record exact evidence as it completes.
+
+## Candidate evidence
+
+The release-small 0.4.0 candidate passes all nine fresh native driver/Core tests,
+including the real native-debt evaluation that the authentic v0.3.7 release
+cannot execute. [Candidate identity and test log](../../../docs/quality/release-0.4.0/README.md)
+record this compatibility check. This does not replace validation against
+published bytes or complete GH-230 acceptance.
