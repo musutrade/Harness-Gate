@@ -16,6 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Include accepted generic project configuration and evidence contracts, native
   Rust measurement tooling, and independent collector installation/release tooling.
 
+### Fixed
+
+- Scope crates.io publication to the public `harness-gate` package; the workspace
+  replay tool remains non-publishable.
+
 ### Compatibility and scope
 
 - Adapter producers must use the accepted protocol v2 signed-request contract;

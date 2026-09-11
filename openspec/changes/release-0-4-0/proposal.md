@@ -40,3 +40,8 @@ including the real native-debt evaluation that the authentic v0.3.7 release
 cannot execute. [Candidate identity and test log](../../../docs/quality/release-0.4.0/README.md)
 record this compatibility check. This does not replace validation against
 published bytes or complete GH-230 acceptance.
+
+The publish dry-run exposed that workspace default members include the private
+replay crate. The release command now explicitly selects `--package harness-gate`;
+replay remains `publish = false`. This corrects package selection without changing
+release gates or publishing the non-authoritative tool.
