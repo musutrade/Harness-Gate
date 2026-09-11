@@ -1,0 +1,31 @@
+{
+  "schema": "rust-collector-tested-source/v1",
+  "scope": "release implementation/tests plus changed native test harness; candidate runtime identities are recorded separately",
+  "sha256": {
+    "tools/quality/tests/rust_collector_config_fixture.py": "052e3abfbe52da0f34c1a86286c121c37202e5f2639560afeb1fb06fcab4b53f",
+    "tools/quality/tests/test_rust_collector_runtime.py": "dacdc784e2dd8a5032a5a83d9d8da566e8de623106dc0604fa4518bee9939113",
+    "tools/release/bootstrap_collector.sh": "0970a1222920198b6c6cdce253effdb2e71fda09534d45c08310aee1b0dc3195",
+    "tools/release/build_collector_bootstrap.py": "317010debd644c6266cce66bac201a6f581f1be3d22f4a565785bc460f09e174",
+    "tools/release/collector_assets.py": "e61479061bb8bfadbbc86b03b2c4bb3471b9e8b8793d165e5919119ddfca8911",
+    "tools/release/collector_dry_run.py": "7bf85fc945e35c920acb5ef9e38324de38d3f2f21d30c11a069277d688a9515a",
+    "tools/release/collector_release_policy.py": "c8e9a02d63458800e59b478bd68313b881f1a9470fbb677d324355c3276c75a1",
+    "tools/release/collector_sigstore.py": "70b06613fea2faa672fe995b7c20c6b3c088e18f1219f9e50c3fc0f5c1a7b47b",
+    "tools/release/generate-sbom.py": "ab09c27f913fdfb0b16cd73259f3378a8240e076538d95e680ac4ee1e34f63a4",
+    "tools/release/install_collector.py": "eb274d40ddbd6a30ae884857c787d6a94f4e3e3c49fd1f2d2043c251473d5e4a",
+    "tools/release/prepare_collector_candidate.py": "fe922a037f610d75c1062a66bef40afca282c6b56c8d6c40ec672acdf25c8e0e",
+    "tools/release/production_collector_release.py": "ab2ee408c2b4dcc39169f3f4e78966d3ded5d6035db79134d563990fbc652347",
+    "tools/release/production_installer.py": "a0bf55d16934a9a7ab1a00300f612501aff12b340869c083c566507351b5a97a",
+    "tools/release/release_inventory.py": "0f3d06ad0d40e592b7dfd388ec0e21481f947767e7f4b2f98f6872b28d03ddab",
+    "tools/release/release_policy.py": "92c80f285ff751879dbed440095ac73e57ac2493338e3a05229af0b1695116ff",
+    "tools/release/rust-collector-release.production.yml": "d7b7c24330470e013268b33bcf75011b5bbe5ecf6c9a587de93f7615db28f1aa",
+    "tools/release/stage_collector_candidate.py": "fca29e64d07fa540d1ddf6ff481e394db1d9667333ec546fcf3a608d10be93ae",
+    "tools/release/tests/test_collector_delivery.py": "fc28c1ce179968fa41dad401264b21f9b9d3cf3465d85ff6fa293307e093b526",
+    "tools/release/tests/test_collector_production.py": "1649b3829783b2c0c6b0acaa919d4431acde7ada9a9a6c0cb65d102e6925f5b7",
+    "tools/release/tests/test_generate_sbom.py": "f903902645685db0c17f5f2881d9270cea47d4648c1588059a358cd23f15c46b",
+    "tools/release/tests/test_install.sh": "05bfa90c52dd8a7771026248d9664196554b21b56d38d8d2fbae0cc40458fee8",
+    "tools/release/tests/test_release_inventory.py": "a33a179c22b701bee3976385965d9629b7b9343ad94f7289143c639ae48d8072",
+    "tools/release/tests/test_release_policy.py": "d8dac9ad9d0b3b28ae92a64045f70706a26c6101ff90dcd7528c9d4d90097cdd",
+    "tools/release/tests/test_release_workflow.py": "80180c640b4e2f6dcb282b610f1ae0623e016c08ca7c19f39d42728bb21dfbe9"
+  },
+  "source_base": "48099c48f1fded35af5d71638bf57160cb8e0b31"
+}

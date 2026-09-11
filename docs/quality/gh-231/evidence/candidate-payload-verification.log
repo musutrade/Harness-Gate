@@ -1,0 +1,1 @@
+PASS: all archive members, modes and SHA256 match actual RC manifest; unsigned, no install eligibility

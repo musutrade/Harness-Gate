@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/mnt/dev-ssd/dev-tmp/tmp.qIlNbI6gPT/runtime/tools/release/production_installer.py", line 22, in <module>
+    main()
+    ~~~~^^
+  File "/mnt/dev-ssd/dev-tmp/tmp.qIlNbI6gPT/runtime/tools/release/production_installer.py", line 16, in main
+    assets.require(assets.read(args.trust).get('schema') == 'rust-collector-host-trust/v2',
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   'production bootstrap requires independently provisioned v2 trust')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/dev-ssd/dev-tmp/tmp.qIlNbI6gPT/runtime/tools/quality/rust_collector_contract.py", line 23, in require
+    raise DeliveryError(message)
+rust_collector_contract.DeliveryError: production bootstrap requires independently provisioned v2 trust
