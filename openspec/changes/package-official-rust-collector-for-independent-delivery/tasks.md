@@ -5,6 +5,9 @@ Planning PR #226 is accepted and merged; see [receipts](design.md#validation-sta
 The explicit execution handoff authorizes #227–#231 serially, not publication.
 Only completed scoped tasks are checked with [GH-227 evidence](../../../docs/quality/gh-227/validation.md)
 and [GH-228 runtime evidence](../../../docs/quality/gh-228/runtime.md).
+P4/P5 evidence is recorded in [GH-229 validation](../../../docs/quality/gh-229/validation.md)
+and the [installation/release contract](../../../docs/quality/rust-collector-installation.md).
+Its local synthetic dry-run does not establish production approval or native acceptance.
 GH-228's original [dependency blocker](../../../docs/quality/gh-228/blocker.md)
 is resolved by the recorded operator inputs; its failures remain retained.
 P2/P3 completion covers the private runtime and local bundle, with exact observed
@@ -37,13 +40,13 @@ Acceptance is the concrete output/test named in each item; logs must retain fail
 
 ## P4 Lifecycle
 
-- [ ] P4.1 [priority:P1] [effort:M, <=3h] Implement verified staging/atomic activation and interrupted-install tests.
-- [ ] P4.2 [priority:P1] [effort:M, <=3h] Implement isolated version selection, rollback and manifest-owned uninstall tests.
+- [x] P4.1 [priority:P1] [effort:M, <=3h] Implement verified staging/atomic activation and interrupted-install tests.
+- [x] P4.2 [priority:P1] [effort:M, <=3h] Implement isolated version selection, rollback and manifest-owned uninstall tests.
 
 ## P5 Supply chain
 
-- [ ] P5.1 [priority:P1] [effort:M, <=3h] Define protected independent-tag eligibility, SBOM and provenance subjects.
-- [ ] P5.2 [priority:P1] [effort:M, <=3h] Implement exact inventory verification and tamper/missing/extra asset rejection.
+- [x] P5.1 [priority:P1] [effort:M, <=3h] Define protected independent-tag eligibility, SBOM and provenance subjects.
+- [x] P5.2 [priority:P1] [effort:M, <=3h] Implement exact inventory verification and tamper/missing/extra asset rejection.
 
 ## P6 Integration
 
