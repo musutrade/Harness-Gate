@@ -25,3 +25,13 @@ crate's old ^0.3 dependency; it was updated to ^0.4 before the successful build.
 Initial OpenSpec validation required an explicit metadata-only skip_specs marker;
 this release changes no normative spec and all validation remains strict.
 No measurement baseline or retained fixture was rewritten.
+
+## Publication selection regression
+
+A real `cargo publish --dry-run` initially failed because workspace defaults
+selected the private `harness-gate-quality-core` crate (`publish = false`).
+The workflow now explicitly selects `--package harness-gate`. The matching
+`cargo publish --manifest-path tools/harness-gate/Cargo.toml --package harness-gate
+--locked --dry-run --allow-dirty` passed package verification and stopped before
+upload as requested. Both logs are retained; all 42 release tests passed again.
+No crate or tag was published by this local dry-run.
