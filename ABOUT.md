@@ -80,7 +80,7 @@ Harness-Gate is ideal for:
 
 ## Project Status
 
-- **Version**: 0.3.7
+- **Version**: 0.4.0
 - **License**: MIT
 - **Platforms**: Linux, macOS, Windows
 - **Status**: Production-ready, actively maintained

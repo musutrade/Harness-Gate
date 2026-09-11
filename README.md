@@ -66,7 +66,7 @@ cargo install harness-gate
 ### Install from GitHub Release (Pre-built Binaries)
 
 Download the binary for your platform from an immutable [GitHub Release
-tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.7):
+tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.0):
 
 - **Linux (x86_64)**: `harness-gate-linux-amd64`
 - **macOS (Intel)**: `harness-gate-macos-amd64`
@@ -80,8 +80,8 @@ immutable tag, then pass that tag explicitly:
 ```bash
 curl --fail --show-error --location --proto '=https' --tlsv1.2 \
   -o /tmp/harness-gate-install.sh \
-  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.3.7/install.sh
-bash /tmp/harness-gate-install.sh --version v0.3.7
+  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.4.0/install.sh
+bash /tmp/harness-gate-install.sh --version v0.4.0
 harness-gate --version
 ```
 
