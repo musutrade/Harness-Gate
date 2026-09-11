@@ -720,7 +720,7 @@
       "release_impact": "Build candidate only; no signature, publication or policy authority.",
       "authoritative_status": "Packaging input validation only.",
       "final_disposition": "Retain bounded local bundle builder; lifecycle and release supply chain require separate acceptance.",
-      "sha256": "3adcc9126919eeea9c18cb3069d3a8cccdb621d085b5cdb29c1f4ef68f03ebbd"
+      "sha256": "755386c77e983de16e97e474fe7c99aa8147fa59fa7bd0ce4cbd53c794b1ad5f"
     },
     {
       "module": "tools/quality/rust_collector_entry.py",
@@ -734,7 +734,37 @@
       "release_impact": "Independent runtime candidate; released Core retains all policy decisions.",
       "authoritative_status": "Measurement integrity only; unknown Core/ABI combinations cannot sample.",
       "final_disposition": "Retain measurement entry; trusted installed-host collect integration remains P6.",
-      "sha256": "9923d134ed91ba9ea25cb9234088b7ec306fce6fedc3f0b8541b1ee82376a90f"
+      "sha256": "321302db2b7fec51a15fd3dd770233d3fdf8b9c171b92249a467d652e7fe1548"
+    },
+    {
+      "module": "tools/quality/rust_collector_project.py",
+      "category": "B",
+      "purpose": "Project authenticated native measurement facts into generic collector evidence using a digest-bound capture binding.",
+      "callers": [
+        "tools/quality/rust_collector_entry.py",
+        "tools/quality/tests/test_rust_collector_project.py",
+        "tools/quality/tests/test_rust_collector_runtime.py"
+      ],
+      "ci_role": "Transport regression and opt-in private-runtime projection through actual Core; no clean-host certification.",
+      "release_impact": "Private runtime candidate only; no policy, baseline acceptance or release authority.",
+      "authoritative_status": "Measurement integrity and typed projection only; Core authenticates requests and decides policy.",
+      "final_disposition": "Retain ecosystem measurement projection; GH-230 installed fixture integration does not certify native projects.",
+      "sha256": "de72ceb4d9a6d18a93198eab0ff6b45e03866b0e4c2f8c899bf035c539f1e1e0"
+    },
+    {
+      "module": "tools/quality/rust_collector_delivery.py",
+      "category": "B",
+      "purpose": "Verify observed private runtime bytes and the host-pinned exact Core/protocol/ABI contract before native re-export.",
+      "callers": [
+        "tools/quality/rust_collector_entry.py",
+        "tools/quality/tests/rust_collector_clean_host.py",
+        "tools/quality/tests/test_rust_collector_delivery.py"
+      ],
+      "ci_role": "Delivery preflight and failure-before-execution regression coverage.",
+      "release_impact": "Collector measurement compatibility only; no policy, baseline acceptance or release authority.",
+      "authoritative_status": "Host authenticates distribution and requests; Core decides requiredness and final outcomes.",
+      "final_disposition": "Retain ecosystem measurement compatibility checks; GH-230 fixture evidence is separate from native project acceptance.",
+      "sha256": "c720bd954ea923a0c980df3917ee93c838dbb7c7d2bb4e0dd6989c5061aa6ae6"
     }
   ],
   "schema": "python-product-boundary/v1",

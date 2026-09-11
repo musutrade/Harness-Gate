@@ -1,0 +1,134 @@
+{
+  "original_archive": "core-0.4.0-python-final-evidence.tar.gz",
+  "bytes": 71696594,
+  "sha256": "98c3fb568f520a5573c6ba5c1269f35a4faa43659c674c836988ab9f0def2013",
+  "parts": [
+    {
+      "file": "part-0000",
+      "bytes": 2880000,
+      "sha256": "a8eb892e1c64f529c3e8b5e99f5719daabbd4cd96fec2f636b5ffa1ee6afb9b9"
+    },
+    {
+      "file": "part-0001",
+      "bytes": 2880000,
+      "sha256": "d958a1b0e65ba04d9a24dd15d0bc0d1e7f474026251b4b03cf5af5547f7eaa49"
+    },
+    {
+      "file": "part-0002",
+      "bytes": 2880000,
+      "sha256": "16a210ff16f17e2ac4c2c7d94ac4ed4771a65acdbbc1ea78faa023e0d3648039"
+    },
+    {
+      "file": "part-0003",
+      "bytes": 2880000,
+      "sha256": "1c36cfd0fc5d2e36898adfcab48ca6a6e895a1fd89bdb93068a1112db4a2d388"
+    },
+    {
+      "file": "part-0004",
+      "bytes": 2880000,
+      "sha256": "a20ce2b8cd02c51fb7cb6f298420e14587c0151ad03cb0bd2c508a9aa22d0c2a"
+    },
+    {
+      "file": "part-0005",
+      "bytes": 2880000,
+      "sha256": "a7fec17c1d62ac700b2605baf5a0f4fc5c55ac87e3649823c8a4ee39d32fe2d8"
+    },
+    {
+      "file": "part-0006",
+      "bytes": 2880000,
+      "sha256": "1617507858f67194446100f9b25385e40ce3065f7a1d511390b1b36942974226"
+    },
+    {
+      "file": "part-0007",
+      "bytes": 2880000,
+      "sha256": "1f68ce99c523d004de9f1ca41ffa1557cede20ca28b9db1e364f3236051ed125"
+    },
+    {
+      "file": "part-0008",
+      "bytes": 2880000,
+      "sha256": "2b499ccf374f8ccb66fe48aff5a7e9be5ade6f39a1ecc46b9f1722d4ed6f13fb"
+    },
+    {
+      "file": "part-0009",
+      "bytes": 2880000,
+      "sha256": "077ea87c9db2509c241119d9d8d92a0fa1703a7370a50f59a39ab1eaa1d1af6e"
+    },
+    {
+      "file": "part-0010",
+      "bytes": 2880000,
+      "sha256": "d0b76486e71befa31eab28929ac8a802e09b015e7e06a99211978e9e6a5b4738"
+    },
+    {
+      "file": "part-0011",
+      "bytes": 2880000,
+      "sha256": "5a682e5cd054479e83185238c497db2fb78e72fd380522e3a23d06b2e126c9f2"
+    },
+    {
+      "file": "part-0012",
+      "bytes": 2880000,
+      "sha256": "75ef068fa1a577bb2ff627e364c5f3b23eb9e31e3b0eef79a27139209398f195"
+    },
+    {
+      "file": "part-0013",
+      "bytes": 2880000,
+      "sha256": "629727427fc63b799a9f29cbc51cd4c01f4e16a3300fa6c312477f334247d089"
+    },
+    {
+      "file": "part-0014",
+      "bytes": 2880000,
+      "sha256": "b91ae1550c7f32631d6eb68da52d8564bad373da99952e0f5c53d869fcc6221f"
+    },
+    {
+      "file": "part-0015",
+      "bytes": 2880000,
+      "sha256": "c3e6b09745803f5391fbf0634c32368e85616e5e866227c50c9ae625ed916915"
+    },
+    {
+      "file": "part-0016",
+      "bytes": 2880000,
+      "sha256": "62b14643da9c9cee7551d6a8f16037a0056ef9898c17f1800d912e036825443b"
+    },
+    {
+      "file": "part-0017",
+      "bytes": 2880000,
+      "sha256": "930a167d51f57a6b324cf619f3e9d98dd25d23f17c0b150de271072a505cfb53"
+    },
+    {
+      "file": "part-0018",
+      "bytes": 2880000,
+      "sha256": "43294760feb15e5604dd64337edfd3712ab852e6d7393257d1e15583e772468d"
+    },
+    {
+      "file": "part-0019",
+      "bytes": 2880000,
+      "sha256": "8ec4078ee36b1fdc6380cd1de6a99120310e0a433c1e241fd3ae38fb140a4d95"
+    },
+    {
+      "file": "part-0020",
+      "bytes": 2880000,
+      "sha256": "2df8303cad993c69419299769f5f8e83f149ef581a77200e2f28fc236320207c"
+    },
+    {
+      "file": "part-0021",
+      "bytes": 2880000,
+      "sha256": "815718cb3da91daaeb737d8fe4a748533bfa23572e66c565e0b5f7097ec4235c"
+    },
+    {
+      "file": "part-0022",
+      "bytes": 2880000,
+      "sha256": "784a49f247ffb44974f268b763a66d706c6c6365332699a76084273a0c315b32"
+    },
+    {
+      "file": "part-0023",
+      "bytes": 2880000,
+      "sha256": "20d3f80fcdde65919845218159aa29a686f38f25aef739c17f7273d92eb266c9"
+    },
+    {
+      "file": "part-0024",
+      "bytes": 2576594,
+      "sha256": "4822612a236a0d116d4bd391fbeb13b126fe1b968f36a43428ee089a55b2de63"
+    }
+  ],
+  "reconstruct_from_parts_directory": "cat part-* > ../core-0.4.0-python-final-evidence.tar.gz",
+  "verify": "Verify original archive SHA-256 before extraction; original per-file inventory remains unchanged."
+}

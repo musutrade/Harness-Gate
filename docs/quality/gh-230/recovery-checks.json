@@ -1,0 +1,106 @@
+{
+  "status": "incomplete; diagnostics only",
+  "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+  "environment": {
+    "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+    "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+    "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+    "OPENSPEC_TELEMETRY": "0"
+  },
+  "proxy_environment": "HTTP_PROXY/HTTPS_PROXY/ALL_PROXY (case insensitive) removed for required local checks",
+  "checks": [
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--manifest-path",
+        "tools/harness-gate/Cargo.toml",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 0.6176707990234718
+    },
+    {
+      "name": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.007510446012020111
+    },
+    {
+      "name": "docs-consistency",
+      "command": [
+        "python3",
+        "tools/quality/docs_consistency.py",
+        "--output",
+        "target/quality/docs-consistency.json"
+      ],
+      "exit_code": 0,
+      "seconds": 3.4265999590279534
+    },
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--manifest-path",
+        "tools/harness-gate/Cargo.toml",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.933445208997
+    },
+    {
+      "name": "nextest",
+      "command": [
+        "cargo",
+        "nextest",
+        "run",
+        "--manifest-path",
+        "tools/harness-gate/Cargo.toml",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "seconds": 210.26916507998249
+    },
+    {
+      "name": "openspec",
+      "command": [
+        "openspec",
+        "validate",
+        "package-official-rust-collector-for-independent-delivery",
+        "--strict",
+        "--no-interactive"
+      ],
+      "exit_code": 0,
+      "seconds": 0.8468663539970294
+    },
+    {
+      "name": "quality-tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/quality/tests",
+        "-v"
+      ],
+      "exit_code": 0,
+      "seconds": 248.26404737797566
+    }
+  ],
+  "not_applicable": [
+    "harness-gate config check",
+    "harness-gate verify --profile ci --all"
+  ],
+  "not_applicable_reason": ".harness-gate/flow.toml absent"
+}
