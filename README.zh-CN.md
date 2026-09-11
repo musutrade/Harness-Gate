@@ -59,7 +59,7 @@ cargo install harness-gate
 
 ### 从 GitHub Release 安装（预编译二进制）
 
-从不可变的 [GitHub Release tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.7) 下载适合你平台的二进制文件：
+从不可变的 [GitHub Release tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.0) 下载适合你平台的二进制文件：
 
 - **Linux (x86_64)**: `harness-gate-linux-amd64`
 - **macOS (Intel)**: `harness-gate-macos-amd64`
@@ -72,8 +72,8 @@ tag 下载脚本并显式传入版本：
 ```bash
 curl --fail --show-error --location --proto '=https' --tlsv1.2 \
   -o /tmp/harness-gate-install.sh \
-  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.3.7/install.sh
-bash /tmp/harness-gate-install.sh --version v0.3.7
+  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.4.0/install.sh
+bash /tmp/harness-gate-install.sh --version v0.4.0
 harness-gate --version
 ```
 
