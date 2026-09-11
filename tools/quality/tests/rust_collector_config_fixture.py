@@ -219,6 +219,9 @@ def configured_malformed_rejection(test, binary):
     launches = output / 'collector-launches.txt'
     wrapper = output / 'malformed-collector.sh'
     wrapper.write_text('#!/bin/sh\n'
+        # Drain only the synthetic malformed producer's request before exiting.
+        # The real collector wrapper above must preserve stdin for the collector.
+        'while IFS= read -r line; do :; done\n'
         f'printf "collector\\n" >> {shlex.quote(str(launches))}\n'
         'printf "{\\n"\n'
         'exit 0\n')
