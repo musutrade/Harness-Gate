@@ -201,3 +201,11 @@ workflow through a normal PR only after those provisions are usable. Rebuild
 from the resulting final main, wait for that source's required CI, and complete
 clean install/native/Core/lifecycle acceptance. Keep GH-239 open until the
 concrete final packet is verified, and GH-240 separately publication-gated.
+
+## Follow-up inspection
+
+[Historical license materials](license-materials-review.md) now cover both the
+collector and standalone bootstrap archive, with per-file digest verification
+and embedded crate declarations/text hashes. No license decision is inferred.
+[Execution handoff](execution-handoff.md) specifies pending real-job receipts and
+a proposed two-phase GitHub evidence publication ordering for GH-240 review.
