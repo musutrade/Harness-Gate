@@ -61,6 +61,16 @@ Installation SHALL verify exact-tag origin, complete inventory, checksums and pr
 - **WHEN** installation is interrupted or the archive contains traversal or undeclared payloads
 - **THEN** activation is refused and the prior version and project evidence remain unchanged.
 
+#### Scenario: Package supplies its own verifier
+- **GIVEN** no independently authenticated host verifier and public key have been provisioned
+- **WHEN** a package offers a verifier or runtime alongside its signature
+- **THEN** that code SHALL NOT establish the package's root of trust; installation remains blocked until host trust is supplied independently.
+
+#### Scenario: Interrupted removal with unrelated evidence
+- **GIVEN** removal has a durable ownership journal and unexpected project evidence exists inside the version tree
+- **WHEN** recovery resumes
+- **THEN** cleanup refuses the unexpected tree, preserves the evidence and does not broaden manifest ownership.
+
 ### Requirement: Protected independent publication
 Publication SHALL use an explicit independent inventory, SBOM and protected release approval while preserving existing Core required checks.
 
@@ -68,6 +78,11 @@ Publication SHALL use an explicit independent inventory, SBOM and protected rele
 - **GIVEN** a required signature, attestation or inventory subject is missing
 - **WHEN** RC publication is attempted
 - **THEN** publication fails without weakening checks or substituting unsigned assets.
+
+#### Scenario: Nonpublishing rehearsal
+- **GIVEN** the GH-229 workflow has read permissions and requires the existing protected release environment
+- **WHEN** its delivery rehearsal uses a disposable key and synthetic payloads
+- **THEN** it creates no tag or release and does not claim production eligibility, protected approval or native measurement from the local rehearsal.
 
 ### Requirement: Capture trust and retention
 Delivery signatures SHALL NOT substitute for host capture authentication. Native re-export acceptance SHALL retain all original required bytes under reviewed anchors.
