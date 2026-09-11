@@ -71,6 +71,11 @@ Installation SHALL verify exact-tag origin, complete inventory, checksums and pr
 - **WHEN** recovery resumes
 - **THEN** cleanup refuses the unexpected tree, preserves the evidence and does not broaden manifest ownership.
 
+#### Scenario: Independently provisioned standalone bootstrap
+- **GIVEN** a host without Python or a source checkout and an administrator-authenticated launcher, capsule digest and host trust
+- **WHEN** the bootstrap capsule is missing or its private snapshot fails that independent digest
+- **THEN** installation rejects it before extraction or execution; a positive installation requires separately retained fresh-host evidence.
+
 ### Requirement: Protected independent publication
 Publication SHALL use an explicit independent inventory, SBOM and protected release approval while preserving existing Core required checks.
 
@@ -78,6 +83,16 @@ Publication SHALL use an explicit independent inventory, SBOM and protected rele
 - **GIVEN** a required signature, attestation or inventory subject is missing
 - **WHEN** RC publication is attempted
 - **THEN** publication fails without weakening checks or substituting unsigned assets.
+
+#### Scenario: RSA alone does not satisfy production Sigstore verification
+- **GIVEN** a production inventory with a valid RSA signature but no valid Sigstore bundle for the exact approved workflow identity and OIDC issuer
+- **WHEN** production verification runs with an independently authenticated verifier and trusted root
+- **THEN** verification fails, including for a wrong certificate identity, missing inclusion evidence or tampered inventory; synthetic verifier tests SHALL NOT establish real Sigstore acceptance.
+
+#### Scenario: Unsigned candidate preparation
+- **GIVEN** real pinned build inputs but incomplete production approvals
+- **WHEN** preparation inventories the unsigned archive, manifest and SBOM
+- **THEN** the receipt identifies the actual bytes as ineligible and SHALL NOT invent successful CI, licensing, compatibility, environment or signing evidence.
 
 #### Scenario: Nonpublishing rehearsal
 - **GIVEN** the GH-229 workflow has read permissions and requires the existing protected release environment

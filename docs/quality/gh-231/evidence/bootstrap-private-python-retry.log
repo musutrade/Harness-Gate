@@ -1,0 +1,31 @@
+rust-collector-host-trust/v2 exit 0
+usage: production_installer.py [-h] --root ROOT --trust TRUST
+                               {install,select,rollback,uninstall,recover} ...
+
+Host-trusted, offline Linux collector lifecycle. No payload code is executed.
+
+positional arguments:
+  {install,select,rollback,uninstall,recover}
+
+options:
+  -h, --help            show this help message and exit
+  --root ROOT
+  --trust TRUST
+
+
+rust-collector-host-trust/v1 exit 1
+
+Traceback (most recent call last):
+  File "/mnt/dev-ssd/workspaces/symphony/GH-231/target/gh-231/tmp/tmp.K9NPbHl5XO/runtime/tools/release/production_installer.py", line 22, in <module>
+    main()
+    ~~~~^^
+  File "/mnt/dev-ssd/workspaces/symphony/GH-231/target/gh-231/tmp/tmp.K9NPbHl5XO/runtime/tools/release/production_installer.py", line 16, in main
+    assets.require(assets.read(args.trust).get('schema') == 'rust-collector-host-trust/v2',
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   'production bootstrap requires independently provisioned v2 trust')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/dev-ssd/workspaces/symphony/GH-231/target/gh-231/tmp/tmp.K9NPbHl5XO/runtime/tools/quality/rust_collector_contract.py", line 23, in require
+    raise DeliveryError(message)
+rust_collector_contract.DeliveryError: production bootstrap requires independently provisioned v2 trust
+
+PASS private capsule Python imports and CLI; v1 rejected. No signed install or isolated clean-host claim.
