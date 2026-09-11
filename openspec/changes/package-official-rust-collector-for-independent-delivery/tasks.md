@@ -73,6 +73,12 @@ release authorization remain pending.
 ## P8 Handoff
 
 - [ ] P8.1 [priority:P1] [effort:M, <=3h] Run applicable local checks, strict OpenSpec, docs and required CI; retain results.
+- [ ] P8.1a [priority:P1] [effort:M, <=3h] Reconcile current-source documentation and local/hosted validation, retaining historical failures.
+- [ ] P8.1b [priority:P1] [effort:M, <=3h] Implement independently authenticated bootstrap and verify fresh-host positive and bootstrap negatives.
+- [ ] P8.1c [priority:P1] [effort:M, <=3h] Prepare immutable final candidate, dependency/license closure and durable exact asset receipts.
+- [ ] P8.1d [priority:P1] [effort:M, <=3h] Validate final candidate native/generic Core/lifecycle behavior and approve only evidenced compatibility entries.
+- [ ] P8.1e [priority:P1] [effort:M, <=3h] Prepare protected production workflow and dual RSA/Sigstore verification with rejection tests for review.
+- [ ] P8.1f [priority:P1] [effort:M, <=3h] Assemble publication packet and identify outstanding operator trust, environment and retention inputs.
 - [ ] P8.2 [priority:P1] [effort:M, <=3h] Obtain controller release approval and publish/verify exact RC assets.
 - [ ] P8.3 [priority:P1] [effort:M, <=3h] Deliver immutable RC receipt to Arc-Admin owner; record separate GH-215 acceptance/stable-promotion condition.
 
