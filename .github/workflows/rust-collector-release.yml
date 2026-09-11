@@ -1,0 +1,55 @@
+name: Rust collector release dry run
+
+# Publication remains disabled until the separately authorized P8 handoff.
+# No tag trigger, production secrets, contents:write, or OIDC token in this job.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: rust-collector-release-dry-run-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  protection:
+    if: github.repository == 'musutrade/Harness-Gate' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Require existing protected environment before requesting approval
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PYTHONPATH=tools/release python3 - <<'PY'
+          import os
+          import collector_release_policy as policy
+          client = policy.core.GitHubClient('https://api.github.com', policy.assets.REPOSITORY, os.environ['GH_TOKEN'])
+          policy.protected_environment(client.get_json('/repos/' + policy.assets.REPOSITORY + '/environments/' + policy.ENVIRONMENT))
+          PY
+  dry-run:
+    needs: protection
+    if: github.repository == 'musutrade/Harness-Gate' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: rust-collector-release
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Exercise delivery negatives and lifecycle
+        run: python3 -m unittest discover -s tools/release/tests -v
+      - name: Rehearse signed asset verification without publication
+        run: python3 tools/release/collector_dry_run.py --output target/collector-release-dry-run
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: collector-release-dry-run-${{ github.run_id }}
+          path: target/collector-release-dry-run
+          if-no-files-found: error
+          retention-days: 90
