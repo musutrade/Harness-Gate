@@ -181,3 +181,29 @@ costs establish the exact fixture candidate tuple documented there. Original
 failures are preserved. Local P6/P7 completion does not approve publication, add
 platform claims, imply series equivalence, accept a baseline or enable GH-215.
 The shipped matrix remains unapproved; controller review/CI and P8 remain separate.
+
+### GH-231 production preparation reconciliation
+
+The [reopened preparation packet](../../../docs/quality/gh-231/preparation.md)
+records new unsigned RC bytes from reviewed source, actual payload/dependency
+inventory, fresh native diagnostics, original failures and unavailable operator
+inputs. GH-230's installed container fixture does not certify RC 0.1.0-rc.1 or
+installation on a fresh host without Python/source checkout. No matrix row is
+approved here, and P8 publication/handoff remain incomplete.
+
+The proposed standalone bootstrap authenticates a separately provisioned capsule
+digest before extracting or executing its private Python and installer modules.
+The launcher, digest, host OS and verification trust are independent administrator
+inputs; the collector cannot authenticate its own bootstrap. Production trust v2
+requires pinned RSA plus Sigstore verification of the same inventory bytes, with
+an exact protected-main workflow certificate identity, OIDC issuer and offline
+trusted root. A v2 envelope in release-inventory.sig preserves the six-asset
+contract. RSA-only fixtures remain historical development evidence.
+
+The production workflow is deliberately a review template outside the active
+workflow directory. It requires independently approved input hashes, exact-main
+successful CI/aggregate, protected collector environment, final native matrix,
+license closure and real verification receipts before signing or publication.
+No successful eligibility record is fabricated to prepare unsigned bytes. Actual
+Sigstore and fresh-host acceptance, production trust, environment provisioning,
+durable artifact retention and explicit publication approval remain prerequisites.

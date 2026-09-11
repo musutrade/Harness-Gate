@@ -1,5 +1,9 @@
 # GH-231 validation
 
+Historical PR #232 receipt, retained verbatim below including its failed checks
+and malformed transcription. It is not current release eligibility. See the
+[reopened preparation record](preparation.md) for fresh evidence after PR #237.
+
 Scope: OpenSpec `package-official-rust-collector-for-independent-delivery` handoff tasks `P8.1`–`P8.3`.
 
 Runtime checks used workspace-local Cargo output under `target/quality/gh-231/`.

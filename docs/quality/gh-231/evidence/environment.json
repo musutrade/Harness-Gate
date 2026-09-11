@@ -1,0 +1,8 @@
+{
+  "body": {
+    "documentation_url": "https://docs.github.com/rest/deployments/environments#get-an-environment",
+    "message": "Not Found",
+    "status": "404"
+  },
+  "status": 404
+}

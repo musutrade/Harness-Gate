@@ -43,7 +43,7 @@ class StandaloneNativeTests(unittest.TestCase):
         if not runtime:
             raise unittest.SkipTest('RUST_COLLECTOR_RUNTIME required: assembled private Linux runtime')
         cls.runtime = Path(runtime).resolve(strict=True)
-        base = ROOT / 'target/gh-230/runtime-tests'
+        base = Path(os.environ.get('RUST_COLLECTOR_TEST_OUTPUT', ROOT / 'target/gh-230/runtime-tests'))
         base.mkdir(parents=True, exist_ok=True)
         cls.work = Path(tempfile.mkdtemp(dir=base))
         cls.command_index = 0

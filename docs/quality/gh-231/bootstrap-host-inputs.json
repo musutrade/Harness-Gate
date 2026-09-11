@@ -1,0 +1,102 @@
+{
+  "dynamic_libraries_sha256": {
+    "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2": "bda779ea9e9ad234f60315477d7cfd0bdde861cd8ddd9df8cdaf62f18c4cec14",
+    "/usr/lib/x86_64-linux-gnu/libacl.so.1.1.2302": "534d062c6b873081a5f5623627bdeb7d8339087c434be758493ad87c87e257ab",
+    "/usr/lib/x86_64-linux-gnu/libattr.so.1.1.2502": "bdaf51cec34ae2930638f55ebf752b1f66197c24cd13a16dc30f30c62f059458",
+    "/usr/lib/x86_64-linux-gnu/libc.so.6": "85e64f97e348786a8fb4d9f3d52fec289e2fb86bba20f0731dfe61990525e0f7",
+    "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1": "9d339ecb409578d6a5d587e6c537a8f9589b8a13fefba30d167433a4b5758bee",
+    "/usr/lib/x86_64-linux-gnu/libm.so.6": "1c488db6f4fe8cecb72456bc018de000b7a9b539c2994864b0416b5e8371b3d8",
+    "/usr/lib/x86_64-linux-gnu/libpcre2-8.so.0.14.0": "4a6b6b2078685b074869d75cb068664d7da6b3036df7bca0442b1bbbd4ac7e65",
+    "/usr/lib/x86_64-linux-gnu/libselinux.so.1": "7538ee77765a27966563c0d22437a3080dcdb346ff76cc16d71a3ce3379a716a"
+  },
+  "glibc": "glibc 2.43",
+  "kernel": "7.0.0-31-generic",
+  "schema": "rust-collector-bootstrap-host-inputs/v1",
+  "status": "observed-host-only-not-independent-authentication-or-fresh-host-acceptance",
+  "utilities": [
+    {
+      "invocation": "/usr/bin/sh",
+      "ldd_command": [
+        "ldd",
+        "/usr/bin/dash"
+      ],
+      "ldd_exit": 0,
+      "ldd_stderr": "",
+      "ldd_stdout": "\tlinux-vdso.so.1 (0x00007d4e3ae1b000)\n\tlibc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007d4e3aa00000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007d4e3ae1d000)\n",
+      "resolved_path": "/usr/bin/dash",
+      "sha256": "c626229526bb58ec2d0f585f3c3ae1412e6f973b4353385042d11c38d8426917"
+    },
+    {
+      "invocation": "/usr/bin/tar",
+      "ldd_command": [
+        "ldd",
+        "/usr/bin/tar"
+      ],
+      "ldd_exit": 0,
+      "ldd_stderr": "",
+      "ldd_stdout": "\tlinux-vdso.so.1 (0x0000711ea055c000)\n\tlibacl.so.1 => /usr/lib/x86_64-linux-gnu/libacl.so.1 (0x0000711ea04cd000)\n\tlibselinux.so.1 => /usr/lib/x86_64-linux-gnu/libselinux.so.1 (0x0000711ea049a000)\n\tlibc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x0000711ea0200000)\n\tlibpcre2-8.so.0 => /usr/lib/x86_64-linux-gnu/libpcre2-8.so.0 (0x0000711ea0154000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000711ea055e000)\n",
+      "resolved_path": "/usr/bin/tar",
+      "sha256": "708692f9457a16a95a51fd881551b55b4ce72200d16b8c6d2bacbea857cfd9cc"
+    },
+    {
+      "invocation": "/usr/bin/sha256sum",
+      "ldd_command": [
+        "ldd",
+        "/usr/lib/cargo/bin/coreutils/sha256sum"
+      ],
+      "ldd_exit": 0,
+      "ldd_stderr": "",
+      "ldd_stdout": "\tlinux-vdso.so.1 (0x00007d498a0a0000)\n\tlibselinux.so.1 => /usr/lib/x86_64-linux-gnu/libselinux.so.1 (0x00007d498a057000)\n\tlibgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007d498a029000)\n\tlibm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007d4989f03000)\n\tlibc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007d4989000000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007d498a0a2000)\n\tlibpcre2-8.so.0 => /usr/lib/x86_64-linux-gnu/libpcre2-8.so.0 (0x00007d4989354000)\n",
+      "resolved_path": "/usr/lib/cargo/bin/coreutils/sha256sum",
+      "sha256": "48893b0fb21436b54619db80486e83ef39dfccaf1aefe83dfa00c02d6146e8c0"
+    },
+    {
+      "invocation": "/usr/bin/cp",
+      "ldd_command": [
+        "ldd",
+        "/usr/bin/gnucp"
+      ],
+      "ldd_exit": 0,
+      "ldd_stderr": "",
+      "ldd_stdout": "\tlinux-vdso.so.1 (0x00007561ae9f7000)\n\tlibselinux.so.1 => /usr/lib/x86_64-linux-gnu/libselinux.so.1 (0x00007561ae98b000)\n\tlibacl.so.1 => /usr/lib/x86_64-linux-gnu/libacl.so.1 (0x00007561ae981000)\n\tlibattr.so.1 => /usr/lib/x86_64-linux-gnu/libattr.so.1 (0x00007561ae979000)\n\tlibc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007561ae600000)\n\tlibpcre2-8.so.0 => /usr/lib/x86_64-linux-gnu/libpcre2-8.so.0 (0x00007561ae8cd000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007561ae9f9000)\n",
+      "resolved_path": "/usr/bin/gnucp",
+      "sha256": "8fcdb2485ebc68f00392d647b3d3d9130f0d4bb9f72c69ee258086dd63e1c122"
+    },
+    {
+      "invocation": "/usr/bin/mktemp",
+      "ldd_command": [
+        "ldd",
+        "/usr/lib/cargo/bin/coreutils/mktemp"
+      ],
+      "ldd_exit": 0,
+      "ldd_stderr": "",
+      "ldd_stdout": "\tlinux-vdso.so.1 (0x0000773103438000)\n\tlibselinux.so.1 => /usr/lib/x86_64-linux-gnu/libselinux.so.1 (0x00007731033ef000)\n\tlibgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007731033c1000)\n\tlibm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007731026da000)\n\tlibc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x0000773102400000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000077310343a000)\n\tlibpcre2-8.so.0 => /usr/lib/x86_64-linux-gnu/libpcre2-8.so.0 (0x0000773103315000)\n",
+      "resolved_path": "/usr/lib/cargo/bin/coreutils/mktemp",
+      "sha256": "48893b0fb21436b54619db80486e83ef39dfccaf1aefe83dfa00c02d6146e8c0"
+    },
+    {
+      "invocation": "/usr/bin/rm",
+      "ldd_command": [
+        "ldd",
+        "/usr/bin/gnurm"
+      ],
+      "ldd_exit": 0,
+      "ldd_stderr": "",
+      "ldd_stdout": "\tlinux-vdso.so.1 (0x000071a5f7785000)\n\tlibc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x000071a5f7400000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000071a5f7787000)\n",
+      "resolved_path": "/usr/bin/gnurm",
+      "sha256": "0362781f855d9de6396b71af947662758970ed09946c4a0a78ff740b20f5e6a6"
+    },
+    {
+      "invocation": "/usr/bin/mkdir",
+      "ldd_command": [
+        "ldd",
+        "/usr/lib/cargo/bin/coreutils/mkdir"
+      ],
+      "ldd_exit": 0,
+      "ldd_stderr": "",
+      "ldd_stdout": "\tlinux-vdso.so.1 (0x00007e572b224000)\n\tlibselinux.so.1 => /usr/lib/x86_64-linux-gnu/libselinux.so.1 (0x00007e572b1db000)\n\tlibgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007e572b1ad000)\n\tlibm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007e572a4da000)\n\tlibc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007e572a200000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007e572b226000)\n\tlibpcre2-8.so.0 => /usr/lib/x86_64-linux-gnu/libpcre2-8.so.0 (0x00007e572b101000)\n",
+      "resolved_path": "/usr/lib/cargo/bin/coreutils/mkdir",
+      "sha256": "48893b0fb21436b54619db80486e83ef39dfccaf1aefe83dfa00c02d6146e8c0"
+    }
+  ]
+}

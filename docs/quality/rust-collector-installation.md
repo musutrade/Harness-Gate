@@ -1,5 +1,13 @@
 # Rust collector installation and independent release
 
+GH-231 prepares a separately authenticated private-Python installer capsule and
+a production RSA/Sigstore verifier for review. The six-asset publication workflow
+is a non-active template. See the [preparation and approval packet](gh-231/preparation.md)
+for actual unsigned RC bytes, trust provisioning, checks and remaining blockers.
+No collector RC or clean-host production installation is certified by this work.
+The v1 source-install instructions below describe the earlier fixture path;
+production bootstrap requires v2 trust and both inventory signatures.
+
 GH-229 implements OpenSpec P4.1–P5.2. The predecessor is accepted PR #234,
 merged at `9bdc203c21a75cc769fdb2adbafb897e4b96a30e`. This is an offline lifecycle
 and nonpublishing release rehearsal. [Validation](gh-229/validation.md) records
@@ -19,8 +27,10 @@ usable only after verification and is not this bootstrap runtime.
 The current source entry is `tools/release/install_collector.py`; its release
 modules, imported `tools/quality` modules and schemas must all come from the same
 authenticated reviewed source tree. Preserve their relative paths. This issue
-does not ship an independently authenticated standalone installer
-executable. Before claiming installation on a host without Python or a source
+did not ship an independently authenticated standalone installer
+executable. GH-231 now builds the private runtime capsule, but its independent
+distribution and clean-host acceptance remain pending. Before claiming
+installation on a host without Python or a source
 checkout, P7/P8 must provide and verify an OS-packaged bootstrap runtime or a
 separately authenticated standalone installer. Downloading the collector's own
 runtime first does not satisfy that prerequisite.
