@@ -1,0 +1,8 @@
+{
+  "command": "concatenate ordered inventoried parts; verify part/archive/member SHA-256 identities",
+  "parts": 19,
+  "archive_bytes": 79452501,
+  "archive_sha256": "09388d2b355091bc00ea086e5fed97cddc90fb9db2c78711d3871c50ea8ebb06",
+  "verified_members": 1563,
+  "exit_code": 0
+}

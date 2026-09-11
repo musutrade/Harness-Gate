@@ -135,6 +135,11 @@ The later explicit execution handoff authorizes #227–#231 serially, supersedin
 backlog-only activation wording without authorizing publication or GH-215.
 GH-227's actual checks and genuine failures are recorded in
 [validation evidence](../../../docs/quality/gh-227/validation.md).
-P2 onward remains incomplete here. Required CI and controller acceptance still
-apply to each implementation PR; planning acceptance is not native/runtime,
+GH-228's [private runtime and local bundle](../../../docs/quality/gh-228/runtime.md)
+implement P2/P3 with [actual validation](../../../docs/quality/gh-228/validation.md).
+The observed host is pinned exactly; repeated assembly is byte-identical, but
+compiler rebuild reproducibility and clean-host acceptance are unproven. The
+empty reviewed compatibility matrix continues to reject installed-host requests
+until P6. P4 onward remains incomplete. Required CI and controller acceptance
+still apply to each implementation PR; planning acceptance is not native/runtime,
 baseline or release acceptance. Relevant Engineering Policy semantics are unchanged.
