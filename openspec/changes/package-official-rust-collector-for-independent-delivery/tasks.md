@@ -3,8 +3,14 @@
 Parent: [proposal](proposal.md), [design](design.md), [delivery requirements](specs/rust-collector-delivery/spec.md).
 Planning PR #226 is accepted and merged; see [receipts](design.md#validation-status).
 The explicit execution handoff authorizes #227–#231 serially, not publication.
-Only completed scoped tasks are checked with [GH-227 evidence](../../../docs/quality/gh-227/validation.md);
-later implementation and acceptance tasks remain unchecked.
+Only completed scoped tasks are checked with [GH-227 evidence](../../../docs/quality/gh-227/validation.md)
+and [GH-228 runtime evidence](../../../docs/quality/gh-228/runtime.md).
+GH-228's original [dependency blocker](../../../docs/quality/gh-228/blocker.md)
+is resolved by the recorded operator inputs; its failures remain retained.
+P2/P3 completion covers the private runtime and local bundle, with exact observed
+host constraints and retained license notices. The empty compatibility matrix
+still rejects all installed-host collect requests pending P6; clean-host acceptance,
+distribution obligations, required CI and controller acceptance remain separate.
 Each item is estimated 1–3 focused hours (M); split before execution if larger.
 Acceptance is the concrete output/test named in each item; logs must retain failures.
 
@@ -20,14 +26,14 @@ Acceptance is the concrete output/test named in each item; logs must retain fail
 
 ## P2 Standalone runtime
 
-- [ ] P2.1 [priority:P1] [effort:M, <=3h] Inventory Python imports, frozen helpers and runtime/license closure.
-- [ ] P2.2 [priority:P1] [effort:M, <=3h] Implement private-runtime launcher and command contracts with no source-tree dependency.
-- [ ] P2.3 [priority:P1] [effort:M, <=3h] Separate measurement-only results from legacy policy-related exits; retain regression parity.
+- [x] P2.1 [priority:P1] [effort:M, <=3h] Inventory Python imports, frozen helpers and runtime/license closure.
+- [x] P2.2 [priority:P1] [effort:M, <=3h] Implement private-runtime launcher and command contracts with no source-tree dependency.
+- [x] P2.3 [priority:P1] [effort:M, <=3h] Separate measurement-only results from legacy policy-related exits; retain regression parity.
 
 ## P3 Build
 
-- [ ] P3.1 [priority:P1] [effort:M, <=3h] Pin compiler/runtime/dependency inputs and document verified host ABI.
-- [ ] P3.2 [priority:P1] [effort:M, <=3h] Build inventoried Linux bundle; compare two builds and document any nondeterminism.
+- [x] P3.1 [priority:P1] [effort:M, <=3h] Pin compiler/runtime/dependency inputs and document verified host ABI.
+- [x] P3.2 [priority:P1] [effort:M, <=3h] Build inventoried Linux bundle; compare two builds and document any nondeterminism.
 
 ## P4 Lifecycle
 
