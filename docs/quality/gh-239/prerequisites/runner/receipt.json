@@ -1,0 +1,25 @@
+{
+  "status": "local-preparation-verified-not-production-accepted",
+  "image": "sha256:65b960d0cb906275c54d2576b4488f8ba6387d858dd79780e149738d069ebf04",
+  "image_archive": {
+    "path": "/mnt/dev-ssd/symphony-inputs/gh239/runner-image/runner-image.tar",
+    "size": 603724288,
+    "sha256": "b6cfd73232250b70ea21ba0015d08e2cab87e985264bc5b4a513a5c8e01c5aaf"
+  },
+  "release_tests": {
+    "passed": 56
+  },
+  "registration": "not performed",
+  "files": {
+    "Dockerfile": "006aff18b2e6c91f688903160ae5390b391762c9102d01931e25a65801b358ed",
+    "README.md": "5d394553c8fc96de85872bc2f221515a02f8b81306220ced1cb05c2d4400227e",
+    "build-original-failure.log": "9489f2e94d25d31880c5f30dc2d052f8037f104bf35895da2e164db40dac33be",
+    "download-receipt.json": "01253adce902924b236e50f51dc612b4c6019e646772608921d6b5a0a8c53080",
+    "host-library-inputs.json": "54aaeebef28fe93eb5a3d6b79e19a79d49ae366de501eb9537fb4133bccef50d",
+    "packages.txt": "be793fd638b971a9b2cc7a0201a52d8ee198ac29ce07467fa17c5a162ff37eac",
+    "probe-command.json": "cad9d8b97177c7d59e804cf6bc7e1058408f006584c74e1076a2507174662d60",
+    "probe-original-failure.log": "929798a5fa88ff71c8cd949742ed7dca76ad37f6fbe0f39a3d91f96fb4376422",
+    "probe-result.json": "2adc1dd2db34eb6c2c7e00fa0386c10c96aa84c3df438ff4ab60db50750feb76",
+    "probe.py": "231dfbc107df1864e8250eb77d9fae58f0d9f51c11dcce6f2f7b1cf4157b5eb9"
+  }
+}
