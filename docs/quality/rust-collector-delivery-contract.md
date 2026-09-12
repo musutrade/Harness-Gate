@@ -46,6 +46,23 @@ only. They do not establish native positive measurement or delivery compatibilit
 
 ## Manifest and compatibility matrix
 
+New candidates use `rust-collector-delivery/v2`, defined by the
+[plugin manifest schema](../../tools/quality/schema/rust-collector-plugin.schema.json).
+The package pins compiler, tools, normalization code, payloads and compatibility.
+Project subjects, configuration digest and normalized series belong to the host's
+`quality-trusted-state/v1` and authenticated collection request. They are no longer
+baked into the package. The v2 manifest declares this configuration authority and
+rejects the old project-specific fields. Core still authenticates the exact
+configuration and claims; the collector binds its projection implementation and
+compiler to the requested series and checks the certified capture's native identity.
+
+This permits fresh project configurations after installation without rebuilding
+the plugin. A changed compiler owner identifier still requires fresh subject
+bindings; it does not establish historical equivalence or reset a baseline.
+The v1 schema and its exact packaged configuration/series checks remain supported
+without migration or relaxed validation. Both versions require the same reviewed
+compatibility tuple, payload checks and independently authenticated capture.
+
 The draft-07 [schema](../../tools/quality/schema/rust-collector-delivery.schema.json)
 defines `Manifest`, `Environment`, `Matrix`, and `CaptureIdentity`. Root validation
 is `Manifest`; the others use their definition references. Unknown fields, missing

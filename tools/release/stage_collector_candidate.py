@@ -25,14 +25,14 @@ def stage(runtime, core, core_id, source, binding, output):
     for name, row in inventory['payload'].items():
         assets.regular(runtime / name)
         assets.require(assets.sha(runtime / name) == row['sha256'], 'runtime inventory changed')
-    manifest = {'schema': 'rust-collector-delivery/v1', 'collector': binding['input']['collector'],
+    manifest = {'schema': 'rust-collector-delivery/v2', 'collector': binding['input']['collector'],
         'source_commit': source, 'protocol': delivery.PROTOCOL,
         'host_abi': observed['host_abi'], 'core_compatibility': [core_id],
         'tools': [dict(t, path=str(paths[t['name']].relative_to(runtime))) for t in observed['tools']],
         'payloads': [{'path': str(p.relative_to(runtime)), 'sha256': assets.sha(p), 'role': 'runtime'}
                      for p in sorted(runtime.rglob('*')) if p.is_file()],
         'capabilities': [dict(c, scope='single-file-fixture') for c in binding['capabilities']],
-        'measurement': {'native_series': native.SERIES, 'normalized_series': [binding['series']['id']],
+        'measurement': {'native_series': native.SERIES,
             'compiler_commit': native.RUSTC_COMMIT, 'llvm_version': '22.1.6',
             'compiler_inventory_schema': native.SCHEMA,
             'adapter_sha256': assets.sha(runtime / 'app/rust_native_driver.py'),
@@ -40,7 +40,7 @@ def stage(runtime, core, core_id, source, binding, output):
             'classifier_sha256': assets.sha(runtime / 'app/rust_native_classify.py'),
             'normalization': 'exact owner counts and rational CRAP; rust_collector_project',
             'source_boundary': 'single-file-fixture production owners',
-            'configuration_sha256': binding['config_digest']},
+            'configuration_authority': 'quality-trusted-state/v1'},
         'dependency_inventory_sha256': assets.sha(runtime / 'runtime.json'),
         'license_inventory_sha256': assets.contract.fingerprint({k: v for k, v in inventory['payload'].items()
                                                                if k.startswith('licenses/')})}
