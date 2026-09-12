@@ -7,6 +7,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 import subprocess
+import base64
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import collector_assets as assets
@@ -104,6 +105,26 @@ class TransportTests(unittest.TestCase):
         with patch.object(installer.subprocess,'run',side_effect=curl):
             with self.assertRaisesRegex(ValueError,'Download interrupted'):
                 installer.download_parts('https://example.invalid/file',self.root/'bad.part',7)
+
+    def test_pinned_existing_verifier_is_reused_but_changed_binary_is_not(self):
+        verifier=self.root/'cosign';verifier.write_bytes(b'independently pinned verifier fixture')
+        openssl=self.root/'openssl';openssl.write_bytes(b'host verifier fixture')
+        row={'name':'cosign-linux-amd64','size':verifier.stat().st_size,'sha256':assets.sha(verifier)}
+        host={'schema':'rust-collector-host-trust/v2','openssl':str(openssl),'openssl_sha256':assets.sha(openssl)}
+        profile={'host':host,'verifier':row}
+        for key in ('public_key','trusted_root'):
+            p=self.root/key;p.write_bytes(key.encode())
+            host[key+'_sha256']=assets.sha(p);profile[key]=base64.b64encode(p.read_bytes()).decode()
+        catalog={'trust':profile,'host_abi':{},'base_url':'https://example.invalid'}
+        offline=self.root/'offline';offline.mkdir()
+        cache=self.root/'cache';cache.mkdir()
+        with patch.object(installer.assets,'probe_host',return_value={}), patch.object(installer.shutil,'which',return_value=str(verifier)):
+            trust=installer.provision(catalog,cache/'trust',cache,offline)
+            self.assertEqual(Path(trust['cosign']).read_bytes(),verifier.read_bytes())
+            verifier.write_bytes(b'untrusted replacement')
+            other=self.root/'other';other.mkdir()
+            with self.assertRaises(FileNotFoundError):
+                installer.provision(catalog,other/'trust',other,offline)
 
 
 if __name__=='__main__': unittest.main()

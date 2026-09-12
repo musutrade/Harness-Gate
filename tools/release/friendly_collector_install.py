@@ -80,6 +80,7 @@ def fetch(row, base, cache, offline=None):
 def provision(catalog, directory, cache, offline):
     profile = catalog['trust']
     trust = dict(profile['host'])
+    assets.require(trust['schema'] == 'rust-collector-host-trust/v2', 'dual-signature production trust required')
     # The profile is authenticated with the installer, never chosen by a plugin.
     assets.require(assets.probe_host(trust) == catalog['host_abi'],
                    'This Rust plugin does not support this host yet; Core can be installed separately.')
@@ -93,7 +94,21 @@ def provision(catalog, directory, cache, offline):
         path.write_bytes(raw)
         assets.require(assets.sha(path) == trust[key + '_sha256'], 'invalid installer trust profile')
         trust[key] = str(path)
-    cosign = fetch(profile['verifier'], catalog['base_url'], cache, offline)
+    verifier = profile['verifier']
+    cached = cache / (verifier['sha256'] + '-' + assets.safe_name(verifier['name']))
+    if not cached.exists() and not cached.is_symlink():
+        candidate = shutil.which('cosign')
+        if candidate:
+            candidate = Path(candidate).resolve()
+            try:
+                assets.regular(candidate)
+                reusable = candidate.stat().st_size == verifier['size'] and assets.sha(candidate) == verifier['sha256']
+            except (OSError, ValueError):
+                reusable = False
+            if reusable:
+                shutil.copyfile(candidate, cached)
+                print('Reusing the pinned signature verifier already available on this host.', flush=True)
+    cosign = fetch(verifier, catalog['base_url'], cache, offline)
     cosign.chmod(0o700)
     trust['cosign'] = str(cosign)
     assets.write(directory / 'trust.json', trust)
