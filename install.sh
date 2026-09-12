@@ -14,15 +14,20 @@ ARCH=""
 PLATFORM=""
 INSTALL_NAME="$BINARY_NAME"
 ATOMIC_TEMPORARY=""
+RUST_INSTALLER_URL="https://github.com/musutrade/Harness-Gate/releases/download/rust-collector-installer-v0.1.0-rc.2/install-rust.sh"
+RUST_INSTALLER_SHA256="cdd1f444ee9f6c8374809d0ae9be8b0d74a4a5aedbdbf9301dacf06b55860c76"
 
 usage() {
     cat <<'EOF'
 Usage: install.sh --version vX.Y.Z [--install-dir DIR]
        install.sh --version vX.Y.Z --from-source [--install-dir DIR]
+       install.sh --version vX.Y.Z --with-rust [--rust-root DIR] [--cache-dir DIR]
+       install.sh --rust-only [--rust-root DIR] [--cache-dir DIR] [--offline DIR]
 
 The version is required so the download is bound to an immutable release tag.
 The installer verifies SHA256 and the Sigstore keyless certificate before it
 changes the destination directory.
+Rust tools are optional, compressed and cached independently of Core updates.
 EOF
 }
 
@@ -141,6 +146,41 @@ verify_signature() {
         --certificate-identity-regexp "^https://github.com/${REPO}/.github/workflows/release\\.yml@refs/tags/${escaped_version}$" \
         "$dist/$filename" \
         || die "Sigstore verification failed for $filename"
+}
+
+ensure_cosign() {
+    command -v cosign >/dev/null 2>&1 && return 0
+    local name digest path
+    case "$PLATFORM" in
+        linux-amd64) name=cosign-linux-amd64; digest=4629c757b7618056f8ddd7e2625ae9fdd94c0372a65049520bc7d9df9efc7f71 ;;
+        macos-amd64) name=cosign-darwin-amd64; digest=2347488e5d5b25336644024dfeca5601b190e91197a71a917bda44744aff106c ;;
+        macos-arm64) name=cosign-darwin-arm64; digest=5cf948c2f4dfe59687bdd0b8523709067383e03982cc543475c8a7dc70e92a76 ;;
+        windows-amd64) name=cosign-windows-amd64.exe; digest=9fe59be0eca1271873ce019061335eb1ac419b7059202e797828467ddabe33be ;;
+        *) die "no pinned signature verifier for $PLATFORM" ;;
+    esac
+    mkdir -p "$1/verifier"
+    path="$1/verifier/cosign"
+    [[ "$OS" != windows ]] || path="${path}.exe"
+    download "https://github.com/sigstore/cosign/releases/download/v3.1.3/$name" "$path"
+    local actual
+    if command -v sha256sum >/dev/null 2>&1; then actual=$(sha256sum "$path"); else actual=$(shasum -a 256 "$path"); fi
+    [[ "${actual%% *}" == "$digest" ]] || die "signature verifier checksum mismatch"
+    chmod 755 "$path"
+    export PATH="$1/verifier:$PATH"
+}
+
+install_rust() {
+    local temporary="$1"
+    shift
+    if [[ -n "${rust_offline:-}" ]]; then
+        cp -- "$rust_offline/install-rust.sh" "$temporary/install-rust.sh"
+    else
+        download "$RUST_INSTALLER_URL" "$temporary/install-rust.sh"
+    fi
+    local actual
+    if command -v sha256sum >/dev/null 2>&1; then actual=$(sha256sum "$temporary/install-rust.sh"); else actual=$(shasum -a 256 "$temporary/install-rust.sh"); fi
+    [[ "${actual%% *}" == "$RUST_INSTALLER_SHA256" ]] || die "Rust installer checksum mismatch"
+    bash "$temporary/install-rust.sh" "$@"
 }
 
 validate_install_dir() {
@@ -273,8 +313,21 @@ install_from_source() {
 
 main() {
     local from_source=0
+    local with_rust=0 rust_only=0 rust_offline=""
+    local rust_args=()
     while (($# > 0)); do
         case "$1" in
+            --with-rust) with_rust=1; shift ;;
+            --rust-only) rust_only=1; with_rust=1; shift ;;
+            --rust-root|--cache-dir|--offline)
+                (($# >= 2)) || die "$1 requires a value"
+                if [[ "$1" == --rust-root ]]; then
+                    rust_args+=(--root "$2")
+                else
+                    rust_args+=("$1" "$2")
+                    [[ "$1" != --offline ]] || rust_offline="$2"
+                fi
+                shift 2 ;;
             --version)
                 (($# >= 2)) || die "--version requires a value"
                 VERSION="$2"
@@ -300,8 +353,12 @@ main() {
         esac
     done
 
-    [[ -n "$VERSION" ]] || { usage >&2; die "--version is required"; }
-    validate_version
+    if (( !rust_only )); then
+        [[ -n "$VERSION" ]] || { usage >&2; die "--version is required"; }
+        validate_version
+    fi
+    ((with_rust)) || [[ ${#rust_args[@]} -eq 0 ]] || die "Rust options require --with-rust or --rust-only"
+    [[ -z "$rust_offline" || "$rust_only" == 1 ]] || die "--offline currently applies to --rust-only"
     local temporary_root
     temporary_root="$(mktemp -d "${TMPDIR:-/tmp}/harness-gate-install.XXXXXXXX")" \
         || die "cannot create temporary installation directory"
@@ -309,11 +366,16 @@ main() {
     trap 'abort_on_signal 129' HUP
     trap 'abort_on_signal 130' INT
     trap 'abort_on_signal 143' TERM
-    if ((from_source)); then
+    if ((rust_only)); then
+        install_rust "$temporary_root" "${rust_args[@]}"
+    elif ((from_source)); then
         install_from_source "$temporary_root"
     else
+        detect_platform
+        ensure_cosign "$temporary_root"
         install_binary "$temporary_root"
     fi
+    if ((with_rust && !rust_only)); then install_rust "$temporary_root" "${rust_args[@]}"; fi
 }
 
 main "$@"
