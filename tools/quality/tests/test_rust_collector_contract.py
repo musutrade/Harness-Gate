@@ -55,6 +55,29 @@ def fixture():
 
 
 class DeliveryManifestTests(unittest.TestCase):
+    def test_host_configuration_schema_is_explicit_and_versioned(self):
+        manifest, matrix, observed = fixture()
+        manifest['schema'] = 'rust-collector-delivery/v2'
+        measurement = manifest['measurement']
+        del measurement['normalized_series']
+        del measurement['configuration_sha256']
+        measurement['configuration_authority'] = 'quality-trusted-state/v1'
+        matrix['tested'][0]['manifest_sha256'] = contract.fingerprint(manifest)
+        self.assertEqual(contract.load_manifest(json.dumps(manifest)), manifest)
+        self.assertEqual(contract.preflight(manifest, matrix, observed), matrix['tested'][0]['receipt'])
+        for mutate in (
+            lambda m: m.update(schema='rust-collector-delivery/v3'),
+            lambda m: m.update(schema='rust-collector-delivery/v1'),
+            lambda m: m['measurement'].pop('configuration_authority'),
+            lambda m: m['measurement'].update(configuration_authority='untrusted'),
+            lambda m: m['measurement'].update(configuration_sha256='a' * 64),
+            lambda m: m['measurement'].update(normalized_series=['measurement-series/v1:' + 'a' * 64]),
+        ):
+            damaged = copy.deepcopy(manifest)
+            mutate(damaged)
+            with self.subTest(manifest=damaged), self.assertRaises(contract.DeliveryError):
+                contract.validate_manifest(damaged)
+
     def test_exact_tuple_and_empty_production_matrix(self):
         manifest, matrix, observed = fixture()
         self.assertEqual(contract.load_manifest(json.dumps(manifest)), manifest)

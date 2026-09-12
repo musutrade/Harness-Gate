@@ -29,7 +29,11 @@ def fingerprint(value):
 
 def validate(value, definition):
     try:
-        evidence._shape(value, 'rust-collector-delivery.schema.json', definition)
+        filename = ('rust-collector-plugin.schema.json'
+                    if definition == 'Manifest' and isinstance(value, dict) and
+                    value.get('schema') == 'rust-collector-delivery/v2'
+                    else 'rust-collector-delivery.schema.json')
+        evidence._shape(value, filename, definition)
     except evidence.MeasurementError as error:
         raise DeliveryError(str(error)) from error
 
