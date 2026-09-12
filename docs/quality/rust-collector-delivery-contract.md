@@ -15,7 +15,7 @@ These source references describe existing behavior, not newly delivered commands
 | Entry/source | Completion and failure | Authority |
 | --- | --- | --- |
 | [collector_runner.py](../../tools/quality/collector_runner.py), `run_collector`, `SubprocessAdapter` | Development `harness-collector-request/v1` / `harness-collector-response/v1`; exit zero alone is insufficient. Validate mutually exclusive error/evidence, exact context/collector/capabilities, artifact inventory and hashes. Any nonzero exit rejects even parseable stdout; operational errors expose no partial evidence. | Frozen protocol/normalization reference; no release decision. |
-| [Rust project collectors](../../tools/harness-gate/src/config/quality/collectors.rs), `Response`, collection validation | Released Core sends `harness-project-collector-request/v1` through the generic adapter. Response has `schema_version: "1"`, transport `status: "PASS"`, matching invocation, artifacts, and `collection` with `harness-project-collector-response/v1`, evidence and no error. Checks expected producer/series claims and retained artifact integrity. | This envelope is distinct from the development protocol. P6 must implement the binding; a Python development response is not directly a Core response. `PASS` here is transport completion, not quality acceptance. |
+| [Rust project collectors](../../tools/harness-gate/src/config/quality/collectors.rs), `Response`, collection validation | Released Core sends `harness-project-collector-request/v1` through the generic adapter. Response has `schema_version: "1"`, transport `status: "PASS"`, matching invocation, artifacts, and `collection` with `harness-project-collector-response/v1`, evidence and no error. Checks expected producer/series claims and retained artifact integrity. | This envelope is distinct from the development protocol. The standalone collector implements the binding; a Python development response is not directly a Core response. `PASS` here is transport completion, not quality acceptance. |
 | [Rust process adapter](../../tools/harness-gate/src/process/adapter.rs), `run`, `run_process` | Host approves/signs requests and validates invocation, process exit and output. Nonzero execution blocks ingestion. | Host execution/capture trust, independent of package signing. |
 | [rust_native_driver.py](../../tools/quality/rust_native_driver.py), `certify`, `main` | `certify` verifies the independent anchor, exact retained inventory, original tool paths/hashes and selection; reruns profdata merge and LLVM export against retained binaries/profiles. Complete report may have `passed: false`; legacy CLI writes it then returns 1. Integrity/tool/missing-file exceptions are failures too. Collection subcommands return 0 on completion. | Historical threshold-derived fields remain raw history, not a new collector verdict. An arbitrary exit 1 cannot be upgraded to success. |
 | [rust_native.py](../../tools/quality/rust_native.py), `certify`, CLI | Earlier fixture certification also uses threshold-derived nonzero exits. | Historical fixture/series contract, not an independently delivered runtime. |
@@ -80,13 +80,15 @@ check does not replace P4/P5 extraction, symlink or byte-inventory verification.
 | Capabilities | Unique metric name, supported/unsupported package capability, scope and reason. Runtime evidence still preserves all six capability states. A package declaration does not establish policy requiredness. |
 | Measurement | Full native series object, normalized measurement-series identities, compiler commit/inventory schema, LLVM version, adapter/classifier/projection digests, normalization identity, configuration digest and source boundary. |
 
-The [reviewed compatibility matrix](../../tools/quality/rust-collector-compatibility.json)
-is currently **empty**. There are no tested independently delivered Core/ABI
-combinations. Source pins are rustc commit
+The [repository development matrix](../../tools/quality/rust-collector-compatibility.json)
+remains empty by default. The published RC has a separate
+[reviewed compatibility matrix](https://github.com/musutrade/Harness-Gate/releases/download/rust-collector-review-7165558-v1/compatibility.json)
+and source-bound receipt; see [current compatibility](../release-status.md#compatibility).
+It certifies the exact Core 0.4.0 and host row, not an inferred Core 0.4.1 or a
+Linux distribution family. Source pins remain rustc commit
 `8bab26f4f68e0e26f0bb7960be334d5b520ea452`, LLVM `22.1.6` and
-`rustc-mir-block-inventory/3`; they are source prerequisites, not delivery
-certification. Neither the Core Cargo version nor synthetic fixture identities
-qualify as a matrix receipt.
+`rustc-mir-block-inventory/3`. Synthetic fixture identities are not production
+matrix receipts.
 
 `preflight(manifest, matrix, observed)` requires a declared Core and exactly one
 reviewed row matching the manifest SHA-256 and entire observed environment.
