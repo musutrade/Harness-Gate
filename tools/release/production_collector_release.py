@@ -4,6 +4,7 @@ Preparation does not generate these approval inputs or an eligibility pass.
 The workflow template must be reviewed and installed separately before use.
 """
 import argparse
+import json
 import os
 from pathlib import Path
 import shutil
@@ -53,8 +54,8 @@ def reviewed_checks(manifest, manifest_sha, licenses, validation):
 def preflight(packet_path, digest, source, client):
     packet = assets.read(pinned(packet_path, digest))
     assets.require(packet['schema'] == 'rust-collector-publication-approval/v1', 'wrong approval schema')
-    assets.require(packet['source_commit'] == source and packet['version'] == '0.1.0-rc.1',
-                   'wrong approved source/version')
+    assets.require(packet['source_commit'] == source, 'wrong approved source/version')
+    assets.require('-rc.' in assets.version(packet['version']), 'approved RC version required')
     for ref in ('HEAD', 'refs/remotes/origin/main'):
         assets.require(policy.core._resolve_commit(Path.cwd(), ref, ref) == source,
                        'publication requires exact checked-out protected main')
@@ -130,6 +131,20 @@ def sign(directory, trust, private_key):
                     str(directory / 'release-inventory.json')], check=True)
     assets.write(directory / 'release-inventory.sig', sigstore.envelope(raw.read_bytes(), assets.read(bundle)))
     sigstore.verify(directory, trust)
+
+
+def create_or_verify_tag(tag, source):
+    """Reuse only the exact immutable commit tag created for private acceptance."""
+    rows = json.loads(subprocess.check_output(['gh', 'api', 'repos/' + assets.REPOSITORY +
+                                              '/git/matching-refs/tags/' + tag]))
+    matches = [row for row in rows if row['ref'] == 'refs/tags/' + tag]
+    if matches:
+        assets.require(len(matches) == 1 and matches[0]['object']['type'] == 'commit' and
+                       matches[0]['object']['sha'] == source, 'existing collector tag differs')
+    else:
+        subprocess.run(['gh', 'api', '--method', 'POST', 'repos/' + assets.REPOSITORY + '/git/refs',
+                        '-f', 'ref=refs/tags/' + tag, '-f', 'sha=' + source],
+                       check=True, stdout=subprocess.DEVNULL)
 
 
 def main():
