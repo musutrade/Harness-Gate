@@ -17,6 +17,8 @@ import collector_assets as assets
 import collector_sigstore as sigstore
 import prepare_collector_candidate as candidate
 import production_collector_release as production
+import sign_collector_candidate as private_signing
+import collector_release_policy as policy
 import test_collector_delivery as fixtures
 
 
@@ -193,6 +195,25 @@ class ApprovalTests(unittest.TestCase):
         with self.assertRaises((ValueError, FileNotFoundError)):
             self.check()
 
+
+    def test_publication_reuses_only_the_exact_private_acceptance_tag(self):
+        import json
+        source = self.manifest['source_commit']
+        tag = 'rust-collector-v0.1.0-rc.1'
+        row = {'ref': 'refs/tags/' + tag, 'object': {'type': 'commit', 'sha': source}}
+        with patch.object(production.subprocess, 'check_output', return_value=json.dumps([row])), \
+             patch.object(production.subprocess, 'run') as mutate:
+            production.create_or_verify_tag(tag, source)
+            mutate.assert_not_called()
+            with self.assertRaisesRegex(ValueError, 'tag differs'):
+                production.create_or_verify_tag(tag, '0' * 40)
+            mutate.assert_not_called()
+        with patch.object(production.subprocess, 'check_output', return_value='[]'), \
+             patch.object(production.subprocess, 'run') as mutate:
+            production.create_or_verify_tag(tag, source)
+            mutate.assert_called_once()
+            self.assertNotIn('PATCH', mutate.call_args.args[0])
+
     def test_wrong_source_and_unsuccessful_main_ci_stop_preflight(self):
         packet = self.path.parent / 'packet.json'
         source = self.manifest['source_commit']
@@ -208,6 +229,90 @@ class ApprovalTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'CI pending'):
                 production.preflight(packet, assets.sha(packet), source, client)
         client.get_json.assert_not_called()
+
+
+class PrivateCandidateTests(unittest.TestCase):
+    """Candidate signing cannot substitute publication approval or accept changed bytes."""
+    @classmethod
+    def setUpClass(cls):
+        fixtures.DeliveryTests.setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        fixtures.DeliveryTests.tearDownClass()
+
+    def setUp(self):
+        helper = ProductionSignatureTests()
+        helper.setUp()
+        self.addCleanup(helper.doCleanups)
+        self.fixture, self.release, self.trust = helper.fixture, helper.release, helper.trust
+        for name in ('provenance.json',) + assets.CONTROL:
+            (self.release / name).unlink()
+        self.trust_path = self.fixture.base / 'host-trust.json'
+        assets.write(self.trust_path, self.trust)
+        self.packet_path = self.fixture.base / 'signing-packet.json'
+        self.packet = {'schema': 'rust-collector-private-signing/v1',
+            'source_commit': self.fixture.manifest['source_commit'],
+            'version': self.fixture.manifest['collector']['version'],
+            'directory': str(self.release), 'output': str(self.fixture.base / 'signed'),
+            'trust': {'path': str(self.trust_path), 'sha256': assets.sha(self.trust_path)},
+            'unsigned_assets': {name: {'sha256': assets.sha(self.release / name),
+                'size': (self.release / name).stat().st_size} for name in assets.ASSETS[:3]}}
+        self.client = Mock(repository=assets.REPOSITORY)
+
+    def check_candidate(self):
+        assets.write(self.packet_path, self.packet)
+        with patch.object(policy.core, '_resolve_commit', return_value=self.packet['source_commit']), \
+             patch.object(policy.core, 'verify_ci_run') as ci, \
+             patch.object(policy, 'protected_environment') as environment:
+            result = private_signing.preflight(self.packet_path, assets.sha(self.packet_path),
+                                               self.packet['source_commit'], self.client)
+            ci.assert_called_once()
+            environment.assert_called_once()
+            return result
+
+    def test_private_candidate_needs_no_future_install_receipt_and_creates_no_release(self):
+        self.check_candidate()
+        self.assertFalse(Path(self.packet['output']).exists())
+        self.assertEqual(set(p.name for p in self.release.iterdir()), set(assets.ASSETS[:3]))
+        source = (Path(private_signing.__file__)).read_text()
+        self.assertNotIn('gh release', source)
+        self.assertNotIn("'published': True", source)
+
+    def test_changed_packet_assets_trust_and_existing_output_reject(self):
+        self.check_candidate()
+        for field in ('manifest.json', 'collector.tar', 'sbom.spdx.json'):
+            path = self.release / field
+            original = path.read_bytes()
+            path.write_bytes(original + b'\n')
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                self.check_candidate()
+            path.write_bytes(original)
+        original = self.trust_path.read_bytes()
+        self.trust_path.write_bytes(original + b'\n')
+        with self.assertRaises(ValueError):
+            self.check_candidate()
+        self.trust_path.write_bytes(original)
+        Path(self.packet['output']).mkdir()
+        with self.assertRaisesRegex(ValueError, 'must be fresh'):
+            self.check_candidate()
+
+    def test_wrong_packet_hash_source_stable_version_and_bad_ci_reject(self):
+        self.check_candidate()
+        with self.assertRaisesRegex(ValueError, 'digest changed'):
+            private_signing.preflight(self.packet_path, '0' * 64, self.packet['source_commit'], self.client)
+        with self.assertRaisesRegex(ValueError, 'wrong signing source'):
+            private_signing.preflight(self.packet_path, assets.sha(self.packet_path), '0' * 40, self.client)
+        self.packet['version'] = '0.1.0'
+        with self.assertRaisesRegex(ValueError, 'RC version'):
+            self.check_candidate()
+        self.packet['version'] = self.fixture.manifest['collector']['version']
+        assets.write(self.packet_path, self.packet)
+        with patch.object(policy.core, '_resolve_commit', return_value=self.packet['source_commit']), \
+             patch.object(policy.core, 'verify_ci_run', side_effect=ValueError('CI pending')):
+            with self.assertRaisesRegex(ValueError, 'CI pending'):
+                private_signing.preflight(self.packet_path, assets.sha(self.packet_path),
+                                          self.packet['source_commit'], self.client)
 
 
 class BootstrapAuthenticationTests(unittest.TestCase):
