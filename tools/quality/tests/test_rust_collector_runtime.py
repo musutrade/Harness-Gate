@@ -240,6 +240,7 @@ class StandaloneNativeTests(unittest.TestCase):
             artifacts.mkdir()
             binding = binding_for(report, self.work / name, artifacts)
             binding['input']['context'].update(commit=commit * 40, base_commit=parent * 40)
+            binding['config_digest'] = commit * 64
             binding_path = output / (name + '-binding.json')
             request, digest = request_for(binding, binding_path)
             request_path = output / (name + '-request.json')
@@ -251,9 +252,21 @@ class StandaloneNativeTests(unittest.TestCase):
             # reviewed delivery matrix is empty; this is no substitute for it.
             code = ('import sys,json; from pathlib import Path; '
                     'sys.path.insert(0,str(Path(sys.argv[1])/"app")); '
-                    'import rust_collector_project as p; '
+                    'import rust_collector_project as p, rust_collector_delivery as d, rust_native_driver as n; '
                     'b=p.load_binding(json.loads(Path(sys.argv[2]).read_text()),'
                     'Path(sys.argv[3]),sys.argv[4]); '
+                    # Exercise v2 project configuration separation against real
+                    # native captures and private code. This diagnostic manifest
+                    # is not a signed distribution or compatibility approval.
+                    'r=Path(sys.argv[1]); '
+                    'm={"schema":"rust-collector-delivery/v2","measurement":{'
+                    '"native_series":n.SERIES,"compiler_commit":n.RUSTC_COMMIT,'
+                    '"llvm_version":"22.1.6","compiler_inventory_schema":n.SCHEMA,'
+                    '"configuration_authority":"quality-trusted-state/v1",'
+                    '"adapter_sha256":n.file_hash(r/"app/rust_native_driver.py"),'
+                    '"classifier_sha256":n.file_hash(r/"app/rust_native_classify.py"),'
+                    '"projection_sha256":n.file_hash(r/"app/rust_collector_project.py")}}; '
+                    'd.require_measurement_identity(r,m,b); '
                     'print(json.dumps(p.project_report(json.loads(Path(sys.argv[5]).read_text()),b)))')
             result = self.command(name + '-generic-project', [str(self.runtime / 'python/bin/python3'),
                 '-I', '-S', '-B', '-c', code, str(self.runtime), str(request_path), str(binding_path),
