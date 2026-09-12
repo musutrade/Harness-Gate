@@ -1,9 +1,14 @@
-name: Rust collector release dry run
+name: Rust collector preparation
 
 # Publication remains disabled until the separately authorized P8 handoff.
-# No tag trigger, production secrets, contents:write, or OIDC token in this job.
+# Private signing is separately selected and environment-approved; no public release is created.
 on:
   workflow_dispatch:
+    inputs:
+      signing_packet_sha256:
+        description: Exact private RC signing packet digest; empty runs the rehearsal
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -33,7 +38,7 @@ jobs:
           PY
   dry-run:
     needs: protection
-    if: github.repository == 'musutrade/Harness-Gate' && github.ref == 'refs/heads/main'
+    if: inputs.signing_packet_sha256 == '' && github.repository == 'musutrade/Harness-Gate' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: rust-collector-release
     steps:
@@ -53,3 +58,42 @@ jobs:
           path: target/collector-release-dry-run
           if-no-files-found: error
           retention-days: 90
+
+  sign-private-candidate:
+    needs: protection
+    if: inputs.signing_packet_sha256 != '' && github.repository == 'musutrade/Harness-Gate' && github.ref == 'refs/heads/main'
+    environment: rust-collector-release
+    runs-on:
+      group: harness-gate-rust-collector-release
+      labels: rust-collector-release
+    permissions:
+      contents: write
+      actions: read
+      id-token: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PACKET: ${{ vars.COLLECTOR_SIGNING_PACKET }}
+      PACKET_SHA256: ${{ inputs.signing_packet_sha256 }}
+      SOURCE_SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify private candidate before accessing the signing key
+        run: |
+          python3 tools/release/sign_collector_candidate.py preflight \
+            --packet "$PACKET" --packet-sha256 "$PACKET_SHA256" --source "$SOURCE_SHA"
+      - name: Sign locally for installation acceptance without public distribution
+        shell: bash
+        env:
+          COLLECTOR_RSA_PRIVATE_KEY: ${{ secrets.COLLECTOR_RSA_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          umask 077
+          key=$(mktemp)
+          trap 'rm -f -- "$key"' EXIT
+          printf '%s\n' "$COLLECTOR_RSA_PRIVATE_KEY" > "$key"
+          unset COLLECTOR_RSA_PRIVATE_KEY
+          python3 tools/release/sign_collector_candidate.py sign \
+            --packet "$PACKET" --packet-sha256 "$PACKET_SHA256" --source "$SOURCE_SHA" --private-key "$key"
