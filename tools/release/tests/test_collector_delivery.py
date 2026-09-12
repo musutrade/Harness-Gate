@@ -411,7 +411,7 @@ class EligibilityTests(unittest.TestCase):
         self.assertIn('needs: protection', source)
         self.assertNotIn('runs-on: [self-hosted', source)
 
-    def test_nonpublishing_workflow_remains_protected(self):
+    def test_default_rehearsal_and_explicit_publication_remain_protected(self):
         source = (RELEASE.parents[1] / assets.WORKFLOW).read_text()
         self.assertIn('needs: protection', source)
         self.assertIn('policy.protected_environment(client.get_json(', source)
@@ -422,7 +422,18 @@ class EligibilityTests(unittest.TestCase):
         self.assertNotIn('contents: write', rehearsal)
         self.assertNotIn('id-token: write', rehearsal)
         self.assertIn("inputs.signing_packet_sha256 == ''", rehearsal)
-        self.assertNotIn('gh release create', source)
+        signing = source.split('  sign-private-candidate:', 1)[1].split('\n  publish:', 1)[0]
+        publication = source.split('\n  publish:', 1)[1]
+        self.assertNotIn('gh release create', rehearsal)
+        self.assertNotIn('gh release create', signing)
+        self.assertIn("inputs.publication_packet_sha256 != ''", publication)
+        self.assertIn("inputs.signing_packet_sha256 == ''", publication)
+        self.assertIn("github.ref == 'refs/heads/main'", publication)
+        self.assertIn('needs: protection', publication)
+        self.assertIn('environment: rust-collector-release', publication)
+        self.assertIn('group: harness-gate-rust-collector-release', publication)
+        self.assertIn('production_collector_release.py assemble', publication)
+        self.assertIn('--packet-sha256', publication)
         self.assertNotIn('git tag ', source)
         self.assertNotIn('\n  push:', source)
 
