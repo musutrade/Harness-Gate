@@ -13,7 +13,7 @@ import collector_assets as assets
 RELEASE = Path(__file__).resolve().parent
 
 
-def build(runtime, output):
+def build(runtime, output, *, user_entry=False):
     inventory = assets.read(runtime / 'runtime.json')['payload']
     files = {}
     for name, row in inventory.items():
@@ -26,6 +26,9 @@ def build(runtime, output):
     for name in ('collector_assets.py', 'collector_sigstore.py', 'collector_release_policy.py',
                  'release_policy.py', 'install_collector.py', 'production_installer.py'):
         files['tools/release/' + name] = ((RELEASE / name).read_bytes(), 0o644)
+    if user_entry:
+        for name in ('collector_transport.py', 'friendly_collector_install.py'):
+            files['tools/release/' + name] = ((RELEASE / name).read_bytes(), 0o644)
     assets.require('python/bin/python3' in files, 'missing private bootstrap Python')
     # Inventory is descriptive; the out-of-band capsule SHA authenticates it.
     import hashlib

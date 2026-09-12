@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-09-12
+
+### Improved
+
+- Keep Core installation small by default; add `install.sh --with-rust` and
+  `--rust-only` for the optional Rust collector with automatic verifier provisioning.
+- Compress and deduplicate collector transport into reusable toolchain and plugin
+  layers while preserving every original signed archive byte and dual verification.
+- Cache downloads by digest; support offline installation and bounded HTTP/1.1
+  range retries for large downloads, including publication read-back verification.
+- Publish reviewed installer deliveries through the existing protected collector
+  workflow. Core continues to use the existing GitHub/crates.io release workflow.
+
+
 ## [0.4.0] - 2026-09-11
 
 ### Added
