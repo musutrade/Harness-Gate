@@ -84,21 +84,39 @@ def preflight(root, binding):
                    'wrong delivered tool path')
     receipt = contract.preflight(manifest, matrix, observed)
     pinned(receipt)
+    require_measurement_identity(root, manifest, binding)
+    states = {c['metric']: c['state'] for c in manifest['capabilities']}
+    native.require(all(states.get(c['metric']) == c['state'] for c in binding['capabilities']),
+                   'capability differs from delivered contract')
+    return receipt
+
+
+def require_measurement_identity(root, manifest, binding):
     identity = manifest['measurement']
-    native.require(binding['series']['id'] in identity['normalized_series']
-                   and identity['native_series'] == native.SERIES
+    native.require(identity['native_series'] == native.SERIES
                    and identity['compiler_commit'] == native.RUSTC_COMMIT
                    and identity['llvm_version'] == '22.1.6'
                    and identity['compiler_inventory_schema'] == native.SCHEMA
                    and identity['adapter_sha256'] == native.file_hash(root / 'app/rust_native_driver.py')
                    and identity['projection_sha256'] == native.file_hash(root / 'app/rust_collector_project.py')
-                   and identity['classifier_sha256'] == native.file_hash(root / 'app/rust_native_classify.py')
-                   and identity['configuration_sha256'] == binding['config_digest'],
+                   and identity['classifier_sha256'] == native.file_hash(root / 'app/rust_native_classify.py'),
                    'wrong delivered measurement identity')
-    states = {c['metric']: c['state'] for c in manifest['capabilities']}
-    native.require(all(states.get(c['metric']) == c['state'] for c in binding['capabilities']),
-                   'capability differs from delivered contract')
-    return receipt
+    if manifest['schema'] == 'rust-collector-delivery/v1':
+        native.require(binding['series']['id'] in identity['normalized_series'] and
+                       identity['configuration_sha256'] == binding['config_digest'],
+                       'wrong delivered measurement identity')
+    else:
+        native.require(manifest['schema'] == 'rust-collector-delivery/v2' and
+                       identity['configuration_authority'] == 'quality-trusted-state/v1',
+                       'unknown project configuration authority')
+        # Core authenticates the exact project/config/series in its request.
+        # load_binding binds the same digest, claims and context; project_report
+        # independently matches this native identity to the certified capture.
+        # The package continues to pin the actual normalization implementation.
+        native.require(binding['native_identity']['projection_sha256'] == identity['projection_sha256'] and
+                       binding['series']['normalization']['version'] == identity['projection_sha256'] and
+                       binding['series']['runtime']['version'] == identity['compiler_commit'],
+                       'wrong host-bound normalization identity')
 
 
 def capture_paths(root, directory):
