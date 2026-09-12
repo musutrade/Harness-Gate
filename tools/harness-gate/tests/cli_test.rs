@@ -26,7 +26,10 @@ fn test_version_command() {
     assert_success(&output);
     let stdout = stdout_str(&output);
     assert!(stdout.contains("harness-gate"));
-    assert!(stdout.contains("0.4.0"));
+    assert_eq!(
+        stdout.trim(),
+        concat!("harness-gate ", env!("CARGO_PKG_VERSION"))
+    );
 }
 
 #[test]
