@@ -82,16 +82,31 @@ def inventory(driver, sysroot, crate_cache, rustc_dev, build_record):
     for name in extensions:
         add(name, 'python/lib/' + stdlib.name + '/lib-dynload/' + Path(name).name)
     tree(ROOT / 'schema', 'app/schema')
-    for name in ('harness-gate-rust-collector', 'native-wrapper'):
+    for name in ('harness-gate-rust-collector', 'native-wrapper', 'pkg-config'):
         add(ROOT / 'rust-collector-runtime' / name, 'bin/' + name)
     add(ROOT / 'rust-collector-runtime/native_wrapper.py', 'app/native_wrapper.py')
     add(ROOT / 'rust-collector-runtime/cc', 'bin/cc')
-    # Rust's GNU target invokes a compiler driver for linking. Keep that driver,
-    # its subprocess and startup/link inputs private as well as rustc itself.
+    # Cargo dependencies compile C as well as link Rust. Ship the compiler,
+    # assembler and headers instead of depending on a host C toolchain.
     add('/usr/bin/cc', 'link/bin/gcc')
     add('/usr/bin/ld.bfd', 'link/gcc/ld')
-    for name in ('collect2', 'lto-wrapper', 'liblto_plugin.so', 'lto1'):
+    add('/usr/bin/as', 'link/gcc/as')
+    for name in ('ar', 'ranlib'):
+        add('/usr/bin/' + name, 'bin/' + name)
+    add('/usr/bin/pkgconf', 'link/bin/pkgconf')
+    for name in ('cc1', 'collect2', 'lto-wrapper', 'liblto_plugin.so', 'lto1'):
         add('/usr/libexec/gcc/x86_64-linux-gnu/15/' + name, 'link/gcc/' + name)
+    tree('/usr/lib/gcc/x86_64-linux-gnu/15/include', 'link/gcc/include')
+    for package in ('libc6-dev', 'linux-libc-dev', 'libssl-dev'):
+        for name in command('dpkg-query', '-L', package).splitlines():
+            path = Path(name)
+            if path.is_file() and (path.is_relative_to('/usr/include') or name.endswith('.pc')):
+                add(path, 'link/sysroot' + name)
+    for name in ('libssl', 'libcrypto'):
+        add('/usr/lib/x86_64-linux-gnu/' + name + '.so',
+            'link/sysroot/usr/lib/x86_64-linux-gnu/' + name + '.so')
+        for directory in ('lib', 'rust/lib'):
+            add('/usr/lib/x86_64-linux-gnu/' + name + '.so.3', directory + '/' + name + '.so.3')
     tree('/usr/lib/gcc/x86_64-linux-gnu/15', 'link/gcc',
          lambda p: p.suffix in ('.o', '.a', '.so'))
     for name in ('Scrt1.o', 'crt1.o', 'crti.o', 'crtn.o', 'libc.so',
@@ -132,7 +147,8 @@ def inventory(driver, sysroot, crate_cache, rustc_dev, build_record):
                        'license': metadata['package']['license'], 'notices': notices})
     packages = {}
     for package in ('python3.14', 'python3.14-minimal', 'gcc-15-base',
-                    'gcc-15-x86-64-linux-gnu', 'libgcc-15-dev', 'binutils-x86-64-linux-gnu', 'libc6-dev', 'libc6'):
+                    'gcc-15-x86-64-linux-gnu', 'libgcc-15-dev', 'binutils-x86-64-linux-gnu',
+                    'libc6-dev', 'libc6', 'linux-libc-dev', 'libssl-dev', 'pkgconf-bin'):
         add('/usr/share/doc/' + package + '/copyright', 'licenses/' + package + '/copyright')
         packages[package] = command('dpkg-query', '-W', '-f=${Version}', package)
     tree('/usr/share/common-licenses', 'licenses/common')

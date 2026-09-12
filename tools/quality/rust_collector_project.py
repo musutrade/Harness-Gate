@@ -166,17 +166,26 @@ def project_report(report, binding):
                              'unsupported metric cannot supply a value')
         rows.append((subject, values))
     evidence.require({s['id'] for s, _ in rows} == selected, 'missing selected subject')
-    facts = copy.deepcopy(report)
-    facts.pop('passed', None)
-    for function in facts['functions']:
-        function.pop('passed', None)
-    raw = native_json(facts)
+    # Bind the complete, retained native report once. Repeating all exclusions
+    # and owners in every subject artifact grows quadratically on real projects.
+    report_digest = fingerprint(report)
+    identity = measurement_identity(report)
     output = Path(inner['output_root'])
     evidence.require(output.is_dir() and not output.is_symlink() and not any(output.iterdir()),
                      'collector output must be an empty directory')
     records, artifacts = [], []
     for subject, values in rows:
         source = {'path': subject['path'], 'sha256': subject['source_sha256']}
+        function = copy.deepcopy(functions[subject['discriminator']])
+        function.pop('passed', None)
+        paths = {row[0] for row in function['source_lines']}
+        facts = {'schema': 'rust-native-owner-artifact/v1',
+                 'native_report_sha256': report_digest, 'native_identity': identity,
+                 'artifact_anchor': report['artifact_anchor'], 'series': report['series'],
+                 'scope': report['scope'], 'tools': report['tools'],
+                 'source_inventory': [p for p in report['source_inventory'] if p['relative'] in paths],
+                 'functions': [function]}
+        raw = native_json(facts)
         # Core binds each artifact to one source: distinct paths avoid conflicting
         # descriptors when two selected owners share the same raw capture.
         name = fingerprint(subject['id']) + '.json'
