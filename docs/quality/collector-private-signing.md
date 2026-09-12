@@ -3,7 +3,11 @@
 The former preparation flow required successful production-signature and fresh
 installation receipts before the first production signature could exist. The
 manual collector workflow now accepts an optional `signing_packet_sha256` input.
-Without it, the protected synthetic rehearsal remains the default.
+With neither digest input, the protected synthetic rehearsal remains the default.
+The separate `publication_packet_sha256` input selects final publication using
+`COLLECTOR_APPROVAL_PACKET`; selecting both operations is rejected. Both entry
+points live in the same source commit so enabling publication does not invalidate
+the tag and manifest that were already accepted.
 
 With it, the existing main-only workflow and restricted local runner group run a
 separate job behind the existing `rust-collector-release` environment approval.
@@ -24,7 +28,7 @@ installation acceptance and publication have not happened. A tag is public;
 it does not publish the binary assets or assert final project acceptance.
 
 These bytes allow actual production-trust installation and signature negatives
-to run before public distribution. Final publication still requires the unchanged
+to run before public distribution. The separately selected publication job still requires the unchanged
 license approval, reviewed compatibility tuple, all six successful validation
 receipts, exact unsigned bytes and independently downloaded asset verification.
 The production template may reuse the exact commit tag created for acceptance;
