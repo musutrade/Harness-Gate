@@ -29,7 +29,7 @@ Current configuration evidence (2026-09-01):
   and required-reviewer rule `64256604` names `higoalespn`; and
 - deployment policy `58783819` is type `tag` with pattern `v*`.
 
-Latest release evidence (2026-09-03):
+Historical release evidence (2026-09-03):
 
 - PR [#81](https://github.com/musutrade/Harness-Gate/pull/81) merged as
   `0491ecca098bfd6d48dfc17829f700a69734a996`; the PR CI run
@@ -49,14 +49,24 @@ Latest release evidence (2026-09-03):
   constitute DevRail staging, shadow/canary, rollback-authority, or R-07
   OS-sandbox acceptance.
 
-## Pending 0.4.0 Core publication
+## Current publication status (2026-09-12)
 
-The [0.4.0 release plan](../openspec/changes/release-0-4-0/proposal.md)
-publishes the accepted generic quality Core needed for released-binary
-validation in GH-230. Candidate/native compatibility must pass before the normal
-PR, exact-main CI, immutable tag and protected publication sequence. This does
-not publish an independent collector or certify GH-230/GH-215. Relevant
-Engineering Policy semantics and all release gates are unchanged.
+Core 0.4.0 was published on 2026-09-11. Core **0.4.1** is now published on GitHub
+and crates.io from `62313a251f1862707a887480cbf593130da2ba4a`, after successful
+[exact-main CI](https://github.com/musutrade/Harness-Gate/actions/runs/34704575706).
+The existing [release workflow](https://github.com/musutrade/Harness-Gate/actions/runs/34706873399)
+passed eligibility, four-platform builds, quality gates, signing, GitHub publication
+and the separate protected crates.io job. The normal workflow already publishes
+the crate; no second cargo publication workflow is needed.
+
+Rust collector 0.1.0-rc.1 and installer 0.1.0-rc.2 use their separate immutable
+tags and the existing collector workflow. Its dedicated environment uses the
+owner-approved single-maintainer v2 policy: required pinned-owner review,
+self-review allowed, no admin bypass and main-only deployment. This replaces the
+historical collector v1 two-person assumption, not Core's release controls.
+See [release receipts and remaining integration](release-status.md) and the
+[current collector installation/release guide](quality/rust-collector-installation.md).
+Relevant Engineering Policy semantics remain unchanged.
 
 ## Release Procedure
 
@@ -73,18 +83,10 @@ Engineering Policy semantics and all release gates are unchanged.
 6. Verify the GitHub Release asset set, crate, signatures, attestations, and
    clean-environment consumer procedure before closing the release record.
 
-Example tag creation after the version change is on verified `main`:
-
-```bash
-git fetch origin main
-git switch main
-git pull --ff-only origin main
-git tag -a v0.3.7 -m "Release v0.3.7" origin/main
-git push origin v0.3.7
-```
-
-The literal version is an example. It must match the package version and must
-not already exist locally or remotely.
+Create a **new, unused** tag only after the version change is on verified main.
+Use the exact version in `tools/harness-gate/Cargo.toml`; published tags such as
+`v0.4.1` must never be recreated, moved or replaced. Review the concrete source,
+CI and version before executing the tag operation.
 
 ## Automated Eligibility Evidence
 

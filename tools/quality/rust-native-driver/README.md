@@ -1,5 +1,9 @@
 # Pinned native production measurement
 
+This page documents source development commands. Users of the published optional
+Rust plugin should start with the [installation guide](../../../docs/quality/rust-collector-installation.md)
+and [current compatibility record](../../../docs/release-status.md#compatibility).
+
 This opt-in development collector uses rustc **1.97.1**, commit
 `8bab26f4f68e0e26f0bb7960be334d5b520ea452`, LLVM **22.1.6** and
 `rustc-mir-block-inventory/3`. It needs the matching `rustc-dev` and `llvm-tools`

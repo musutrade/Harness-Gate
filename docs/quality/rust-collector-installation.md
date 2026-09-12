@@ -1,131 +1,106 @@
 # Rust collector installation and independent release
 
-GH-231 prepares a separately authenticated private-Python installer capsule and
-a production RSA/Sigstore verifier for review. The six-asset publication workflow
-is a non-active template. See the [preparation and approval packet](gh-231/preparation.md)
-for actual unsigned RC bytes, trust provisioning, checks and remaining blockers.
-No collector RC or clean-host production installation is certified by this work.
-The v1 source-install instructions below describe the earlier fixture path;
-production bootstrap requires v2 trust and both inventory signatures.
+The collector **0.1.0-rc.1** and compressed installer **0.1.0-rc.2** are published.
+See [current release receipts and compatibility](../release-status.md). This guide
+supersedes the historical GH-229/GH-231 preparation instructions for normal use.
+Core and installer installation are verified at Core 0.4.1; the RC's native
+measurement compatibility receipt still pins Core 0.4.0 and the exact tested
+Linux x86_64 host. Installing both does not extend that certification.
 
-GH-229 implements OpenSpec P4.1–P5.2. The predecessor is accepted PR #234,
-merged at `9bdc203c21a75cc769fdb2adbafb897e4b96a30e`. This is an offline lifecycle
-and nonpublishing release rehearsal. [Validation](gh-229/validation.md) records
-actual results. P6 integration, P7 native clean-host acceptance and P8 release
-approval remain separate; the production compatibility matrix is still empty.
+## Recommended installation
 
-## Host trust bootstrap
-
-The trusted computing base is the host OS, a host-managed Python 3.11+ runtime,
-the reviewed installer source and its imported contract/schema files, and a
-host-managed OpenSSL executable and its dynamic dependencies. Install those
-through an independently authenticated administrator channel before inspecting
-collector assets. Never run an installer, Python, OpenSSL or key downloaded from
-the collector release as its own verifier. The collector's bundled Python is
-usable only after verification and is not this bootstrap runtime.
-
-The current source entry is `tools/release/install_collector.py`; its release
-modules, imported `tools/quality` modules and schemas must all come from the same
-authenticated reviewed source tree. Preserve their relative paths. This issue
-did not ship an independently authenticated standalone installer
-executable. GH-231 now builds the private runtime capsule, but its independent
-distribution and clean-host acceptance remain pending. Before claiming
-installation on a host without Python or a source
-checkout, P7/P8 must provide and verify an OS-packaged bootstrap runtime or a
-separately authenticated standalone installer. Downloading the collector's own
-runtime first does not satisfy that prerequisite.
-
-An administrator provisions a JSON trust file outside the asset directory:
-
-```json
-{
-  "schema": "rust-collector-host-trust/v1",
-  "openssl": "/absolute/host/openssl",
-  "openssl_sha256": "<independently verified executable SHA-256>",
-  "public_key": "/absolute/host/collector-release-public.pem",
-  "public_key_sha256": "<independently verified public-key-file SHA-256>",
-  "rsa_signature_bytes": 256,
-  "host_libraries": {"<reviewed logical library identity>": "/absolute/host/library"}
-}
-```
-
-The example is a template, not usable trust. Pin an RSA public key and its actual
-signature width (256 bytes for RSA-2048). Only SHA-256 RSA signatures are used;
-the installer rejects trailing signature bytes even when OpenSSL accepts them.
-Pinning the OpenSSL executable does not authenticate its loader, shared libraries
-or the host Python runtime: those remain administrator-managed host trust.
-Key rotation requires an independently reviewed trust-file update, never a key
-supplied by a new release. No production private key is created by this issue.
-
-The administrator also supplies the reviewed logical-name-to-library-path map.
-The installer hashes those host files and compares the resulting inventory
-fingerprint, `Linux`/`x86_64`, glibc string and kernel release with the exact
-manifest ABI. A different kernel, library identity or digest fails before
-sampling; there is no inferred distro-wide support. This host map must come from
-the eventual certified ABI receipt, not from untrusted release instructions.
-
-## Exact release assets and eligibility
-
-The release directory contains exactly these six regular, single-link files:
-
-| File | Binding |
-| --- | --- |
-| `collector.tar` | Uncompressed private runtime archive |
-| `manifest.json` | Existing strict delivery manifest, all payload hashes and identities |
-| `sbom.spdx.json` | SPDX 2.3 file inventory of every manifest payload and its SHA-256 |
-| `provenance.json` | in-toto statement covering archive, manifest and SBOM |
-| `release-inventory.json` | Exact ordered names and SHA-256 subjects for all four files above |
-| `release-inventory.sig` | Detached RSA/SHA-256 signature of the inventory's exact bytes |
-
-The signature binds the complete inventory; the inventory binds the attestation
-and other subjects. The attestation excludes itself and the inventory to avoid
-a digest cycle. Missing, unsigned, duplicate, extra or tampered assets fail.
-The manifest binds its runtime dependency and license inventories; their bytes
-and all shipped license notices are also ordinary SBOM payload subjects. File
-licenses are `NOASSERTION`, not an invented legal clearance. P8 must review the
-retained notices and redistribution obligations before any publication.
-
-`collector_release_policy.py` requires the canonical repository, an exact
-`rust-collector-vX.Y.Z-rc.N` tag (N >= 1), the same manifest version and full source
-commit, tag resolution to that commit, and reachability from fetched protected
-`origin/main`. It reuses Core's exact-commit successful `ci.yml` push-on-main run
-and successful `Required Quality Aggregate` checks. It does not compare the
-collector version with Core's Cargo version. Missing/wrong branch, SHA, tag,
-workflow or aggregate evidence blocks eligibility. Stable tags remain explicitly
-blocked pending separately accepted GH-215 fresh integration.
-
-Eligibility also requires the existing `rust-collector-release` environment to
-have required reviewers, prevent self-review and disable administrator bypass.
-The receipt records the CI run/job IDs and normalized protection requirements.
-It is a signed workflow assertion, not an independently queried approval or an
-OIDC certificate. The eventual production signer must run only after this
-environment's approval and recheck eligibility immediately before signing. Its
-RSA private key must exist only as a secret scoped to that protected environment;
-protect workflow edits on main and restrict who can administer that environment.
-An unprotected local invocation can construct a receipt but cannot authenticate
-it without that separately provisioned production key.
-
-The implemented workflow, `.github/workflows/rust-collector-release.yml`, has
-only manual dispatch on canonical main, read permissions, and no production
-key, tag trigger or publication command. A preflight checks the existing
-environment before requesting approval, so a missing environment cannot silently
-become an unprotected release job. Approved execution runs tests and uploads
-synthetic rehearsal artifacts. This issue exercises that rehearsal locally,
-without requesting hosted approval. P8 must separately authorize any publication,
-provision production trust, build real assets, verify the exact inventory and
-retain the approved workflow receipt. Existing Core release checks are unchanged.
-
-## Lifecycle
-
-Use absolute paths for a private, administrator-selected installation root and
-trust file. The source entry requires the authenticated bootstrap described above:
+Download the existing Core installer from its immutable release source:
 
 ```bash
-python3 tools/release/install_collector.py --root "$PWD/target/collector-install" --trust /absolute/host/trust.json install --release /absolute/verified-download-directory --tag rust-collector-v0.1.0-rc.1
-python3 tools/release/install_collector.py --root "$PWD/target/collector-install" --trust /absolute/host/trust.json select --version 0.1.0-rc.1
-python3 tools/release/install_collector.py --root "$PWD/target/collector-install" --trust /absolute/host/trust.json rollback --version 0.1.0-rc.1
-python3 tools/release/install_collector.py --root "$PWD/target/collector-install" --trust /absolute/host/trust.json recover
-python3 tools/release/install_collector.py --root "$PWD/target/collector-install" --trust /absolute/host/trust.json uninstall --version 0.1.0-rc.1
+curl --fail --show-error --location --proto '=https' --tlsv1.2 \
+  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.4.1/install.sh \
+  -o /tmp/harness-gate-install.sh
+# Add only the optional plugin
+bash /tmp/harness-gate-install.sh --rust-only
+# Or install Core 0.4.1 and the plugin together
+bash /tmp/harness-gate-install.sh --version v0.4.1 --with-rust
+```
+
+The root script pins the child installer's SHA-256. The child pins its private
+Python bootstrap, transport catalog, RSA public key, Sigstore trusted root and
+cosign v3.1.3 digest. It provisions these inputs automatically and checks the
+original RSA and Sigstore signatures before installing the reconstructed archive.
+The initial shell installer and host OS remain the trust entry point; a plugin
+cannot supply its own replacement verifier or trusted key. No system Python or
+Harness-Gate source checkout is needed for this installation path.
+
+Required host tools are Bash, curl, sha256sum, tar/gzip and the pinned host
+OpenSSL/runtime libraries. The released ABI is Linux x86_64, glibc 2.43, kernel
+`7.0.0-31-generic`, with exact library digests, not general Linux support.
+Unsupported hosts reject before the large toolchain download.
+
+Default root: `~/.local/share/harness-gate/rust-collector`.
+Default cache: `~/.cache/harness-gate/collector`.
+Use `--rust-root DIR` and `--cache-dir DIR` on the Core installer; the standalone
+`install-rust.sh` calls the root option `--root DIR`.
+The installer prints the exact versioned launcher. `current.json` records selection;
+there is no automatic collector executable on PATH. Keep captures outside the
+installation tree. Installation never changes the default rustup toolchain,
+creates project signing keys, accepts a baseline or replaces existing project gates.
+
+The two compressed layers total 282 MB; first use with bootstrap, verifier and
+metadata totals approximately 444 MB. Verified unchanged layers and cosign are
+cached. Interrupted large downloads retain completed ranges; rerun the same
+command to resume. Reinstalling an existing version verifies it and selects it.
+The original signed archive and extracted runtime are retained, so disk usage
+is larger than the compressed download size.
+
+## Offline installation
+
+On a connected machine, download **all twelve assets** from the
+[installer release](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-installer-v0.1.0-rc.2)
+into one directory. Add the official
+[cosign-linux-amd64 v3.1.3](https://github.com/sigstore/cosign/releases/download/v3.1.3/cosign-linux-amd64)
+with that exact filename and SHA-256
+`4629c757b7618056f8ddd7e2625ae9fdd94c0372a65049520bc7d9df9efc7f71`.
+Also retain the authenticated Core `install.sh` downloaded above. Transfer this
+kit intact, then on the supported offline host run:
+
+```bash
+bash /path/to/install.sh --rust-only --offline /absolute/path/to/offline-kit
+```
+
+The twelve assets include `install-rust.sh`, its Sigstore bundle,
+`installer-bootstrap.tar.gz`, `installer-build.json`, `transport.json`, both
+compressed layers and the five original control/metadata files. There is no
+need to download the 1.06 GB `collector.tar` for this path. The offline flag is
+for Rust installation only; it does not implement offline Core installation.
+The installer still verifies every input and the reconstructed signed payload.
+
+## Original signed assets and production trust
+
+The [original RC release](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-v0.1.0-rc.1)
+retains exactly six assets: `collector.tar`, `manifest.json`, `sbom.spdx.json`,
+`provenance.json`, `release-inventory.json`, and `release-inventory.sig`.
+The production signature control contains RSA and Sigstore verification material;
+legacy RSA-only v1 trust is insufficient for this release. The production RSA
+key is 3072 bits (384-byte signatures). Public trust is carried by the separately
+authenticated installer, and the private key stays in the protected environment.
+See the [six-asset readback receipt](release-0.4.1/published-verification.json).
+
+Checks bind the entire inventory, payload hashes, source, provenance, exact ABI,
+and signer identity. Missing, extra, tampered or incompatible inputs fail closed.
+[Immutable source, notices and relink materials](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-materials-7165558-v1)
+and [per-file engineering review](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-review-7165558-v1)
+accompany the RC. Installer and plugin versions remain independent.
+
+## Advanced lifecycle
+
+For operator-managed lifecycle operations, use the authenticated source version
+of `tools/release/install_collector.py`, its same-source imported modules, host
+Python 3.11+ and an independently pinned **v2** trust file. This advanced entry
+is distinct from the automatic shell installer. For example:
+
+```bash
+python3 tools/release/install_collector.py --root /absolute/collector-root --trust /absolute/host/trust-v2.json select --version 0.1.0-rc.1
+python3 tools/release/install_collector.py --root /absolute/collector-root --trust /absolute/host/trust-v2.json rollback --version 0.1.0-rc.1
+python3 tools/release/install_collector.py --root /absolute/collector-root --trust /absolute/host/trust-v2.json recover
+python3 tools/release/install_collector.py --root /absolute/collector-root --trust /absolute/host/trust-v2.json uninstall --version 0.1.0-rc.1
 ```
 
 Install and select print the exact version's launcher path. `current.json` is the
@@ -167,28 +142,19 @@ path relocation establishes no measurement-series equivalence. Released Rust
 Core retains requiredness, thresholds, lineage, debt/ratchet and final outcomes;
 all accepted coverage/CRAP rules and capability states remain unchanged.
 
-## Nonpublishing local rehearsal
+## Publication and historical evidence
 
-```bash
-python3 -m unittest discover -s tools/release/tests -v
-python3 tools/release/collector_dry_run.py --output target/gh-229/dry-run
-```
+The existing `.github/workflows/rust-collector-release.yml` is active. Its
+separate operations cover rehearsal, private signing, original RC publication
+and compressed installer publication. The dedicated `rust-collector-release`
+environment requires the pinned owner's manual approval, allows self-review
+under the explicitly accepted single-maintainer v2 policy, disables admin bypass,
+and permits only main. Core publication keeps its separate `release` environment.
+Exact-source main CI, approved packet digests and immutable version rules remain.
+Stable collector promotion still waits for separately accepted GH-215 integration.
 
-The rehearsal creates a disposable RSA key, synthetic payloads, a signed asset
-inventory and an explicit report, then installs, selects and uninstalls. Its
-private key is discarded; output retains the public test trust and signed bytes.
-The report labels production eligibility and protected approval as unevaluated,
-native measurement as unperformed, and publication as unattempted. Those test
-assets are never production release candidates.
-
-
-## Proposed single-maintainer collector approval (GH-239)
-
-The earlier no-self-review description remains the v1 eligibility contract.
-The [explicit personal-project exception](gh-239/operator-preparation.md) uses v2
-and permits only the pinned owner to approve their own run in the dedicated
-collector environment. Required manual review and no administrator bypass remain.
-Wrong/additional reviewers, wrong environments and v1/v2 mismatches reject.
-The final installer must be rebuilt to understand the v2 receipt; old installers
-reject it. Review and actual environment provisioning are still pending, and no
-collector publication or final host certification is claimed by this change.
+Historical [GH-229 fixture validation](gh-229/validation.md),
+[GH-231 preparation](gh-231/preparation.md) and
+[GH-239 governance proposal](gh-239/operator-preparation.md) describe their dated
+scope; their old pending notes are not the current release status. Synthetic
+local rehearsals remain tests and never stand in for production signatures.
