@@ -15,7 +15,7 @@ PLATFORM=""
 INSTALL_NAME="$BINARY_NAME"
 ATOMIC_TEMPORARY=""
 RUST_INSTALLER_URL="https://github.com/musutrade/Harness-Gate/releases/download/rust-collector-installer-v0.1.0-rc.2/install-rust.sh"
-RUST_INSTALLER_SHA256="cdd1f444ee9f6c8374809d0ae9be8b0d74a4a5aedbdbf9301dacf06b55860c76"
+RUST_INSTALLER_SHA256="0a1136ede55682d1163ac8588a2d5d637b5ce57b1952b3d1885fc585e942219b"
 
 usage() {
     cat <<'EOF'
@@ -161,7 +161,16 @@ ensure_cosign() {
     mkdir -p "$1/verifier"
     path="$1/verifier/cosign"
     [[ "$OS" != windows ]] || path="${path}.exe"
-    download "https://github.com/sigstore/cosign/releases/download/v3.1.3/$name" "$path"
+    local cache_dir="${HOME}/.cache/harness-gate/collector" i cached
+    for ((i=0; i<${#rust_args[@]}; i++)); do
+        if [[ "${rust_args[i]}" == --cache-dir ]]; then cache_dir="${rust_args[i+1]}"; fi
+    done
+    cached="$cache_dir/${digest}-${name}"
+    if [[ -f "$cached" && ! -L "$cached" ]]; then
+        cp -- "$cached" "$path"
+    else
+        download "https://github.com/sigstore/cosign/releases/download/v3.1.3/$name" "$path"
+    fi
     local actual
     if command -v sha256sum >/dev/null 2>&1; then actual=$(sha256sum "$path"); else actual=$(shasum -a 256 "$path"); fi
     [[ "${actual%% *}" == "$digest" ]] || die "signature verifier checksum mismatch"

@@ -26,6 +26,7 @@ def main():
     policy.core.verify_ci_run(client, args.source, 'main')
     policy.protected_environment(client.get_json('/repos/' + assets.REPOSITORY + '/environments/' + policy.ENVIRONMENT))
     trust = assets.read(production.pinned(Path(packet['trust']['path']), packet['trust']['sha256']))
+    assets.require(trust['schema'] == 'rust-collector-host-trust/v2', 'dual-signature production trust required')
     for name in ('openssl','cosign','public_key','trusted_root'):
         production.pinned(Path(trust[name]),trust[name+'_sha256'])
     release = Path(packet['release'])
