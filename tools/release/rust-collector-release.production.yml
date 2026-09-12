@@ -48,7 +48,6 @@ jobs:
       APPROVAL_SHA256: ${{ inputs.approval_sha256 }}
       APPROVAL_PACKET: ${{ vars.COLLECTOR_APPROVAL_PACKET }}
       SOURCE_SHA: ${{ github.sha }}
-      TAG: rust-collector-v0.1.0-rc.1
       CARGO_TARGET_DIR: ${{ github.workspace }}/target/collector-production/cargo
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
@@ -62,6 +61,12 @@ jobs:
           python3 tools/release/production_collector_release.py assemble \
             --packet "$APPROVAL_PACKET" --packet-sha256 "$APPROVAL_SHA256" \
             --source "$SOURCE_SHA" --directory target/collector-production/assets
+          PYTHONPATH=tools/release python3 - <<'PYVERSION' >> "$GITHUB_ENV"
+          from pathlib import Path
+          import collector_assets as assets
+          manifest = assets.read(Path('target/collector-production/assets/manifest.json'))
+          print('TAG=rust-collector-v' + assets.version(manifest['collector']['version']))
+          PYVERSION
       - name: Create independent immutable tag after approval and successful checks
         shell: bash
         run: |

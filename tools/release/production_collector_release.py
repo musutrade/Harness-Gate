@@ -54,8 +54,8 @@ def reviewed_checks(manifest, manifest_sha, licenses, validation):
 def preflight(packet_path, digest, source, client):
     packet = assets.read(pinned(packet_path, digest))
     assets.require(packet['schema'] == 'rust-collector-publication-approval/v1', 'wrong approval schema')
-    assets.require(packet['source_commit'] == source and packet['version'] == '0.1.0-rc.1',
-                   'wrong approved source/version')
+    assets.require(packet['source_commit'] == source, 'wrong approved source/version')
+    assets.require('-rc.' in assets.version(packet['version']), 'approved RC version required')
     for ref in ('HEAD', 'refs/remotes/origin/main'):
         assets.require(policy.core._resolve_commit(Path.cwd(), ref, ref) == source,
                        'publication requires exact checked-out protected main')
