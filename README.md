@@ -60,13 +60,13 @@ actual collector/series. New metric semantics require separate contract review.
 ### Install from Crates.io (Recommended)
 
 ```bash
-cargo install harness-gate
+cargo install harness-gate --locked
 ```
 
 ### Install from GitHub Release (Pre-built Binaries)
 
 Download the binary for your platform from an immutable [GitHub Release
-tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.0):
+tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.1):
 
 - **Linux (x86_64)**: `harness-gate-linux-amd64`
 - **macOS (Intel)**: `harness-gate-macos-amd64`
@@ -80,17 +80,55 @@ immutable tag, then pass that tag explicitly:
 ```bash
 curl --fail --show-error --location --proto '=https' --tlsv1.2 \
   -o /tmp/harness-gate-install.sh \
-  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.4.0/install.sh
-bash /tmp/harness-gate-install.sh --version v0.4.0
+  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.4.1/install.sh
+bash /tmp/harness-gate-install.sh --version v0.4.1
 harness-gate --version
 ```
 
 The script installs to `~/.local/bin` by default. Set `--install-dir` to an
 existing private directory when a different location is required. It never
 uses the mutable `releases/latest` API or a `raw/main` installation command.
-Binary installation requires the `cosign` CLI so the keyless Sigstore
-certificate can be checked locally; source installation additionally requires
-`git` and Rust `cargo`.
+The installer provisions a pinned `cosign` verifier when it is missing;
+source installation additionally requires `git` and Rust `cargo`.
+
+### Optional Rust collection
+
+Core does not download a Rust analysis toolchain by default. Use the same entry
+point to add the optional plugin:
+
+```bash
+# Core and Rust collection
+bash /tmp/harness-gate-install.sh --version v0.4.1 --with-rust
+# Add Rust collection to an existing Core installation
+bash /tmp/harness-gate-install.sh --rust-only
+```
+
+The installer automatically provisions verification inputs. Compressed delivery
+uses approximately 270 MB of reusable tools and 13 MB of plugin contents, plus
+the small bootstrap and the verifier on first use. Unchanged tools are cached
+under `~/.cache/harness-gate/collector`; upgrading a plugin reuses the cache.
+The original signed archive is reconstructed locally and both RSA and Sigstore
+signatures are checked before installation. Disk usage is larger than download
+size because the installed runtime and signed archive are retained for rollback.
+
+This initial Rust plugin is certified only for the exact Linux x86_64 ABI listed
+in its [installer release](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-installer-v0.1.0-rc.2).
+Unsupported hosts fail before downloading the toolchain; Core remains available
+on its supported platforms. This installer version delivers the unchanged
+`rust-collector-v0.1.0-rc.1` payload. Installer and plugin versions are independent.
+
+For offline installation, prepare a directory containing the installer release
+assets and the pinned `cosign-linux-amd64` from Sigstore v3.1.3 (its SHA-256 is in
+`installer-build.json`), then run:
+
+```bash
+bash /tmp/harness-gate-install.sh --rust-only --offline ./offline-kit
+```
+
+Do not extract `collector.tar` manually. Interrupted network downloads retain
+completed ranges and can be resumed by rerunning the installer. Reinstalling an
+already selected version verifies its files and signatures without redownloading
+the toolchain.
 
 Release assets include `SHA256SUMS`, a CycloneDX SBOM, and Sigstore bundles. For
 an offline integrity check, download the binary, `SHA256SUMS`, and the matching

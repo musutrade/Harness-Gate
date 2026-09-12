@@ -8,6 +8,10 @@ on:
         description: Exact private RC signing packet digest; empty runs the rehearsal
         required: false
         type: string
+      installer_packet_sha256:
+        description: Exact approved installer delivery packet digest
+        required: false
+        type: string
       publication_packet_sha256:
         description: Exact reviewed final publication packet digest
         required: false
@@ -30,7 +34,13 @@ jobs:
         env:
           SIGNING: ${{ inputs.signing_packet_sha256 }}
           PUBLICATION: ${{ inputs.publication_packet_sha256 }}
-        run: test -z "$SIGNING" || test -z "$PUBLICATION"
+          INSTALLER: ${{ inputs.installer_packet_sha256 }}
+        run: |
+          count=0
+          for value in "$SIGNING" "$PUBLICATION" "$INSTALLER"; do
+            if [ -n "$value" ]; then count=$((count + 1)); fi
+          done
+          test "$count" -le 1
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           persist-credentials: false
@@ -46,7 +56,7 @@ jobs:
           PY
   dry-run:
     needs: protection
-    if: inputs.signing_packet_sha256 == '' && inputs.publication_packet_sha256 == '' && github.repository == 'musutrade/Harness-Gate' && github.ref == 'refs/heads/main'
+    if: inputs.installer_packet_sha256 == '' && inputs.signing_packet_sha256 == '' && inputs.publication_packet_sha256 == '' && github.repository == 'musutrade/Harness-Gate' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: rust-collector-release
     steps:
@@ -69,7 +79,7 @@ jobs:
 
   sign-private-candidate:
     needs: protection
-    if: inputs.signing_packet_sha256 != '' && inputs.publication_packet_sha256 == '' && github.repository == 'musutrade/Harness-Gate' && github.ref == 'refs/heads/main'
+    if: inputs.installer_packet_sha256 == '' && inputs.signing_packet_sha256 != '' && inputs.publication_packet_sha256 == '' && github.repository == 'musutrade/Harness-Gate' && github.ref == 'refs/heads/main'
     environment: rust-collector-release
     runs-on:
       group: harness-gate-rust-collector-release
@@ -108,7 +118,7 @@ jobs:
 
   publish:
     needs: protection
-    if: inputs.publication_packet_sha256 != '' && inputs.signing_packet_sha256 == '' && github.repository == 'musutrade/Harness-Gate' && github.ref == 'refs/heads/main'
+    if: inputs.installer_packet_sha256 == '' && inputs.publication_packet_sha256 != '' && inputs.signing_packet_sha256 == '' && github.repository == 'musutrade/Harness-Gate' && github.ref == 'refs/heads/main'
     environment: rust-collector-release
     # Ephemeral operator-provisioned runner matching the approved exact ABI.
     runs-on:
@@ -178,14 +188,16 @@ jobs:
             target/collector-production/assets/provenance.json \
             target/collector-production/assets/release-inventory.json \
             target/collector-production/assets/release-inventory.sig
-          gh release download "$TAG" --repo musutrade/Harness-Gate --dir target/collector-production/downloaded
+          python3 -B tools/release/download_collector_release.py --tag "$TAG" \
+            --expected target/collector-production/assets --output target/collector-production/downloaded
           python3 tools/release/production_collector_release.py verify \
             --packet "$APPROVAL_PACKET" --packet-sha256 "$APPROVAL_SHA256" \
             --source "$SOURCE_SHA" --directory target/collector-production/downloaded \
             --expected-directory target/collector-production/assets \
             --receipt target/collector-production/draft-verification.json
           gh release edit "$TAG" --repo musutrade/Harness-Gate --draft=false
-          gh release download "$TAG" --repo musutrade/Harness-Gate --dir target/collector-production/published-download
+          python3 -B tools/release/download_collector_release.py --tag "$TAG" \
+            --expected target/collector-production/assets --output target/collector-production/published-download
           python3 tools/release/production_collector_release.py verify \
             --packet "$APPROVAL_PACKET" --packet-sha256 "$APPROVAL_SHA256" \
             --source "$SOURCE_SHA" --directory target/collector-production/published-download \
@@ -198,5 +210,38 @@ jobs:
           path: |
             target/collector-production/assets
             target/collector-production/*-verification.json
+          if-no-files-found: warn
+          retention-days: 90
+
+  publish-installer:
+    needs: protection
+    if: inputs.installer_packet_sha256 != '' && inputs.signing_packet_sha256 == '' && inputs.publication_packet_sha256 == ''
+    environment: rust-collector-release
+    runs-on:
+      group: harness-gate-rust-collector-release
+      labels: rust-collector-release
+    permissions:
+      contents: write
+      actions: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Rebuild, verify and publish the reviewed user installer
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PACKET: ${{ vars.COLLECTOR_INSTALLER_PACKET }}
+          PACKET_SHA256: ${{ inputs.installer_packet_sha256 }}
+          SOURCE: ${{ github.sha }}
+        run: |
+          python3 -B tools/release/publish_user_installer.py \
+            --packet "$PACKET" --sha256 "$PACKET_SHA256" --source "$SOURCE"
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        if: always()
+        with:
+          name: collector-user-installer-${{ github.run_id }}
+          path: target/installer-publication.json
           if-no-files-found: warn
           retention-days: 90
