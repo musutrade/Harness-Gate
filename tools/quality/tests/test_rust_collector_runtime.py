@@ -130,6 +130,29 @@ class StandaloneNativeTests(unittest.TestCase):
         self.assertEqual(json.loads(result.stdout)['evidence'], [])
         self.assertFalse(output.exists())
 
+    def test_private_c_dependency_compiles_archives_and_links(self):
+        import shlex
+
+        source = self.work / 'native-dependency.c'
+        source.write_text('#include <stdint.h>\n#include <openssl/crypto.h>\n'
+                          'int main(void) { uint64_t v = OpenSSL_version_num(); return v == 0; }\n')
+        flags = self.command('private-pkg-config', [str(self.runtime / 'bin/pkg-config'),
+                                                  '--cflags', '--libs', 'openssl'])
+        self.assertEqual(flags.returncode, 0, flags.stderr)
+        args = shlex.split(flags.stdout)
+        for arg in args:
+            if arg.startswith(('-I', '-L')):
+                self.assertTrue(Path(arg[2:]).is_relative_to(self.runtime), arg)
+        obj, archive, binary = (self.work / name for name in ('native.o', 'libnative.a', 'native-c'))
+        for name, command in (
+            ('private-c-compile', [str(self.runtime / 'bin/cc'), '-c', str(source), '-o', str(obj)]),
+            ('private-c-archive', [str(self.runtime / 'bin/ar'), 'rcs', str(archive), str(obj)]),
+            ('private-c-link', [str(self.runtime / 'bin/cc'), str(archive), *args, '-o', str(binary)]),
+            ('private-c-run', [str(binary)]),
+        ):
+            result = self.command(name, command)
+            self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_wrong_anchor_has_no_measurement(self):
         result = self.entry('wrong-anchor', 'certify', '--evidence', 'base', '--anchor', '0' * 64)
         self.assertEqual(result.returncode, 1)
