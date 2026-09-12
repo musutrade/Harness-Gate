@@ -418,8 +418,10 @@ class EligibilityTests(unittest.TestCase):
         self.assertIn('environment: rust-collector-release', source)
         self.assertIn('contents: read', source)
         self.assertIn('workflow_dispatch:', source)
-        self.assertNotIn('contents: write', source)
-        self.assertNotIn('id-token: write', source)
+        rehearsal = source.split('  dry-run:', 1)[1].split('\n  sign-private-candidate:', 1)[0]
+        self.assertNotIn('contents: write', rehearsal)
+        self.assertNotIn('id-token: write', rehearsal)
+        self.assertIn("inputs.signing_packet_sha256 == ''", rehearsal)
         self.assertNotIn('gh release create', source)
         self.assertNotIn('git tag ', source)
         self.assertNotIn('\n  push:', source)

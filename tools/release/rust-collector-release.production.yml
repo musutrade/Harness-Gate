@@ -66,8 +66,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gh api --method POST repos/musutrade/Harness-Gate/git/refs \
-            -f "ref=refs/tags/$TAG" -f "sha=$SOURCE_SHA"
+          PYTHONPATH=tools/release python3 - <<'PYTAG'
+          import os
+          import production_collector_release as release
+          release.create_or_verify_tag(os.environ['TAG'], os.environ['SOURCE_SHA'])
+          PYTAG
           git fetch --no-tags origin "refs/tags/$TAG:refs/tags/$TAG"
       - name: Check actual tag eligibility and sign inventory with RSA and Sigstore
         shell: bash
