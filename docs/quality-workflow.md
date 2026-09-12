@@ -1,5 +1,9 @@
 # Project quality workflow
 
+Core and the optional Rust plugin have separate installation and certification
+boundaries. Start with the [current releases](release-status.md) and
+[Rust installation guide](quality/rust-collector-installation.md).
+
 **`init -> verify -> one project decision`** is the normal product workflow.
 Configuration selects execution, collectors, capabilities, policy and profiles.
 Collectors measure; the released Rust evaluator decides quality. `verify`

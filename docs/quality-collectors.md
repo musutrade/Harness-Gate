@@ -1,5 +1,10 @@
 # Trusted project collectors
 
+For the published Rust native collector, use the
+[installation guide](quality/rust-collector-installation.md) and
+[exact compatibility record](release-status.md#compatibility). The interfaces
+below remain generic and apply to configured collectors of any ecosystem.
+
 GH-181 implements OpenSpec tasks 3.1–3.4 over the existing signed, out-of-process
 adapter v2 host. `quality collect` is an advanced project orchestration interface:
 
