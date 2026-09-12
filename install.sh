@@ -161,7 +161,16 @@ ensure_cosign() {
     mkdir -p "$1/verifier"
     path="$1/verifier/cosign"
     [[ "$OS" != windows ]] || path="${path}.exe"
-    download "https://github.com/sigstore/cosign/releases/download/v3.1.3/$name" "$path"
+    local cache_dir="${HOME}/.cache/harness-gate/collector" i cached
+    for ((i=0; i<${#rust_args[@]}; i++)); do
+        if [[ "${rust_args[i]}" == --cache-dir ]]; then cache_dir="${rust_args[i+1]}"; fi
+    done
+    cached="$cache_dir/${digest}-${name}"
+    if [[ -f "$cached" && ! -L "$cached" ]]; then
+        cp -- "$cached" "$path"
+    else
+        download "https://github.com/sigstore/cosign/releases/download/v3.1.3/$name" "$path"
+    fi
     local actual
     if command -v sha256sum >/dev/null 2>&1; then actual=$(sha256sum "$path"); else actual=$(shasum -a 256 "$path"); fi
     [[ "${actual%% *}" == "$digest" ]] || die "signature verifier checksum mismatch"
