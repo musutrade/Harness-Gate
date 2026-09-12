@@ -109,6 +109,30 @@ class ProjectTransportTests(unittest.TestCase):
         self.assertEqual(raw['functions'][0]['crap'], 56.0)
         self.assertFalse(self.report['passed'])  # Original report is unchanged.
 
+    def test_owner_artifacts_do_not_repeat_unrelated_report_inventory(self):
+        report = copy.deepcopy(self.report)
+        second = copy.deepcopy(report['functions'][0])
+        second['owner'] = 'another-owner'
+        report['functions'].append(second)
+        report['exclusions'] = [{'diagnostic': 'x' * 100000}]
+        report['definition_inventory'] = [{'diagnostic': 'y' * 100000}]
+        binding = binding_for(report, self.root, self.output)
+        response = adapter.project_report(report, binding)
+        self.assertLess(sum(a['bytes'] for a in response['artifacts']), 20000)
+        owners = []
+        for artifact in response['artifacts']:
+            raw = json.loads((self.output / artifact['path']).read_text())
+            self.assertEqual(raw['schema'], 'rust-native-owner-artifact/v1')
+            self.assertEqual(raw['native_report_sha256'], adapter.fingerprint(report))
+            self.assertEqual(raw['artifact_anchor'], report['artifact_anchor'])
+            self.assertEqual(raw['native_identity'], adapter.measurement_identity(report))
+            self.assertEqual(len(raw['functions']), 1)
+            owners.append(raw['functions'][0]['owner'])
+            self.assertNotIn('exclusions', raw)
+            self.assertNotIn('definition_inventory', raw)
+        self.assertEqual(set(owners), {'synthetic-selected', 'another-owner'})
+        self.assertEqual(len(report['exclusions'][0]['diagnostic']), 100000)
+
     def test_capability_states_never_become_zero_values(self):
         for state in ('unsupported', 'not_configured', 'not_collected', 'not_applicable', 'measurement_error'):
             with self.subTest(state=state):
