@@ -1,22 +1,17 @@
 # Implementation tasks
 
 Parent: [proposal](proposal.md), [design](design.md), [delivery requirements](specs/rust-collector-delivery/spec.md).
-Planning PR #226 is accepted and merged; see [receipts](design.md#validation-status).
-The explicit execution handoff authorizes #227–#231 serially, not publication.
-Only completed scoped tasks are checked with [GH-227 evidence](../../../docs/quality/gh-227/validation.md)
-and [GH-228 runtime evidence](../../../docs/quality/gh-228/runtime.md).
-P4/P5 evidence is recorded in [GH-229 validation](../../../docs/quality/gh-229/validation.md)
-and the [installation/release contract](../../../docs/quality/rust-collector-installation.md).
-Its local synthetic dry-run does not establish production approval or native acceptance.
-GH-228's original [dependency blocker](../../../docs/quality/gh-228/blocker.md)
-is resolved by the recorded operator inputs; its failures remain retained.
-P2/P3 completion covers the private runtime and local bundle, with exact observed
-host constraints and retained license notices. The empty compatibility matrix
-still rejects unapproved shipped combinations. P6/P7 fixture evidence is frozen
-separately below; distribution obligations, required CI and controller acceptance
-remain separate.
-Each item is estimated 1–3 focused hours (M); split before execution if larger.
-Acceptance is the concrete output/test named in each item; logs must retain failures.
+Planning PR #226 and implementation P0–P8 are accepted. The
+[current release and immutable handoff](../../../docs/release-status.md) records
+production acceptance, publication, recovered readbacks and remaining GH-215 work.
+Historical [GH-227 contracts](../../../docs/quality/gh-227/validation.md),
+[GH-228 runtime](../../../docs/quality/gh-228/runtime.md),
+[GH-229 lifecycle](../../../docs/quality/gh-229/validation.md) and
+[GH-230 integration](../../../docs/quality/gh-230/acceptance.md) retain scoped evidence.
+The original publication workflow failure is preserved; successful operator
+recovery is separately identified. Completion is RC delivery, not stable promotion,
+Core 0.4.1 native certification, baseline acceptance or Arc-Admin gate transfer.
+Relevant Engineering Policy semantics remain unchanged.
 
 ## P0 Contracts
 
@@ -58,8 +53,8 @@ The P6.1 subdivisions were authenticated request binding (<=3h), observed delive
 preflight/native re-export (<=3h), and installed generic invocation (<=3h).
 P7 work was split into clean fixture/re-export, rejection/relocation probes, and
 cost/archive accounting (each <=3h focused implementation); dependency waits and
-failed environment attempts are retained separately. Controller CI/review and P8
-release authorization remain pending.
+failed environment attempts are retained separately. Subsequent production approval and P8 completion are recorded in the current
+release handoff above.
 
 - [x] P6.1 [priority:P1] [effort:M, <=3h] Bind installed collector through existing generic configuration and trusted requests.
 - [x] P6.2 [priority:P1] [effort:M, <=3h] Test Core evaluation, unsupported capabilities and no duplicate producer/fallback launches.
@@ -72,15 +67,15 @@ release authorization remain pending.
 
 ## P8 Handoff
 
-- [ ] P8.1 [priority:P1] [effort:M, <=3h] Run applicable local checks, strict OpenSpec, docs and required CI; retain results.
-- [ ] P8.1a [priority:P1] [effort:M, <=3h] Reconcile current-source documentation and local/hosted validation, retaining historical failures.
-- [ ] P8.1b [priority:P1] [effort:M, <=3h] Implement independently authenticated bootstrap and verify fresh-host positive and bootstrap negatives.
-- [ ] P8.1c [priority:P1] [effort:M, <=3h] Prepare immutable final candidate, dependency/license closure and durable exact asset receipts.
-- [ ] P8.1d [priority:P1] [effort:M, <=3h] Validate final candidate native/generic Core/lifecycle behavior and approve only evidenced compatibility entries.
-- [ ] P8.1e [priority:P1] [effort:M, <=3h] Prepare protected production workflow and dual RSA/Sigstore verification with rejection tests for review.
-- [ ] P8.1f [priority:P1] [effort:M, <=3h] Assemble publication packet and identify outstanding operator trust, environment and retention inputs.
-- [ ] P8.2 [priority:P1] [effort:M, <=3h] Obtain controller release approval and publish/verify exact RC assets.
-- [ ] P8.3 [priority:P1] [effort:M, <=3h] Deliver immutable RC receipt to Arc-Admin owner; record separate GH-215 acceptance/stable-promotion condition.
+- [x] P8.1 [priority:P1] [effort:M, <=3h] Run applicable local checks, strict OpenSpec, docs and required CI; retain results.
+- [x] P8.1a [priority:P1] [effort:M, <=3h] Reconcile current-source documentation and local/hosted validation, retaining historical failures.
+- [x] P8.1b [priority:P1] [effort:M, <=3h] Implement independently authenticated bootstrap and verify fresh-host positive and bootstrap negatives.
+- [x] P8.1c [priority:P1] [effort:M, <=3h] Prepare immutable final candidate, dependency/license closure and durable exact asset receipts.
+- [x] P8.1d [priority:P1] [effort:M, <=3h] Validate final candidate native/generic Core/lifecycle behavior and approve only evidenced compatibility entries.
+- [x] P8.1e [priority:P1] [effort:M, <=3h] Prepare protected production workflow and dual RSA/Sigstore verification with rejection tests for review.
+- [x] P8.1f [priority:P1] [effort:M, <=3h] Assemble publication packet and identify outstanding operator trust, environment and retention inputs.
+- [x] P8.2 [priority:P1] [effort:M, <=3h] Obtain controller release approval and publish/verify exact RC assets.
+- [x] P8.3 [priority:P1] [effort:M, <=3h] Deliver immutable RC receipt to Arc-Admin owner; record separate GH-215 acceptance/stable-promotion condition.
 
 ## Planning acceptance
 

@@ -11,6 +11,10 @@
 
 它统一负责 changed paths、secret scan、architecture audit、环境体检、外部命令编排、测试结果计数、超时与中断处理，以及临时服务生命周期。Git hook 只保留启动器，流程判断不依赖 Shell 脚本。
 
+## 当前版本
+
+Core **0.4.1** 已发布到 GitHub 和 crates.io。Rust 原生测量通过独立安装、独立版本的可选插件提供；Core 负责编排和质量决策。文档入口见[文档目录](docs/README.md)，发布凭据与剩余工作见[交付状态](docs/release-status.md)。
+
 ## 阅读导航
 
 - 快速开始：看[安装](#安装)和[快速开始](#安装与快速开始)；
@@ -54,12 +58,12 @@ component、profile、命令、路径、parser 和 service 都来自 TOML。常�
 ### 从 Crates.io 安装（推荐）
 
 ```bash
-cargo install harness-gate
+cargo install harness-gate --version 0.4.1 --locked
 ```
 
 ### 从 GitHub Release 安装（预编译二进制）
 
-从不可变的 [GitHub Release tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.0) 下载适合你平台的二进制文件：
+从不可变的 [GitHub Release tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.1) 下载适合你平台的二进制文件：
 
 - **Linux (x86_64)**: `harness-gate-linux-amd64`
 - **macOS (Intel)**: `harness-gate-macos-amd64`
@@ -72,15 +76,33 @@ tag 下载脚本并显式传入版本：
 ```bash
 curl --fail --show-error --location --proto '=https' --tlsv1.2 \
   -o /tmp/harness-gate-install.sh \
-  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.4.0/install.sh
-bash /tmp/harness-gate-install.sh --version v0.4.0
+  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.4.1/install.sh
+bash /tmp/harness-gate-install.sh --version v0.4.1
 harness-gate --version
 ```
 
 默认安装到 `~/.local/bin`，也可以用 `--install-dir` 指定私有目录。脚本不会调用可变的
 `releases/latest` API，也不再推荐执行 `raw/main` 安装命令。
-安装预编译二进制需要本机安装 `cosign`，用于校验 keyless Sigstore 证书；源码安装还需要
-`git` 和 Rust `cargo`。
+缺少 `cosign` 时，安装器会自动下载并校验固定版本的验证工具，也会复用已有缓存；源码安装还需要 `git` 和 Rust `cargo`。
+
+### 可选 Rust 插件
+
+先按上面的命令下载 `install.sh`，再选择安装范围：
+
+```bash
+# Core 与 Rust 插件一起安装
+bash /tmp/harness-gate-install.sh --version v0.4.1 --with-rust
+# 已安装 Core 时单独加装 Rust 插件
+bash /tmp/harness-gate-install.sh --rust-only
+```
+
+默认仅安装 Core，不下载 Rust 分析工具链。插件采用约 270 MB 的工具链层与 13 MB 的插件层；首次连同约 15 MB bootstrap、141 MB 验证工具和元数据，总下载约 **444 MB**。工具链和验证工具按摘要缓存，重复安装会验证已有文件。解压后的运行时、原始签名归档和缓存仍占用磁盘，不等同于下载大小。
+
+[安装器 `0.1.0-rc.2`](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-installer-v0.1.0-rc.2) 安装原有已签名插件 `0.1.0-rc.1`，两者版本独立。插件目前只认证指定的 Linux x86_64 ABI，不代表任意 Linux、macOS 或 Windows 都可采集；不兼容主机会在下载工具链前被拒绝。
+
+插件的正式采集兼容性记录仍绑定 **Core 0.4.0**。Core 0.4.1 已验证安装，但还需要新的真实采集兼容性回执才能宣称这个组合通过认证。详见[兼容性与剩余工作](docs/release-status.md#compatibility)。
+
+默认插件目录是 `~/.local/share/harness-gate/rust-collector`，缓存目录是 `~/.cache/harness-gate/collector`。可用 `--rust-root`、`--cache-dir` 修改；离线安装、生命周期及信任说明见[插件安装指南](docs/quality/rust-collector-installation.md)。安装不会替项目生成可信采集请求、接受基线或修改默认 Rust 工具链。
 
 ### 从源码安装
 
@@ -113,8 +135,8 @@ worker 在 scheduler 边界由 `catch_unwind` 转换为可发布的失败结果�
 `panic = "abort"`，调用方不能依赖该二进制的 unwind。稳定的 machine failure 注册表见
 [docs/failure-codes.md](docs/failure-codes.md)。
 
-Release 资产同时提供 `SHA256SUMS`、CycloneDX SBOM 和 Sigstore 签名 bundle。
-安装前下载二进制、清单以及对应的 `.sig`/`.crt` 文件，先校验摘要，再校验
+Release 资产同时提供 `SHA256SUMS`、CycloneDX SBOM，以及 Sigstore 签名和证书。
+手工验证时下载清单中列出的全部资产及对应的 `.sig`/`.crt` 文件，先校验摘要，再校验
 二进制和 SBOM 的签名：
 
 ```bash
@@ -122,12 +144,12 @@ sha256sum --check SHA256SUMS
 cosign verify-blob --signature harness-gate-linux-amd64.sig \
   --certificate harness-gate-linux-amd64.crt \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity-regexp '^https://github.com/musutrade/Harness-Gate/.github/workflows/release\.yml@refs/tags/v0\.3\.7$' \
+  --certificate-identity-regexp '^https://github.com/musutrade/Harness-Gate/.github/workflows/release\.yml@refs/tags/v0\.4\.1$' \
   harness-gate-linux-amd64
 cosign verify-blob --signature harness-gate.sbom.cdx.json.sig \
   --certificate harness-gate.sbom.cdx.json.crt \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity-regexp '^https://github.com/musutrade/Harness-Gate/.github/workflows/release\.yml@refs/tags/v0\.3\.7$' \
+  --certificate-identity-regexp '^https://github.com/musutrade/Harness-Gate/.github/workflows/release\.yml@refs/tags/v0\.4\.1$' \
   harness-gate.sbom.cdx.json
 ```
 
@@ -254,7 +276,7 @@ harness-gate hook
 git commit -m "..."
 ```
 
-仓库的 pre-commit 会自动执行 `harness-gate hook`。hook profile 只保留快速确定性检查，不代替完整测试。
+项目可配置 pre-commit 执行 `harness-gate hook`。hook profile 应选择适合提交前运行的检查，具体内容由项目配置决定，不代替完整测试。
 
 ### PR 或发布前
 
@@ -568,17 +590,7 @@ harness-gate parse-logs \
 
 ## Git Hook
 
-当前仓库使用：
-
-```bash
-git config core.hooksPath harness-gate/hooks
-```
-
-`pre-commit` 执行 `harness-gate hook`。hook profile 不运行数据库集成测试或 production build；交付前使用 `harness-gate verify --all`。
-
-业务代码模板由 `.codex/templates/manifest.json` 统一登记。`hook` 和 `full` 流程会执行模板质量门禁，检查清单覆盖、占位符一致性和示例渲染结果；TypeScript 模板使用编译器诊断，Rust 模板使用 `rustfmt --check`，SQL 模板检查引号、注释、括号和语句终止符。对应入口为 `scripts/check-templates.mjs`，负向测试位于 `scripts/check-templates.test.mjs`。
-
-独立安装方式的新项目可以创建同样的薄 hook：
+在已配置的使用项目中，将以下内容保存为可执行的 `.githooks/pre-commit`，然后执行 `git config core.hooksPath .githooks`。hook 运行哪些测试由项目 profile 决定，不存在全局排除数据库测试或构建的规则。
 
 ```sh
 #!/bin/sh
@@ -676,11 +688,11 @@ auditor 以整文件为单位执行正则检查并把命中映射回起始代码
 ## 开发 harness-gate 本身
 
 ```bash
-cargo fmt --manifest-path harness-gate/tools/harness-gate/Cargo.toml -- --check
-cargo clippy --manifest-path harness-gate/tools/harness-gate/Cargo.toml \
+cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check
+cargo clippy --manifest-path tools/harness-gate/Cargo.toml \
   --locked --all-targets --all-features -- -D warnings
-cargo test --manifest-path harness-gate/tools/harness-gate/Cargo.toml --locked
-harness-gate verify --components workflow
+cargo test --manifest-path tools/harness-gate/Cargo.toml --locked
+python3 tools/quality/docs_consistency.py
 ```
 
-修改配置模型时还应验证全部内置预设和 v1 migration 测试；修改 service provider 时必须执行 `harness-gate verify --all`，确认一次性容器会在成功和失败路径上清理。
+修改配置模型时还应验证全部内置预设和 v1 migration 测试；修改 service provider 时须运行相应的服务集成测试，确认成功和失败路径都会清理一次性容器。本工具源码仓库没有项目级 `flow.toml`，应使用仓库 CI 和测试夹具；上面的 `verify` 接入示例用于已配置的使用项目。
