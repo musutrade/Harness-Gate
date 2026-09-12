@@ -1,4 +1,4 @@
-# Arc Admin local acceptance and private C toolchain repair
+# Arc Admin local acceptance and collector repairs
 
 Engineering-policy semantics are unchanged. Core requiredness, coverage/CRAP,
 baseline/ratchet, signatures and delivery preflight retain their existing rules.
@@ -41,7 +41,7 @@ their normal release review before distribution.
 - A read-only, network-disabled container with neither system Python nor a C
   compiler performs the C regression and a fresh Rust capture with two identical
   reexports. Independent execve tracing is retained.
-- Collector transport: 6 passed; delivery preflight: 4 passed; production helper
+- Collector transport: 7 passed; delivery preflight: 4 passed; production helper
   contracts: 12 passed; installation lifecycle: 21 passed.
 - Documentation/schema consistency and `git diff --check` pass.
 
@@ -49,6 +49,39 @@ The first exported-source test attempt omitted preset/workflow fixture inputs.
 Those files were restored from the same main commit; the affected tests were
 rerun successfully, followed by the full runtime and lifecycle runs above. This
 was a test setup repair, not a collector behavior change.
+
+## Fresh Arc Admin measurements and bounded evidence
+
+After the C toolchain repair, all three native integration-test binaries run
+against an isolated PostgreSQL container: API flow 1 passed, OpenAPI 2 passed,
+permission-template contracts 5 passed. Native certification completes with
+`mapping_complete_for_declared_scope: true`, `backend_complete: true` and 1,778
+functions. The raw totals are 5,990/8,025 lines, 18,155/46,315 regions and
+1,124/1,778 functions covered. These are measurements, not a project policy PASS.
+The capture anchor is
+`ed52bb5a92272b173d46193edf9f4f4b4dd4619dc84fbc991e3a8ff11bcb0e6e`.
+
+This report also exposed quadratic artifact duplication: each subject previously
+received the complete native report, including unrelated exclusions and owners.
+For this project that would write 79,243,813,572 bytes, exceeding Core's existing
+64 MiB artifact budget. Each `rust-native-owner-artifact/v1` now contains only its
+owner's exact facts and source inventory, plus the complete retained report's
+SHA-256, capture anchor and measurement identity. Original captures/reports remain
+unchanged. The projection's existing source hash changes the series identity;
+old bindings must not be reused or asserted equivalent.
+
+Host projection of all 1,778 actual functions validates successfully: 5,731,679
+artifact bytes and a 7,445,940-byte response, below the unchanged 64 MiB artifact
+and 16 MiB stdout limits. A regression with large unrelated inventory verifies
+that owner artifacts do not repeat it and still bind the original report.
+
+Published Core v0.4.0 consumes the complete actual evidence batch in a direct
+evaluation. Two explicit numeric acceptance controls at exact CRAP 30 produce
+one pass and one fail, with the expected aggregate fail. These controls validate
+transport and arithmetic; they do not replace Arc Admin's project quality policy,
+accept a debt baseline, or claim production-signed collector execution. The
+evidence context uses the actual project commit and its parent
+`66850935a7cc9335ff2a2d1e586dc946852f6384`, not fabricated fixture commits.
 
 ## Installation boundary
 
