@@ -74,6 +74,15 @@ def fetch(row, base, cache, offline=None):
                 '--output', str(temporary), url], check=True)
     assets.require(temporary.stat().st_size == row['size'] and assets.sha(temporary) == row['sha256'], 'download checksum mismatch')
     temporary.rename(target)
+    ranges = temporary.with_name(temporary.name + '-ranges')
+    if ranges.exists():
+        assets.require(not ranges.is_symlink(), 'unsafe range cache')
+        for entry in ranges.iterdir():
+            assets.regular(entry)
+            assets.require(entry.name.removesuffix('.headers').isdigit(), 'unknown download range file')
+        for entry in ranges.iterdir():
+            entry.unlink()
+        ranges.rmdir()
     return target
 
 
@@ -115,7 +124,12 @@ def provision(catalog, directory, cache, offline):
     return trust
 
 
-def install(catalog, root, cache, offline=None):
+def install(catalog, root, cache, offline=None, *, mode='auto', policy='deny', reuse=None,
+            plan_only=False, cache_limit=512 * 1024**2):
+    if catalog['schema'] == 'rust-collector-user-install/v2':
+        import collector_light_install
+        return collector_light_install.install(catalog, root.absolute(), cache.absolute(), offline,
+            mode=mode, policy=policy, reuse=reuse, plan_only=plan_only, cache_limit=cache_limit)
     assets.require(catalog['schema'] == 'rust-collector-user-install/v1', 'unknown installer catalog')
     root, cache = root.absolute(), cache.absolute()
     # Serialize cache writes and reject unsafe ancestors/permissions using the
@@ -153,8 +167,25 @@ def main():
     parser.add_argument('--root', type=Path, default=Path.home()/'.local/share/harness-gate/rust-collector')
     parser.add_argument('--cache-dir', type=Path, default=Path.home()/'.cache/harness-gate/collector')
     parser.add_argument('--offline', type=Path)
+    parser.add_argument('--mode', choices=('auto', 'pinned'), default='auto')
+    parser.add_argument('--download-policy', choices=('allow', 'deny'), default='deny')
+    parser.add_argument('--reuse-runtime', type=Path)
+    parser.add_argument('--plan', action='store_true', help='show exact object/byte plan without downloads')
+    parser.add_argument('--cache-limit-bytes', type=int, default=512 * 1024**2)
+    parser.add_argument('--action', choices=('install', 'usage', 'cleanup', 'migrate', 'rollback', 'export'), default='install')
+    parser.add_argument('--version')
+    parser.add_argument('--export-output', type=Path)
+    parser.add_argument('--keep', type=int, default=2)
+    parser.add_argument('--dry-run', action='store_true')
     args = parser.parse_args()
-    install(assets.read(args.catalog), args.root, args.cache_dir, args.offline)
+    assets.require(args.cache_limit_bytes >= 0, 'cache limit must be nonnegative')
+    if args.action != 'install':
+        import collector_light_install
+        collector_light_install.manage(assets.read(args.catalog), args)
+        return
+    install(assets.read(args.catalog), args.root, args.cache_dir, args.offline, mode=args.mode,
+            policy=args.download_policy, reuse=args.reuse_runtime, plan_only=args.plan,
+            cache_limit=args.cache_limit_bytes)
 
 
 if __name__ == '__main__':
