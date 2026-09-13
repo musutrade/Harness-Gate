@@ -193,6 +193,71 @@
       "passed": true
     },
     {
+      "name": "prepare-registry",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "registry",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "verify-registry",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "registry-function-owner",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "missing-registry-archive",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "changed-registry-archive",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "changed-registry-source",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "poisoned-registry-before-build",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "extra-registry-source",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "registry-source-symlink",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "omitted-dependency-provenance",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "omitted-metadata-dependency",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "restored-registry-integrity",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
       "name": "wrong-tool-identity",
       "exit_code": 1,
       "passed": true
@@ -274,8 +339,8 @@
       "anchors": {
         "capture": "complete",
         "core_acceptance": "pending",
-        "manifest_sha256": "3f4a81642379dc8c05a558abe8d2ae5eea2f1abb712a90793ff417a45e9b7b7c",
-        "request_sha256": "cc7d3dc27a3ed9c8e65037dd0aa18fa70549518dd39aa91a4a3f02ddaa5a729f",
+        "manifest_sha256": "7afe3a1af3aa88c98a9ed64d6e942288abe4370e876732867dc3107152474b2b",
+        "request_sha256": "e66bac8f4e52886fd7240af1f685c70ad3f6d6ffb8075efb2c3f1451760f5c62",
         "state": "unsupported"
       },
       "llvm_totals_test_inclusive": {
@@ -346,8 +411,8 @@
       "anchors": {
         "capture": "complete",
         "core_acceptance": "pending",
-        "manifest_sha256": "4ba2b9553117fe32442867799c471f970571fad1af092b24d7165acf76fd5706",
-        "request_sha256": "da0db5ce78669edab00458217c2530c57926a56b46a5b9599da2192d0d0d683e",
+        "manifest_sha256": "625de93ee9ef1c0d63d73efbea1f8f5525d16c840082820e2333f101e8508b98",
+        "request_sha256": "fd0f378afc6033cba33f778cf745aca79d1095ead92e4ee5e7558cb57f0c3ff4",
         "state": "unsupported"
       },
       "llvm_totals_test_inclusive": {
@@ -472,8 +537,8 @@
       "anchors": {
         "capture": "complete",
         "core_acceptance": "pending",
-        "manifest_sha256": "460d0289a323732afaeff1d12f826bad1e7f4172c214ad138589e5722157fbd2",
-        "request_sha256": "dce77a786dfb3274d8be385e832a053262916cdfa2fd04c3ae4005116962d236",
+        "manifest_sha256": "417ee8a73f5ff1ba182b5f176a653c57781589c02dc638c99857a5e23a1fef92",
+        "request_sha256": "a28350096b7e812cac99eaa10f4ba793087e65d108dd648afca364456d04b636",
         "state": "unsupported"
       },
       "llvm_totals_test_inclusive": {
@@ -593,6 +658,31 @@
         "macro expansion / generated owner not certified",
         "unresolved attribute: # [derive (Debug , Clone)]"
       ]
+    },
+    "registry": {
+      "anchors": {
+        "capture": "complete",
+        "core_acceptance": "pending",
+        "manifest_sha256": "15f25ac35b0b35651230c533f074bcc014a9d2015bb9eb9a5f3052aafc7138c7",
+        "request_sha256": "721cd787b277ad9d198e0fc018f2bcad6c5cce9009210a4dcb3c948de73beb34",
+        "state": "unsupported"
+      },
+      "archive_sha256": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682",
+      "source_files": 14,
+      "setup_command": [
+        "cargo",
+        "metadata",
+        "--format-version",
+        "1",
+        "--locked",
+        "--offline",
+        "--manifest-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-16/project-registry/Cargo.toml"
+      ],
+      "setup_is_repository_automation": true,
+      "isolated_cargo_home": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-16/registry-cargo-home",
+      "network_download_bytes": 0,
+      "scope": "single locked crates.io dependency; local cache copied by test setup"
     }
   },
   "tools": {
@@ -650,10 +740,10 @@
     "llvm": "22.1.6"
   },
   "binary": {
-    "sha256": "6134e73d0069c6fd03b6d173b8a76f933bf6e30c449fd0ae8cadcd7db03fda14",
-    "bytes": 1750872
+    "sha256": "b00cc80c9aa89bd48e8881e628be65d44e1500b8cca693e8f22cb42f92bd7fc3",
+    "bytes": 1872168
   },
-  "capture_bytes": 42252,
+  "capture_bytes": 42767,
   "persistent_candidate_cache_bytes": 0,
   "execve_trace": "not performed",
   "core_protocol_authentication": "not exercised by this capture suite; see separate Core acceptance",

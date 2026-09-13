@@ -128,7 +128,7 @@ def acceptance(path, pin, binary):
             'acceptance does not identify this candidate binary')
     checks = value['checks']
     names = {check['name'] for check in checks}
-    require(len(names) == len(checks) and len(checks) >= 46
+    require(len(names) == len(checks) and len(checks) >= 59
             and {'doctor', 'plain', 'boundaries', 'features', 'verify', 'failed-test',
                  'corrupt-coverage', 'mixed-artifact', 'changed-source',
                  'negative-function-count', 'overflow-function-count',
@@ -139,7 +139,13 @@ def acceptance(path, pin, binary):
                  'certified-function-owners', 'missing-llvm-owner', 'duplicate-llvm-symbol',
                  'multiple-llvm-owners', 'cross-file-owner', 'unknown-source-owner',
                  'inherited-parent-count', 'unexecuted-owner-regions',
-                 'omitted-source-owners', 'changed-test-exclusions'} <= names
+                 'omitted-source-owners', 'changed-test-exclusions',
+                 'prepare-registry', 'registry', 'verify-registry',
+                 'registry-function-owner', 'missing-registry-archive',
+                 'changed-registry-archive', 'changed-registry-source',
+                 'poisoned-registry-before-build', 'extra-registry-source',
+                 'registry-source-symlink', 'omitted-dependency-provenance',
+                 'omitted-metadata-dependency', 'restored-registry-integrity'} <= names
             and all(check['passed'] is True for check in checks),
             'candidate acceptance is incomplete or failed')
     tools = value['tools']

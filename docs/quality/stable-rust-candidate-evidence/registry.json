@@ -1,0 +1,49 @@
+{
+  "schema": "rust-stable-registry-acceptance/v1",
+  "collector": {
+    "sha256": "b00cc80c9aa89bd48e8881e628be65d44e1500b8cca693e8f22cb42f92bd7fc3",
+    "bytes": 1872168
+  },
+  "observations": {
+    "anchors": {
+      "capture": "complete",
+      "core_acceptance": "pending",
+      "manifest_sha256": "15f25ac35b0b35651230c533f074bcc014a9d2015bb9eb9a5f3052aafc7138c7",
+      "request_sha256": "721cd787b277ad9d198e0fc018f2bcad6c5cce9009210a4dcb3c948de73beb34",
+      "state": "unsupported"
+    },
+    "archive_sha256": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682",
+    "source_files": 14,
+    "setup_command": [
+      "cargo",
+      "metadata",
+      "--format-version",
+      "1",
+      "--locked",
+      "--offline",
+      "--manifest-path",
+      "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-16/project-registry/Cargo.toml"
+    ],
+    "setup_is_repository_automation": true,
+    "isolated_cargo_home": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-16/registry-cargo-home",
+    "network_download_bytes": 0,
+    "scope": "single locked crates.io dependency; local cache copied by test setup"
+  },
+  "prior_rejection": {
+    "prior_binary_sha256": "6134e73d0069c6fd03b6d173b8a76f933bf6e30c449fd0ae8cadcd7db03fda14",
+    "command": [
+      "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+      "collect",
+      "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/registry-reproduction-01/request.json"
+    ],
+    "exit_code": 1,
+    "error": "{\"message\":\"registry/git dependencies unsupported by candidate identity validation\",\"schema\":\"rust-stable-error/v1\",\"state\":\"measurement_error\"}\n"
+  },
+  "isolated_fixture_cache_bytes": 134385,
+  "explicit_archive_bytes": 15935,
+  "extracted_package_bytes": 51103,
+  "index_bytes": 9826,
+  "capture_bytes": 53990,
+  "network_download_bytes": 0,
+  "scope": "Package-directory provenance, not complete compiler input closure. Cargo cache layout is used only in repository test setup."
+}

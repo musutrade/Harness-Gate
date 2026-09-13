@@ -13,6 +13,8 @@ import re
 import shutil
 import subprocess
 
+from validate_registry_dependencies import validate as validate_registry
+
 
 def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -198,6 +200,8 @@ def main():
             assert any(f['name'].endswith('12feature_only') for f in owners) == bool(features)
             observations[label] = {'anchors': result, 'llvm_totals_test_inclusive': raw['data'][0]['totals'], 'async_constructor_count': 1, 'async_body_count': 0, 'lexical_functions': inventory['functions'], 'unsupported': inventory['unsupported']}
             assert inventory['unsupported'] and 'build.rs' in data['excluded_paths']
+
+        observations["registry"] = validate_registry(output, run, digest, True)
 
         changed_tools = json.loads(request_path.read_text())
         changed_tools['output_root'] = str(output / 'capture-wrong-tools')

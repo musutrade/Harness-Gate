@@ -54,3 +54,22 @@ uncertified syntax MUST remain unsupported.
 - GIVEN two LLVM records claiming one source span or an execution count inconsistent with that owner's entry region
 - WHEN the collector verifies the export
 - THEN measurement fails without a successful evidence response or a replacement baseline.
+
+### Requirement: Locked registry source provenance
+
+Registry package provenance MUST bind an explicit archive input to its lockfile
+checksum and to every source file Cargo compiles. Runtime code MUST NOT infer
+private Cargo cache layouts. Uncertified source kinds and incomplete dependency
+inventories MUST block collection; verification MUST recompute provenance.
+
+#### Scenario: Modified cache under an unchanged lock
+
+- GIVEN a matching locked archive and a dependency source file modified in the local cache
+- WHEN the collector prepares compilation or verifies captured evidence
+- THEN measurement fails before emitting a successful evidence response.
+
+#### Scenario: Omitted package proof
+
+- GIVEN otherwise anchored evidence whose dependency proof omits a locked package
+- WHEN the collector verifies the manifest and dependency inventory
+- THEN the missing provenance is rejected, even if the test manifest is re-anchored.
