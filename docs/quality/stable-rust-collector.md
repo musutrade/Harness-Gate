@@ -78,12 +78,44 @@ dependency requirements are not yet finalized or accepted.
 The candidate request records canonical project/output roots, hashes of source
 files and lockfiles, effective Cargo configuration files, exact tool bytes/version
 output, explicit features and a bounded per-command timeout. It rejects symlinks,
-registry/git/outside-workspace dependencies, outside-workspace target roots and
+git/custom-registry/outside-workspace dependencies, outside-workspace target roots and
 unreviewed Cargo configuration. Only `build.target-dir` configuration is currently
 accepted and overridden with a temporary capture directory. Compiler flags and
 wrapper injection are rejected. The sanitized environment, commands, output,
 exit status and duration are retained. Sources/configuration/tools are rechecked
 after collection. Output must be fresh. Failed capture produces no manifest.
+
+For a locked crates.io dependency, explicitly provide the original `.crate`
+archive via `prepare PROJECT OUTPUT DOCTOR --registry-archives ARCHIVES.json`.
+The JSON object maps each dependency's `Cargo.lock` SHA-256 checksum to its
+canonical absolute archive path, for example:
+
+```json
+{"<checksum from Cargo.lock>": "/absolute/user-provisioned/itoa-1.0.18.crate"}
+```
+
+Obtain the exact locked archive from the registry's download interface when
+provisioning dependencies; retain it for later evidence verification. The plugin
+does not download archives or infer Cargo's private cache layout. Cargo must
+already be able to build the project offline. Using Cargo's public metadata
+format 1, the Rust collector binds each package to lock format 4, verifies archive
+SHA-256, streams gzip/tar without extraction, and compares every file in Cargo's extracted package directory with the archive. Only Cargo's two generated cache markers
+are omitted from that equality; symlinks, special files, unsafe/duplicate archive
+members, extra source files and oversized inputs are rejected. The limits are
+16 MiB per file and 128 MiB decompressed archive. `dependencies.json` is anchored
+in the capture manifest, and the proof is recomputed before/after compilation
+and during verification. Archive paths and source files must remain available.
+
+This bounded candidate requires an exact lock/metadata package inventory and
+rejects inactive lock entries, unused archive inputs, registry build scripts and
+proc macros. Git, custom registries and external path dependencies remain outside
+its support boundary. Source replacement configuration remains rejected. The real
+registry fixture exercises one `itoa` dependency, not every dependency graph.
+This proves package-directory provenance; compiler dep-info reconciliation for
+files reached through includes, path attributes or other compile-time inputs is
+not implemented, so complete build-input provenance remains unaccepted.
+Pre/post checks detect observed changes; they do not provide a filesystem snapshot
+or defend against a concurrent actor changing and restoring files during a build.
 
 These hashes establish local integrity against externally supplied anchors, not
 trust, expiry, complete dependency provenance or adversarial build isolation.
@@ -127,7 +159,7 @@ The repository's Rust `stable_collector_acceptance` example exercises the actual
 Core CLI signature/nonce/expiry transport, then Core's evidence validation and
 requiredness evaluation. Plain complexity and function execution coverage are accepted as the new series; required
 CRAP remains blocked. This uses a clearly named test-only signing key, not protected
-production signing. General dependency provenance, broader coverage normalization
+production signing. Complete compiler input provenance, broader coverage normalization
 and full T4 acceptance remain open.
 
 ### Source/coverage boundaries

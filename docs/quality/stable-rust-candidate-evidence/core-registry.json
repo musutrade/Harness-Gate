@@ -1,14 +1,16 @@
 {
   "capture": {
-    "manifest_sha256": "417ee8a73f5ff1ba182b5f176a653c57781589c02dc638c99857a5e23a1fef92",
-    "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-16/capture-features",
-    "request_sha256": "a28350096b7e812cac99eaa10f4ba793087e65d108dd648afca364456d04b636"
+    "manifest_sha256": "15f25ac35b0b35651230c533f074bcc014a9d2015bb9eb9a5f3052aafc7138c7",
+    "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-16/capture-registry",
+    "request_sha256": "721cd787b277ad9d198e0fc018f2bcad6c5cce9009210a4dcb3c948de73beb34"
   },
   "checks": {
     "authenticated_capture": {
       "accepted": true,
-      "counts": [],
-      "records": 5
+      "counts": [
+        1
+      ],
+      "records": 1
     },
     "changed-project": {
       "blocked": true,
@@ -28,7 +30,7 @@
       "blocked": true,
       "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request has expired\n"
     },
-    "fixture": "features",
+    "fixture": "registry",
     "invalid_signature": {
       "blocked": true,
       "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter signature verification failed\n"
@@ -44,35 +46,7 @@
     "required_crap": [
       {
         "component": "rust",
-        "evidence_id": "stable-9674fb12d9fd834d1c8731ed2a714cd7dd00747b61929a3e96a19ff50ab51459",
-        "metric": "risk.crap",
-        "state": "unsupported",
-        "status": "blocked"
-      },
-      {
-        "component": "rust",
-        "evidence_id": "stable-6491fe323a12b819fb1bf2e690f0cc016d828b8af259f362bc8d11581e8ef458",
-        "metric": "risk.crap",
-        "state": "unsupported",
-        "status": "blocked"
-      },
-      {
-        "component": "rust",
-        "evidence_id": "stable-f227570359a39a81f5af2be3487622fe95f298629c02f60b1eb9a9084a941540",
-        "metric": "risk.crap",
-        "state": "unsupported",
-        "status": "blocked"
-      },
-      {
-        "component": "rust",
-        "evidence_id": "stable-0301c7acc733e82cd0ec887ca55ad7f6696c450e85a9e6082e098ed9e3b0bcc5",
-        "metric": "risk.crap",
-        "state": "unsupported",
-        "status": "blocked"
-      },
-      {
-        "component": "rust",
-        "evidence_id": "stable-a00564a1091eb99b0220ad37e106b14f4e8dcc0061c7f2bc768e2adabc8d1f6c",
+        "evidence_id": "stable-2e3da7167fb29132905f1eb2626236b8d6268af5e1f5dd8e73d6f244323578ee",
         "metric": "risk.crap",
         "state": "unsupported",
         "status": "blocked"
