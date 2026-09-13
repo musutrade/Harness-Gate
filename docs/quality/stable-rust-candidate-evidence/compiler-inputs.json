@@ -1,8 +1,8 @@
 {
   "schema": "rust-stable-compiler-input-acceptance/v1",
   "collector": {
-    "sha256": "e020ad59faf78db0133f4a83105b18f0a39d9676ea21c24386dcb662ac476f73",
-    "bytes": 1995304
+    "sha256": "e2e3296e90b8da095bfe98f504589faca27ade64565262697747567183cd3e6c",
+    "bytes": 2002000
   },
   "observations": {
     "external_inputs": "three real captures blocked before manifest",

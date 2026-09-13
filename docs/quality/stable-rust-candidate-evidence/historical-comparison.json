@@ -1,7 +1,7 @@
 {
   "schema": "rust-stable-historical-comparison/v1",
   "state": "migration-review-required",
-  "collector_sha256": "e020ad59faf78db0133f4a83105b18f0a39d9676ea21c24386dcb662ac476f73",
+  "collector_sha256": "e2e3296e90b8da095bfe98f504589faca27ade64565262697747567183cd3e6c",
   "historical": {
     "archive": "docs/quality/gh-220/native-fixtures.tar.gz",
     "archive_sha256": "0ceb9051ec35c0047bb2c083fab25fb1ba0f72a120b147d1ad3307889ef10391",
@@ -130,8 +130,8 @@
     "anchor": {
       "capture": "complete",
       "core_acceptance": "pending",
-      "manifest_sha256": "e612019dd165c6ed06657e50e1ef385369a2a2339d06c7a200521ae64a4df974",
-      "request_sha256": "16efff1107d71a5d40ffef57ea8b8ab2b5351a0c5319fafb8eb40dce1d0a8f94",
+      "manifest_sha256": "1317857ee735d4f4198e0069d9ddf4126d1c6851736a7984ef976b001bff5d79",
+      "request_sha256": "2efe8423293ec3c7797b5672c1485d95b4026c24e85a16362d91c60f2074f652",
       "state": "unsupported"
     },
     "series": {
@@ -139,7 +139,7 @@
         "name": "harness-gate-rust-stable-collector",
         "version": "0.1.0-candidate.1"
       },
-      "id": "measurement-series/v1:9a73e5df975325e22a4f164ab5a8bdcdc6fe046d0657e0b2b1b0bcbe96a2a654",
+      "id": "measurement-series/v1:1c2b8dadf3a592e1af28547f26ef973854d1ee34348289f33f819bbc511cf29a",
       "metrics": [
         {
           "name": "complexity.cyclomatic",
@@ -165,7 +165,7 @@
       "name": "rust-stable-lexical-candidate",
       "normalization": {
         "name": "stable-rust-core-candidate",
-        "version": "e020ad59faf78db0133f4a83105b18f0a39d9676ea21c24386dcb662ac476f73"
+        "version": "e2e3296e90b8da095bfe98f504589faca27ade64565262697747567183cd3e6c"
       },
       "rule": {
         "name": "rust-source-decisions",

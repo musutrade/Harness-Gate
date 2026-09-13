@@ -152,7 +152,7 @@ fn run() -> Result<()> {
     let args: Vec<_> = env::args_os().skip(1).collect();
     ensure!(
         args.len() == 5,
-        "usage: stable_collector_acceptance COLLECTOR CORE CAPTURE_ACCEPTANCE NEW_OUTPUT plain|boundaries|features|registry"
+        "usage: stable_collector_acceptance COLLECTOR CORE CAPTURE_ACCEPTANCE NEW_OUTPUT plain|partial|boundaries|features|registry"
     );
     let binary = Path::new(&args[0]).canonicalize()?;
     let core = Path::new(&args[1]).canonicalize()?;
@@ -161,7 +161,7 @@ fn run() -> Result<()> {
     let root = Path::new(&args[3]).canonicalize()?;
     let case = args[4].to_str().context("fixture name")?;
     ensure!(
-        ["plain", "boundaries", "features", "registry"].contains(&case),
+        ["plain", "partial", "boundaries", "features", "registry"].contains(&case),
         "unknown fixture"
     );
     let anchor = read(&capture_root.join(format!("{case}.stdout")))?;
@@ -243,7 +243,7 @@ fn run() -> Result<()> {
         .filter(|m| m["name"] == "complexity.cyclomatic")
         .map(|m| m["value"]["value"].clone())
         .collect();
-    if case == "plain" {
+    if matches!(case, "plain" | "partial") {
         ensure!(
             counts == vec![json!(3), json!(1)],
             "real lexical counts: {counts:?}"
@@ -263,6 +263,23 @@ fn run() -> Result<()> {
                     json!({"type":"ratio","covered":0,"total":1})
                 ],
             "real function coverage: {coverage:?}"
+        );
+        let regions: Vec<_> = records
+            .as_array()
+            .unwrap()
+            .iter()
+            .flat_map(|r| r["metrics"].as_array().unwrap())
+            .filter(|m| m["name"] == "coverage.region")
+            .map(|m| m["value"].clone())
+            .collect();
+        let covered = if case == "partial" { 5 } else { 6 };
+        ensure!(
+            regions
+                == vec![
+                    json!({"type":"ratio","covered":covered,"total":6}),
+                    json!({"type":"ratio","covered":0,"total":3})
+                ],
+            "real region coverage: {regions:?}"
         );
     } else if case == "registry" {
         ensure!(counts == vec![json!(1)], "registry lexical count");

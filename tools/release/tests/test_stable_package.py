@@ -90,7 +90,9 @@ class PreparationTests(unittest.TestCase):
                 acceptance(path, '0' * 64, binary)
             with self.assertRaisesRegex(ValueError, 'candidate binary'):
                 acceptance(path, pin, dict(binary, bytes=0))
-            for name in ('negative-function-count', 'certified-function-owners',
+            for name in ('partial', 'certified-region-owners', 'duplicate-owner-region',
+                         'owner-region-counter-disagreement', 'owner-region-summary-count',
+                         'owner-region-summary-covered', 'negative-function-count', 'certified-function-owners',
                          'missing-llvm-owner', 'omitted-source-owners', 'changed-test-exclusions',
                          'total-lines-count', 'total-functions-covered', 'file-summary-disagreement',
                          'external-include-bytes', 'wrong-compiler-cwd', 'omitted-dep-info-producer'):

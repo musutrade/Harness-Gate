@@ -124,3 +124,23 @@ is internally valid and the integrity manifest matches the supplied bytes.
 - GIVEN a real export with unchanged function owners and internally valid but inconsistent total/file summaries
 - WHEN the candidate verifies a test-reanchored integrity manifest
 - THEN it fails measurement before emitting normalized evidence.
+
+### Requirement: Distinct code-region coverage for certified owners
+
+A candidate region ratio MUST use the verified owner's own LLVM code-region
+counters and MUST NOT substitute its function execution count. Duplicate spans
+or disagreement with test-inclusive file region summaries MUST fail measurement.
+Explicit test owners MUST be excluded from normalized production ratios. This
+capability MUST NOT enable CRAP or an existing required binding without review.
+
+#### Scenario: Partly executed ordinary function
+
+- GIVEN an exact certified owner whose function executes but one of six code regions remains unexecuted
+- WHEN authenticated Core validates its evidence
+- THEN function execution is 1/1 and region coverage is 5/6, with required CRAP still blocked.
+
+#### Scenario: Internally consistent summaries conceal changed counters
+
+- GIVEN an anchored export whose file and total summaries agree but disagree with its owners' region counts or covered regions
+- WHEN the candidate verifies the evidence
+- THEN measurement fails before emitting normalized evidence.
