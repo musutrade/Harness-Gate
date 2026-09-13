@@ -152,7 +152,7 @@ fn run() -> Result<()> {
     let args: Vec<_> = env::args_os().skip(1).collect();
     ensure!(
         args.len() == 5,
-        "usage: stable_collector_acceptance COLLECTOR CORE CAPTURE_ACCEPTANCE NEW_OUTPUT plain|boundaries|features"
+        "usage: stable_collector_acceptance COLLECTOR CORE CAPTURE_ACCEPTANCE NEW_OUTPUT plain|boundaries|features|registry"
     );
     let binary = Path::new(&args[0]).canonicalize()?;
     let core = Path::new(&args[1]).canonicalize()?;
@@ -161,7 +161,7 @@ fn run() -> Result<()> {
     let root = Path::new(&args[3]).canonicalize()?;
     let case = args[4].to_str().context("fixture name")?;
     ensure!(
-        ["plain", "boundaries", "features"].contains(&case),
+        ["plain", "boundaries", "features", "registry"].contains(&case),
         "unknown fixture"
     );
     let anchor = read(&capture_root.join(format!("{case}.stdout")))?;
@@ -263,6 +263,18 @@ fn run() -> Result<()> {
                     json!({"type":"ratio","covered":0,"total":1})
                 ],
             "real function coverage: {coverage:?}"
+        );
+    } else if case == "registry" {
+        ensure!(counts == vec![json!(1)], "registry lexical count");
+        let metric = records[0]["metrics"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|m| m["name"] == "coverage.function")
+            .context("registry function coverage missing")?;
+        ensure!(
+            metric["value"] == json!({"type":"ratio","covered":1,"total":1}),
+            "registry function execution coverage"
         );
     } else {
         ensure!(

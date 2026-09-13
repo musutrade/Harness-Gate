@@ -1,0 +1,10 @@
+[package]
+name = "stable-registry-fixture"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+itoa = "=1.0.18"
+
+[workspace]

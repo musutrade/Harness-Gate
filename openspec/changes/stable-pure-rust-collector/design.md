@@ -76,3 +76,15 @@ inconsistent entry counts are measurement errors; unsupported syntax and `impl
 Trait` never acquire coverage. Line/region coverage and all CRAP remain unsupported.
 Actual owner mutations and authenticated Core checks are recorded in the validation
 record. T3–T8, migration review and the legacy release hold remain open.
+
+The bounded registry checkpoint extends T3/T4 with explicit user-provided `.crate`
+archive paths keyed by Cargo.lock SHA-256. Pure Rust streaming gzip/tar validation
+compares every cached dependency source file with the authenticated archive and
+rechecks the manifest-anchored dependency proof at collection and verification.
+Cargo metadata format 1 and lock format 4 must describe exactly the same packages;
+crates.io normal libraries are eligible, while registry build scripts/proc macros,
+inactive lock entries, custom registries, Git and external path dependencies remain
+unsupported. Runtime code does not infer Cargo's private cache layout or download
+inputs. The isolated real itoa fixture and cache/archive/proof mutations extend
+acceptance without changing Core thresholds, requiredness or migration policy.
+T3–T8 remain unchecked pending the complete matrix and release contract.

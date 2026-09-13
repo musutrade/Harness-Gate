@@ -1,7 +1,7 @@
 //! Candidate capture, deliberately not a Core adapter or signed release format.
 use crate::{
     artifact::{self, FileIdentity},
-    coverage, ownership,
+    coverage, dependencies, ownership,
     process::Runner,
     source,
     tools::{self, Tools},
@@ -29,6 +29,8 @@ struct Request {
     tools: Tools,
     features: Vec<String>,
     timeout_seconds: u64,
+    #[serde(default)]
+    registry_archives: dependencies::Archives,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -85,7 +87,17 @@ fn validate_cargo_config(text: &str) -> Result<()> {
     Ok(())
 }
 
-pub fn prepare(project: &Path, output: &Path, doctor: &Path) -> Result<Value> {
+pub fn prepare(
+    project: &Path,
+    output: &Path,
+    doctor: &Path,
+    archives: Option<&Path>,
+) -> Result<Value> {
+    let registry_archives = match archives {
+        Some(path) => serde_json::from_slice(&fs::read(path)?)?,
+        None => dependencies::Archives::new(),
+    };
+    dependencies::check_archives(&registry_archives)?;
     let project_root = project.canonicalize()?;
     let output_root = output
         .parent()
@@ -102,11 +114,13 @@ pub fn prepare(project: &Path, output: &Path, doctor: &Path) -> Result<Value> {
         tools,
         features: vec![],
         timeout_seconds: 300,
+        registry_archives,
     })?)
 }
 
 fn validate_request(request: &Request) -> Result<()> {
     ensure!(request.schema == REQUEST, "unsupported request schema");
+    dependencies::check_archives(&request.registry_archives)?;
     ensure!(
         request.project_root.is_absolute()
             && request.project_root.canonicalize()? == request.project_root,
@@ -133,48 +147,6 @@ fn validate_request(request: &Request) -> Result<()> {
                     .all(|c| c.is_ascii_alphanumeric() || matches!(c, '_' | '-' | '/')),
             "unsupported feature name"
         );
-    }
-    Ok(())
-}
-
-fn validate_metadata(value: &Value, root: &Path) -> Result<()> {
-    ensure!(
-        value["workspace_root"].as_str() == root.to_str(),
-        "project must be the Cargo workspace root"
-    );
-    let packages = value["packages"]
-        .as_array()
-        .context("Cargo packages missing")?;
-    ensure!(!packages.is_empty(), "empty Cargo package inventory");
-    for package in packages {
-        // Dependency provenance is deliberately not inferred from Cargo's cache.
-        ensure!(
-            package["source"].is_null(),
-            "registry/git dependencies unsupported by candidate identity validation"
-        );
-        let manifest = Path::new(
-            package["manifest_path"]
-                .as_str()
-                .context("manifest path missing")?,
-        );
-        ensure!(
-            manifest.canonicalize()?.starts_with(root),
-            "dependency outside measured workspace is unsupported"
-        );
-        for target in package["targets"]
-            .as_array()
-            .context("Cargo targets missing")?
-        {
-            let path = Path::new(
-                target["src_path"]
-                    .as_str()
-                    .context("target source missing")?,
-            );
-            ensure!(
-                path.canonicalize()?.starts_with(root),
-                "target source outside measured workspace is unsupported"
-            );
-        }
     }
     Ok(())
 }
@@ -286,7 +258,9 @@ pub fn collect(path: &Path) -> Result<String> {
     }
     let metadata: Value =
         serde_json::from_str(&runner.run(&toolset.cargo.path, &metadata_args, &extra)?)?;
-    validate_metadata(&metadata, &request.project_root)?;
+    let dependencies =
+        dependencies::snapshot(&metadata, &request.project_root, &request.registry_archives)?;
+    artifact::write(&runner.root.join("dependencies.json"), &dependencies)?;
     artifact::write(&runner.root.join("cargo-metadata.json"), &metadata)?;
     let coverage_path = runner.root.join("coverage.json");
     let mut args: Vec<String> = ["llvm-cov", "--verbose", "--json", "--output-path"]
@@ -333,6 +307,15 @@ pub fn collect(path: &Path) -> Result<String> {
     )?;
     // No persistent target, profile or external runtime archives in the capture.
     scratch.close()?;
+    ensure!(
+        dependencies
+            == dependencies::snapshot(
+                &metadata,
+                &request.project_root,
+                &request.registry_archives
+            )?,
+        "dependency identity changed during capture"
+    );
     validate_request(&request)?;
     recheck_tools(&request.tools)?;
     let manifest = Manifest {
@@ -374,6 +357,17 @@ pub fn verify(root: &Path, anchor: &str, request_digest: &str) -> Result<()> {
     );
     validate_request(&request)?;
     recheck_tools(&request.tools)?;
+    let metadata: Value = crate::strict_json::parse(&fs::read(root.join("cargo-metadata.json"))?)?;
+    let recorded: Value = crate::strict_json::parse(&fs::read(root.join("dependencies.json"))?)?;
+    ensure!(
+        recorded
+            == dependencies::snapshot(
+                &metadata,
+                &request.project_root,
+                &request.registry_archives
+            )?,
+        "dependency provenance differs from recomputed facts"
+    );
     let coverage: Value = coverage::parse(&fs::read(root.join("coverage.json"))?)?;
     coverage::validate(&coverage)?;
     let analysis: Value = crate::strict_json::parse(&fs::read(root.join("source-analysis.json"))?)?;

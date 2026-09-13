@@ -3,6 +3,7 @@ mod adapter;
 mod artifact;
 mod collect;
 mod coverage;
+mod dependencies;
 mod ownership;
 mod process;
 mod release;
@@ -32,12 +33,13 @@ fn run() -> Result<()> {
         ["adapter", "--binding", path, "--binding-sha256", digest] => println!("{}", adapter::run(Path::new(path), digest)?),
         ["describe", root, anchor, request_digest] => println!("{}", adapter::describe(Path::new(root), anchor, request_digest)?),
         ["collect", request] => println!("{}", collect::collect(Path::new(request))?),
-        ["prepare", project, output, doctor] => println!("{}", collect::prepare(Path::new(project), Path::new(output), Path::new(doctor))?),
+        ["prepare", project, output, doctor] => println!("{}", collect::prepare(Path::new(project), Path::new(output), Path::new(doctor), None)?),
+        ["prepare", project, output, doctor, "--registry-archives", archives] => println!("{}", collect::prepare(Path::new(project), Path::new(output), Path::new(doctor), Some(Path::new(archives)))?),
         ["verify", directory, anchor, request_digest] => {
             collect::verify(Path::new(directory), anchor, request_digest)?;
             println!("{}", json!({"schema":"rust-stable-verification/v1", "integrity":"verified", "core_acceptance":"pending"}));
         }
-        _ => bail!("usage: harness-gate-rust-stable-collector --version | doctor PROJECT NEW_OUTPUT | prepare PROJECT NEW_OUTPUT DOCTOR.json | collect REQUEST.json | verify OUTPUT MANIFEST_SHA256 REQUEST_SHA256 | describe OUTPUT MANIFEST_SHA256 REQUEST_SHA256 | adapter --binding FILE --binding-sha256 SHA256 | release-verify BUNDLE TRUST TRUST_SHA256 NEW_LOG | install BUNDLE TRUST TRUST_SHA256 ROOT NEW_LOG | rollback ROOT INVENTORY_SHA256 TRUST TRUST_SHA256 NEW_LOG"),
+        _ => bail!("usage: harness-gate-rust-stable-collector --version | doctor PROJECT NEW_OUTPUT | prepare PROJECT NEW_OUTPUT DOCTOR.json [--registry-archives ARCHIVES.json] | collect REQUEST.json | verify OUTPUT MANIFEST_SHA256 REQUEST_SHA256 | describe OUTPUT MANIFEST_SHA256 REQUEST_SHA256 | adapter --binding FILE --binding-sha256 SHA256 | release-verify BUNDLE TRUST TRUST_SHA256 NEW_LOG | install BUNDLE TRUST TRUST_SHA256 ROOT NEW_LOG | rollback ROOT INVENTORY_SHA256 TRUST TRUST_SHA256 NEW_LOG"),
     }
     Ok(())
 }
