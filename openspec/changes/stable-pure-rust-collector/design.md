@@ -232,3 +232,15 @@ unsupported. The rule version changes; metric definitions, Core authority and
 migration requirements remain unchanged. The new binary-bound normalization
 produces a different full Core measurement-series identity. Signed support
 metadata must name this rule; no existing baseline compatibility is assumed.
+
+## Strict identity decoding
+
+The candidate uses one recursive duplicate-key validator before decoding request,
+manifest, doctor and dependency archive maps into Rust types. Typed Serde map
+decoding alone silently retained the last identity for repeated paths; a locally
+captured, test-reanchored manifest reproduced this acceptance. Cargo metadata
+passes the same validator on capture and verification. SHA authentication remains
+required and does not excuse ambiguous JSON. Test-only re-anchoring isolates this
+semantic defect; it is not signature forgery or producer-authentication evidence.
+Both key orders must fail, and ambiguous collection input must fail before output
+creation. Package preparation requires those actual CLI regression observations.

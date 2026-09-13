@@ -94,7 +94,7 @@ pub fn prepare(
     archives: Option<&Path>,
 ) -> Result<Value> {
     let registry_archives = match archives {
-        Some(path) => serde_json::from_slice(&fs::read(path)?)?,
+        Some(path) => crate::strict_json::decode(&fs::read(path)?)?,
         None => dependencies::Archives::new(),
     };
     dependencies::check_archives(&registry_archives)?;
@@ -104,7 +104,7 @@ pub fn prepare(
         .context("output parent required")?
         .canonicalize()?
         .join(output.file_name().context("output filename required")?);
-    let tools: Tools = serde_json::from_slice(&fs::read(doctor)?)?;
+    let tools: Tools = crate::strict_json::decode(&fs::read(doctor)?)?;
     Ok(serde_json::to_value(Request {
         schema: REQUEST.into(),
         source_files: artifact::inventory(&project_root, true)?,
@@ -195,7 +195,7 @@ fn analyze_sources(request: &Request) -> Result<Value> {
 
 pub fn collect(path: &Path) -> Result<String> {
     let request_bytes = fs::read(path)?;
-    let request: Request = serde_json::from_slice(&request_bytes)?;
+    let request: Request = crate::strict_json::decode(&request_bytes)?;
     validate_request(&request)?;
     let mut runner = Runner::create(
         &request.output_root,
@@ -256,8 +256,11 @@ pub fn collect(path: &Path) -> Result<String> {
     if !request.features.is_empty() {
         metadata_args.extend(["--features".into(), request.features.join(",")]);
     }
-    let metadata: Value =
-        serde_json::from_str(&runner.run(&toolset.cargo.path, &metadata_args, &extra)?)?;
+    let metadata: Value = crate::strict_json::parse(
+        runner
+            .run(&toolset.cargo.path, &metadata_args, &extra)?
+            .as_bytes(),
+    )?;
     let dependencies =
         dependencies::snapshot(&metadata, &request.project_root, &request.registry_archives)?;
     artifact::write(&runner.root.join("dependencies.json"), &dependencies)?;
@@ -360,7 +363,7 @@ pub fn verify(root: &Path, anchor: &str, request_digest: &str) -> Result<()> {
         artifact::digest(&manifest_bytes) == anchor,
         "manifest anchor mismatch"
     );
-    let manifest: Manifest = serde_json::from_slice(&manifest_bytes)?;
+    let manifest: Manifest = crate::strict_json::decode(&manifest_bytes)?;
     ensure!(manifest.schema == MANIFEST, "unsupported manifest schema");
     ensure!(
         manifest.request_sha256 == request_digest,
@@ -374,7 +377,7 @@ pub fn verify(root: &Path, anchor: &str, request_digest: &str) -> Result<()> {
         artifact::digest(&request_bytes) == request_digest,
         "request identity mismatch"
     );
-    let request: Request = serde_json::from_slice(&request_bytes)?;
+    let request: Request = crate::strict_json::decode(&request_bytes)?;
     ensure!(
         request.output_root.canonicalize()? == root.canonicalize()?,
         "capture root identity mismatch"

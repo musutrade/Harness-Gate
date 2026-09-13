@@ -103,6 +103,21 @@ without implying certified source ownership or arbitrary build-script isolation.
 - WHEN stable dep-info reports a relative source path
 - THEN verification resolves it from that producer's observed compiler working directory and rejects missing or inconsistent producer records.
 
+### Requirement: Unambiguous JSON identities
+
+Collection requests, capture manifests, doctor reports, dependency archive maps
+and Cargo metadata MUST reject duplicate object keys at every depth before
+typed decoding can discard an identity. Re-anchoring ambiguous bytes MUST NOT
+make them valid. Ambiguous collection input MUST fail before launching tools or
+creating a capture directory. LLVM exports retain their separately validated
+floating-point summary domain; authenticated identity records remain integer-only.
+
+#### Scenario: Conflicting identities for the same path
+
+- GIVEN a real capture whose manifest or request is changed to contain two different identities for one file path
+- WHEN verification receives anchors for those test-mutated bytes in either key order
+- THEN it rejects duplicate keys instead of selecting either identity.
+
 ### Requirement: Authenticated executable activation
 
 Install, upgrade and rollback MUST execute only the authenticated staged program

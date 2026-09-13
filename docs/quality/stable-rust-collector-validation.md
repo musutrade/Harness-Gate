@@ -5,9 +5,63 @@ complete; T3–T8 remain open. The [design](stable-rust-collector.md) defines th
 boundary. No Core required binding, threshold, baseline or historical evidence
 was changed. No compiler-private backend was built or executed for these results.
 
+## Duplicate identity decoding checkpoint
+
+A fresh plain-fixture capture reproduced a concrete collector defect: when its
+manifest listed `candidate.json` twice with different identities, typed map
+decoding retained the last entry and verification succeeded. The test explicitly
+supplied the changed manifest's SHA anchor. This demonstrates ambiguous decoding,
+not forged producer authentication. The same pinned bytes now fail with
+`measurement_error: duplicate key`; the original capture manifest was restored.
+Both binaries and exact input/command identities are recorded in
+[the JSON checkpoint](stable-rust-candidate-evidence/json-identities.json).
+
+Requests, manifests, doctor reports, archive maps and captured Cargo metadata now
+pass recursive duplicate-key validation before typed decoding. Eight actual CLI
+regressions cover both key orders in manifest files, captured request source
+identities, incoming collection requests and archive identities. Incoming
+ambiguous requests fail before output creation. Package preparation requires all
+eight cases; its unit regression also rejects each missing case independently.
+
+The initial release build using the `stable` alias produced
+`dcb1902a07ee2e3213f8a103b0419f1c71b9685dd42840543937b65709d2713d`.
+Release preparation's sanitized explicit-1.97.1 build produced a different binary,
+`8c925c2cf93b39990a93add07de000ef08081f7b07becd529cf3cf602e5261ff`;
+its mismatched acceptance record correctly blocked preparation. Both compiler
+queries report the same 1.97.1 commit and LLVM 22.1.6. The difference is not
+counted as a second supported toolchain, and no reproducibility across these build
+invocations is claimed. Fresh runtime validation uses the latter exact program.
+
+That final 3,486,656-byte program passes 113 capture checks, 26 macro checks,
+six authenticated Core fixture cases, 38 lifecycle checks and 29 real loopback
+HTTPS checks. Package preparation passes with that exact binary identity. The
+[113-case capture summary](stable-rust-candidate-evidence/acceptance-json.json)
+is separate from all prior checkpoint records. Candidate unit tests pass 20;
+Core nextest passes 397; both crates pass formatting and all-target clippy.
+Quality discovery passes 449 tests with 36 manual legacy skips. Release discovery
+passes 91 after correcting its stale acceptance fixture; the initial expected-case
+failure is retained. The final package-specific six tests also pass.
+
+The unsigned payload is 4,800,266 bytes. Signed test bundles download 4,800,735
+bytes initially and 4,800,761 bytes on upgrade. Two installed versions occupy
+9,601,496 bytes; interrupted staging adds 4,800,761 bytes, for 14,402,885 bytes
+including installation metadata. The HTTPS matrix receives 37,541,515 response-body
+bytes across successful and failed transfers; cache and observed abandoned-download
+bytes are zero. These figures exclude headers, TLS overhead and unwritten audit
+from the killed download process. RSA verification and loopback TLS are real with
+repository test trust; Sigstore is mocked and production signing is unverified.
+
+ELF inspection records the final executable and its system library dependencies.
+Command logs record actual validation invocations, but unavailable process tracing
+prevents a complete child-process audit. Only Rust 1.97.1 / LLVM 22.1.6 and the
+existing Ubuntu 26.04 Linux x86_64 environment were exercised. Second-toolchain and
+second-system execution, complete generated-owner/input certification, real
+production signing and reviewed migration remain incomplete. T3–T8 stay unchecked
+and release remains paused.
+
 ## Inline-module owner checkpoint
 
-The current release binary is
+The release binary at this checkpoint was
 `6addb9cf8c716304464f756c3f6e37e402bf65823cb0ba418f610572770e6701`,
 3,475,840 bytes, built with stable Rust 1.97.1. Package preparation reproduced
 that digest. The previous binary and this one compiled and measured the exact
@@ -29,7 +83,7 @@ compile and execute but remain unsupported. Two explicit test-module spans are
 excluded from production owners. Core accepts all three authenticated records
 and blocks required CRAP, as well as identity, signature, expiry and replay errors.
 
-The final executable passes 20 Rust tests, 105 generic capture checks, 26 macro
+That checkpoint executable passed 20 Rust tests, 105 generic capture checks, 26 macro
 checks, six authenticated Core fixture cases, 38 local lifecycle checks and
 29 real loopback HTTPS checks. Core nextest passes 397 tests; candidate/Core
 formatting and all-target clippy pass. Quality discovery passes 449 tests with
