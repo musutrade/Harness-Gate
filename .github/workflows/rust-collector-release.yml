@@ -177,6 +177,8 @@ jobs:
             --packet "$APPROVAL_PACKET" --packet-sha256 "$APPROVAL_SHA256" \
             --source "$SOURCE_SHA" --directory target/collector-production/assets --private-key "$key"
       - name: Publish exactly six assets as a draft and independently download and verify
+        env:
+          GODEBUG: http2client=0
         shell: bash
         run: |
           set -euo pipefail
@@ -231,6 +233,7 @@ jobs:
           persist-credentials: false
       - name: Rebuild, verify and publish the reviewed user installer
         env:
+          GODEBUG: http2client=0
           GH_TOKEN: ${{ github.token }}
           PACKET: ${{ vars.COLLECTOR_INSTALLER_PACKET }}
           PACKET_SHA256: ${{ inputs.installer_packet_sha256 }}
