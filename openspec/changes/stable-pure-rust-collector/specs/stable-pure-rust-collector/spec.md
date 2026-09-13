@@ -111,3 +111,16 @@ MUST remain unchanged through this check before the current selection is replace
 - GIVEN an authenticated program that changes staged resources while reporting its version
 - WHEN post-launch identity validation runs
 - THEN activation fails without replacing the previous selected program.
+
+### Requirement: Consistent exported coverage totals
+
+For the exercised LLVM JSON format, verification MUST reconcile each total count
+and covered value with the checked sum of the corresponding file summaries.
+Overflow or disagreement MUST fail measurement, even when each individual summary
+is internally valid and the integrity manifest matches the supplied bytes.
+
+#### Scenario: Reanchored inconsistent summary
+
+- GIVEN a real export with unchanged function owners and internally valid but inconsistent total/file summaries
+- WHEN the candidate verifies a test-reanchored integrity manifest
+- THEN it fails measurement before emitting normalized evidence.

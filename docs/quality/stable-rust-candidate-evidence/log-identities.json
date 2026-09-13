@@ -78,6 +78,51 @@
       "sha256": "77586541a69e4898553c9e90b82ed2a71771905f87c211abf5b0a39d6ab3acd2"
     },
     {
+      "path": "target/gh-259/acceptance-22.log",
+      "bytes": 117,
+      "sha256": "e1b8d8129a246e5a4ecfc0de5e0062c0ff3906bd1b0df9b9b9fa66cabbc8a6eb"
+    },
+    {
+      "path": "target/gh-259/acceptance-22/summary.json",
+      "bytes": 20927,
+      "sha256": "d672ef27b0966ac54b085143464907b1ce38def3e38f6f3b75c14286395f934d"
+    },
+    {
+      "path": "target/gh-259/aggregate-build-01.log",
+      "bytes": 208,
+      "sha256": "572956632defab8aa0d34f62ea909eafe9aee02ce1ce206a08a8db00d404f2c5"
+    },
+    {
+      "path": "target/gh-259/aggregate-clippy-01.log",
+      "bytes": 217,
+      "sha256": "1a273b10e3af24d52e246921c32757e5bf7d121386fa37a7d98640184677e4e8"
+    },
+    {
+      "path": "target/gh-259/aggregate-fmt-01.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-259/aggregate-reproduction-01/stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-259/aggregate-reproduction-01/stdout",
+      "bytes": 92,
+      "sha256": "79a72e6514df96c6b644411537c3262aec270a7091eafb8b6cf222128a7c1753"
+    },
+    {
+      "path": "target/gh-259/aggregate-reproduction-01/summary.json",
+      "bytes": 716,
+      "sha256": "32347afb5a83739d3457bf8290a624a23eb978748de8a14cf221615851d204e8"
+    },
+    {
+      "path": "target/gh-259/aggregate-tests-01.log",
+      "bytes": 1820,
+      "sha256": "e902391e0ea6d0c78748c5f4be931b257acbd4b791a07899550b7d1d6f49971e"
+    },
+    {
       "path": "target/gh-259/compiler-input-build-01.log",
       "bytes": 208,
       "sha256": "88239b54d5c2bc266c321b89acc0adfc0f2c1d813f1b8b32d47167ad8ec01697"
@@ -148,6 +193,16 @@
       "sha256": "a7a0415cf0cc6eb5c2d6d3713c901e8894ae3569073a81a1e120350f78350c9b"
     },
     {
+      "path": "target/gh-259/core-acceptance-boundaries-15.log",
+      "bytes": 102,
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+    },
+    {
+      "path": "target/gh-259/core-acceptance-boundaries-15/summary.json",
+      "bytes": 5130,
+      "sha256": "b8b58538657c1768994f4aa64503c0c55dd4a3b9f6b51f1dd249514ff2e0c28a"
+    },
+    {
       "path": "target/gh-259/core-acceptance-features-05.log",
       "bytes": 102,
       "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
@@ -186,6 +241,16 @@
       "path": "target/gh-259/core-acceptance-features-14/summary.json",
       "bytes": 5126,
       "sha256": "d260ea05ab22c28e3e923488c1ab2d6d5291e10a29f71049023466791b4ec77b"
+    },
+    {
+      "path": "target/gh-259/core-acceptance-features-15.log",
+      "bytes": 102,
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+    },
+    {
+      "path": "target/gh-259/core-acceptance-features-15/summary.json",
+      "bytes": 5126,
+      "sha256": "4b2415956561edffddc9951341f96abe5ea2d7f3fece1e6f01bedcf8f053d1b6"
     },
     {
       "path": "target/gh-259/core-acceptance-plain-05.log",
@@ -228,6 +293,16 @@
       "sha256": "5b4dcccefea25d01c48f423b695d28f873a85677a21613063399c23254625282"
     },
     {
+      "path": "target/gh-259/core-acceptance-plain-15.log",
+      "bytes": 102,
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+    },
+    {
+      "path": "target/gh-259/core-acceptance-plain-15/summary.json",
+      "bytes": 4443,
+      "sha256": "bf8035f1d8ac759558bae4cce1532a78165660fe3970af5478f4290e259de0f2"
+    },
+    {
       "path": "target/gh-259/core-acceptance-registry-10.log",
       "bytes": 129,
       "sha256": "5b5cd4e738dd4081bee87fef3a963648427054899b6d0a378b9cca35f42a993c"
@@ -256,6 +331,16 @@
       "path": "target/gh-259/core-acceptance-registry-14/summary.json",
       "bytes": 4203,
       "sha256": "29f003624237601ca719e2be3e9704ab09e676febff929b38c6009da654827e3"
+    },
+    {
+      "path": "target/gh-259/core-acceptance-registry-15.log",
+      "bytes": 102,
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+    },
+    {
+      "path": "target/gh-259/core-acceptance-registry-15/summary.json",
+      "bytes": 4203,
+      "sha256": "232fee5e16e1037c28e1ab5e67964462cb6db7493bf5817e69b29c158b78157b"
     },
     {
       "path": "target/gh-259/core-adapter-build.log",
@@ -403,6 +488,26 @@
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
+      "path": "target/gh-259/docs-consistency-12-default-target-failed.json",
+      "bytes": 1494,
+      "sha256": "aaa8827a635f45e33054de13bb86b19559a2ffe7ebc80c8d6421ef08b20e0405"
+    },
+    {
+      "path": "target/gh-259/docs-consistency-12-default-target-failed.log",
+      "bytes": 79,
+      "sha256": "6fdde67acd13145abd556580c3ab8d9ea34bad99a09db00ccf28a3fbeabecb76"
+    },
+    {
+      "path": "target/gh-259/docs-consistency-12.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-259/docs-default-target-probe.log",
+      "bytes": 120,
+      "sha256": "1518f5efe4e6f2ab73a01b43187054665d70adad18be3c687269a0d7028ada40"
+    },
+    {
       "path": "target/gh-259/historical-02.log",
       "bytes": 140,
       "sha256": "0e6078e6ae02f57f08636145d5ed27ae7330ee55f1a7fdc09377bd0ceeec618a"
@@ -451,6 +556,16 @@
       "path": "target/gh-259/historical-09/comparison.json",
       "bytes": 9650,
       "sha256": "f9bc82539e5b7bbc556068bb225c97cec357c334aca6661d2dcdada8f4e47b90"
+    },
+    {
+      "path": "target/gh-259/historical-10.log",
+      "bytes": 140,
+      "sha256": "2574eec0f4403b045138da71050e47c4376548c3967606d83f6bbee4b3c63abf"
+    },
+    {
+      "path": "target/gh-259/historical-10/comparison.json",
+      "bytes": 9650,
+      "sha256": "dff1a1a0ff947cc657e90db2d4f8f03f84903647f99f1748e740b8d04836848b"
     },
     {
       "path": "target/gh-259/input-reproduction-01/summary.json",
@@ -511,6 +626,31 @@
       "path": "target/gh-259/lifecycle-10/upgrade-build.json",
       "bytes": 3458,
       "sha256": "32a154e3b6fabad417da62bc8e470d6e016c81b8ad7690aa4de19125924a2618"
+    },
+    {
+      "path": "target/gh-259/lifecycle-11-setup-failed.log",
+      "bytes": 751,
+      "sha256": "10ef0320d138e19319728f26b190b0a3a367fa05eb7da8acda8cd291e4e7286f"
+    },
+    {
+      "path": "target/gh-259/lifecycle-11.log",
+      "bytes": 109,
+      "sha256": "fef1f60ece7649990496e0d82268eb8c6faedac8cdc7594c6d49b6b3421174ac"
+    },
+    {
+      "path": "target/gh-259/lifecycle-11/automation.json",
+      "bytes": 17466,
+      "sha256": "8a6972fdd260d05dced6ae71c7a46e007fe7a2795a896d8accc175cb79f3346f"
+    },
+    {
+      "path": "target/gh-259/lifecycle-11/summary.json",
+      "bytes": 6262,
+      "sha256": "1fb90c9027ebbe91429e481e4efae194f3c25eb1923e83be524974a00081ed00"
+    },
+    {
+      "path": "target/gh-259/lifecycle-11/upgrade-build.json",
+      "bytes": 3458,
+      "sha256": "f4480a9c30c7e7fccd6bf2c059a5e138d259ee6b9a6e3aa1e9502ee7cc6dd168"
     },
     {
       "path": "target/gh-259/lifecycle-health-build-01.log",
@@ -608,6 +748,16 @@
       "sha256": "f5d5c656f4ae248528c74f55c8574dad2740aa31e96d2158198a885c360f3030"
     },
     {
+      "path": "target/gh-259/package-10.log",
+      "bytes": 148,
+      "sha256": "413ede056281a6ad8d79331baeb51833a8b3cbfb8afe467a7b8f3c1652a6a895"
+    },
+    {
+      "path": "target/gh-259/package-10/preparation.json",
+      "bytes": 38094,
+      "sha256": "5c20bbb700af60af95f79c00a3c529e0418044e6b1b1718d4e7b016fadc1ee17"
+    },
+    {
       "path": "target/gh-259/package-ci-build-01.log",
       "bytes": 62,
       "sha256": "765f1396d07f30f3a451cd3f9d9cad4e83c92c8e0aecf955ffc09061a6cf1e02"
@@ -673,6 +823,11 @@
       "sha256": "86d251ed4262c3e6ff5a2cb05b5d25e7c61a479aa3334885a30c29374f940e35"
     },
     {
+      "path": "target/gh-259/quality-tests-11.log",
+      "bytes": 77463,
+      "sha256": "b6948db25e8729b61ae6d3f91c3fc2b3c00d34b4c313dd3aecc19e0e1a072874"
+    },
+    {
       "path": "target/gh-259/registry-reproduction-01/summary.json",
       "bytes": 538,
       "sha256": "ab97b3a4b28e2d431c9f772e85f11194343eaa3f2c958ba6724e83b9694ee418"
@@ -721,6 +876,11 @@
       "path": "target/gh-259/release-tests-11.log",
       "bytes": 14290,
       "sha256": "5d6d8096c8d5cd863bbdd4c9705055df09afa58e3da8facc90df8193745a9c79"
+    },
+    {
+      "path": "target/gh-259/release-tests-12.log",
+      "bytes": 14291,
+      "sha256": "428e8642fdbd14fee194d132a2cb7e67379f2feffe8688e3327bbfe001127f42"
     },
     {
       "path": "target/gh-259/release-tests.log",

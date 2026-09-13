@@ -68,7 +68,7 @@ The T4 raw-evidence checkpoint validates the exercised public LLVM JSON structur
 integer domains, region IDs, segments and summary arithmetic with duplicate-key
 rejection. Thirteen mutations of real exports now fail after test-only manifest
 re-anchoring, and package preparation requires those checks. This remains a raw
-format contract: aggregate/counter reconciliation, certified source owners and
+format contract: complete counter reconciliation, broad certified source owners and
 normalized coverage/CRAP are not complete. T4, T6–T8 remain unchecked; required
 metrics, migration review and the release hold are unchanged.
 
@@ -105,3 +105,12 @@ builds establish relative-path resolution from the observed compiler cwd. This i
 not arbitrary build-script/environment closure or a transitive process audit.
 The validation record retains the original external-input reproduction and all
 limits. T3–T8 and the publication hold remain open.
+
+The bounded T4 aggregate checkpoint reconciles public LLVM JSON total count and
+covered values against the sum of all exported file summaries, using checked
+integer addition. Percentages and notcovered retain their independent arithmetic
+checks. LLVM 22.1.6 CoverageExporterJson::renderRoot and
+CoverageReport::prepareFileReports define this relation. Eleven internally valid
+but mutually inconsistent mutations of real exports are required acceptance
+cases. This does not certify region/segment counter semantics, broaden function
+owners or enable intra-function coverage/CRAP. T3–T8 remain open.

@@ -108,6 +108,61 @@
       "passed": true
     },
     {
+      "name": "total-lines-count",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "total-lines-covered",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "total-functions-count",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "total-functions-covered",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "total-instantiations-count",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "total-instantiations-covered",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "total-regions-count",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "total-regions-covered",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "total-branches-count",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "total-branches-covered",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "file-summary-disagreement",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
       "name": "missing-llvm-owner",
       "exit_code": 1,
       "passed": true
@@ -414,8 +469,8 @@
       "anchors": {
         "capture": "complete",
         "core_acceptance": "pending",
-        "manifest_sha256": "e0d62d9c269ce587153d222aa5cb90799d8c060800acdb4aa6af339bd05c422a",
-        "request_sha256": "d8dce47e1819b8fd7d4bec75bbad96f00892c3e2978d93727ba136afa98afc3c",
+        "manifest_sha256": "f25fbfae22b5e74aa8bfc3741c059eee5a5030d42b3c186e7c6963f67f2091e8",
+        "request_sha256": "c2a1d77ff49981f9ffa9df6a7e674a1827947cdca04986936aa5dbb382488cf8",
         "state": "unsupported"
       },
       "llvm_totals_test_inclusive": {
@@ -486,8 +541,8 @@
       "anchors": {
         "capture": "complete",
         "core_acceptance": "pending",
-        "manifest_sha256": "003e5d89e07d199cb260fe06951508fb26b3bfa55dd4b92d8539d79cb4699969",
-        "request_sha256": "4b42e61e20aec0ea98236c423dee7d0532ceb83ae7c5342b7b30e543f38f2eae",
+        "manifest_sha256": "3e9d49b9bd65f13efd8e908f1d92023da99d04859dfa2ff96add1bf3df3efc64",
+        "request_sha256": "d8adbad6765550dec6bca6dfd4c985b17baabc6ac78729ba4ee83e65a2980c36",
         "state": "unsupported"
       },
       "llvm_totals_test_inclusive": {
@@ -612,8 +667,8 @@
       "anchors": {
         "capture": "complete",
         "core_acceptance": "pending",
-        "manifest_sha256": "7ebc000f8ca492b846c711837dea0204f17f94be86b799b8298e630ae0c9ce2b",
-        "request_sha256": "c0a62bfe0eb524eff98efcece64d34330557113830c4c8330801131a39cef95c",
+        "manifest_sha256": "541c4924ea5332bd47784b96ecdb1204778dc8071bb7eca2e85788e2201ba7b6",
+        "request_sha256": "5cb6e800a163f1bd7566ad4b456095e9068486a33b96dcffa593b9f899b21c30",
         "state": "unsupported"
       },
       "llvm_totals_test_inclusive": {
@@ -738,8 +793,8 @@
       "anchors": {
         "capture": "complete",
         "core_acceptance": "pending",
-        "manifest_sha256": "775f552a5a30789f0c7cbf057d700ae7a3fe127ca47e8df3906b98ff349a96e1",
-        "request_sha256": "719a7a8ee5db31050787161e0c05a74d8e5fd679995e61684921d1706325fc8d",
+        "manifest_sha256": "63761c553cfdc65954b5d300a535521c099bf1bcc31c93328277b2e596f02641",
+        "request_sha256": "d302e0ca88c2da770a5cc9086c858d09e8436ea0e2b2a2f642b5f78675bc349e",
         "state": "unsupported"
       },
       "archive_sha256": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682",
@@ -752,10 +807,10 @@
         "--locked",
         "--offline",
         "--manifest-path",
-        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-21/project-registry/Cargo.toml"
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-22/project-registry/Cargo.toml"
       ],
       "setup_is_repository_automation": true,
-      "isolated_cargo_home": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-21/registry-cargo-home",
+      "isolated_cargo_home": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-22/registry-cargo-home",
       "network_download_bytes": 0,
       "scope": "single locked crates.io dependency; local cache copied by test setup"
     },
@@ -821,8 +876,8 @@
     "llvm": "22.1.6"
   },
   "binary": {
-    "sha256": "05b61f7047ac8e204d0ac0fb658164ac48e7022498672f351147a8a6fe80a9ef",
-    "bytes": 1994248
+    "sha256": "e020ad59faf78db0133f4a83105b18f0a39d9676ea21c24386dcb662ac476f73",
+    "bytes": 1995304
   },
   "capture_bytes": 48545,
   "persistent_candidate_cache_bytes": 0,

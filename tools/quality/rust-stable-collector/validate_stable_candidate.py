@@ -122,6 +122,25 @@ def main():
             ('invalid-segment-boolean', ['data', 0, 'files', 0, 'segments', 0, 3], 1, 'segment fields'),
             ('mcdc-capability', ['data', 0, 'functions', 0, 'mcdc_records'], [[1]], 'unsupported LLVM MC/DC'),
         ]
+        # Keep each changed row internally consistent; only cross-file totals
+        # reconciliation can detect these test-only reanchored corruptions.
+        for metric in ('lines', 'functions', 'instantiations', 'regions', 'branches'):
+            for field in ('count', 'covered'):
+                row = json.loads(original_coverage)['data'][0]['totals'][metric]
+                if field == 'count':
+                    row['count'] += 1
+                elif row['covered']:
+                    row['covered'] -= 1
+                else:
+                    row['count'] = max(row['count'], 1)
+                    row['covered'] = 1
+                row['percent'] = row['covered'] / row['count'] * 100
+                if 'notcovered' in row:
+                    row['notcovered'] = row['count'] - row['covered']
+                mutations.append((f'total-{metric}-{field}', ['data', 0, 'totals', metric],
+                                  row, f'LLVM {metric} total'))
+        mutations.append(('file-summary-disagreement', ['data', 0, 'files', 0, 'summary', 'lines'],
+                          {'count': 0, 'covered': 0, 'percent': 0}, 'LLVM lines total'))
         llvm_functions = json.loads(original_coverage)['data'][0]['functions']
         unused_index = next(i for i, f in enumerate(llvm_functions) if f['name'].endswith('12never_called'))
         second_owner = {**llvm_functions[0], 'name': 'different-symbol-same-owner'}
