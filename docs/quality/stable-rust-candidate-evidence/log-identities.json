@@ -1,6 +1,6 @@
 {
   "schema": "rust-stable-candidate-log-identities/v1",
-  "note": "Workspace execution logs, not distributed acceptance archives. Includes superseded failures (quality-tests-02.log, package-01.log); validation record names the final successful results.",
+  "note": "Workspace execution logs, not distributed acceptance archives. Includes superseded failures (quality-tests-02.log, package-01.log, coverage-tests-01.log); validation record names the final successful results. coverage-reproduction-01.json records the preceding binary accepting malformed data before the fix.",
   "logs": [
     {
       "path": "target/gh-259/stable-lifecycle-build-02.log",
@@ -206,6 +206,86 @@
       "path": "target/gh-259/docs-consistency-06.log",
       "bytes": 0,
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-259/coverage-build-01.log",
+      "bytes": 208,
+      "sha256": "f4ef5566925e9d9c3357fe4b182870c313a17bcd2e682fd34d16a02e60689dbd"
+    },
+    {
+      "path": "target/gh-259/coverage-tests-01.log",
+      "bytes": 2569,
+      "sha256": "ab24ebd552911a666b7284ad60759eb2e27628cc79fcfdc020241ea3cdf1b162"
+    },
+    {
+      "path": "target/gh-259/coverage-tests-02.log",
+      "bytes": 1140,
+      "sha256": "e2f7fdd5707cb78857e707eab66f1fd2aa7cf8227f3eb8ee52fcc7979e68df44"
+    },
+    {
+      "path": "target/gh-259/coverage-fmt-01.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-259/coverage-clippy-01.log",
+      "bytes": 217,
+      "sha256": "d99a0af29bce38d0a8bcad29205bd25c97b1754386c48616be4d595728f68b2f"
+    },
+    {
+      "path": "target/gh-259/coverage-reproduction-01.json",
+      "bytes": 544,
+      "sha256": "8685a47137c105adf581db17b94d81997aa4cb394c9d78b8984d2608f9d27137"
+    },
+    {
+      "path": "target/gh-259/acceptance-11.log",
+      "bytes": 117,
+      "sha256": "584d6cd21f289ddba6c1e0e631fcc2987849aea5f678d45d23ee69141ddbe00f"
+    },
+    {
+      "path": "target/gh-259/historical-04.log",
+      "bytes": 140,
+      "sha256": "5af306ca488130b6608d039c2617f9a46f6acef26340a8429517f7e708558163"
+    },
+    {
+      "path": "target/gh-259/package-03.log",
+      "bytes": 148,
+      "sha256": "2da0f992d4b242bde1fdb70661c4715881fef52fdf572e13740b4b907dab1cd7"
+    },
+    {
+      "path": "target/gh-259/lifecycle-05.log",
+      "bytes": 109,
+      "sha256": "4d0dfd908ee64de4c2d3791240d38254a0323240a22bff4ad1477d9d78a34062"
+    },
+    {
+      "path": "target/gh-259/quality-tests-06.log",
+      "bytes": 77462,
+      "sha256": "7aa47bb2009bc7e2a7ade9dd5431e13e776b946cd70922230fc1a3d7483d3233"
+    },
+    {
+      "path": "target/gh-259/release-tests-04.log",
+      "bytes": 14290,
+      "sha256": "410fcc4130bf3eb79424db0614d19850a19c2dd321a3704ebd080d1f7c874e2c"
+    },
+    {
+      "path": "target/gh-259/docs-consistency-07.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-259/core-acceptance-plain-07.log",
+      "bytes": 102,
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+    },
+    {
+      "path": "target/gh-259/core-acceptance-boundaries-07.log",
+      "bytes": 102,
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+    },
+    {
+      "path": "target/gh-259/core-acceptance-features-07.log",
+      "bytes": 102,
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
     }
   ]
 }

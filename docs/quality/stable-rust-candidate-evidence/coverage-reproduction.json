@@ -1,0 +1,13 @@
+{
+  "mutation": "negative LLVM function execution count, re-anchored test manifest",
+  "command": [
+    "target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+    "verify",
+    "target/gh-259/acceptance-10/capture-plain",
+    "7afad3902e0bbaf7b71cbb264d351fb506a3fccd6a4728c60b4ce3deeefde30a",
+    "aa30d02d5ee82e33e5fbad768c64519ead12b246dde62d6981d284344f8a1f10"
+  ],
+  "exit_code": 0,
+  "stdout": "{\"core_acceptance\":\"pending\",\"integrity\":\"verified\",\"schema\":\"rust-stable-verification/v1\"}\n",
+  "stderr": ""
+}

@@ -154,6 +154,18 @@ JSON `3.1.0` is preserved under `rust-llvm-source-coverage/v1-candidate`; schema
 checks do not certify owners. No branch denominator is synthesized when standard
 instrumentation exports zero branch regions.
 
+The raw validator follows the public [LLVM 22.1.6 JSON exporter](https://github.com/llvm/llvm-project/blob/llvmorg-22.1.6/llvm/tools/llvm-cov/CoverageExporterJson.cpp).
+The exercised invocation requires one nonempty export object, rejects duplicate
+JSON keys, and validates signed-64 execution-count bounds, region coordinates and
+filename IDs, ordered segments and summary arithmetic. Finite floating-point
+percentages are accepted only in raw coverage parsing; Core and release documents
+retain integer-only strict parsing. Unknown formats/region kinds and MC/DC fail
+with `measurement_error` and an unsupported-format explanation. A valid raw capture
+can still declare a metric capability `unsupported`; malformed data never produces
+a successful capture. Branch/expansion layout checks do not establish a verified
+producer capability. Cross-file aggregate reconciliation, counter-to-summary
+reconstruction and certified ownership remain pending T4 work.
+
 ### Independent lifecycle and migration (T5–T8)
 
 The Rust `release` module now verifies local flat bundles and atomically selects
