@@ -1,0 +1,49 @@
+{
+  "schema": "gh259-operator-unblock/v1",
+  "binary": {
+    "sha256": "62feafa4831df83843fa71e7384d15c7bd79fb6c679525bcccfb853d47607409",
+    "bytes": 3496016
+  },
+  "ci_patch": "cc1681ed085469e02b8115c87e22839b9e2dd7f1",
+  "rust198_capture": {
+    "checks": 125,
+    "execve_trace": "verified",
+    "summary_path": "/mnt/dev-ssd/workspaces/gh259-unblock/target/operator-gh259/rust198-runtime/summary.json",
+    "summary_sha256": "e9bacef99a3b3d5db21219a0c625b39896ccb5981d75558623ffef278904d5d1"
+  },
+  "ubuntu24": [
+    {
+      "version": "1.97.1",
+      "image": "sha256:9db3f99559b89217bae47e34867aae751e84cae48e0e25dfa6f352b7209c0918",
+      "commands_passed": 4,
+      "receipt_path": "/mnt/dev-ssd/workspaces/gh259-unblock/target/operator-gh259/ubuntu24-ready/1.97.1/operator-receipt.json",
+      "receipt_sha256": "670e00b8cf6f7f54b2b829eaff311bbfec46845f6616ccbcb1e7a614c8aef924"
+    },
+    {
+      "version": "1.98.1",
+      "image": "sha256:9db3f99559b89217bae47e34867aae751e84cae48e0e25dfa6f352b7209c0918",
+      "commands_passed": 4,
+      "receipt_path": "/mnt/dev-ssd/workspaces/gh259-unblock/target/operator-gh259/ubuntu24-ready/1.98.1/operator-receipt.json",
+      "receipt_sha256": "17ebc6e772275c33f3bb06352e99863af1dc57c73dc5d2d9b74c8559aa05bc65"
+    }
+  ],
+  "limitations": [
+    "Ubuntu container checks cover doctor/prepare/collect/verify on the plain fixture; they are not the full cross-system matrix.",
+    "Container shares host kernel; no second-kernel claim.",
+    "Generated macro owner coverage, CRAP migration and production signatures remain incomplete.",
+    "CI status must be checked separately."
+  ],
+  "rust198_core": {
+    "fixtures": [
+      "plain",
+      "partial",
+      "modules",
+      "boundaries",
+      "features",
+      "registry"
+    ],
+    "trace": "verified",
+    "receipt_path": "/mnt/dev-ssd/workspaces/gh259-unblock/target/operator-gh259/core198-receipt.json",
+    "receipt_sha256": "2d13175fcf1df985c0382ee8b7177ea0cfebc41a5fd7974afaf5785858ca4e8d"
+  }
+}
