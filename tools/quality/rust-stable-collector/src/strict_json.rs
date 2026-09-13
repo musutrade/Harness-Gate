@@ -73,6 +73,11 @@ pub fn parse(bytes: &[u8]) -> Result<Value> {
     Ok(serde_json::from_slice::<Strict<false>>(bytes)?.0)
 }
 
+/// Validate the entire input before typed deserialization can collapse map keys.
+pub fn decode<T: serde::de::DeserializeOwned>(bytes: &[u8]) -> Result<T> {
+    Ok(serde_json::from_value(parse(bytes)?)?)
+}
+
 /// LLVM exports contain floating point summary percentages. They are never
 /// imported into the integer-only authenticated Core metric domain.
 pub fn parse_coverage(bytes: &[u8]) -> Result<Value> {
@@ -92,6 +97,9 @@ mod tests {
             assert!(parse(raw.as_bytes()).is_err());
         }
         assert!(parse_coverage(br#"{"x":1,"x":2}"#).is_err());
+        for raw in [br#"{"path":1,"path":2}"#, br#"{"path":2,"path":1}"#] {
+            assert!(decode::<std::collections::BTreeMap<String, u64>>(raw).is_err());
+        }
         assert_eq!(
             parse_coverage(br#"{"percent":1.5}"#).unwrap()["percent"],
             1.5
