@@ -1,6 +1,7 @@
 //! Candidate capture, deliberately not a Core adapter or signed release format.
 use crate::{
     artifact::{self, FileIdentity},
+    coverage,
     process::Runner,
     source,
     tools::{self, Tools},
@@ -178,46 +179,6 @@ fn validate_metadata(value: &Value, root: &Path) -> Result<()> {
     Ok(())
 }
 
-fn validate_coverage(value: &Value) -> Result<()> {
-    ensure!(
-        value["type"] == "llvm.coverage.json.export",
-        "wrong LLVM JSON type"
-    );
-    ensure!(
-        value["version"] == "3.1.0",
-        "unsupported LLVM JSON export version: {}",
-        value["version"]
-    );
-    let data = value["data"]
-        .as_array()
-        .context("LLVM data array missing")?;
-    ensure!(!data.is_empty(), "empty LLVM data");
-    for object in data {
-        let files = object["files"].as_array().context("LLVM files missing")?;
-        ensure!(!files.is_empty(), "empty LLVM files");
-        for file in files {
-            ensure!(
-                file["filename"].as_str().is_some_and(|s| !s.is_empty()),
-                "LLVM filename missing"
-            );
-            let segments = file["segments"]
-                .as_array()
-                .context("LLVM segments missing")?;
-            for segment in segments {
-                let fields = segment.as_array().context("invalid LLVM segment")?;
-                ensure!(
-                    fields.len() == 6
-                        && fields[..3].iter().all(|v| v.as_u64().is_some())
-                        && fields[3..].iter().all(|v| v.as_bool().is_some()),
-                    "invalid LLVM segment fields"
-                );
-            }
-        }
-        ensure!(object["functions"].is_array(), "LLVM functions missing");
-    }
-    Ok(())
-}
-
 fn recheck_tools(tools: &Tools) -> Result<()> {
     for tool in [
         &tools.rustc,
@@ -325,8 +286,8 @@ pub fn collect(path: &Path) -> Result<String> {
         args.extend(["--features".into(), request.features.join(",")]);
     }
     runner.run(&toolset.cargo_llvm_cov.path, &args, &extra)?;
-    let coverage: Value = serde_json::from_slice(&fs::read(&coverage_path)?)?;
-    validate_coverage(&coverage)?;
+    let coverage: Value = coverage::parse(&fs::read(&coverage_path)?)?;
+    coverage::validate(&coverage)?;
     let mut sources = BTreeMap::new();
     let mut exclusions = Vec::new();
     for name in request.source_files.keys().filter(|n| n.ends_with(".rs")) {
@@ -404,8 +365,8 @@ pub fn verify(root: &Path, anchor: &str, request_digest: &str) -> Result<()> {
     );
     validate_request(&request)?;
     recheck_tools(&request.tools)?;
-    let coverage: Value = serde_json::from_slice(&fs::read(root.join("coverage.json"))?)?;
-    validate_coverage(&coverage)?;
+    let coverage: Value = coverage::parse(&fs::read(root.join("coverage.json"))?)?;
+    coverage::validate(&coverage)?;
     Ok(())
 }
 
@@ -431,7 +392,7 @@ mod tests {
             json!({"type":"llvm.coverage.json.export", "version":"999", "data":[]}),
             json!({"type":"llvm.coverage.json.export", "version":"3.1.0", "data":[{"files":[{"filename":"x", "segments":[[1,2,-1,true,true,false]]}],"functions":[]}]}),
         ] {
-            assert!(validate_coverage(&value).is_err());
+            assert!(coverage::validate(&value).is_err());
         }
     }
     #[test]

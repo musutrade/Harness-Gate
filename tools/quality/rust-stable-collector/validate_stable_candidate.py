@@ -97,6 +97,44 @@ def main():
         coverage.write_bytes(b'{}')
         assert 'artifact identity/set mismatch' in verify('corrupt-coverage', anchor, success=False)
         coverage.write_bytes(original_coverage)
+        # Re-anchor only the test capture to exercise semantic validation beyond
+        # SHA checks. These synthetic mutations are not producer or signing proof.
+        manifest_path = output / 'capture-plain/manifest.json'
+        original_manifest = manifest_path.read_bytes()
+        mutations = [
+            ('negative-function-count', ['data', 0, 'functions', 0, 'count'], -1, 'nonnegative integer'),
+            ('overflow-function-count', ['data', 0, 'functions', 0, 'count'], 2**63, 'exporter range'),
+            ('fractional-function-count', ['data', 0, 'functions', 0, 'count'], 1.5, 'nonnegative integer'),
+            ('missing-function-regions', ['data', 0, 'functions', 0, 'regions'], [], 'empty LLVM function regions'),
+            ('invalid-region-file', ['data', 0, 'functions', 0, 'regions', 0, 5], 999, 'file ID out of range'),
+            ('reversed-region', ['data', 0, 'functions', 0, 'regions', 0, 0], 999, 'reversed LLVM region'),
+            ('unknown-region-kind', ['data', 0, 'functions', 0, 'regions', 0, 7], 99, 'unsupported LLVM region kind'),
+            ('covered-exceeds-total', ['data', 0, 'totals', 'lines', 'covered'], 999, 'covered exceeds count'),
+            ('wrong-summary-percent', ['data', 0, 'files', 0, 'summary', 'lines', 'percent'], 1.5, 'percentage mismatch'),
+            ('wrong-notcovered', ['data', 0, 'totals', 'regions', 'notcovered'], 999, 'notcovered mismatch'),
+            ('invalid-segment-boolean', ['data', 0, 'files', 0, 'segments', 0, 3], 1, 'segment fields'),
+            ('mcdc-capability', ['data', 0, 'functions', 0, 'mcdc_records'], [[1]], 'unsupported LLVM MC/DC'),
+        ]
+        try:
+            for label, path, replacement, error in mutations:
+                changed = json.loads(original_coverage)
+                parent = changed
+                for component in path[:-1]:
+                    parent = parent[component]
+                parent[path[-1]] = replacement
+                coverage.write_text(json.dumps(changed))
+                manifest = json.loads(original_manifest)
+                manifest['files']['coverage.json'] = {'sha256': digest(coverage), 'bytes': coverage.stat().st_size}
+                manifest_path.write_text(json.dumps(manifest))
+                assert error in verify(label, {**anchor, 'manifest_sha256': digest(manifest_path)}, success=False)
+            coverage.write_bytes(original_coverage.replace(b'"count":', b'"count":0,"count":', 1))
+            manifest = json.loads(original_manifest)
+            manifest['files']['coverage.json'] = {'sha256': digest(coverage), 'bytes': coverage.stat().st_size}
+            manifest_path.write_text(json.dumps(manifest))
+            assert 'duplicate key' in verify('duplicate-coverage-key', {**anchor, 'manifest_sha256': digest(manifest_path)}, success=False)
+        finally:
+            coverage.write_bytes(original_coverage)
+            manifest_path.write_bytes(original_manifest)
         unknown = output / 'capture-plain/unlisted.json'
         unknown.write_text('{}')
         verify('mixed-artifact', anchor, success=False)

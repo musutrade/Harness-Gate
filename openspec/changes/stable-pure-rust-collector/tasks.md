@@ -33,3 +33,11 @@ notices. Real lifecycle checks consume that payload and reject unsigned packages
 and re-signed overstated support metadata. This is review preparation only:
 protected production signing, trust bootstrap, downloader, license review and
 multi-toolchain/system acceptance remain open. T5 and T8 stay unchecked.
+
+The T4 raw-evidence checkpoint validates the exercised public LLVM JSON structure,
+integer domains, region IDs, segments and summary arithmetic with duplicate-key
+rejection. Thirteen mutations of real exports now fail after test-only manifest
+re-anchoring, and package preparation requires those checks. This remains a raw
+format contract: aggregate/counter reconciliation, certified source owners and
+normalized coverage/CRAP are not complete. T4, T6–T8 remain unchecked; required
+metrics, migration review and the release hold are unchanged.
