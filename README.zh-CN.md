@@ -13,7 +13,7 @@
 
 ## 当前版本
 
-Core **0.4.1** 已发布到 GitHub 和 crates.io。Rust 原生测量通过独立安装、独立版本的可选插件提供；Core 负责编排和质量决策。文档入口见[文档目录](docs/README.md)，发布凭据与剩余工作见[交付状态](docs/release-status.md)。
+Core **0.4.2** 包含暂存区主机输入与大型原生报告修复，发布进度以交付状态为准。Rust 原生测量通过独立安装、独立版本的可选插件提供；Core 负责编排和质量决策。文档入口见[文档目录](docs/README.md)，发布凭据与剩余工作见[交付状态](docs/release-status.md)。
 
 ## 阅读导航
 
@@ -58,12 +58,12 @@ component、profile、命令、路径、parser 和 service 都来自 TOML。常�
 ### 从 Crates.io 安装（推荐）
 
 ```bash
-cargo install harness-gate --version 0.4.1 --locked
+cargo install harness-gate --version 0.4.2 --locked
 ```
 
 ### 从 GitHub Release 安装（预编译二进制）
 
-从不可变的 [GitHub Release tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.1) 下载适合你平台的二进制文件：
+从不可变的 [GitHub Release tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.2) 下载适合你平台的二进制文件：
 
 - **Linux (x86_64)**: `harness-gate-linux-amd64`
 - **macOS (Intel)**: `harness-gate-macos-amd64`
@@ -77,7 +77,7 @@ cargo install harness-gate --version 0.4.1 --locked
 curl --fail --show-error --location --proto '=https' --tlsv1.2 \
   -o /tmp/harness-gate-install.sh \
   https://raw.githubusercontent.com/musutrade/Harness-Gate/13722b0ba8781be106c160c422c07fbacb1bdc6e/install.sh
-bash /tmp/harness-gate-install.sh --version v0.4.1
+bash /tmp/harness-gate-install.sh --version v0.4.2
 harness-gate --version
 ```
 
@@ -87,22 +87,11 @@ harness-gate --version
 
 ### 可选 Rust 插件
 
-先按上面的命令下载 `install.sh`，再选择安装范围：
+默认仅安装 Core，不下载 Rust 分析工具链。请按[当前插件安装指南](docs/quality/rust-collector-installation.md)选择已签名安装器、兼容的 Core/插件组合或离线包。安装器与插件独立版本；历史 Core tag 中的脚本不会自动选择未来插件版本。
 
-```bash
-# Core 与 Rust 插件一起安装
-bash /tmp/harness-gate-install.sh --version v0.4.1 --with-rust
-# 已安装 Core 时单独加装 Rust 插件
-bash /tmp/harness-gate-install.sh --rust-only
-```
+插件采用约 270 MB 的工具链层与 13 MB 的插件层；首次连同 bootstrap、验证工具及元数据约 **444 MB**。未改变的工具层按摘要缓存，运行时和原始签名归档保留用于验证及回滚。默认插件目录为 `~/.local/share/harness-gate/rust-collector`，缓存目录为 `~/.cache/harness-gate/collector`。
 
-默认仅安装 Core，不下载 Rust 分析工具链。插件采用约 270 MB 的工具链层与 13 MB 的插件层；首次连同约 15 MB bootstrap、141 MB 验证工具和元数据，总下载约 **444 MB**。工具链和验证工具按摘要缓存，重复安装会验证已有文件。解压后的运行时、原始签名归档和缓存仍占用磁盘，不等同于下载大小。
-
-[安装器 `0.1.0-rc.3`](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-installer-v0.1.0-rc.3) 安装已签名插件 `0.1.0-rc.2`，两者版本独立。插件目前只认证指定的 Linux x86_64 ABI，不代表任意 Linux、macOS 或 Windows 都可采集；不兼容主机会在下载工具链前被拒绝。
-
-RC2 的正式兼容性回执已覆盖 **Core 0.4.1** 和上述精确主机。验收复用了原始采集，并逐文件验证保留运行时与新版本相同，没有重复编译 Arc Admin。详见[兼容性与回执](docs/release-status.md#compatibility)。
-
-默认插件目录是 `~/.local/share/harness-gate/rust-collector`，缓存目录是 `~/.cache/harness-gate/collector`。可用 `--rust-root`、`--cache-dir` 修改；离线安装、生命周期及信任说明见[插件安装指南](docs/quality/rust-collector-installation.md)。安装不会替项目生成可信采集请求、接受基线或修改默认 Rust 工具链。
+Rust 原生采集只认证明确记录的 Linux x86_64 ABI，兼容版本和实际回执见[交付状态](docs/release-status.md#compatibility)。安装不会替项目生成可信采集请求、接受基线或修改默认 Rust 工具链。
 
 ### 从源码安装
 

@@ -13,7 +13,7 @@ It handles changed paths, secret scanning, architecture auditing, environment va
 
 ## Current releases
 
-Core **0.4.1** is available on GitHub and crates.io. Rust-specific native measurement is an optional, independently installed plugin; Core owns orchestration and quality decisions. See the [documentation index](docs/README.md) and [release status, acceptance and remaining work](docs/release-status.md).
+Core **0.4.2** includes staged-host input and large native-report fixes; publication status is recorded below. Rust-specific native measurement is an optional, independently installed plugin; Core owns orchestration and quality decisions. See the [documentation index](docs/README.md) and [release status, acceptance and remaining work](docs/release-status.md).
 
 ## Navigation
 
@@ -64,13 +64,13 @@ actual collector/series. New metric semantics require separate contract review.
 ### Install from Crates.io (Recommended)
 
 ```bash
-cargo install harness-gate --version 0.4.1 --locked
+cargo install harness-gate --version 0.4.2 --locked
 ```
 
 ### Install from GitHub Release (Pre-built Binaries)
 
 Download the binary for your platform from an immutable [GitHub Release
-tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.1):
+tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.2):
 
 - **Linux (x86_64)**: `harness-gate-linux-amd64`
 - **macOS (Intel)**: `harness-gate-macos-amd64`
@@ -85,7 +85,7 @@ the pinned source revision, then select the immutable Core release explicitly:
 curl --fail --show-error --location --proto '=https' --tlsv1.2 \
   -o /tmp/harness-gate-install.sh \
   https://raw.githubusercontent.com/musutrade/Harness-Gate/13722b0ba8781be106c160c422c07fbacb1bdc6e/install.sh
-bash /tmp/harness-gate-install.sh --version v0.4.1
+bash /tmp/harness-gate-install.sh --version v0.4.2
 harness-gate --version
 ```
 
@@ -97,44 +97,18 @@ source installation additionally requires `git` and Rust `cargo`.
 
 ### Optional Rust collection
 
-Core does not download a Rust analysis toolchain by default. Use the same entry
-point to add the optional plugin:
+Core does not download a Rust analysis toolchain by default. Use the current
+[plugin installation guide](docs/quality/rust-collector-installation.md) for the
+signed installer, compatible Core/plugin pair and offline kit. Installer and
+plugin versions are independent; a historical Core tag does not select future
+plugin releases automatically.
 
-```bash
-# Core and Rust collection
-bash /tmp/harness-gate-install.sh --version v0.4.1 --with-rust
-# Add Rust collection to an existing Core installation
-bash /tmp/harness-gate-install.sh --rust-only
-```
-
-The installer automatically provisions verification inputs. Compressed delivery
-uses approximately 270 MB of reusable tools and 13 MB of plugin contents.
-First installation totals approximately **444 MB**, including the 15 MB bootstrap,
-the 141 MB verifier and metadata. Unchanged tools are cached
-under `~/.cache/harness-gate/collector`; upgrading a plugin reuses the cache.
-The original signed archive is reconstructed locally and both RSA and Sigstore
-signatures are checked before installation. Disk usage is larger than download
-size because the installed runtime and signed archive are retained for rollback.
-
-This initial Rust plugin is certified only for the exact Linux x86_64 ABI listed
-in its [installer release](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-installer-v0.1.0-rc.3).
-Unsupported hosts fail before downloading the toolchain; Core remains available
-on its supported platforms. Installer `0.1.0-rc.3` delivers plugin
-`rust-collector-v0.1.0-rc.2`, whose reviewed compatibility receipt includes
-**Core 0.4.1** on that exact host. Installer and plugin versions are independent.
-The original native capture is reused with verified identical runtime bytes;
-see [current status and receipts](docs/release-status.md#compatibility).
-
-For offline installation, prepare the [complete offline kit](docs/quality/rust-collector-installation.md#offline-installation), then run:
-
-```bash
-bash /tmp/harness-gate-install.sh --rust-only --offline ./offline-kit
-```
-
-Do not extract `collector.tar` manually. Interrupted network downloads retain
-completed ranges and can be resumed by rerunning the installer. Reinstalling an
-already selected version verifies its files and signatures without redownloading
-the toolchain.
+Compressed delivery uses about 270 MB of reusable tools and 13 MB of plugin
+contents. First installation is about 444 MB including bootstrap and verifier;
+unchanged layers are cached under `~/.cache/harness-gate/collector`. The installed
+runtime and original signed archive are retained for verification and rollback.
+Only the exact reviewed Linux x86_64 ABI is certified for native Rust collection.
+See [compatibility and receipts](docs/release-status.md#compatibility).
 
 Release assets include `SHA256SUMS`, a CycloneDX SBOM, and Sigstore signatures/certificates. For
 a manual integrity check, download all listed assets, `SHA256SUMS`, and the matching
