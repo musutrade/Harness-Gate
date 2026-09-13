@@ -119,7 +119,8 @@ its support boundary. Source replacement configuration remains rejected. The rea
 registry fixture exercises one `itoa` dependency, not every dependency graph.
 The same Rust executable also serves as Cargo's public `RUSTC_WRAPPER`. It
 forwards compiler arguments unchanged and records the pinned compiler, working
-directory, arguments and exit status. Stable Makefile dep-info records must match
+directory, arguments, exit status and the dep-info output's digest and byte length
+immediately after a successful compiler invocation. Stable Makefile dep-info records must match
 those observed producers exactly; relative input paths resolve from the recorded
 working directory, including registry packages with the same source filenames.
 Every observed file must match the authenticated workspace or registry inventory.
@@ -128,7 +129,9 @@ before a manifest exists. Files generated under the fresh build directory are
 retained by content hash; they do not acquire certified source owners.
 
 The candidate retains raw dep-info and compiler invocation records in the capture
-and rechecks their identities during verification. It accepts only the exercised
+and rechecks their identities during verification. The producer's digest must match
+the complete raw dep-info bytes, including environment dependency comments; matching
+only the parsed file set is insufficient. It accepts only the exercised
 Linux dep-info escaping and public compiler output arguments; unknown forms fail
 closed. This follows the documented [Cargo wrapper protocol](https://doc.rust-lang.org/cargo/reference/config.html#buildrustc-wrapper)
 and [rustc dep-info output](https://doc.rust-lang.org/rustc/command-line-arguments.html).

@@ -1,5 +1,12 @@
 # Tasks
 
+T4's dep-info follow-up binds complete raw compiler output to the producing
+invocation's observed digest and byte length. Added/changed/omitted environment
+comments and missing/inconsistent producer identities have real-capture regression
+checks. This authenticates observed output bytes only; environment completeness,
+build-script isolation and full T3–T8 acceptance remain open. See `dep-info.json`
+and `acceptance-dep-info.json` in the candidate evidence directory.
+
 The built-in `Clone` derive follow-up fixes four invocation inputs and two feature
 configurations, reproduces absent derived owners with an annotated/manual control,
 and pins the compiler's explicit eligibility rule. See `derive-coverage-diagnostic.json`
