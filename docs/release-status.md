@@ -65,14 +65,24 @@ Private signing keys and Arc Admin business source are not part of this handoff.
 | --- | --- |
 | [#239](https://github.com/musutrade/Harness-Gate/issues/239), [#240](https://github.com/musutrade/Harness-Gate/issues/240), [#225](https://github.com/musutrade/Harness-Gate/issues/225) | Completed RC preparation/publication; historical evidence retained. |
 | [#249](https://github.com/musutrade/Harness-Gate/issues/249) | RC2 provides the reviewed Core 0.4.1 tuple and new immutable delivery. |
-| [#215](https://github.com/musutrade/Harness-Gate/issues/215) | [Arc Admin #40](https://github.com/musutrade/arc-admin/pull/40) adds native frontend/API evidence, project host state and Git-baseline bootstrap. Integration and complete-workload acceptance are tracked separately from plugin delivery. |
+| [#215](https://github.com/musutrade/Harness-Gate/issues/215) | Arc Admin #40/#41 integrate all three producers and the current lockfile series. The [source-pinned candidate full run](quality/arc-native-20260913/arc-fixed-full-acceptance.json) passes 27 execution checks, collects 1,921 records and resolves the real Git baseline; quality remains fail. Released Core still needs the staged-hook and large-report fixes. |
 | [#251](https://github.com/musutrade/Harness-Gate/pull/251) | Merged fix for real staged partial quality input loading. Released Core 0.4.1 fails that case; the patched candidate passes. Candidate validation is not a claim that the old binary changed. |
 
 Completed Arc Admin work is reused: the existing 25 execution gates plus two
-prelude checks, the original native backend capture/re-export, and unchanged
-lifecycle/cryptographic negative coverage. Fresh frontend measurement covers all
+prelude checks and unchanged lifecycle/cryptographic negative coverage. Current
+main updates chacha20 to 0.10.2, so its backend was freshly captured and re-exported
+twice (1,778 mapped functions); the old lockfile evidence was correctly rejected.
+The retained frontend measurement covers all
 141 production TS files: 24 test files and 85 tests pass, but line coverage is
 44.15% and function coverage 41.34%, below the existing 80% threshold. API
 breaking-change, generation-drift and compatibility policies pass. Full quality
 remains fail because of actual coverage/CRAP results. Existing `cargo flow` gates
 remain in place; stable collector promotion and authority transfer are not claimed.
+
+Released Core 0.4.1 completes the large native evaluation but fails publication
+of its 72,060,628-byte quality JSON at the 16 MiB untrusted-text limit.
+[PR #253](https://github.com/musutrade/Harness-Gate/pull/253) fixes the Core-owned
+JSON boundary without expanding external evidence limits. The [verified candidate
+report](quality/arc-native-20260913/final-report-verification.json) retains all
+5,760 gate outcomes and 33 verified manifest artifacts. This candidate is not a
+new published Core version; the [old binary failure](quality/arc-native-20260913/released-core-large-report-failure.json) remains recorded.
