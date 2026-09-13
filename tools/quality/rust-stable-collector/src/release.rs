@@ -1,6 +1,6 @@
 //! Offline release verification and transactional selection. No downloader or signer.
 //! The host pins trust; release files cannot choose a key, verifier or identity.
-use crate::{artifact, process::Runner, strict_json};
+use crate::{artifact, process::Runner, strict_json, support::Support};
 use anyhow::{ensure, Context, Result};
 use base64::{engine::general_purpose::STANDARD, Engine};
 use rsa::{
@@ -268,6 +268,13 @@ fn snapshot(
             "release payload mismatch: {name}"
         );
     }
+    let support: Support = typed(&read(&stage.path().join("support.json"), 8 * 1024 * 1024)?)?;
+    support.validate(
+        &inventory.version,
+        &inventory.target,
+        &inventory.files[PROGRAM],
+        &inventory.files["LICENSE"],
+    )?;
     let executable = read(&stage.path().join(PROGRAM), LIMIT)?;
     ensure!(
         executable.len() > 20

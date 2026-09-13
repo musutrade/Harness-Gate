@@ -68,5 +68,5 @@ Reproduce with `tools/quality/rust-stable-collector/compare_historical_fixture.p
 as documented in the [candidate commands](stable-rust-collector.md). This is
 repository development automation; the measured plugin executes only Rust and
 its declared external tools. New raw captures remain at
-`target/gh-259/historical-02/`; runtime payloads do not include the old archive or
+`target/gh-259/historical-03/`; runtime payloads do not include the old archive or
 these acceptance captures.

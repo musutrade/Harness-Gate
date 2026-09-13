@@ -33,9 +33,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--binary', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--package', type=Path, required=True, help='prepared four-file unsigned candidate package')
     parser.add_argument('--trace', action='store_true', help='require real execve tracing of candidate commands')
     args = parser.parse_args()
     binary = args.binary.resolve(strict=True)
+    prepared = args.package.resolve(strict=True)
+    assert {p.name for p in prepared.iterdir()} == {PROGRAM, 'LICENSE', 'support.json', 'release-inventory.json'}
+    assert all(p.is_file() and not p.is_symlink() for p in prepared.iterdir())
+    assert sha(prepared / PROGRAM) == sha(binary)
     args.output.mkdir(parents=True, exist_ok=False)
     output = args.output.resolve()
     host = output / 'test-only-host-trust'
@@ -78,8 +83,10 @@ exit 0
         directory = output / f'package-{version}'
         directory.mkdir()
         shutil.copyfile(binary, directory / PROGRAM)
-        (directory / 'LICENSE').write_text('TEST ONLY package; not a distributable license inventory.\n')
-        write(directory / 'support.json', {'schema': 'test-only-support/v1', 'production_ready': False})
+        shutil.copyfile(prepared / 'LICENSE', directory / 'LICENSE')
+        support = json.loads((prepared / 'support.json').read_text())
+        support['release_version'] = version
+        write(directory / 'support.json', support)
         files = {name: {'sha256': sha(directory / name), 'bytes': (directory / name).stat().st_size}
                  for name in (PROGRAM, 'LICENSE', 'support.json')}
         write(directory / 'release-inventory.json', {'schema': 'rust-stable-release-inventory/v1',
@@ -111,6 +118,7 @@ exit 0
     def install(name, directory, success=True, trust_path=trust):
         return run(name, ['install', directory, trust_path, sha(trust_path), root], success)
 
+    run('unsigned-package-rejected', ['release-verify', prepared, trust, sha(trust)], False)
     verified = run('verify', ['release-verify', first, trust, sha(trust)])
     assert verified['inventory_sha256'] == first_id
     installed = install('install', first)
@@ -139,6 +147,37 @@ exit 0
         shutil.copytree(first, broken)
         mutation(broken)
         install(name, broken, False)
+        unchanged()
+
+    # These are re-signed with the real test RSA key, so failure proves the
+    # Rust support contract check, rather than a stale payload/signature hash.
+    for name, mutation in (
+        ('support-schema', lambda v: v.update(schema='arbitrary/v1')),
+        ('support-release', lambda v: v.update(release_version='different')),
+        ('support-target', lambda v: v.update(target='aarch64-unknown-linux-gnu')),
+        ('support-program', lambda v: v['program'].update(sha256='0' * 64)),
+        ('support-license', lambda v: v['license'].update(bytes=0)),
+        ('support-crap', lambda v: v.update(function_crap='supported')),
+        ('support-published', lambda v: v.update(release_status='production-ready')),
+        ('support-no-observations', lambda v: v.update(observations=[])),
+        ('support-duplicate-observations', lambda v: v['observations'].append(v['observations'][0])),
+        ('support-unknown-field', lambda v: v.update(host_kernel='publisher-fingerprint')),
+    ):
+        broken = output / name
+        shutil.copytree(first, broken)
+        support = json.loads((broken / 'support.json').read_text())
+        mutation(support)
+        write(broken / 'support.json', support)
+        inventory = json.loads((broken / 'release-inventory.json').read_text())
+        inventory['files']['support.json'] = {'sha256': sha(broken / 'support.json'), 'bytes': (broken / 'support.json').stat().st_size}
+        write(broken / 'release-inventory.json', inventory)
+        signature = host / f'{name}.sig'
+        automation(['openssl', 'dgst', '-sha256', '-sign', private, '-out', signature, broken / 'release-inventory.json'])
+        envelope = json.loads((broken / 'release-inventory.sig').read_text())
+        envelope['rsa_signature'] = base64.b64encode(signature.read_bytes()).decode()
+        write(broken / 'release-inventory.sig', envelope)
+        error = install(name, broken, False)
+        assert 'support' in error or 'candidate' in error or 'unknown field' in error, error
         unchanged()
 
     saved = verifier.read_bytes()

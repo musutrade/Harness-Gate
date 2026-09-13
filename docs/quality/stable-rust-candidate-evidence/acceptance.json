@@ -123,8 +123,8 @@
       "anchors": {
         "capture": "complete",
         "core_acceptance": "pending",
-        "manifest_sha256": "b685be137884bbe57bfbc6805812c1733059ecfb1dd463139a6731336c12a54d",
-        "request_sha256": "443d695ea78ff4bd50f89eecba856ad892bd1172413325cdacbc9293215cc21f",
+        "manifest_sha256": "b79d65e2da08dd97085070975fbc4f0489aba9e68674a5e058b05f38a6a8b2ef",
+        "request_sha256": "aa30d02d5ee82e33e5fbad768c64519ead12b246dde62d6981d284344f8a1f10",
         "state": "unsupported"
       },
       "llvm_totals_test_inclusive": {
@@ -193,8 +193,8 @@
       "anchors": {
         "capture": "complete",
         "core_acceptance": "pending",
-        "manifest_sha256": "e936b5a12ccb2c006c38c662d77921cfa049fb6ccd90ff77c9b9710fdfdb3d0f",
-        "request_sha256": "76da7c6d5c01de001165a0cd040231834431ebfb091d62224086c62ec162b3b5",
+        "manifest_sha256": "2eaac53aa2f360c99b280b26450b3d3cf97dffe5c67e3892bb32ebf6a5f38542",
+        "request_sha256": "0f8072e2094a56b6bd247262a2e4adff5c9a4aae7e921ef45016aa9eac42eba8",
         "state": "unsupported"
       },
       "llvm_totals_test_inclusive": {
@@ -314,8 +314,8 @@
       "anchors": {
         "capture": "complete",
         "core_acceptance": "pending",
-        "manifest_sha256": "896bd091f02aaa4595b75e3d4dcd41dc3d7dca99f4c5c6c7e7132b4745f430c0",
-        "request_sha256": "33e8b2d7880c6fa2ba908daf15f0a206bd87e63f5c93f53099ef0aa0a2c2149a",
+        "manifest_sha256": "a1c15b60d793a0faf094926f9501cb6db42e22c64dafe5a4823eff2a95297667",
+        "request_sha256": "6390b5bd72e3787675456f54070310c02df5da3796a90f33344c61c5403ff34e",
         "state": "unsupported"
       },
       "llvm_totals_test_inclusive": {
@@ -487,8 +487,8 @@
     "llvm": "22.1.6"
   },
   "binary": {
-    "sha256": "a7e348c64089cbb592e1b094558b937066748c9979ba253218521511c1693a79",
-    "bytes": 1681064
+    "sha256": "f4f71cc58f51194ab4b9c9c976bd34360ddb0bf471c414f7c7439949353ee81e",
+    "bytes": 1721832
   },
   "capture_bytes": 42063,
   "persistent_candidate_cache_bytes": 0,

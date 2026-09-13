@@ -18,8 +18,8 @@ extra archives:
 | Asset | Purpose |
 | --- | --- |
 | `harness-gate-rust-stable-collector` | Our x86_64 Linux GNU ELF program |
-| `LICENSE` | Required distribution license/notices; production inventory pending |
-| `support.json` | Signed support/measurement metadata; production schema pending |
+| `LICENSE` | Authenticated collected notices; production license review pending |
+| `support.json` | Typed `rust-stable-support/v1` candidate observations and capability limits |
 | `release-inventory.json` | `rust-stable-release-inventory/v1`: version, target, and `files` mapping the three payload names to `{sha256, bytes}` |
 | `release-inventory.sig` | `rust-collector-signatures/v2`: base64 `rsa_signature` and nonempty `sigstore_bundle` |
 
@@ -27,8 +27,12 @@ RSA signs the exact inventory bytes using SHA-256/PKCS#1 v1.5 with a 2048–8192
 SPKI PEM public key. Sigstore independently verifies those same bytes. JSON
 duplicate keys, trailing data and unknown envelope fields are rejected. Payload
 hash/length, exact inventory, target and ELF architecture are checked before
-selection. The production support schema and license inventory still need release
-preparation; a signed arbitrary support document is not a compatibility claim.
+selection. The typed `rust-stable-support/v1` document must bind the release,
+program and license identities and declare the exact candidate series, unsupported
+function coverage/CRAP and `candidate-review-required` status. Unknown fields,
+empty/duplicate acceptance anchors and overstated capabilities fail even when the
+inventory has a valid signature. Observations identify actual acceptance records;
+they do not authorize a measurement migration or imply untested platform support.
 
 ## External trust and invocation
 
@@ -102,5 +106,42 @@ implemented. The test records their disk usage separately from retained versions
 Reports include actual package/install bytes and selection identities. The current
 input is a local directory: network download bytes are zero for these operations,
 not a measurement of a future downloader. No compiler archives or acceptance logs
-are package assets. Protected packaging, license completeness, download/cache
-accounting, trusted bootstrap and full independent upgrade acceptance remain open.
+are package assets. Protected signing/publication, production license review,
+download/cache accounting, trusted bootstrap and full independent upgrade acceptance
+remain open.
+
+## Candidate package preparation
+
+Repository maintainers can run `prepare_release.py` with an explicit supported
+stable build toolchain, a workspace build directory and SHA-256-pinned acceptance
+summaries for the exact resulting binary. It performs locked offline builds and
+rejects acceptance for a different binary or failed checks. The preparation script
+is repository automation; it is never included in or called by the Rust plugin.
+
+Preparation verifies every cached crates.io archive against `Cargo.lock`, checks
+all unpacked source bytes against that archive before and after the build, and
+rejects untracked files, symlinks, unknown sources or missing license notices. It
+preserves notices verbatim for the conservatively filtered Cargo dependency graph
+(including build dependencies), plus the build toolchain's Rust library copyright
+notice. It requires these existing maintainer inputs and downloads no environment.
+This is an auditable license inventory; production license review remains required.
+
+```bash
+python3 tools/quality/rust-stable-collector/prepare_release.py \
+  --output target/candidate-package \
+  --target-dir "$PWD/target/stable-build" --toolchain 1.97.1 \
+  --acceptance target/candidate-acceptance/summary.json '<reviewed SHA-256>'
+```
+
+The fresh output contains `unsigned-package/` with exactly the executable,
+`LICENSE`, `support.json` and `release-inventory.json`. Build logs and
+`preparation.json` stay outside this payload. The required signature envelope is
+absent, so the installed verifier rejects this package. No unsigned fallback,
+release workflow activation or production signing occurs. A reviewed protected
+signing step must eventually supply both signatures over the exact inventory bytes.
+
+The lifecycle suite consumes this actual prepared program/license/support payload.
+It re-signs test metadata with a repository-generated RSA key and uses an explicitly
+mocked Sigstore verifier. Its disk accounting includes the collected notices, but
+its signature envelope and two metadata versions remain test inputs. It is not
+production signing or a demonstrated upgrade between two different program builds.
