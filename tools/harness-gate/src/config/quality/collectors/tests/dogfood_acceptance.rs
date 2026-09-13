@@ -216,3 +216,87 @@ fn quality_preparation_failure_retains_requested_profile_and_blocks() {
             .contains("Quality profile \"full\": blocked"));
     }
 }
+
+#[test]
+fn staged_partial_quality_reads_host_state_and_validates_the_index() {
+    for mode in [
+        "pass",
+        "missing-state",
+        "stale-source",
+        "retained-artifacts",
+    ] {
+        let mut fixture = Fixture::workflow("pass", true, false);
+        fixture.select_profile("hook", true);
+        let root = fixture.dir.path();
+        let mut files: Vec<_> = fixture.state.config_files.keys().cloned().collect();
+        files.extend([
+            "src/lib.rs".into(),
+            "execution.py".into(),
+            ".harness-gate/audit.toml".into(),
+            ".harness-gate/secrets.toml".into(),
+        ]);
+        assert!(std::process::Command::new("git")
+            .arg("add")
+            .args(&files)
+            .current_dir(root)
+            .status()
+            .unwrap()
+            .success());
+        // These host-only files must never enter the staged snapshot.
+        fs::write(root.join("target/evidence/old.json"), "old native evidence").unwrap();
+        fs::write(root.join("src/lib.rs"), "unstaged working-tree content").unwrap();
+        let state_path = root.join(".harness-gate/workflow-state.json");
+        match mode {
+            "missing-state" => fs::remove_file(&state_path).unwrap(),
+            "stale-source" => {
+                fixture.state.subjects.values_mut().next().unwrap()[0].source_sha256 =
+                    "f".repeat(64);
+                write(&state_path, &fixture.state);
+            }
+            "retained-artifacts" => {
+                fixture
+                    .state
+                    .artifacts
+                    .insert("old.json".into(), "f".repeat(64));
+                write(&state_path, &fixture.state);
+            }
+            _ => {}
+        }
+        let project = crate::project::Project::discover(Some(root.to_path_buf()), None).unwrap();
+        let staged = project.staged_snapshot().unwrap();
+        assert!(!staged
+            .execution_root
+            .join(".harness-gate/workflow-state.json")
+            .exists());
+        let report = crate::verify::run(
+            &staged,
+            crate::scope::ScopeResult::all(&staged),
+            "hook",
+            true,
+        )
+        .unwrap();
+        let result = serde_json::to_value(&report).unwrap();
+        assert_eq!(report.passed, mode == "pass", "{mode}: {result}");
+        assert_eq!(
+            result["quality"]["status"],
+            if mode == "pass" {
+                "not_collected"
+            } else {
+                "blocked"
+            }
+        );
+        if mode == "pass" {
+            assert_eq!(result["quality"]["full_quality_status"], "not_collected");
+            assert_eq!(result["quality"]["producers"], json!({}));
+            assert!(staged.execution_root.join("target/evidence").is_dir());
+            assert!(!staged
+                .execution_root
+                .join("target/evidence/old.json")
+                .exists());
+        }
+        assert_eq!(
+            fs::read_to_string(root.join("src/lib.rs")).unwrap(),
+            "unstaged working-tree content"
+        );
+    }
+}
