@@ -11,6 +11,38 @@ import collector_release_policy as policy
 import production_collector_release as production
 
 
+def publish_assets(output, catalog, tag, source, body):
+    """Verify every draft shard before making the installer discoverable."""
+    groups = {tag: {}}
+    locations = catalog['object_base_urls']
+    object_tags = {row['name']: locations[digest].rsplit('/', 1)[1]
+                   for digest, row in catalog['components']['objects'].items()}
+    for path in output.iterdir():
+        assets.regular(path)
+        groups.setdefault(object_tags.get(path.name, tag), {})[path.name] = assets.sha(path)
+    for release_tag, expected in groups.items():
+        assets.require(len(expected) <= 900, 'installer release exceeds asset budget')
+        production.create_or_verify_tag(release_tag, source)
+        subprocess.run(['gh', 'release', 'create', release_tag, '--repo', assets.REPOSITORY,
+                        '--verify-tag', '--draft', '--prerelease', '--title', release_tag,
+                        '--notes-file', str(body),
+                        *[str(output / name) for name in sorted(expected)]], check=True)
+        draft = json.loads(subprocess.check_output(
+            ['gh', 'api', 'repos/' + assets.REPOSITORY + '/releases/tags/' + release_tag]))
+        pages = json.loads(subprocess.check_output(
+            ['gh', 'api', '--paginate', '--slurp', 'repos/' + assets.REPOSITORY +
+             '/releases/' + str(draft['id']) + '/assets?per_page=100']))
+        uploaded = [row for page in pages for row in page]
+        assets.require(draft['draft'] and len(uploaded) == len(expected) and
+                       {a['name']: a['digest'] for a in uploaded} ==
+                       {n: 'sha256:' + d for n, d in expected.items()}, 'uploaded installer assets differ')
+    # Partially published component shards cannot expose a usable installer.
+    for release_tag in [t for t in groups if t != tag] + [tag]:
+        subprocess.run(['gh', 'release', 'edit', release_tag, '--repo', assets.REPOSITORY,
+                        '--draft=false', '--latest=false'], check=True)
+    return groups
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--packet', type=Path, required=True)
@@ -41,9 +73,9 @@ def main():
                     str(output/'install-rust.sh')],check=True)
     # The publication source and operator-reviewed script pin authenticate the
     # bootstrap and transport. Underlying collector signatures remain unchanged.
-    expected = {p.name:assets.sha(p) for p in output.iterdir()}
-    notes = ('One-command Rust plugin installer. Download install-rust.sh and run bash install-rust.sh. '
-             'The first install downloads compressed tools; later plugin versions reuse unchanged tools. '
+    notes = ('Rust plugin installer. Run bash install-rust.sh --plan, then use --download-policy allow or --offline DIR. '
+             'Exact compatible components are reused; only missing content objects are acquired. '
+             'Installation automatically verifies signatures and compiles a diagnostic before activation. '
              'For an offline kit also provision the pinned cosign verifier listed in installer-build.json.\n\n'
              'Installer version '+packet['version']+' delivers the unchanged signed Rust plugin '+catalog['version']+'. '
              'Supported host: '+json.dumps(catalog['host_abi'],sort_keys=True)+'.\n\n'
@@ -51,13 +83,7 @@ def main():
              'https://github.com/'+assets.REPOSITORY+'/releases/tag/rust-collector-materials-7165558-v1 .\n\n'
              'This product includes software developed by the NetBSD Foundation, Inc. and its contributors.')
     body = output.parent/'installer-release-notes.md';body.write_text(notes)
-    subprocess.run(['gh','release','create',tag,'--repo',assets.REPOSITORY,'--verify-tag','--draft','--prerelease',
-                    '--title',tag,'--notes-file',str(body),*[str(output/name) for name in sorted(expected)]],check=True)
-    rows=json.loads(subprocess.check_output(['gh','api','repos/'+assets.REPOSITORY+'/releases?per_page=30']))
-    draft=next(row for row in rows if row['tag_name']==tag)
-    assets.require(draft['draft'] and {a['name']:a['digest'] for a in draft['assets']}==
-                   {n:'sha256:'+d for n,d in expected.items()},'uploaded installer assets differ')
-    subprocess.run(['gh','release','edit',tag,'--repo',assets.REPOSITORY,'--draft=false','--latest=false'],check=True)
+    expected = publish_assets(output, catalog, tag, args.source, body)
     assets.write(output.parent/'installer-publication.json',{'status':'pass','source':args.source,'tag':tag,
                  'installer_sha256':packet['installer_sha256'],'assets':expected})
 
