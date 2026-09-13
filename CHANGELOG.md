@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-09-13
+
 ### Fixed
 
 - Finalize large Core-owned native quality JSON with bounded field redaction and exact output digest checks; retain external evidence limits and the invocation byte budget. Preserve all quality records and valid JSON instead of failing report publication solely because a generated report exceeds the per-text-file limit.
