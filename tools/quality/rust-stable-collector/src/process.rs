@@ -43,11 +43,28 @@ impl Runner {
                 "unsupported environment {key}: unset {key} before collection"
             );
         }
-        fs::create_dir(root)
+        // Resolve aliases and parent components before creating anything. A
+        // rejected request must not leave a directory in the measured project.
+        let project = project.canonicalize()?;
+        let name = root
+            .file_name()
+            .context("output must name a new directory")?;
+        let parent = root
+            .parent()
+            .filter(|path| !path.as_os_str().is_empty())
+            .unwrap_or_else(|| Path::new("."))
+            .canonicalize()
+            .context("output parent must already exist")?;
+        let root = parent.join(name);
+        ensure!(
+            !root.starts_with(&project),
+            "output must be outside the measured project"
+        );
+        fs::create_dir(&root)
             .with_context(|| format!("output must be a new directory: {}", root.display()))?;
         let root = root.canonicalize()?;
         ensure!(
-            !root.starts_with(project),
+            !root.starts_with(&project),
             "output must be outside the measured project"
         );
         fs::create_dir(root.join("commands"))?;
@@ -70,7 +87,7 @@ impl Runner {
         environment.insert("CARGO_INCREMENTAL".into(), "0".into());
         Ok(Self {
             root,
-            project: project.to_owned(),
+            project,
             environment,
             timeout: Duration::from_secs(seconds),
             sequence: 0,
@@ -162,6 +179,29 @@ impl Runner {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn rejected_output_paths_do_not_create_project_directories() {
+        let dir = tempfile::tempdir().unwrap();
+        let project = dir.path().join("project");
+        fs::create_dir(&project).unwrap();
+        let alias = dir.path().join("alias");
+        std::os::unix::fs::symlink(&project, &alias).unwrap();
+        for output in [
+            project.join("direct"),
+            alias.join("aliased"),
+            dir.path().join("project/../project/traversal"),
+        ] {
+            let error = Runner::create(&output, &project, 1).err().unwrap();
+            assert!(error.to_string().contains("outside the measured project"));
+            assert!(!output.exists());
+        }
+        assert_eq!(fs::read_dir(&project).unwrap().count(), 0);
+        // Component boundaries must still allow a sibling with a common prefix.
+        let output = dir.path().join("project-capture");
+        assert!(Runner::create(&output, &alias, 1).is_ok());
+        assert!(output.join("commands").is_dir());
+    }
+
     #[test]
     fn nonzero_and_timeout_never_return_tool_output() {
         let dir = tempfile::tempdir().unwrap();

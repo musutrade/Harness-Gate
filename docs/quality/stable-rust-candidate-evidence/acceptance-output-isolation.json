@@ -1,0 +1,1294 @@
+{
+  "schema": "rust-stable-candidate-acceptance/v1",
+  "state": "candidate-only",
+  "checks": [
+    {
+      "name": "doctor",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "prepare-plain",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "output-isolation-doctor-direct",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "output-isolation-doctor-alias",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "output-isolation-doctor-parent",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "output-isolation-collect-direct",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "output-isolation-collect-alias",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "output-isolation-collect-parent",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "doctor-relative-output",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "plain",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "verify",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "certified-function-owners",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "prepare-partial",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "partial",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "certified-region-owners",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "prepare-modules",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "modules",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "certified-module-owners",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "missing-module-owner",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "duplicate-module-owner",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "module-parent-count-inheritance",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "restored-module-owners",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "prepare-module-attribute",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "module-attribute",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "describe-module-attribute",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "prepare-module-cfg",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "module-cfg",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "describe-module-cfg",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "stale-output",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "wrong-request-anchor",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "wrong-manifest-anchor",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "corrupt-coverage",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "duplicate-manifest-identity-first",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "duplicate-request-identity-first",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "duplicate-collect-identity-first",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "duplicate-manifest-identity-last",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "duplicate-request-identity-last",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "duplicate-collect-identity-last",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "duplicate-archive-identity-first",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "duplicate-archive-identity-last",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "negative-function-count",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "overflow-function-count",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "fractional-function-count",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "missing-function-regions",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "invalid-region-file",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "reversed-region",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "unknown-region-kind",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "covered-exceeds-total",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "wrong-summary-percent",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "wrong-notcovered",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "invalid-segment-boolean",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "mcdc-capability",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "total-lines-count",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "total-lines-covered",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "total-functions-count",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "total-functions-covered",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "total-instantiations-count",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "total-instantiations-covered",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "total-regions-count",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "total-regions-covered",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "total-branches-count",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "total-branches-covered",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "file-summary-disagreement",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "duplicate-owner-region",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "owner-region-counter-disagreement",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "missing-llvm-owner",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "duplicate-llvm-symbol",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "multiple-llvm-owners",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "cross-file-owner",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "unknown-source-owner",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "inherited-parent-count",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "unexecuted-owner-regions",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "owner-region-summary-count",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "owner-region-summary-covered",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "duplicate-coverage-key",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "omitted-source-owners",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "changed-test-exclusions",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "mixed-artifact",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "changed-source",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "restored-integrity",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "prepare-boundaries",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "boundaries",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "prepare-features",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "features",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "prepare-registry",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "registry",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "verify-registry",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "registry-function-owner",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "missing-registry-archive",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "changed-registry-archive",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "changed-registry-source",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "poisoned-registry-before-build",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "extra-registry-source",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "registry-source-symlink",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "omitted-dependency-provenance",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "omitted-metadata-dependency",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "restored-registry-integrity",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "prepare-external-include-bytes",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "external-include-bytes",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "prepare-external-include-rust",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "external-include-rust",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "prepare-external-path-module",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "external-path-module",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "prepare-workspace-include-bytes",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "workspace-include-bytes",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "verify-workspace-include",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "empty-compiler-proof",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "omitted-compiler-input",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "malformed-dep-info",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "wrong-compiler-cwd",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "omitted-dep-info-producer",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "restored-compiler-input-proof",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "wrong-tool-identity",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "config-injection",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "missing-rust",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "injected-flags",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "missing-project-toolchain",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "symlink-source",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "prepare-failed-test",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "failed-test",
+      "exit_code": 1,
+      "passed": true
+    }
+  ],
+  "observations": {
+    "output_isolation": {
+      "before": {
+        "Cargo.toml": "d06a38d5d01483e8b121582afaf44c78b6cebf419cad5b6c8bd1880525f565f8",
+        "src": "directory",
+        "Cargo.lock": "8558ed7244d374cf529b80de9f84bc952c4f240dacb9325586b611f2b6c3d5e9",
+        "src/lib.rs": "3f175da6464cacc2543c0fcb8dd4fc841214a3050d26d7abcf25a14fa37eccdc"
+      },
+      "after": {
+        "Cargo.toml": "d06a38d5d01483e8b121582afaf44c78b6cebf419cad5b6c8bd1880525f565f8",
+        "src": "directory",
+        "Cargo.lock": "8558ed7244d374cf529b80de9f84bc952c4f240dacb9325586b611f2b6c3d5e9",
+        "src/lib.rs": "3f175da6464cacc2543c0fcb8dd4fc841214a3050d26d7abcf25a14fa37eccdc"
+      },
+      "cases": [
+        {
+          "name": "output-isolation-doctor-direct",
+          "destination": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02/plain/rejected-doctor-direct",
+          "output_exists": false,
+          "project_unchanged": true
+        },
+        {
+          "name": "output-isolation-doctor-alias",
+          "destination": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02/project-alias/rejected-doctor-alias",
+          "output_exists": false,
+          "project_unchanged": true
+        },
+        {
+          "name": "output-isolation-doctor-parent",
+          "destination": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02/doctor/../plain/rejected-doctor-parent",
+          "output_exists": false,
+          "project_unchanged": true
+        },
+        {
+          "name": "output-isolation-collect-direct",
+          "destination": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02/plain/rejected-collect-direct",
+          "output_exists": false,
+          "project_unchanged": true
+        },
+        {
+          "name": "output-isolation-collect-alias",
+          "destination": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02/project-alias/rejected-collect-alias",
+          "output_exists": false,
+          "project_unchanged": true
+        },
+        {
+          "name": "output-isolation-collect-parent",
+          "destination": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02/doctor/../plain/rejected-collect-parent",
+          "output_exists": false,
+          "project_unchanged": true
+        }
+      ],
+      "relative_output_created": true
+    },
+    "function_owners": [
+      {
+        "coverage_function": {
+          "covered": 1,
+          "total": 1,
+          "type": "ratio"
+        },
+        "coverage_region": {
+          "covered": 6,
+          "total": 6,
+          "type": "ratio"
+        },
+        "execution_count": 2,
+        "llvm_function_index": 0,
+        "name": "classify",
+        "span": [
+          1,
+          1,
+          7,
+          2
+        ],
+        "symbol": "_RNvCsbjVbUl7Oeio_20stable_plain_fixture8classify"
+      },
+      {
+        "coverage_function": {
+          "covered": 0,
+          "total": 1,
+          "type": "ratio"
+        },
+        "coverage_region": {
+          "covered": 0,
+          "total": 3,
+          "type": "ratio"
+        },
+        "execution_count": 0,
+        "llvm_function_index": 2,
+        "name": "never_called",
+        "span": [
+          9,
+          1,
+          11,
+          2
+        ],
+        "symbol": "_RNvCsbjVbUl7Oeio_20stable_plain_fixture12never_called"
+      }
+    ],
+    "plain": {
+      "anchors": {
+        "capture": "complete",
+        "core_acceptance": "pending",
+        "manifest_sha256": "db006b1248417b76ab81ae35a058790cdfda5fdfb6ad897fd803fe7fdb7db33b",
+        "request_sha256": "1b9dde5121e268e4748eab4101fb501e7b81ee0e563f8eea8d39b494073caabc",
+        "state": "unsupported"
+      },
+      "llvm_totals_test_inclusive": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 3,
+          "covered": 2,
+          "percent": 66.66666666666666
+        },
+        "instantiations": {
+          "count": 3,
+          "covered": 2,
+          "percent": 66.66666666666666
+        },
+        "lines": {
+          "count": 12,
+          "covered": 9,
+          "percent": 75
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 15,
+          "covered": 12,
+          "notcovered": 3,
+          "percent": 80
+        }
+      },
+      "lexical_functions": [
+        {
+          "complexity": 3,
+          "coverage_eligible": true,
+          "name": "classify",
+          "reasons": [],
+          "span": [
+            1,
+            1,
+            7,
+            2
+          ],
+          "state": "supported"
+        },
+        {
+          "complexity": 1,
+          "coverage_eligible": true,
+          "name": "never_called",
+          "reasons": [],
+          "span": [
+            9,
+            1,
+            11,
+            2
+          ],
+          "state": "supported"
+        }
+      ]
+    },
+    "partial": {
+      "anchors": {
+        "capture": "complete",
+        "core_acceptance": "pending",
+        "manifest_sha256": "c84ecd0c28db40fee95ee014831f31cdf340dd97b4a1f6f028533825147c99f1",
+        "request_sha256": "40c586a6f3bf65bca9f9f7607c613ca208d1cd08188ff1a7c27024fedc8351b4",
+        "state": "unsupported"
+      },
+      "function_owners": [
+        {
+          "coverage_function": {
+            "covered": 1,
+            "total": 1,
+            "type": "ratio"
+          },
+          "coverage_region": {
+            "covered": 5,
+            "total": 6,
+            "type": "ratio"
+          },
+          "execution_count": 1,
+          "llvm_function_index": 0,
+          "name": "classify",
+          "span": [
+            1,
+            1,
+            7,
+            2
+          ],
+          "symbol": "_RNvCsar3kSzbHmDr_22stable_partial_fixture8classify"
+        },
+        {
+          "coverage_function": {
+            "covered": 0,
+            "total": 1,
+            "type": "ratio"
+          },
+          "coverage_region": {
+            "covered": 0,
+            "total": 3,
+            "type": "ratio"
+          },
+          "execution_count": 0,
+          "llvm_function_index": 2,
+          "name": "never_called",
+          "span": [
+            9,
+            1,
+            11,
+            2
+          ],
+          "symbol": "_RNvCsar3kSzbHmDr_22stable_partial_fixture12never_called"
+        }
+      ],
+      "llvm_totals_test_inclusive": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 3,
+          "covered": 2,
+          "percent": 66.66666666666666
+        },
+        "instantiations": {
+          "count": 3,
+          "covered": 2,
+          "percent": 66.66666666666666
+        },
+        "lines": {
+          "count": 11,
+          "covered": 7,
+          "percent": 63.63636363636363
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 13,
+          "covered": 9,
+          "notcovered": 4,
+          "percent": 69.23076923076923
+        }
+      }
+    },
+    "modules": {
+      "anchors": {
+        "capture": "complete",
+        "core_acceptance": "pending",
+        "manifest_sha256": "cd0b9507998811fd7d15ed903c02f8441f78fc554ff14c389a601f401b404464",
+        "request_sha256": "3a003ba945205c508a31bc522ae7e381721dd7826499ef1f9d1356742cb395cf",
+        "state": "unsupported"
+      },
+      "function_owners": [
+        {
+          "coverage_function": {
+            "covered": 1,
+            "total": 1,
+            "type": "ratio"
+          },
+          "coverage_region": {
+            "covered": 4,
+            "total": 5,
+            "type": "ratio"
+          },
+          "execution_count": 1,
+          "llvm_function_index": 0,
+          "name": "left::classify",
+          "span": [
+            2,
+            5,
+            8,
+            6
+          ],
+          "symbol": "_RNvNtCsaEINoLvSCvk_22stable_modules_fixture4left8classify"
+        },
+        {
+          "coverage_function": {
+            "covered": 0,
+            "total": 1,
+            "type": "ratio"
+          },
+          "coverage_region": {
+            "covered": 0,
+            "total": 3,
+            "type": "ratio"
+          },
+          "execution_count": 0,
+          "llvm_function_index": 4,
+          "name": "left::nested::never_called",
+          "span": [
+            11,
+            9,
+            13,
+            10
+          ],
+          "symbol": "_RNvNtNtCsaEINoLvSCvk_22stable_modules_fixture4left6nested12never_called"
+        },
+        {
+          "coverage_function": {
+            "covered": 1,
+            "total": 1,
+            "type": "ratio"
+          },
+          "coverage_region": {
+            "covered": 5,
+            "total": 5,
+            "type": "ratio"
+          },
+          "execution_count": 2,
+          "llvm_function_index": 1,
+          "name": "right::classify",
+          "span": [
+            26,
+            5,
+            32,
+            6
+          ],
+          "symbol": "_RNvNtCsaEINoLvSCvk_22stable_modules_fixture5right8classify"
+        }
+      ],
+      "scope": "unannotated free functions in unannotated inline modules; same-name and unexecuted owners independently matched; nested tests excluded; annotated/cfg module coverage remains unsupported"
+    },
+    "boundaries": {
+      "anchors": {
+        "capture": "complete",
+        "core_acceptance": "pending",
+        "manifest_sha256": "8a4a3497b5817b61d68265f5f8d7e97b29a9dda28f332ba09e41b5468cecb6e9",
+        "request_sha256": "698e519f12e34e23add6fbd2f9276b309222c630c6d38a57a67b79c98477a7a4",
+        "state": "unsupported"
+      },
+      "llvm_totals_test_inclusive": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 8,
+          "covered": 6,
+          "percent": 75
+        },
+        "instantiations": {
+          "count": 8,
+          "covered": 6,
+          "percent": 75
+        },
+        "lines": {
+          "count": 18,
+          "covered": 16,
+          "percent": 88.88888888888889
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 37,
+          "covered": 30,
+          "notcovered": 7,
+          "percent": 81.0810810810811
+        }
+      },
+      "async_constructor_count": 1,
+      "async_body_count": 0,
+      "lexical_functions": [
+        {
+          "complexity": null,
+          "coverage_eligible": false,
+          "name": "deferred",
+          "reasons": [
+            "async lowering owner not certified"
+          ],
+          "span": [
+            11,
+            1,
+            11,
+            36
+          ],
+          "state": "unsupported"
+        },
+        {
+          "complexity": null,
+          "coverage_eligible": false,
+          "name": "generic",
+          "reasons": [
+            "generic instantiation owner not certified"
+          ],
+          "span": [
+            12,
+            1,
+            12,
+            35
+          ],
+          "state": "unsupported"
+        },
+        {
+          "complexity": null,
+          "coverage_eligible": false,
+          "name": "closure",
+          "reasons": [
+            "closure owner not certified; no parent coverage inheritance"
+          ],
+          "span": [
+            13,
+            1,
+            16,
+            2
+          ],
+          "state": "unsupported"
+        },
+        {
+          "complexity": null,
+          "coverage_eligible": false,
+          "name": "feature_only",
+          "reasons": [
+            "unresolved attribute: # [cfg (feature = \"extra\")]"
+          ],
+          "span": [
+            18,
+            1,
+            19,
+            34
+          ],
+          "state": "unsupported"
+        },
+        {
+          "complexity": 1,
+          "coverage_eligible": true,
+          "name": "never_called",
+          "reasons": [],
+          "span": [
+            21,
+            1,
+            21,
+            34
+          ],
+          "state": "supported"
+        }
+      ],
+      "unsupported": [
+        "closure owner not certified; no parent coverage inheritance",
+        "macro expansion / generated owner not certified",
+        "unresolved attribute: # [derive (Debug , Clone)]"
+      ]
+    },
+    "features": {
+      "anchors": {
+        "capture": "complete",
+        "core_acceptance": "pending",
+        "manifest_sha256": "5d33976af004b306e309950ce05c6290c85c54d2dd33dbb18955bdb81b686936",
+        "request_sha256": "2ba73896d1967c7d1c72872d63ebf98a624d0319e1ff9ee4d912aa4372aea41e",
+        "state": "unsupported"
+      },
+      "llvm_totals_test_inclusive": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 9,
+          "covered": 7,
+          "percent": 77.77777777777779
+        },
+        "instantiations": {
+          "count": 9,
+          "covered": 7,
+          "percent": 77.77777777777779
+        },
+        "lines": {
+          "count": 20,
+          "covered": 18,
+          "percent": 90
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 42,
+          "covered": 35,
+          "notcovered": 7,
+          "percent": 83.33333333333334
+        }
+      },
+      "async_constructor_count": 1,
+      "async_body_count": 0,
+      "lexical_functions": [
+        {
+          "complexity": null,
+          "coverage_eligible": false,
+          "name": "deferred",
+          "reasons": [
+            "async lowering owner not certified"
+          ],
+          "span": [
+            11,
+            1,
+            11,
+            36
+          ],
+          "state": "unsupported"
+        },
+        {
+          "complexity": null,
+          "coverage_eligible": false,
+          "name": "generic",
+          "reasons": [
+            "generic instantiation owner not certified"
+          ],
+          "span": [
+            12,
+            1,
+            12,
+            35
+          ],
+          "state": "unsupported"
+        },
+        {
+          "complexity": null,
+          "coverage_eligible": false,
+          "name": "closure",
+          "reasons": [
+            "closure owner not certified; no parent coverage inheritance"
+          ],
+          "span": [
+            13,
+            1,
+            16,
+            2
+          ],
+          "state": "unsupported"
+        },
+        {
+          "complexity": null,
+          "coverage_eligible": false,
+          "name": "feature_only",
+          "reasons": [
+            "unresolved attribute: # [cfg (feature = \"extra\")]"
+          ],
+          "span": [
+            18,
+            1,
+            19,
+            34
+          ],
+          "state": "unsupported"
+        },
+        {
+          "complexity": 1,
+          "coverage_eligible": true,
+          "name": "never_called",
+          "reasons": [],
+          "span": [
+            21,
+            1,
+            21,
+            34
+          ],
+          "state": "supported"
+        }
+      ],
+      "unsupported": [
+        "closure owner not certified; no parent coverage inheritance",
+        "macro expansion / generated owner not certified",
+        "unresolved attribute: # [derive (Debug , Clone)]"
+      ]
+    },
+    "registry": {
+      "anchors": {
+        "capture": "complete",
+        "core_acceptance": "pending",
+        "manifest_sha256": "7bb5025f9e13154a8c2b8f1a9b18c804e0354234b6663f585386839f0a016f98",
+        "request_sha256": "2e097cc01d8e6f631990069552597fd390636f578b8f6b412485e38fd7d17cf1",
+        "state": "unsupported"
+      },
+      "archive_sha256": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682",
+      "source_files": 14,
+      "setup_command": [
+        "cargo",
+        "metadata",
+        "--format-version",
+        "1",
+        "--locked",
+        "--offline",
+        "--manifest-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02/project-registry/Cargo.toml"
+      ],
+      "setup_is_repository_automation": true,
+      "isolated_cargo_home": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02/registry-cargo-home",
+      "network_download_bytes": 0,
+      "scope": "single locked crates.io dependency; local cache copied by test setup"
+    },
+    "compiler_inputs": {
+      "external_inputs": "three real captures blocked before manifest",
+      "workspace_data": "identity verified",
+      "generated_inputs": 1,
+      "scope": "observed rustc dep-info file inputs only; arbitrary build-script reads and environment are not certified"
+    }
+  },
+  "tools": {
+    "rustc": {
+      "path": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+      "identity": {
+        "sha256": "d3a664c970a9fd8361b64194861bebc1ae37b9054e5ee3400dc1c9e691797eea",
+        "bytes": 645000
+      },
+      "version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6"
+    },
+    "cargo": {
+      "path": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+      "identity": {
+        "sha256": "828980723df339d62434390e9fb8ef8831036583343ae2316b7ab5646b5c1953",
+        "bytes": 42839824
+      },
+      "version": "cargo 1.97.1 (c980f4866 2026-06-30)"
+    },
+    "rustdoc": {
+      "path": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustdoc",
+      "identity": {
+        "sha256": "3b0c7aef20e0dfdfe2dd19ddb0b40d3b744f76318a44031813f501e1912934df",
+        "bytes": 13680928
+      },
+      "version": "rustdoc 1.97.1 (8bab26f4f 2026-07-14)"
+    },
+    "cargo_llvm_cov": {
+      "path": "/home/gem/.cargo/bin/cargo-llvm-cov",
+      "identity": {
+        "sha256": "61d0638359c3dd320e61b1a3467857036307235afed31fb51781a66ec5cf47a5",
+        "bytes": 4609480
+      },
+      "version": "cargo-llvm-cov 0.9.0"
+    },
+    "llvm_cov": {
+      "path": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+      "identity": {
+        "sha256": "bb415d8767d2ad73d72c01941f409ffc8f9478747ec7c18a7a69356735551ed9",
+        "bytes": 639712
+      },
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+    },
+    "llvm_profdata": {
+      "path": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+      "identity": {
+        "sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+        "bytes": 666968
+      },
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+    },
+    "release": "1.97.1",
+    "commit": "8bab26f4f68e0e26f0bb7960be334d5b520ea452",
+    "host": "x86_64-unknown-linux-gnu",
+    "llvm": "22.1.6"
+  },
+  "binary": {
+    "sha256": "adeaf2d1a53e182f810097161c93ec83d8b32bcc5afefd9ec67ed20f87402ed3",
+    "bytes": 3488488
+  },
+  "capture_bytes": 49122,
+  "persistent_candidate_cache_bytes": 0,
+  "execve_trace": "not performed",
+  "core_protocol_authentication": "not exercised by this capture suite; see separate Core acceptance",
+  "release_signature_lifecycle": "not exercised by this capture suite; see separate lifecycle acceptance",
+  "second_toolchain_and_system": "not established by this invocation"
+}

@@ -1,0 +1,988 @@
+{
+  "schema": "rust-stable-output-isolation-checkpoint/v1",
+  "state": "reproduced failure side effect fixed; T3-T8 incomplete; release hold retained",
+  "binary": {
+    "sha256": "adeaf2d1a53e182f810097161c93ec83d8b32bcc5afefd9ec67ed20f87402ed3",
+    "bytes": 3488488
+  },
+  "root_cause": "Runner created the output before canonicalizing and checking the project boundary. Lexical collection validation rejected direct paths but allowed aliases and parent components to reach that mutating failure path.",
+  "before": [
+    {
+      "path": "target/gh-259/output-isolation-before/summary.json",
+      "bytes": 1927,
+      "sha256": "35e059daf514a7f71dda14834c4b07bb0484cda70acbf2221e4830c83761f3b7",
+      "observations": {
+        "binary_sha256": "8c925c2cf93b39990a93add07de000ef08081f7b07becd529cf3cf602e5261ff",
+        "cases": [
+          {
+            "name": "direct",
+            "argv": [
+              "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+              "doctor",
+              "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/output-isolation-before/project",
+              "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/output-isolation-before/project/direct"
+            ],
+            "exit_code": 1,
+            "stderr": "{\"message\":\"output must be outside the measured project\",\"schema\":\"rust-stable-error/v1\",\"state\":\"measurement_error\"}\n",
+            "output_exists": true
+          },
+          {
+            "name": "symlink",
+            "argv": [
+              "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+              "doctor",
+              "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/output-isolation-before/project",
+              "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/output-isolation-before/alias/symlink"
+            ],
+            "exit_code": 1,
+            "stderr": "{\"message\":\"output must be outside the measured project\",\"schema\":\"rust-stable-error/v1\",\"state\":\"measurement_error\"}\n",
+            "output_exists": true
+          },
+          {
+            "name": "parent",
+            "argv": [
+              "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+              "doctor",
+              "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/output-isolation-before/project",
+              "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/output-isolation-before/project/../project/parent"
+            ],
+            "exit_code": 1,
+            "stderr": "{\"message\":\"output must be outside the measured project\",\"schema\":\"rust-stable-error/v1\",\"state\":\"measurement_error\"}\n",
+            "output_exists": true
+          }
+        ]
+      }
+    },
+    {
+      "path": "target/gh-259/output-isolation-before/collect-summary.json",
+      "bytes": 1581,
+      "sha256": "7f58105d67eb07dcc6da68382ecb20384c45397b622b3f00fc7717d6b89b1b63",
+      "observations": {
+        "binary_sha256": "8c925c2cf93b39990a93add07de000ef08081f7b07becd529cf3cf602e5261ff",
+        "cases": [
+          {
+            "name": "direct",
+            "argv": [
+              "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/output-isolation-before/collector-before",
+              "collect",
+              "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/output-isolation-before/request-direct.json"
+            ],
+            "exit_code": 1,
+            "stderr": "{\"message\":\"output must be outside project\",\"schema\":\"rust-stable-error/v1\",\"state\":\"measurement_error\"}\n",
+            "output_exists": false
+          },
+          {
+            "name": "alias",
+            "argv": [
+              "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/output-isolation-before/collector-before",
+              "collect",
+              "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/output-isolation-before/request-alias.json"
+            ],
+            "exit_code": 1,
+            "stderr": "{\"message\":\"output must be outside the measured project\",\"schema\":\"rust-stable-error/v1\",\"state\":\"measurement_error\"}\n",
+            "output_exists": true
+          },
+          {
+            "name": "parent",
+            "argv": [
+              "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/output-isolation-before/collector-before",
+              "collect",
+              "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/output-isolation-before/request-parent.json"
+            ],
+            "exit_code": 1,
+            "stderr": "{\"message\":\"output must be outside the measured project\",\"schema\":\"rust-stable-error/v1\",\"state\":\"measurement_error\"}\n",
+            "output_exists": true
+          }
+        ]
+      }
+    }
+  ],
+  "after": {
+    "acceptance": {
+      "path": "target/gh-259/acceptance-output-02/summary.json",
+      "bytes": 31544,
+      "sha256": "cbc0254a2367e0a707b7d44f24cbef5f1ab2081929bd901ac09a248a4cfb541e"
+    },
+    "checks": 120,
+    "observations": {
+      "before": {
+        "Cargo.toml": "d06a38d5d01483e8b121582afaf44c78b6cebf419cad5b6c8bd1880525f565f8",
+        "src": "directory",
+        "Cargo.lock": "8558ed7244d374cf529b80de9f84bc952c4f240dacb9325586b611f2b6c3d5e9",
+        "src/lib.rs": "3f175da6464cacc2543c0fcb8dd4fc841214a3050d26d7abcf25a14fa37eccdc"
+      },
+      "after": {
+        "Cargo.toml": "d06a38d5d01483e8b121582afaf44c78b6cebf419cad5b6c8bd1880525f565f8",
+        "src": "directory",
+        "Cargo.lock": "8558ed7244d374cf529b80de9f84bc952c4f240dacb9325586b611f2b6c3d5e9",
+        "src/lib.rs": "3f175da6464cacc2543c0fcb8dd4fc841214a3050d26d7abcf25a14fa37eccdc"
+      },
+      "cases": [
+        {
+          "name": "output-isolation-doctor-direct",
+          "destination": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02/plain/rejected-doctor-direct",
+          "output_exists": false,
+          "project_unchanged": true
+        },
+        {
+          "name": "output-isolation-doctor-alias",
+          "destination": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02/project-alias/rejected-doctor-alias",
+          "output_exists": false,
+          "project_unchanged": true
+        },
+        {
+          "name": "output-isolation-doctor-parent",
+          "destination": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02/doctor/../plain/rejected-doctor-parent",
+          "output_exists": false,
+          "project_unchanged": true
+        },
+        {
+          "name": "output-isolation-collect-direct",
+          "destination": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02/plain/rejected-collect-direct",
+          "output_exists": false,
+          "project_unchanged": true
+        },
+        {
+          "name": "output-isolation-collect-alias",
+          "destination": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02/project-alias/rejected-collect-alias",
+          "output_exists": false,
+          "project_unchanged": true
+        },
+        {
+          "name": "output-isolation-collect-parent",
+          "destination": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02/doctor/../plain/rejected-collect-parent",
+          "output_exists": false,
+          "project_unchanged": true
+        }
+      ],
+      "relative_output_created": true
+    }
+  },
+  "fix_scope": "Resolve project and existing output parent before directory creation. Directory and file snapshots cover six rejected CLI requests. A successful relative sibling output is also required. No concurrent filesystem replacement isolation claim.",
+  "source_inputs": [
+    {
+      "path": "tools/quality/rust-stable-collector/src/process.rs",
+      "bytes": 8232,
+      "sha256": "9775e7bb0aa2ea64ceac6720fa338502bc36dfc0a5ec80d99a05e8c217279188"
+    },
+    {
+      "path": "tools/quality/rust-stable-collector/validate_stable_candidate.py",
+      "bytes": 27301,
+      "sha256": "918ca94a773f3a0461490e98652e9940c8173a4da29c1c55aa20a07ae37cb23e"
+    },
+    {
+      "path": "tools/quality/rust-stable-collector/prepare_release.py",
+      "bytes": 17637,
+      "sha256": "5a667903b9d16a84f22f3634c5f570dca0c16f6513529d61eabbd4d0ce801b5f"
+    },
+    {
+      "path": "tools/release/tests/test_stable_package.py",
+      "bytes": 7326,
+      "sha256": "54968541c16e485f613abcb55daf66df3b5e66a336728ad53bbe0d8a4ebadcc9"
+    }
+  ],
+  "release_build": {
+    "argv": [
+      "cargo",
+      "+1.97.1",
+      "build",
+      "--manifest-path",
+      "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/Cargo.toml",
+      "--release",
+      "--locked",
+      "--offline",
+      "--message-format=json"
+    ],
+    "environment": {
+      "HOME": "/home/gem",
+      "PATH": "/home/gem/.codex/packages/standalone/releases/0.154.0-x86_64-unknown-linux-musl/codex-path:/home/gem/.npm-global/bin:/home/gem/.codex/tmp/arg0/codex-arg05WQtvy:/home/gem/.codex/packages/standalone/releases/0.154.0-x86_64-unknown-linux-musl/codex-path:/home/gem/.npm-global/bin:/home/gem/.local/share/mise/installs/erlang/28.5/erts-16.4/bin:/home/gem/.local/share/mise/installs/erlang/28.5/bin:/home/gem/.local/share/mise/installs/erlang/28/bin:/home/gem/.local/share/mise/installs/elixir/1.19.5-otp-28/bin:/home/gem/.local/share/mise/installs/elixir/1.19.5-otp-28/.mix/escripts:/home/gem/.local/share/.burrito/symphony_erts-16.4_0.0.2/erts-16.4/bin:/home/gem/.local/share/.burrito/symphony_erts-16.4_0.0.2/bin:/home/gem/.npm-global/bin:/home/gem/.codex/packages/standalone/releases/0.153.4-x86_64-unknown-linux-musl/codex-path:/home/gem/.codex/tmp/arg0/codex-arg0VigbCL:/home/gem/.grok/bin:/home/gem/.local/bin:/home/gem/.cargo/bin:/home/gem/.opencode/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin",
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target",
+      "RUSTFLAGS": "",
+      "RUSTDOCFLAGS": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTC_WORKSPACE_WRAPPER": ""
+    },
+    "exit_code": 0,
+    "log": "target/gh-259/output-build.log"
+  },
+  "validated_runtime_commands": [
+    {
+      "label": "historical",
+      "argv": [
+        "python3",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/compare_historical_fixture.py",
+        "--binary",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/historical-output-02"
+      ],
+      "environment_overrides": null,
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final2-historical.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final2-historical.log",
+        "bytes": 147,
+        "sha256": "87669fc4126dadb9e2a0d3fb39707fded05a78ecd2ef627ca5140b1dc35c57cf"
+      }
+    },
+    {
+      "label": "macros",
+      "argv": [
+        "python3",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/validate_macro_templates.py",
+        "--binary",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/macros-output-02"
+      ],
+      "environment_overrides": null,
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final2-macros.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final2-macros.log",
+        "bytes": 74,
+        "sha256": "1e4f283d753b484af4cc846a30d30950381e46158229bb7deff97130a6bedac1"
+      }
+    },
+    {
+      "label": "capture",
+      "argv": [
+        "python3",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/validate_stable_candidate.py",
+        "--binary",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02"
+      ],
+      "environment_overrides": null,
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final2-capture.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final2-capture.log",
+        "bytes": 125,
+        "sha256": "7686179110e37019bf0ab09c132f062b9b05392b3ed249c9c9c1297803c386c3"
+      }
+    },
+    {
+      "label": "core-plain",
+      "argv": [
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/examples/stable_collector_acceptance",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/harness-gate",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-output-02-plain",
+        "plain"
+      ],
+      "environment_overrides": {},
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final2-core-plain.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final2-core-plain.log",
+        "bytes": 102,
+        "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+      }
+    },
+    {
+      "label": "core-modules",
+      "argv": [
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/examples/stable_collector_acceptance",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/harness-gate",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-output-02-modules",
+        "modules"
+      ],
+      "environment_overrides": {},
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final2-core-modules.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final2-core-modules.log",
+        "bytes": 102,
+        "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+      }
+    },
+    {
+      "label": "core-partial",
+      "argv": [
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/examples/stable_collector_acceptance",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/harness-gate",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-output-02-partial",
+        "partial"
+      ],
+      "environment_overrides": {},
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final2-core-partial.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final2-core-partial.log",
+        "bytes": 102,
+        "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+      }
+    },
+    {
+      "label": "core-features",
+      "argv": [
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/examples/stable_collector_acceptance",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/harness-gate",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-output-02-features",
+        "features"
+      ],
+      "environment_overrides": {},
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final2-core-features.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final2-core-features.log",
+        "bytes": 102,
+        "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+      }
+    },
+    {
+      "label": "core-boundaries",
+      "argv": [
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/examples/stable_collector_acceptance",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/harness-gate",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-output-02-boundaries",
+        "boundaries"
+      ],
+      "environment_overrides": {},
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final2-core-boundaries.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final2-core-boundaries.log",
+        "bytes": 102,
+        "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+      }
+    },
+    {
+      "label": "core-registry",
+      "argv": [
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/examples/stable_collector_acceptance",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/harness-gate",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-output-02-registry",
+        "registry"
+      ],
+      "environment_overrides": {
+        "CARGO_HOME": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02/registry-cargo-home"
+      },
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final2-core-registry.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final2-core-registry.log",
+        "bytes": 102,
+        "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+      }
+    },
+    {
+      "label": "package",
+      "argv": [
+        "python3",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/prepare_release.py",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/package-output-02",
+        "--target-dir",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target",
+        "--toolchain",
+        "1.97.1",
+        "--acceptance",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-02/summary.json",
+        "cbc0254a2367e0a707b7d44f24cbef5f1ab2081929bd901ac09a248a4cfb541e"
+      ],
+      "environment_overrides": null,
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final2-package.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final2-package.log",
+        "bytes": 155,
+        "sha256": "0875b6c7fee4d2053320e8ec5b27ac03480a03897a9fb6ae42850d4289e5f993"
+      }
+    },
+    {
+      "label": "lifecycle",
+      "argv": [
+        "python3",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/validate_lifecycle.py",
+        "--binary",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "--package",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/package-output-02/unsigned-package",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle-output-02"
+      ],
+      "environment_overrides": null,
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final2-lifecycle.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final2-lifecycle.log",
+        "bytes": 116,
+        "sha256": "6d633bcffc75a63d7a0338722ea401c3ca6a82b79f5ff441404c72a4c380a04e"
+      }
+    },
+    {
+      "label": "download",
+      "argv": [
+        "python3",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/validate_download.py",
+        "--binary",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "--lifecycle",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle-output-02",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/download-output-02"
+      ],
+      "environment_overrides": null,
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final2-download.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final2-download.log",
+        "bytes": 101,
+        "sha256": "26983535af9f6b746c81565f76e3a35f34771f5b4bf68c56a9a566bf5d243b4f"
+      }
+    }
+  ],
+  "candidate_checks": [
+    {
+      "label": "fmt",
+      "argv": [
+        "cargo",
+        "+1.97.1",
+        "fmt",
+        "--manifest-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/Cargo.toml",
+        "--",
+        "--check"
+      ],
+      "environment_overrides": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target"
+      },
+      "environment_removed": [],
+      "exit_code": 1,
+      "log": "target/gh-259/output-final-fmt.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final-fmt.log",
+        "bytes": 612,
+        "sha256": "0765574d5b1f9af4410a18659fc0d09195fd5007b70f0e4258e8b85c730ed719"
+      }
+    },
+    {
+      "label": "unit",
+      "argv": [
+        "cargo",
+        "+1.97.1",
+        "test",
+        "--manifest-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/Cargo.toml",
+        "--locked"
+      ],
+      "environment_overrides": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target"
+      },
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final-unit.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final-unit.log",
+        "bytes": 2241,
+        "sha256": "265c1bae8f87282bec8d4b432abf6fc3f196ad57ad8af5137b154b9d639d01a5"
+      }
+    },
+    {
+      "label": "clippy",
+      "argv": [
+        "cargo",
+        "+1.97.1",
+        "clippy",
+        "--manifest-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/Cargo.toml",
+        "--all-targets",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "environment_overrides": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target"
+      },
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final-clippy.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final-clippy.log",
+        "bytes": 217,
+        "sha256": "94d6bbe77734f36011d9d21aa34132c1fab3c0c5e0eb69e2cc5c762d619768a9"
+      }
+    },
+    {
+      "argv": [
+        "cargo",
+        "+1.97.1",
+        "fmt",
+        "--manifest-path",
+        "tools/quality/rust-stable-collector/Cargo.toml",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final-fmt-corrected.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final-fmt-corrected.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "repository_checks": [
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/quality/tests",
+        "-v"
+      ],
+      "environment_overrides": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target"
+      },
+      "exit_code": 0,
+      "log": "target/gh-259/output-final-quality.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final-quality.log",
+        "bytes": 78304,
+        "sha256": "4e07df2b323150a29a2cf304d2fa8d1cbfd030b6c8cb42c1bc18791ab2060b82"
+      }
+    },
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/release/tests",
+        "-v"
+      ],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final-release.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final-release.log",
+        "bytes": 14290,
+        "sha256": "400fddb07d18705def96522130f0bf3ffbacd90d1364e30442c93d84ecca52d9"
+      }
+    },
+    {
+      "command": "CARGO_TARGET_DIR=\"$PWD/target/gh-259/core-target\" python3 tools/quality/docs_consistency.py --output target/gh-259/output-docs-consistency.json",
+      "exit_code": 0,
+      "log_identity": {
+        "path": "target/gh-259/output-final-docs.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "report_identity": {
+        "path": "target/gh-259/output-docs-consistency.json",
+        "bytes": 1488,
+        "sha256": "c9ee03a7e138ee180bb381cfc740a797f5b6d3f69bb129a91b9e1f7394a03594"
+      }
+    },
+    {
+      "command": "git diff --check; Python trailing-whitespace scan of all 118 submitted files",
+      "exit_code": 0,
+      "note": "git diff --check run separately; scan covers untracked implementation files as well"
+    }
+  ],
+  "retained_core_repository_checks": {
+    "record": {
+      "path": "docs/quality/stable-rust-candidate-evidence/json-identities.json",
+      "bytes": 39210,
+      "sha256": "261b10982abf84eb3a08377aa0bbb4dcaf8aa50674e0282a0abd7abae0d0ad47"
+    },
+    "reason": "Core source and dependencies unchanged; prior 397 nextest, fmt and all-target clippy remain applicable. Six actual Core fixture cases were rerun against the new binary."
+  },
+  "initial_runtime_commands": [
+    {
+      "label": "historical",
+      "argv": [
+        "python3",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/compare_historical_fixture.py",
+        "--binary",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/historical-output-01"
+      ],
+      "environment_overrides": null,
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final-historical.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final-historical.log",
+        "bytes": 147,
+        "sha256": "f491becb63a252ee32f56efa8045336562fa9824639d52bbf71c1b727e618db5"
+      }
+    },
+    {
+      "label": "macros",
+      "argv": [
+        "python3",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/validate_macro_templates.py",
+        "--binary",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/macros-output-01"
+      ],
+      "environment_overrides": null,
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final-macros.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final-macros.log",
+        "bytes": 74,
+        "sha256": "1e4f283d753b484af4cc846a30d30950381e46158229bb7deff97130a6bedac1"
+      }
+    },
+    {
+      "label": "capture",
+      "argv": [
+        "python3",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/validate_stable_candidate.py",
+        "--binary",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-01"
+      ],
+      "environment_overrides": null,
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final-capture.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final-capture.log",
+        "bytes": 125,
+        "sha256": "40a0a5fe246378c5f99f1c083fbba305407334f3a3bb42e95b9a4f7f4442d166"
+      }
+    },
+    {
+      "label": "core-plain",
+      "argv": [
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/examples/stable_collector_acceptance",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/harness-gate",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-01",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-output-01-plain",
+        "plain"
+      ],
+      "environment_overrides": {},
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final-core-plain.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final-core-plain.log",
+        "bytes": 102,
+        "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+      }
+    },
+    {
+      "label": "core-modules",
+      "argv": [
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/examples/stable_collector_acceptance",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/harness-gate",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-01",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-output-01-modules",
+        "modules"
+      ],
+      "environment_overrides": {},
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final-core-modules.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final-core-modules.log",
+        "bytes": 102,
+        "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+      }
+    },
+    {
+      "label": "core-partial",
+      "argv": [
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/examples/stable_collector_acceptance",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/harness-gate",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-01",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-output-01-partial",
+        "partial"
+      ],
+      "environment_overrides": {},
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final-core-partial.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final-core-partial.log",
+        "bytes": 102,
+        "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+      }
+    },
+    {
+      "label": "core-registry",
+      "argv": [
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/examples/stable_collector_acceptance",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/harness-gate",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-01",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-output-01-registry",
+        "registry"
+      ],
+      "environment_overrides": {
+        "CARGO_HOME": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-01/registry-cargo-home"
+      },
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final-core-registry.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final-core-registry.log",
+        "bytes": 102,
+        "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+      }
+    },
+    {
+      "label": "core-features",
+      "argv": [
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/examples/stable_collector_acceptance",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/harness-gate",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-01",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-output-01-features",
+        "features"
+      ],
+      "environment_overrides": {},
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final-core-features.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final-core-features.log",
+        "bytes": 102,
+        "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+      }
+    },
+    {
+      "label": "core-boundaries",
+      "argv": [
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/examples/stable_collector_acceptance",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/harness-gate",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-01",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-output-01-boundaries",
+        "boundaries"
+      ],
+      "environment_overrides": {},
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": "target/gh-259/output-final-core-boundaries.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final-core-boundaries.log",
+        "bytes": 102,
+        "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+      }
+    },
+    {
+      "label": "package",
+      "argv": [
+        "python3",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/prepare_release.py",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/package-output-01",
+        "--target-dir",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target",
+        "--toolchain",
+        "1.97.1",
+        "--acceptance",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-output-01/summary.json",
+        "a73230af7f7165b1672e7a6c2b43eb252eb38f4e2e0169106d704b3194c2e4c2"
+      ],
+      "environment_overrides": null,
+      "environment_removed": [],
+      "exit_code": 1,
+      "log": "target/gh-259/output-final-package.log",
+      "log_identity": {
+        "path": "target/gh-259/output-final-package.log",
+        "bytes": 1506,
+        "sha256": "ca3c28bbb7621c2b2280fa791fb0cc7c5db7fa6765568a174233370517e9761f"
+      }
+    }
+  ],
+  "corrected_failures": [
+    "Initial fmt check required one line wrap. Formatting was applied after the first release build; package preparation rebuilt the source and correctly rejected acceptance for the earlier binary. Full runtime validation and package preparation were rerun against the final artifact."
+  ],
+  "artifact_audit": {
+    "binary": {
+      "sha256": "adeaf2d1a53e182f810097161c93ec83d8b32bcc5afefd9ec67ed20f87402ed3",
+      "bytes": 3488488
+    },
+    "records": [
+      {
+        "label": "file",
+        "argv": [
+          "file",
+          "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector"
+        ],
+        "exit_code": 0,
+        "log": "target/gh-259/output-artifact-file.log",
+        "log_sha256": "732c64e7c4f6a32e14c8cfe6c0ce9c60229ee20566af1a79c99c3d1c961e45e7"
+      },
+      {
+        "label": "dynamic",
+        "argv": [
+          "readelf",
+          "-d",
+          "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector"
+        ],
+        "exit_code": 0,
+        "log": "target/gh-259/output-artifact-dynamic.log",
+        "log_sha256": "1b4604ed3fbcdb4f181b252f3c14e12412ebd173331d74d7ad0fa0013e6bf204"
+      },
+      {
+        "label": "linked",
+        "argv": [
+          "ldd",
+          "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector"
+        ],
+        "exit_code": 0,
+        "log": "target/gh-259/output-artifact-linked.log",
+        "log_sha256": "d3aa43e953428b5175b40ff8d9886aa1caa74346eda034566f766b8ea180a725"
+      },
+      {
+        "label": "compiler",
+        "argv": [
+          "rustc",
+          "+1.97.1",
+          "-vV"
+        ],
+        "exit_code": 0,
+        "log": "target/gh-259/output-artifact-compiler.log",
+        "log_sha256": "b2bdf493bcf6d1dc55181a0efc2774b6d9cf7bf5c8dcc5bed592c994b2ad38c4"
+      }
+    ],
+    "limits": "ELF dependency inspection and recorded tool commands only; ptrace unavailable; no complete execve trace"
+  },
+  "package": {
+    "record": {
+      "path": "target/gh-259/package-output-02/preparation.json",
+      "bytes": 47371,
+      "sha256": "1c6fc109cfb8f6781213f4b233b87b4210a1c960e97c2c6a7b401f46605b2929"
+    },
+    "unsigned_package_bytes": 4802098,
+    "payload": {
+      "LICENSE": {
+        "bytes": 1312123,
+        "sha256": "4cec384f7847b51b9398bd4d44358544922f12252512c0195d8f7725c00abf4b"
+      },
+      "harness-gate-rust-stable-collector": {
+        "bytes": 3488488,
+        "sha256": "adeaf2d1a53e182f810097161c93ec83d8b32bcc5afefd9ec67ed20f87402ed3"
+      },
+      "support.json": {
+        "bytes": 924,
+        "sha256": "1e7a72491ee5b002c36faaaf76da3ce82251c1e3a2d5ee711b2964ef80fb7b3e"
+      }
+    },
+    "production_ready": false
+  },
+  "lifecycle": {
+    "record": {
+      "path": "target/gh-259/lifecycle-output-02/summary.json",
+      "bytes": 6320,
+      "sha256": "4952014499df921813026348bd83b7bb6c8123fd3172c514d721355b2430fe80"
+    },
+    "checks": 38,
+    "package_bytes": 4802567,
+    "upgrade_package_bytes": 4802593,
+    "two_versions_bytes": 9605160,
+    "interrupted_staging_bytes": 4802593,
+    "installation_bytes_including_interrupted_staging": 14408381,
+    "network_download_bytes": 0,
+    "rsa": "real RSA-2048/SHA-256 signatures; repository-generated test key",
+    "sigstore": "MOCK invocation/exit behavior only; no cryptographic or production acceptance",
+    "production_signature": false
+  },
+  "download": {
+    "record": {
+      "path": "target/gh-259/download-output-02/summary.json",
+      "bytes": 50595,
+      "sha256": "e7a455bf978b8243609b13d50a81e92962eb92dedfea63893557bfa140e3b140"
+    },
+    "checks": 29,
+    "initial_download_bytes": 4802567,
+    "upgrade_download_bytes": 4802593,
+    "total_received_body_bytes": 37554339,
+    "abandoned_download_bytes": 0,
+    "cache_bytes": 0,
+    "tls": "real loopback HTTPS with explicitly pinned test CA; certificate and hostname failures tested",
+    "signature_scope": "real test RSA; mock Sigstore invocation only; no production signature claim"
+  },
+  "fixtures": [
+    {
+      "path": "target/gh-259/core-output-02-plain/summary.json",
+      "bytes": 4450,
+      "sha256": "091efe1210111375a55fd3f3f307025d283d46fa24e77a304d04ac2de581ae8d"
+    },
+    {
+      "path": "target/gh-259/core-output-02-partial/summary.json",
+      "bytes": 4454,
+      "sha256": "422947810ad2d653db8ac9ceb7e7fbc816c35cdf66191af64b4e12d796c261cd"
+    },
+    {
+      "path": "target/gh-259/core-output-02-modules/summary.json",
+      "bytes": 4700,
+      "sha256": "0f5877f50d73be991b2259f4a1a281b15192bd566908d67e66bca0e739cefed5"
+    },
+    {
+      "path": "target/gh-259/core-output-02-boundaries/summary.json",
+      "bytes": 5137,
+      "sha256": "83a916e1e30e74d1d417b5a788fecd0b166cc57ccff4c79e83ff7f29012864bf"
+    },
+    {
+      "path": "target/gh-259/core-output-02-features/summary.json",
+      "bytes": 5133,
+      "sha256": "19fe6bac0cb8b629ed648f92c1840322a147a3f6675cf9ec8911da7eff3e0dd4"
+    },
+    {
+      "path": "target/gh-259/core-output-02-registry/summary.json",
+      "bytes": 4210,
+      "sha256": "53503dd7a5fc95eca704722a2f5d515d439eec8b5c3706b7c2aeb48e6362534f"
+    },
+    {
+      "path": "target/gh-259/macros-output-02/summary.json",
+      "bytes": 30749,
+      "sha256": "18b31776ad6d84ab0b17c2dbfe8d873cc150e6b4180b4d72b8cdced04e7e4873"
+    },
+    {
+      "path": "target/gh-259/historical-output-02/comparison.json",
+      "bytes": 9650,
+      "sha256": "dfe5a368f6db681674e76b0fb1a01894127b2c53c4a58c2c9ada000d17c1a582"
+    }
+  ],
+  "limits": [
+    "One actual stable release (1.97.1), one actual system (Ubuntu 26.04 / glibc 2.43 / Linux x86_64 GNU).",
+    "1.98.1 unavailable; official manifest network request blocked; containers, namespaces and ptrace denied; real cosign absent.",
+    "ELF and logged tool commands are not complete process tracing. RSA test keys, mock Sigstore and test-CA HTTPS are not production signature or hosting acceptance.",
+    "Generated-owner coverage, complete build-input provenance, reviewed CRAP/migration and protected public distribution remain incomplete.",
+    "No project-local .harness-gate/flow.toml declaring ci: config check and verify --profile ci --all are not applicable. No user toolchain, baseline, installation or production release changed."
+  ]
+}
