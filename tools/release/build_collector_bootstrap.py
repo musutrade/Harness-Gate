@@ -24,10 +24,12 @@ def build(runtime, output, *, user_entry=False):
             destination = 'tools/quality/' + name[4:] if name.startswith('app/') else name
             files[destination] = (source.read_bytes(), row['mode'])
     for name in ('collector_assets.py', 'collector_sigstore.py', 'collector_release_policy.py',
-                 'release_policy.py', 'install_collector.py', 'production_installer.py'):
+                 'release_policy.py', 'install_collector.py', 'collector_receipt.py',
+                 'collector_store.py', 'collector_maintenance.py', 'production_installer.py'):
         files['tools/release/' + name] = ((RELEASE / name).read_bytes(), 0o644)
     if user_entry:
-        for name in ('collector_transport.py', 'friendly_collector_install.py'):
+        for name in ('collector_transport.py', 'collector_components.py', 'collector_light_install.py',
+                     'friendly_collector_install.py'):
             files['tools/release/' + name] = ((RELEASE / name).read_bytes(), 0o644)
     assets.require('python/bin/python3' in files, 'missing private bootstrap Python')
     # Inventory is descriptive; the out-of-band capsule SHA authenticates it.

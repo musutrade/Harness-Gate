@@ -1,5 +1,10 @@
 # Rust collector installation and independent release
 
+For the **unreleased GH-255 source implementation**, see the
+[lightweight lifecycle guide](lightweight-collector-installation.md). Its component
+store, archive-free verification and maintenance commands supersede the source
+lifecycle details below; the immutable published installer described here is unchanged.
+
 The collector **0.1.0-rc.3** and compressed installer **0.1.0-rc.4** are published.
 See [current release receipts and compatibility](../release-status.md). This guide
 supersedes the historical GH-229/GH-231 preparation instructions for normal use.

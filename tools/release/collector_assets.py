@@ -141,22 +141,32 @@ def prepare(directory, eligibility):
         'assets': subjects(directory, ASSETS)})
 
 
-def verify(directory, trust, tag):
-    require(set(p.name for p in directory.iterdir()) == set(ASSETS + CONTROL), 'missing/extra release assets')
-    for name in ASSETS + CONTROL:
+def verify(directory, trust, tag, *, archive_sha256=None):
+    names = ASSETS + CONTROL if archive_sha256 is None else ASSETS[1:] + CONTROL
+    allowed = set(names)
+    if archive_sha256 is not None:
+        allowed.add('archive-receipt.json')
+        if (directory / 'collector.tar').exists():
+            allowed.add('collector.tar')  # recoverable migration before archive removal
+    require(set(p.name for p in directory.iterdir()) == allowed, 'missing/extra release assets')
+    for name in allowed:
         regular(directory / name)
     verify_signature(directory, trust)
     inventory = read(directory / CONTROL[0])
     manifest = contract.load_manifest((directory / 'manifest.json').read_bytes())
     require(tag == 'rust-collector-v' + version(manifest['collector']['version']), 'wrong exact tag')
+    def bound_subjects(names):
+        return [{'name': name, 'digest': {'sha256': archive_sha256}}
+                if name == 'collector.tar' and archive_sha256 is not None
+                else {'name': name, 'digest': {'sha256': sha(directory / name)}} for name in names]
     require(inventory == {'schema': 'rust-collector-release/v1', 'tag': tag,
                            'source_commit': manifest['source_commit'],
-                           'assets': subjects(directory, ASSETS)}, 'release inventory mismatch')
+                           'assets': bound_subjects(ASSETS)}, 'release inventory mismatch')
     require(read(directory / 'sbom.spdx.json') == sbom(manifest), 'SBOM payload inventory mismatch')
     provenance = read(directory / 'provenance.json')
     predicate = provenance['predicate']
     require(provenance == {'_type': 'https://in-toto.io/Statement/v1',
-        'subject': subjects(directory, ASSETS[:3]),
+        'subject': bound_subjects(ASSETS[:3]),
         'predicateType': 'https://harness-gate.dev/collector-release/v1',
         'predicate': predicate}, 'provenance subjects mismatch')
     require(set(predicate) == {'repository', 'workflow', 'ref', 'source_commit', 'eligibility'}
