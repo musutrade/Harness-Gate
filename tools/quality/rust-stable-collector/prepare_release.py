@@ -128,9 +128,14 @@ def acceptance(path, pin, binary):
             'acceptance does not identify this candidate binary')
     checks = value['checks']
     names = {check['name'] for check in checks}
-    require(len(names) == len(checks) and len(checks) >= 23
+    require(len(names) == len(checks) and len(checks) >= 36
             and {'doctor', 'plain', 'boundaries', 'features', 'verify', 'failed-test',
-                 'corrupt-coverage', 'mixed-artifact', 'changed-source'} <= names
+                 'corrupt-coverage', 'mixed-artifact', 'changed-source',
+                 'negative-function-count', 'overflow-function-count',
+                 'fractional-function-count', 'missing-function-regions',
+                 'invalid-region-file', 'reversed-region', 'unknown-region-kind',
+                 'covered-exceeds-total', 'wrong-summary-percent', 'wrong-notcovered',
+                 'invalid-segment-boolean', 'mcdc-capability', 'duplicate-coverage-key'} <= names
             and all(check['passed'] is True for check in checks),
             'candidate acceptance is incomplete or failed')
     tools = value['tools']

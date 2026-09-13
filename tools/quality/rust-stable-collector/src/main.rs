@@ -2,6 +2,7 @@
 mod adapter;
 mod artifact;
 mod collect;
+mod coverage;
 mod process;
 mod release;
 mod source;

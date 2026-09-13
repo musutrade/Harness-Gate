@@ -1,5 +1,5 @@
 
-Dynamic section at offset 0x1a2b98 contains 28 entries:
+Dynamic section at offset 0x1a4338 contains 28 entries:
   Tag        Type                         Name/Value
  0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
  0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
@@ -7,24 +7,24 @@ Dynamic section at offset 0x1a2b98 contains 28 entries:
  0x000000006ffffffb (FLAGS_1)            Flags: NOW PIE
  0x0000000000000015 (DEBUG)              0x0
  0x0000000000000007 (RELA)               0x1958
- 0x0000000000000008 (RELASZ)             40824 (bytes)
+ 0x0000000000000008 (RELASZ)             40944 (bytes)
  0x0000000000000009 (RELAENT)            24 (bytes)
- 0x000000006ffffff9 (RELACOUNT)          1572
- 0x0000000000000017 (JMPREL)             0xb8d0
+ 0x000000006ffffff9 (RELACOUNT)          1577
+ 0x0000000000000017 (JMPREL)             0xb948
  0x0000000000000002 (PLTRELSZ)           48 (bytes)
- 0x0000000000000003 (PLTGOT)             0x1a5160
+ 0x0000000000000003 (PLTGOT)             0x1a6900
  0x0000000000000014 (PLTREL)             RELA
  0x0000000000000006 (SYMTAB)             0x340
  0x000000000000000b (SYMENT)             24 (bytes)
  0x0000000000000005 (STRTAB)             0x121c
  0x000000000000000a (STRSZ)              1851 (bytes)
  0x000000006ffffef5 (GNU_HASH)           0x1200
- 0x0000000000000019 (INIT_ARRAY)         0x19e068
+ 0x0000000000000019 (INIT_ARRAY)         0x19f798
  0x000000000000001b (INIT_ARRAYSZ)       16 (bytes)
- 0x000000000000001a (FINI_ARRAY)         0x19e060
+ 0x000000000000001a (FINI_ARRAY)         0x19f790
  0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)
- 0x000000000000000c (INIT)               0x19cfe0
- 0x000000000000000d (FINI)               0x19cffc
+ 0x000000000000000c (INIT)               0x19e710
+ 0x000000000000000d (FINI)               0x19e72c
  0x000000006ffffff0 (VERSYM)             0xf88
  0x000000006ffffffe (VERNEED)            0x1090
  0x000000006fffffff (VERNEEDNUM)         2

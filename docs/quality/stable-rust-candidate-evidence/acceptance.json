@@ -43,6 +43,71 @@
       "passed": true
     },
     {
+      "name": "negative-function-count",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "overflow-function-count",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "fractional-function-count",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "missing-function-regions",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "invalid-region-file",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "reversed-region",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "unknown-region-kind",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "covered-exceeds-total",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "wrong-summary-percent",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "wrong-notcovered",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "invalid-segment-boolean",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "mcdc-capability",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "duplicate-coverage-key",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
       "name": "mixed-artifact",
       "exit_code": 1,
       "passed": true
@@ -123,8 +188,8 @@
       "anchors": {
         "capture": "complete",
         "core_acceptance": "pending",
-        "manifest_sha256": "b79d65e2da08dd97085070975fbc4f0489aba9e68674a5e058b05f38a6a8b2ef",
-        "request_sha256": "aa30d02d5ee82e33e5fbad768c64519ead12b246dde62d6981d284344f8a1f10",
+        "manifest_sha256": "e0060010eeb0eecea06a11b179bf6e35a1a392c00b7763312bd103e490ab0d1c",
+        "request_sha256": "69d47b99ae23d269339bd8574a2bcf1da160de6781e79593df892584891313ee",
         "state": "unsupported"
       },
       "llvm_totals_test_inclusive": {
@@ -193,8 +258,8 @@
       "anchors": {
         "capture": "complete",
         "core_acceptance": "pending",
-        "manifest_sha256": "2eaac53aa2f360c99b280b26450b3d3cf97dffe5c67e3892bb32ebf6a5f38542",
-        "request_sha256": "0f8072e2094a56b6bd247262a2e4adff5c9a4aae7e921ef45016aa9eac42eba8",
+        "manifest_sha256": "a34c833ac08e17ba4a496255704b58a8829316d16cff63b3c47c87010c13fc48",
+        "request_sha256": "2065064ed3f8399529d8adc17c8a0cb44fe9d4a1f8c33c1b666d7aa188a2b84f",
         "state": "unsupported"
       },
       "llvm_totals_test_inclusive": {
@@ -314,8 +379,8 @@
       "anchors": {
         "capture": "complete",
         "core_acceptance": "pending",
-        "manifest_sha256": "a1c15b60d793a0faf094926f9501cb6db42e22c64dafe5a4823eff2a95297667",
-        "request_sha256": "6390b5bd72e3787675456f54070310c02df5da3796a90f33344c61c5403ff34e",
+        "manifest_sha256": "13b51a41811d95e17d68143b6524dee309dbb52bf869d9d26ac145aedf13cd53",
+        "request_sha256": "e1da74e51dafa3c6594d6a453cdae26e9316f019b69cd29bfaee7641876880c1",
         "state": "unsupported"
       },
       "llvm_totals_test_inclusive": {
@@ -487,8 +552,8 @@
     "llvm": "22.1.6"
   },
   "binary": {
-    "sha256": "f4f71cc58f51194ab4b9c9c976bd34360ddb0bf471c414f7c7439949353ee81e",
-    "bytes": 1721832
+    "sha256": "06ee8edb7b5a85813c20b6b5fa68b501dec6b4a7ef7e398e3a3285e0831bcbf3",
+    "bytes": 1727880
   },
   "capture_bytes": 42063,
   "persistent_candidate_cache_bytes": 0,
