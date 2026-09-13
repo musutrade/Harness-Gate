@@ -105,3 +105,21 @@ The end-to-end fixture uses `nebula-unregistered-2049`, an arbitrary configured
 collector/tool/runtime and the supported generic `bundle.size` contract, including
 a retained baseline and direct-evaluator equivalence. An architecture regression
 guard rejects closed ecosystem dispatch in generic verification and reporting.
+
+
+## Staged partial profiles
+
+For a staged profile declared `assurance = "partial"` with no selected collectors
+or policies, workflow state and trusted keys are read from the host checkout.
+They do not need to be added to the Git index. The Core still validates every
+configuration/source pin and the selected subjects against the immutable staged
+snapshot, so a working-tree edit cannot replace staged source evidence.
+
+Git cannot preserve empty directories. For this uncollected profile only, the
+Core creates the configured artifact directories inside its private snapshot;
+it does not import working-tree artifacts. State containing artifacts or retained
+responses is rejected. Missing host state/keys, stale pins and unsafe paths stay
+blocked, and successful hook execution reports full quality as `not_collected`.
+Profiles selecting collectors or policies retain their existing authenticated
+request and baseline requirements. This transport fix changes no engineering
+policy, threshold, requiredness, measurement series, debt or release authority.

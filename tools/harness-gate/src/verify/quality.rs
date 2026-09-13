@@ -96,11 +96,38 @@ pub(super) fn prepare(
         .workflow
         .as_ref()
         .context("quality profile requires workflow state and trusted_keys")?;
-    let state: compiler::TrustedState = read(root, &workflow.state)?;
+    // An execution-only partial profile has no signed collector mount paths.
+    // Its host-owned state/keys must stay outside the Git index, while all
+    // configuration and source pins are still checked against the staged tree.
+    let staged_partial = project.invocation_input.is_snapshot()
+        && participation.assurance == Assurance::Partial
+        && participation.collectors.is_empty()
+        && participation.policies.is_empty();
+    let trust_root = if staged_partial { &project.root } else { root };
+    let state: compiler::TrustedState = read(trust_root, &workflow.state)?;
     ensure!(
         state.profile == profile,
         "quality state profile differs from verify profile"
     );
+    if staged_partial {
+        ensure!(
+            state.artifacts.is_empty() && state.retained.is_empty(),
+            "uncollected staged profile cannot import retained artifacts"
+        );
+        // Git cannot represent empty directories. Create only contained roots
+        // in our private snapshot; never copy working-tree evidence into it.
+        for name in std::iter::once(&state.artifact_root)
+            .chain(config.components.values().map(|c| &c.artifact_root))
+        {
+            let path = crate::project::resolve_repo_path(
+                root,
+                Path::new(name),
+                "staged quality artifact root",
+                false,
+            )?;
+            fs::create_dir_all(path)?;
+        }
+    }
     compiler::compile(root, &state)?;
     validate_selection(&config, &state, scope)?;
     Ok(Some(Prepared {
@@ -108,7 +135,7 @@ pub(super) fn prepare(
         complete: participation.assurance == Assurance::Complete,
         has_policy: !participation.policies.is_empty(),
         state,
-        keys: read(root, &workflow.trusted_keys)?,
+        keys: read(trust_root, &workflow.trusted_keys)?,
         baseline: workflow
             .baseline_request
             .as_ref()
