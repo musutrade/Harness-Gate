@@ -14,8 +14,8 @@ ARCH=""
 PLATFORM=""
 INSTALL_NAME="$BINARY_NAME"
 ATOMIC_TEMPORARY=""
-RUST_INSTALLER_URL="https://github.com/musutrade/Harness-Gate/releases/download/rust-collector-installer-v0.1.0-rc.3/install-rust.sh"
-RUST_INSTALLER_SHA256="e69025454cedd659ad91d2522c7636e6c4a53c164e477ffafd2ca75d8cf17760"
+RUST_INSTALLER_URL="https://github.com/musutrade/Harness-Gate/releases/download/rust-collector-installer-v0.1.0-rc.4/install-rust.sh"
+RUST_INSTALLER_SHA256="fdd277b6ec48ec89b4155d0df5d2bf6f8e6c2b15c41f0ea711cdb7eee479298a"
 
 usage() {
     cat <<'EOF'
