@@ -38,6 +38,8 @@ class ExecutionAuditTests(unittest.TestCase):
             'execve("/rust/bin/rustc", ["rustc"], 0x0)',
             'execve("/rust/bin/rustc", ["unterminated], 0x0) = 0',
             'strace: unexpected tracing error',
+            '7476 ???( <detached ...>',
+            '7476 execve( <detached ...>',
         ):
             with self.subTest(record=record), self.assertRaises(AssertionError):
                 self.audit(record + '\n')

@@ -114,7 +114,7 @@ exit 0
         command = [str(binary), *map(str, argv), str(output / f'log-{name}')]
         trace = output / f'{name}.execve'
         if args.trace:
-            command = ['strace', '-f', '-qq', '-s', '16384', '-e', 'trace=execve', '-o', str(trace), *command]
+            command = ['strace', '-f', '-q', '-s', '16384', '-e', 'trace=execve', '-o', str(trace), *command]
         result = subprocess.run(command, capture_output=True, timeout=80)
         if args.trace:
             check_trace(trace)
