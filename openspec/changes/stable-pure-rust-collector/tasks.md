@@ -9,6 +9,10 @@ collection and generated-function coverage remain blocked. T4 stays unchecked.
 The follow-up stable span diagnostic has four actual original/diagnostic coverage
 runs and pins the equal body/interior source ranges. It narrows the compiler
 mapping investigation without claiming internal trace evidence or an upstream fix.
+Related upstream issue 131119 / PR 158276 are tracked with their inspected source
+and submission/merge/adoption states in `macro-upstream-tracking.json` under the
+candidate evidence directory. The proposed attribute-macro fix is not certified
+for our function-like fixture; no patched compiler or fixed version was adopted.
 
 - [x] T1: Record the user-approved normative policy and guard legacy publication.
 - [x] T2: Inventory legacy collector/runtime/installer behavior and stable CI; define the pure-Rust replacement contract and supported measurement boundaries.

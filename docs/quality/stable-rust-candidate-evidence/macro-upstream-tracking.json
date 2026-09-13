@@ -1,0 +1,69 @@
+{
+  "schema": "rust-stable-macro-upstream-tracking/v1",
+  "checked_at_utc": "2026-09-13 21:11:57 UTC",
+  "kind": "read-only upstream source/status review; not runtime acceptance",
+  "related_issue": {
+    "url": "https://github.com/rust-lang/rust/issues/131119",
+    "scope": "Missing body coverage with tracing::instrument; not established as the same failure as our function-like macro"
+  },
+  "related_pr": {
+    "url": "https://github.com/rust-lang/rust/pull/158276",
+    "number": 158276,
+    "state": "open",
+    "merged_at": null,
+    "head_sha": "401941acaed24c6477203c87533d08f3c548d953",
+    "base_sha": "59dabe56f7b78d9dd427645cd7f8e7fd426724cc",
+    "updated_at": "2026-09-06T05:31:58Z",
+    "files": [
+      {
+        "path": "compiler/rustc_mir_transform/src/coverage/spans.rs",
+        "blob_sha": "3448ce9ed1681ad75be1209c07b29e6ec055b9a5",
+        "additions": 14,
+        "deletions": 1,
+        "source_url": "https://github.com/rust-lang/rust/blob/401941acaed24c6477203c87533d08f3c548d953/compiler/rustc_mir_transform/src/coverage/spans.rs"
+      }
+    ],
+    "submitted": true,
+    "submitted_by_this_project": false,
+    "merged": false,
+    "adopted_fixed_version": null
+  },
+  "applicability": {
+    "upstream_condition": "Attribute macro; selected expansion node has no children and only empty/dummy spans; a root-context node exists.",
+    "local_observation": "Function-like macro emits whole functions; body and interior have equal nonempty source ranges; generated business owners absent in real stable LLVM export.",
+    "conclusion": "Related but not an established fix. No internal compiler trace or patched compiler execution.",
+    "local_evidence": "docs/quality/stable-rust-candidate-evidence/macro-span-diagnostic.json"
+  },
+  "exact_fixture_capability_request": {
+    "submitted": false,
+    "needed": "Stable generated owner and real counter export for executed and unexecuted functions with invocation/configuration identity.",
+    "next_step": "Establish upstream applicability or track the exact function-like reproduction separately; do not claim this related PR fixes it."
+  },
+  "adoption_requirements": [
+    "Merged change available in supported released stable Rust",
+    "Real default/branching fixture coverage with matching LLVM",
+    "Distinct generated owners including unexecuted owner; reject missing/ambiguous mapping",
+    "Authenticated compiler inputs and unchanged Core migration requirements"
+  ],
+  "no_changes_to": [
+    "metric support",
+    "Core policy or baseline",
+    "release hold",
+    "supported toolchain range"
+  ],
+  "validation": {
+    "compiler_built": false,
+    "fixture_rerun": false,
+    "source_status_review_only": true,
+    "docs_consistency": {
+      "command": "CARGO_TARGET_DIR=/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target python3 tools/quality/docs_consistency.py --output target/gh-259/upstream-tracking-docs-consistency-complete.json",
+      "exit_code": 0,
+      "initial_failure_record": "target/gh-259/upstream-tracking-docs-consistency.json",
+      "initial_failure_diagnosis": "Direct cargo run --quiet --locked --manifest-path tools/harness-gate/Cargo.toml -- --help exited 101: failed to open /home/gem/cargo-target/debug/.cargo-build-lock; Read-only file system (os error 30)"
+    },
+    "whitespace": {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  }
+}

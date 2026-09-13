@@ -130,8 +130,35 @@ This first-party integration is in draft PR 261; it is not an upstream fix.
 | Work | Submitted | Merged | Adopted fixed version |
 | --- | --- | --- | --- |
 | Third-party parser/macro defect | No concrete defect established; no speculative PR | No | No |
-| Missing generated-function coverage capability | Reproducer/exports recorded here; capability request not yet submitted | No | No |
+| Related upstream proc-macro coverage work | Existing rust-lang/rust issue 131119 and PR 158276; not submitted by this project | PR open at inspected head; not merged | None; applicability to this fixture unverified |
+| This fixture's missing generated-function coverage capability | Reproducer/exports recorded here; no exact-match capability request submitted | No | No |
 | First-party dependency build-input certification | Refusal reproduced; implementation pending | No | No |
+
+### Related upstream work and applicability
+
+[rust-lang/rust issue 131119](https://github.com/rust-lang/rust/issues/131119)
+reports missing body coverage with `tracing::instrument`. The related
+[PR 158276](https://github.com/rust-lang/rust/pull/158276) was open and unmerged
+when inspected at head `401941acaed24c6477203c87533d08f3c548d953`.
+Its proposed change selects the root expansion node for an attribute-macro body
+whose selected node has no child contexts and only empty/dummy spans.
+
+This is related work, not an established fix for our reproduction. Our function-like
+macro emits complete functions, has equal nonempty body/interior source ranges,
+and does not use an attribute-macro closure. No patched compiler was built or run.
+The applicability distinction follows from comparing the proposed source condition
+with our existing diagnostic; it is not a trace of the compiler's internal state.
+The inspected upstream status and source anchors are retained in
+[macro-upstream-tracking.json](stable-rust-candidate-evidence/macro-upstream-tracking.json).
+
+The outstanding capability is a stable export that distinguishes generated function
+owners, including an unexecuted owner, and binds real counters to each fixed
+invocation/configuration. A future upstream merge must still reach a supported
+stable release and pass both configurations of this fixture, unused-owner and
+ambiguity regressions with matching LLVM tools before adoption. Submission, merge,
+and adoption are separate events; no supported metric or toolchain range changes
+based on this related PR. The exact function-like reproduction still needs an
+upstream applicability determination or a separately tracked capability request.
 
 Before promotion, establish an authenticated stable mapping from generated owners
 to counters, cover nested/repeated expansion and derive cases, and exercise compiler
