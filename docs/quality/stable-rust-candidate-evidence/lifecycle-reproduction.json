@@ -1,0 +1,18 @@
+{
+  "binary_sha256": "fabd9588da2be024913375d1e284238d77e5c964cb107ddaeb844d87acc9e99e",
+  "command": [
+    "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+    "release-verify",
+    "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle-09/package-0.1.0-candidate.2",
+    "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle-09/test-only-host-trust/trust.json",
+    "3cb9a63cbd3bde4e711d7d1b36077f8d424c25104a1d0b7e78c798c0136d064b",
+    "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle-reproduction-01/verify"
+  ],
+  "exit_code": 0,
+  "stdout": "{\"inventory_sha256\":\"23c75b66c4fc1bf27ceaf80e4f6a277800c6d9017904186740ebfd817bd73e79\",\"package_bytes\":3124647,\"schema\":\"rust-stable-release-verification/v1\",\"signatures\":\"rsa-and-sigstore\",\"version\":\"0.1.0-candidate.2\"}\n",
+  "stderr": "",
+  "declared_version": "0.1.0-candidate.2",
+  "actual_version": "harness-gate-rust-stable-collector 0.1.0-candidate.1\n",
+  "actual_version_exit": 0,
+  "reproduced": true
+}

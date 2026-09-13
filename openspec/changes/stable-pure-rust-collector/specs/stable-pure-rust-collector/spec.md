@@ -92,3 +92,22 @@ without implying certified source ownership or arbitrary build-script isolation.
 - GIVEN a workspace and registry package both containing src/lib.rs
 - WHEN stable dep-info reports a relative source path
 - THEN verification resolves it from that producer's observed compiler working directory and rejects missing or inconsistent producer records.
+
+### Requirement: Authenticated executable activation
+
+Install, upgrade and rollback MUST execute only the authenticated staged program
+after both release signatures pass, and MUST require a bounded successful launch
+whose reported version equals the signed inventory. Payload and trust identities
+MUST remain unchanged through this check before the current selection is replaced.
+
+#### Scenario: Signed package has a mismatched or unusable program
+
+- GIVEN a validly signed candidate inventory whose program reports a different version, fails to launch, exits nonzero or exceeds the launch deadline
+- WHEN a lifecycle transaction prepares activation
+- THEN it fails and retains the previous selected program unchanged.
+
+#### Scenario: Executable changes its staged payload
+
+- GIVEN an authenticated program that changes staged resources while reporting its version
+- WHEN post-launch identity validation runs
+- THEN activation fails without replacing the previous selected program.

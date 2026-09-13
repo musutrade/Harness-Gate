@@ -9,7 +9,13 @@ release hold remains. No candidate package or test key authorizes production use
 
 The same Rust executable performs `release-verify`, `install` (also upgrade) and
 `rollback`. It does not invoke Python, OpenSSL, a shell installer or a compiler.
-The only verification subprocess is the host-pinned external `cosign` executable.
+Verification invokes the host-pinned external `cosign` executable and then the
+authenticated staged program with `--version`. The latter must launch, exit zero
+within 60 seconds, and return exactly the program name and signed release version
+followed by a newline. Both signatures and staged identities must pass before
+this execution; payload and trust identities are checked again afterward. Install,
+upgrade and rollback share this check before changing `current`. This establishes
+launch/version compatibility on the installation host, not coverage certification.
 Its user-owned dependency installation is separate from collector upgrades.
 
 A local flat bundle contains exactly these regular files, with no symlinks or
@@ -142,7 +148,16 @@ release workflow activation or production signing occurs. A reviewed protected
 signing step must eventually supply both signatures over the exact inventory bytes.
 
 The lifecycle suite consumes this actual prepared program/license/support payload.
-It re-signs test metadata with a repository-generated RSA key and uses an explicitly
-mocked Sigstore verifier. Its disk accounting includes the collected notices, but
-its signature envelope and two metadata versions remain test inputs. It is not
-production signing or a demonstrated upgrade between two different program builds.
+Repository automation also makes a separate locked, offline stable release build
+with a test-only version suffix. Source identities record that only the crate and
+lockfile version changed. The two executables have different hashes and report
+their respective versions; the installed first executable upgrades and the installed
+second executable rolls back. This tests executable replacement and lifecycle
+compatibility within this implementation, not compatibility with a historical or
+production release. No compiler is invoked by the installed lifecycle implementation.
+
+Test bundles use a repository-generated RSA key and an explicitly mocked Sigstore
+verifier. Re-signed nonlaunching, wrong-version, nonzero, timed-out and stage-mutating
+Rust/ELF fixtures must preserve the current version. Command records check that
+failed signatures never reach program execution. Test fixtures, build sources,
+private keys, verifiers and build caches remain outside the runtime packages.
