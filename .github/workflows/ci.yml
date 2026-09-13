@@ -530,15 +530,15 @@ jobs:
 
       - name: Install candidate's explicit stable dependencies
         run: |
-          rustup toolchain install 1.97.1 --profile minimal --component llvm-tools-preview,rustfmt,clippy
-          cargo +1.97.1 install cargo-llvm-cov --version 0.9.0 --locked
+          rustup toolchain install 1.98.1 --profile minimal --component llvm-tools-preview,rustfmt,clippy
+          cargo +1.98.1 install cargo-llvm-cov --version 0.9.0 --locked
           sudo apt-get update
           sudo apt-get install --yes strace
 
       - name: Build and run pure Rust candidate with execution traces
         env:
           CARGO_TARGET_DIR: ${{ github.workspace }}/target/stable-candidate-build
-          RUSTUP_TOOLCHAIN: 1.97.1
+          RUSTUP_TOOLCHAIN: 1.98.1
           # Match unsigned preparation's explicit build environment before capture.
           RUSTFLAGS: ""
           RUSTDOCFLAGS: ""
@@ -592,7 +592,7 @@ jobs:
             --output target/stable-candidate-checks/historical
           python3 tools/quality/rust-stable-collector/prepare_release.py \
             --output target/stable-candidate-checks/package \
-            --target-dir "$CARGO_TARGET_DIR" --toolchain 1.97.1 \
+            --target-dir "$CARGO_TARGET_DIR" --toolchain 1.98.1 \
             --acceptance target/stable-candidate-checks/runtime/summary.json \
               "$(sha256sum target/stable-candidate-checks/runtime/summary.json | cut -d ' ' -f 1)"
           python3 tools/quality/rust-stable-collector/validate_lifecycle.py \
