@@ -1,0 +1,22 @@
+{
+  "binary_sha256": "05b61f7047ac8e204d0ac0fb658164ac48e7022498672f351147a8a6fe80a9ef",
+  "command": [
+    "target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+    "verify",
+    "target/gh-259/acceptance-21/capture-plain",
+    "182e37850bd4f8c5d1b6ee83b20800339223fefe9f8b82875fa8433cd24d897f",
+    "d8dce47e1819b8fd7d4bec75bbad96f00892c3e2978d93727ba136afa98afc3c"
+  ],
+  "exit_code": 0,
+  "original_totals": {
+    "count": 12,
+    "covered": 9,
+    "percent": 75
+  },
+  "altered_totals": {
+    "count": 1,
+    "covered": 1,
+    "percent": 100
+  },
+  "note": "Real previous capture; test-only manifest reanchor bypasses integrity to exercise semantic verification. Original files restored."
+}

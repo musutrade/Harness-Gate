@@ -1,15 +1,15 @@
 {
   "schema": "rust-stable-registry-acceptance/v1",
   "collector": {
-    "sha256": "05b61f7047ac8e204d0ac0fb658164ac48e7022498672f351147a8a6fe80a9ef",
-    "bytes": 1994248
+    "sha256": "e020ad59faf78db0133f4a83105b18f0a39d9676ea21c24386dcb662ac476f73",
+    "bytes": 1995304
   },
   "observations": {
     "anchors": {
       "capture": "complete",
       "core_acceptance": "pending",
-      "manifest_sha256": "775f552a5a30789f0c7cbf057d700ae7a3fe127ca47e8df3906b98ff349a96e1",
-      "request_sha256": "719a7a8ee5db31050787161e0c05a74d8e5fd679995e61684921d1706325fc8d",
+      "manifest_sha256": "63761c553cfdc65954b5d300a535521c099bf1bcc31c93328277b2e596f02641",
+      "request_sha256": "d302e0ca88c2da770a5cc9086c858d09e8436ea0e2b2a2f642b5f78675bc349e",
       "state": "unsupported"
     },
     "archive_sha256": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682",
@@ -22,10 +22,10 @@
       "--locked",
       "--offline",
       "--manifest-path",
-      "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-21/project-registry/Cargo.toml"
+      "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-22/project-registry/Cargo.toml"
     ],
     "setup_is_repository_automation": true,
-    "isolated_cargo_home": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-21/registry-cargo-home",
+    "isolated_cargo_home": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-22/registry-cargo-home",
     "network_download_bytes": 0,
     "scope": "single locked crates.io dependency; local cache copied by test setup"
   },
