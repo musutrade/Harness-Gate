@@ -237,13 +237,15 @@ def main() -> int:
     parser.add_argument('--output', type=Path, default=QUALITY_ROOT / 'critical-paths.json')
     parser.add_argument('--evidence', type=Path, default=QUALITY_ROOT / 'critical-path-runs/bundle.json')
     parser.add_argument('--collect', action='store_true')
+    parser.add_argument('--jobs', type=int, default=2, choices=range(1, 9),
+                        help='parallel isolated critical-path tests (default: 2; 1 is serial)')
     parser.add_argument('--coverage', type=Path, help='obsolete; module coverage is rejected')
     parser.add_argument('--threshold', type=float, default=95)
     args = parser.parse_args()
     try:
         if args.collect:
             from critical_paths_collect import collect
-            collect(args.evidence)
+            collect(args.evidence, jobs=args.jobs)
         return run(args.output, args.evidence, args.threshold, args.coverage)
     except (ValueError, KeyError, OSError, TypeError, IndexError) as error:
         write_json(args.output, {'summary': {'status': 'fail'}, 'error': str(error)})
