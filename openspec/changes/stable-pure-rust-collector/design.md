@@ -30,3 +30,23 @@ changes, bundled compiler/Python default, routine user download of review archiv
 or publisher OS/kernel fingerprints. Do not promise platform support without actual
 native tests. Rust version changes require supported-interface/format validation,
 not unconditional full toolchain redistribution or baseline reset.
+
+## Source-level remediation and macro accuracy
+
+Do not conflate the macro library implementation with its per-invocation generated
+code. Fix dependency version, macro input and relevant cfg/features/target/build inputs.
+Measure verified generated code or use explicitly validated macro measurement rules;
+retain owner mapping and declared metric definitions. Obtain coverage through execution,
+never infer it from source availability or from a parent invocation having executed.
+
+For a concrete gap, produce a minimal reproducer and regression fixture, identify the
+responsible layer and prepare a focused collector/dependency PR. Prefer upstream fixes;
+track submission, acceptance and deployed fixed versions separately. A temporary patch
+must retain source/version provenance and an exit plan. Missing stable compiler metadata
+requires a tracked capability request or validated alternative, not a claim that source
+access solves every case. Neither macro presence nor library popularity determines support.
+
+Validation must include the same derive/macro source used with different invocation
+inputs/configuration, generated owners with different execution outcomes, and a faulty
+mapping repaired by a source-level patch. Do not change business behavior or metric
+semantics solely to make a gate pass. Unresolved required measurements remain blocking.
