@@ -71,9 +71,10 @@ def preflight(root, binding):
     matrix = pinned(delivery['matrix'])
     native.require(manifest['collector'] == binding['input']['collector'], 'wrong delivered collector identity')
     # The host installer owns these inert distribution records. They are not
-    # executable runtime payload and include a second copy of the archive.
+    # executable runtime payload. Legacy versions may still include the archive.
     controls = {'.delivery/' + name for name in ('collector.tar', 'manifest.json',
-        'sbom.spdx.json', 'provenance.json', 'release-inventory.json', 'release-inventory.sig')}
+        'sbom.spdx.json', 'provenance.json', 'release-inventory.json', 'release-inventory.sig',
+        'archive-receipt.json')}
     payload = {p.relative_to(root).as_posix(): native.file_hash(p)
                for p in root.rglob('*') if p.is_file() and p.relative_to(root).as_posix() not in controls}
     native.require(not any(p.is_symlink() for p in root.rglob('*')), 'symlink in delivered runtime')
