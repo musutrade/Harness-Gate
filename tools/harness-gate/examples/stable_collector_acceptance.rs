@@ -240,12 +240,29 @@ fn run() -> Result<()> {
         .unwrap()
         .iter()
         .flat_map(|r| r["metrics"].as_array().unwrap().iter())
+        .filter(|m| m["name"] == "complexity.cyclomatic")
         .map(|m| m["value"]["value"].clone())
         .collect();
     if case == "plain" {
         ensure!(
             counts == vec![json!(3), json!(1)],
             "real lexical counts: {counts:?}"
+        );
+        let coverage: Vec<_> = records
+            .as_array()
+            .unwrap()
+            .iter()
+            .flat_map(|r| r["metrics"].as_array().unwrap())
+            .filter(|m| m["name"] == "coverage.function")
+            .map(|m| m["value"].clone())
+            .collect();
+        ensure!(
+            coverage
+                == vec![
+                    json!({"type":"ratio","covered":1,"total":1}),
+                    json!({"type":"ratio","covered":0,"total":1})
+                ],
+            "real function coverage: {coverage:?}"
         );
     } else {
         ensure!(

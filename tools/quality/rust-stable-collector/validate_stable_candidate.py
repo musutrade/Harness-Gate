@@ -85,6 +85,10 @@ def main():
         raw = json.loads((output / 'capture-plain/coverage.json').read_text())
         never_called = [f for f in raw['data'][0]['functions'] if f['name'].endswith('12never_called')]
         assert len(never_called) == 1 and never_called[0]['count'] == 0
+        description = run('certified-function-owners', ['describe', output / 'capture-plain', anchor['manifest_sha256'], anchor['request_sha256']])
+        mapped = [o['coverage_owner'] for o in description['owners']]
+        assert [o['coverage_function'] for o in mapped] == [{'type': 'ratio', 'covered': 1, 'total': 1}, {'type': 'ratio', 'covered': 0, 'total': 1}]
+        observations['function_owners'] = mapped
         observations['plain'] = {'anchors': anchor, 'llvm_totals_test_inclusive': raw['data'][0]['totals'], 'lexical_functions': functions}
         assert not list((output / 'capture-plain').glob('build-*'))
         assert 'output must be a new directory' in run('stale-output', ['collect', request_path], success=False)
@@ -115,6 +119,18 @@ def main():
             ('invalid-segment-boolean', ['data', 0, 'files', 0, 'segments', 0, 3], 1, 'segment fields'),
             ('mcdc-capability', ['data', 0, 'functions', 0, 'mcdc_records'], [[1]], 'unsupported LLVM MC/DC'),
         ]
+        llvm_functions = json.loads(original_coverage)['data'][0]['functions']
+        unused_index = next(i for i, f in enumerate(llvm_functions) if f['name'].endswith('12never_called'))
+        second_owner = {**llvm_functions[0], 'name': 'different-symbol-same-owner'}
+        mutations.extend([
+            ('missing-llvm-owner', ['data', 0, 'functions'], llvm_functions[1:], 'source owner missing'),
+            ('duplicate-llvm-symbol', ['data', 0, 'functions'], llvm_functions + [llvm_functions[0]], 'duplicate LLVM owner symbol'),
+            ('multiple-llvm-owners', ['data', 0, 'functions'], llvm_functions + [second_owner], 'multiple LLVM records'),
+            ('cross-file-owner', ['data', 0, 'functions', 0, 'filenames'], llvm_functions[0]['filenames'] + ['/untrusted.rs'], 'ambiguous cross-file'),
+            ('unknown-source-owner', ['data', 0, 'functions', 0, 'regions', 0, 1], 2, 'missing or ambiguous LLVM source owner'),
+            ('inherited-parent-count', ['data', 0, 'functions', unused_index, 'count'], 2, 'entry count mismatch'),
+            ('unexecuted-owner-regions', ['data', 0, 'functions', unused_index, 'regions', 1, 4], 1, 'unexecuted LLVM owner'),
+        ])
         try:
             for label, path, replacement, error in mutations:
                 changed = json.loads(original_coverage)
@@ -134,6 +150,20 @@ def main():
             assert 'duplicate key' in verify('duplicate-coverage-key', {**anchor, 'manifest_sha256': digest(manifest_path)}, success=False)
         finally:
             coverage.write_bytes(original_coverage)
+            manifest_path.write_bytes(original_manifest)
+        analysis_path = output / 'capture-plain/source-analysis.json'
+        original_analysis = analysis_path.read_bytes()
+        try:
+            for label, field in [('omitted-source-owners', 'functions'), ('changed-test-exclusions', 'excluded_spans')]:
+                changed = json.loads(original_analysis)
+                changed['files']['src/lib.rs'][field] = []
+                analysis_path.write_text(json.dumps(changed))
+                manifest = json.loads(original_manifest)
+                manifest['files']['source-analysis.json'] = {'sha256': digest(analysis_path), 'bytes': analysis_path.stat().st_size}
+                manifest_path.write_text(json.dumps(manifest))
+                assert 'source analysis differs from recomputed facts' in verify(label, {**anchor, 'manifest_sha256': digest(manifest_path)}, success=False)
+        finally:
+            analysis_path.write_bytes(original_analysis)
             manifest_path.write_bytes(original_manifest)
         unknown = output / 'capture-plain/unlisted.json'
         unknown.write_text('{}')

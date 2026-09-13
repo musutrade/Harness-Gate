@@ -18,6 +18,7 @@ pub struct Function {
     pub span: [usize; 4],
     pub state: &'static str,
     pub complexity: Option<u64>,
+    pub coverage_eligible: bool,
     pub reasons: BTreeSet<String>,
 }
 
@@ -26,12 +27,19 @@ pub struct Inventory {
     pub functions: Vec<Function>,
     pub unsupported: BTreeSet<String>,
     pub exclusions: Vec<String>,
+    pub excluded_spans: Vec<[usize; 4]>,
     #[serde(skip)]
     scope: Vec<String>,
     #[serde(skip)]
     stack: Vec<usize>,
     #[serde(skip)]
     inherited: BTreeSet<String>,
+}
+
+fn coordinates(span: Span) -> [usize; 4] {
+    let start = span.start();
+    let end = span.end();
+    [start.line, start.column + 1, end.line, end.column + 1]
 }
 
 fn is_test(attrs: &[syn::Attribute]) -> bool {
@@ -79,6 +87,7 @@ impl Inventory {
         location: Span,
     ) {
         if is_test(attrs) {
+            self.excluded_spans.push(coordinates(location));
             self.exclusions
                 .push(format!("test function: {}", sig.ident));
             return;
@@ -105,6 +114,7 @@ impl Inventory {
             span: [start.line, start.column + 1, end.line, end.column + 1],
             state: "supported",
             complexity: Some(1),
+            coverage_eligible: self.scope.is_empty() && attrs.is_empty() && reasons.is_empty(),
             reasons,
         });
         self.visit_signature(sig);
@@ -116,6 +126,7 @@ impl Inventory {
 impl<'ast> Visit<'ast> for Inventory {
     fn visit_item_mod(&mut self, node: &'ast syn::ItemMod) {
         if is_test(&node.attrs) {
+            self.excluded_spans.push(coordinates(node.span()));
             self.exclusions.push(format!("test module: {}", node.ident));
             return;
         }
@@ -166,6 +177,9 @@ impl<'ast> Visit<'ast> for Inventory {
             self.unsupported(&reason);
         }
     }
+    fn visit_type_impl_trait(&mut self, _: &'ast syn::TypeImplTrait) {
+        self.unsupported("opaque or argument-position impl Trait owner not certified");
+    }
     fn visit_macro(&mut self, _: &'ast syn::Macro) {
         self.unsupported("macro expansion / generated owner not certified");
     }
@@ -206,6 +220,7 @@ pub fn analyze(source: &str) -> Result<Inventory> {
     for function in &mut inventory.functions {
         if !function.reasons.is_empty() {
             function.state = "unsupported";
+            function.coverage_eligible = false;
             function.complexity = None;
         }
     }
@@ -228,6 +243,7 @@ mod tests {
         for source in [
             "async fn f() {}",
             "fn f<T>() {}",
+            "fn f(x: impl Copy) {}",
             "fn f() { let _ = || 1; }",
             "fn f() { panic!(); }",
             "#[cfg(feature=\"x\")] fn f() {}",

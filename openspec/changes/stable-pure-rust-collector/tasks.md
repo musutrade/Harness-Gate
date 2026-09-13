@@ -20,7 +20,7 @@ Actual candidate execution and remaining acceptance:
 `docs/quality/stable-rust-collector-validation.md`. T3 has a runnable Rust capture
 and AST implementation, but the second toolchain remains unverified. T4 has
 a Core v2 adapter whose real signed transport and evidence checks accept verified
-lexical complexity while required coverage/CRAP remains blocked. The same-source
+lexical complexity while required line/region coverage and CRAP remain blocked. The same-source
 GH-220 historical probe preserves original anchors and records unequal measurement
 boundaries. T5 has Rust offline dual-verification transactions and real RSA tests;
 Sigstore cryptography, downloader, trusted bootstrap and protected release preparation
@@ -41,3 +41,13 @@ re-anchoring, and package preparation requires those checks. This remains a raw
 format contract: aggregate/counter reconciliation, certified source owners and
 normalized coverage/CRAP are not complete. T4, T6–T8 remain unchecked; required
 metrics, migration review and the release hold are unchanged.
+
+The bounded T4 owner checkpoint adds `rust-llvm-exact-root-owner/v1-candidate`.
+ASCII source files containing unannotated, nongeneric root functions can join an
+exact unique LLVM region envelope to a source span; explicit test spans are
+excluded. Core accepts the resulting per-function execution ratio (1/1 or 0/1),
+not an intra-function coverage fraction. Missing/duplicate/cross-file owners and
+inconsistent entry counts are measurement errors; unsupported syntax and `impl
+Trait` never acquire coverage. Line/region coverage and all CRAP remain unsupported.
+Actual owner mutations and authenticated Core checks are recorded in the validation
+record. T3–T8, migration review and the legacy release hold remain open.

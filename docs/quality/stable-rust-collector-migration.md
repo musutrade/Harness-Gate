@@ -50,6 +50,11 @@ own syntax or file activation/expansion cannot be certified. The LLVM totals are
 diagnostic and have no certified production/test split. Different denominators
 and owner models prohibit direct trend, threshold or CRAP comparison.
 
+The separate plain fixture now certifies exact root-function execution coverage
+as 1/1 or 0/1. This is a new binary-bound normalization and does not provide the
+intra-function fraction needed by CRAP. The historical fixture contains unsupported
+owners, so its test-inclusive totals remain diagnostic.
+
 The separate plain/boundaries/features tests exercise actual authenticated Core
 reading; this historical probe performs capture/integrity/description checks and
 does not claim a new Core certificate for the archived report. Test-only signatures
@@ -68,5 +73,5 @@ Reproduce with `tools/quality/rust-stable-collector/compare_historical_fixture.p
 as documented in the [candidate commands](stable-rust-collector.md). This is
 repository development automation; the measured plugin executes only Rust and
 its declared external tools. New raw captures remain at
-`target/gh-259/historical-04/`; runtime payloads do not include the old archive or
+`target/gh-259/historical-05/`; runtime payloads do not include the old archive or
 these acceptance captures.

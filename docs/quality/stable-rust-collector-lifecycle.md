@@ -28,8 +28,9 @@ SPKI PEM public key. Sigstore independently verifies those same bytes. JSON
 duplicate keys, trailing data and unknown envelope fields are rejected. Payload
 hash/length, exact inventory, target and ELF architecture are checked before
 selection. The typed `rust-stable-support/v1` document must bind the release,
-program and license identities and declare the exact candidate series, unsupported
-function coverage/CRAP and `candidate-review-required` status. Unknown fields,
+program and license identities and declare the exact candidate series,
+`rust-llvm-exact-root-owner/v1-candidate` function execution coverage, unsupported
+CRAP and `candidate-review-required` status. Unknown fields,
 empty/duplicate acceptance anchors and overstated capabilities fail even when the
 inventory has a valid signature. Observations identify actual acceptance records;
 they do not authorize a measurement migration or imply untested platform support.
