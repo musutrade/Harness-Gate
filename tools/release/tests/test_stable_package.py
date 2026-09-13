@@ -77,7 +77,7 @@ class PreparationTests(unittest.TestCase):
                 registry_notices(package, lock)
 
     def test_acceptance_requires_anchor_same_binary_and_passed_checks(self):
-        value = json.loads((ROOT / 'docs/quality/stable-rust-candidate-evidence/acceptance-modules.json').read_text())
+        value = json.loads((ROOT / 'docs/quality/stable-rust-candidate-evidence/acceptance-json.json').read_text())
         binary = value['binary']
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / 'summary.json'
@@ -99,7 +99,11 @@ class PreparationTests(unittest.TestCase):
                          'modules', 'certified-module-owners', 'missing-module-owner',
                          'duplicate-module-owner', 'module-parent-count-inheritance',
                          'restored-module-owners', 'module-attribute', 'describe-module-attribute',
-                         'module-cfg', 'describe-module-cfg'):
+                         'module-cfg', 'describe-module-cfg',
+                         'duplicate-manifest-identity-first', 'duplicate-manifest-identity-last',
+                         'duplicate-request-identity-first', 'duplicate-request-identity-last',
+                         'duplicate-collect-identity-first', 'duplicate-collect-identity-last',
+                         'duplicate-archive-identity-first', 'duplicate-archive-identity-last'):
                 semantic = next(check for check in value['checks'] if check['name'] == name)
                 semantic['name'] = 'unrelated-placeholder'
                 with self.assertRaisesRegex(ValueError, 'incomplete or failed'):

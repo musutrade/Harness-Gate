@@ -153,6 +153,49 @@ def main():
         # SHA checks. These synthetic mutations are not producer or signing proof.
         manifest_path = output / 'capture-plain/manifest.json'
         original_manifest = manifest_path.read_bytes()
+        # Even newly pinned bytes must have exactly one interpretation. These
+        # test-only re-anchors exercise decoding, not producer authentication.
+        def duplicate_member(value, section, key, wrong, wrong_first):
+            encoded = json.dumps(value)
+            original = json.dumps(value[section])
+            pairs = []
+            for name, item in value[section].items():
+                items = ([wrong, item] if wrong_first else [item, wrong]) if name == key else [item]
+                pairs.extend(f'{json.dumps(name)}: {json.dumps(v)}' for v in items)
+            needle = f'{json.dumps(section)}: {original}'
+            assert encoded.count(needle) == 1 and key in value[section]
+            return encoded.replace(needle, f'{json.dumps(section)}: ' + '{' + ', '.join(pairs) + '}', 1).encode()
+
+        captured_request = output / 'capture-plain/request.json'
+        original_request = captured_request.read_bytes()
+        wrong_identity = {'sha256': '0' * 64, 'bytes': 0}
+        try:
+            for wrong_first in (True, False):
+                order = 'first' if wrong_first else 'last'
+                manifest_path.write_bytes(duplicate_member(json.loads(original_manifest), 'files', 'coverage.json', wrong_identity, wrong_first))
+                assert 'duplicate key' in verify(f'duplicate-manifest-identity-{order}', {**anchor, 'manifest_sha256': digest(manifest_path)}, success=False)
+
+                request = json.loads(original_request)
+                captured_request.write_bytes(duplicate_member(request, 'source_files', 'src/lib.rs', wrong_identity, wrong_first))
+                manifest = json.loads(original_manifest)
+                manifest['request_sha256'] = digest(captured_request)
+                manifest['files']['request.json'] = {'sha256': digest(captured_request), 'bytes': captured_request.stat().st_size}
+                manifest_path.write_text(json.dumps(manifest))
+                assert 'duplicate key' in verify(f'duplicate-request-identity-{order}', {**anchor, 'manifest_sha256': digest(manifest_path)}, request_digest=digest(captured_request), success=False)
+
+                request['output_root'] = str(output / f'capture-duplicate-{order}')
+                pending = output / f'request-duplicate-{order}.json'
+                pending.write_bytes(duplicate_member(request, 'source_files', 'src/lib.rs', wrong_identity, wrong_first))
+                assert 'duplicate key' in run(f'duplicate-collect-identity-{order}', ['collect', pending], success=False)
+                assert not Path(request['output_root']).exists(), 'ambiguous input must fail before creating capture or launching tools'
+        finally:
+            captured_request.write_bytes(original_request)
+            manifest_path.write_bytes(original_manifest)
+
+        archives_path = output / 'duplicate-archives.json'
+        for order, values in [('first', ['/missing/a', '/missing/b']), ('last', ['/missing/b', '/missing/a'])]:
+            archives_path.write_text('{' + ','.join(f'{json.dumps("0" * 64)}:{json.dumps(v)}' for v in values) + '}')
+            assert 'duplicate key' in run(f'duplicate-archive-identity-{order}', ['prepare', project, output / 'unused-duplicate-archives', output / 'doctor/doctor.json', '--registry-archives', archives_path], success=False)
         mutations = [
             ('negative-function-count', ['data', 0, 'functions', 0, 'count'], -1, 'nonnegative integer'),
             ('overflow-function-count', ['data', 0, 'functions', 0, 'count'], 2**63, 'exporter range'),

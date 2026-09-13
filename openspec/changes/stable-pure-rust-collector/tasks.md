@@ -188,3 +188,15 @@ acceptance and package preparation require the module cases. Exact commands and
 final results are in the candidate validation record. This does not certify
 generated owners or complete T3–T8. Metric definitions are unchanged; the new
 binary-bound Core series identity does not authorize baseline compatibility.
+
+## Duplicate identity follow-up
+
+T4's strict decoder now also covers typed request/manifest/doctor/archive inputs
+and capture-time Cargo metadata. Fresh captured data reproduced last-key-wins
+acceptance for conflicting file identities; the same re-anchored input now fails.
+Eight CLI checks cover both orders and early collection failure, and package
+preparation requires all eight. See `json-identities.json` and `acceptance-json.json`
+in the candidate evidence directory for actual commands, identities and scope.
+This closes the concrete decoder defect only; T3–T8 and release/migration blockers
+remain open. No threshold, baseline, existing required binding or old evidence is
+changed.
