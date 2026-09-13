@@ -556,6 +556,11 @@ jobs:
           python3 tools/quality/rust-stable-collector/validate_stable_candidate.py \
             --binary target/stable-candidate-build/release/harness-gate-rust-stable-collector \
             --output target/stable-candidate-checks/runtime --trace
+          cargo test --manifest-path tools/quality/fixtures/rust-macro-observation/Cargo.toml --workspace --locked
+          cargo fmt --manifest-path tools/quality/fixtures/rust-macro-observation/Cargo.toml --all -- --check
+          python3 tools/quality/rust-stable-collector/validate_macro_templates.py \
+            --binary target/stable-candidate-build/release/harness-gate-rust-stable-collector \
+            --output target/stable-candidate-checks/macros --trace
           cargo build --manifest-path tools/harness-gate/Cargo.toml --bin harness-gate --example stable_collector_acceptance --locked
           for fixture in plain partial boundaries features registry; do
             candidate_env=()

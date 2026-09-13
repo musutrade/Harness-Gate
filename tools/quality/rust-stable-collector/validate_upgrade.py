@@ -12,15 +12,18 @@ def build_programs(output, automation, sha):
     version = manifest['version']
     upgraded_version = version + '.upgrade-test'
     toolchain = manifest['rust-version']
-    source = output / 'upgrade-source'
-    source.mkdir()
+    source_root = output / 'upgrade-source'
+    source = source_root / 'rust-stable-collector'
+    source.mkdir(parents=True)
+    shutil.copytree(crate.parent / 'fixtures/rust-macro-observation',
+                    source_root / 'fixtures/rust-macro-observation')
     shutil.copytree(crate / 'src', source / 'src')
     before = {}
     for name in ('Cargo.toml', 'Cargo.lock'):
         shutil.copyfile(crate / name, source / name)
-    for path in sorted(source.rglob('*')):
+    for path in sorted(source_root.rglob('*')):
         if path.is_file():
-            before[str(path.relative_to(source))] = sha(path)
+            before[str(path.relative_to(source_root))] = sha(path)
     for name, prefix in (('Cargo.toml', ''), ('Cargo.lock', f'name = "{manifest["name"]}"\n')):
         path = source / name
         original = path.read_text()
@@ -38,8 +41,10 @@ def build_programs(output, automation, sha):
     automation(['cargo', f'+{toolchain}', 'build', '--manifest-path', source / 'Cargo.toml',
                 '--locked', '--offline', '--release'], timeout=600, env=environment)
     upgraded = output / 'upgrade-target/release' / manifest['name']
-    after = {str(p.relative_to(source)): sha(p) for p in sorted(source.rglob('*')) if p.is_file()}
-    assert {p for p in before if before[p] != after[p]} == {'Cargo.toml', 'Cargo.lock'}
+    after = {str(p.relative_to(source_root)): sha(p) for p in sorted(source_root.rglob('*')) if p.is_file()}
+    assert before.keys() == after.keys()
+    assert {p for p in before if before[p] != after[p]} == {
+        'rust-stable-collector/Cargo.toml', 'rust-stable-collector/Cargo.lock'}
     record = {'scope': 'separate stable release build of the same implementation with a test-only version change; not historical or production upgrade certification',
               'toolchain': toolchain, 'version': upgraded_version, 'binary_sha256': sha(upgraded),
               'source_before': before, 'source_after': after}
