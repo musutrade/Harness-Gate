@@ -19,6 +19,12 @@ struct Invocation {
     cwd: PathBuf,
     args: Vec<String>,
     exit_code: Option<i32>,
+    dep_info_identity: Option<artifact::FileIdentity>,
+}
+
+pub struct Producer {
+    pub cwd: PathBuf,
+    pub identity: artifact::FileIdentity,
 }
 
 // Only the observed stable Cargo invocation form is accepted. These are public
@@ -101,14 +107,20 @@ pub fn run(root: &Path) -> Result<i32> {
         "wrapper compiler identity differs"
     );
     let args: Vec<_> = args.collect();
-    dep_info(&args)?;
+    let output = dep_info(&args)?;
     let cwd = env::current_dir()?.canonicalize()?;
     let status = Command::new(&rustc).args(&args).status()?;
+    let dep_info_identity = if status.success() {
+        output.as_deref().map(artifact::identity).transpose()?
+    } else {
+        None
+    };
     let invocation = Invocation {
         rustc,
         cwd,
         args,
         exit_code: status.code(),
+        dep_info_identity,
     };
     let mut file = tempfile::NamedTempFile::new_in(root.join("compiler-invocations"))?;
     file.write_all(&serde_json::to_vec(&invocation)?)?;
@@ -121,7 +133,7 @@ pub fn directories(
     root: &Path,
     scratch: &Path,
     rustc: &Path,
-) -> Result<BTreeMap<PathBuf, PathBuf>> {
+) -> Result<BTreeMap<PathBuf, Producer>> {
     let mut result = BTreeMap::new();
     let files = artifact::inventory(&root.join("compiler-invocations"), false)?;
     ensure!(files.len() <= 10000, "too many compiler invocations");
@@ -142,13 +154,35 @@ pub fn directories(
             "compiler cwd is not canonical"
         );
         if let Some(path) = dep_info(&invocation.args)? {
+            let identity = invocation
+                .dep_info_identity
+                .context("compiler dep-info identity missing")?;
+            ensure!(
+                identity.bytes <= 8 * 1024 * 1024
+                    && identity.sha256.len() == 64
+                    && identity.sha256.bytes().all(|b| b.is_ascii_hexdigit()),
+                "invalid compiler dep-info identity"
+            );
             ensure!(
                 path.starts_with(scratch),
                 "compiler dep-info outside scratch"
             );
             ensure!(
-                result.insert(path, invocation.cwd).is_none(),
+                result
+                    .insert(
+                        path,
+                        Producer {
+                            cwd: invocation.cwd,
+                            identity
+                        }
+                    )
+                    .is_none(),
                 "duplicate compiler dep-info producer"
+            );
+        } else {
+            ensure!(
+                invocation.dep_info_identity.is_none(),
+                "unexpected compiler dep-info identity"
             );
         }
     }

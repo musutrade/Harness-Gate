@@ -5,7 +5,57 @@ complete; T3–T8 remain open. The [design](stable-rust-collector.md) defines th
 boundary. No Core required binding, threshold, baseline or historical evidence
 was changed. No compiler-private backend was built or executed for these results.
 
-## Output-directory isolation checkpoint
+## Compiler dep-info output identity checkpoint
+
+A real preceding capture accepted an added `env-dep` comment after a test-only
+outer manifest re-anchor. The parser verified the file-input set but ignored
+comments, and the compiler invocation had no separately observed output digest.
+The original proof and manifest were restored byte-for-byte. This reproduced an
+internal output-consistency defect, not a producer-signature bypass.
+
+The Rust compiler wrapper now hashes each successful dep-info output immediately
+after the unchanged compiler command completes. Capture and verification compare
+the complete raw bytes against that producer record. Real `env!("CARGO_PKG_NAME")`
+output supplies the positive case. Added, changed and omitted environment comments,
+and missing or inconsistent producer identities, all block. Package preparation
+requires all five new regressions. [The evidence](stable-rust-candidate-evidence/dep-info.json)
+records before/after binary identities, exact commands, log hashes and limitations.
+This authenticates observed bytes within the capture; environment semantics,
+arbitrary build-script reads, environment closure and adversarial build isolation
+remain uncertified.
+
+The stable 1.97.1 release SHA256 is
+`62feafa4831df83843fa71e7384d15c7bd79fb6c679525bcccfb853d47607409`,
+3,496,016 bytes. Candidate tests pass 22; formatting and all-target clippy pass.
+[125 real capture checks](stable-rust-candidate-evidence/acceptance-dep-info.json),
+26 shared-generator macro checks, historical comparison and six authenticated Core
+fixtures pass against this exact executable. Quality discovery passes 449 with
+36 manual legacy skips; release discovery passes 91. Unchanged Core source and
+dependencies retain the prior 397-test nextest, formatting and clippy evidence.
+The two project-local gate commands remain not applicable because this checkout
+has no `.harness-gate/flow.toml` declaring a `ci` profile.
+
+Documentation consistency initially failed because the inherited Cargo target
+`/home/gem/cargo-target` was read-only; a direct Cargo probe retained the
+`.cargo-build-lock` error. The rerun passes using this workspace's existing Core target.
+
+Package preparation, 38 lifecycle checks and 29 loopback HTTPS checks also pass.
+The unsigned payload is 4,809,626 bytes; initial and upgrade test bundles transfer
+4,810,095 and 4,810,121 bytes. Two installed versions occupy 9,620,216 bytes;
+interrupted staging and metadata bring the installation to 14,430,965 bytes.
+The HTTPS matrix receives 37,607,035 response-body bytes across successful and
+failed transfers, with zero cache and observed abandoned downloads. Headers, TLS
+overhead and unwritten audit from the killed process are excluded. RSA signatures
+and loopback TLS use real test trust; Sigstore is mocked. The package excludes
+acceptance archives and external toolchains and is not production-ready.
+
+Only Rust 1.97.1 / LLVM 22.1.6 on Ubuntu 26.04 Linux x86_64 has actual acceptance.
+The second compiler/system environments, full process tracing, authenticated
+generated-function coverage, reviewed CRAP/migration and production signing remain
+incomplete. No support claim, threshold or baseline was expanded. T3–T8 remain
+unchecked and release stays paused.
+
+## Preceding output-directory isolation checkpoint
 
 The preceding release rejected output inside the measured project only after
 creating its directory. Real CLI reproductions retained five empty directories:
@@ -21,7 +71,7 @@ checks are required by package preparation and independently tested for omission
 This covers path resolution before creation; concurrent filesystem replacement
 is not certified.
 
-The final stable 1.97.1 release is
+That checkpoint's final stable 1.97.1 release is
 `adeaf2d1a53e182f810097161c93ec83d8b32bcc5afefd9ec67ed20f87402ed3`,
 3,488,488 bytes. It passes [120 capture checks](stable-rust-candidate-evidence/acceptance-output-isolation.json),
 26 macro checks, six authenticated Core fixture cases, 38 lifecycle checks and

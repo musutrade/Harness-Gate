@@ -158,6 +158,17 @@ not arbitrary build-script/environment closure or a transitive process audit.
 The validation record retains the original external-input reproduction and all
 limits. T3–T8 and the publication hold remain open.
 
+The producer also records the dep-info digest and byte length after successful
+compilation. Capture and verification reconcile the complete raw bytes against
+that identity, including comments ignored by the file parser. Real evidence with
+an added env-dep comment previously passed a test-only manifest re-anchor; the
+producer binding now rejects additions, changes, omissions and missing/inconsistent
+producer identities. This certifies observed compiler output bytes, not environment
+semantics, complete environment inputs or arbitrary build-script reads. Existing
+externally anchored manifests remain mandatory; hashes do not establish trust in
+an adversarial build. The binary-bound candidate series changes without authorizing
+comparison with earlier captures or adopting a baseline.
+
 The bounded T4 aggregate checkpoint reconciles public LLVM JSON total count and
 covered values against the sum of all exported file summaries, using checked
 integer addition. Percentages and notcovered retain their independent arithmetic
