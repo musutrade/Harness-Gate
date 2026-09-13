@@ -1,7 +1,7 @@
 //! Candidate capture, deliberately not a Core adapter or signed release format.
 use crate::{
     artifact::{self, FileIdentity},
-    coverage, dependencies, ownership,
+    compiler_inputs, coverage, dependencies, ownership,
     process::Runner,
     source,
     tools::{self, Tools},
@@ -262,6 +262,15 @@ pub fn collect(path: &Path) -> Result<String> {
         dependencies::snapshot(&metadata, &request.project_root, &request.registry_archives)?;
     artifact::write(&runner.root.join("dependencies.json"), &dependencies)?;
     artifact::write(&runner.root.join("cargo-metadata.json"), &metadata)?;
+    fs::create_dir(runner.root.join("compiler-invocations"))?;
+    extra.insert(
+        "RUSTC_WRAPPER".into(),
+        env::current_exe()?.display().to_string(),
+    );
+    extra.insert(
+        crate::compiler_wrapper::CONTEXT.into(),
+        runner.root.display().to_string(),
+    );
     let coverage_path = runner.root.join("coverage.json");
     let mut args: Vec<String> = ["llvm-cov", "--verbose", "--json", "--output-path"]
         .iter()
@@ -284,6 +293,14 @@ pub fn collect(path: &Path) -> Result<String> {
         args.extend(["--features".into(), request.features.join(",")]);
     }
     runner.run(&toolset.cargo_llvm_cov.path, &args, &extra)?;
+    compiler_inputs::capture(
+        &runner.root,
+        scratch.path(),
+        &request.project_root,
+        &request.source_files,
+        &dependencies,
+        &request.tools.rustc.path,
+    )?;
     let coverage: Value = coverage::parse(&fs::read(&coverage_path)?)?;
     coverage::validate(&coverage)?;
     let analysis = analyze_sources(&request)?;
@@ -318,6 +335,13 @@ pub fn collect(path: &Path) -> Result<String> {
     );
     validate_request(&request)?;
     recheck_tools(&request.tools)?;
+    compiler_inputs::verify(
+        &runner.root,
+        &request.project_root,
+        &request.source_files,
+        &dependencies,
+        &request.tools.rustc.path,
+    )?;
     let manifest = Manifest {
         schema: MANIFEST.into(),
         request_sha256: artifact::digest(&request_bytes),
@@ -368,6 +392,13 @@ pub fn verify(root: &Path, anchor: &str, request_digest: &str) -> Result<()> {
             )?,
         "dependency provenance differs from recomputed facts"
     );
+    compiler_inputs::verify(
+        root,
+        &request.project_root,
+        &request.source_files,
+        &recorded,
+        &request.tools.rustc.path,
+    )?;
     let coverage: Value = coverage::parse(&fs::read(root.join("coverage.json"))?)?;
     coverage::validate(&coverage)?;
     let analysis: Value = crate::strict_json::parse(&fs::read(root.join("source-analysis.json"))?)?;

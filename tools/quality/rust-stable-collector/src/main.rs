@@ -2,6 +2,8 @@
 mod adapter;
 mod artifact;
 mod collect;
+mod compiler_inputs;
+mod compiler_wrapper;
 mod coverage;
 mod dependencies;
 mod ownership;
@@ -45,6 +47,15 @@ fn run() -> Result<()> {
 }
 
 fn main() -> ExitCode {
+    if let Some(root) = env::var_os(compiler_wrapper::CONTEXT) {
+        match compiler_wrapper::run(Path::new(&root)) {
+            Ok(code) => return ExitCode::from(u8::try_from(code).unwrap_or(1)),
+            Err(error) => {
+                eprintln!("compiler wrapper: {error:#}");
+                return ExitCode::FAILURE;
+            }
+        }
+    }
     match run() {
         Ok(()) => ExitCode::SUCCESS,
         Err(error) => {
