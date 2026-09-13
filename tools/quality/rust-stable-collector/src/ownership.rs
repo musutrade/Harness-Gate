@@ -44,6 +44,8 @@ pub fn file(root: &Path, path: &str, raw: &Value) -> Result<Value> {
     let mut symbols = BTreeSet::new();
     let mut mapped = Vec::new();
     let mut excluded = Vec::new();
+    let mut file_regions = 0_u64;
+    let mut file_covered = 0_u64;
     for (index, record) in raw_functions.iter().enumerate() {
         let files = record["filenames"].as_array().context("LLVM filenames")?;
         if !files.iter().any(|f| f == filename) {
@@ -56,16 +58,27 @@ pub fn file(root: &Path, path: &str, raw: &Value) -> Result<Value> {
         );
         let regions = record["regions"].as_array().context("LLVM regions")?;
         let mut envelope = ((u64::MAX, u64::MAX), (0, 0));
+        let mut spans = BTreeSet::new();
+        let mut covered = 0_u64;
         for region in regions {
             let range = span(region)?;
             ensure!(
                 region[5] == 0 && region[6] == 0 && region[7] == 0,
                 "unsupported LLVM owner region mapping"
             );
+            ensure!(spans.insert(range), "duplicate LLVM owner region span");
+            covered += u64::from(region[4].as_u64().context("LLVM region count")? > 0);
             envelope.0 = envelope.0.min(range.0);
             envelope.1 = envelope.1.max(range.1);
         }
         ensure!(!regions.is_empty(), "missing LLVM owner regions");
+        let total = u64::try_from(regions.len())?;
+        file_regions = file_regions
+            .checked_add(total)
+            .context("LLVM region total overflow")?;
+        file_covered = file_covered
+            .checked_add(covered)
+            .context("LLVM covered total overflow")?;
         let excluded_matches = inventory["excluded_spans"]
             .as_array()
             .context("excluded spans")?
@@ -109,15 +122,27 @@ pub fn file(root: &Path, path: &str, raw: &Value) -> Result<Value> {
         mapped.push(
             json!({"name":functions[owner]["name"],"span":functions[owner]["span"],
             "llvm_function_index":index,"symbol":record["name"],"execution_count":count,
-            "coverage_function":{"type":"ratio","covered":u64::from(count > 0),"total":1}}),
+            "coverage_function":{"type":"ratio","covered":u64::from(count > 0),"total":1},
+            "coverage_region":{"type":"ratio","covered":covered,"total":total}}),
         );
     }
     ensure!(
         assigned.len() == functions.len(),
         "source owner missing from LLVM export"
     );
+    let files = raw["data"][0]["files"].as_array().context("LLVM files")?;
+    let summaries: Vec<_> = files.iter().filter(|f| f["filename"] == filename).collect();
+    ensure!(
+        summaries.len() == 1,
+        "missing or ambiguous LLVM file summary"
+    );
+    let summary = &summaries[0]["summary"]["regions"];
+    ensure!(
+        summary["count"] == file_regions && summary["covered"] == file_covered,
+        "LLVM owner regions disagree with file summary"
+    );
     Ok(
-        json!({"state":"supported","rule":"rust-llvm-exact-root-owner/v1-candidate","functions":mapped,"excluded":excluded}),
+        json!({"state":"supported","rule":"rust-llvm-exact-root-owner/v2-candidate","functions":mapped,"excluded":excluded}),
     )
 }
 

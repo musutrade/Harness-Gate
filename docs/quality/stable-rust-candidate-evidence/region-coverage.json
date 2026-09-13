@@ -1,0 +1,557 @@
+{
+  "schema": "rust-stable-code-region-checkpoint/v1",
+  "state": "candidate-only",
+  "rule": "rust-llvm-exact-root-owner/v2-candidate",
+  "llvm_reference": {
+    "url": "https://github.com/llvm/llvm-project/blob/llvmorg-22.1.6/llvm/tools/llvm-cov/CoverageSummaryInfo.cpp",
+    "source": {
+      "path": "target/gh-259/llvm-22.1.6-CoverageSummaryInfo.cpp",
+      "bytes": 4615,
+      "sha256": "e29773f34d1d649a4b48332773e79c572241ab0e445171bee27e5b8dd868c970"
+    },
+    "semantics": "Count CodeRegion entries; covered when ExecutionCount is nonzero. Eligible owner/file totals must agree, including excluded test owners in reconciliation only."
+  },
+  "before": {
+    "binary_sha256": "e020ad59faf78db0133f4a83105b18f0a39d9676ea21c24386dcb662ac476f73",
+    "description": {
+      "path": "target/gh-259/region-repro-01/description.json",
+      "bytes": 2345,
+      "sha256": "0c2635aeff386e71f21be9ad5f47b9ba49289386bdf81327063a6f9ac89fad48"
+    },
+    "raw_coverage": {
+      "path": "target/gh-259/region-repro-01/capture/coverage.json",
+      "bytes": 2826,
+      "sha256": "0717ba90349abfedaebb2c18eb539c4fd2d1580f04022150cb8427b652f435c2"
+    },
+    "original_collect_result": {
+      "capture": "complete",
+      "core_acceptance": "pending",
+      "manifest_sha256": "70319acb446b12a2d3bbfc69220d69eae188f2c6b8b18225e76eccf2d462eaa9",
+      "request_sha256": "8cecddb3cf34b30203edddcfb2b90f700b99dcf042c2365b74060e074330ecb9",
+      "state": "unsupported"
+    },
+    "function_ratio": {
+      "covered": 1,
+      "total": 1,
+      "type": "ratio"
+    },
+    "observed_raw_code_regions": {
+      "covered": 5,
+      "total": 6
+    },
+    "region_metric_present": false
+  },
+  "after": {
+    "binary": {
+      "sha256": "e2e3296e90b8da095bfe98f504589faca27ade64565262697747567183cd3e6c",
+      "bytes": 2002000
+    },
+    "partial": {
+      "anchors": {
+        "capture": "complete",
+        "core_acceptance": "pending",
+        "manifest_sha256": "bf9218503d8a0e14dcd7490246bedc0d783ef4db653731feef6be571289eeb1e",
+        "request_sha256": "cdf1a3209c937c755fc0a74cbe7ebcfed1f3e16928ea1dcbc4fadbe7f7a873f2",
+        "state": "unsupported"
+      },
+      "function_owners": [
+        {
+          "coverage_function": {
+            "covered": 1,
+            "total": 1,
+            "type": "ratio"
+          },
+          "coverage_region": {
+            "covered": 5,
+            "total": 6,
+            "type": "ratio"
+          },
+          "execution_count": 1,
+          "llvm_function_index": 0,
+          "name": "classify",
+          "span": [
+            1,
+            1,
+            7,
+            2
+          ],
+          "symbol": "_RNvCsar3kSzbHmDr_22stable_partial_fixture8classify"
+        },
+        {
+          "coverage_function": {
+            "covered": 0,
+            "total": 1,
+            "type": "ratio"
+          },
+          "coverage_region": {
+            "covered": 0,
+            "total": 3,
+            "type": "ratio"
+          },
+          "execution_count": 0,
+          "llvm_function_index": 2,
+          "name": "never_called",
+          "span": [
+            9,
+            1,
+            11,
+            2
+          ],
+          "symbol": "_RNvCsar3kSzbHmDr_22stable_partial_fixture12never_called"
+        }
+      ],
+      "llvm_totals_test_inclusive": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 3,
+          "covered": 2,
+          "percent": 66.66666666666666
+        },
+        "instantiations": {
+          "count": 3,
+          "covered": 2,
+          "percent": 66.66666666666666
+        },
+        "lines": {
+          "count": 11,
+          "covered": 7,
+          "percent": 63.63636363636363
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 13,
+          "covered": 9,
+          "notcovered": 4,
+          "percent": 69.23076923076923
+        }
+      }
+    },
+    "core": {
+      "plain": {
+        "response": {
+          "path": "target/gh-259/core-acceptance-plain-17/positive.stdout",
+          "bytes": 13453,
+          "sha256": "6b389e1f598c8bbae92fcf79f5ca2362c0a81ccb8feb1e9acf36d97c816f79f3"
+        },
+        "records": [
+          {
+            "subject": {
+              "boundary": "production",
+              "component": "rust",
+              "discriminator": "rust-source-span/v1:bcfd91e86e8ad44dc1b309e90a9556b51738c457695cbdd975969aaddc40e632",
+              "id": "subject-identity/v1:4e95ef487c5d01eba9e37415072fe6a54baa643cc66abb4e79b4c2a3ed14c7a2",
+              "identity_version": "subject-identity/v1",
+              "kind": "function/v1",
+              "metadata": {},
+              "path": "src/lib.rs",
+              "source_sha256": "3f175da6464cacc2543c0fcb8dd4fc841214a3050d26d7abcf25a14fa37eccdc",
+              "target": "x86_64-unknown-linux-gnu"
+            },
+            "metrics": [
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "name": "complexity.cyclomatic",
+                "value": {
+                  "type": "count",
+                  "value": 3
+                }
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "name": "coverage.function",
+                "value": {
+                  "covered": 1,
+                  "total": 1,
+                  "type": "ratio"
+                }
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "name": "coverage.region",
+                "value": {
+                  "covered": 6,
+                  "total": 6,
+                  "type": "ratio"
+                }
+              }
+            ],
+            "capabilities": [
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "metric": "complexity.cyclomatic",
+                "reason": "lexical source decisions; no expansion or reachability claim",
+                "state": "supported"
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "metric": "coverage.function",
+                "reason": "exact source span and unique LLVM root function; explicit test spans excluded",
+                "state": "supported"
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "metric": "coverage.line",
+                "reason": "source/coverage ownership or source activation is not certified",
+                "state": "unsupported"
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "metric": "coverage.region",
+                "reason": "exact source span and unique LLVM root function; explicit test spans excluded",
+                "state": "supported"
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "metric": "risk.crap",
+                "reason": "source/coverage ownership or source activation is not certified",
+                "state": "unsupported"
+              }
+            ]
+          },
+          {
+            "subject": {
+              "boundary": "production",
+              "component": "rust",
+              "discriminator": "rust-source-span/v1:e5d71ee47ca702caa2c45b6ecbda6867d79bb5fb74b16f768452b8f122837c83",
+              "id": "subject-identity/v1:bd18d8cf7afda7a0d4118626b395fda29d4d901d37d6ed846644e7e764d640d7",
+              "identity_version": "subject-identity/v1",
+              "kind": "function/v1",
+              "metadata": {},
+              "path": "src/lib.rs",
+              "source_sha256": "3f175da6464cacc2543c0fcb8dd4fc841214a3050d26d7abcf25a14fa37eccdc",
+              "target": "x86_64-unknown-linux-gnu"
+            },
+            "metrics": [
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "name": "complexity.cyclomatic",
+                "value": {
+                  "type": "count",
+                  "value": 1
+                }
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "name": "coverage.function",
+                "value": {
+                  "covered": 0,
+                  "total": 1,
+                  "type": "ratio"
+                }
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "name": "coverage.region",
+                "value": {
+                  "covered": 0,
+                  "total": 3,
+                  "type": "ratio"
+                }
+              }
+            ],
+            "capabilities": [
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "metric": "complexity.cyclomatic",
+                "reason": "lexical source decisions; no expansion or reachability claim",
+                "state": "supported"
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "metric": "coverage.function",
+                "reason": "exact source span and unique LLVM root function; explicit test spans excluded",
+                "state": "supported"
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "metric": "coverage.line",
+                "reason": "source/coverage ownership or source activation is not certified",
+                "state": "unsupported"
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "metric": "coverage.region",
+                "reason": "exact source span and unique LLVM root function; explicit test spans excluded",
+                "state": "supported"
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "metric": "risk.crap",
+                "reason": "source/coverage ownership or source activation is not certified",
+                "state": "unsupported"
+              }
+            ]
+          }
+        ],
+        "required_crap": [
+          {
+            "component": "rust",
+            "evidence_id": "stable-0d2e68a8d1c14b9151a334b879a56dbb78d1f3712df4e3250b4f52d45e32c14c",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-4ea91cad05f85e5cd1e646da093aa43b1f0dc851c2bad559dc2999b5ebbf6ee0",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          }
+        ]
+      },
+      "partial": {
+        "response": {
+          "path": "target/gh-259/core-acceptance-partial-17/positive.stdout",
+          "bytes": 13453,
+          "sha256": "fb25ccb517b92763b94e63f878062e983701861003a7f5965346e8d6caeb3835"
+        },
+        "records": [
+          {
+            "subject": {
+              "boundary": "production",
+              "component": "rust",
+              "discriminator": "rust-source-span/v1:bcfd91e86e8ad44dc1b309e90a9556b51738c457695cbdd975969aaddc40e632",
+              "id": "subject-identity/v1:ee01ea2e9ca9bc9c65add1e1b0b4482f1ea9a1f3da5789dd14135d3b8bf56600",
+              "identity_version": "subject-identity/v1",
+              "kind": "function/v1",
+              "metadata": {},
+              "path": "src/lib.rs",
+              "source_sha256": "0a53213153d026a3bcbdca92a1d96245fa5bf0bd0be51b3e8d5ed5c2591e52cd",
+              "target": "x86_64-unknown-linux-gnu"
+            },
+            "metrics": [
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "name": "complexity.cyclomatic",
+                "value": {
+                  "type": "count",
+                  "value": 3
+                }
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "name": "coverage.function",
+                "value": {
+                  "covered": 1,
+                  "total": 1,
+                  "type": "ratio"
+                }
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "name": "coverage.region",
+                "value": {
+                  "covered": 5,
+                  "total": 6,
+                  "type": "ratio"
+                }
+              }
+            ],
+            "capabilities": [
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "metric": "complexity.cyclomatic",
+                "reason": "lexical source decisions; no expansion or reachability claim",
+                "state": "supported"
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "metric": "coverage.function",
+                "reason": "exact source span and unique LLVM root function; explicit test spans excluded",
+                "state": "supported"
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "metric": "coverage.line",
+                "reason": "source/coverage ownership or source activation is not certified",
+                "state": "unsupported"
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "metric": "coverage.region",
+                "reason": "exact source span and unique LLVM root function; explicit test spans excluded",
+                "state": "supported"
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "metric": "risk.crap",
+                "reason": "source/coverage ownership or source activation is not certified",
+                "state": "unsupported"
+              }
+            ]
+          },
+          {
+            "subject": {
+              "boundary": "production",
+              "component": "rust",
+              "discriminator": "rust-source-span/v1:e5d71ee47ca702caa2c45b6ecbda6867d79bb5fb74b16f768452b8f122837c83",
+              "id": "subject-identity/v1:fb26b63a7ece0fb3c516e39b96e8d733200564fd9b82c9261835137437a20154",
+              "identity_version": "subject-identity/v1",
+              "kind": "function/v1",
+              "metadata": {},
+              "path": "src/lib.rs",
+              "source_sha256": "0a53213153d026a3bcbdca92a1d96245fa5bf0bd0be51b3e8d5ed5c2591e52cd",
+              "target": "x86_64-unknown-linux-gnu"
+            },
+            "metrics": [
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "name": "complexity.cyclomatic",
+                "value": {
+                  "type": "count",
+                  "value": 1
+                }
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "name": "coverage.function",
+                "value": {
+                  "covered": 0,
+                  "total": 1,
+                  "type": "ratio"
+                }
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "name": "coverage.region",
+                "value": {
+                  "covered": 0,
+                  "total": 3,
+                  "type": "ratio"
+                }
+              }
+            ],
+            "capabilities": [
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "metric": "complexity.cyclomatic",
+                "reason": "lexical source decisions; no expansion or reachability claim",
+                "state": "supported"
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "metric": "coverage.function",
+                "reason": "exact source span and unique LLVM root function; explicit test spans excluded",
+                "state": "supported"
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "metric": "coverage.line",
+                "reason": "source/coverage ownership or source activation is not certified",
+                "state": "unsupported"
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "metric": "coverage.region",
+                "reason": "exact source span and unique LLVM root function; explicit test spans excluded",
+                "state": "supported"
+              },
+              {
+                "artifacts": [
+                  "source"
+                ],
+                "metric": "risk.crap",
+                "reason": "source/coverage ownership or source activation is not certified",
+                "state": "unsupported"
+              }
+            ]
+          }
+        ],
+        "required_crap": [
+          {
+            "component": "rust",
+            "evidence_id": "stable-73c3126951899f2b9eec1b97055176a1b4b225351d270f283580c3967f90a21e",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-39674dc3e03ba6ed2104b94d4e3c1f619ce5c9b9b6189de613e69b41b322bb6c",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          }
+        ]
+      }
+    }
+  },
+  "limits": [
+    "ASCII unannotated nongeneric root owners only; all existing owner exclusions retained",
+    "Line coverage and CRAP unsupported; no accepted series, threshold or baseline changed",
+    "Single stable compiler/system acceptance; production signing and full process audit unproven"
+  ]
+}

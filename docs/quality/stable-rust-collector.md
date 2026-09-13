@@ -169,7 +169,8 @@ source, context target, workspace, series, claims and ambiguous/missing owners. 
 requires all five metric contracts for each selected function. Verified ordinary
 lexical owners can emit `complexity.cyclomatic`. Eligible owners also emit
 `coverage.function` as executed functions / functions (1/1 or 0/1 for one owner).
-Line/region coverage and CRAP explicitly emit `unsupported`, with no fabricated values. A file containing
+`coverage.region` counts nonzero LLVM code regions / all code regions for that same
+certified owner. Line coverage and CRAP explicitly emit `unsupported`, with no fabricated values. A file containing
 uncertified activation/expansion also makes its complexity unavailable. Per-owner
 artifacts bind source facts, context, series and capture anchors. Input identities
 are rechecked after conversion; failure returns nonzero and no successful envelope.
@@ -191,8 +192,8 @@ does not claim compilation, reachability or expansion of every parsed source.
 
 | Construct | Current real behavior | Certification boundary |
 | --- | --- | --- |
-| Unannotated root function, including never-called | Lexical complexity and exact-owner function execution ratio | ASCII, single-file LLVM owner; no intra-function coverage/CRAP join |
-| Direct `#[test]` or `#[cfg(test)]` function/module | Explicit source spans excluded from certified function owners | Raw file totals still include tests; no production line/region fraction |
+| Unannotated root function, including never-called | Lexical complexity, function execution and code-region ratios | ASCII, single-file LLVM owner; CRAP model and migration remain unaccepted |
+| Direct `#[test]` or `#[cfg(test)]` function/module | Explicit source spans excluded from certified function owners | Raw file totals still include tests; normalized production owners exclude their regions |
 | Macro/derive/include-generated code | Expansion/attribute recorded as unsupported | No generated owner inferred from parent/file totals |
 | Async/closure/nested function | Affected lexical function is unsupported with null complexity | Constructor, future body and closure owners are never merged |
 | Generic function, `impl Trait`, generic/trait impl, trait default | Unsupported owner with null complexity | No instantiation or unused-generic denominator claim |
@@ -201,7 +202,7 @@ does not claim compilation, reachability or expansion of every parsed source.
 | Build script output | Build script runs; no instrumentation of the host build script | Generated paths/raw export retained; production owner unsupported |
 | Parse/tool/identity/format error | `measurement_error`, nonzero process exit | No successful evidence manifest |
 
-Function ownership uses `rust-llvm-exact-root-owner/v1-candidate`: every function
+Function ownership uses `rust-llvm-exact-root-owner/v2-candidate`: every function
 in an eligible source file must be an unannotated, nongeneric root function with
 no uncertified syntax; non-ASCII files, module/impl methods and annotated functions
 remain unsupported for this mapping. LLVM records must name exactly that source
@@ -216,7 +217,20 @@ from pinned files, including its complete file set. Symbol suffixes are never us
 as the mapping algorithm. This narrow contract was actually exercised only with
 the recorded Rust 1.97.1 fixture; broader syntax/toolchain certification remains open.
 
-All function CRAP is currently unsupported, including simple functions. Raw LLVM
+Within that exact owner, region coverage counts each distinct LLVM code-region
+span once and counts it covered only when its own counter is nonzero. Duplicate
+spans fail measurement. All owner regions, including explicitly excluded test
+owners, must reconcile with the file's region count and covered summary. This
+narrow rule follows LLVM 22.1.6's
+[function region statistics](https://github.com/llvm/llvm-project/blob/llvmorg-22.1.6/llvm/tools/llvm-cov/CoverageSummaryInfo.cpp).
+The real partial fixture distinguishes function execution 1/1 from region
+coverage 5/6; an exported never-called function is 0/1 and 0/3 respectively.
+This is standard LLVM region coverage, not MIR basic-block coverage, branch
+coverage, or a claim about arbitrary segment/expansion semantics.
+
+All function CRAP is currently unsupported, including simple functions. CRAP model selection
+and measurement migration require review; the candidate does not derive CRAP
+or enable an existing required binding from these new ratios. Raw LLVM
 JSON `3.1.0` is preserved under `rust-llvm-source-coverage/v1-candidate`; schema
 checks do not certify owners. No branch denominator is synthesized when standard
 instrumentation exports zero branch regions.

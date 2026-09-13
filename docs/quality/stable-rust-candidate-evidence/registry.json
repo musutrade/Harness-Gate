@@ -1,15 +1,15 @@
 {
   "schema": "rust-stable-registry-acceptance/v1",
   "collector": {
-    "sha256": "e020ad59faf78db0133f4a83105b18f0a39d9676ea21c24386dcb662ac476f73",
-    "bytes": 1995304
+    "sha256": "e2e3296e90b8da095bfe98f504589faca27ade64565262697747567183cd3e6c",
+    "bytes": 2002000
   },
   "observations": {
     "anchors": {
       "capture": "complete",
       "core_acceptance": "pending",
-      "manifest_sha256": "63761c553cfdc65954b5d300a535521c099bf1bcc31c93328277b2e596f02641",
-      "request_sha256": "d302e0ca88c2da770a5cc9086c858d09e8436ea0e2b2a2f642b5f78675bc349e",
+      "manifest_sha256": "e12291dd3c7dd2873e3ed72bc081e43cdfa0d5c81dd64b8625452c7b19a49200",
+      "request_sha256": "52e8d545fade0a98a66e021c35b15664e045d3adf13c59a52758ee3265393cf6",
       "state": "unsupported"
     },
     "archive_sha256": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682",
@@ -22,10 +22,10 @@
       "--locked",
       "--offline",
       "--manifest-path",
-      "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-22/project-registry/Cargo.toml"
+      "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-24/project-registry/Cargo.toml"
     ],
     "setup_is_repository_automation": true,
-    "isolated_cargo_home": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-22/registry-cargo-home",
+    "isolated_cargo_home": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-24/registry-cargo-home",
     "network_download_bytes": 0,
     "scope": "single locked crates.io dependency; local cache copied by test setup"
   },
@@ -43,7 +43,7 @@
   "explicit_archive_bytes": 15935,
   "extracted_package_bytes": 51103,
   "index_bytes": 9826,
-  "capture_bytes": 64675,
+  "capture_bytes": 64718,
   "network_download_bytes": 0,
   "scope": "Authenticated package directories and observed compiler dep-info file inputs; arbitrary build-script reads and environment are not certified. Cargo cache layout is used only in repository test setup."
 }

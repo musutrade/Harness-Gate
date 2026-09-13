@@ -318,7 +318,7 @@ pub fn collect(path: &Path) -> Result<String> {
             "schema":"rust-stable-candidate/v1", "state":"unsupported",
             "coverage":{"series":"rust-llvm-source-coverage/v1-candidate", "format":coverage["version"], "scope":"Cargo workspace tests; test code included; build scripts not instrumented", "artifact":"coverage.json"},
             "complexity":{"series":source::SERIES, "artifact":"source-analysis.json"},
-            "function_crap":{"state":"unsupported", "reason":"intra-function coverage fraction for CRAP not certified"},
+            "function_crap":{"state":"unsupported", "reason":"CRAP model and measurement migration not accepted; region coverage is a separate candidate metric"},
             "core_acceptance":{"state":"unsupported", "reason":"candidate capture is not a signed Core protocol v2 adapter"},
         }),
     )?;

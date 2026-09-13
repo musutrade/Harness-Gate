@@ -14,13 +14,13 @@ installation fingerprint. Rust 1.97.1 reports commit
 matching external LLVM tools report `22.1.6-rust-1.97.1-stable`.
 External cargo-llvm-cov is 0.9.0. The actual export format is LLVM JSON 3.1.0.
 
-The candidate binary is **1,995,304 bytes**, SHA-256
-`e020ad59faf78db0133f4a83105b18f0a39d9676ea21c24386dcb662ac476f73`.
+The candidate binary is **2,002,000 bytes**, SHA-256
+`e2e3296e90b8da095bfe98f504589faca27ade64565262697747567183cd3e6c`.
 ELF `NEEDED` entries are `libgcc_s.so.1` and `libc.so.6`; no Python or compiler
 private shared library appears. This observation alone is not a transitive
-process audit. The plain capture occupies 48,545 bytes. Its temporary Cargo
+process audit. The plain capture occupies 48,587 bytes. Its temporary Cargo
 build directory is removed and persistent candidate cache is zero bytes.
-The actual unsigned candidate package occupies 3,125,938 bytes: program 1,995,304,
+The actual unsigned candidate package occupies 3,132,634 bytes: program 2,002,000,
 collected licenses 1,129,147, support metadata 924 and inventory 563 bytes. The
 [preparation record](stable-rust-candidate-evidence/preparation.json) binds the
 locked build, 74 registry dependency notice inventories, Rust library notices and
@@ -28,9 +28,9 @@ acceptance for that exact executable. It retains conservative build-dependency
 notices; production license review remains open. Full notices and build logs are
 in the workspace review directory, without repackaged raw dependency archives.
 
-The local test-only signed package and one installed version occupy 3,126,407
-bytes each. Two retained versions occupy 6,252,856 bytes. Interrupted staging
-occupies 3,126,449 bytes; the exercised root totals 9,379,933 bytes including
+The local test-only signed package and one installed version occupy 3,133,103
+bytes each. Two retained versions occupy 6,266,248 bytes. Interrupted staging
+occupies 3,133,145 bytes; the exercised root totals 9,400,021 bytes including
 verification metadata. Local input operations downloaded zero bytes; a network
 downloader is not implemented. The prepared package is deliberately unsigned;
 the lifecycle package uses test RSA and mocked Sigstore metadata. These sizes are
@@ -38,17 +38,18 @@ actual candidate measurements, not a production archive/download claim. Build
 targets and acceptance logs are not runtime payloads.
 
 The checked-in [acceptance summary](stable-rust-candidate-evidence/acceptance.json)
-contains actual tool hashes, binary identity, all 85 checks, raw totals and
+contains actual tool hashes, binary identity, all 92 checks, raw totals and
 capture/request anchors. [Environment probes](stable-rust-candidate-evidence/environment.json)
 record exact commands, errors and outputs. [ELF dependencies](stable-rust-candidate-evidence/dynamic-libraries.txt)
 record the binary inspection. The [log identity index](stable-rust-candidate-evidence/log-identities.json)
 records hashes and sizes of retained workspace logs. These are new candidate observations, not repackaged
 historical evidence. The separate [plain](stable-rust-candidate-evidence/core-plain.json),
+[partial](stable-rust-candidate-evidence/core-partial.json),
 [boundaries](stable-rust-candidate-evidence/core-boundaries.json) and
 [features](stable-rust-candidate-evidence/core-features.json) and
 [registry](stable-rust-candidate-evidence/core-registry.json) summaries record
 authenticated Core acceptance using an explicitly test-only key, not production signing. Full captures/logs remain
-under `target/gh-259/acceptance-22/` in the execution workspace; the summary is
+under `target/gh-259/acceptance-24/` in the execution workspace; the summary is
 not a standalone verifiable capture archive. CI uploads its own complete captures.
 
 ## Aggregate consistency checkpoint
@@ -66,8 +67,9 @@ Eleven new real-export mutations preserve each summary's internal arithmetic
 while changing totals or file summaries; all must fail verification. Package
 preparation requires these cases. A Rust regression covers multiple-file sums,
 covered/count disagreement and integer overflow. These checks establish summary
-consistency only: full segment/region counter reconciliation and intra-function
-coverage/CRAP remain incomplete. No supported owner or measurement series changes.
+consistency only. At that checkpoint intra-function coverage remained unsupported;
+the v2 checkpoint below adds bounded code-region coverage. Full segment/counter
+reconciliation and CRAP remain incomplete.
 
 ## Real fixture observations
 
@@ -89,9 +91,10 @@ an async future unpolled. Its assertions inspect known fixture symbols solely
 to establish observations; that suffix matching is not a certified production
 owner mapping. Uninstantiated generic ownership remains unproven. The exact root-owner rule separately certifies plain function execution ratios
 (1/1 and 0/1) after excluding explicit test spans. All candidate function CRAP
-and normalized line/region coverage remain unsupported.
+and normalized line coverage remain unsupported. The v2 owner rule additionally
+certifies code-region ratios as documented below.
 
-The 85 actual checks include valid capture/integrity verification, stale output,
+The 92 actual checks include valid capture/integrity verification, stale output,
 wrong request/manifest anchors, damaged and mixed artifacts, changed source,
 restored source, boundary/features captures, wrong tool identity, injected Cargo
 configuration, missing tools, inherited compiler flags, unavailable project pin,
@@ -110,10 +113,12 @@ and duplicate object keys. Both original files are restored after each suite.
 Unsigned package preparation requires these named checks in the pinned acceptance.
 
 These checks validate the exercised JSON format, scalar domains and local summary
-arithmetic. They do not reconstruct summaries from counters or certify cross-file
-aggregate totals. Nonempty branch/expansion
+arithmetic. The aggregate checkpoint below reconciles file totals; the v2 owner
+checkpoint additionally reconciles eligible file region summaries with owner counters.
+This does not certify every LLVM layout or semantic relation. Nonempty branch/expansion
 layouts have structural checks but no real producer acceptance in this matrix;
-MC/DC is explicitly unsupported. Required line/region coverage and CRAP stay blocked.
+MC/DC is explicitly unsupported. Required line coverage and CRAP stay blocked; candidate code-region support is
+limited to the exact owners documented below.
 
 The exact root-owner validator additionally rejects seven real-export mutations:
 missing LLVM function, duplicate symbol, multiple records for one source function,
@@ -143,7 +148,7 @@ is forged. Tests mutate and restore only the isolated workspace cache.
 That fixture cache occupies 134,385 bytes
 (15,935 archive, 51,103
 extracted files, 9,826 index); its capture occupies
-64,675 bytes. These are user dependency/test inputs, separate
+64,718 bytes. These are user dependency/test inputs, separate
 from the plugin's zero-byte persistent cache and four-file release payload. Test
 setup copies the already provisioned crate locally; zero network bytes were fetched.
 Observed external `include!`/path inputs now block capture, as described below.
@@ -170,7 +175,7 @@ negative test expecting a producer-set error after deleting its only record; the
 empty-proof check correctly fired first. The revised test retains an unmatched
 record and exercises the intended check. Package preparation then correctly
 rejected a binary/acceptance digest mismatch (`package-07.log`); the final
-preparation artifact was revalidated in `acceptance-22`, all four Core cases,
+preparation artifact was revalidated in `acceptance-24`, all five Core cases,
 historical comparison and lifecycle checks. No acceptance anchor was bypassed.
 
 Rust unit tests separately exercise nonzero exit, timeout/process-group cleanup,
@@ -181,19 +186,21 @@ not cross-host acceptance.
 
 ## Actual Core and migration checks
 
-The same collector binary was used by all four real Core acceptance cases. The
+The same collector binary was used by all five real Core acceptance cases. The
 plain/boundary cases are at
-`target/gh-259/core-acceptance-{plain,boundaries,features}-15/`. Each invokes the
+`target/gh-259/core-acceptance-{plain,partial,boundaries,features}-17/`. Each invokes the
 actual Core CLI with a signed v2 request, then runs Core's generic evidence
 validation and requiredness evaluator. Plain produces two verified complexity
-counts, 3 and 1, plus verified per-function execution ratios 1/1 and 0/1. Boundary fixtures produce unavailable evidence with unsupported
+counts, 3 and 1, plus verified per-function execution ratios 1/1 and 0/1
+and code-region ratios 6/6 and 0/3. Partial executes only one side of the same
+production function: its function ratio is still 1/1, while its region ratio is 5/6. Boundary fixtures produce unavailable evidence with unsupported
 capabilities and no metrics. Required CRAP blocks in every case. The registry fixture at
-`target/gh-259/core-acceptance-registry-15/` adds CC 1 and execution coverage 1/1.
+`target/gh-259/core-acceptance-registry-17/` adds CC 1 and execution coverage 1/1.
 It runs with the same isolated `CARGO_HOME` used for capture. The first attempt
 with the host Cargo home correctly failed configuration identity verification
 (`core-acceptance-registry-10.log`); no identity check was bypassed.
 
-All four cases reject invalid signatures, replay, expiry, altered project/series,
+All five cases reject invalid signatures, replay, expiry, altered project/series,
 unknown owners, changed source identity, wrong context target, missing claims,
 wrong capture anchor and a stale configuration binding. Core independently rejects
 stale context and corrupted normalized artifacts. Test keys and synthetic fixture
@@ -220,7 +227,7 @@ using stable Rust 1.97.1. Only the package and lockfile versions change. The two
 program hashes differ: the installed first program performs the upgrade, and the
 installed second program performs rollback. This validates executable switching,
 not historical or production release compatibility. Its signed package occupies
-3,126,449 bytes; the repository-only second build target occupies 178,705,200 bytes
+3,133,145 bytes; the repository-only second build target occupies 178,718,592 bytes
 and is excluded from runtime packages and downloads.
 
 Checks cover unsigned-package rejection, ten re-signed invalid support documents,
@@ -244,7 +251,7 @@ Unsigned preparation fails if an acceptance pin, binary identity, archived licen
 or unpacked build source does not match; six automated preparation tests cover
 these boundaries. The first actual preparation rejected acceptance for an earlier
 binary (`package-01.log`); the final binary was recaptured before successful
-preparation (`package-10.log`).
+preparation (`package-12.log`).
 
 ## Commands and results
 
@@ -255,25 +262,25 @@ this workspace because the default `/home/gem/cargo-target` is read-only.
 
 | Command | Actual result and log under `target/gh-259/` |
 | --- | --- |
-| `CARGO_TARGET_DIR="$PWD/target/gh-259/stable-target" RUSTFLAGS= CARGO_ENCODED_RUSTFLAGS= RUSTC_WRAPPER= RUSTC_WORKSPACE_WRAPPER= cargo +1.97.1 build --manifest-path tools/quality/rust-stable-collector/Cargo.toml --release --locked --offline` | Passed development build; final artifact rebuilt with preparation environment and revalidated below; `aggregate-build-01.log` |
-| Same target, `cargo +1.97.1 test --manifest-path tools/quality/rust-stable-collector/Cargo.toml --locked --offline` | 17 passed; `aggregate-tests-01.log` |
-| `cargo +1.97.1 fmt --manifest-path tools/quality/rust-stable-collector/Cargo.toml -- --check` | Passed; `aggregate-fmt-01.log` |
-| Same target, `cargo +1.97.1 clippy --manifest-path tools/quality/rust-stable-collector/Cargo.toml --all-targets --locked --offline -- -D warnings` | Passed; `aggregate-clippy-01.log` |
-| `python3 tools/quality/rust-stable-collector/validate_stable_candidate.py --binary target/gh-259/stable-target/release/harness-gate-rust-stable-collector --output target/gh-259/acceptance-22` | 85 passed; `acceptance-22.log` |
-| `env -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u http_proxy -u https_proxy -u all_proxy CARGO_TARGET_DIR="$PWD/target/gh-259/core-target" cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked` | 397 passed; `core-nextest-02.log` |
-| `cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check` | Passed; `core-registry-fmt-01.log` |
-| `CARGO_TARGET_DIR="$PWD/target/gh-259/core-target" cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings` | Passed; `core-registry-clippy-01.log` |
-| `CARGO_TARGET_DIR="$PWD/target/gh-259/quality-target" python3 -m unittest discover -s tools/quality/tests -v` | 444 tests OK, 36 skipped; `quality-tests-11.log` |
-| `python3 -m unittest discover -s tools/release/tests -v` | 91 passed; `release-tests-12.log` |
+| `CARGO_TARGET_DIR="$PWD/target/gh-259/stable-target" RUSTFLAGS= RUSTDOCFLAGS= CARGO_ENCODED_RUSTFLAGS= RUSTC_WRAPPER= RUSTC_WORKSPACE_WRAPPER= cargo +1.97.1 build --manifest-path tools/quality/rust-stable-collector/Cargo.toml --release --locked --offline` | Passed final build with explicit empty compiler flags/wrappers; exact artifact revalidated below; `region-build-02.log` |
+| Same target, `cargo +1.97.1 test --manifest-path tools/quality/rust-stable-collector/Cargo.toml --locked --offline` | 17 passed; `region-tests-01.log` |
+| `cargo +1.97.1 fmt --manifest-path tools/quality/rust-stable-collector/Cargo.toml -- --check` | Passed; `region-fmt-01.log` |
+| Same target, `cargo +1.97.1 clippy --manifest-path tools/quality/rust-stable-collector/Cargo.toml --all-targets --locked --offline -- -D warnings` | Passed; `region-clippy-01.log` |
+| `python3 tools/quality/rust-stable-collector/validate_stable_candidate.py --binary target/gh-259/stable-target/release/harness-gate-rust-stable-collector --output target/gh-259/acceptance-24` | 92 passed; `acceptance-24.log` |
+| `env -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u NO_PROXY -u http_proxy -u https_proxy -u all_proxy -u no_proxy CARGO_TARGET_DIR="$PWD/target/gh-259/core-target" cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked` | 397 passed; `region-core-nextest-03.log` |
+| `cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check` | Passed; `region-core-fmt-01.log` |
+| `CARGO_TARGET_DIR="$PWD/target/gh-259/core-target" cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings` | Passed; `region-core-clippy-01.log` |
+| `CARGO_TARGET_DIR="$PWD/target/gh-259/quality-target" python3 -m unittest discover -s tools/quality/tests -v` | 444 tests OK, 36 skipped; `quality-tests-12.log` |
+| `python3 -m unittest discover -s tools/release/tests -v` | 91 passed; `release-tests-13.log` |
 | `python3 -m unittest discover -s tools/release/tests -p test_stable_collector_policy.py -v` | 2 passed after CI build environment alignment; `package-ci-policy-01.log` |
 | `CARGO_TARGET_DIR="$PWD/target/gh-259/quality-target" python3 -m unittest discover -s tools/quality/tests -p test_ci_topology.py -v` | 7 passed after CI build environment alignment; `package-ci-topology-01.log` |
-| `CARGO_TARGET_DIR="$PWD/target/gh-259/core-target" python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json` | Passed; `docs-consistency-12.log` |
-| Same Core target, `cargo build --manifest-path tools/harness-gate/Cargo.toml --example stable_collector_acceptance --locked --offline` | Passed; `core-registry-build-01.log` |
-| `target/gh-259/core-target/debug/examples/stable_collector_acceptance target/gh-259/stable-target/release/harness-gate-rust-stable-collector target/gh-259/core-target/debug/harness-gate target/gh-259/acceptance-22 target/gh-259/core-acceptance-${fixture}-15 $fixture` for `plain boundaries features` | All three passed; matching `core-acceptance-${fixture}-15.log` |
-| `CARGO_HOME="$PWD/target/gh-259/acceptance-22/registry-cargo-home" target/gh-259/core-target/debug/examples/stable_collector_acceptance target/gh-259/stable-target/release/harness-gate-rust-stable-collector target/gh-259/core-target/debug/harness-gate target/gh-259/acceptance-22 target/gh-259/core-acceptance-registry-15 registry` | Passed; `core-acceptance-registry-15.log` |
-| `python3 tools/quality/rust-stable-collector/compare_historical_fixture.py --binary target/gh-259/stable-target/release/harness-gate-rust-stable-collector --output target/gh-259/historical-10` | Passed; `historical-10.log` |
-| `python3 tools/quality/rust-stable-collector/validate_lifecycle.py --binary target/gh-259/stable-target/release/harness-gate-rust-stable-collector --package target/gh-259/package-10/unsigned-package --output target/gh-259/lifecycle-11` | 38 passed; real RSA, mocked Sigstore; `lifecycle-11.log` |
-| `python3 tools/quality/rust-stable-collector/prepare_release.py --output target/gh-259/package-10 --target-dir "$PWD/target/gh-259/stable-target" --toolchain 1.97.1 --acceptance target/gh-259/acceptance-22/summary.json d672ef27b0966ac54b085143464907b1ce38def3e38f6f3b75c14286395f934d` | Passed locked offline build and package preparation; `package-10.log` and `package-10/preparation.json` |
+| `CARGO_TARGET_DIR="$PWD/target/gh-259/core-target" python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json` | Passed; `docs-consistency-13.log` |
+| Same Core target, `cargo build --manifest-path tools/harness-gate/Cargo.toml --example stable_collector_acceptance --locked --offline` | Passed; `region-core-build-01.log` |
+| `target/gh-259/core-target/debug/examples/stable_collector_acceptance target/gh-259/stable-target/release/harness-gate-rust-stable-collector target/gh-259/core-target/debug/harness-gate target/gh-259/acceptance-24 target/gh-259/core-acceptance-${fixture}-17 $fixture` for `plain partial boundaries features` | All four passed; matching `core-acceptance-${fixture}-17.log` |
+| `CARGO_HOME="$PWD/target/gh-259/acceptance-24/registry-cargo-home" target/gh-259/core-target/debug/examples/stable_collector_acceptance target/gh-259/stable-target/release/harness-gate-rust-stable-collector target/gh-259/core-target/debug/harness-gate target/gh-259/acceptance-24 target/gh-259/core-acceptance-registry-17 registry` | Passed; `core-acceptance-registry-17.log` |
+| `python3 tools/quality/rust-stable-collector/compare_historical_fixture.py --binary target/gh-259/stable-target/release/harness-gate-rust-stable-collector --output target/gh-259/historical-12` | Passed; `historical-12.log` |
+| `python3 tools/quality/rust-stable-collector/validate_lifecycle.py --binary target/gh-259/stable-target/release/harness-gate-rust-stable-collector --package target/gh-259/package-12/unsigned-package --output target/gh-259/lifecycle-12` | 38 passed; real RSA, mocked Sigstore; `lifecycle-12.log` |
+| `python3 tools/quality/rust-stable-collector/prepare_release.py --output target/gh-259/package-12 --target-dir "$PWD/target/gh-259/stable-target" --toolchain 1.97.1 --acceptance target/gh-259/acceptance-24/summary.json 60848db3d1742b91dacdccfb18486318700967f42baa2bdba52829a71fb95d73` | Passed locked offline build and package preparation; `package-12.log` and `package-12/preparation.json` |
 | `harness-gate config check`; `harness-gate verify --profile ci --all` | Not applicable: no `.harness-gate/flow.toml` declaring `ci`; neither was run |
 
 The registry suite first hit an offline test-setup failure while resolving the
@@ -313,7 +320,7 @@ required CI retains all other existing checks and does not bootstrap that backen
   a complete transitive `execve` audit did not run. Required CI now requests real
   release-build and runtime traces and fails if tracing fails; CI is pending.
 - The Core candidate certifies lexical complexity and bounded function execution
-  coverage for the declared limited owners. It does not certify line/region
+  and code-region coverage for the declared limited owners. It does not certify line
   coverage or CRAP and does not replace existing required measurements. Production request signing and project integration remain open.
 - Complete compiler input provenance, broader certified source/coverage owners, comprehensive
   adversarial coverage formats, complete negative matrices and reviewed migration
@@ -342,3 +349,62 @@ A direct `cargo run --quiet --locked --manifest-path tools/harness-gate/Cargo.to
 `Read-only file system (os error 30)` in `docs-default-target-probe.log`.
 The documented workspace-local `CARGO_TARGET_DIR` invocation passed; the failed
 report and log remain in `docs-consistency-12-default-target-failed.{json,log}`.
+
+
+## Exact-owner code-region checkpoint
+
+The [retained reproduction and Core results](stable-rust-candidate-evidence/region-coverage.json)
+show the preceding `e020ad59…` binary returning function execution 1/1 for the
+partially exercised `classify` function, while its actual LLVM record contains five
+covered code regions out of six. That binary exposed no normalized region metric.
+Original reproduction files remain at `target/gh-259/region-repro-01/`.
+
+The new `rust-llvm-exact-root-owner/v2-candidate` rule counts unique CodeRegion
+entries belonging to the existing exact source owner and counts nonzero execution
+counts as covered. This follows LLVM 22.1.6's
+[`sumRegions` and function summary implementation](https://github.com/llvm/llvm-project/blob/llvmorg-22.1.6/llvm/tools/llvm-cov/CoverageSummaryInfo.cpp).
+It rejects duplicate spans and requires the sum across all mapped owners,
+including explicitly excluded test owners, to match that file's region summary.
+Test regions participate in this reconciliation but never enter production ratios.
+This does not prove arbitrary counters are truthful after every possible coordinated
+rewrite; capture integrity, identities and the remaining LLVM checks still apply.
+
+Real plain and partial fixtures produce region ratios 6/6 and 5/6 respectively;
+the unexecuted function has its own actual 0/3 record in both. Their complexity
+counts remain 3 and 1. The partial raw export has 13 regions including tests, while
+its two production owners have only 9. Five authenticated Core cases now pass,
+including direct assertions on these normalized ratios and on required CRAP
+remaining blocked. No CRAP model or measurement migration has been accepted.
+The support metadata and normalization binary identity identify this candidate;
+no accepted historical series or required binding is upgraded automatically.
+
+Seven additional real checks bring the capture suite from 85 to 92: partial
+fixture preparation, capture, certified partial ratios, duplicate owner region,
+owner counter disagreement, and two internally consistent file/export-summary
+mutations (count and covered). The latter mutations pass local summary arithmetic
+but fail reconciliation with actual owner records. Release preparation requires
+the named checks. Rust tests, stable-only CI and the Core example retain the
+existing unsupported owner boundaries.
+
+The first region release build passed and `acceptance-23` recorded 92 successful
+checks, but package preparation rebuilt with explicit empty compiler environment
+variables and correctly rejected the different executable digest
+(`package-11.log`: `acceptance does not identify this candidate binary`). Those
+records are not final package acceptance. `region-build-02.log` uses the same
+explicit environment as preparation; `acceptance-24`, all five Core cases at
+`core-acceptance-*-17`, `historical-12`, `package-12` and `lifecycle-12` use the final
+`e2e3296e…` executable. The unsigned payload is four files totaling 3,132,634 bytes.
+Lifecycle checks use actual test RSA and mocked Sigstore, with 38 passed; the
+separate upgrade executable is `ed82b2bc…`. No production artifact was signed.
+
+The unmodified Core nextest command initially failed the existing
+`webhook_accepts_success_response` test with `io: Connection refused` under host
+proxy variables. The focused retry reproduced it, while a direct loopback socket
+probe succeeded. Removing proxy variables only from the test process made the
+focused test pass (`region-core-webhook-no-proxy-01.log`). The full no-proxy command
+passed all 397 tests. The inherited-proxy full run had four webhook failures;
+the initial fail-fast run stopped at the first. Results are recorded in the table
+above; failures remain in
+`region-core-nextest-01.log` and `region-core-nextest-02.log`, with the exact final
+environment adjustment in `region-core-nextest-03.json`. No Core implementation
+or network policy was changed.

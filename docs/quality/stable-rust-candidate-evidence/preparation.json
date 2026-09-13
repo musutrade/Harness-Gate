@@ -1,6 +1,6 @@
 {
   "acceptance_records": [
-    "d672ef27b0966ac54b085143464907b1ce38def3e38f6f3b75c14286395f934d"
+    "60848db3d1742b91dacdccfb18486318700967f42baa2bdba52829a71fb95d73"
   ],
   "commands": [
     {
@@ -55,8 +55,8 @@
         "--message-format=json"
       ],
       "exit_code": 0,
-      "stderr_sha256": "85c8dbac64ed6a362d668bf3988686e26e947620bb15cfdbe2e999a0ff8261b2",
-      "stdout_sha256": "2225fbef6ffde438aed6fd149c92149a5303b47becb0507cf8157866df57cf7a"
+      "stderr_sha256": "0b5fe2277fd2b29cc111b76604c482f8ec516047dbc0954657203c5614f4e4db",
+      "stdout_sha256": "ee93e378ff44bb0ce220fe63cdf9fbb0b8123fe682e6c6e298ceda92c3d98fca"
     }
   ],
   "compiler": {
@@ -814,7 +814,7 @@
   ],
   "inventory": {
     "bytes": 563,
-    "sha256": "4af07acca0cc1a559875277edf3054b8d722eda45a4a4aa70cd040649b588ecd"
+    "sha256": "133858e7f02c1ff0fb3e8258f6c41d37355591ae5724e69350295ca73f12c62a"
   },
   "license_scope": "conservative filtered Cargo graph including build dependencies plus Rust library notices",
   "network_download_bytes": 0,
@@ -824,12 +824,12 @@
       "sha256": "651f110cfd7fdf25f73e057669e8c421ed9911049d62e15d9211d3be2655d756"
     },
     "harness-gate-rust-stable-collector": {
-      "bytes": 1995304,
-      "sha256": "e020ad59faf78db0133f4a83105b18f0a39d9676ea21c24386dcb662ac476f73"
+      "bytes": 2002000,
+      "sha256": "e2e3296e90b8da095bfe98f504589faca27ade64565262697747567183cd3e6c"
     },
     "support.json": {
       "bytes": 924,
-      "sha256": "7b2dfaa408e8a6660f140b08a8655b0a1cbe3169797596d2cc66cf813e433e98"
+      "sha256": "5dee95b420290db37d7594bdb3c06d72af718b2c4ac44ca1279fded51367ea31"
     }
   },
   "production_ready": false,
@@ -860,20 +860,20 @@
       "sha256": "4706e08f6d86b846b8c88a649e51a42a45b7e2cceb727656c7287d5c2d1c4099"
     },
     "tools/quality/rust-stable-collector/prepare_release.py": {
-      "bytes": 16046,
-      "sha256": "3c7686e70d6d91247e1709887c559f99855e0f94ae53fd517c0690fc1c7cde00"
+      "bytes": 16260,
+      "sha256": "7648af382805351db4c3849ef302ab873ecffc962227a493e3a1b224489e14cc"
     },
     "tools/quality/rust-stable-collector/src/adapter.rs": {
-      "bytes": 13291,
-      "sha256": "67c3ad009c07793a7fc572d5dd54fb0e6ce0c7da8e19dc1433b75b3fd4556b82"
+      "bytes": 13486,
+      "sha256": "47adb3a2765458c20c5d2efe749a263085bb555e9ade5aed284feada07bd15e8"
     },
     "tools/quality/rust-stable-collector/src/artifact.rs": {
       "bytes": 3177,
       "sha256": "f8e25815474b0c7ae584bc783d0e4ad59bf80e8efe38e46d25a27129d3325950"
     },
     "tools/quality/rust-stable-collector/src/collect.rs": {
-      "bytes": 16130,
-      "sha256": "c2d9b319d616872e03d3abd39ef2aa3c7ff58bb7ab3fe7d43a598ee51b5464f7"
+      "bytes": 16172,
+      "sha256": "d6006656dc1e1523b6bdef45440e0ab5ede3a47062bc47586e9c51dcf4cfb457"
     },
     "tools/quality/rust-stable-collector/src/compiler_inputs.rs": {
       "bytes": 12465,
@@ -896,8 +896,8 @@
       "sha256": "5b1972a2c4b008c30eb0ba9155f777c66fb11e0c79fee1d3d4337d941038bef2"
     },
     "tools/quality/rust-stable-collector/src/ownership.rs": {
-      "bytes": 5570,
-      "sha256": "0f0cca68024d6c450f452e3cb85ef494a7182c8effbf32165a1a05acd7597c3a"
+      "bytes": 6729,
+      "sha256": "d26abbf19f899f8d3aafb1cf7cd9f6e9b483b14690e1a6de417ab028e6bfdfe6"
     },
     "tools/quality/rust-stable-collector/src/process.rs": {
       "bytes": 6509,
@@ -917,7 +917,7 @@
     },
     "tools/quality/rust-stable-collector/src/support.rs": {
       "bytes": 3207,
-      "sha256": "a4005068ad19361347a112f10aec6fdaaf7ac1c2e18aa37dcbbe101f92f3e508"
+      "sha256": "678e5e0dea864f391dede9ba1d3adff271cd1e9d60a86592295cb16fbea3b6bf"
     },
     "tools/quality/rust-stable-collector/src/tools.rs": {
       "bytes": 4692,
@@ -925,5 +925,5 @@
     }
   },
   "state": "unsigned-candidate-review-required",
-  "unsigned_package_bytes": 3125938
+  "unsigned_package_bytes": 3132634
 }

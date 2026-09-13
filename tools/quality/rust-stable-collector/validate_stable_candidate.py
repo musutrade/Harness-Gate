@@ -46,6 +46,7 @@ def main():
     fixtures = Path(__file__).resolve().parent.parent / 'fixtures/rust-stable'
     shutil.copytree(fixtures / 'plain', project)
     shutil.copytree(fixtures / 'boundaries', boundaries)
+    shutil.copytree(fixtures / 'partial', output / 'partial')
     records = []
     observations = {}
 
@@ -91,8 +92,19 @@ def main():
         description = run('certified-function-owners', ['describe', output / 'capture-plain', anchor['manifest_sha256'], anchor['request_sha256']])
         mapped = [o['coverage_owner'] for o in description['owners']]
         assert [o['coverage_function'] for o in mapped] == [{'type': 'ratio', 'covered': 1, 'total': 1}, {'type': 'ratio', 'covered': 0, 'total': 1}]
+        assert [o['coverage_region'] for o in mapped] == [{'type': 'ratio', 'covered': 6, 'total': 6}, {'type': 'ratio', 'covered': 0, 'total': 3}]
         observations['function_owners'] = mapped
         observations['plain'] = {'anchors': anchor, 'llvm_totals_test_inclusive': raw['data'][0]['totals'], 'lexical_functions': functions}
+        partial_request = write_request('partial', output / 'partial')
+        partial_anchor = run('partial', ['collect', partial_request], trace=True)
+        partial_description = run('certified-region-owners', ['describe', output / 'capture-partial', partial_anchor['manifest_sha256'], partial_anchor['request_sha256']])
+        partial_owners = [o['coverage_owner'] for o in partial_description['owners']]
+        assert [o['coverage_function'] for o in partial_owners] == [{'type': 'ratio', 'covered': 1, 'total': 1}, {'type': 'ratio', 'covered': 0, 'total': 1}]
+        assert [o['coverage_region'] for o in partial_owners] == [{'type': 'ratio', 'covered': 5, 'total': 6}, {'type': 'ratio', 'covered': 0, 'total': 3}]
+        partial_raw = json.loads((output / 'capture-partial/coverage.json').read_text())
+        assert partial_raw['data'][0]['totals']['regions']['count'] > 9, 'raw tests must be excluded from normalized owners'
+        observations['partial'] = {'anchors': partial_anchor, 'function_owners': partial_owners, 'llvm_totals_test_inclusive': partial_raw['data'][0]['totals']}
+
         assert not list((output / 'capture-plain').glob('build-*'))
         assert 'output must be a new directory' in run('stale-output', ['collect', request_path], success=False)
         verify('wrong-request-anchor', anchor, success=False, request_digest='0' * 64)
@@ -145,6 +157,8 @@ def main():
         unused_index = next(i for i, f in enumerate(llvm_functions) if f['name'].endswith('12never_called'))
         second_owner = {**llvm_functions[0], 'name': 'different-symbol-same-owner'}
         mutations.extend([
+            ('duplicate-owner-region', ['data', 0, 'functions', 0, 'regions'], llvm_functions[0]['regions'] + [llvm_functions[0]['regions'][0]], 'duplicate LLVM owner region span'),
+            ('owner-region-counter-disagreement', ['data', 0, 'functions', 0, 'regions', 1, 4], 0, 'LLVM owner regions disagree'),
             ('missing-llvm-owner', ['data', 0, 'functions'], llvm_functions[1:], 'source owner missing'),
             ('duplicate-llvm-symbol', ['data', 0, 'functions'], llvm_functions + [llvm_functions[0]], 'duplicate LLVM owner symbol'),
             ('multiple-llvm-owners', ['data', 0, 'functions'], llvm_functions + [second_owner], 'multiple LLVM records'),
@@ -153,6 +167,13 @@ def main():
             ('inherited-parent-count', ['data', 0, 'functions', unused_index, 'count'], 2, 'entry count mismatch'),
             ('unexecuted-owner-regions', ['data', 0, 'functions', unused_index, 'regions', 1, 4], 1, 'unexecuted LLVM owner'),
         ])
+        for field in ('count', 'covered'):
+            entry = json.loads(original_coverage)['data'][0]
+            for row in (entry['files'][0]['summary']['regions'], entry['totals']['regions']):
+                row[field] += 1 if field == 'count' else -1
+                row['percent'] = row['covered'] / row['count'] * 100
+                row['notcovered'] = row['count'] - row['covered']
+            mutations.append((f'owner-region-summary-{field}', ['data', 0], entry, 'LLVM owner regions disagree'))
         try:
             for label, path, replacement, error in mutations:
                 changed = json.loads(original_coverage)

@@ -557,7 +557,7 @@ jobs:
             --binary target/stable-candidate-build/release/harness-gate-rust-stable-collector \
             --output target/stable-candidate-checks/runtime --trace
           cargo build --manifest-path tools/harness-gate/Cargo.toml --bin harness-gate --example stable_collector_acceptance --locked
-          for fixture in plain boundaries features registry; do
+          for fixture in plain partial boundaries features registry; do
             candidate_env=()
             if [ "$fixture" = registry ]; then
               candidate_env=(env "CARGO_HOME=$PWD/target/stable-candidate-checks/runtime/registry-cargo-home")

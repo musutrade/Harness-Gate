@@ -42,7 +42,8 @@ A runnable stable Rust capture/source-analysis candidate now exercises the
 [implementation contract](../quality/stable-rust-collector.md). Its
 [actual validation](../quality/stable-rust-collector-validation.md) is partial:
 real Core request authentication and evidence validation now accept verified
-lexical complexity in a separate candidate series. Line/region coverage and CRAP remain unsupported;
+lexical complexity plus bounded function execution and code-region coverage in a separate
+candidate series. Line coverage and CRAP remain unsupported;
 Rust offline signed lifecycle transactions now have real RSA and interruption tests;
 real Sigstore verification, protected release preparation and the cross-toolchain/system
 acceptance matrix remain pending.
@@ -72,13 +73,14 @@ format contract: complete counter reconciliation, broad certified source owners 
 normalized coverage/CRAP are not complete. T4, T6–T8 remain unchecked; required
 metrics, migration review and the release hold are unchanged.
 
-The bounded T4 owner checkpoint adds `rust-llvm-exact-root-owner/v1-candidate`.
+The earlier bounded T4 owner checkpoint added `rust-llvm-exact-root-owner/v1-candidate`.
 ASCII source files containing unannotated, nongeneric root functions can join an
 exact unique LLVM region envelope to a source span; explicit test spans are
 excluded. Core accepts the resulting per-function execution ratio (1/1 or 0/1),
 not an intra-function coverage fraction. Missing/duplicate/cross-file owners and
 inconsistent entry counts are measurement errors; unsupported syntax and `impl
-Trait` never acquire coverage. Line/region coverage and all CRAP remain unsupported.
+Trait` never acquire coverage. At that checkpoint line/region coverage and all CRAP
+were unsupported; the v2 code-region checkpoint below supersedes the region limit.
 Actual owner mutations and authenticated Core checks are recorded in the validation
 record. T3–T8, migration review and the legacy release hold remain open.
 
@@ -114,3 +116,21 @@ CoverageReport::prepareFileReports define this relation. Eleven internally valid
 but mutually inconsistent mutations of real exports are required acceptance
 cases. This does not certify region/segment counter semantics, broaden function
 owners or enable intra-function coverage/CRAP. T3–T8 remain open.
+
+## Bounded code-region checkpoint (T4 remains incomplete)
+
+`rust-llvm-exact-root-owner/v2-candidate` extends the previous execution-only
+checkpoint with standard LLVM code-region coverage for the same exact root
+owners. Each distinct code-region span contributes one denominator entry; only
+its own nonzero counter contributes to covered. Duplicate spans and disagreement
+between all owner regions (including excluded tests) and the file summary fail
+measurement. Source activation/expansion boundaries do not broaden. Core receives
+`coverage.region` alongside lexical complexity and `coverage.function`.
+
+The real partial fixture exercises function execution 1/1 with region coverage
+5/6, plus an exported never-called owner at 0/1 and 0/3. Test code contributes to
+raw summaries but never to these production-owner ratios. This supersedes the
+execution-only checkpoint's region-unsupported statement; line coverage and all
+CRAP remain unsupported. The candidate does not select Core's CRAP model, change
+requiredness/thresholds, or authorize migration/baseline adoption. LLVM region
+coverage is not the historical MIR basic-block metric. T3–T8 remain open.
