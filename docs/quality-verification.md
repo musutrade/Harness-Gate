@@ -123,3 +123,9 @@ blocked, and successful hook execution reports full quality as `not_collected`.
 Profiles selecting collectors or policies retain their existing authenticated
 request and baseline requirements. This transport fix changes no engineering
 policy, threshold, requiredness, measurement series, debt or release authority.
+
+## Large native verification reports
+
+Core-generated quality and machine-result JSON can exceed the 16 MiB limit for untrusted text files. The writer redacts the structured model before serialization, preserving JSON structure, numerical evidence and complete arrays. Each string/key remains bounded to 16 MiB, nesting to 128 levels, and the invocation evidence byte budget remains 256 MiB. Credential-bearing values are replaced without producing malformed JSON.
+
+Only the exact SHA-256 of JSON produced and redacted by the current writer may pass the file-size boundary. Existing files, matching filenames or JSON extensions grant no exemption; modified generated output fails closed. External logs and evidence retain their existing 16 MiB limit. No quality policy, required capability, subject/series identity or baseline rule changes.

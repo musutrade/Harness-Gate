@@ -4,7 +4,7 @@ use crate::failure::FailureCode;
 use crate::net_policy::{is_local_only, normalize_host};
 use crate::project::Project;
 use crate::service::ResourceLease;
-use crate::utils::redaction::{redact_text, REDACTION_TEXT_LIMIT};
+use crate::utils::redaction::{redact_json, redact_text, REDACTION_TEXT_LIMIT};
 use anyhow::{bail, Context, Result};
 use serde::{ser::Serializer, Deserialize, Serialize};
 use serde_json::Value;
@@ -782,22 +782,24 @@ fn next_invocation_id() -> String {
 /// Report output boundary. The verifier produces a report model; this module
 /// owns serialization and optional result delivery.
 pub(super) fn write(report: &VerificationReport, project: &Project) -> Result<()> {
+    let mut generated = BTreeMap::new();
     if let Some(quality) = &report.quality {
         if !quality.project_report.is_null() {
-            write_report_file(
+            write_generated_json(
                 project,
                 "quality-project-report.json",
-                serde_json::to_vec_pretty(&quality.project_report)?,
+                redacted_json_bytes(&quality.project_report)?,
+                &mut generated,
             )?;
         }
     }
-    redact_invocation_files(project)?;
-    let failures = write_report_documents(report, project);
+    redact_invocation_files_with_generated(project, &generated)?;
+    let failures = write_report_documents(report, project, &mut generated);
     if !failures.is_empty() {
         return finish_incomplete_report(report, project, failures);
     }
 
-    redact_invocation_files(project)?;
+    redact_invocation_files_with_generated(project, &generated)?;
     let assessment = assess_evidence(report, project)?;
     if !assessment.complete() {
         let details = format_failures(&assessment.failures);
@@ -835,7 +837,11 @@ pub(super) fn write(report: &VerificationReport, project: &Project) -> Result<()
 
 /// Render all configured formats, retaining every error before finalization.
 /// A preliminary machine result remains incomplete until evidence is validated.
-fn write_report_documents(report: &VerificationReport, project: &Project) -> Vec<anyhow::Error> {
+fn write_report_documents(
+    report: &VerificationReport,
+    project: &Project,
+    generated: &mut BTreeMap<String, String>,
+) -> Vec<anyhow::Error> {
     // Publish an explicitly incomplete machine result first. Only the closed-
     // set validation below is allowed to replace it with a complete result.
     let preliminary = EvidenceAssessment {
@@ -847,11 +853,11 @@ fn write_report_documents(report: &VerificationReport, project: &Project) -> Vec
         }],
     };
     let mut failures = Vec::new();
-    match serde_json::to_string_pretty(&machine_result_with_assessment(report, &preliminary))
+    match redacted_json_bytes(&machine_result_with_assessment(report, &preliminary))
         .context("serialize verification report as JSON")
         .and_then(|json| {
-            ensure_supported_machine_result(json.as_bytes())?;
-            write_report_file(project, MACHINE_RESULT_FILE, json)
+            ensure_supported_machine_result(&json)?;
+            write_generated_json(project, MACHINE_RESULT_FILE, json, generated)
         }) {
         Ok(()) => {}
         Err(error) => failures.push(error),
@@ -1162,6 +1168,28 @@ fn report_target(project: &Project, relative: &str) -> Result<PathBuf> {
     Ok(target)
 }
 
+fn redacted_json_bytes(value: &impl Serialize) -> Result<Vec<u8>> {
+    let mut value = serde_json::to_value(value).context("serialize Core JSON model")?;
+    redact_json(&mut value)?;
+    let bytes = serde_json::to_vec_pretty(&value)?;
+    if bytes.len() as u64 > MAX_INVOCATION_EVIDENCE_BYTES {
+        bail!("generated JSON exceeds invocation evidence budget");
+    }
+    Ok(bytes)
+}
+
+fn write_generated_json(
+    project: &Project,
+    relative: &str,
+    bytes: Vec<u8>,
+    generated: &mut BTreeMap<String, String>,
+) -> Result<()> {
+    let digest = format!("{:x}", Sha256::digest(&bytes));
+    write_report_file(project, relative, bytes)?;
+    generated.insert(relative.into(), digest);
+    Ok(())
+}
+
 fn write_report_file(project: &Project, relative: &str, contents: impl AsRef<[u8]>) -> Result<()> {
     report_target(project, relative)?;
     crate::utils::fs::confined_atomic_write(
@@ -1181,7 +1209,7 @@ fn write_machine_result(
     _final: bool,
 ) -> Result<()> {
     let value = machine_result_with_assessment(report, assessment);
-    let contents = serde_json::to_vec_pretty(&value).context("serialize machine result")?;
+    let contents = redacted_json_bytes(&value).context("serialize machine result")?;
     ensure_supported_machine_result(&contents)?;
     write_report_file(project, MACHINE_RESULT_FILE, contents)
 }
@@ -1719,9 +1747,11 @@ fn binding_for(
 }
 
 fn sha256_file(path: &Path) -> Result<String> {
-    let mut file =
-        fs::File::open(path).with_context(|| format!("open artifact {}", path.display()))?;
+    let mut file = fs::File::open(path)
+        .with_context(|| format!("open artifact {}", path.display()))?
+        .take(MAX_INVOCATION_EVIDENCE_BYTES + 1);
     let mut hasher = Sha256::new();
+    let mut total = 0_u64;
     let mut buffer = [0_u8; 64 * 1024];
     loop {
         let read = file
@@ -1729,6 +1759,10 @@ fn sha256_file(path: &Path) -> Result<String> {
             .with_context(|| format!("read artifact {}", path.display()))?;
         if read == 0 {
             break;
+        }
+        total += read as u64;
+        if total > MAX_INVOCATION_EVIDENCE_BYTES {
+            bail!("artifact exceeds invocation evidence byte budget while hashing");
         }
         hasher.update(&buffer[..read]);
     }
@@ -1895,7 +1929,15 @@ fn format_failures(failures: &[MachineFailure]) -> String {
         .join("; ")
 }
 
+#[cfg(test)]
 fn redact_invocation_files(project: &Project) -> Result<()> {
+    redact_invocation_files_with_generated(project, &BTreeMap::new())
+}
+
+fn redact_invocation_files_with_generated(
+    project: &Project,
+    generated: &BTreeMap<String, String>,
+) -> Result<()> {
     if !project.reports.exists() {
         return Ok(());
     }
@@ -1912,10 +1954,15 @@ fn redact_invocation_files(project: &Project) -> Result<()> {
         bail!("report directory escapes project root");
     }
     let mut total_bytes = 0_u64;
-    redact_directory(&reports, &reports, &mut total_bytes)
+    redact_directory(&reports, &reports, &mut total_bytes, generated)
 }
 
-fn redact_directory(root: &Path, directory: &Path, total_bytes: &mut u64) -> Result<()> {
+fn redact_directory(
+    root: &Path,
+    directory: &Path,
+    total_bytes: &mut u64,
+    generated: &BTreeMap<String, String>,
+) -> Result<()> {
     if !directory.exists() {
         return Ok(());
     }
@@ -1928,7 +1975,7 @@ fn redact_directory(root: &Path, directory: &Path, total_bytes: &mut u64) -> Res
             .file_type()
             .with_context(|| format!("inspect evidence entry {}", path.display()))?;
         if file_type.is_dir() {
-            redact_directory(root, &path, total_bytes)?;
+            redact_directory(root, &path, total_bytes, generated)?;
             continue;
         }
         if !file_type.is_file() {
@@ -1939,9 +1986,6 @@ fn redact_directory(root: &Path, directory: &Path, total_bytes: &mut u64) -> Res
         // amplification path.
         let metadata = fs::symlink_metadata(&path)
             .with_context(|| format!("inspect evidence {}", path.display()))?;
-        if metadata.len() > REDACTION_TEXT_LIMIT as u64 {
-            bail!("text evidence exceeds redaction limit: {}", path.display());
-        }
         *total_bytes = total_bytes
             .checked_add(metadata.len())
             .ok_or_else(|| anyhow::anyhow!("invocation evidence byte budget overflow"))?;
@@ -1951,6 +1995,18 @@ fn redact_directory(root: &Path, directory: &Path, total_bytes: &mut u64) -> Res
                 MAX_INVOCATION_EVIDENCE_BYTES,
                 *total_bytes
             );
+        }
+        let relative = path.strip_prefix(root).context("resolve evidence path")?;
+        if let Some(expected) = relative.to_str().and_then(|name| generated.get(name)) {
+            // Only exact bytes redacted from the Core-owned model qualify. A
+            // filename, extension or pre-existing file grants no exemption.
+            if sha256_file(&path)? != *expected {
+                bail!("generated JSON changed after redaction: {}", path.display());
+            }
+            continue;
+        }
+        if metadata.len() > REDACTION_TEXT_LIMIT as u64 {
+            bail!("text evidence exceeds redaction limit: {}", path.display());
         }
         if path.file_name().and_then(|name| name.to_str()) == Some("manifest.json")
             || path
@@ -2744,6 +2800,85 @@ mod tests {
         std::fs::write(invocation.root.join("logs/unit.log"), "tampered\n").expect("tamper log");
         assert!(verify_manifest(&invocation_project).is_err());
         drop(invocation);
+    }
+
+    #[test]
+    fn large_core_quality_json_is_redacted_and_finalized_without_truncation() {
+        let (_workspace, _original, invocation, project, mut current) =
+            complete_invocation_fixture("large-native-quality-report");
+        let records = vec![
+            serde_json::json!({"source": "x".repeat(1024 * 1024),
+            "password": "opaque-large-report-secret", "covered": 9, "total": 10});
+            17
+        ];
+        current.passed = false;
+        current.quality = Some(crate::verify::quality::QualityResult {
+            schema: "quality-verification/v1",
+            status: "fail",
+            phase: "complete",
+            error: None,
+            selection: serde_json::Value::Null,
+            inputs: serde_json::Value::Null,
+            evidence: serde_json::json!([]),
+            baseline: serde_json::json!({"status":"available"}),
+            project_report: serde_json::json!({"aggregate":{"state":"fail"}, "gates":{}, "records":records}),
+            project_report_path: Some("quality-project-report.json".into()),
+            output: None,
+            formats: Default::default(),
+            evaluation_time: None,
+            participation: serde_json::json!({"profile":"full"}),
+            full_quality_status: "fail",
+            producers: serde_json::json!({"native":"collected"}),
+        });
+        write(&current, &project).expect("finalize large Core-owned report");
+        verify_manifest(&project).expect("large artifact digests remain verifiable");
+        for name in ["quality-project-report.json", MACHINE_RESULT_FILE] {
+            let bytes = std::fs::read(invocation.root.join(name)).unwrap();
+            assert!(bytes.len() > REDACTION_TEXT_LIMIT);
+            assert!(!String::from_utf8_lossy(&bytes).contains("opaque-large-report-secret"));
+            let value: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+            let report = if name == MACHINE_RESULT_FILE {
+                &value["quality"]["project_report"]
+            } else {
+                &value
+            };
+            assert_eq!(report["records"].as_array().unwrap().len(), 17);
+            assert_eq!(report["records"][16]["covered"], 9);
+            assert_eq!(report["aggregate"]["state"], "fail");
+        }
+    }
+
+    #[test]
+    fn generated_json_exemption_requires_the_exact_redacted_bytes() {
+        let (_workspace, _original, _invocation, project, _current) =
+            complete_invocation_fixture("generated-json-digest");
+        let mut generated = std::collections::BTreeMap::new();
+        let bytes =
+            super::redacted_json_bytes(&serde_json::json!({"password":"opaque-before"})).unwrap();
+        super::write_generated_json(
+            &project,
+            "quality-project-report.json",
+            bytes,
+            &mut generated,
+        )
+        .unwrap();
+        super::redact_invocation_files_with_generated(&project, &generated).unwrap();
+        std::fs::write(
+            project.reports.join("quality-project-report.json"),
+            r#"{"password":"opaque-after"}"#,
+        )
+        .unwrap();
+        let error =
+            super::redact_invocation_files_with_generated(&project, &generated).unwrap_err();
+        assert!(error.to_string().contains("changed after redaction"));
+        std::fs::File::create(project.reports.join("quality-project-report.json"))
+            .unwrap()
+            .set_len(REDACTION_TEXT_LIMIT as u64 + 1)
+            .unwrap();
+        assert!(redact_invocation_files(&project)
+            .unwrap_err()
+            .to_string()
+            .contains("redaction limit"));
     }
 
     #[test]
