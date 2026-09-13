@@ -29,6 +29,16 @@ remain intact. Unsupported or ambiguous measurement MUST NOT become success.
 
 Required CI MUST NOT build/run a compiler-private backend. New legacy publication
 MUST fail until the pure-Rust stable replacement has reviewed actual acceptance.
+Its execution audit MUST reject abbreviated or incomplete executable/argument
+records and MUST inspect decoded arguments after joining resumed calls by PID.
+Environment pointer/count output MUST NOT be presented as environment contents.
+
+#### Scenario: Incomplete or resumed execution record
+
+- GIVEN a required candidate execution trace with interleaved process records
+- WHEN a resumed call contains a forbidden argument or a call remains truncated,
+  unmatched or incomplete
+- THEN the audit fails; synthetic parser tests alone do not prove runtime acceptance.
 
 #### Scenario: Legacy publication request during migration
 

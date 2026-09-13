@@ -5,6 +5,7 @@ Requires an already built candidate, installed target toolchain and LLVM tools.
 No compiler bootstrap, install, baseline update or production publication.
 """
 import argparse
+import ast
 import hashlib
 import json
 import os
@@ -22,14 +23,44 @@ def digest(path):
 
 
 def check_trace(path):
-    """Check actual execve arguments, excluding intentionally rejected probes."""
-    text = path.read_text()
-    assert 'execve(' in text, 'empty execution trace'
-    for line in text.splitlines():
-        if 'execve(' not in line:
+    """Audit complete execve records from our untimestamped strace invocation.
+
+    Fail closed on abbreviated or incomplete arguments. Interleaved unfinished
+    syscalls must be joined by PID before inspecting their arguments. This does
+    not audit the environment behind strace's default pointer/count rendering.
+    """
+    quoted = r'"(?:[^"\\\n]|\\(?:[0-7]{1,3}|x[0-9a-fA-F]{2}|[abfnrtv\\"]))*"'
+    strings = rf'{quoted}(?:,\s*{quoted})*'
+    array = rf'\[(?:{strings})?\]'
+    environment = rf'(?:0x[0-9a-fA-F]+(?: /\* \d+ vars \*/)?|NULL|{array})'
+    complete = re.compile(rf'execve\({quoted},\s*{array},\s*{environment}\)\s*=\s*(?:0|-1 [A-Z0-9_]+ \([^\n]*\))')
+    pending = {}
+    count = 0
+    for line in path.read_text().splitlines():
+        match = re.fullmatch(r'(?:(?:\[pid\s+(\d+)\]|(\d+))\s+)?(.*)', line)
+        pid = match[1] or match[2] or 'main'
+        record = match[3]
+        if record.startswith('<... execve resumed>'):
+            assert pid in pending, f'unmatched execve resume: {line}'
+            record = pending.pop(pid) + record.removeprefix('<... execve resumed>')
+        elif record.startswith('execve('):
+            assert pid not in pending, f'duplicate unfinished execve: {line}'
+        elif not record or record.startswith(('--- ', '+++ ')):
             continue
-        assert not re.search(r'(?:/|")(python[^/" ]*|pypy[^/" ]*)"', line), line
-        assert not re.search(r'"-Z[^" ]*"|/nightly[-/]|"\+nightly|rustc-dev|rustc_driver|RUSTC_BOOTSTRAP=', line), line
+        else:
+            raise AssertionError(f'unrecognized execution trace record: {line}')
+        if record.endswith(' <unfinished ...>'):
+            pending[pid] = record.removesuffix(' <unfinished ...>')
+            continue
+        assert complete.fullmatch(record), f'incomplete or abbreviated execve: {record}'
+        count += 1
+        for literal in re.findall(quoted, record):
+            argument = ast.literal_eval(literal)
+            assert not re.search(r'(?:^|/)(?:python|pypy)[^/ ]*$', argument), record
+            assert not argument.startswith(('-Z', '+nightly')), record
+            assert not re.search(r'/nightly[-/]|rustc-dev|rustc_driver|RUSTC_BOOTSTRAP=', argument), record
+    assert not pending, f'unfinished execution trace: {pending}'
+    assert count, 'empty execution trace'
 
 
 def main():
