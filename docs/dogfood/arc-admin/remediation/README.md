@@ -1,5 +1,7 @@
 # GH-207 product gap remediation
 
+> Historical receipt: this page records the dated experiment below. For current native integration, released fixes and scoped cost observations, see the [2026-09-13 acceptance record](../../../quality/arc-native-20260913/README.md) and [release status](../../../release-status.md). Historical failures are preserved.
+
 This record implements OpenSpec tasks 8.1–8.4. It preserves the historical
 GH-204/205/206 receipts and the frozen Arc-Admin commands, requiredness, profiles,
 policies and measurement series. Native quality integration remains blocked and

@@ -1,24 +1,26 @@
 # Rust collector installation and independent release
 
-The collector **0.1.0-rc.2** and compressed installer **0.1.0-rc.3** are published.
+The collector **0.1.0-rc.3** and compressed installer **0.1.0-rc.4** are published.
 See [current release receipts and compatibility](../release-status.md). This guide
 supersedes the historical GH-229/GH-231 preparation instructions for normal use.
-The RC2 compatibility matrix includes Core 0.4.1 on the exact tested Linux
+The RC3 compatibility matrix includes Core 0.4.2 on the exact tested Linux
 x86_64 host. The original native capture and identical runtime payload are
 reused explicitly; the new manifest, installation and Core binding are verified.
 
 ## Recommended installation
 
+Use the immutable installer revision below for Core plus Rust. The v0.4.2 source tag predates this RC3 plugin delivery and retains its older Rust installer pin. Existing tags are not rewritten.
+
 Download the current Core installer from its immutable source revision:
 
 ```bash
 curl --fail --show-error --location --proto '=https' --tlsv1.2 \
-  https://raw.githubusercontent.com/musutrade/Harness-Gate/13722b0ba8781be106c160c422c07fbacb1bdc6e/install.sh \
+  https://raw.githubusercontent.com/musutrade/Harness-Gate/9ffa2b829ec25ca54fcb00a9bc720284c3913924/install.sh \
   -o /tmp/harness-gate-install.sh
 # Add only the optional plugin
 bash /tmp/harness-gate-install.sh --rust-only
-# Or install Core 0.4.1 and the plugin together
-bash /tmp/harness-gate-install.sh --version v0.4.1 --with-rust
+# Or install Core 0.4.2 and the plugin together
+bash /tmp/harness-gate-install.sh --version v0.4.2 --with-rust
 ```
 
 The root script pins the child installer's SHA-256. The child pins its private
@@ -53,7 +55,7 @@ is larger than the compressed download size.
 ## Offline installation
 
 On a connected machine, download **all twelve assets** from the
-[installer release](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-installer-v0.1.0-rc.3)
+[installer release](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-installer-v0.1.0-rc.4)
 into one directory. Add the official
 [cosign-linux-amd64 v3.1.3](https://github.com/sigstore/cosign/releases/download/v3.1.3/cosign-linux-amd64)
 with that exact filename and SHA-256
@@ -74,20 +76,20 @@ The installer still verifies every input and the reconstructed signed payload.
 
 ## Original signed assets and production trust
 
-The [signed RC2 release](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-v0.1.0-rc.2)
+The [signed RC3 release](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-v0.1.0-rc.3)
 retains exactly six assets: `collector.tar`, `manifest.json`, `sbom.spdx.json`,
 `provenance.json`, `release-inventory.json`, and `release-inventory.sig`.
 The production signature control contains RSA and Sigstore verification material;
 legacy RSA-only v1 trust is insufficient for this release. The production RSA
 key is 3072 bits (384-byte signatures). Public trust is carried by the separately
 authenticated installer, and the private key stays in the protected environment.
-See the [six-asset readback receipt](release-rc2/published-verification.json).
+See the [six-asset readback receipt](release-0.4.2/published-verification.json).
 
 Checks bind the entire inventory, payload hashes, source, provenance, exact ABI,
 and signer identity. Missing, extra, tampered or incompatible inputs fail closed.
 [Immutable source, notices and relink materials](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-materials-7165558-v1)
 and [per-file engineering review](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-review-7165558-v1)
-remain applicable to the identical runtime payload; [RC2 incremental review](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-materials-19d7ed5-v1) binds the new manifest and Core tuple. Installer and plugin versions remain independent.
+remain applicable to the identical runtime payload; [RC3 incremental review](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-materials-718bc5a-v1) binds the new manifest and Core tuple. Installer and plugin versions remain independent.
 
 ## Advanced lifecycle
 
@@ -97,10 +99,11 @@ Python 3.11+ and an independently pinned **v2** trust file. This advanced entry
 is distinct from the automatic shell installer. For example:
 
 ```bash
-python3 tools/release/install_collector.py --root /absolute/collector-root --trust /absolute/host/trust-v2.json select --version 0.1.0-rc.2
+python3 tools/release/install_collector.py --root /absolute/collector-root --trust /absolute/host/trust-v2.json select --version 0.1.0-rc.3
+# Roll back to the previously installed RC2, retained after upgrade
 python3 tools/release/install_collector.py --root /absolute/collector-root --trust /absolute/host/trust-v2.json rollback --version 0.1.0-rc.2
 python3 tools/release/install_collector.py --root /absolute/collector-root --trust /absolute/host/trust-v2.json recover
-python3 tools/release/install_collector.py --root /absolute/collector-root --trust /absolute/host/trust-v2.json uninstall --version 0.1.0-rc.2
+python3 tools/release/install_collector.py --root /absolute/collector-root --trust /absolute/host/trust-v2.json uninstall --version 0.1.0-rc.3
 ```
 
 Install and select print the exact version's launcher path. `current.json` is the
