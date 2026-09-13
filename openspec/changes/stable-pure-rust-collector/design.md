@@ -184,3 +184,25 @@ execution-only checkpoint's region-unsupported statement; line coverage and all
 CRAP remain unsupported. The candidate does not select Core's CRAP model, change
 requiredness/thresholds, or authorize migration/baseline adoption. LLVM region
 coverage is not the historical MIR basic-block metric. T3–T8 remain open.
+
+
+## Bounded T5 HTTPS transport
+
+The Rust `download-install` entry point takes a caller-pinned strict request listing
+only five assets with HTTPS URLs, SHA-256 and exact byte counts, plus separately
+pinned host signing trust. ureq/rustls performs bounded streaming, verified TLS and
+at most three validated absolute HTTPS redirects. The host may explicitly pin a
+private PEM root; a release cannot supply trust. No archives, interpreter, toolchain,
+latest-version discovery, unsigned fallback or dependency installer is involved.
+
+The installation lock spans network transfer, existing dual signature/support/
+launch checks and atomic selection. Each asset has a 1–120-second overall deadline;
+program/metadata caps are 64/8 MiB. The five assets consume at most 96 MiB before
+verification. Exact request/TLS/trust identities are rechecked. Received application
+body bytes, cache absence and abandoned interrupted staging are recorded separately;
+network framing is not claimed as measured. Failures preserve the active version.
+
+Real loopback TLS and test-RSA lifecycle fixtures validate this transport. Mocked
+Sigstore cannot satisfy production signing acceptance. Trusted public bootstrap,
+protected publication, two toolchains/systems and complete acceptance still block
+T5/T8; no release hold is removed by the downloader.

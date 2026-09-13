@@ -6,6 +6,7 @@ mod compiler_inputs;
 mod compiler_wrapper;
 mod coverage;
 mod dependencies;
+mod download;
 mod macro_model;
 mod ownership;
 mod process;
@@ -32,6 +33,7 @@ fn run() -> Result<()> {
         }
         ["release-verify", bundle, trust, digest, log] => println!("{}", release::verify(Path::new(bundle), Path::new(trust), digest, Path::new(log))?),
         ["install", bundle, trust, digest, root, log] => println!("{}", release::install(Path::new(bundle), Path::new(trust), digest, Path::new(root), Path::new(log))?),
+        ["download-install", request, request_digest, trust, digest, root, log] => println!("{}", release::download_install(Path::new(request), request_digest, Path::new(trust), digest, Path::new(root), Path::new(log))?),
         ["rollback", root, version, trust, digest, log] => println!("{}", release::rollback(Path::new(root), version, Path::new(trust), digest, Path::new(log))?),
         ["adapter", "--binding", path, "--binding-sha256", digest] => println!("{}", adapter::run(Path::new(path), digest)?),
         ["describe", root, anchor, request_digest] => println!("{}", adapter::describe(Path::new(root), anchor, request_digest)?),
@@ -51,7 +53,7 @@ fn run() -> Result<()> {
             collect::verify(Path::new(directory), anchor, request_digest)?;
             println!("{}", json!({"schema":"rust-stable-verification/v1", "integrity":"verified", "core_acceptance":"pending"}));
         }
-        _ => bail!("usage: harness-gate-rust-stable-collector --version | doctor PROJECT NEW_OUTPUT | prepare PROJECT NEW_OUTPUT DOCTOR.json [--registry-archives ARCHIVES.json] | collect REQUEST.json | verify OUTPUT MANIFEST_SHA256 REQUEST_SHA256 | describe OUTPUT MANIFEST_SHA256 REQUEST_SHA256 | observe-macro-template PROJECT default|branching NEW_OUTPUT | verify-macro-template PROJECT OBSERVATION SHA256 | adapter --binding FILE --binding-sha256 SHA256 | release-verify BUNDLE TRUST TRUST_SHA256 NEW_LOG | install BUNDLE TRUST TRUST_SHA256 ROOT NEW_LOG | rollback ROOT INVENTORY_SHA256 TRUST TRUST_SHA256 NEW_LOG"),
+        _ => bail!("usage: harness-gate-rust-stable-collector --version | doctor PROJECT NEW_OUTPUT | prepare PROJECT NEW_OUTPUT DOCTOR.json [--registry-archives ARCHIVES.json] | collect REQUEST.json | verify OUTPUT MANIFEST_SHA256 REQUEST_SHA256 | describe OUTPUT MANIFEST_SHA256 REQUEST_SHA256 | observe-macro-template PROJECT default|branching NEW_OUTPUT | verify-macro-template PROJECT OBSERVATION SHA256 | adapter --binding FILE --binding-sha256 SHA256 | release-verify BUNDLE TRUST TRUST_SHA256 NEW_LOG | install BUNDLE TRUST TRUST_SHA256 ROOT NEW_LOG | download-install REQUEST REQUEST_SHA256 TRUST TRUST_SHA256 ROOT NEW_LOG | rollback ROOT INVENTORY_SHA256 TRUST TRUST_SHA256 NEW_LOG"),
     }
     Ok(())
 }
