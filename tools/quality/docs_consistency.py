@@ -142,6 +142,12 @@ def engineering_policy_failures() -> list[str]:
         "Quality collector plugins",
         "A new application validation tool or framework must not require",
         "ADR-0049",
+        "Officially released plugins and required CI gates MUST NOT depend on unstable compiler APIs",
+        "first-party Rust quality collector MUST be implemented entirely in Rust",
+        "installed runtime MUST NOT require Python",
+        "Users install the documented external Rust/Cargo/coverage and project-native dependencies",
+        "New signing/publication of the legacy Python/compiler-private Rust collector and its installer is suspended",
+
     )
     failures = [f"engineering policy missing normative anchor: {phrase}" for phrase in required_phrases if phrase not in text]
     try:

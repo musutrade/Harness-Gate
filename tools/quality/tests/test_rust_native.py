@@ -15,6 +15,8 @@ sys.path.insert(0, str(QUALITY))
 import rust_native as native
 
 
+@unittest.skipUnless(os.environ.get('HARNESS_GATE_LEGACY_EXPERIMENT') == '1',
+                     'manual legacy experiment: unstable MIR backend excluded from required CI (ADR 0053)')
 class NativeEvidenceTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

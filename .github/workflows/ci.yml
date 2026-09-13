@@ -528,6 +528,39 @@ jobs:
           python3 -m unittest discover -s tools/quality/tests -v
           python3 -m py_compile tools/quality/*.py tools/quality/tests/*.py
 
+      - name: Install candidate's explicit stable dependencies
+        run: |
+          rustup toolchain install 1.97.1 --profile minimal --component llvm-tools-preview,rustfmt,clippy
+          cargo +1.97.1 install cargo-llvm-cov --version 0.9.0 --locked
+          sudo apt-get update
+          sudo apt-get install --yes strace
+
+      - name: Build and run pure Rust candidate with execution traces
+        env:
+          CARGO_TARGET_DIR: ${{ github.workspace }}/target/stable-candidate-build
+          RUSTUP_TOOLCHAIN: 1.97.1
+        run: |
+          mkdir -p target/stable-candidate-checks
+          cargo fmt --manifest-path tools/quality/rust-stable-collector/Cargo.toml -- --check
+          cargo test --manifest-path tools/quality/rust-stable-collector/Cargo.toml --locked
+          cargo clippy --manifest-path tools/quality/rust-stable-collector/Cargo.toml --all-targets --locked -- -D warnings
+          strace -f -qq -s 16384 -e trace=execve -o target/stable-candidate-checks/build.execve \
+            cargo build --manifest-path tools/quality/rust-stable-collector/Cargo.toml --release --locked
+          python3 -c 'from pathlib import Path; import sys; sys.path.insert(0, "tools/quality/rust-stable-collector"); from validate_stable_candidate import check_trace; check_trace(Path("target/stable-candidate-checks/build.execve"))'
+          python3 tools/quality/rust-stable-collector/validate_stable_candidate.py \
+            --binary target/stable-candidate-build/release/harness-gate-rust-stable-collector \
+            --output target/stable-candidate-checks/runtime --trace
+          readelf -d target/stable-candidate-build/release/harness-gate-rust-stable-collector \
+            > target/stable-candidate-checks/dynamic-libraries.txt
+
+      - name: Retain candidate acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stable-rust-candidate-checks
+          path: target/stable-candidate-checks/
+          if-no-files-found: error
+
   quality-required:
     name: Required Quality Aggregate
     if: ${{ always() }}
