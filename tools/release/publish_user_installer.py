@@ -77,8 +77,10 @@ def main():
              'Exact compatible components are reused; only missing content objects are acquired. '
              'Installation automatically verifies signatures and compiles a diagnostic before activation. '
              'For an offline kit also provision the pinned cosign verifier listed in installer-build.json.\n\n'
-             'Installer version '+packet['version']+' delivers the unchanged signed Rust plugin '+catalog['version']+'. '
-             'Supported host: '+json.dumps(catalog['host_abi'],sort_keys=True)+'.\n\n'
+             'Installer version '+packet['version']+' delivers the unchanged signed Rust plugin '+catalog['version']+'. '+
+             ('Required runtime dependencies: '+json.dumps(catalog['runtime_requirements'],sort_keys=True)
+              if catalog['schema'] == 'rust-collector-user-install/v3'
+              else 'Supported host: '+json.dumps(catalog['host_abi'],sort_keys=True))+'.\n\n'
              'Corresponding source, full notices and relink materials: '
              'https://github.com/'+assets.REPOSITORY+'/releases/tag/rust-collector-materials-7165558-v1 .\n\n'
              'This product includes software developed by the NetBSD Foundation, Inc. and its contributors.')

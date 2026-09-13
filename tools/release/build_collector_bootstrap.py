@@ -7,13 +7,14 @@ import argparse
 import io
 from pathlib import Path
 import tarfile
+import subprocess
 
 import collector_assets as assets
 
 RELEASE = Path(__file__).resolve().parent
 
 
-def build(runtime, output, *, user_entry=False):
+def build(runtime, output, *, user_entry=False, openssl=None):
     inventory = assets.read(runtime / 'runtime.json')['payload']
     files = {}
     for name, row in inventory.items():
@@ -23,6 +24,18 @@ def build(runtime, output, *, user_entry=False):
             assets.require(assets.sha(source) == row['sha256'], 'bootstrap runtime pin changed')
             destination = 'tools/quality/' + name[4:] if name.startswith('app/') else name
             files[destination] = (source.read_bytes(), row['mode'])
+    if openssl is not None:
+        assets.regular(openssl)
+        requirements = assets.read(runtime / 'runtime.json')['runtime_requirements']
+        result = subprocess.run(['readelf', '--wide', '--dynamic', '--version-info', str(openssl)],
+                                capture_output=True, text=True, check=True, env={'LC_ALL': 'C', 'PATH': '/usr/bin:/bin'})
+        needed, versions = assets.contract.dependencies.elf_requirements(result.stdout)
+        assets.require(all(name in assets.contract.dependencies.HOST_LIBRARIES or 'lib/' + name in files
+                           for name in needed), 'bootstrap verifier has an unpackaged dependency')
+        assets.require(all(assets.contract.dependencies.version(v) <=
+                           assets.contract.dependencies.version(requirements['libc_min']) for v in versions),
+                       'bootstrap verifier needs a newer libc than the signed runtime requirements')
+        files['bin/openssl'] = (openssl.read_bytes(), 0o755)
     for name in ('collector_assets.py', 'collector_sigstore.py', 'collector_release_policy.py',
                  'release_policy.py', 'install_collector.py', 'collector_receipt.py',
                  'collector_store.py', 'collector_maintenance.py', 'production_installer.py'):

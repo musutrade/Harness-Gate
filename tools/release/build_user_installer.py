@@ -42,6 +42,7 @@ for ((i=0;i<${#args[@]};i++)); do
         --plan) plan=true ;;
     esac
 done
+# @DEPENDENCY_PREFLIGHT@
 [[ "$policy" == allow || "$policy" == deny ]] || { echo 'Invalid download policy' >&2; exit 1; }
 [[ "$cache" == /* ]] || { echo 'Cache must be absolute' >&2; exit 1; }
 # Do not traverse caller-controlled links when bootstrapping the private interpreter.
@@ -102,6 +103,24 @@ export LD_LIBRARY_PATH="$stage/runtime/lib"
 '''
 
 
+def dependency_preflight(requirements):
+    assets.contract.dependencies.validate(requirements)
+    major, minor, patch = assets.contract.dependencies.version(requirements['libc_min'])
+    return rf'''for tool in uname dirname stat id mkdir mktemp tar gzip sha256sum flock getconf cp mv rm cat; do
+    command -v "$tool" >/dev/null || {{ echo "Missing installation dependency: $tool; install it with your package manager." >&2; exit 1; }}
+done
+if [[ -z "$offline" && "$policy" == allow ]]; then
+    command -v curl >/dev/null || {{ echo 'Missing download dependency: curl.' >&2; exit 1; }}
+fi
+observed_libc=$(getconf GNU_LIBC_VERSION) || {{ echo 'glibc runtime required.' >&2; exit 1; }}
+[[ "$observed_libc" =~ ^glibc\ ([0-9]+)\.([0-9]+)(\.([0-9]+))?$ ]] || {{ echo 'Unrecognized glibc runtime.' >&2; exit 1; }}
+major=${{BASH_REMATCH[1]}} minor=${{BASH_REMATCH[2]}} patch=${{BASH_REMATCH[4]:-0}}
+if (( major < {major} || (major == {major} && minor < {minor}) || (major == {major} && minor == {minor} && patch < {patch}) )); then
+    echo "Dependency incompatible: glibc >= {requirements['libc_min']} required; found $observed_libc. Select compatible runtime components." >&2
+    exit 1
+fi'''
+
+
 def object_locations(descriptor, base_url):
     """Keep each immutable GitHub release below its 1,000-asset limit."""
     return {digest: base_url + '-objects-' + str(index // 900 + 1)
@@ -131,7 +150,9 @@ def build(release, runtime, trust, output, base_url, prepared_transport=None):
         descriptor = transport.pack(release / 'collector.tar', output)
     transport.validate(descriptor)
     capsule = output / 'installer-bootstrap.tar'
-    receipt = bootstrap.build(runtime, capsule, user_entry=True)
+    requirements = assets.contract.dependencies.requirements_for_manifest(manifest)
+    receipt = bootstrap.build(runtime, capsule, user_entry=True,
+                              openssl=Path(trust['openssl']) if requirements else None)
     compressed = output / 'installer-bootstrap.tar.gz'
     with capsule.open('rb') as src, compressed.open('xb') as dst:
         with gzip.GzipFile(filename='', fileobj=dst, mode='wb', mtime=0) as gz:
@@ -160,12 +181,18 @@ def build(release, runtime, trust, output, base_url, prepared_transport=None):
                'compatibility': {key: manifest[key] for key in
                    ('collector', 'protocol', 'core_compatibility', 'host_abi', 'tools', 'measurement', 'capabilities')}}
     maximum = sum(b['size'] for b in descriptor['objects'].values()) + compressed.stat().st_size + sum(r['size'] for r in controls) + profile['verifier']['size']
+    if requirements:
+        catalog['schema'] = 'rust-collector-user-install/v3'
+        catalog['runtime_requirements'] = requirements
+        catalog['compatibility']['runtime_requirements'] = requirements
+        catalog['compatibility']['schema'] = manifest['schema']
     bootstrap_plan = {'phase': 'bootstrap', 'bootstrap': row(compressed),
         'reason': 'pinned private installer interpreter; reused from digest cache on subsequent runs',
         'maximum_total_download_bytes_before_reuse': maximum,
         'components': [{'path': r['path'], 'object': r['sha256'], 'expanded_bytes': r['size'], 'compressed_bytes': descriptor['objects'][r['sha256']]['size']} for r in descriptor['payloads']],
         'metadata': controls, 'verifier': profile['verifier']}
-    script = TEMPLATE.replace('@BOOTSTRAP_PLAN@', json.dumps(bootstrap_plan, sort_keys=True)).replace('@CATALOG@', json.dumps(catalog, sort_keys=True))
+    preflight = dependency_preflight(requirements) if requirements else ''
+    script = TEMPLATE.replace('# @DEPENDENCY_PREFLIGHT@', preflight).replace('@BOOTSTRAP_PLAN@', json.dumps(bootstrap_plan, sort_keys=True)).replace('@CATALOG@', json.dumps(catalog, sort_keys=True))
     script = script.replace('@BASE@', base_url).replace('@BOOTSTRAP@', compressed.name).replace('@SHA@', assets.sha(compressed))
     (output / 'install-rust.sh').write_text(script)
     (output / 'install-rust.sh').chmod(0o755)

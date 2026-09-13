@@ -12,6 +12,7 @@ import subprocess
 import harness_evidence as evidence
 import rust_collector_contract as contract
 import rust_native_driver as native
+import rust_runtime_requirements as dependencies
 
 
 PROTOCOL = {'request': 'harness-collector-request/v1', 'response': 'harness-collector-response/v1',
@@ -41,10 +42,13 @@ def observe(root, core_path, core_id):
     native.require(version(core_path, '--version') == 'harness-gate ' + core_id['version'],
                    'wrong released Core version')
     inventory = json.loads((root / 'runtime.json').read_text())
-    libraries = {k: native.file_hash(v['source']) for k, v in inventory['host']['libraries'].items()}
-    native.require(platform.system() == 'Linux' and platform.machine() == 'x86_64', 'unsupported host ABI')
-    host = {'target': 'x86_64-unknown-linux-gnu', 'glibc': os.confstr('CS_GNU_LIBC_VERSION'),
-            'kernel': platform.release(), 'runtime_dependencies_sha256': contract.fingerprint(libraries)}
+    if inventory['schema'] == 'rust-collector-runtime/2':
+        host = dependencies.probe(inventory['runtime_requirements'])
+    else:
+        libraries = {k: native.file_hash(v['source']) for k, v in inventory['host']['libraries'].items()}
+        native.require(platform.system() == 'Linux' and platform.machine() == 'x86_64', 'unsupported host ABI')
+        host = {'target': 'x86_64-unknown-linux-gnu', 'glibc': os.confstr('CS_GNU_LIBC_VERSION'),
+                'kernel': platform.release(), 'runtime_dependencies_sha256': contract.fingerprint(libraries)}
     compiler_libraries = list((root / 'rust/lib').glob('librustc_driver-*.so'))
     native.require(len(compiler_libraries) == 1, 'missing/ambiguous rustc driver library')
     llvm = root / 'rust/lib/rustlib/x86_64-unknown-linux-gnu/bin'
@@ -107,7 +111,7 @@ def require_measurement_identity(root, manifest, binding):
                        identity['configuration_sha256'] == binding['config_digest'],
                        'wrong delivered measurement identity')
     else:
-        native.require(manifest['schema'] == 'rust-collector-delivery/v2' and
+        native.require(manifest['schema'] in ('rust-collector-delivery/v2', 'rust-collector-delivery/v3') and
                        identity['configuration_authority'] == 'quality-trusted-state/v1',
                        'unknown project configuration authority')
         # Core authenticates the exact project/config/series in its request.
