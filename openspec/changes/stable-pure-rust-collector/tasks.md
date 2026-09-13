@@ -135,3 +135,24 @@ share SHA-256 `e2e3296e90b8da095bfe98f504589faca27ade64565262697747567183cd3e6c`
 Only Rust 1.97.1 on the recorded Ubuntu environment ran. T3–T8 remain unchecked;
 two-toolchain/system, real signing/process trace, complete owner/input boundaries
 and reviewed migration remain required before removing the release hold.
+
+## Bounded HTTPS lifecycle checkpoint (T5 remains incomplete)
+
+The Rust executable now downloads an explicit digest-pinned request's five assets
+with verified TLS, bounded redirects/body sizes/deadlines and exact length/hash
+checks. Existing host-pinned RSA/cosign, support, executable-version and atomic
+activation checks follow transport while retaining the installation lock. Failed
+or killed updates preserve the prior version. No trust bootstrap, release discovery,
+unsigned fallback or toolchain download is added; the release hold stays active.
+
+The final stable binary passes 29 real loopback HTTPS checks, including distinct
+compiled upgrade/rollback and request/TLS-root mutation during transfer. Initial
+and upgrade signed-test downloads are 4,790,111 and 4,790,201 body bytes. TLS and RSA
+are real test fixtures; Sigstore is mocked. The same binary passes 92 capture,
+26 macro, five authenticated Core and 38 local lifecycle checks; Core 397, quality
+444 (36 manual legacy skips), release 91, formatting and clippy pass. Exact logs,
+prior failed attempts and byte measurements are recorded in
+`docs/quality/stable-rust-candidate-evidence/https-download.json` and the validation
+document. Second toolchain/system, actual process tracing, public distribution,
+real dual-signature, protected trust bootstrap and release review remain pending.
+These results do not complete T5 or T8, authorize publication or adopt a baseline.

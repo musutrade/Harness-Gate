@@ -548,11 +548,15 @@ jobs:
         run: |
           mkdir -p target/stable-candidate-checks
           cargo fmt --manifest-path tools/quality/rust-stable-collector/Cargo.toml -- --check
-          cargo test --manifest-path tools/quality/rust-stable-collector/Cargo.toml --locked
+          env -u RUSTFLAGS -u RUSTDOCFLAGS -u CARGO_ENCODED_RUSTFLAGS \
+            -u RUSTC_WRAPPER -u RUSTC_WORKSPACE_WRAPPER \
+            cargo test --manifest-path tools/quality/rust-stable-collector/Cargo.toml --locked
           cargo clippy --manifest-path tools/quality/rust-stable-collector/Cargo.toml --all-targets --locked -- -D warnings
           strace -f -qq -s 16384 -e trace=execve -o target/stable-candidate-checks/build.execve \
             cargo build --manifest-path tools/quality/rust-stable-collector/Cargo.toml --release --locked
           python3 -c 'from pathlib import Path; import sys; sys.path.insert(0, "tools/quality/rust-stable-collector"); from validate_stable_candidate import check_trace; check_trace(Path("target/stable-candidate-checks/build.execve"))'
+          # The collector rejects inherited compiler injection, including empty flags.
+          unset RUSTFLAGS RUSTDOCFLAGS CARGO_ENCODED_RUSTFLAGS RUSTC_WRAPPER RUSTC_WORKSPACE_WRAPPER
           python3 tools/quality/rust-stable-collector/validate_stable_candidate.py \
             --binary target/stable-candidate-build/release/harness-gate-rust-stable-collector \
             --output target/stable-candidate-checks/runtime --trace
@@ -591,6 +595,10 @@ jobs:
             --binary target/stable-candidate-build/release/harness-gate-rust-stable-collector \
             --package target/stable-candidate-checks/package/unsigned-package \
             --output target/stable-candidate-checks/lifecycle --trace
+          python3 tools/quality/rust-stable-collector/validate_download.py \
+            --binary target/stable-candidate-build/release/harness-gate-rust-stable-collector \
+            --lifecycle target/stable-candidate-checks/lifecycle \
+            --output target/stable-candidate-checks/download --trace
           readelf -d target/stable-candidate-build/release/harness-gate-rust-stable-collector \
             > target/stable-candidate-checks/dynamic-libraries.txt
 

@@ -5,6 +5,66 @@ complete; T3–T8 remain open. The [design](stable-rust-collector.md) defines th
 boundary. No Core required binding, threshold, baseline or historical evidence
 was changed. No compiler-private backend was built or executed for these results.
 
+## HTTPS lifecycle checkpoint
+
+The candidate now implements `download-install` in Rust using pinned ureq/rustls.
+The preceding executable rejects the same complete invocation; its original
+digest and error are retained in the [HTTPS evidence](stable-rust-candidate-evidence/https-download.json).
+The new stable release is `b876d72b536ff2a809bea7da62a7d4e1b33a670666cca99438462e456f3e3b95`,
+3,476,032 bytes. Its exact five-asset request is separately pinned, bounded and
+downloaded over verified HTTPS before the existing signature and activation checks.
+No release discovery or trust bootstrap is implied. The
+[lifecycle contract](stable-rust-collector-lifecycle.md#explicit-https-download-and-installation)
+defines redirects, deadlines, host trust and interrupted staging.
+
+Real loopback HTTPS acceptance passes 29 checks: installation, distinct compiled
+upgrade, rollback, certificate/hostname failures, HTTP/redirect/length/encoding/hash
+failures, timeout, truncation, signature failure and SIGKILL. Request and TLS-root
+changes during transfer also fail before any verifier/launch command, despite all
+five downloaded assets having matching hashes. Every failed update preserves the
+previous selection and executable digest. TLS uses an actual test CA/server leaf;
+RSA uses real test signatures; Sigstore is explicitly mocked. Neither public
+hosting nor production signatures have been accepted.
+
+The unsigned four-file payload is 4,789,642 bytes. The signed test bundle downloads
+4,790,111 bytes initially and 4,790,201 bytes for the independently compiled
+upgrade. The network matrix reads 37,467,211 response-body bytes including failed
+partial transfers; HTTP headers, TLS/proxy overhead and the killed process's
+unwritten audit are excluded. The killed download leaves zero file bytes in this
+run; it can leave bounded unselected files in other executions. Download cache is
+zero. The separate local lifecycle matrix retains 9,580,312 bytes for two versions,
+4,790,201 interrupted staging bytes, and 14,371,141 bytes including installation
+metadata. Compiler/build caches, test keys and acceptance files stay outside the
+release payload. The new TLS dependencies' archives, source identities and notices
+passed package preparation; production license review remains pending.
+
+The final binary passes 19 Rust tests, 92 real generic capture checks, 26 macro
+checks, five authenticated Core fixture cases, and 38 local lifecycle checks.
+Core nextest passes 397 tests with only test-process proxy variables removed;
+quality discovery passes 444 tests with 36 manual legacy skips; release discovery
+passes 91 tests. Candidate/Core formatting and clippy pass. Exact commands and
+original log identities are retained in the HTTPS evidence. ELF inspection lists
+only libc/libgcc runtime dependencies; it does not replace the transitive process
+trace, which remains unavailable locally and required in CI.
+
+Earlier failed invocations are retained: explicit empty compiler flag variables
+caused one Rust runtime test to reject its environment; unsetting those variables
+passed without weakening the test. The CI step had inherited the same empty
+release-build flags: its unit command now unsets those variables, and the runtime
+phase unsets them after the traced build. The exact unit command under the CI
+parent environment passes all 19 tests; runtime environment rejection remains
+strict. The repository shell installer integrity suite also passes. The first TLS fixture incorrectly used a CA
+certificate as its leaf and was rejected; a separate leaf fixed the fixture.
+An initial Core harness invocation omitted the capture directory and returned a
+usage error; the corrected five invocations passed. The preceding 27-check network
+run used older signed fixtures and is superseded by the final 29-check run.
+
+Rust 1.98.1, a second runnable Linux system, actual process tracing and real
+Sigstore acceptance remain unavailable as documented below. Generated-owner/CRAP
+certification and reviewed migration remain unfinished. T3–T8 stay unchecked and
+the release hold stays active. Subsequent sections retain historical checkpoint
+identities and are not acceptance for this new executable.
+
 ## Macro span diagnostic follow-up
 
 The [stable span diagnostic](stable-rust-macro-observation.md#stable-span-diagnostic)
@@ -22,7 +82,7 @@ section. T4 and release acceptance remain incomplete.
 
 ## Shared-generator checkpoint
 
-The current executable adds the [bounded macro source observer](stable-rust-macro-observation.md),
+That checkpoint's executable adds the [bounded macro source observer](stable-rust-macro-observation.md),
 sharing our ordinary Rust generator with the actual procedural macro. Its release
 SHA-256 is `8227f231adea15a433f194e67bfd45b0e2647911e628cece5f8b54a234b94f43`
 and its size is 2,084,496 bytes. The [macro regression record](stable-rust-candidate-evidence/macro-observation.json)
@@ -387,7 +447,9 @@ required CI retains all other existing checks and does not bootstrap that backen
 - Rust offline verification/install/upgrade/rollback now pass real RSA and
   transaction tests. Unsigned package preparation and an authenticated notice inventory
   are implemented. Protected signing/publication, production license review, trusted
-  bootstrap, downloader/cache accounting and full release acceptance remain open.
+  bootstrap and full release acceptance remain open. The HTTPS checkpoint above
+  adds explicit pinned transport and measured body/cache bytes; public distribution
+  and production signature acceptance remain pending.
   The Sigstore verifier is unavailable locally (`cosign version`: no such file
   or directory). The [continuation probes](stable-rust-candidate-evidence/continuation-environment.json)
   retain this error and the installed toolchain list.

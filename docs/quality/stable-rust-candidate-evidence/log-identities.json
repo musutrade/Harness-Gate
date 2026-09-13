@@ -1961,6 +1961,241 @@
       "path": "target/quality/docs-consistency.json",
       "bytes": 1488,
       "sha256": "783fa28054d5b7e4d554790af14ab4b29b2ded0e50ab7081ee30b65e043a1310"
+    },
+    {
+      "path": "target/gh-259/acceptance-27/summary.json",
+      "bytes": 24074,
+      "sha256": "2fe12ae97bdb7845325d69d8f8754c6ef301d163cba892044bfade8379ac5934"
+    },
+    {
+      "path": "target/gh-259/core-20-boundaries/summary.json",
+      "bytes": 5130,
+      "sha256": "7649696891aebbf2fb644918acb150f0e7f845524a4aa58d98f532490d8c5721"
+    },
+    {
+      "path": "target/gh-259/core-20-features/summary.json",
+      "bytes": 5126,
+      "sha256": "c54767b6470a8f2aaf2cab12b3b7a1fc24e1d3ae4f53934a2abe3fe2c85ca54f"
+    },
+    {
+      "path": "target/gh-259/core-20-partial/summary.json",
+      "bytes": 4447,
+      "sha256": "5ac8785981bc3cf2f202578ca43b70a51311fd01bda8f76b0b58ec274e711e74"
+    },
+    {
+      "path": "target/gh-259/core-20-plain/summary.json",
+      "bytes": 4443,
+      "sha256": "88b296f9a4361846d4bc698b68c50015324065da3a8c105d8f306b9d813dfd63"
+    },
+    {
+      "path": "target/gh-259/core-20-registry/summary.json",
+      "bytes": 4203,
+      "sha256": "1f612eefce7fbc917afc110dab4be29d44cb6dce2eb7b7f8881d5046848c8230"
+    },
+    {
+      "path": "target/gh-259/download-acceptance01.log",
+      "bytes": 814,
+      "sha256": "11ed5c49d672a4f5bad1395084ae3dee789b04d1c24e0a9b162c710fe540afdd"
+    },
+    {
+      "path": "target/gh-259/download-acceptance02.log",
+      "bytes": 101,
+      "sha256": "8583a05c4ea4a473319c37b03daf50b8634ef1ca29063dd65f5ec12fca473f21"
+    },
+    {
+      "path": "target/gh-259/download-acceptance03/summary.json",
+      "bytes": 51787,
+      "sha256": "943d79f635ec375643edfb886e7a0d3ec2d72fc3f8a0ccf27c13b6270e7f6b33"
+    },
+    {
+      "path": "target/gh-259/download-acceptance03.log",
+      "bytes": 101,
+      "sha256": "2cc2b2bceffb5b9b06bc19811ab370796bf13d3a9971125e2f699388f737e7e3"
+    },
+    {
+      "path": "target/gh-259/download-before.json",
+      "bytes": 1546,
+      "sha256": "c23a68490ea97df8f9e909e672a8fca1874899a5772b5c1a644d98351a5cbed5"
+    },
+    {
+      "path": "target/gh-259/download-build01.log",
+      "bytes": 746,
+      "sha256": "08e2a3075da3a513c07758f1759e1dc50eb8f8af00e6fae221c5710d05b1d846"
+    },
+    {
+      "path": "target/gh-259/download-ci-unit-environment.log",
+      "bytes": 1865,
+      "sha256": "1ef48bc0dfb652d0677db4e08168b88c88faa487bec44a3c43711b16497b53c5"
+    },
+    {
+      "path": "target/gh-259/download-clippy01.log",
+      "bytes": 756,
+      "sha256": "d2816f6df5cbcf4395b4e6ffc3f766b57eba460498da039ad038b73e57edac9a"
+    },
+    {
+      "path": "target/gh-259/download-collection27.log",
+      "bytes": 117,
+      "sha256": "d498ee4dfc51b402996bd9553434a5d07786212b35cbb2cb4352ff7da063b497"
+    },
+    {
+      "path": "target/gh-259/download-core-clippy.log",
+      "bytes": 72,
+      "sha256": "e736d608af4933d92144949c87701ac8f4de67b152ddfb1a7507d4d66022e032"
+    },
+    {
+      "path": "target/gh-259/download-core-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-259/download-core-nextest.json",
+      "bytes": 389,
+      "sha256": "c56348685c37db49895b84175fc037ba2dbf97411d7dec2532886e04787e75e3"
+    },
+    {
+      "path": "target/gh-259/download-core-nextest.log",
+      "bytes": 55037,
+      "sha256": "183b8dd79bdc4b543b3f5dff742b2ce0bef64ae9f3b7649d392d4f9435bbb988"
+    },
+    {
+      "path": "target/gh-259/download-core19-commands.json",
+      "bytes": 474,
+      "sha256": "3b345cb309e25ff26bc0825ec5fc84abebcc7b33b0d11b33aa4e24060f1b9f71"
+    },
+    {
+      "path": "target/gh-259/download-core19-plain.log",
+      "bytes": 130,
+      "sha256": "df2428aa7a3793ff298ce90eab6c38bdfdc4c594852c34f6cb63880e7e4ca81b"
+    },
+    {
+      "path": "target/gh-259/download-core20-boundaries.log",
+      "bytes": 102,
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+    },
+    {
+      "path": "target/gh-259/download-core20-commands.json",
+      "bytes": 2773,
+      "sha256": "66dfece96fde155ee24611ead3fa20d5ab119b81a81d29851dc2782a77d75f8d"
+    },
+    {
+      "path": "target/gh-259/download-core20-features.log",
+      "bytes": 102,
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+    },
+    {
+      "path": "target/gh-259/download-core20-partial.log",
+      "bytes": 102,
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+    },
+    {
+      "path": "target/gh-259/download-core20-plain.log",
+      "bytes": 102,
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+    },
+    {
+      "path": "target/gh-259/download-core20-registry.log",
+      "bytes": 102,
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+    },
+    {
+      "path": "target/gh-259/download-docs-consistency-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-259/download-docs-consistency.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-259/download-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-259/download-historical14.log",
+      "bytes": 139,
+      "sha256": "3cdb6391e49125fb44a4fb4c7134ab7d04e1e0ccef1dd4fce10bb881e5626907"
+    },
+    {
+      "path": "target/gh-259/download-install-shell.log",
+      "bytes": 213,
+      "sha256": "9ded19064fc7914af9a3a0dc4586054cd709862cf0117677fbea335b5a653a7c"
+    },
+    {
+      "path": "target/gh-259/download-lifecycle14.log",
+      "bytes": 108,
+      "sha256": "9b2917f659a5accbb7c3f3e992434e885a37c261919a8f630e309d40385c7ad1"
+    },
+    {
+      "path": "target/gh-259/download-lock.log",
+      "bytes": 415,
+      "sha256": "23b3359281745abe2395e69da64fe5d6e899063d0b7500a7d1d80ce6965296e7"
+    },
+    {
+      "path": "target/gh-259/download-macros14.log",
+      "bytes": 74,
+      "sha256": "1e4f283d753b484af4cc846a30d30950381e46158229bb7deff97130a6bedac1"
+    },
+    {
+      "path": "target/gh-259/download-package14-command.json",
+      "bytes": 349,
+      "sha256": "122b2b5d28e80cb3ca1fd4b374aeb00b1518ce0c77189ed5ddfa7a981dc44631"
+    },
+    {
+      "path": "target/gh-259/download-package14.log",
+      "bytes": 148,
+      "sha256": "f767e5691b7aa1d23c63b4962edb05f41aa1c43d0a6569db2253d30cb5baca5e"
+    },
+    {
+      "path": "target/gh-259/download-quality-tests.log",
+      "bytes": 77459,
+      "sha256": "5ec307e149a58fa7e0a10cf69866076f91b0d5a2cee2ae2d4b070cf3ded86f35"
+    },
+    {
+      "path": "target/gh-259/download-readelf.log",
+      "bytes": 1537,
+      "sha256": "feae0ea9f3ca380e5c301a92caf9fa0ec2b3cb2ccf00c40874c38fa26e94333d"
+    },
+    {
+      "path": "target/gh-259/download-release-tests.log",
+      "bytes": 14290,
+      "sha256": "5216c990ce0679b074340060644df8cf879921795911577dd496bedafda863f7"
+    },
+    {
+      "path": "target/gh-259/download-tests01.log",
+      "bytes": 3019,
+      "sha256": "5ece8895b41353335f1e1306b2af3fccad1d5c44ba62f3b0d8c1e241eecc99e3"
+    },
+    {
+      "path": "target/gh-259/download-tests02.log",
+      "bytes": 2010,
+      "sha256": "0919992af3c8b338b1ce685b378e07be42a21e9d2dc117f359b6a88f7b0eaad7"
+    },
+    {
+      "path": "target/gh-259/historical14/comparison.json",
+      "bytes": 9650,
+      "sha256": "180ff4487107c3b43c76b80abd0ad906c74994e8e0fe4f027f626dca38ad8012"
+    },
+    {
+      "path": "target/gh-259/lifecycle14/summary.json",
+      "bytes": 6260,
+      "sha256": "74f3714422801515b1e94486981077df337f57df6af5603af1f00ff3e881c159"
+    },
+    {
+      "path": "target/gh-259/macros-14/summary.json",
+      "bytes": 30363,
+      "sha256": "17e745998008dbb533b42dcea433c061811c334a91c07d9e51d7ec65090102df"
+    },
+    {
+      "path": "target/gh-259/package-14/preparation.json",
+      "bytes": 47370,
+      "sha256": "0602be16e72d276bb29b446778c9a893744df6e6ef2c925e07a147f012e75b80"
+    },
+    {
+      "path": "target/quality/docs-consistency.json",
+      "bytes": 1488,
+      "sha256": "23cc5b69a9bef3983cc948f186dacfeb93f60185342cb1455a8d85099e8deebb"
     }
   ]
 }

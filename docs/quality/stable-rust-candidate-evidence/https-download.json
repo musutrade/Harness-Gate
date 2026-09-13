@@ -1,0 +1,3401 @@
+{
+  "schema": "rust-stable-https-checkpoint/v1",
+  "state": "partial; T3-T8 incomplete; legacy release hold retained",
+  "binary": {
+    "path": "target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+    "bytes": 3476032,
+    "sha256": "b876d72b536ff2a809bea7da62a7d4e1b33a670666cca99438462e456f3e3b95"
+  },
+  "before": {
+    "argv": [
+      "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/package13/unsigned-package/harness-gate-rust-stable-collector",
+      "download-install",
+      "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/download-acceptance03/install.request.json",
+      "0f86037a53e260ee682f901c047d8e71213f0fc90185044be4a36224c6ac0579",
+      "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle14/test-only-host-trust/trust.json",
+      "188828ebb9b4ee723e8df85f9caead64604052351f95b5ffd30590341b7a752a",
+      "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/download-acceptance03/installation",
+      "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/download-before-log"
+    ],
+    "binary_sha256": "8227f231adea15a433f194e67bfd45b0e2647911e628cece5f8b54a234b94f43",
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "{\"message\":\"usage: harness-gate-rust-stable-collector --version | doctor PROJECT NEW_OUTPUT | prepare PROJECT NEW_OUTPUT DOCTOR.json [--registry-archives ARCHIVES.json] | collect REQUEST.json | verify OUTPUT MANIFEST_SHA256 REQUEST_SHA256 | describe OUTPUT MANIFEST_SHA256 REQUEST_SHA256 | observe-macro-template PROJECT default|branching NEW_OUTPUT | verify-macro-template PROJECT OBSERVATION SHA256 | adapter --binding FILE --binding-sha256 SHA256 | release-verify BUNDLE TRUST TRUST_SHA256 NEW_LOG | install BUNDLE TRUST TRUST_SHA256 ROOT NEW_LOG | rollback ROOT INVENTORY_SHA256 TRUST TRUST_SHA256 NEW_LOG\",\"schema\":\"rust-stable-error/v1\",\"state\":\"measurement_error\"}\n",
+    "new_log_created": false
+  },
+  "preparation": {
+    "record": {
+      "path": "target/gh-259/package-14/preparation.json",
+      "bytes": 47370,
+      "sha256": "0602be16e72d276bb29b446778c9a893744df6e6ef2c925e07a147f012e75b80"
+    },
+    "commands": [
+      {
+        "argv": [
+          "rustc",
+          "+1.97.1",
+          "-vV"
+        ],
+        "exit_code": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_sha256": "b2bdf493bcf6d1dc55181a0efc2774b6d9cf7bf5c8dcc5bed592c994b2ad38c4"
+      },
+      {
+        "argv": [
+          "rustc",
+          "+1.97.1",
+          "--print",
+          "sysroot"
+        ],
+        "exit_code": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_sha256": "7c71e167b6531b3e9265e13cbab8f303c665aa2541dc4ac7698c979560486d5d"
+      },
+      {
+        "argv": [
+          "cargo",
+          "+1.97.1",
+          "metadata",
+          "--manifest-path",
+          "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/Cargo.toml",
+          "--locked",
+          "--offline",
+          "--format-version",
+          "1",
+          "--filter-platform",
+          "x86_64-unknown-linux-gnu"
+        ],
+        "exit_code": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_sha256": "aca2eb868f4cff43add111eb90fa187ac212b4a1bf38062ba31e0f9ef6c74793"
+      },
+      {
+        "argv": [
+          "cargo",
+          "+1.97.1",
+          "build",
+          "--manifest-path",
+          "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/Cargo.toml",
+          "--release",
+          "--locked",
+          "--offline",
+          "--message-format=json"
+        ],
+        "exit_code": 0,
+        "stderr_sha256": "2d5694fb348541fae3d68a033b004800c9c79f8f6edb468d5763b1d8f389597a",
+        "stdout_sha256": "3dd9cbd71b3a4f2564b28837c4c7264c98f9928f896bc054ffc099fb24c117b6"
+      }
+    ],
+    "compiler": {
+      "bytes": 645000,
+      "sha256": "d3a664c970a9fd8361b64194861bebc1ae37b9054e5ee3400dc1c9e691797eea"
+    },
+    "source": {
+      "LICENSE": {
+        "bytes": 1082,
+        "sha256": "5b9835780a3cd7518d7637c6730a26c1141d24a00a413364264c2a4091c0e6d9"
+      },
+      "tools/quality/fixtures/rust-macro-observation/Cargo.lock": {
+        "bytes": 1367,
+        "sha256": "7e749927e1048ef9dd72dbdeff7e559d7415e1cd4eb387430059a3a7399a42d3"
+      },
+      "tools/quality/fixtures/rust-macro-observation/Cargo.toml": {
+        "bytes": 73,
+        "sha256": "f7e71f9c95397029349e3f44c39be846b6d016c097a54c068401dcdb09d7c1ad"
+      },
+      "tools/quality/fixtures/rust-macro-observation/consumer/Cargo.toml": {
+        "bytes": 188,
+        "sha256": "116086e10273b649e4563f3ab01664372bb4711ff554c7ab3620621f178b4186"
+      },
+      "tools/quality/fixtures/rust-macro-observation/generator/Cargo.toml": {
+        "bytes": 233,
+        "sha256": "a15f42bd0ef45e1a2dfe2d0d621c05952437f29c171ffa36ea43433a4fcbe2e5"
+      },
+      "tools/quality/fixtures/rust-macro-observation/generator/src/lib.rs": {
+        "bytes": 2448,
+        "sha256": "afcffe5c527216247fdbffa9ef6e1d4543e1ee8e3742337f337d5cab3997ea13"
+      },
+      "tools/quality/fixtures/rust-macro-observation/macros/Cargo.toml": {
+        "bytes": 245,
+        "sha256": "3e7a9eeaf09af33c6d9ff22dec0f8890510bb9ac689bd61207f2899cac409760"
+      },
+      "tools/quality/fixtures/rust-macro-observation/macros/src/lib.rs": {
+        "bytes": 289,
+        "sha256": "085a4a2684c9a9374e249218872be5fd18f4b8227b062c03785e635eb446546c"
+      },
+      "tools/quality/rust-stable-collector/Cargo.lock": {
+        "bytes": 24777,
+        "sha256": "8b3ccf1106ee8c9ac0e97881f56b7418007a7781e8a2e80d6ae02e33e7ecba01"
+      },
+      "tools/quality/rust-stable-collector/Cargo.toml": {
+        "bytes": 1031,
+        "sha256": "e9077f8e2c60846081d327a2eaebf6babfedd4fa9b61130b53a3736da23f1182"
+      },
+      "tools/quality/rust-stable-collector/prepare_release.py": {
+        "bytes": 16681,
+        "sha256": "083481878e58aa596b1c207f13965eab729d5e563e664a4bf1e361ce675b3ff8"
+      },
+      "tools/quality/rust-stable-collector/src/adapter.rs": {
+        "bytes": 13486,
+        "sha256": "47adb3a2765458c20c5d2efe749a263085bb555e9ade5aed284feada07bd15e8"
+      },
+      "tools/quality/rust-stable-collector/src/artifact.rs": {
+        "bytes": 3177,
+        "sha256": "f8e25815474b0c7ae584bc783d0e4ad59bf80e8efe38e46d25a27129d3325950"
+      },
+      "tools/quality/rust-stable-collector/src/collect.rs": {
+        "bytes": 16172,
+        "sha256": "d6006656dc1e1523b6bdef45440e0ab5ede3a47062bc47586e9c51dcf4cfb457"
+      },
+      "tools/quality/rust-stable-collector/src/compiler_inputs.rs": {
+        "bytes": 12465,
+        "sha256": "228068d528e62fd6ae12c0e65cbdcc52b35279be73d3ac2c2741960386c78911"
+      },
+      "tools/quality/rust-stable-collector/src/compiler_wrapper.rs": {
+        "bytes": 5970,
+        "sha256": "b065bb68f010271735b16b525bf48ef15da2afa32e2e0d000441246232d2a98d"
+      },
+      "tools/quality/rust-stable-collector/src/coverage.rs": {
+        "bytes": 8718,
+        "sha256": "9a6e6dd07070da44342822336de48b4a1ce6e8666ddf2570dc4047aa93d2f7bf"
+      },
+      "tools/quality/rust-stable-collector/src/dependencies.rs": {
+        "bytes": 12561,
+        "sha256": "406fcd4ded9fbf168fa4c9ccab23ba6c320edaac9327723d60233d36b31d274b"
+      },
+      "tools/quality/rust-stable-collector/src/download.rs": {
+        "bytes": 8023,
+        "sha256": "e86c3d0e47eeb18f5c6b8e5ff6ff6645a96522c4dafbed0457b0990e3115e880"
+      },
+      "tools/quality/rust-stable-collector/src/macro_model.rs": {
+        "bytes": 10662,
+        "sha256": "0843c7135aefd4433d41388eb6713dc99cc22048d0375a5b847f23a41fc0e7e1"
+      },
+      "tools/quality/rust-stable-collector/src/main.rs": {
+        "bytes": 4805,
+        "sha256": "ade99ed04441527e7b4f5eb94a6f5a762527dad132fd9c7e1d4283b8fb635014"
+      },
+      "tools/quality/rust-stable-collector/src/ownership.rs": {
+        "bytes": 6729,
+        "sha256": "d26abbf19f899f8d3aafb1cf7cd9f6e9b483b14690e1a6de417ab028e6bfdfe6"
+      },
+      "tools/quality/rust-stable-collector/src/process.rs": {
+        "bytes": 6509,
+        "sha256": "0bc1aa5b5928ff2e9fb1baabf7acf8686063406f204159a58f3928e23b67bb05"
+      },
+      "tools/quality/rust-stable-collector/src/release.rs": {
+        "bytes": 21406,
+        "sha256": "a555dfce129568cdb6b5c4e9cf2d4849d53f75d3e40bdfc6d696ecd5c5c4d8b8"
+      },
+      "tools/quality/rust-stable-collector/src/source.rs": {
+        "bytes": 9398,
+        "sha256": "a2d6c4730e8c489464a643cbf09fa293a40c9d8ce00d104bf181f9d97559ad00"
+      },
+      "tools/quality/rust-stable-collector/src/strict_json.rs": {
+        "bytes": 4051,
+        "sha256": "f391825570ec6795578be6ac83a1c85e59493358c44f48e063c67ec07538c4dc"
+      },
+      "tools/quality/rust-stable-collector/src/support.rs": {
+        "bytes": 3207,
+        "sha256": "678e5e0dea864f391dede9ba1d3adff271cd1e9d60a86592295cb16fbea3b6bf"
+      },
+      "tools/quality/rust-stable-collector/src/tools.rs": {
+        "bytes": 4692,
+        "sha256": "cd0d52404cfa1bbff5d2e135f8e9eb6950af7afad403a336dac9928df80fe7f7"
+      }
+    },
+    "payload": {
+      "LICENSE": {
+        "bytes": 1312123,
+        "sha256": "4cec384f7847b51b9398bd4d44358544922f12252512c0195d8f7725c00abf4b"
+      },
+      "harness-gate-rust-stable-collector": {
+        "bytes": 3476032,
+        "sha256": "b876d72b536ff2a809bea7da62a7d4e1b33a670666cca99438462e456f3e3b95"
+      },
+      "support.json": {
+        "bytes": 924,
+        "sha256": "75dc2743cb6843ab490d3536e89b1c5f35132db1bf7c149a797be9d5d389cc68"
+      }
+    },
+    "inventory": {
+      "bytes": 563,
+      "sha256": "951cee16baddcf6b069ac2ab2996ea27848178053c15528b6272e104d24011d4"
+    },
+    "unsigned_package_bytes": 4789642,
+    "signed_package_bytes": null,
+    "production_ready": false,
+    "publication_blockers": [
+      "reviewed measurement migration",
+      "two toolchains and two systems",
+      "production license review",
+      "real dual-signature acceptance",
+      "protected release approval"
+    ],
+    "license_scope": "conservative filtered Cargo graph including build dependencies plus Rust library notices",
+    "dependencies": [
+      {
+        "crate_sha256": "320119579fcad9c21884f5c4861d16174d0e06250625266f50fe6898340abefa",
+        "license_expression": "0BSD OR MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-0BSD": "861399f8c21c042b110517e76dc6b63a2b334276c8cf17412fc3c8908ca8dc17",
+          "LICENSE-APACHE": "8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb",
+          "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        "package": "adler2",
+        "version": "2.0.1"
+      },
+      {
+        "crate_sha256": "330a5ed07fa54e4702c9d6c4174f74427fc0ef6e214bbd677ae50a5099946470",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+          "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        "package": "anyhow",
+        "version": "1.0.104"
+      },
+      {
+        "crate_sha256": "f2032f911046de80f0a198e0901378627c33f59ea0ac00e363d481118bd70a53",
+        "license_expression": "Apache-2.0 OR MIT",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "27995d58ad5c1145c1a8cd86244ce844886958a35eb2b78c6b772748669999ac"
+        },
+        "package": "autocfg",
+        "version": "1.5.1"
+      },
+      {
+        "crate_sha256": "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "0dd882e53de11566d50f8e8e2d5a651bcf3fabee4987d70f306233cf39094ba7"
+        },
+        "package": "base64",
+        "version": "0.22.1"
+      },
+      {
+        "crate_sha256": "ac07cdecf99051d9a5238b80f35af32cdeba5b336e55d957b318b50137e18da5",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "ab499c75a0f0da8e0fe83bf9ba3a27e5c39705310f07107c6c66b69958d2401c"
+        },
+        "package": "base64",
+        "version": "0.23.1"
+      },
+      {
+        "crate_sha256": "2af50177e190e07a26ab74f8b1efbfe2ef87da2116221318cb1c2e82baf7de06",
+        "license_expression": "Apache-2.0 OR MIT",
+        "notices": {
+          "LICENSE-APACHE": "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+          "LICENSE-MIT": "2d1c57bff28344b9e698f51063bc8509799cc4c99a4e0cf2aa3f7e7c3e1f9a9d"
+        },
+        "package": "base64ct",
+        "version": "1.8.3"
+      },
+      {
+        "crate_sha256": "b588b76d00fde79687d7646a9b5bdf3cc0f655e0bbd080335a95d7e96f3587da",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+        },
+        "package": "bitflags",
+        "version": "2.13.1"
+      },
+      {
+        "crate_sha256": "3078c7629b62d3f0439517fa394996acacc5cbc91c5a20d8c658e77abd503a71",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+          "LICENSE-MIT": "d5c22aa3118d240e877ad41c5d9fa232f9c77d757d4aac0c2f943afc0a95e0ef"
+        },
+        "package": "block-buffer",
+        "version": "0.10.4"
+      },
+      {
+        "crate_sha256": "fc652a48c352aef3ea3aed32080501cf3ef6ed5da78602a020c991775b0aff04",
+        "license_expression": "MIT",
+        "notices": {
+          "LICENSE": "45f522cacecb1023856e46df79ca625dfc550c94910078bd8aec6e02880b3d42"
+        },
+        "package": "bytes",
+        "version": "1.12.1"
+      },
+      {
+        "crate_sha256": "005ec2760ca554fae18df7a11195552ec576cd665632a881bc011d5bb2fd4d80",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+        },
+        "package": "cc",
+        "version": "1.4.5"
+      },
+      {
+        "crate_sha256": "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+        },
+        "package": "cfg-if",
+        "version": "1.0.4"
+      },
+      {
+        "crate_sha256": "c2459377285ad874054d797f3ccebf984978aa39129f6eafde5cdc8315b612f8",
+        "license_expression": "Apache-2.0 OR MIT",
+        "notices": {
+          "LICENSE-APACHE": "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+          "LICENSE-MIT": "bada9e7ed8dc00d63502053c455d7c8d7575dfb7e8277a2a832531844d900682"
+        },
+        "package": "const-oid",
+        "version": "0.9.6"
+      },
+      {
+        "crate_sha256": "59ed5838eebb26a2bb2e58f6d5b5316989ae9d08bab10e0e6d103e656d1b0280",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+          "LICENSE-MIT": "ae9baa7beea910273c2f384c2a6b721fb7bd02bda3436074a1072e4ee689f985"
+        },
+        "package": "cpufeatures",
+        "version": "0.2.17"
+      },
+      {
+        "crate_sha256": "8498c871161e1742aaa9d52551b2d6ebdd4c3d45a3be423e3728f33b955be550",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+          "LICENSE-MIT": "61d383b05b87d78f94d2937e2580cce47226d17823c0430fbcad09596537efcf"
+        },
+        "package": "crc32fast",
+        "version": "1.5.1"
+      },
+      {
+        "crate_sha256": "78c8292055d1c1df0cce5d180393dc8cce0abec0a7102adb6c7b1eef6016d60a",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+          "LICENSE-MIT": "3521672491a3479422d5fe1aca6645dd2984090f85da6e5205abfb18fb7a6897"
+        },
+        "package": "crypto-common",
+        "version": "0.1.7"
+      },
+      {
+        "crate_sha256": "e7c1832837b905bbfb5101e07cc24c8deddf52f93225eee6ead5f4d63d53ddcb",
+        "license_expression": "Apache-2.0 OR MIT",
+        "notices": {
+          "LICENSE-APACHE": "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+          "LICENSE-MIT": "ad64fcb9589f162720f3cc5010ad76ca6ad3764e11861f9192c489df176bb71d"
+        },
+        "package": "der",
+        "version": "0.7.10"
+      },
+      {
+        "crate_sha256": "9ed9a281f7bc9b7576e61468ba615a66a5c8cfdff42420a70aa82701a3b1e292",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+          "LICENSE-MIT": "9e0dfd2dd4173a530e238cb6adb37aa78c34c6bc7444e0e10c1ab5d8881f63ba"
+        },
+        "package": "digest",
+        "version": "0.10.7"
+      },
+      {
+        "crate_sha256": "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f",
+        "license_expression": "Apache-2.0 OR MIT",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "7365cc8878a1d7ce155a58c4ca09c3d7a6be413efa5334a80ea842912b669349"
+        },
+        "package": "equivalent",
+        "version": "1.0.2"
+      },
+      {
+        "crate_sha256": "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "8764a597675778ddfd4e25f81b08a05dbcf089ac05662df7613fe67f150e3aa2"
+        },
+        "package": "errno",
+        "version": "0.3.14"
+      },
+      {
+        "crate_sha256": "da7c62ceae207dd37ea5b845da6a0696c799f85e97da1ab5b7910be3c1c80223",
+        "license_expression": "Apache-2.0 OR MIT",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        "package": "fastrand",
+        "version": "2.5.0"
+      },
+      {
+        "crate_sha256": "5c287a33c7f0a620c38e641e7f60827713987b3c0f26e8ddc9462cc69cf75759",
+        "license_expression": "MIT/Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+        },
+        "package": "filetime",
+        "version": "0.2.29"
+      },
+      {
+        "crate_sha256": "3e0f1c7c3a72c66fd80abe965175f7523475c0489a87d3ff9d6e8c87d87a9d2d",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+        },
+        "package": "find-msvc-tools",
+        "version": "0.1.12"
+      },
+      {
+        "crate_sha256": "6e634e2e0ebac1ee034020da1ca582e17ffe4e0f5e985823721e168928136dcb",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "025436edff4cfcdde17a5811fdea78892d8482efd1abdec5a17872d07a4f2112"
+        },
+        "package": "flate2",
+        "version": "1.1.10"
+      },
+      {
+        "crate_sha256": "85649ca51fd72272d7821adaf274ad91c288277713d9c18820d8499a7ff69e9a",
+        "license_expression": "MIT",
+        "notices": {
+          "LICENSE": "c09aae9d3c77b531f56351a9947bc7446511d6b025b3255312d3e3442a9a7583"
+        },
+        "package": "generic-array",
+        "version": "0.14.7"
+      },
+      {
+        "crate_sha256": "ff2abc00be7fca6ebc474524697ae276ad847ad0a6b3faa4bcb027e9a4614ad0",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "aaff376532ea30a0cd5330b9502ad4a4c8bf769c539c87ffe78819d188a18ebf",
+          "LICENSE-MIT": "42fa16951ce7f24b5a467a40e5b449a1d41e662f97ca779864f053f39e097737"
+        },
+        "package": "getrandom",
+        "version": "0.2.17"
+      },
+      {
+        "crate_sha256": "300e883d756b2e4ec94e02791f39b04b522276138852cfc41d9fb7e904106099",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "aaff376532ea30a0cd5330b9502ad4a4c8bf769c539c87ffe78819d188a18ebf",
+          "LICENSE-MIT": "523a42c25d245dde9c015f882cec7f4555aad883382a6cf19b4b7d9b2cd5419b"
+        },
+        "package": "getrandom",
+        "version": "0.4.3"
+      },
+      {
+        "crate_sha256": "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "ff8f68cb076caf8cefe7a6430d4ac086ce6af2ca8ce2c4e5a2004d4552ef52a2"
+        },
+        "package": "hashbrown",
+        "version": "0.17.1"
+      },
+      {
+        "crate_sha256": "918d3568bebf352712bc2ef3d46a8bcf1a75b373be6539de198e9105cbbf9ce0",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "8bb1b50b0e5c9399ae33bd35fab2769010fa6c14e8860c729a52295d84896b7a",
+          "LICENSE-MIT": "dc91f8200e4b2a1f9261035d4c18c33c246911a6c0f7b543d75347e61b249cff"
+        },
+        "package": "http",
+        "version": "1.5.0"
+      },
+      {
+        "crate_sha256": "6dbf3de79e51f3d586ab4cb9d5c3e2c14aa28ed23d180cf89b4df0454a69cc87",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "391a5396cec6230bfabd4ef4eb2350eb895bc5efce377a2218f5702ed020d3e3"
+        },
+        "package": "httparse",
+        "version": "1.10.1"
+      },
+      {
+        "crate_sha256": "d466e9454f08e4a911e14806c24e16fba1b4c121d1ea474396f396069cf949d9",
+        "license_expression": "Apache-2.0 OR MIT",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "ecc269ef87fd38a1d98e30bfac9ba964a9dbd9315c3770fed98d4d7cb5882055"
+        },
+        "package": "indexmap",
+        "version": "2.14.0"
+      },
+      {
+        "crate_sha256": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+          "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        "package": "itoa",
+        "version": "1.0.18"
+      },
+      {
+        "crate_sha256": "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "0621878e61f0d0fda054bcbe02df75192c28bde1ecc8289cbd86aeba2dd72720"
+        },
+        "package": "lazy_static",
+        "version": "1.5.0"
+      },
+      {
+        "crate_sha256": "3eaf3ede3fee6db1a4c2ee091bf8a8b4dccdc6d17f656fb07896ee72867612f2",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+          "LICENSE-MIT": "123a331b5dbf04c30097fa43b8f858bc85df671fe776de498d01f3d6b7c1f69e"
+        },
+        "package": "libc",
+        "version": "0.2.189"
+      },
+      {
+        "crate_sha256": "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981",
+        "license_expression": "MIT",
+        "notices": {
+          "LICENSE.txt": "3823dda7cf046602f4b4e77ec8e227863dc4736037cc85bb33d9f19febe16bb7"
+        },
+        "package": "libm",
+        "version": "0.2.16"
+      },
+      {
+        "crate_sha256": "32a66949e030da00e8c7d4434b251670a91556f4144941d37452769c25d58a53",
+        "license_expression": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+        "notices": {
+          "COPYRIGHT": "3290ae0fbc9ddb77d2239121d710f0bb9d31b3b4744e6d97fe01e652b4c1870b",
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-Apache-2.0_WITH_LLVM-exception": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        "package": "linux-raw-sys",
+        "version": "0.12.1"
+      },
+      {
+        "crate_sha256": "f9f8bd3e56ce4dfc153cf470fffbfa98c7620958b312ca5c3a4b8d5181fd13c6",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+        },
+        "package": "log",
+        "version": "0.4.34"
+      },
+      {
+        "crate_sha256": "cf8baf1c55e62ffcace7a9f06f4bd9cd3f0c4beb022d3b367256b91b87513d98",
+        "license_expression": "Unlicense OR MIT",
+        "notices": {
+          "COPYING": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f",
+          "LICENSE-MIT": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f",
+          "UNLICENSE": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c"
+        },
+        "package": "memchr",
+        "version": "2.8.3"
+      },
+      {
+        "crate_sha256": "b63fbc4a50860e98e7b2aa7804ded1db5cbc3aff9193adaff57a6931bf7c4b4c",
+        "license_expression": "MIT OR Zlib OR Apache-2.0",
+        "notices": {
+          "LICENSE": "4108245a1f2df9d4e94df8abed5b4ba0759bb2f9b40a6b939f1be141077ae50b",
+          "LICENSE-APACHE.md": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+          "LICENSE-MIT.md": "799e9ca9d179295ef372f25d3769cdda7d25bb2668add6a6a1e22d1e4c678b8d",
+          "LICENSE-ZLIB.md": "0a54e647fe54104658b5e563c04c6f9edf251710e47bce692e0bd990a4ddaa39"
+        },
+        "package": "miniz_oxide",
+        "version": "0.9.1"
+      },
+      {
+        "crate_sha256": "e661dda6640fad38e827a6d4a310ff4763082116fe217f279885c97f511bb0b7",
+        "license_expression": "MIT/Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+        },
+        "package": "num-bigint-dig",
+        "version": "0.8.6"
+      },
+      {
+        "crate_sha256": "7ce2d95d4b3734dc35aa2f45e1aa22cd416814592a4f9d9205e11affd5b8e10b",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+        },
+        "package": "num-integer",
+        "version": "0.1.47"
+      },
+      {
+        "crate_sha256": "c92800bd69a1eac91786bcfe9da64a897eb72911b8dc3095decbd07429e8048b",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+        },
+        "package": "num-iter",
+        "version": "0.1.46"
+      },
+      {
+        "crate_sha256": "071dfc062690e90b734c0b2273ce72ad0ffa95f0c74596bc250dcfd960262841",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+        },
+        "package": "num-traits",
+        "version": "0.2.19"
+      },
+      {
+        "crate_sha256": "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        "package": "once_cell",
+        "version": "1.21.4"
+      },
+      {
+        "crate_sha256": "88b39c9bfcfc231068454382784bb460aae594343fb030d46e9f50a645418412",
+        "license_expression": "Apache-2.0 OR MIT",
+        "notices": {
+          "LICENSE-APACHE": "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+          "LICENSE-MIT": "90c503b61dee04e1449c323ec34c229dfb68d7adcb96c7e140ee55f70fce2d8e"
+        },
+        "package": "pem-rfc7468",
+        "version": "0.7.0"
+      },
+      {
+        "crate_sha256": "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5"
+        },
+        "package": "percent-encoding",
+        "version": "2.3.2"
+      },
+      {
+        "crate_sha256": "c8ffb9f10fa047879315e6625af03c164b16962a5368d724ed16323b68ace47f",
+        "license_expression": "Apache-2.0 OR MIT",
+        "notices": {
+          "LICENSE-APACHE": "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+          "LICENSE-MIT": "c995204cc6bad2ed67dd41f7d89bb9f1a9d48e0edd745732b30640d7912089a4"
+        },
+        "package": "pkcs1",
+        "version": "0.7.5"
+      },
+      {
+        "crate_sha256": "f950b2377845cebe5cf8b5165cb3cc1a5e0fa5cfa3e1f7f55707d8fd82e0a7b7",
+        "license_expression": "Apache-2.0 OR MIT",
+        "notices": {
+          "LICENSE-APACHE": "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+          "LICENSE-MIT": "ad64fcb9589f162720f3cc5010ad76ca6ad3764e11861f9192c489df176bb71d"
+        },
+        "package": "pkcs8",
+        "version": "0.10.2"
+      },
+      {
+        "crate_sha256": "85eae3c4ed2f50dcfe72643da4befc30deadb458a9b590d720cde2f2b1e97da9",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "0218327e7a480793ffdd4eb792379a9709e5c135c7ba267f709d6f6d4d70af0a",
+          "LICENSE-MIT": "4cada0bd02ea3692eee6f16400d86c6508bbd3bafb2b65fed0419f36d4f83e8f"
+        },
+        "package": "ppv-lite86",
+        "version": "0.2.21"
+      },
+      {
+        "crate_sha256": "8fd00f0bb2e90d81d1044c2b32617f68fcb9fa3bb7640c23e9c748e53fb30934",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+          "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        "package": "proc-macro2",
+        "version": "1.0.106"
+      },
+      {
+        "crate_sha256": "41f2619966050689382d2b44f664f4bc593e129785a36d6ee376ddf37259b924",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+          "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        "package": "quote",
+        "version": "1.0.45"
+      },
+      {
+        "crate_sha256": "e058c7de0b26af77780c769414d6257830bb240f3c38477dbc2c16e5f54d6d4c",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "COPYRIGHT": "90eb64f0279b0d9432accfa6023ff803bc4965212383697eee27a0f426d5f8d5",
+          "LICENSE-APACHE": "35242e7a83f69875e6edeff02291e688c97caafe2f8902e4e19b49d3e78b4cab",
+          "LICENSE-MIT": "209fbbe0ad52d9235e37badf9cadfe4dbdc87203179c0899e738b39ade42177b"
+        },
+        "package": "rand",
+        "version": "0.8.8"
+      },
+      {
+        "crate_sha256": "e6c10a63a0fa32252be49d21e7709d4d4baf8d231c2dbce1eaa8141b9b127d88",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "COPYRIGHT": "90eb64f0279b0d9432accfa6023ff803bc4965212383697eee27a0f426d5f8d5",
+          "LICENSE-APACHE": "aaff376532ea30a0cd5330b9502ad4a4c8bf769c539c87ffe78819d188a18ebf",
+          "LICENSE-MIT": "209fbbe0ad52d9235e37badf9cadfe4dbdc87203179c0899e738b39ade42177b"
+        },
+        "package": "rand_chacha",
+        "version": "0.3.1"
+      },
+      {
+        "crate_sha256": "ec0be4795e2f6a28069bec0b5ff3e2ac9bafc99e6a9a7dc3547996c5c816922c",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "COPYRIGHT": "90eb64f0279b0d9432accfa6023ff803bc4965212383697eee27a0f426d5f8d5",
+          "LICENSE-APACHE": "6df43f6f4b5d4587f3d8d71e45532c688fd168afa5fe89d571cb32fa09c4ef51",
+          "LICENSE-MIT": "209fbbe0ad52d9235e37badf9cadfe4dbdc87203179c0899e738b39ade42177b"
+        },
+        "package": "rand_core",
+        "version": "0.6.4"
+      },
+      {
+        "crate_sha256": "a4689e6c2294d81e88dc6261c768b63bc4fcdb852be6d1352498b114f61383b7",
+        "license_expression": "Apache-2.0 AND ISC",
+        "notices": {
+          "LICENSE": "b3d734001a94efff3579978d953391aa7115f877657d25eb54037a43875d078a",
+          "LICENSE-BoringSSL": "005fc765ddc5115da796cca915baa9557abae13ff35e0a47c47affc56f6c414d",
+          "LICENSE-other-bits": "f025ccfb7dfb6bdfedc75ca0f67acc69e6fb4998143d834f7c2f38a29989680f",
+          "src/polyfill/once_cell/LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "src/polyfill/once_cell/LICENSE-MIT": "6ee2ed6c77710de911761acd5fc1ad1da00f476beb1a7ef27e78c2d1858deafc",
+          "third_party/fiat/LICENSE": "9eacbcb81be660840c714a560a9d65ba07913db98dd4baf969f78dd499fdd60f"
+        },
+        "package": "ring",
+        "version": "0.17.14"
+      },
+      {
+        "crate_sha256": "b8573f03f5883dcaebdfcf4725caa1ecb9c15b2ef50c43a07b816e06799bb12d",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "769f80b5bcb42ed0af4e4d2fd74e1ac9bf843cb80c5a29219d1ef3544428a6bb",
+          "LICENSE-MIT": "30fefc3a7d6a0041541858293bcbea2dde4caa4c0a5802f996a7f7e8c0085652"
+        },
+        "package": "rsa",
+        "version": "0.9.10"
+      },
+      {
+        "crate_sha256": "b6fe4565b9518b83ef4f91bb47ce29620ca828bd32cb7e408f0062e9930ba190",
+        "license_expression": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+        "notices": {
+          "COPYRIGHT": "377c2e7c53250cc5905c0b0532d35973392af16ffb9596a41d99d202cf3617c9",
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-Apache-2.0_WITH_LLVM-exception": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+          "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        "package": "rustix",
+        "version": "1.1.4"
+      },
+      {
+        "crate_sha256": "6725596c3f2c3a0aef021139e145d4eafe314a6623e4680ca83852b2c67ab2ba",
+        "license_expression": "Apache-2.0 OR ISC OR MIT",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-ISC": "7cfafc877eccc46c0e346ccbaa5c51bb6b894d2b818e617d970211e232785ad4",
+          "LICENSE-MIT": "709e3175b4212f7b13aa93971c9f62ff8c69ec45ad8c6532a7e0c41d7a7d6f8c"
+        },
+        "package": "rustls",
+        "version": "0.23.44"
+      },
+      {
+        "crate_sha256": "2f4925028c7eb5d1fcdaf196971378ed9d2c1c4efc7dc5d011256f76c99c0a96",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "45fd05c4865e7c350b98ad7ac50e1b15462d49af4a91e9b0c9dd933dc9a69742",
+          "LICENSE-MIT": "9117d922e667125508dde62b02c1f57ed22f5ad21eb536aa2e2d99e1c796e639"
+        },
+        "package": "rustls-pki-types",
+        "version": "1.15.1"
+      },
+      {
+        "crate_sha256": "f3c3cf1d8b1e7d4927e2d154c3fcb02979afb9939629c62cd9048d4f07b60ac2",
+        "license_expression": "ISC",
+        "notices": {
+          "LICENSE": "5b698ca13897be3afdb7174256fa1574f8c6892b8bea1a66dd6469d3fe27885a"
+        },
+        "package": "rustls-webpki",
+        "version": "0.103.15"
+      },
+      {
+        "crate_sha256": "4148590afebada386688f18773da617792bf2ef03ffc1e4cbd2b1d45b023e0ba",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+          "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        "package": "serde",
+        "version": "1.0.229"
+      },
+      {
+        "crate_sha256": "67dca2c9c51e58a4791a4b1ed58308b39c64224d349a935ab5039aa360942a48",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+          "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        "package": "serde_core",
+        "version": "1.0.229"
+      },
+      {
+        "crate_sha256": "e7a5d71263a5a7d47b41f6b3f06ba276f10cc18b0931f1799f710578e2309348",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+          "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        "package": "serde_derive",
+        "version": "1.0.229"
+      },
+      {
+        "crate_sha256": "c841b55ecdae098c80dcae9cf767f6f8a0c2cdb3416bbef72181df4d0fe73f14",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+          "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        "package": "serde_json",
+        "version": "1.0.151"
+      },
+      {
+        "crate_sha256": "bf41e0cfaf7226dca15e8197172c295a782857fcb97fad1808a166870dee75a3",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+          "LICENSE-MIT": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+        },
+        "package": "serde_spanned",
+        "version": "0.6.9"
+      },
+      {
+        "crate_sha256": "a7507d819769d01a365ab707794a4084392c824f54a7a6a7862f8c3d0892b283",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+          "LICENSE-MIT": "b4eb00df6e2a4d22518fcaa6a2b4646f249b3a3c9814509b22bd2091f1392ff1"
+        },
+        "package": "sha2",
+        "version": "0.10.9"
+      },
+      {
+        "crate_sha256": "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "553fffcd9b1cb158bc3e9edc35da85ca5c3b3d7d2e61c883ebcfa8a65814b583",
+          "LICENSE-MIT": "4455bf75a91154108304cb283e0fea9948c14f13e20d60887cf2552449dea3b1"
+        },
+        "package": "shlex",
+        "version": "2.0.1"
+      },
+      {
+        "crate_sha256": "77549399552de45a898a580c1b41d445bf730df867cc44e6c0233bbc4b8329de",
+        "license_expression": "Apache-2.0 OR MIT",
+        "notices": {
+          "LICENSE-APACHE": "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+          "LICENSE-MIT": "b3470648aff02beb36d7a53240fc9260ed80ed93bd43bace6b67d7ef7336ee33"
+        },
+        "package": "signature",
+        "version": "2.2.0"
+      },
+      {
+        "crate_sha256": "3a219298ac11a56ea9a6d2120044824d6f01aeb034955e7af7bc16858527deea",
+        "license_expression": "MIT",
+        "notices": {
+          "LICENSE.md": "42a35170233e83e18856792e748de4c1ce4a63b2afce9a370c89ef3fe23f9f2d"
+        },
+        "package": "simd-adler32",
+        "version": "0.3.10"
+      },
+      {
+        "crate_sha256": "b9be42f50aa861c555654aa3a37f52f4b1074bacf4e48fe0ef7fa584e80f1f0f",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "0b28172679e0009b655da42797c03fd163a3379d5cfa67ba1f1655e974a2a1a9"
+        },
+        "package": "smallvec",
+        "version": "1.16.0"
+      },
+      {
+        "crate_sha256": "3763264f6b73151db08c50ff20d7d8a0b8796e021cdea7ceedad07b80155fa0e",
+        "license_expression": "MIT",
+        "notices": {
+          "LICENSE": "6ac8711fb340c62ce0a4ecd463342d3fa0e8e70de697c863a2e1c0c53006003c"
+        },
+        "package": "spin",
+        "version": "0.9.9"
+      },
+      {
+        "crate_sha256": "d91ed6c858b01f942cd56b37a94b3e0a1798290327d1236e4d9cf4eaca44d29d",
+        "license_expression": "Apache-2.0 OR MIT",
+        "notices": {
+          "LICENSE-APACHE": "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+          "LICENSE-MIT": "c995204cc6bad2ed67dd41f7d89bb9f1a9d48e0edd745732b30640d7912089a4"
+        },
+        "package": "spki",
+        "version": "0.7.3"
+      },
+      {
+        "crate_sha256": "13c2bddecc57b384dee18652358fb23172facb8a2c51ccc10d74c157bdea3292",
+        "license_expression": "BSD-3-Clause",
+        "notices": {
+          "LICENSE": "d1fc1bc0d155df60b2e7705b6b2ae02a05c96f948e1cec6e2fb86360b09f346b"
+        },
+        "package": "subtle",
+        "version": "2.6.1"
+      },
+      {
+        "crate_sha256": "872831b642d1a07999a962a351ed35b955ea2cfc8f3862091e2a240a84f17297",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+          "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        "package": "syn",
+        "version": "2.0.119"
+      },
+      {
+        "crate_sha256": "12df2e0110f65b775f769bb17ef989067a1d931b2eb822bd4346631eeada89f9",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+          "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        "package": "syn",
+        "version": "3.0.5"
+      },
+      {
+        "crate_sha256": "3f6221d9a6003c78398e3b239969f352578258df48c8eb051caadae0015bc840",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "8ca6b96cea9e67c6c5c63f452c31bd396db8bd2406231fdea5d48ef462b48077"
+        },
+        "package": "tar",
+        "version": "0.4.46"
+      },
+      {
+        "crate_sha256": "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "8b427f5bc501764575e52ba4f9d95673cf8f6d80a86d0d06599852e1a9a20a36"
+        },
+        "package": "tempfile",
+        "version": "3.27.0"
+      },
+      {
+        "crate_sha256": "dc1beb996b9d83529a9e75c17a1686767d148d70663143c7854d8b4a09ced362",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+          "LICENSE-MIT": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+        },
+        "package": "toml",
+        "version": "0.8.23"
+      },
+      {
+        "crate_sha256": "22cddaf88f4fbc13c51aebbf5f8eceb5c7c5a9da2ac40a13519eb5b0a0e8f11c",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+          "LICENSE-MIT": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+        },
+        "package": "toml_datetime",
+        "version": "0.6.11"
+      },
+      {
+        "crate_sha256": "41fe8c660ae4257887cf66394862d21dbca4a6ddd26f04a3560410406a2f819a",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+          "LICENSE-MIT": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+        },
+        "package": "toml_edit",
+        "version": "0.22.27"
+      },
+      {
+        "crate_sha256": "5d99f8c9a7727884afe522e9bd5edbfc91a3312b36a77b5fb8926e4c31a41801",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+          "LICENSE-MIT": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+        },
+        "package": "toml_write",
+        "version": "0.1.2"
+      },
+      {
+        "crate_sha256": "b6f5e870be6c3b371b77fe0ee0bafb859fa4964b4404c27de1d380043c4dda20",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE": "db11fec9946737df39ca3898d9cd8c10ec6f6c3a884a6802b0ad0b81b4e8f23a",
+          "LICENSE-APACHE": "516b24e051bf5630880ebbd55c40a25ce9552ebaf8970a53e8976eb70e522406",
+          "LICENSE-MIT": "a825bd853ab71619a4923d7b4311221427848070ff44d990da39b0b274c1683f"
+        },
+        "package": "typenum",
+        "version": "1.20.1"
+      },
+      {
+        "crate_sha256": "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75",
+        "license_expression": "(MIT OR Apache-2.0) AND Unicode-3.0",
+        "notices": {
+          "LICENSE-APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+          "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "LICENSE-UNICODE": "f7db81051789b729fea528a63ec4c938fdcb93d9d61d97dc8cc2e9df6d47f2a1"
+        },
+        "package": "unicode-ident",
+        "version": "1.0.24"
+      },
+      {
+        "crate_sha256": "8ecb6da28b8a351d773b68d5825ac39017e680750f980f3a1a85cd8dd28a47c1",
+        "license_expression": "ISC",
+        "notices": {
+          "LICENSE.txt": "7abd9b6960dcf7d4d0a48606a5b71bfe37d472db68d70637f3a58a56785f1621"
+        },
+        "package": "untrusted",
+        "version": "0.9.0"
+      },
+      {
+        "crate_sha256": "972d7902c8735f2695410b8aed7df6ed12a47394aa1c8d7af49f0497b731a94d",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "LICENSE-MIT": "7e5886959f67f8c75063a9d55cd3cb08c5a8cbea9a944fa1df2d4ae038f53721"
+        },
+        "package": "ureq",
+        "version": "3.4.0"
+      },
+      {
+        "crate_sha256": "da5f78b09e6941e1a0f2e30e695e4b120377b54d5e0aec11b594bb57b3971613",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "LICENSE-MIT.txt": "5b460f37be48ac4cf2181596181cc6cae432fc2caae05944873f380730829a4b"
+        },
+        "package": "ureq-proto",
+        "version": "0.6.1"
+      },
+      {
+        "crate_sha256": "b8c0a043c9540bae7c578c88f91dda8bd82e59ae27c21baca69c8b191aaf5a6e",
+        "license_expression": "MIT OR Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+          "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        "package": "utf8-zero",
+        "version": "0.8.1"
+      },
+      {
+        "crate_sha256": "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a",
+        "license_expression": "MIT/Apache-2.0",
+        "notices": {
+          "LICENSE-APACHE": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+          "LICENSE-MIT": "b7e650f3fce5c53249d1cdc608b54df156a97edd636cf9d23498d0cfe7aec63e"
+        },
+        "package": "version_check",
+        "version": "0.9.5"
+      },
+      {
+        "crate_sha256": "7dcd9d09a39985f5344844e66b0c530a33843579125f23e21e9f0f220850f22a",
+        "license_expression": "CDLA-Permissive-2.0",
+        "notices": {
+          "LICENSE": "e271993808fec50ab29350b39539cdec611a9103f827e0aa26d61da70e2d33f8"
+        },
+        "package": "webpki-roots",
+        "version": "1.0.9"
+      },
+      {
+        "crate_sha256": "df79d97927682d2fd8adb29682d1140b343be4ac0f08fd68b7765d9c059d3945",
+        "license_expression": "MIT",
+        "notices": {
+          "LICENSE-MIT": "cb5aedb296c5246d1f22e9099f925a65146f9f0d6b4eebba97fd27a6cdbbab2d"
+        },
+        "package": "winnow",
+        "version": "0.7.15"
+      },
+      {
+        "crate_sha256": "d35102a9f36d089ccae9e4c6802bc118be4487b80aaffc0ab4e0cf5ce92d2873",
+        "license_expression": "BSD-2-Clause OR Apache-2.0 OR MIT",
+        "notices": {
+          "LICENSE-APACHE": "9d185ac6703c4b0453974c0d85e9eee43e6941009296bb1f5eb0b54e2329e9f3",
+          "LICENSE-BSD": "83c1763356e822adde0a2cae748d938a73fdc263849ccff6b27776dff213bd32",
+          "LICENSE-MIT": "1a2f5c12ddc934d58956aa5dbdd3255fe55fd957633ab7d0d39e4f0daa73f7df"
+        },
+        "package": "zerocopy",
+        "version": "0.8.57"
+      },
+      {
+        "crate_sha256": "e13c156562582aa81c60cb29407084cdb54c4164760106ab78e6c5b0858cf64e",
+        "license_expression": "Apache-2.0 OR MIT",
+        "notices": {
+          "LICENSE-APACHE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "LICENSE-MIT": "8c7516d4b27b1e495be5e38b612298b63de48d05f49cdac94f70f3cd70f8864b"
+        },
+        "package": "zeroize",
+        "version": "1.9.0"
+      },
+      {
+        "crate_sha256": "29666d0abbfad1e3dc4dcf6144730dd3a3ab225bbbdac83319345b1b44ccfc1b",
+        "license_expression": "MIT",
+        "notices": {
+          "LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        "package": "zmij",
+        "version": "1.0.23"
+      }
+    ]
+  },
+  "download": {
+    "record": {
+      "path": "target/gh-259/download-acceptance03/summary.json",
+      "bytes": 51787,
+      "sha256": "943d79f635ec375643edfb886e7a0d3ec2d72fc3f8a0ccf27c13b6270e7f6b33"
+    },
+    "checks": [
+      {
+        "name": "install",
+        "passed": true,
+        "requests": 5
+      },
+      {
+        "name": "http-error",
+        "passed": true,
+        "requests": 1
+      },
+      {
+        "name": "wrong-length",
+        "passed": true,
+        "requests": 1
+      },
+      {
+        "name": "truncated-body",
+        "passed": true,
+        "requests": 1
+      },
+      {
+        "name": "wrong-content",
+        "passed": true,
+        "requests": 1
+      },
+      {
+        "name": "oversized-body",
+        "passed": true,
+        "requests": 1
+      },
+      {
+        "name": "encoded-body",
+        "passed": true,
+        "requests": 1
+      },
+      {
+        "name": "timeout",
+        "passed": true,
+        "requests": 1
+      },
+      {
+        "name": "redirect-downgrade",
+        "passed": true,
+        "requests": 1
+      },
+      {
+        "name": "redirect-cycle",
+        "passed": true,
+        "requests": 4
+      },
+      {
+        "name": "redirect-credentials",
+        "passed": true,
+        "requests": 1
+      },
+      {
+        "name": "bad-rsa",
+        "passed": true,
+        "requests": 5
+      },
+      {
+        "name": "missing-sigstore",
+        "passed": true,
+        "requests": 5
+      },
+      {
+        "name": "untrusted-tls",
+        "passed": true,
+        "requests": 0
+      },
+      {
+        "name": "wrong-tls-name",
+        "passed": true,
+        "requests": 0
+      },
+      {
+        "name": "wrong-ca-pin",
+        "passed": true,
+        "requests": 0
+      },
+      {
+        "name": "http-input",
+        "passed": true,
+        "requests": 0
+      },
+      {
+        "name": "credential-input",
+        "passed": true,
+        "requests": 0
+      },
+      {
+        "name": "extra-asset",
+        "passed": true,
+        "requests": 0
+      },
+      {
+        "name": "wrong-size",
+        "passed": true,
+        "requests": 0
+      },
+      {
+        "name": "wrong-hash",
+        "passed": true,
+        "requests": 1
+      },
+      {
+        "name": "wrong-request-pin",
+        "passed": true,
+        "requests": 0
+      },
+      {
+        "name": "unknown-field",
+        "passed": true,
+        "requests": 0
+      },
+      {
+        "name": "request-during-transfer",
+        "passed": true,
+        "requests": 5
+      },
+      {
+        "name": "ca-during-transfer",
+        "passed": true,
+        "requests": 5
+      },
+      {
+        "name": "interrupted-preserves-current",
+        "passed": true,
+        "abandoned_download_bytes": 0
+      },
+      {
+        "name": "retry-redirect",
+        "passed": true,
+        "requests": 10
+      },
+      {
+        "name": "upgrade",
+        "passed": true,
+        "requests": 5
+      },
+      {
+        "name": "rollback-after-downloaded-upgrade",
+        "passed": true
+      }
+    ],
+    "initial_download_bytes": 4790111,
+    "upgrade_download_bytes": 4790201,
+    "total_received_body_bytes": 37467211,
+    "abandoned_download_bytes": 0,
+    "interrupted_audit": "SIGKILL prevents final audit; actual abandoned file bytes recorded separately",
+    "cache_bytes": 0,
+    "tls": "real loopback HTTPS with explicitly pinned test CA; certificate and hostname failures tested",
+    "process_trace": "unavailable; command records only",
+    "signature_scope": "real test RSA; mock Sigstore invocation only; no production signature claim",
+    "platform_scope": "current host only; no cross-host or public-network acceptance",
+    "byte_scope": "HTTP response body bytes read by the application; excludes headers, TLS and proxy overhead. Failed partial reads included. SIGKILL may prevent final audit.",
+    "transfers": {
+      "log-http-error": {
+        "byte_scope": "HTTP response bodies read; excludes headers, TLS and proxy overhead",
+        "cache_bytes": 0,
+        "received_body_bytes": 0,
+        "request_sha256": "0a62c3a8b55e31cf293e31e2c575f173f14b2795f272eb85a5a51b3a852dd0a5",
+        "schema": "rust-stable-download/v1",
+        "signature_verification": "separate-required-step",
+        "transfer_complete": false,
+        "transfers": [
+          {
+            "asset": "LICENSE",
+            "elapsed_ms": 4,
+            "received_body_bytes": 0,
+            "verified": false
+          }
+        ]
+      },
+      "log-wrong-tls-name": {
+        "byte_scope": "HTTP response bodies read; excludes headers, TLS and proxy overhead",
+        "cache_bytes": 0,
+        "received_body_bytes": 0,
+        "request_sha256": "03f5875a7127168c90210e6aa87b0f78d3e3351cc842f779e3d58d86823fcc5c",
+        "schema": "rust-stable-download/v1",
+        "signature_verification": "separate-required-step",
+        "transfer_complete": false,
+        "transfers": [
+          {
+            "asset": "LICENSE",
+            "elapsed_ms": 4,
+            "received_body_bytes": 0,
+            "verified": false
+          }
+        ]
+      },
+      "log-untrusted-tls": {
+        "byte_scope": "HTTP response bodies read; excludes headers, TLS and proxy overhead",
+        "cache_bytes": 0,
+        "received_body_bytes": 0,
+        "request_sha256": "204413073245f83e12d96fc3971661ffdb35851f644ff648c9f4a65e3ec8f45a",
+        "schema": "rust-stable-download/v1",
+        "signature_verification": "separate-required-step",
+        "transfer_complete": false,
+        "transfers": [
+          {
+            "asset": "LICENSE",
+            "elapsed_ms": 4,
+            "received_body_bytes": 0,
+            "verified": false
+          }
+        ]
+      },
+      "log-request-during-transfer": {
+        "byte_scope": "HTTP response bodies read; excludes headers, TLS and proxy overhead",
+        "cache_bytes": 0,
+        "received_body_bytes": 4790111,
+        "request_sha256": "cdd5f7fc35570e8156cd1d70e31fded13aced525639a830e09045aa1afd49547",
+        "schema": "rust-stable-download/v1",
+        "signature_verification": "separate-required-step",
+        "transfer_complete": false,
+        "transfers": [
+          {
+            "asset": "LICENSE",
+            "elapsed_ms": 32,
+            "received_body_bytes": 1312123,
+            "verified": true
+          },
+          {
+            "asset": "harness-gate-rust-stable-collector",
+            "elapsed_ms": 63,
+            "received_body_bytes": 3476032,
+            "verified": true
+          },
+          {
+            "asset": "release-inventory.json",
+            "elapsed_ms": 7,
+            "received_body_bytes": 563,
+            "verified": true
+          },
+          {
+            "asset": "release-inventory.sig",
+            "elapsed_ms": 5,
+            "received_body_bytes": 469,
+            "verified": true
+          },
+          {
+            "asset": "support.json",
+            "elapsed_ms": 5,
+            "received_body_bytes": 924,
+            "verified": true
+          }
+        ]
+      },
+      "log-oversized-body": {
+        "byte_scope": "HTTP response bodies read; excludes headers, TLS and proxy overhead",
+        "cache_bytes": 0,
+        "received_body_bytes": 1312124,
+        "request_sha256": "e33c3260f0411002570f15f08d57e15d91fb3ab6377d24fac3092e8df61d9e2a",
+        "schema": "rust-stable-download/v1",
+        "signature_verification": "separate-required-step",
+        "transfer_complete": false,
+        "transfers": [
+          {
+            "asset": "LICENSE",
+            "elapsed_ms": 23,
+            "received_body_bytes": 1312124,
+            "verified": false
+          }
+        ]
+      },
+      "log-ca-during-transfer": {
+        "byte_scope": "HTTP response bodies read; excludes headers, TLS and proxy overhead",
+        "cache_bytes": 0,
+        "received_body_bytes": 4790111,
+        "request_sha256": "fd14803f468886f578dd56b9a5057c2379bb4603986a2205bbbf11ea11eeb671",
+        "schema": "rust-stable-download/v1",
+        "signature_verification": "separate-required-step",
+        "transfer_complete": false,
+        "transfers": [
+          {
+            "asset": "LICENSE",
+            "elapsed_ms": 30,
+            "received_body_bytes": 1312123,
+            "verified": true
+          },
+          {
+            "asset": "harness-gate-rust-stable-collector",
+            "elapsed_ms": 64,
+            "received_body_bytes": 3476032,
+            "verified": true
+          },
+          {
+            "asset": "release-inventory.json",
+            "elapsed_ms": 7,
+            "received_body_bytes": 563,
+            "verified": true
+          },
+          {
+            "asset": "release-inventory.sig",
+            "elapsed_ms": 6,
+            "received_body_bytes": 469,
+            "verified": true
+          },
+          {
+            "asset": "support.json",
+            "elapsed_ms": 6,
+            "received_body_bytes": 924,
+            "verified": true
+          }
+        ]
+      },
+      "log-truncated-body": {
+        "byte_scope": "HTTP response bodies read; excludes headers, TLS and proxy overhead",
+        "cache_bytes": 0,
+        "received_body_bytes": 4,
+        "request_sha256": "519bb7f9941c5117bf9ef5d0c0078d4c0c8a548387eb9eb021906aa9453b92c9",
+        "schema": "rust-stable-download/v1",
+        "signature_verification": "separate-required-step",
+        "transfer_complete": false,
+        "transfers": [
+          {
+            "asset": "LICENSE",
+            "elapsed_ms": 4,
+            "received_body_bytes": 4,
+            "verified": false
+          }
+        ]
+      },
+      "log-encoded-body": {
+        "byte_scope": "HTTP response bodies read; excludes headers, TLS and proxy overhead",
+        "cache_bytes": 0,
+        "received_body_bytes": 0,
+        "request_sha256": "2f265d05481153c4e9c2dc8dff7c0b53c3c0dbf9f236aa0db3f1fb1a52a8109f",
+        "schema": "rust-stable-download/v1",
+        "signature_verification": "separate-required-step",
+        "transfer_complete": false,
+        "transfers": [
+          {
+            "asset": "LICENSE",
+            "elapsed_ms": 6,
+            "received_body_bytes": 0,
+            "verified": false
+          }
+        ]
+      },
+      "log-retry-redirect": {
+        "byte_scope": "HTTP response bodies read; excludes headers, TLS and proxy overhead",
+        "cache_bytes": 0,
+        "received_body_bytes": 4790111,
+        "request_sha256": "b459bd8b71eafc80e14b9ef95554bf88f8a498950c867ac3e81bd085bcbc912a",
+        "schema": "rust-stable-download/v1",
+        "signature_verification": "separate-required-step",
+        "transfer_complete": true,
+        "transfers": [
+          {
+            "asset": "LICENSE",
+            "elapsed_ms": 34,
+            "received_body_bytes": 1312123,
+            "verified": true
+          },
+          {
+            "asset": "harness-gate-rust-stable-collector",
+            "elapsed_ms": 63,
+            "received_body_bytes": 3476032,
+            "verified": true
+          },
+          {
+            "asset": "release-inventory.json",
+            "elapsed_ms": 11,
+            "received_body_bytes": 563,
+            "verified": true
+          },
+          {
+            "asset": "release-inventory.sig",
+            "elapsed_ms": 11,
+            "received_body_bytes": 469,
+            "verified": true
+          },
+          {
+            "asset": "support.json",
+            "elapsed_ms": 10,
+            "received_body_bytes": 924,
+            "verified": true
+          }
+        ]
+      },
+      "log-wrong-length": {
+        "byte_scope": "HTTP response bodies read; excludes headers, TLS and proxy overhead",
+        "cache_bytes": 0,
+        "received_body_bytes": 0,
+        "request_sha256": "84dedafbb3417697ee78236516485d6657502ff546bd9b5bfa19b065d4702bad",
+        "schema": "rust-stable-download/v1",
+        "signature_verification": "separate-required-step",
+        "transfer_complete": false,
+        "transfers": [
+          {
+            "asset": "LICENSE",
+            "elapsed_ms": 4,
+            "received_body_bytes": 0,
+            "verified": false
+          }
+        ]
+      },
+      "log-wrong-hash": {
+        "byte_scope": "HTTP response bodies read; excludes headers, TLS and proxy overhead",
+        "cache_bytes": 0,
+        "received_body_bytes": 1312123,
+        "request_sha256": "f6cbc711a925a0c492b55bb2a78d1a4bed471332c3fd774084af9d6daab6e742",
+        "schema": "rust-stable-download/v1",
+        "signature_verification": "separate-required-step",
+        "transfer_complete": false,
+        "transfers": [
+          {
+            "asset": "LICENSE",
+            "elapsed_ms": 24,
+            "received_body_bytes": 1312123,
+            "verified": false
+          }
+        ]
+      },
+      "log-redirect-credentials": {
+        "byte_scope": "HTTP response bodies read; excludes headers, TLS and proxy overhead",
+        "cache_bytes": 0,
+        "received_body_bytes": 0,
+        "request_sha256": "13080bb8c4672bb22cda91d9e8106b61f09d94890721aeeb02e7d4ef3c0e5d82",
+        "schema": "rust-stable-download/v1",
+        "signature_verification": "separate-required-step",
+        "transfer_complete": false,
+        "transfers": [
+          {
+            "asset": "LICENSE",
+            "elapsed_ms": 5,
+            "received_body_bytes": 0,
+            "verified": false
+          }
+        ]
+      },
+      "log-upgrade": {
+        "byte_scope": "HTTP response bodies read; excludes headers, TLS and proxy overhead",
+        "cache_bytes": 0,
+        "received_body_bytes": 4790201,
+        "request_sha256": "2f5653652c9003203d88807b68744c649167622c6f0a0a8a60945f8d5390dedb",
+        "schema": "rust-stable-download/v1",
+        "signature_verification": "separate-required-step",
+        "transfer_complete": true,
+        "transfers": [
+          {
+            "asset": "LICENSE",
+            "elapsed_ms": 27,
+            "received_body_bytes": 1312123,
+            "verified": true
+          },
+          {
+            "asset": "harness-gate-rust-stable-collector",
+            "elapsed_ms": 57,
+            "received_body_bytes": 3476096,
+            "verified": true
+          },
+          {
+            "asset": "release-inventory.json",
+            "elapsed_ms": 7,
+            "received_body_bytes": 576,
+            "verified": true
+          },
+          {
+            "asset": "release-inventory.sig",
+            "elapsed_ms": 5,
+            "received_body_bytes": 469,
+            "verified": true
+          },
+          {
+            "asset": "support.json",
+            "elapsed_ms": 5,
+            "received_body_bytes": 937,
+            "verified": true
+          }
+        ]
+      },
+      "log-timeout": {
+        "byte_scope": "HTTP response bodies read; excludes headers, TLS and proxy overhead",
+        "cache_bytes": 0,
+        "received_body_bytes": 0,
+        "request_sha256": "8987916e05c5b7fd14fd9942da0b416d7def24fdb59bd7e1393c151686fdb42d",
+        "schema": "rust-stable-download/v1",
+        "signature_verification": "separate-required-step",
+        "transfer_complete": false,
+        "transfers": [
+          {
+            "asset": "LICENSE",
+            "elapsed_ms": 1087,
+            "received_body_bytes": 0,
+            "verified": false
+          }
+        ]
+      },
+      "log-install": {
+        "byte_scope": "HTTP response bodies read; excludes headers, TLS and proxy overhead",
+        "cache_bytes": 0,
+        "received_body_bytes": 4790111,
+        "request_sha256": "0f86037a53e260ee682f901c047d8e71213f0fc90185044be4a36224c6ac0579",
+        "schema": "rust-stable-download/v1",
+        "signature_verification": "separate-required-step",
+        "transfer_complete": true,
+        "transfers": [
+          {
+            "asset": "LICENSE",
+            "elapsed_ms": 35,
+            "received_body_bytes": 1312123,
+            "verified": true
+          },
+          {
+            "asset": "harness-gate-rust-stable-collector",
+            "elapsed_ms": 63,
+            "received_body_bytes": 3476032,
+            "verified": true
+          },
+          {
+            "asset": "release-inventory.json",
+            "elapsed_ms": 6,
+            "received_body_bytes": 563,
+            "verified": true
+          },
+          {
+            "asset": "release-inventory.sig",
+            "elapsed_ms": 6,
+            "received_body_bytes": 469,
+            "verified": true
+          },
+          {
+            "asset": "support.json",
+            "elapsed_ms": 5,
+            "received_body_bytes": 924,
+            "verified": true
+          }
+        ]
+      },
+      "log-missing-sigstore": {
+        "byte_scope": "HTTP response bodies read; excludes headers, TLS and proxy overhead",
+        "cache_bytes": 0,
+        "received_body_bytes": 4790081,
+        "request_sha256": "152bcd5f5a26adc2f9dc5124ba7f5b978213d1bae13d40324b1c06d0d959ac58",
+        "schema": "rust-stable-download/v1",
+        "signature_verification": "separate-required-step",
+        "transfer_complete": true,
+        "transfers": [
+          {
+            "asset": "LICENSE",
+            "elapsed_ms": 31,
+            "received_body_bytes": 1312123,
+            "verified": true
+          },
+          {
+            "asset": "harness-gate-rust-stable-collector",
+            "elapsed_ms": 64,
+            "received_body_bytes": 3476032,
+            "verified": true
+          },
+          {
+            "asset": "release-inventory.json",
+            "elapsed_ms": 6,
+            "received_body_bytes": 563,
+            "verified": true
+          },
+          {
+            "asset": "release-inventory.sig",
+            "elapsed_ms": 6,
+            "received_body_bytes": 439,
+            "verified": true
+          },
+          {
+            "asset": "support.json",
+            "elapsed_ms": 5,
+            "received_body_bytes": 924,
+            "verified": true
+          }
+        ]
+      },
+      "log-redirect-cycle": {
+        "byte_scope": "HTTP response bodies read; excludes headers, TLS and proxy overhead",
+        "cache_bytes": 0,
+        "received_body_bytes": 0,
+        "request_sha256": "a50353f108b4b1d3fcb1714624eb03bee85e4c0c7cb9578f6b24abdce3a61cdd",
+        "schema": "rust-stable-download/v1",
+        "signature_verification": "separate-required-step",
+        "transfer_complete": false,
+        "transfers": [
+          {
+            "asset": "LICENSE",
+            "elapsed_ms": 18,
+            "received_body_bytes": 0,
+            "verified": false
+          }
+        ]
+      },
+      "log-bad-rsa": {
+        "byte_scope": "HTTP response bodies read; excludes headers, TLS and proxy overhead",
+        "cache_bytes": 0,
+        "received_body_bytes": 4790111,
+        "request_sha256": "7edf225871f2f864d6825abfcdd244ca59235ce4ab1013ad793a5d028bfda610",
+        "schema": "rust-stable-download/v1",
+        "signature_verification": "separate-required-step",
+        "transfer_complete": true,
+        "transfers": [
+          {
+            "asset": "LICENSE",
+            "elapsed_ms": 30,
+            "received_body_bytes": 1312123,
+            "verified": true
+          },
+          {
+            "asset": "harness-gate-rust-stable-collector",
+            "elapsed_ms": 62,
+            "received_body_bytes": 3476032,
+            "verified": true
+          },
+          {
+            "asset": "release-inventory.json",
+            "elapsed_ms": 6,
+            "received_body_bytes": 563,
+            "verified": true
+          },
+          {
+            "asset": "release-inventory.sig",
+            "elapsed_ms": 6,
+            "received_body_bytes": 469,
+            "verified": true
+          },
+          {
+            "asset": "support.json",
+            "elapsed_ms": 6,
+            "received_body_bytes": 924,
+            "verified": true
+          }
+        ]
+      },
+      "log-wrong-content": {
+        "byte_scope": "HTTP response bodies read; excludes headers, TLS and proxy overhead",
+        "cache_bytes": 0,
+        "received_body_bytes": 1312123,
+        "request_sha256": "c1e2ccf052ddd6003317106c06e52e913c082820f6d9e2c83d8d3416e1828feb",
+        "schema": "rust-stable-download/v1",
+        "signature_verification": "separate-required-step",
+        "transfer_complete": false,
+        "transfers": [
+          {
+            "asset": "LICENSE",
+            "elapsed_ms": 24,
+            "received_body_bytes": 1312123,
+            "verified": false
+          }
+        ]
+      },
+      "log-redirect-downgrade": {
+        "byte_scope": "HTTP response bodies read; excludes headers, TLS and proxy overhead",
+        "cache_bytes": 0,
+        "received_body_bytes": 0,
+        "request_sha256": "28dce4b53766c4a85c42dc2d1a0b935e3a78a37014ea8cee18934794c582cf9a",
+        "schema": "rust-stable-download/v1",
+        "signature_verification": "separate-required-step",
+        "transfer_complete": false,
+        "transfers": [
+          {
+            "asset": "LICENSE",
+            "elapsed_ms": 5,
+            "received_body_bytes": 0,
+            "verified": false
+          }
+        ]
+      }
+    }
+  },
+  "lifecycle": {
+    "record": {
+      "path": "target/gh-259/lifecycle14/summary.json",
+      "bytes": 6260,
+      "sha256": "74f3714422801515b1e94486981077df337f57df6af5603af1f00ff3e881c159"
+    },
+    "schema": "rust-stable-lifecycle-acceptance/v1",
+    "collector_sha256": "b876d72b536ff2a809bea7da62a7d4e1b33a670666cca99438462e456f3e3b95",
+    "upgrade_collector_sha256": "a10ab190c7e57d08b66cc4e62cb36e90b067fc56877f57c4bca30ad584192629",
+    "upgrade_version": "0.1.0-candidate.1.upgrade-test",
+    "upgrade_scope": "separately compiled test version of the same implementation; no production or historical release compatibility claim",
+    "rsa": "real RSA-2048/SHA-256 signatures; repository-generated test key",
+    "sigstore": "MOCK invocation/exit behavior only; no cryptographic or production acceptance",
+    "production_signature": false,
+    "checks": [
+      {
+        "name": "unsigned-package-rejected",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "verify",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "name": "install",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "name": "upgrade",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "name": "rollback",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "name": "program-version-mismatch",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "program-nonzero",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "program-timeout",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "program-mutates-stage",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "program-invalid-elf",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "bad-rsa",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "missing-sigstore",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "tampered-program",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "mixed-inventory",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "extra-asset",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "symlink-asset",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "duplicate-json",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "support-schema",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "support-release",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "support-target",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "support-program",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "support-license",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "support-crap",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "support-published",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "support-no-observations",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "support-duplicate-observations",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "support-unknown-field",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "changed-verifier-pin",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "verifier-nonzero",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "verifier-timeout",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "missing-verifier",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "symlink-root",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "corrupt-rollback",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "nonexecutable-rollback",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "concurrent-install",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "interrupted-upgrade-preserves-current",
+        "exit_code": -9,
+        "passed": true
+      },
+      {
+        "name": "retry-after-interruption",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "name": "final-rollback",
+        "exit_code": 0,
+        "passed": true
+      }
+    ],
+    "first_install": {
+      "current": "0c9fae7a11669f96295a5e81856d48e063f7c83f0375b5bc4b0c4b524074590e",
+      "download_bytes": 0,
+      "executable": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle14/installation/current/harness-gate-rust-stable-collector",
+      "installed_version_bytes": 4790111,
+      "package_bytes": 4790111,
+      "previous": null,
+      "schema": "rust-stable-installation/v1",
+      "trust_sha256": "188828ebb9b4ee723e8df85f9caead64604052351f95b5ffd30590341b7a752a",
+      "version": "0.1.0-candidate.1"
+    },
+    "upgrade": {
+      "current": "6dc8f9b3d63c8e72e71878a9f961f1a17f6221349197b9757eb28244e046295d",
+      "download_bytes": 0,
+      "executable": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle14/installation/current/harness-gate-rust-stable-collector",
+      "installed_version_bytes": 4790201,
+      "package_bytes": 4790201,
+      "previous": "0c9fae7a11669f96295a5e81856d48e063f7c83f0375b5bc4b0c4b524074590e",
+      "schema": "rust-stable-installation/v1",
+      "trust_sha256": "188828ebb9b4ee723e8df85f9caead64604052351f95b5ffd30590341b7a752a",
+      "version": "0.1.0-candidate.1.upgrade-test"
+    },
+    "rollback": {
+      "current": "0c9fae7a11669f96295a5e81856d48e063f7c83f0375b5bc4b0c4b524074590e",
+      "download_bytes": 0,
+      "executable": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle14/installation/current/harness-gate-rust-stable-collector",
+      "installed_version_bytes": 4790111,
+      "package_bytes": 4790111,
+      "previous": "6dc8f9b3d63c8e72e71878a9f961f1a17f6221349197b9757eb28244e046295d",
+      "schema": "rust-stable-installation/v1",
+      "trust_sha256": "188828ebb9b4ee723e8df85f9caead64604052351f95b5ffd30590341b7a752a",
+      "version": "0.1.0-candidate.1"
+    },
+    "package_bytes": 4790111,
+    "upgrade_package_bytes": 4790201,
+    "two_versions_bytes": 9580312,
+    "interrupted_staging_bytes": 4790201,
+    "installation_bytes_including_interrupted_staging": 14371141,
+    "network_download_bytes": 0,
+    "network_note": "local directory inputs; downloader not implemented",
+    "stale_staging_note": "killed processes may leave unselected staging directories; no automatic garbage collection yet"
+  },
+  "capture": {
+    "path": "target/gh-259/acceptance-27/summary.json",
+    "bytes": 24074,
+    "sha256": "2fe12ae97bdb7845325d69d8f8754c6ef301d163cba892044bfade8379ac5934"
+  },
+  "macro": {
+    "path": "target/gh-259/macros-14/summary.json",
+    "bytes": 30363,
+    "sha256": "17e745998008dbb533b42dcea433c061811c334a91c07d9e51d7ec65090102df"
+  },
+  "core": {
+    "plain": {
+      "record": {
+        "path": "target/gh-259/core-20-plain/summary.json",
+        "bytes": 4443,
+        "sha256": "88b296f9a4361846d4bc698b68c50015324065da3a8c105d8f306b9d813dfd63"
+      },
+      "capture": {
+        "manifest_sha256": "160dcaedd7effe73af89442d5869d7d69e1304bef02aa72472c4d7b7e498b765",
+        "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-27/capture-plain",
+        "request_sha256": "ed568a3bc6722c58df491c47880726c1fcbb53f3b293e585835905a6556bb481"
+      },
+      "checks": {
+        "authenticated_capture": {
+          "accepted": true,
+          "counts": [
+            3,
+            1
+          ],
+          "records": 2
+        },
+        "changed-project": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "changed-series": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "core-corrupt-artifact": {
+          "blocked": true
+        },
+        "core-stale-context": {
+          "blocked": true
+        },
+        "expired_request": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request has expired\n"
+        },
+        "fixture": "plain",
+        "invalid_signature": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter signature verification failed\n"
+        },
+        "missing-claim": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "nonce_replay": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request nonce has already been used\n"
+        },
+        "required_crap": [
+          {
+            "component": "rust",
+            "evidence_id": "stable-0d2e68a8d1c14b9151a334b879a56dbb78d1f3712df4e3250b4f52d45e32c14c",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-4ea91cad05f85e5cd1e646da093aa43b1f0dc851c2bad559dc2999b5ebbf6ee0",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          }
+        ],
+        "stale-config-binding": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "unknown-owner": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-capture-anchor": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-source": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-target": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        }
+      },
+      "collector_sha256": "b876d72b536ff2a809bea7da62a7d4e1b33a670666cca99438462e456f3e3b95",
+      "core_sha256": "3614dfc5dcaa1d9cdb427c2ff2fae528ec564a6672fa0a43fbd7eafd086994b0",
+      "production_signature": false,
+      "schema": "rust-stable-core-acceptance/v1",
+      "series": {
+        "collector": {
+          "name": "harness-gate-rust-stable-collector",
+          "version": "0.1.0-candidate.1"
+        },
+        "id": "measurement-series/v1:a125aeca2d53df742e713c0ad48b7a8f244a585b2fa1c8a08b7f5ffd77f1a574",
+        "metrics": [
+          {
+            "name": "complexity.cyclomatic",
+            "type": "count"
+          },
+          {
+            "name": "coverage.function",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.line",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.region",
+            "type": "ratio"
+          },
+          {
+            "name": "risk.crap",
+            "type": "rational"
+          }
+        ],
+        "name": "rust-stable-lexical-candidate",
+        "normalization": {
+          "name": "stable-rust-core-candidate",
+          "version": "b876d72b536ff2a809bea7da62a7d4e1b33a670666cca99438462e456f3e3b95"
+        },
+        "rule": {
+          "name": "rust-source-decisions",
+          "version": "rust-source-decisions/v1-candidate"
+        },
+        "runtime": {
+          "name": "rustc",
+          "version": "8bab26f4f68e0e26f0bb7960be334d5b520ea452"
+        },
+        "source_identity": {
+          "name": "rust-lexical-source-span",
+          "version": "1"
+        },
+        "target": "x86_64-unknown-linux-gnu",
+        "tool": {
+          "name": "stable-rust-coverage-tools",
+          "version": "f6cf1932ab62a9b43f6f09107f1ce8720d686a3841908e02cfc80d7c9048acd2"
+        }
+      },
+      "state": "candidate-only"
+    },
+    "partial": {
+      "record": {
+        "path": "target/gh-259/core-20-partial/summary.json",
+        "bytes": 4447,
+        "sha256": "5ac8785981bc3cf2f202578ca43b70a51311fd01bda8f76b0b58ec274e711e74"
+      },
+      "capture": {
+        "manifest_sha256": "62b9480eb6d46b0c2470f3515071d6d13e058cfba63af2754a99701cfddb8a29",
+        "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-27/capture-partial",
+        "request_sha256": "159a4804baac7116812cb83644422c0e1d112c15c59324438ecc38acdde14bfc"
+      },
+      "checks": {
+        "authenticated_capture": {
+          "accepted": true,
+          "counts": [
+            3,
+            1
+          ],
+          "records": 2
+        },
+        "changed-project": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "changed-series": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "core-corrupt-artifact": {
+          "blocked": true
+        },
+        "core-stale-context": {
+          "blocked": true
+        },
+        "expired_request": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request has expired\n"
+        },
+        "fixture": "partial",
+        "invalid_signature": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter signature verification failed\n"
+        },
+        "missing-claim": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "nonce_replay": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request nonce has already been used\n"
+        },
+        "required_crap": [
+          {
+            "component": "rust",
+            "evidence_id": "stable-73c3126951899f2b9eec1b97055176a1b4b225351d270f283580c3967f90a21e",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-39674dc3e03ba6ed2104b94d4e3c1f619ce5c9b9b6189de613e69b41b322bb6c",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          }
+        ],
+        "stale-config-binding": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "unknown-owner": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-capture-anchor": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-source": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-target": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        }
+      },
+      "collector_sha256": "b876d72b536ff2a809bea7da62a7d4e1b33a670666cca99438462e456f3e3b95",
+      "core_sha256": "3614dfc5dcaa1d9cdb427c2ff2fae528ec564a6672fa0a43fbd7eafd086994b0",
+      "production_signature": false,
+      "schema": "rust-stable-core-acceptance/v1",
+      "series": {
+        "collector": {
+          "name": "harness-gate-rust-stable-collector",
+          "version": "0.1.0-candidate.1"
+        },
+        "id": "measurement-series/v1:a125aeca2d53df742e713c0ad48b7a8f244a585b2fa1c8a08b7f5ffd77f1a574",
+        "metrics": [
+          {
+            "name": "complexity.cyclomatic",
+            "type": "count"
+          },
+          {
+            "name": "coverage.function",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.line",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.region",
+            "type": "ratio"
+          },
+          {
+            "name": "risk.crap",
+            "type": "rational"
+          }
+        ],
+        "name": "rust-stable-lexical-candidate",
+        "normalization": {
+          "name": "stable-rust-core-candidate",
+          "version": "b876d72b536ff2a809bea7da62a7d4e1b33a670666cca99438462e456f3e3b95"
+        },
+        "rule": {
+          "name": "rust-source-decisions",
+          "version": "rust-source-decisions/v1-candidate"
+        },
+        "runtime": {
+          "name": "rustc",
+          "version": "8bab26f4f68e0e26f0bb7960be334d5b520ea452"
+        },
+        "source_identity": {
+          "name": "rust-lexical-source-span",
+          "version": "1"
+        },
+        "target": "x86_64-unknown-linux-gnu",
+        "tool": {
+          "name": "stable-rust-coverage-tools",
+          "version": "f6cf1932ab62a9b43f6f09107f1ce8720d686a3841908e02cfc80d7c9048acd2"
+        }
+      },
+      "state": "candidate-only"
+    },
+    "boundaries": {
+      "record": {
+        "path": "target/gh-259/core-20-boundaries/summary.json",
+        "bytes": 5130,
+        "sha256": "7649696891aebbf2fb644918acb150f0e7f845524a4aa58d98f532490d8c5721"
+      },
+      "capture": {
+        "manifest_sha256": "774a4fcb9e1164953738088b3e0d51ed67c6d99992a0d4acced181292147502b",
+        "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-27/capture-boundaries",
+        "request_sha256": "65b73a79f9ad7da19b9e7e3126abde76557e2fbf248b06c28e461949169eb1e7"
+      },
+      "checks": {
+        "authenticated_capture": {
+          "accepted": true,
+          "counts": [],
+          "records": 5
+        },
+        "changed-project": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "changed-series": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "core-corrupt-artifact": {
+          "blocked": true
+        },
+        "core-stale-context": {
+          "blocked": true
+        },
+        "expired_request": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request has expired\n"
+        },
+        "fixture": "boundaries",
+        "invalid_signature": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter signature verification failed\n"
+        },
+        "missing-claim": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "nonce_replay": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request nonce has already been used\n"
+        },
+        "required_crap": [
+          {
+            "component": "rust",
+            "evidence_id": "stable-9674fb12d9fd834d1c8731ed2a714cd7dd00747b61929a3e96a19ff50ab51459",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-6491fe323a12b819fb1bf2e690f0cc016d828b8af259f362bc8d11581e8ef458",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-f227570359a39a81f5af2be3487622fe95f298629c02f60b1eb9a9084a941540",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-0301c7acc733e82cd0ec887ca55ad7f6696c450e85a9e6082e098ed9e3b0bcc5",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-a00564a1091eb99b0220ad37e106b14f4e8dcc0061c7f2bc768e2adabc8d1f6c",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          }
+        ],
+        "stale-config-binding": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "unknown-owner": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-capture-anchor": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-source": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-target": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        }
+      },
+      "collector_sha256": "b876d72b536ff2a809bea7da62a7d4e1b33a670666cca99438462e456f3e3b95",
+      "core_sha256": "3614dfc5dcaa1d9cdb427c2ff2fae528ec564a6672fa0a43fbd7eafd086994b0",
+      "production_signature": false,
+      "schema": "rust-stable-core-acceptance/v1",
+      "series": {
+        "collector": {
+          "name": "harness-gate-rust-stable-collector",
+          "version": "0.1.0-candidate.1"
+        },
+        "id": "measurement-series/v1:a125aeca2d53df742e713c0ad48b7a8f244a585b2fa1c8a08b7f5ffd77f1a574",
+        "metrics": [
+          {
+            "name": "complexity.cyclomatic",
+            "type": "count"
+          },
+          {
+            "name": "coverage.function",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.line",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.region",
+            "type": "ratio"
+          },
+          {
+            "name": "risk.crap",
+            "type": "rational"
+          }
+        ],
+        "name": "rust-stable-lexical-candidate",
+        "normalization": {
+          "name": "stable-rust-core-candidate",
+          "version": "b876d72b536ff2a809bea7da62a7d4e1b33a670666cca99438462e456f3e3b95"
+        },
+        "rule": {
+          "name": "rust-source-decisions",
+          "version": "rust-source-decisions/v1-candidate"
+        },
+        "runtime": {
+          "name": "rustc",
+          "version": "8bab26f4f68e0e26f0bb7960be334d5b520ea452"
+        },
+        "source_identity": {
+          "name": "rust-lexical-source-span",
+          "version": "1"
+        },
+        "target": "x86_64-unknown-linux-gnu",
+        "tool": {
+          "name": "stable-rust-coverage-tools",
+          "version": "f6cf1932ab62a9b43f6f09107f1ce8720d686a3841908e02cfc80d7c9048acd2"
+        }
+      },
+      "state": "candidate-only"
+    },
+    "features": {
+      "record": {
+        "path": "target/gh-259/core-20-features/summary.json",
+        "bytes": 5126,
+        "sha256": "c54767b6470a8f2aaf2cab12b3b7a1fc24e1d3ae4f53934a2abe3fe2c85ca54f"
+      },
+      "capture": {
+        "manifest_sha256": "0ddce7bc2010048670f37e7bed59b7dcbd90b8461a3e4948dc472b09be85c991",
+        "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-27/capture-features",
+        "request_sha256": "573f54b38f9ea6df27e614d82b58bfc4cfad57b94e7baa577b468259fc8cf887"
+      },
+      "checks": {
+        "authenticated_capture": {
+          "accepted": true,
+          "counts": [],
+          "records": 5
+        },
+        "changed-project": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "changed-series": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "core-corrupt-artifact": {
+          "blocked": true
+        },
+        "core-stale-context": {
+          "blocked": true
+        },
+        "expired_request": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request has expired\n"
+        },
+        "fixture": "features",
+        "invalid_signature": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter signature verification failed\n"
+        },
+        "missing-claim": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "nonce_replay": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request nonce has already been used\n"
+        },
+        "required_crap": [
+          {
+            "component": "rust",
+            "evidence_id": "stable-9674fb12d9fd834d1c8731ed2a714cd7dd00747b61929a3e96a19ff50ab51459",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-6491fe323a12b819fb1bf2e690f0cc016d828b8af259f362bc8d11581e8ef458",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-f227570359a39a81f5af2be3487622fe95f298629c02f60b1eb9a9084a941540",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-0301c7acc733e82cd0ec887ca55ad7f6696c450e85a9e6082e098ed9e3b0bcc5",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-a00564a1091eb99b0220ad37e106b14f4e8dcc0061c7f2bc768e2adabc8d1f6c",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          }
+        ],
+        "stale-config-binding": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "unknown-owner": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-capture-anchor": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-source": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-target": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        }
+      },
+      "collector_sha256": "b876d72b536ff2a809bea7da62a7d4e1b33a670666cca99438462e456f3e3b95",
+      "core_sha256": "3614dfc5dcaa1d9cdb427c2ff2fae528ec564a6672fa0a43fbd7eafd086994b0",
+      "production_signature": false,
+      "schema": "rust-stable-core-acceptance/v1",
+      "series": {
+        "collector": {
+          "name": "harness-gate-rust-stable-collector",
+          "version": "0.1.0-candidate.1"
+        },
+        "id": "measurement-series/v1:a125aeca2d53df742e713c0ad48b7a8f244a585b2fa1c8a08b7f5ffd77f1a574",
+        "metrics": [
+          {
+            "name": "complexity.cyclomatic",
+            "type": "count"
+          },
+          {
+            "name": "coverage.function",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.line",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.region",
+            "type": "ratio"
+          },
+          {
+            "name": "risk.crap",
+            "type": "rational"
+          }
+        ],
+        "name": "rust-stable-lexical-candidate",
+        "normalization": {
+          "name": "stable-rust-core-candidate",
+          "version": "b876d72b536ff2a809bea7da62a7d4e1b33a670666cca99438462e456f3e3b95"
+        },
+        "rule": {
+          "name": "rust-source-decisions",
+          "version": "rust-source-decisions/v1-candidate"
+        },
+        "runtime": {
+          "name": "rustc",
+          "version": "8bab26f4f68e0e26f0bb7960be334d5b520ea452"
+        },
+        "source_identity": {
+          "name": "rust-lexical-source-span",
+          "version": "1"
+        },
+        "target": "x86_64-unknown-linux-gnu",
+        "tool": {
+          "name": "stable-rust-coverage-tools",
+          "version": "f6cf1932ab62a9b43f6f09107f1ce8720d686a3841908e02cfc80d7c9048acd2"
+        }
+      },
+      "state": "candidate-only"
+    },
+    "registry": {
+      "record": {
+        "path": "target/gh-259/core-20-registry/summary.json",
+        "bytes": 4203,
+        "sha256": "1f612eefce7fbc917afc110dab4be29d44cb6dce2eb7b7f8881d5046848c8230"
+      },
+      "capture": {
+        "manifest_sha256": "e6827313e5be4d2879113b05201274efeab17e8a70995487264ac564aa402702",
+        "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-27/capture-registry",
+        "request_sha256": "57d9ed4c83c413546c15c0bbfa3b547d331c087010d3972ff2f9679f761a2507"
+      },
+      "checks": {
+        "authenticated_capture": {
+          "accepted": true,
+          "counts": [
+            1
+          ],
+          "records": 1
+        },
+        "changed-project": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "changed-series": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "core-corrupt-artifact": {
+          "blocked": true
+        },
+        "core-stale-context": {
+          "blocked": true
+        },
+        "expired_request": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request has expired\n"
+        },
+        "fixture": "registry",
+        "invalid_signature": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter signature verification failed\n"
+        },
+        "missing-claim": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "nonce_replay": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request nonce has already been used\n"
+        },
+        "required_crap": [
+          {
+            "component": "rust",
+            "evidence_id": "stable-2e3da7167fb29132905f1eb2626236b8d6268af5e1f5dd8e73d6f244323578ee",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          }
+        ],
+        "stale-config-binding": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "unknown-owner": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-capture-anchor": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-source": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-target": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        }
+      },
+      "collector_sha256": "b876d72b536ff2a809bea7da62a7d4e1b33a670666cca99438462e456f3e3b95",
+      "core_sha256": "3614dfc5dcaa1d9cdb427c2ff2fae528ec564a6672fa0a43fbd7eafd086994b0",
+      "production_signature": false,
+      "schema": "rust-stable-core-acceptance/v1",
+      "series": {
+        "collector": {
+          "name": "harness-gate-rust-stable-collector",
+          "version": "0.1.0-candidate.1"
+        },
+        "id": "measurement-series/v1:a125aeca2d53df742e713c0ad48b7a8f244a585b2fa1c8a08b7f5ffd77f1a574",
+        "metrics": [
+          {
+            "name": "complexity.cyclomatic",
+            "type": "count"
+          },
+          {
+            "name": "coverage.function",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.line",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.region",
+            "type": "ratio"
+          },
+          {
+            "name": "risk.crap",
+            "type": "rational"
+          }
+        ],
+        "name": "rust-stable-lexical-candidate",
+        "normalization": {
+          "name": "stable-rust-core-candidate",
+          "version": "b876d72b536ff2a809bea7da62a7d4e1b33a670666cca99438462e456f3e3b95"
+        },
+        "rule": {
+          "name": "rust-source-decisions",
+          "version": "rust-source-decisions/v1-candidate"
+        },
+        "runtime": {
+          "name": "rustc",
+          "version": "8bab26f4f68e0e26f0bb7960be334d5b520ea452"
+        },
+        "source_identity": {
+          "name": "rust-lexical-source-span",
+          "version": "1"
+        },
+        "target": "x86_64-unknown-linux-gnu",
+        "tool": {
+          "name": "stable-rust-coverage-tools",
+          "version": "f6cf1932ab62a9b43f6f09107f1ce8720d686a3841908e02cfc80d7c9048acd2"
+        }
+      },
+      "state": "candidate-only"
+    }
+  },
+  "historical": {
+    "record": {
+      "path": "target/gh-259/historical14/comparison.json",
+      "bytes": 9650,
+      "sha256": "180ff4487107c3b43c76b80abd0ad906c74994e8e0fe4f027f626dca38ad8012"
+    },
+    "schema": "rust-stable-historical-comparison/v1",
+    "state": "migration-review-required",
+    "collector_sha256": "b876d72b536ff2a809bea7da62a7d4e1b33a670666cca99438462e456f3e3b95",
+    "historical": {
+      "archive": "docs/quality/gh-220/native-fixtures.tar.gz",
+      "archive_sha256": "0ceb9051ec35c0047bb2c083fab25fb1ba0f72a120b147d1ad3307889ef10391",
+      "index": "docs/quality/gh-220/native-fixtures.json",
+      "original_workspace_path": "target/gh-220/native-tests/tmps4u3czr1/complete",
+      "members": {
+        "complete/evidence.json": "8ddb8b0fd9f5bd5c402e0754ec0846a54b6e5da8c13876462d1b28bb4479e683",
+        "complete/report.json": "e728a77f257929c7dc4463df778814998e8699f76af9c22c3bb79a2435f71f4d",
+        "complete/raw/source.rs": "5848ae7e66cdec35029a945b55d6f4b972c4f1b51256d1e050bba5cb45f0722d"
+      },
+      "source_sha256": "5848ae7e66cdec35029a945b55d6f4b972c4f1b51256d1e050bba5cb45f0722d",
+      "series": {
+        "complexity": "mir-normal-cfg/1",
+        "id": "rust-native-production-experiment/1",
+        "instances": "same-mir-owner-sum-counters/1",
+        "lines": "any-owned-code-region/1",
+        "mapping": "mir-instrument-coverage-exact-regions/1",
+        "selection": "single-crate-no-test-cfg/1"
+      },
+      "scope": "standalone-single-file-fixture",
+      "coverage": {
+        "functions": {
+          "count": 8,
+          "covered": 7
+        },
+        "lines": {
+          "count": 19,
+          "covered": 17
+        },
+        "regions": {
+          "count": 36,
+          "covered": 28
+        }
+      },
+      "backend_complete": false,
+      "source_provenance_complete": false,
+      "functions": [
+        {
+          "name": "closure::{closure#0}",
+          "kind": "closure",
+          "cc": 2,
+          "count": 1,
+          "crap_exact": [
+            2,
+            1
+          ]
+        },
+        {
+          "name": "closure",
+          "kind": "function",
+          "cc": 1,
+          "count": 1,
+          "crap_exact": [
+            1,
+            1
+          ]
+        },
+        {
+          "name": "first",
+          "kind": "function",
+          "cc": 2,
+          "count": 1,
+          "crap_exact": [
+            2,
+            1
+          ]
+        },
+        {
+          "name": "future::{closure#0}",
+          "kind": "async-body",
+          "cc": 2,
+          "count": 0,
+          "crap_exact": [
+            6,
+            1
+          ]
+        },
+        {
+          "name": "future",
+          "kind": "function",
+          "cc": 1,
+          "count": 1,
+          "crap_exact": [
+            1,
+            1
+          ]
+        },
+        {
+          "name": "generic",
+          "kind": "function",
+          "cc": 1,
+          "count": 2,
+          "crap_exact": [
+            1,
+            1
+          ]
+        },
+        {
+          "name": "main",
+          "kind": "function",
+          "cc": 1,
+          "count": 1,
+          "crap_exact": [
+            1,
+            1
+          ]
+        },
+        {
+          "name": "second",
+          "kind": "function",
+          "cc": 2,
+          "count": 1,
+          "crap_exact": [
+            2,
+            1
+          ]
+        }
+      ],
+      "threshold_failures": [
+        "closure::{closure#0}",
+        "future::{closure#0}"
+      ],
+      "authentication": "original manifest/source anchors checked; report is an archived summary, not re-certified"
+    },
+    "stable": {
+      "anchor": {
+        "capture": "complete",
+        "core_acceptance": "pending",
+        "manifest_sha256": "9103a2ba333cf35e7fd747da91baaefa29fc8d861149bc7081207186b7ca320e",
+        "request_sha256": "463d23684ddb4f889a2add48f9a394c66382ee6b99624f53e2f210fefdf70e73",
+        "state": "unsupported"
+      },
+      "series": {
+        "collector": {
+          "name": "harness-gate-rust-stable-collector",
+          "version": "0.1.0-candidate.1"
+        },
+        "id": "measurement-series/v1:a125aeca2d53df742e713c0ad48b7a8f244a585b2fa1c8a08b7f5ffd77f1a574",
+        "metrics": [
+          {
+            "name": "complexity.cyclomatic",
+            "type": "count"
+          },
+          {
+            "name": "coverage.function",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.line",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.region",
+            "type": "ratio"
+          },
+          {
+            "name": "risk.crap",
+            "type": "rational"
+          }
+        ],
+        "name": "rust-stable-lexical-candidate",
+        "normalization": {
+          "name": "stable-rust-core-candidate",
+          "version": "b876d72b536ff2a809bea7da62a7d4e1b33a670666cca99438462e456f3e3b95"
+        },
+        "rule": {
+          "name": "rust-source-decisions",
+          "version": "rust-source-decisions/v1-candidate"
+        },
+        "runtime": {
+          "name": "rustc",
+          "version": "8bab26f4f68e0e26f0bb7960be334d5b520ea452"
+        },
+        "source_identity": {
+          "name": "rust-lexical-source-span",
+          "version": "1"
+        },
+        "target": "x86_64-unknown-linux-gnu",
+        "tool": {
+          "name": "stable-rust-coverage-tools",
+          "version": "f6cf1932ab62a9b43f6f09107f1ce8720d686a3841908e02cfc80d7c9048acd2"
+        }
+      },
+      "llvm_totals": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 7,
+          "covered": 6,
+          "percent": 85.71428571428571
+        },
+        "instantiations": {
+          "count": 9,
+          "covered": 8,
+          "percent": 88.88888888888889
+        },
+        "lines": {
+          "count": 21,
+          "covered": 18,
+          "percent": 85.71428571428571
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 31,
+          "covered": 24,
+          "notcovered": 7,
+          "percent": 77.41935483870968
+        }
+      },
+      "owners": [
+        {
+          "coverage_owner": null,
+          "coverage_state": "unsupported",
+          "discriminator": "rust-source-span/v1:071ee8c14510d36b6125c0a18b191114a6ce559d50cf49a96579a1e50d1c07a0",
+          "file_supported": false,
+          "function": {
+            "complexity": null,
+            "coverage_eligible": false,
+            "name": "future",
+            "reasons": [
+              "async lowering owner not certified"
+            ],
+            "span": [
+              13,
+              1,
+              15,
+              2
+            ],
+            "state": "unsupported"
+          },
+          "path": "source.rs",
+          "source_sha256": "5848ae7e66cdec35029a945b55d6f4b972c4f1b51256d1e050bba5cb45f0722d"
+        },
+        {
+          "coverage_owner": null,
+          "coverage_state": "unsupported",
+          "discriminator": "rust-source-span/v1:e89cd0005c1095fd636853268dd102c12e58cb8646e81875f8aecdae5c8ffc4c",
+          "file_supported": false,
+          "function": {
+            "complexity": null,
+            "coverage_eligible": false,
+            "name": "closure",
+            "reasons": [
+              "closure owner not certified; no parent coverage inheritance"
+            ],
+            "span": [
+              17,
+              1,
+              20,
+              2
+            ],
+            "state": "unsupported"
+          },
+          "path": "source.rs",
+          "source_sha256": "5848ae7e66cdec35029a945b55d6f4b972c4f1b51256d1e050bba5cb45f0722d"
+        },
+        {
+          "coverage_owner": null,
+          "coverage_state": "unsupported",
+          "discriminator": "rust-source-span/v1:4d6fbbf27ff8a13a35fe16d3710f2bf55987191d174c6f2122829dab0ccbc994",
+          "file_supported": false,
+          "function": {
+            "complexity": null,
+            "coverage_eligible": false,
+            "name": "generic",
+            "reasons": [
+              "generic instantiation owner not certified"
+            ],
+            "span": [
+              22,
+              1,
+              22,
+              39
+            ],
+            "state": "unsupported"
+          },
+          "path": "source.rs",
+          "source_sha256": "5848ae7e66cdec35029a945b55d6f4b972c4f1b51256d1e050bba5cb45f0722d"
+        },
+        {
+          "coverage_owner": null,
+          "coverage_state": "unsupported",
+          "discriminator": "rust-source-span/v1:a198575379fe1a916c26dd7c06697dc4495ae5e3cda9b5a36d12fc90441fe01b",
+          "file_supported": false,
+          "function": {
+            "complexity": null,
+            "coverage_eligible": false,
+            "name": "conditional",
+            "reasons": [
+              "unresolved attribute: # [cfg (feature = \"extra\")]"
+            ],
+            "span": [
+              24,
+              1,
+              25,
+              29
+            ],
+            "state": "unsupported"
+          },
+          "path": "source.rs",
+          "source_sha256": "5848ae7e66cdec35029a945b55d6f4b972c4f1b51256d1e050bba5cb45f0722d"
+        },
+        {
+          "coverage_owner": null,
+          "coverage_state": "unsupported",
+          "discriminator": "rust-source-span/v1:26eca8f5b8d23c1333f20c2f5655ce250f7c32cb7d10fc9a7058f1111b89f068",
+          "file_supported": false,
+          "function": {
+            "complexity": null,
+            "coverage_eligible": false,
+            "name": "main",
+            "reasons": [
+              "unresolved attribute: # [cfg (feature = \"extra\")]"
+            ],
+            "span": [
+              33,
+              1,
+              42,
+              2
+            ],
+            "state": "unsupported"
+          },
+          "path": "source.rs",
+          "source_sha256": "5848ae7e66cdec35029a945b55d6f4b972c4f1b51256d1e050bba5cb45f0722d"
+        }
+      ],
+      "build_boundary": "Cargo harness=false test target runs unchanged source main; no claim of identical native build flags"
+    },
+    "migration": {
+      "comparable_series": false,
+      "baseline_adopted": false,
+      "required_binding_changed": false,
+      "function_coverage_and_crap": "unsupported",
+      "raw_coverage": "standard LLVM totals are diagnostic; test/production boundary is not certified"
+    }
+  },
+  "validation": [
+    {
+      "command": "cargo +1.97.1 build --manifest-path tools/quality/rust-stable-collector/Cargo.toml --release --locked --offline",
+      "result": "passed; explicit empty compiler flags/wrappers; same binary reproduced by package preparation",
+      "log": {
+        "path": "target/gh-259/download-build01.log",
+        "bytes": 746,
+        "sha256": "08e2a3075da3a513c07758f1759e1dc50eb8f8af00e6fae221c5710d05b1d846"
+      }
+    },
+    {
+      "command": "cargo +1.97.1 test --manifest-path tools/quality/rust-stable-collector/Cargo.toml --locked --offline",
+      "result": "19 passed; runtime flag/wrapper variables unset",
+      "log": {
+        "path": "target/gh-259/download-tests02.log",
+        "bytes": 2010,
+        "sha256": "0919992af3c8b338b1ce685b378e07be42a21e9d2dc117f359b6a88f7b0eaad7"
+      }
+    },
+    {
+      "command": "cargo +1.97.1 clippy --manifest-path tools/quality/rust-stable-collector/Cargo.toml --all-targets --locked --offline -- -D warnings",
+      "result": "passed",
+      "log": {
+        "path": "target/gh-259/download-clippy01.log",
+        "bytes": 756,
+        "sha256": "d2816f6df5cbcf4395b4e6ffc3f766b57eba460498da039ad038b73e57edac9a"
+      }
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/quality/rust-stable-collector/Cargo.toml -- --check",
+      "result": "passed",
+      "log": {
+        "path": "target/gh-259/download-fmt.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "cargo",
+          "nextest",
+          "run",
+          "--manifest-path",
+          "tools/harness-gate/Cargo.toml",
+          "--locked"
+        ],
+        "exit_code": 0,
+        "env_changes": {
+          "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target",
+          "remove_proxy_env": "HTTP_PROXY,HTTPS_PROXY,ALL_PROXY,NO_PROXY and lowercase equivalents for this test process only"
+        }
+      },
+      "result": "397 passed; no source change; only test-process proxy variables removed",
+      "log": {
+        "path": "target/gh-259/download-core-nextest.log",
+        "bytes": 55037,
+        "sha256": "183b8dd79bdc4b543b3f5dff742b2ce0bef64ae9f3b7649d392d4f9435bbb988"
+      }
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "result": "passed",
+      "log": {
+        "path": "target/gh-259/download-core-fmt.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "result": "passed",
+      "log": {
+        "path": "target/gh-259/download-core-clippy.log",
+        "bytes": 72,
+        "sha256": "e736d608af4933d92144949c87701ac8f4de67b152ddfb1a7507d4d66022e032"
+      }
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "result": "444 tests, OK, 36 explicitly manual legacy skips",
+      "log": {
+        "path": "target/gh-259/download-quality-tests.log",
+        "bytes": 77459,
+        "sha256": "5ec307e149a58fa7e0a10cf69866076f91b0d5a2cee2ae2d4b070cf3ded86f35"
+      }
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/release/tests -v",
+      "result": "91 tests, OK",
+      "log": {
+        "path": "target/gh-259/download-release-tests.log",
+        "bytes": 14290,
+        "sha256": "5216c990ce0679b074340060644df8cf879921795911577dd496bedafda863f7"
+      }
+    },
+    {
+      "command": "env -u RUSTFLAGS -u RUSTDOCFLAGS -u CARGO_ENCODED_RUSTFLAGS -u RUSTC_WRAPPER -u RUSTC_WORKSPACE_WRAPPER cargo test --manifest-path tools/quality/rust-stable-collector/Cargo.toml --locked",
+      "environment": "RUSTUP_TOOLCHAIN=1.97.1; workspace target; parent defines all five injection variables as empty, as CI does",
+      "result": "19 passed",
+      "log": {
+        "path": "target/gh-259/download-ci-unit-environment.log",
+        "bytes": 1865,
+        "sha256": "1ef48bc0dfb652d0677db4e08168b88c88faa487bec44a3c43711b16497b53c5"
+      }
+    },
+    {
+      "command": "bash tools/release/tests/test_install.sh",
+      "result": "installer integrity tests: pass; repository automation mocks, not production installation",
+      "log": {
+        "path": "target/gh-259/download-install-shell.log",
+        "bytes": 213,
+        "sha256": "9ded19064fc7914af9a3a0dc4586054cd709862cf0117677fbea335b5a653a7c"
+      }
+    },
+    {
+      "command": "CARGO_TARGET_DIR=WORKSPACE/target/gh-259/core-target python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "result": "passed",
+      "log": {
+        "path": "target/gh-259/download-docs-consistency.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "command": "harness-gate config check; harness-gate verify --profile ci --all",
+      "result": "not applicable; no .harness-gate/flow.toml; no configuration invented"
+    },
+    {
+      "command": "CARGO_TARGET_DIR=WORKSPACE/target/gh-259/core-target python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "result": "passed after final documentation and CI environment explanation",
+      "log": {
+        "path": "target/gh-259/download-docs-consistency-final.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "ci_environment_fix": "Reproduced empty release-build flags reaching runtime tests; CI unit command removes five compiler flag/wrapper variables, then unsets them after traced release build before runtime acceptance. Runtime rejection remains strict.",
+  "earlier_attempts": [
+    {
+      "record": {
+        "path": "target/gh-259/download-tests01.log",
+        "bytes": 3019,
+        "sha256": "5ece8895b41353335f1e1306b2af3fccad1d5c44ba62f3b0d8c1e241eecc99e3"
+      },
+      "result": "18 passed, one environment rejection: explicitly empty RUSTFLAGS treated as unsupported runtime input; rerun with variables unset, no assertion weakened"
+    },
+    {
+      "record": {
+        "path": "target/gh-259/download-acceptance01.log",
+        "bytes": 814,
+        "sha256": "11ed5c49d672a4f5bad1395084ae3dee789b04d1c24e0a9b162c710fe540afdd"
+      },
+      "result": "test TLS fixture used CA as endpoint certificate; rustls rejected CaUsedAsEndEntity; fixed repository fixture with separate CA/leaf"
+    },
+    {
+      "record": {
+        "path": "target/gh-259/download-acceptance02/summary.json",
+        "bytes": 45798,
+        "sha256": "4430570f21a3afaef051069d9c0ce16c95862abcea67668d689fcb1bdd74d2bf"
+      },
+      "result": "27 passed using prior lifecycle13 bundles; superseded by 29 checks using final lifecycle14 bundles"
+    },
+    {
+      "record": {
+        "path": "target/gh-259/download-core19-commands.json",
+        "bytes": 474,
+        "sha256": "3b345cb309e25ff26bc0825ec5fc84abebcc7b33b0d11b33aa4e24060f1b9f71"
+      },
+      "result": "Core harness invocation omitted capture acceptance directory; usage error, corrected Core20 invocations passed"
+    }
+  ],
+  "runtime_inspection": {
+    "record": {
+      "path": "target/gh-259/download-readelf.log",
+      "bytes": 1537,
+      "sha256": "feae0ea9f3ca380e5c301a92caf9fa0ec2b3cb2ccf00c40874c38fa26e94333d"
+    },
+    "needed": [
+      "libgcc_s.so.1",
+      "libc.so.6"
+    ],
+    "limits": "ELF inspection and command records are not a transitive process trace; required CI requests real strace; restricted local host cannot trace"
+  },
+  "remaining": [
+    "Rust 1.98.1 and matching LLVM unavailable; retained official-manifest proxy failure",
+    "second runnable Linux system unavailable; retained container/user-namespace failures",
+    "real cosign/dual-signature and public distribution acceptance absent",
+    "protected trust bootstrap, production license review and release authorization pending",
+    "complete compiler-input and generated-owner certification, CRAP and reviewed measurement migration unfinished"
+  ],
+  "artifact_scope": "Original workspace logs remain at their paths; compact review metadata only. No toolchains, test keys, fixtures, automation or acceptance archive in release payload."
+}
