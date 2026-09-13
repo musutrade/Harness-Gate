@@ -57,6 +57,64 @@ does not identify a particular erroneous rustc branch or justify guessing at a
 third-party patch. See the public
 [rustc coverage contract](https://doc.rust-lang.org/rustc/instrument-coverage.html).
 
+### Stable span diagnostic
+
+`diagnose_macro_spans.py` now reproduces that gap from a fresh fixture copy. It
+runs the original and diagnostic macro under both configurations, for four real
+test/coverage executions. The diagnostic wrapper calls the same generator and
+returns its original tokens; it only traverses a clone to log stable `proc_macro`
+line/column ranges. The generator, consumer and dependency files remain unchanged.
+The driver verifies identical consumer coverage exports before/after logging and
+different generated `configured` tokens between configurations. It never uses
+compiler-private APIs, a compiler build, MIR dumps or a replacement macro expander.
+
+```sh
+python3 tools/quality/rust-stable-collector/diagnose_macro_spans.py \
+  --output target/macro-span-diagnostic --toolchain 1.97.1 \
+  --llvm-cov /absolute/path/to/matching/llvm-cov \
+  --llvm-profdata /absolute/path/to/matching/llvm-profdata
+```
+
+Both LLVM paths are required, checked for existence and matched to the compiler's
+LLVM version before collection. These are preinstalled external dependencies.
+The span API used here is stable since Rust 1.88; this diagnostic was actually run
+only on 1.97.1. See [the stable Span API](https://doc.rust-lang.org/proc_macro/struct.Span.html).
+
+Observed ranges are 1-based, with an exclusive end column:
+
+| Invocation | Configuration | Body range | Interior token/group count | Interior ranges equal body |
+| --- | --- | --- | --- | --- |
+| `plain` | Both | 3:1–3:33 | 1 | Yes |
+| `branch` | Both | 4:1–4:33 | 9 | Yes |
+| `unexecuted` | Both | 5:1–5:37 | 9 | Yes |
+| `configured` | Default | 9:1–9:38 | 1 | Yes |
+| `configured` | Branching | 7:1–7:37 | 9 | Yes |
+
+Source inspection of the pinned Rust 1.97.1 narrows the suspected failure layer:
+
+- [Coverage span filtering](https://github.com/rust-lang/rust/blob/1.97.1/compiler/rustc_mir_transform/src/coverage/spans.rs#L48-L72)
+  removes spans that occupy the entire body and stops if no usable spans remain.
+- [Mapping extraction](https://github.com/rust-lang/rust/blob/1.97.1/compiler/rustc_mir_transform/src/coverage/mappings.rs)
+  reports an empty mapping set; [instrumentation](https://github.com/rust-lang/rust/blob/1.97.1/compiler/rustc_mir_transform/src/coverage/mod.rs)
+  then returns without adding counters.
+- A separate [eligibility rule](https://github.com/rust-lang/rust/blob/1.97.1/compiler/rustc_mir_transform/src/coverage/query.rs)
+  disables coverage on `automatically_derived` implementations. Our function macro
+  emits no such attribute, so that rule does not explain this reproducer.
+
+The observed token ranges are consistent with the body-span filter discarding
+generated statements. This is an inference, not a trace of internal compiler
+execution: the stable diagnostic does not observe final lowered spans or hygiene
+contexts. Therefore it neither proves a compiler defect nor supplies a fix. Assigning
+invented distinct spans to make counters appear would not certify their ownership
+or coverage. No such workaround is adopted.
+
+The compact record is [macro-span-diagnostic.json](stable-rust-candidate-evidence/macro-span-diagnostic.json);
+full exports/logs are anchored under `target/gh-259/macro-span-diagnostic03/`.
+The initial run without explicit LLVM paths attempted cargo-llvm-cov's rustup
+component setup and failed on the read-only toolchain/download location before
+coverage ran. The revised driver requires existing tools and records their hashes.
+That failed attempt remains recorded; it is not acceptance evidence.
+
 The regression driver runs both real test/coverage configurations and the Rust
 observer. It rejects altered source/model/version identities, wrong anchors, mixed
 configurations, forged coverage zero, altered targets and duplicate owner claims.

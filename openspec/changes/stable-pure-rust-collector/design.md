@@ -35,6 +35,14 @@ adoption additionally requires real coverage alignment, unexecuted and ambiguous
 owners, nested macros and a faulty-mapping regression. Keep missing evidence blocking.
 No third-party library modifications are justified until a concrete defect is reproduced.
 
+The stable macro span diagnostic now compares original/logging-only wrappers on
+both fixture configurations. Equal generated body/interior ranges and unchanged
+consumer exports narrow the source-level gap to a possible compiler span-filter
+interaction; final lowered spans/contexts remain unobserved. See
+`docs/quality/stable-rust-macro-observation.md` for pinned compiler source links,
+actual evidence and inference limits. No third-party fix or generated coverage is
+claimed, and T4 remains open.
+
 Keep code expansion size and cognitive complexity separate from the cyclomatic
 complexity used by CRAP. Do not introduce macro-stats, cargo-expand or other unstable
 compiler options into official collection or required CI. Visualization and tracing
