@@ -90,11 +90,13 @@ class PreparationTests(unittest.TestCase):
                 acceptance(path, '0' * 64, binary)
             with self.assertRaisesRegex(ValueError, 'candidate binary'):
                 acceptance(path, pin, dict(binary, bytes=0))
-            semantic = next(check for check in value['checks'] if check['name'] == 'negative-function-count')
-            semantic['name'] = 'unrelated-placeholder'
-            with self.assertRaisesRegex(ValueError, 'incomplete or failed'):
-                acceptance(path, save(), binary)
-            semantic['name'] = 'negative-function-count'
+            for name in ('negative-function-count', 'certified-function-owners',
+                         'missing-llvm-owner', 'omitted-source-owners', 'changed-test-exclusions'):
+                semantic = next(check for check in value['checks'] if check['name'] == name)
+                semantic['name'] = 'unrelated-placeholder'
+                with self.assertRaisesRegex(ValueError, 'incomplete or failed'):
+                    acceptance(path, save(), binary)
+                semantic['name'] = name
             value['checks'][0]['passed'] = False
             with self.assertRaisesRegex(ValueError, 'incomplete or failed'):
                 acceptance(path, save(), binary)
