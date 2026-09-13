@@ -1,71 +1,78 @@
 # Published releases and remaining work
 
-Verified on **2026-09-12**. This is the current delivery record and Arc-Admin
-handoff for GH-239/GH-240/GH-225; earlier preparation documents retain their
-historical status. Relevant Engineering Policy semantics remain unchanged.
+Verified on **2026-09-13**. This record distinguishes released delivery, reused
+native evidence and remaining project integration. Engineering Policy semantics
+and historical failed runs remain unchanged.
 
 ## Releases
 
 | Component | Version and source | Status |
 | --- | --- | --- |
-| Core | [0.4.1](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.1), `62313a251f1862707a887480cbf593130da2ba4a` | GitHub binaries for Linux x86_64, macOS x86_64/arm64 and Windows x86_64; [crates.io 0.4.1](https://crates.io/crates/harness-gate/0.4.1) published, not yanked |
-| Rust collector | [0.1.0-rc.1](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-v0.1.0-rc.1), `7165558f5e9f5ca5a0de8c9cd33a11d733909f48` | Six immutable assets; original RSA/Sigstore signatures verified before and after publication |
-| Rust installer | [0.1.0-rc.2](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-installer-v0.1.0-rc.2), same source as Core 0.4.1 | Twelve assets; compressed and cached transport installs unchanged collector 0.1.0-rc.1 |
+| Core | [0.4.1](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.1), `62313a251f1862707a887480cbf593130da2ba4a` | Signed GitHub binaries; [crates.io 0.4.1](https://crates.io/crates/harness-gate/0.4.1) published |
+| Rust collector | [0.1.0-rc.2](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-v0.1.0-rc.2), `19d7ed59851d5f042730eb5cb7cf9e0aa67a1345` | Six signed assets; both production readback verifications passed |
+| Rust installer | [0.1.0-rc.3](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-installer-v0.1.0-rc.3), same source as collector RC2 | Compressed, cached delivery of collector RC2 |
 
-The installer reconstructs the byte-identical signed collector archive from
-282,243,324 bytes of compressed layers (original archive: 1,061,498,880 bytes).
-First-use download including bootstrap, verifier and metadata is approximately
-444 MB. This reduces transfer size, not installed disk usage to the same extent.
+The checked root installer now pins installer RC3. README commands use its fixed
+source revision, since the historical `v0.4.1/install.sh` correctly retains its
+old RC2-installer/RC1-plugin pin. Existing tags are never rewritten.
 
 Core Linux binary SHA-256: `fb2d79704b4fd31b7372484b5af1f20651906f21020ff1f42027ff9bc39dc0dd`.
 Crate checksum: `0a03984be110b4b174c0c4b8ad68925695bfde950549c490cf47e2f904fb20f6`.
-Installer SHA-256: `0a1136ede55682d1163ac8588a2d5d637b5ce57b1952b3d1885fc585e942219b`.
+Installer RC3 SHA-256: `e69025454cedd659ad91d2522c7636e6c4a53c164e477ffafd2ca75d8cf17760`.
+
+The unchanged 1,061,498,880-byte signed runtime archive is delivered through
+approximately 282 MB of compressed layers. First use with bootstrap, verifier
+and metadata totals approximately 444 MB; previously verified tools are cached.
+Installed disk usage remains larger than compressed transfer size.
 
 ## Compatibility
 
-The collector's signed manifest and [reviewed compatibility material](https://github.com/musutrade/Harness-Gate/releases/download/rust-collector-review-7165558-v1/compatibility.json)
-bind **Core 0.4.0**, source `ee544690662645806cda7dd4cd2c9192566f7929`, Linux binary
-SHA-256 `8e3df8303ca8f650d4ef768b29cfefb60ca115122a47b116245cc19e4649bbdd`.
-The exact host is Linux x86_64, glibc 2.43, kernel `7.0.0-31-generic`, with runtime
-library inventory fingerprint `f9b213877a2ea9aa44e6119e6fe2e1361f84f9a8084abd410ab8ef34b74e2872`.
-Matching only the distribution name or glibc version is insufficient.
+The [RC2 reviewed matrix and acceptance materials](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-materials-19d7ed5-v1)
+bind **Core 0.4.1** and its exact binary above. The host is Linux x86_64, glibc
+2.43, kernel `7.0.0-31-generic`, with library inventory fingerprint
+`f9b213877a2ea9aa44e6119e6fe2e1361f84f9a8084abd410ab8ef34b74e2872`.
+Matching a distribution name or glibc version alone is insufficient.
 
-Core 0.4.1 and the new installer passed installation/signature verification, but
-this does **not** extend native measurement certification to Core 0.4.1. A new
-real capture/re-export/Core evaluation and reviewed compatibility entry are
-required for that pair; changing the immutable plugin manifest requires a new
-plugin version. Retain Core 0.4.0 for the certified measurement path meanwhile.
-The repository's empty development matrix is not the published reviewed matrix.
+The incremental acceptance installs RC2, verifies clean installation and
+selection/rollback, then authenticates configured Core collection using the
+retained original capture. Every retained runtime payload matches RC2. This
+preserves the capture's original tool paths and anchors; it does not rename or
+reseal old captures or claim a new native compilation. The exact 1,778-function
+measurement and real numerical pass/fail controls are retained. Changed
+source/tool/series identities still require explicit review.
 
-Rust-specific rustc/MIR/LLVM collection is delivered by the optional plugin.
-Core retains generic execution, trust validation, requiredness, coverage/CRAP
-thresholds, baseline/lineage, debt/ratchet and the final project decision.
-Installing the plugin does not provision project-signed requests or policy state.
+The [original RC1/Core 0.4.0 matrix](https://github.com/musutrade/Harness-Gate/releases/download/rust-collector-review-7165558-v1/compatibility.json)
+and its [native/source/bootstrap materials](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-materials-7165558-v1)
+remain historical evidence. The empty development matrix is not the published
+reviewed matrix. Core still owns generic trust, requiredness, thresholds,
+baseline/lineage, debt/ratchet and final decisions; the optional plugin owns Rust
+measurement. Installation does not provision a project's trusted state.
 
-## Acceptance and immutable handoff
+## Publication receipts
 
-- [Main CI 34704575706](https://github.com/musutrade/Harness-Gate/actions/runs/34704575706), [installer publication 34706631425](https://github.com/musutrade/Harness-Gate/actions/runs/34706631425), and [Core/crates.io publication 34706873399](https://github.com/musutrade/Harness-Gate/actions/runs/34706873399) passed.
-- The collector's [original publication run 34692373716](https://github.com/musutrade/Harness-Gate/actions/runs/34692373716) failed during an HTTP/2 readback after signing/upload. Authorized operator continuation used HTTP/1.1 and the unchanged production verifier. Both draft and public readbacks passed; the original Actions failure remains recorded in [recovery receipt](quality/release-0.4.1/recovery-result.json), with the [six-asset sizes and digests](quality/release-0.4.1/published-verification.json).
-- [Immutable acceptance/source/bootstrap materials](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-materials-7165558-v1) include `fresh_host_install.json`, `native_capture_reexport.json`, `generic_core.json`, `lifecycle_negatives.json`, `bootstrap_negatives.json`, and `real_sigstore_positive_and_negatives.json`, plus corresponding sources, notices, relink materials, checksums and retention record.
-- [Immutable review materials](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-review-7165558-v1) include compatibility, rebuild equivalence and per-file license reviews. The engineering reviewer is recorded as Codex; this is not an invented independent human review.
-- Public installer download matched the pinned digest and passed real Sigstore verification against the collector workflow identity on `refs/heads/main`. Running it verified the selected plugin using the cached verifier. Core 0.4.1 was installed from its signed public binary and its version checked; Core 0.4.0 was retained for rollback and certified measurement.
+- Core/crates.io [publication 34706873399](https://github.com/musutrade/Harness-Gate/actions/runs/34706873399) passed; Core is already available through both channels.
+- RC2 [private signing 34728799308](https://github.com/musutrade/Harness-Gate/actions/runs/34728799308) passed. [Publication 34729745154](https://github.com/musutrade/Harness-Gate/actions/runs/34729745154) was interrupted after HTTP/2 uploaded only about 39 MB in 24 minutes. HTTP/1.1 uploaded the same signed archive successfully. The original failure is preserved in the [operator continuation](quality/release-rc2/operator-continuation.json).
+- The unchanged production verifier passed on both [draft](quality/release-rc2/draft-verification.json) and [public](quality/release-rc2/published-verification.json) downloads. SHA-256, RSA, Sigstore, provenance, approved packet and exact-source requirements were not bypassed.
+- Installer RC3 passed the existing protected [publication workflow 34731395535](https://github.com/musutrade/Harness-Gate/actions/runs/34731395535). The public script also passed Sigstore verification and [installed RC2 on the host](quality/release-rc2/public-user-install.json). Publication uploads now select HTTP/1.1, matching the bounded range-download path.
+- Original RC1's failed HTTP/2 readback and successful continuation remain in the [2026-09-12 record](quality/release-0.4.1/recovery-result.json); later success does not rewrite that run.
 
-For installation, offline kit, trust and rollback, use the [installation guide](quality/rust-collector-installation.md).
-For native acceptance inspect the immutable receipts above: project source,
-original binaries/profiles and independent capture anchors remain project/operator
-owned. Package signatures are not runtime capture signatures. No Arc-Admin
-business source or signing private keys are added to this documentation.
+See the [installation/offline/lifecycle guide](quality/rust-collector-installation.md).
+Private signing keys and Arc Admin business source are not part of this handoff.
 
-## Issue disposition
+## Issues and Arc Admin
 
-| Issue | Disposition and remaining boundary |
+| Issue | Current disposition |
 | --- | --- |
-| [#239](https://github.com/musutrade/Harness-Gate/issues/239) | Completed: production prerequisites, exact candidate/bootstrap certification, license/retention records and approved publication packet are evidenced above. |
-| [#240](https://github.com/musutrade/Harness-Gate/issues/240) | Completed: approved RC publication, two verified readbacks and this immutable-source-linked owner handoff. Historical failed workflow is preserved. |
-| [#225](https://github.com/musutrade/Harness-Gate/issues/225) | RC delivery P0–P8 completed; no claim of stable promotion or Arc-Admin gate transfer. |
-| [#249](https://github.com/musutrade/Harness-Gate/issues/249) | Open: exact Core 0.4.1/plugin native compatibility acceptance and any required new immutable plugin version. |
-| [#215](https://github.com/musutrade/Harness-Gate/issues/215) | Remains open: trusted full/hook integration, authenticated baseline lineage, frontend/API evidence, failure/routing parity and complete workload costs. Fresh backend capture/re-export is now available but does not satisfy the whole issue. |
+| [#239](https://github.com/musutrade/Harness-Gate/issues/239), [#240](https://github.com/musutrade/Harness-Gate/issues/240), [#225](https://github.com/musutrade/Harness-Gate/issues/225) | Completed RC preparation/publication; historical evidence retained. |
+| [#249](https://github.com/musutrade/Harness-Gate/issues/249) | RC2 provides the reviewed Core 0.4.1 tuple and new immutable delivery. |
+| [#215](https://github.com/musutrade/Harness-Gate/issues/215) | [Arc Admin #40](https://github.com/musutrade/arc-admin/pull/40) adds native frontend/API evidence, project host state and Git-baseline bootstrap. Integration and complete-workload acceptance are tracked separately from plugin delivery. |
+| [#251](https://github.com/musutrade/Harness-Gate/pull/251) | Merged fix for real staged partial quality input loading. Released Core 0.4.1 fails that case; the patched candidate passes. Candidate validation is not a claim that the old binary changed. |
 
-Next delivery work is Core 0.4.1/plugin native compatibility certification, then
-GH-215's project-owned complete integration and cost acceptance. Stable collector
-promotion and replacement of Arc-Admin's existing gates wait for that evidence.
+Completed Arc Admin work is reused: the existing 25 execution gates plus two
+prelude checks, the original native backend capture/re-export, and unchanged
+lifecycle/cryptographic negative coverage. Fresh frontend measurement covers all
+141 production TS files: 24 test files and 85 tests pass, but line coverage is
+44.15% and function coverage 41.34%, below the existing 80% threshold. API
+breaking-change, generation-drift and compatibility policies pass. Full quality
+remains fail because of actual coverage/CRAP results. Existing `cargo flow` gates
+remain in place; stable collector promotion and authority transfer are not claimed.

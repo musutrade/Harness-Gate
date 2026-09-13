@@ -1,19 +1,19 @@
 # Rust collector installation and independent release
 
-The collector **0.1.0-rc.1** and compressed installer **0.1.0-rc.2** are published.
+The collector **0.1.0-rc.2** and compressed installer **0.1.0-rc.3** are published.
 See [current release receipts and compatibility](../release-status.md). This guide
 supersedes the historical GH-229/GH-231 preparation instructions for normal use.
-Core and installer installation are verified at Core 0.4.1; the RC's native
-measurement compatibility receipt still pins Core 0.4.0 and the exact tested
-Linux x86_64 host. Installing both does not extend that certification.
+The RC2 compatibility matrix includes Core 0.4.1 on the exact tested Linux
+x86_64 host. The original native capture and identical runtime payload are
+reused explicitly; the new manifest, installation and Core binding are verified.
 
 ## Recommended installation
 
-Download the existing Core installer from its immutable release source:
+Download the current Core installer from its immutable source revision:
 
 ```bash
 curl --fail --show-error --location --proto '=https' --tlsv1.2 \
-  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.4.1/install.sh \
+  https://raw.githubusercontent.com/musutrade/Harness-Gate/13722b0ba8781be106c160c422c07fbacb1bdc6e/install.sh \
   -o /tmp/harness-gate-install.sh
 # Add only the optional plugin
 bash /tmp/harness-gate-install.sh --rust-only
@@ -53,7 +53,7 @@ is larger than the compressed download size.
 ## Offline installation
 
 On a connected machine, download **all twelve assets** from the
-[installer release](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-installer-v0.1.0-rc.2)
+[installer release](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-installer-v0.1.0-rc.3)
 into one directory. Add the official
 [cosign-linux-amd64 v3.1.3](https://github.com/sigstore/cosign/releases/download/v3.1.3/cosign-linux-amd64)
 with that exact filename and SHA-256
@@ -74,20 +74,20 @@ The installer still verifies every input and the reconstructed signed payload.
 
 ## Original signed assets and production trust
 
-The [original RC release](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-v0.1.0-rc.1)
+The [signed RC2 release](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-v0.1.0-rc.2)
 retains exactly six assets: `collector.tar`, `manifest.json`, `sbom.spdx.json`,
 `provenance.json`, `release-inventory.json`, and `release-inventory.sig`.
 The production signature control contains RSA and Sigstore verification material;
 legacy RSA-only v1 trust is insufficient for this release. The production RSA
 key is 3072 bits (384-byte signatures). Public trust is carried by the separately
 authenticated installer, and the private key stays in the protected environment.
-See the [six-asset readback receipt](release-0.4.1/published-verification.json).
+See the [six-asset readback receipt](release-rc2/published-verification.json).
 
 Checks bind the entire inventory, payload hashes, source, provenance, exact ABI,
 and signer identity. Missing, extra, tampered or incompatible inputs fail closed.
 [Immutable source, notices and relink materials](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-materials-7165558-v1)
 and [per-file engineering review](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-review-7165558-v1)
-accompany the RC. Installer and plugin versions remain independent.
+remain applicable to the identical runtime payload; [RC2 incremental review](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-materials-19d7ed5-v1) binds the new manifest and Core tuple. Installer and plugin versions remain independent.
 
 ## Advanced lifecycle
 
@@ -97,10 +97,10 @@ Python 3.11+ and an independently pinned **v2** trust file. This advanced entry
 is distinct from the automatic shell installer. For example:
 
 ```bash
-python3 tools/release/install_collector.py --root /absolute/collector-root --trust /absolute/host/trust-v2.json select --version 0.1.0-rc.1
-python3 tools/release/install_collector.py --root /absolute/collector-root --trust /absolute/host/trust-v2.json rollback --version 0.1.0-rc.1
+python3 tools/release/install_collector.py --root /absolute/collector-root --trust /absolute/host/trust-v2.json select --version 0.1.0-rc.2
+python3 tools/release/install_collector.py --root /absolute/collector-root --trust /absolute/host/trust-v2.json rollback --version 0.1.0-rc.2
 python3 tools/release/install_collector.py --root /absolute/collector-root --trust /absolute/host/trust-v2.json recover
-python3 tools/release/install_collector.py --root /absolute/collector-root --trust /absolute/host/trust-v2.json uninstall --version 0.1.0-rc.1
+python3 tools/release/install_collector.py --root /absolute/collector-root --trust /absolute/host/trust-v2.json uninstall --version 0.1.0-rc.2
 ```
 
 Install and select print the exact version's launcher path. `current.json` is the
