@@ -198,7 +198,7 @@ does not claim compilation, reachability or expansion of every parsed source.
 
 | Construct | Current real behavior | Certification boundary |
 | --- | --- | --- |
-| Unannotated root function, including never-called | Lexical complexity, function execution and code-region ratios | ASCII, single-file LLVM owner; CRAP model and migration remain unaccepted |
+| Unannotated root or inline-module free function, including never-called | Lexical complexity, function execution and code-region ratios | ASCII, single-file LLVM owner; CRAP model and migration remain unaccepted |
 | Direct `#[test]` or `#[cfg(test)]` function/module | Explicit source spans excluded from certified function owners | Raw file totals still include tests; normalized production owners exclude their regions |
 | Macro/derive/include-generated code | Expansion/attribute recorded as unsupported | No generated owner inferred from parent/file totals |
 | Async/closure/nested function | Affected lexical function is unsupported with null complexity | Constructor, future body and closure owners are never merged |
@@ -208,10 +208,12 @@ does not claim compilation, reachability or expansion of every parsed source.
 | Build script output | Build script runs; no instrumentation of the host build script | Generated paths/raw export retained; production owner unsupported |
 | Parse/tool/identity/format error | `measurement_error`, nonzero process exit | No successful evidence manifest |
 
-Function ownership uses `rust-llvm-exact-root-owner/v2-candidate`: every function
-in an eligible source file must be an unannotated, nongeneric root function with
-no uncertified syntax; non-ASCII files, module/impl methods and annotated functions
-remain unsupported for this mapping. LLVM records must name exactly that source
+Function ownership uses `rust-llvm-exact-free-owner/v3-candidate`: every function
+in an eligible source file must be an unannotated, nongeneric free function at
+the root or inside unannotated inline modules, with no uncertified syntax.
+Qualified names distinguish nested modules and repeated function names; matching
+still uses exact source spans. Non-ASCII files, external or annotated modules,
+impl/trait methods and annotated functions remain unsupported for this mapping. LLVM records must name exactly that source
 file and contain only code regions. Their exact minimum start / maximum exclusive
 end must uniquely equal one source function span or lie wholly inside one explicit
 test exclusion. Each source owner requires exactly one LLVM record; symbols must
@@ -221,7 +223,7 @@ duplicate, cross-file or ambiguous owners fail with `measurement_error`; no miss
 function is assigned a zero. Collection and verification recompute source analysis
 from pinned files, including its complete file set. Symbol suffixes are never used
 as the mapping algorithm. This narrow contract was actually exercised only with
-the recorded Rust 1.97.1 fixture; broader syntax/toolchain certification remains open.
+the recorded Rust 1.97.1 fixtures; broader syntax/toolchain certification remains open.
 
 Within that exact owner, region coverage counts each distinct LLVM code-region
 span once and counts it covered only when its own counter is nonzero. Duplicate
@@ -231,6 +233,14 @@ narrow rule follows LLVM 22.1.6's
 [function region statistics](https://github.com/llvm/llvm-project/blob/llvmorg-22.1.6/llvm/tools/llvm-cov/CoverageSummaryInfo.cpp).
 The real partial fixture distinguishes function execution 1/1 from region
 coverage 5/6; an exported never-called function is 0/1 and 0/3 respectively.
+The inline-module fixture separately verifies `left::classify` at 4/5 regions
+and one execution, `right::classify` at 5/5 and two executions, and
+`left::nested::never_called` at 0/3 and zero executions. Annotated/cfg module
+variants compile and run but remain unsupported; missing or duplicate owners
+and inherited positive counts fail measurement. The v3 rule broadens owner
+placement without changing the metric definitions or authorizing baseline adoption.
+The binary-bound Core normalization identity changes with this executable; it
+therefore produces a different full measurement-series identity.
 This is standard LLVM region coverage, not MIR basic-block coverage, branch
 coverage, or a claim about arbitrary segment/expansion semantics.
 

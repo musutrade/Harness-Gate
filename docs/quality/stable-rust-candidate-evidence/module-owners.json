@@ -1,0 +1,2334 @@
+{
+  "schema": "rust-stable-inline-module-checkpoint/v1",
+  "state": "partial implementation; T3-T8 incomplete; release hold retained",
+  "rule": "rust-llvm-exact-free-owner/v3-candidate",
+  "binary": {
+    "path": "target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+    "bytes": 3475840,
+    "sha256": "6addb9cf8c716304464f756c3f6e37e402bf65823cb0ba418f610572770e6701"
+  },
+  "before": {
+    "record": {
+      "path": "target/gh-259/modules-before-formatted/summary.json",
+      "bytes": 1141,
+      "sha256": "d23db2807f2fed95594cca61c8e049908350b88cd29d6fbb9c11528e885643ee"
+    },
+    "binary_sha256": "b876d72b536ff2a809bea7da62a7d4e1b33a670666cca99438462e456f3e3b95",
+    "source_files": {
+      "Cargo.lock": {
+        "bytes": 166,
+        "sha256": "db30ca4b66dbea0d4fcceb69649a2d1e3d1908460be255872f029f1eeb6017c6"
+      },
+      "Cargo.toml": {
+        "bytes": 106,
+        "sha256": "fe9a0ba3cfb28ecf10549ae904c2dbb3e223af5ffec4e97da0e8676f1378ce87"
+      },
+      "src/lib.rs": {
+        "bytes": 689,
+        "sha256": "7d89931e082c2c2b5cd4d26cbb4bd921ce455758bdb0242dd1a84512755f3ca1"
+      }
+    },
+    "anchor": {
+      "capture": "complete",
+      "core_acceptance": "pending",
+      "manifest_sha256": "067c709ad7149efbbdfc255e7ad76eb7efe9b517a6c70e7fcd268ad3fcede210",
+      "request_sha256": "16064a36e23734b2e9ac60cdfb13e2cb308fd6331848b7592f137326cfbf6c20",
+      "state": "unsupported"
+    },
+    "owners": [
+      {
+        "name": "left::classify",
+        "complexity": 2,
+        "coverage_state": "unsupported"
+      },
+      {
+        "name": "left::nested::never_called",
+        "complexity": 1,
+        "coverage_state": "unsupported"
+      },
+      {
+        "name": "right::classify",
+        "complexity": 2,
+        "coverage_state": "unsupported"
+      }
+    ],
+    "commands": [
+      {
+        "argv": [
+          "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/modules-before/collector-before",
+          "doctor",
+          "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/modules-before-formatted/project",
+          "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/modules-before-formatted/doctor"
+        ],
+        "exit_code": 0
+      },
+      {
+        "argv": [
+          "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/modules-before/collector-before",
+          "prepare",
+          "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/modules-before-formatted/project",
+          "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/modules-before-formatted/capture",
+          "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/modules-before-formatted/doctor/doctor.json"
+        ],
+        "exit_code": 0
+      },
+      {
+        "argv": [
+          "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/modules-before/collector-before",
+          "collect",
+          "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/modules-before-formatted/request.json"
+        ],
+        "exit_code": 0
+      },
+      {
+        "argv": [
+          "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/modules-before/collector-before",
+          "describe",
+          "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/modules-before-formatted/capture",
+          "067c709ad7149efbbdfc255e7ad76eb7efe9b517a6c70e7fcd268ad3fcede210",
+          "16064a36e23734b2e9ac60cdfb13e2cb308fd6331848b7592f137326cfbf6c20"
+        ],
+        "exit_code": 0
+      }
+    ]
+  },
+  "after": {
+    "request": {
+      "path": "target/gh-259/acceptance-29/request-modules.json",
+      "bytes": 2779,
+      "sha256": "90a97669c240a6e843c4fcfa4d985bec693539cdf75f33628a3d7b469731b271"
+    },
+    "same_source_manifest_lock_as_before": true,
+    "complexities": [
+      2,
+      1,
+      2
+    ],
+    "anchors": {
+      "capture": "complete",
+      "core_acceptance": "pending",
+      "manifest_sha256": "16056293d63de047852ac924964bda21edc5d456cc0fcdb4424902e80a46d696",
+      "request_sha256": "90a97669c240a6e843c4fcfa4d985bec693539cdf75f33628a3d7b469731b271",
+      "state": "unsupported"
+    },
+    "function_owners": [
+      {
+        "coverage_function": {
+          "covered": 1,
+          "total": 1,
+          "type": "ratio"
+        },
+        "coverage_region": {
+          "covered": 4,
+          "total": 5,
+          "type": "ratio"
+        },
+        "execution_count": 1,
+        "llvm_function_index": 0,
+        "name": "left::classify",
+        "span": [
+          2,
+          5,
+          8,
+          6
+        ],
+        "symbol": "_RNvNtCsaEINoLvSCvk_22stable_modules_fixture4left8classify"
+      },
+      {
+        "coverage_function": {
+          "covered": 0,
+          "total": 1,
+          "type": "ratio"
+        },
+        "coverage_region": {
+          "covered": 0,
+          "total": 3,
+          "type": "ratio"
+        },
+        "execution_count": 0,
+        "llvm_function_index": 4,
+        "name": "left::nested::never_called",
+        "span": [
+          11,
+          9,
+          13,
+          10
+        ],
+        "symbol": "_RNvNtNtCsaEINoLvSCvk_22stable_modules_fixture4left6nested12never_called"
+      },
+      {
+        "coverage_function": {
+          "covered": 1,
+          "total": 1,
+          "type": "ratio"
+        },
+        "coverage_region": {
+          "covered": 5,
+          "total": 5,
+          "type": "ratio"
+        },
+        "execution_count": 2,
+        "llvm_function_index": 1,
+        "name": "right::classify",
+        "span": [
+          26,
+          5,
+          32,
+          6
+        ],
+        "symbol": "_RNvNtCsaEINoLvSCvk_22stable_modules_fixture5right8classify"
+      }
+    ],
+    "scope": "unannotated free functions in unannotated inline modules; same-name and unexecuted owners independently matched; nested tests excluded; annotated/cfg module coverage remains unsupported",
+    "checks": [
+      {
+        "name": "prepare-modules",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "name": "modules",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "name": "certified-module-owners",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "name": "missing-module-owner",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "duplicate-module-owner",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "module-parent-count-inheritance",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "restored-module-owners",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "name": "prepare-module-attribute",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "name": "module-attribute",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "name": "describe-module-attribute",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "name": "prepare-module-cfg",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "name": "module-cfg",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "name": "describe-module-cfg",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "name": "prepare-external-path-module",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "name": "external-path-module",
+        "exit_code": 1,
+        "passed": true
+      }
+    ],
+    "negative_scope": "Semantic mutations of actual LLVM export with test-only manifest re-anchoring; not claims that the compiler emitted corrupt data. Annotated/cfg variants separately compiled and executed."
+  },
+  "capture": {
+    "record": {
+      "path": "target/gh-259/acceptance-29/summary.json",
+      "bytes": 27532,
+      "sha256": "8d0dce72299284754aea088009a3bb841d3da68ac7001c5c310d81ac41a5e363"
+    },
+    "checks_passed": 105,
+    "committed_record": {
+      "path": "docs/quality/stable-rust-candidate-evidence/acceptance-modules.json",
+      "bytes": 27532,
+      "sha256": "8d0dce72299284754aea088009a3bb841d3da68ac7001c5c310d81ac41a5e363"
+    },
+    "tools": {
+      "rustc": {
+        "path": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+        "identity": {
+          "sha256": "d3a664c970a9fd8361b64194861bebc1ae37b9054e5ee3400dc1c9e691797eea",
+          "bytes": 645000
+        },
+        "version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6"
+      },
+      "cargo": {
+        "path": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+        "identity": {
+          "sha256": "828980723df339d62434390e9fb8ef8831036583343ae2316b7ab5646b5c1953",
+          "bytes": 42839824
+        },
+        "version": "cargo 1.97.1 (c980f4866 2026-06-30)"
+      },
+      "rustdoc": {
+        "path": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustdoc",
+        "identity": {
+          "sha256": "3b0c7aef20e0dfdfe2dd19ddb0b40d3b744f76318a44031813f501e1912934df",
+          "bytes": 13680928
+        },
+        "version": "rustdoc 1.97.1 (8bab26f4f 2026-07-14)"
+      },
+      "cargo_llvm_cov": {
+        "path": "/home/gem/.cargo/bin/cargo-llvm-cov",
+        "identity": {
+          "sha256": "61d0638359c3dd320e61b1a3467857036307235afed31fb51781a66ec5cf47a5",
+          "bytes": 4609480
+        },
+        "version": "cargo-llvm-cov 0.9.0"
+      },
+      "llvm_cov": {
+        "path": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+        "identity": {
+          "sha256": "bb415d8767d2ad73d72c01941f409ffc8f9478747ec7c18a7a69356735551ed9",
+          "bytes": 639712
+        },
+        "version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+      },
+      "llvm_profdata": {
+        "path": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+        "identity": {
+          "sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+          "bytes": 666968
+        },
+        "version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+      },
+      "release": "1.97.1",
+      "commit": "8bab26f4f68e0e26f0bb7960be334d5b520ea452",
+      "host": "x86_64-unknown-linux-gnu",
+      "llvm": "22.1.6"
+    },
+    "execve_trace": "not performed",
+    "second_toolchain_and_system": "not established by this invocation"
+  },
+  "macro": {
+    "record": {
+      "path": "target/gh-259/macros-15/summary.json",
+      "bytes": 30363,
+      "sha256": "626aabfb2be363eeeccdfa1ddcf25eb9d16e8fe2f781ec9fc019ca776de5af85"
+    },
+    "checks_passed": 26,
+    "scope": "shared generator source/input/config identity and bounded complexity; generated business-function coverage and CRAP remain unsupported"
+  },
+  "core": {
+    "plain": {
+      "record": {
+        "path": "target/gh-259/core-21-plain/summary.json",
+        "bytes": 4443,
+        "sha256": "76befd6318057445faf808c36d040d641f563953c5aeef3755bd8e722b69ed8b"
+      },
+      "capture": {
+        "manifest_sha256": "6b06ea2c4d080673f2c2601ee79038a9e91229a7645564ca02562b0358bdb3a2",
+        "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-29/capture-plain",
+        "request_sha256": "f6fc728153084104f743669914042823298a79db2d050e67e064b63aea48c201"
+      },
+      "checks": {
+        "authenticated_capture": {
+          "accepted": true,
+          "counts": [
+            3,
+            1
+          ],
+          "records": 2
+        },
+        "changed-project": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "changed-series": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "core-corrupt-artifact": {
+          "blocked": true
+        },
+        "core-stale-context": {
+          "blocked": true
+        },
+        "expired_request": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request has expired\n"
+        },
+        "fixture": "plain",
+        "invalid_signature": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter signature verification failed\n"
+        },
+        "missing-claim": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "nonce_replay": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request nonce has already been used\n"
+        },
+        "required_crap": [
+          {
+            "component": "rust",
+            "evidence_id": "stable-0d2e68a8d1c14b9151a334b879a56dbb78d1f3712df4e3250b4f52d45e32c14c",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-4ea91cad05f85e5cd1e646da093aa43b1f0dc851c2bad559dc2999b5ebbf6ee0",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          }
+        ],
+        "stale-config-binding": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "unknown-owner": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-capture-anchor": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-source": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-target": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        }
+      },
+      "collector_sha256": "6addb9cf8c716304464f756c3f6e37e402bf65823cb0ba418f610572770e6701",
+      "core_sha256": "3614dfc5dcaa1d9cdb427c2ff2fae528ec564a6672fa0a43fbd7eafd086994b0",
+      "production_signature": false,
+      "schema": "rust-stable-core-acceptance/v1",
+      "series": {
+        "collector": {
+          "name": "harness-gate-rust-stable-collector",
+          "version": "0.1.0-candidate.1"
+        },
+        "id": "measurement-series/v1:b5809888eb92248a4795ba08d864113c57c155d4ab4c80e1f695f55e149747a8",
+        "metrics": [
+          {
+            "name": "complexity.cyclomatic",
+            "type": "count"
+          },
+          {
+            "name": "coverage.function",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.line",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.region",
+            "type": "ratio"
+          },
+          {
+            "name": "risk.crap",
+            "type": "rational"
+          }
+        ],
+        "name": "rust-stable-lexical-candidate",
+        "normalization": {
+          "name": "stable-rust-core-candidate",
+          "version": "6addb9cf8c716304464f756c3f6e37e402bf65823cb0ba418f610572770e6701"
+        },
+        "rule": {
+          "name": "rust-source-decisions",
+          "version": "rust-source-decisions/v1-candidate"
+        },
+        "runtime": {
+          "name": "rustc",
+          "version": "8bab26f4f68e0e26f0bb7960be334d5b520ea452"
+        },
+        "source_identity": {
+          "name": "rust-lexical-source-span",
+          "version": "1"
+        },
+        "target": "x86_64-unknown-linux-gnu",
+        "tool": {
+          "name": "stable-rust-coverage-tools",
+          "version": "f6cf1932ab62a9b43f6f09107f1ce8720d686a3841908e02cfc80d7c9048acd2"
+        }
+      },
+      "state": "candidate-only"
+    },
+    "partial": {
+      "record": {
+        "path": "target/gh-259/core-21-partial/summary.json",
+        "bytes": 4447,
+        "sha256": "3d31dfcaf4f55c4ea08b1f815ccfc5a4dced6197a32ed1dbbe521a4d6fd22cb6"
+      },
+      "capture": {
+        "manifest_sha256": "01e3fc25c731c431052f880e778b99103a7ce70a925e576e87ea66905c38009c",
+        "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-29/capture-partial",
+        "request_sha256": "d6b287306bc5bbf19c21186c00220b25fd8f11b2e47b6c0da060dbcc0cce490a"
+      },
+      "checks": {
+        "authenticated_capture": {
+          "accepted": true,
+          "counts": [
+            3,
+            1
+          ],
+          "records": 2
+        },
+        "changed-project": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "changed-series": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "core-corrupt-artifact": {
+          "blocked": true
+        },
+        "core-stale-context": {
+          "blocked": true
+        },
+        "expired_request": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request has expired\n"
+        },
+        "fixture": "partial",
+        "invalid_signature": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter signature verification failed\n"
+        },
+        "missing-claim": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "nonce_replay": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request nonce has already been used\n"
+        },
+        "required_crap": [
+          {
+            "component": "rust",
+            "evidence_id": "stable-73c3126951899f2b9eec1b97055176a1b4b225351d270f283580c3967f90a21e",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-39674dc3e03ba6ed2104b94d4e3c1f619ce5c9b9b6189de613e69b41b322bb6c",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          }
+        ],
+        "stale-config-binding": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "unknown-owner": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-capture-anchor": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-source": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-target": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        }
+      },
+      "collector_sha256": "6addb9cf8c716304464f756c3f6e37e402bf65823cb0ba418f610572770e6701",
+      "core_sha256": "3614dfc5dcaa1d9cdb427c2ff2fae528ec564a6672fa0a43fbd7eafd086994b0",
+      "production_signature": false,
+      "schema": "rust-stable-core-acceptance/v1",
+      "series": {
+        "collector": {
+          "name": "harness-gate-rust-stable-collector",
+          "version": "0.1.0-candidate.1"
+        },
+        "id": "measurement-series/v1:b5809888eb92248a4795ba08d864113c57c155d4ab4c80e1f695f55e149747a8",
+        "metrics": [
+          {
+            "name": "complexity.cyclomatic",
+            "type": "count"
+          },
+          {
+            "name": "coverage.function",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.line",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.region",
+            "type": "ratio"
+          },
+          {
+            "name": "risk.crap",
+            "type": "rational"
+          }
+        ],
+        "name": "rust-stable-lexical-candidate",
+        "normalization": {
+          "name": "stable-rust-core-candidate",
+          "version": "6addb9cf8c716304464f756c3f6e37e402bf65823cb0ba418f610572770e6701"
+        },
+        "rule": {
+          "name": "rust-source-decisions",
+          "version": "rust-source-decisions/v1-candidate"
+        },
+        "runtime": {
+          "name": "rustc",
+          "version": "8bab26f4f68e0e26f0bb7960be334d5b520ea452"
+        },
+        "source_identity": {
+          "name": "rust-lexical-source-span",
+          "version": "1"
+        },
+        "target": "x86_64-unknown-linux-gnu",
+        "tool": {
+          "name": "stable-rust-coverage-tools",
+          "version": "f6cf1932ab62a9b43f6f09107f1ce8720d686a3841908e02cfc80d7c9048acd2"
+        }
+      },
+      "state": "candidate-only"
+    },
+    "modules": {
+      "record": {
+        "path": "target/gh-259/core-21-modules/summary.json",
+        "bytes": 4693,
+        "sha256": "c93349fb65e8ea1440c81f0f0a81df8dfeda9c65641c57d71e8de91fd41ab2a0"
+      },
+      "capture": {
+        "manifest_sha256": "16056293d63de047852ac924964bda21edc5d456cc0fcdb4424902e80a46d696",
+        "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-29/capture-modules",
+        "request_sha256": "90a97669c240a6e843c4fcfa4d985bec693539cdf75f33628a3d7b469731b271"
+      },
+      "checks": {
+        "authenticated_capture": {
+          "accepted": true,
+          "counts": [
+            2,
+            1,
+            2
+          ],
+          "records": 3
+        },
+        "changed-project": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "changed-series": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "core-corrupt-artifact": {
+          "blocked": true
+        },
+        "core-stale-context": {
+          "blocked": true
+        },
+        "expired_request": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request has expired\n"
+        },
+        "fixture": "modules",
+        "invalid_signature": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter signature verification failed\n"
+        },
+        "missing-claim": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "nonce_replay": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request nonce has already been used\n"
+        },
+        "required_crap": [
+          {
+            "component": "rust",
+            "evidence_id": "stable-fd5cc6e66e3dfce82f70078aa842ccf3d379e2445e864b867f96e561ac09aa80",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-1f762c455888a4c88332d9a87d92f138d65b78a0eb68630755f1006f372924bc",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-a54fff18194d047193fb46c2c7b401f251546aeb1ccdb82121f797b8d4fea853",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          }
+        ],
+        "stale-config-binding": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "unknown-owner": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-capture-anchor": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-source": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-target": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        }
+      },
+      "collector_sha256": "6addb9cf8c716304464f756c3f6e37e402bf65823cb0ba418f610572770e6701",
+      "core_sha256": "3614dfc5dcaa1d9cdb427c2ff2fae528ec564a6672fa0a43fbd7eafd086994b0",
+      "production_signature": false,
+      "schema": "rust-stable-core-acceptance/v1",
+      "series": {
+        "collector": {
+          "name": "harness-gate-rust-stable-collector",
+          "version": "0.1.0-candidate.1"
+        },
+        "id": "measurement-series/v1:b5809888eb92248a4795ba08d864113c57c155d4ab4c80e1f695f55e149747a8",
+        "metrics": [
+          {
+            "name": "complexity.cyclomatic",
+            "type": "count"
+          },
+          {
+            "name": "coverage.function",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.line",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.region",
+            "type": "ratio"
+          },
+          {
+            "name": "risk.crap",
+            "type": "rational"
+          }
+        ],
+        "name": "rust-stable-lexical-candidate",
+        "normalization": {
+          "name": "stable-rust-core-candidate",
+          "version": "6addb9cf8c716304464f756c3f6e37e402bf65823cb0ba418f610572770e6701"
+        },
+        "rule": {
+          "name": "rust-source-decisions",
+          "version": "rust-source-decisions/v1-candidate"
+        },
+        "runtime": {
+          "name": "rustc",
+          "version": "8bab26f4f68e0e26f0bb7960be334d5b520ea452"
+        },
+        "source_identity": {
+          "name": "rust-lexical-source-span",
+          "version": "1"
+        },
+        "target": "x86_64-unknown-linux-gnu",
+        "tool": {
+          "name": "stable-rust-coverage-tools",
+          "version": "f6cf1932ab62a9b43f6f09107f1ce8720d686a3841908e02cfc80d7c9048acd2"
+        }
+      },
+      "state": "candidate-only"
+    },
+    "boundaries": {
+      "record": {
+        "path": "target/gh-259/core-21-boundaries/summary.json",
+        "bytes": 5130,
+        "sha256": "7258b439a0fb321c6577ff4e2290662a0e464f863f1307edcb6ba0675a905416"
+      },
+      "capture": {
+        "manifest_sha256": "3c86750a62204854394c01c589aed4dd6712af74bcea4facaf86c5031ac5a225",
+        "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-29/capture-boundaries",
+        "request_sha256": "d0267959a25ffb2cc178eadce72860c3af1b91476b17344143ac1f378c3082a6"
+      },
+      "checks": {
+        "authenticated_capture": {
+          "accepted": true,
+          "counts": [],
+          "records": 5
+        },
+        "changed-project": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "changed-series": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "core-corrupt-artifact": {
+          "blocked": true
+        },
+        "core-stale-context": {
+          "blocked": true
+        },
+        "expired_request": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request has expired\n"
+        },
+        "fixture": "boundaries",
+        "invalid_signature": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter signature verification failed\n"
+        },
+        "missing-claim": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "nonce_replay": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request nonce has already been used\n"
+        },
+        "required_crap": [
+          {
+            "component": "rust",
+            "evidence_id": "stable-9674fb12d9fd834d1c8731ed2a714cd7dd00747b61929a3e96a19ff50ab51459",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-6491fe323a12b819fb1bf2e690f0cc016d828b8af259f362bc8d11581e8ef458",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-f227570359a39a81f5af2be3487622fe95f298629c02f60b1eb9a9084a941540",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-0301c7acc733e82cd0ec887ca55ad7f6696c450e85a9e6082e098ed9e3b0bcc5",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-a00564a1091eb99b0220ad37e106b14f4e8dcc0061c7f2bc768e2adabc8d1f6c",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          }
+        ],
+        "stale-config-binding": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "unknown-owner": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-capture-anchor": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-source": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-target": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        }
+      },
+      "collector_sha256": "6addb9cf8c716304464f756c3f6e37e402bf65823cb0ba418f610572770e6701",
+      "core_sha256": "3614dfc5dcaa1d9cdb427c2ff2fae528ec564a6672fa0a43fbd7eafd086994b0",
+      "production_signature": false,
+      "schema": "rust-stable-core-acceptance/v1",
+      "series": {
+        "collector": {
+          "name": "harness-gate-rust-stable-collector",
+          "version": "0.1.0-candidate.1"
+        },
+        "id": "measurement-series/v1:b5809888eb92248a4795ba08d864113c57c155d4ab4c80e1f695f55e149747a8",
+        "metrics": [
+          {
+            "name": "complexity.cyclomatic",
+            "type": "count"
+          },
+          {
+            "name": "coverage.function",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.line",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.region",
+            "type": "ratio"
+          },
+          {
+            "name": "risk.crap",
+            "type": "rational"
+          }
+        ],
+        "name": "rust-stable-lexical-candidate",
+        "normalization": {
+          "name": "stable-rust-core-candidate",
+          "version": "6addb9cf8c716304464f756c3f6e37e402bf65823cb0ba418f610572770e6701"
+        },
+        "rule": {
+          "name": "rust-source-decisions",
+          "version": "rust-source-decisions/v1-candidate"
+        },
+        "runtime": {
+          "name": "rustc",
+          "version": "8bab26f4f68e0e26f0bb7960be334d5b520ea452"
+        },
+        "source_identity": {
+          "name": "rust-lexical-source-span",
+          "version": "1"
+        },
+        "target": "x86_64-unknown-linux-gnu",
+        "tool": {
+          "name": "stable-rust-coverage-tools",
+          "version": "f6cf1932ab62a9b43f6f09107f1ce8720d686a3841908e02cfc80d7c9048acd2"
+        }
+      },
+      "state": "candidate-only"
+    },
+    "features": {
+      "record": {
+        "path": "target/gh-259/core-21-features/summary.json",
+        "bytes": 5126,
+        "sha256": "e6eb6e978b0e887ff95cefce8bf68e1f6ee727861ce5af04c05b1ba76418c404"
+      },
+      "capture": {
+        "manifest_sha256": "be13e597ad07132ab4600837585951eebea33e03159b15d274e8ec9b33502271",
+        "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-29/capture-features",
+        "request_sha256": "d4abec471edb09da536fe2c026366262b44acdceef1c6985417402fca7b9056f"
+      },
+      "checks": {
+        "authenticated_capture": {
+          "accepted": true,
+          "counts": [],
+          "records": 5
+        },
+        "changed-project": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "changed-series": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "core-corrupt-artifact": {
+          "blocked": true
+        },
+        "core-stale-context": {
+          "blocked": true
+        },
+        "expired_request": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request has expired\n"
+        },
+        "fixture": "features",
+        "invalid_signature": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter signature verification failed\n"
+        },
+        "missing-claim": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "nonce_replay": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request nonce has already been used\n"
+        },
+        "required_crap": [
+          {
+            "component": "rust",
+            "evidence_id": "stable-9674fb12d9fd834d1c8731ed2a714cd7dd00747b61929a3e96a19ff50ab51459",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-6491fe323a12b819fb1bf2e690f0cc016d828b8af259f362bc8d11581e8ef458",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-f227570359a39a81f5af2be3487622fe95f298629c02f60b1eb9a9084a941540",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-0301c7acc733e82cd0ec887ca55ad7f6696c450e85a9e6082e098ed9e3b0bcc5",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          },
+          {
+            "component": "rust",
+            "evidence_id": "stable-a00564a1091eb99b0220ad37e106b14f4e8dcc0061c7f2bc768e2adabc8d1f6c",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          }
+        ],
+        "stale-config-binding": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "unknown-owner": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-capture-anchor": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-source": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-target": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        }
+      },
+      "collector_sha256": "6addb9cf8c716304464f756c3f6e37e402bf65823cb0ba418f610572770e6701",
+      "core_sha256": "3614dfc5dcaa1d9cdb427c2ff2fae528ec564a6672fa0a43fbd7eafd086994b0",
+      "production_signature": false,
+      "schema": "rust-stable-core-acceptance/v1",
+      "series": {
+        "collector": {
+          "name": "harness-gate-rust-stable-collector",
+          "version": "0.1.0-candidate.1"
+        },
+        "id": "measurement-series/v1:b5809888eb92248a4795ba08d864113c57c155d4ab4c80e1f695f55e149747a8",
+        "metrics": [
+          {
+            "name": "complexity.cyclomatic",
+            "type": "count"
+          },
+          {
+            "name": "coverage.function",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.line",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.region",
+            "type": "ratio"
+          },
+          {
+            "name": "risk.crap",
+            "type": "rational"
+          }
+        ],
+        "name": "rust-stable-lexical-candidate",
+        "normalization": {
+          "name": "stable-rust-core-candidate",
+          "version": "6addb9cf8c716304464f756c3f6e37e402bf65823cb0ba418f610572770e6701"
+        },
+        "rule": {
+          "name": "rust-source-decisions",
+          "version": "rust-source-decisions/v1-candidate"
+        },
+        "runtime": {
+          "name": "rustc",
+          "version": "8bab26f4f68e0e26f0bb7960be334d5b520ea452"
+        },
+        "source_identity": {
+          "name": "rust-lexical-source-span",
+          "version": "1"
+        },
+        "target": "x86_64-unknown-linux-gnu",
+        "tool": {
+          "name": "stable-rust-coverage-tools",
+          "version": "f6cf1932ab62a9b43f6f09107f1ce8720d686a3841908e02cfc80d7c9048acd2"
+        }
+      },
+      "state": "candidate-only"
+    },
+    "registry": {
+      "record": {
+        "path": "target/gh-259/core-21-registry/summary.json",
+        "bytes": 4203,
+        "sha256": "19a9b71416dac0ab6a57e9365f1fe67f7cf4c7bfa7e183d571e6143e9bcd2ab2"
+      },
+      "capture": {
+        "manifest_sha256": "8a0fb9d7059ae667cf11d79efb93f8e03020a69db91c6038ff95064af7045523",
+        "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-29/capture-registry",
+        "request_sha256": "c5bf24e13488d26f8e9bb0a88a95a72cc99d775c77281b6753d1ce8c7547e023"
+      },
+      "checks": {
+        "authenticated_capture": {
+          "accepted": true,
+          "counts": [
+            1
+          ],
+          "records": 1
+        },
+        "changed-project": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "changed-series": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "core-corrupt-artifact": {
+          "blocked": true
+        },
+        "core-stale-context": {
+          "blocked": true
+        },
+        "expired_request": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request has expired\n"
+        },
+        "fixture": "registry",
+        "invalid_signature": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter signature verification failed\n"
+        },
+        "missing-claim": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "nonce_replay": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter request nonce has already been used\n"
+        },
+        "required_crap": [
+          {
+            "component": "rust",
+            "evidence_id": "stable-2e3da7167fb29132905f1eb2626236b8d6268af5e1f5dd8e73d6f244323578ee",
+            "metric": "risk.crap",
+            "state": "unsupported",
+            "status": "blocked"
+          }
+        ],
+        "stale-config-binding": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "unknown-owner": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-capture-anchor": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-source": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        },
+        "wrong-target": {
+          "blocked": true,
+          "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
+        }
+      },
+      "collector_sha256": "6addb9cf8c716304464f756c3f6e37e402bf65823cb0ba418f610572770e6701",
+      "core_sha256": "3614dfc5dcaa1d9cdb427c2ff2fae528ec564a6672fa0a43fbd7eafd086994b0",
+      "production_signature": false,
+      "schema": "rust-stable-core-acceptance/v1",
+      "series": {
+        "collector": {
+          "name": "harness-gate-rust-stable-collector",
+          "version": "0.1.0-candidate.1"
+        },
+        "id": "measurement-series/v1:b5809888eb92248a4795ba08d864113c57c155d4ab4c80e1f695f55e149747a8",
+        "metrics": [
+          {
+            "name": "complexity.cyclomatic",
+            "type": "count"
+          },
+          {
+            "name": "coverage.function",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.line",
+            "type": "ratio"
+          },
+          {
+            "name": "coverage.region",
+            "type": "ratio"
+          },
+          {
+            "name": "risk.crap",
+            "type": "rational"
+          }
+        ],
+        "name": "rust-stable-lexical-candidate",
+        "normalization": {
+          "name": "stable-rust-core-candidate",
+          "version": "6addb9cf8c716304464f756c3f6e37e402bf65823cb0ba418f610572770e6701"
+        },
+        "rule": {
+          "name": "rust-source-decisions",
+          "version": "rust-source-decisions/v1-candidate"
+        },
+        "runtime": {
+          "name": "rustc",
+          "version": "8bab26f4f68e0e26f0bb7960be334d5b520ea452"
+        },
+        "source_identity": {
+          "name": "rust-lexical-source-span",
+          "version": "1"
+        },
+        "target": "x86_64-unknown-linux-gnu",
+        "tool": {
+          "name": "stable-rust-coverage-tools",
+          "version": "f6cf1932ab62a9b43f6f09107f1ce8720d686a3841908e02cfc80d7c9048acd2"
+        }
+      },
+      "state": "candidate-only"
+    }
+  },
+  "historical": {
+    "record": {
+      "path": "target/gh-259/historical-15/comparison.json",
+      "bytes": 9650,
+      "sha256": "a7b617ec2c2935ce05b8ed92bdeac2225e3f3cbc101b8436950ba38a37e867d0"
+    },
+    "scope": "new stable capture compared with original archived evidence paths/member anchors; no legacy backend executed or historical files rewritten"
+  },
+  "preparation": {
+    "record": {
+      "path": "target/gh-259/package-15/preparation.json",
+      "bytes": 47371,
+      "sha256": "f6eb7d573ad23d79c145325fb8525e8a32d1f1598f7a9f845d741eecec30e455"
+    },
+    "compiler": {
+      "bytes": 645000,
+      "sha256": "d3a664c970a9fd8361b64194861bebc1ae37b9054e5ee3400dc1c9e691797eea"
+    },
+    "source": {
+      "LICENSE": {
+        "bytes": 1082,
+        "sha256": "5b9835780a3cd7518d7637c6730a26c1141d24a00a413364264c2a4091c0e6d9"
+      },
+      "tools/quality/fixtures/rust-macro-observation/Cargo.lock": {
+        "bytes": 1367,
+        "sha256": "7e749927e1048ef9dd72dbdeff7e559d7415e1cd4eb387430059a3a7399a42d3"
+      },
+      "tools/quality/fixtures/rust-macro-observation/Cargo.toml": {
+        "bytes": 73,
+        "sha256": "f7e71f9c95397029349e3f44c39be846b6d016c097a54c068401dcdb09d7c1ad"
+      },
+      "tools/quality/fixtures/rust-macro-observation/consumer/Cargo.toml": {
+        "bytes": 188,
+        "sha256": "116086e10273b649e4563f3ab01664372bb4711ff554c7ab3620621f178b4186"
+      },
+      "tools/quality/fixtures/rust-macro-observation/generator/Cargo.toml": {
+        "bytes": 233,
+        "sha256": "a15f42bd0ef45e1a2dfe2d0d621c05952437f29c171ffa36ea43433a4fcbe2e5"
+      },
+      "tools/quality/fixtures/rust-macro-observation/generator/src/lib.rs": {
+        "bytes": 2448,
+        "sha256": "afcffe5c527216247fdbffa9ef6e1d4543e1ee8e3742337f337d5cab3997ea13"
+      },
+      "tools/quality/fixtures/rust-macro-observation/macros/Cargo.toml": {
+        "bytes": 245,
+        "sha256": "3e7a9eeaf09af33c6d9ff22dec0f8890510bb9ac689bd61207f2899cac409760"
+      },
+      "tools/quality/fixtures/rust-macro-observation/macros/src/lib.rs": {
+        "bytes": 289,
+        "sha256": "085a4a2684c9a9374e249218872be5fd18f4b8227b062c03785e635eb446546c"
+      },
+      "tools/quality/rust-stable-collector/Cargo.lock": {
+        "bytes": 24777,
+        "sha256": "8b3ccf1106ee8c9ac0e97881f56b7418007a7781e8a2e80d6ae02e33e7ecba01"
+      },
+      "tools/quality/rust-stable-collector/Cargo.toml": {
+        "bytes": 1031,
+        "sha256": "e9077f8e2c60846081d327a2eaebf6babfedd4fa9b61130b53a3736da23f1182"
+      },
+      "tools/quality/rust-stable-collector/prepare_release.py": {
+        "bytes": 16984,
+        "sha256": "b1770136ae6877e3228d8f320665b359fa47d5d374793b88aa342e95bd19693a"
+      },
+      "tools/quality/rust-stable-collector/src/adapter.rs": {
+        "bytes": 13486,
+        "sha256": "3ab14c6bf15bbfca63f959d4b382b56909b1b6e18cb6c157207249db4966058b"
+      },
+      "tools/quality/rust-stable-collector/src/artifact.rs": {
+        "bytes": 3177,
+        "sha256": "f8e25815474b0c7ae584bc783d0e4ad59bf80e8efe38e46d25a27129d3325950"
+      },
+      "tools/quality/rust-stable-collector/src/collect.rs": {
+        "bytes": 16172,
+        "sha256": "d6006656dc1e1523b6bdef45440e0ab5ede3a47062bc47586e9c51dcf4cfb457"
+      },
+      "tools/quality/rust-stable-collector/src/compiler_inputs.rs": {
+        "bytes": 12465,
+        "sha256": "228068d528e62fd6ae12c0e65cbdcc52b35279be73d3ac2c2741960386c78911"
+      },
+      "tools/quality/rust-stable-collector/src/compiler_wrapper.rs": {
+        "bytes": 5970,
+        "sha256": "b065bb68f010271735b16b525bf48ef15da2afa32e2e0d000441246232d2a98d"
+      },
+      "tools/quality/rust-stable-collector/src/coverage.rs": {
+        "bytes": 8718,
+        "sha256": "9a6e6dd07070da44342822336de48b4a1ce6e8666ddf2570dc4047aa93d2f7bf"
+      },
+      "tools/quality/rust-stable-collector/src/dependencies.rs": {
+        "bytes": 12561,
+        "sha256": "406fcd4ded9fbf168fa4c9ccab23ba6c320edaac9327723d60233d36b31d274b"
+      },
+      "tools/quality/rust-stable-collector/src/download.rs": {
+        "bytes": 8023,
+        "sha256": "e86c3d0e47eeb18f5c6b8e5ff6ff6645a96522c4dafbed0457b0990e3115e880"
+      },
+      "tools/quality/rust-stable-collector/src/macro_model.rs": {
+        "bytes": 10662,
+        "sha256": "0843c7135aefd4433d41388eb6713dc99cc22048d0375a5b847f23a41fc0e7e1"
+      },
+      "tools/quality/rust-stable-collector/src/main.rs": {
+        "bytes": 4805,
+        "sha256": "ade99ed04441527e7b4f5eb94a6f5a762527dad132fd9c7e1d4283b8fb635014"
+      },
+      "tools/quality/rust-stable-collector/src/ownership.rs": {
+        "bytes": 6901,
+        "sha256": "7f2e73890e5d396bbc138d55baf6fef770d6f5eb3ff6b5f6c305555b6f6e018a"
+      },
+      "tools/quality/rust-stable-collector/src/process.rs": {
+        "bytes": 6509,
+        "sha256": "0bc1aa5b5928ff2e9fb1baabf7acf8686063406f204159a58f3928e23b67bb05"
+      },
+      "tools/quality/rust-stable-collector/src/release.rs": {
+        "bytes": 21406,
+        "sha256": "a555dfce129568cdb6b5c4e9cf2d4849d53f75d3e40bdfc6d696ecd5c5c4d8b8"
+      },
+      "tools/quality/rust-stable-collector/src/source.rs": {
+        "bytes": 10979,
+        "sha256": "4c2a16572dede48396baf34274cf74a0fcf3f7388a51fe18c28526e9e5e53853"
+      },
+      "tools/quality/rust-stable-collector/src/strict_json.rs": {
+        "bytes": 4051,
+        "sha256": "f391825570ec6795578be6ac83a1c85e59493358c44f48e063c67ec07538c4dc"
+      },
+      "tools/quality/rust-stable-collector/src/support.rs": {
+        "bytes": 3192,
+        "sha256": "d3df1c5510c1e1ab75d282509b7d6c8403c6f149dc0736b530939fcd92c4abf6"
+      },
+      "tools/quality/rust-stable-collector/src/tools.rs": {
+        "bytes": 4692,
+        "sha256": "cd0d52404cfa1bbff5d2e135f8e9eb6950af7afad403a336dac9928df80fe7f7"
+      }
+    },
+    "payload": {
+      "LICENSE": {
+        "bytes": 1312123,
+        "sha256": "4cec384f7847b51b9398bd4d44358544922f12252512c0195d8f7725c00abf4b"
+      },
+      "harness-gate-rust-stable-collector": {
+        "bytes": 3475840,
+        "sha256": "6addb9cf8c716304464f756c3f6e37e402bf65823cb0ba418f610572770e6701"
+      },
+      "support.json": {
+        "bytes": 924,
+        "sha256": "5aeef2b3d96c49f9e41733536df970adef0883e5d5fddc7eb6d76a0fa2cd2eb2"
+      }
+    },
+    "inventory": {
+      "bytes": 563,
+      "sha256": "d67dd4da4d5a3529465c8d1439ceb48274a5d11c3fb839d492815514b66bcc19"
+    },
+    "unsigned_package_bytes": 4789450,
+    "production_ready": false,
+    "publication_blockers": [
+      "reviewed measurement migration",
+      "two toolchains and two systems",
+      "production license review",
+      "real dual-signature acceptance",
+      "protected release approval"
+    ],
+    "license_scope": "conservative filtered Cargo graph including build dependencies plus Rust library notices"
+  },
+  "lifecycle": {
+    "record": {
+      "path": "target/gh-259/lifecycle-15/summary.json",
+      "bytes": 6263,
+      "sha256": "cbacdacf0f4a58517e60c706458256eafda3d479d70150e1e9bed5f184f96dc6"
+    },
+    "schema": "rust-stable-lifecycle-acceptance/v1",
+    "collector_sha256": "6addb9cf8c716304464f756c3f6e37e402bf65823cb0ba418f610572770e6701",
+    "upgrade_collector_sha256": "cb9d55109192e2123854b3c28cdee9ae91f762fb2c3e078e0cc3c9860c074bc4",
+    "upgrade_version": "0.1.0-candidate.1.upgrade-test",
+    "upgrade_scope": "separately compiled test version of the same implementation; no production or historical release compatibility claim",
+    "rsa": "real RSA-2048/SHA-256 signatures; repository-generated test key",
+    "sigstore": "MOCK invocation/exit behavior only; no cryptographic or production acceptance",
+    "production_signature": false,
+    "checks": [
+      {
+        "name": "unsigned-package-rejected",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "verify",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "name": "install",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "name": "upgrade",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "name": "rollback",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "name": "program-version-mismatch",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "program-nonzero",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "program-timeout",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "program-mutates-stage",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "program-invalid-elf",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "bad-rsa",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "missing-sigstore",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "tampered-program",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "mixed-inventory",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "extra-asset",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "symlink-asset",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "duplicate-json",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "support-schema",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "support-release",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "support-target",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "support-program",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "support-license",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "support-crap",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "support-published",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "support-no-observations",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "support-duplicate-observations",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "support-unknown-field",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "changed-verifier-pin",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "verifier-nonzero",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "verifier-timeout",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "missing-verifier",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "symlink-root",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "corrupt-rollback",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "nonexecutable-rollback",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "concurrent-install",
+        "exit_code": 1,
+        "passed": true
+      },
+      {
+        "name": "interrupted-upgrade-preserves-current",
+        "exit_code": -9,
+        "passed": true
+      },
+      {
+        "name": "retry-after-interruption",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "name": "final-rollback",
+        "exit_code": 0,
+        "passed": true
+      }
+    ],
+    "first_install": {
+      "current": "51ef652e9315b32107c97868bf09fe07a6f6914dcc00d8744e67a6b12506c5a6",
+      "download_bytes": 0,
+      "executable": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle-15/installation/current/harness-gate-rust-stable-collector",
+      "installed_version_bytes": 4789919,
+      "package_bytes": 4789919,
+      "previous": null,
+      "schema": "rust-stable-installation/v1",
+      "trust_sha256": "1ddbcf807cf38722da2fb219a82f72ff27d84ae5b4119b3575ef342b62ca432d",
+      "version": "0.1.0-candidate.1"
+    },
+    "upgrade": {
+      "current": "73612bcb69b83789e57b2f4287e6ee3c5528afff382d69edfa75aa41fcafc123",
+      "download_bytes": 0,
+      "executable": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle-15/installation/current/harness-gate-rust-stable-collector",
+      "installed_version_bytes": 4789945,
+      "package_bytes": 4789945,
+      "previous": "51ef652e9315b32107c97868bf09fe07a6f6914dcc00d8744e67a6b12506c5a6",
+      "schema": "rust-stable-installation/v1",
+      "trust_sha256": "1ddbcf807cf38722da2fb219a82f72ff27d84ae5b4119b3575ef342b62ca432d",
+      "version": "0.1.0-candidate.1.upgrade-test"
+    },
+    "rollback": {
+      "current": "51ef652e9315b32107c97868bf09fe07a6f6914dcc00d8744e67a6b12506c5a6",
+      "download_bytes": 0,
+      "executable": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle-15/installation/current/harness-gate-rust-stable-collector",
+      "installed_version_bytes": 4789919,
+      "package_bytes": 4789919,
+      "previous": "73612bcb69b83789e57b2f4287e6ee3c5528afff382d69edfa75aa41fcafc123",
+      "schema": "rust-stable-installation/v1",
+      "trust_sha256": "1ddbcf807cf38722da2fb219a82f72ff27d84ae5b4119b3575ef342b62ca432d",
+      "version": "0.1.0-candidate.1"
+    },
+    "package_bytes": 4789919,
+    "upgrade_package_bytes": 4789945,
+    "two_versions_bytes": 9579864,
+    "interrupted_staging_bytes": 4789945,
+    "installation_bytes_including_interrupted_staging": 14370437,
+    "network_download_bytes": 0,
+    "network_note": "local directory inputs; downloader not implemented",
+    "stale_staging_note": "killed processes may leave unselected staging directories; no automatic garbage collection yet",
+    "note_correction": "Original raw network_note is stale. This matrix used local inputs; separate real HTTPS acceptance follows. Repository automation wording corrected after this run; behavior unchanged."
+  },
+  "download": {
+    "record": {
+      "path": "target/gh-259/download-acceptance-04/summary.json",
+      "bytes": 50901,
+      "sha256": "58f84857c7097c0e7b072609d80a8da2488335669eeff4e0a5c2f82a7c0cf97d"
+    },
+    "checks": [
+      {
+        "name": "install",
+        "passed": true,
+        "requests": 5
+      },
+      {
+        "name": "http-error",
+        "passed": true,
+        "requests": 1
+      },
+      {
+        "name": "wrong-length",
+        "passed": true,
+        "requests": 1
+      },
+      {
+        "name": "truncated-body",
+        "passed": true,
+        "requests": 1
+      },
+      {
+        "name": "wrong-content",
+        "passed": true,
+        "requests": 1
+      },
+      {
+        "name": "oversized-body",
+        "passed": true,
+        "requests": 1
+      },
+      {
+        "name": "encoded-body",
+        "passed": true,
+        "requests": 1
+      },
+      {
+        "name": "timeout",
+        "passed": true,
+        "requests": 1
+      },
+      {
+        "name": "redirect-downgrade",
+        "passed": true,
+        "requests": 1
+      },
+      {
+        "name": "redirect-cycle",
+        "passed": true,
+        "requests": 4
+      },
+      {
+        "name": "redirect-credentials",
+        "passed": true,
+        "requests": 1
+      },
+      {
+        "name": "bad-rsa",
+        "passed": true,
+        "requests": 5
+      },
+      {
+        "name": "missing-sigstore",
+        "passed": true,
+        "requests": 5
+      },
+      {
+        "name": "untrusted-tls",
+        "passed": true,
+        "requests": 0
+      },
+      {
+        "name": "wrong-tls-name",
+        "passed": true,
+        "requests": 0
+      },
+      {
+        "name": "wrong-ca-pin",
+        "passed": true,
+        "requests": 0
+      },
+      {
+        "name": "http-input",
+        "passed": true,
+        "requests": 0
+      },
+      {
+        "name": "credential-input",
+        "passed": true,
+        "requests": 0
+      },
+      {
+        "name": "extra-asset",
+        "passed": true,
+        "requests": 0
+      },
+      {
+        "name": "wrong-size",
+        "passed": true,
+        "requests": 0
+      },
+      {
+        "name": "wrong-hash",
+        "passed": true,
+        "requests": 1
+      },
+      {
+        "name": "wrong-request-pin",
+        "passed": true,
+        "requests": 0
+      },
+      {
+        "name": "unknown-field",
+        "passed": true,
+        "requests": 0
+      },
+      {
+        "name": "request-during-transfer",
+        "passed": true,
+        "requests": 5
+      },
+      {
+        "name": "ca-during-transfer",
+        "passed": true,
+        "requests": 5
+      },
+      {
+        "name": "interrupted-preserves-current",
+        "passed": true,
+        "abandoned_download_bytes": 0
+      },
+      {
+        "name": "retry-redirect",
+        "passed": true,
+        "requests": 10
+      },
+      {
+        "name": "upgrade",
+        "passed": true,
+        "requests": 5
+      },
+      {
+        "name": "rollback-after-downloaded-upgrade",
+        "passed": true
+      }
+    ],
+    "initial_download_bytes": 4789919,
+    "upgrade_download_bytes": 4789945,
+    "total_received_body_bytes": 37465803,
+    "abandoned_download_bytes": 0,
+    "interrupted_audit": "SIGKILL prevents final audit; actual abandoned file bytes recorded separately",
+    "cache_bytes": 0,
+    "tls": "real loopback HTTPS with explicitly pinned test CA; certificate and hostname failures tested",
+    "process_trace": "unavailable; command records only",
+    "signature_scope": "real test RSA; mock Sigstore invocation only; no production signature claim",
+    "platform_scope": "current host only; no cross-host or public-network acceptance",
+    "byte_scope": "Application response-body bytes; includes failed partial transfers; excludes headers, TLS/proxy overhead and killed-process unwritten audit"
+  },
+  "validation": [
+    {
+      "label": "unit",
+      "argv": [
+        "cargo",
+        "+1.97.1",
+        "test",
+        "--manifest-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/Cargo.toml",
+        "--locked"
+      ],
+      "environment_overrides": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target"
+      },
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": {
+        "path": "target/gh-259/modules-final-unit.log",
+        "bytes": 2103,
+        "sha256": "331ed406eac38ea921ef07e78936cd8a3fd97fe2dc8cc849a315544c60655d8b"
+      }
+    },
+    {
+      "label": "fmt",
+      "argv": [
+        "cargo",
+        "+1.97.1",
+        "fmt",
+        "--manifest-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/Cargo.toml",
+        "--",
+        "--check"
+      ],
+      "environment_overrides": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target"
+      },
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": {
+        "path": "target/gh-259/modules-final-fmt.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "clippy",
+      "argv": [
+        "cargo",
+        "+1.97.1",
+        "clippy",
+        "--manifest-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/Cargo.toml",
+        "--all-targets",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "environment_overrides": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target"
+      },
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": {
+        "path": "target/gh-259/modules-final-clippy.log",
+        "bytes": 217,
+        "sha256": "64105da36907e7ff622e9b5a44528b17a33e0026754a4febab152a036a50228e"
+      }
+    },
+    {
+      "label": "core-nextest",
+      "argv": [
+        "cargo",
+        "nextest",
+        "run",
+        "--manifest-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/harness-gate/Cargo.toml",
+        "--locked"
+      ],
+      "environment_overrides": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target"
+      },
+      "environment_removed": [
+        "ALL_PROXY",
+        "HTTPS_PROXY",
+        "HTTP_PROXY",
+        "all_proxy",
+        "http_proxy",
+        "https_proxy"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "target/gh-259/modules-final-core-nextest.log",
+        "bytes": 54260,
+        "sha256": "fa125904d8e5502a6066be97dad52cab574a2e49e9a062fbd9518e479c2c3557"
+      }
+    },
+    {
+      "label": "core-fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--manifest-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/harness-gate/Cargo.toml",
+        "--",
+        "--check"
+      ],
+      "environment_overrides": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target"
+      },
+      "environment_removed": [
+        "ALL_PROXY",
+        "HTTPS_PROXY",
+        "HTTP_PROXY",
+        "all_proxy",
+        "http_proxy",
+        "https_proxy"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "target/gh-259/modules-final-core-fmt.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "core-clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--manifest-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/harness-gate/Cargo.toml",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "environment_overrides": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target"
+      },
+      "environment_removed": [
+        "ALL_PROXY",
+        "HTTPS_PROXY",
+        "HTTP_PROXY",
+        "all_proxy",
+        "http_proxy",
+        "https_proxy"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "target/gh-259/modules-final-core-clippy.log",
+        "bytes": 166,
+        "sha256": "516693b0cc3c2ca407fb412ee006c71cba6ab348a7684aa14b5e76535e93d1ee"
+      }
+    },
+    {
+      "label": "quality",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/quality/tests",
+        "-v"
+      ],
+      "environment_overrides": null,
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": {
+        "path": "target/gh-259/modules-final-quality.log",
+        "bytes": 78307,
+        "sha256": "084b1eb56ed3d62c512f21d6a0592b19942b7f40a6c0f2d7f5c0cdd2d2fa8e5d"
+      }
+    },
+    {
+      "label": "release",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/release/tests",
+        "-v"
+      ],
+      "environment_overrides": null,
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": {
+        "path": "target/gh-259/modules-final-release.log",
+        "bytes": 14290,
+        "sha256": "d65edf4019b8c0bc3adff3dba19258524495af696058546b39370eab2ea92502"
+      }
+    },
+    {
+      "label": "capture",
+      "argv": [
+        "python3",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/validate_stable_candidate.py",
+        "--binary",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-29"
+      ],
+      "environment_overrides": null,
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": {
+        "path": "target/gh-259/modules-final-capture.log",
+        "bytes": 118,
+        "sha256": "c4bf955a9a5d2e7649e2f98cae7fa4c1b7d6537cb8b2ff309a93242ae690b94e"
+      }
+    },
+    {
+      "label": "macros",
+      "argv": [
+        "python3",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/validate_macro_templates.py",
+        "--binary",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/macros-15"
+      ],
+      "environment_overrides": null,
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": {
+        "path": "target/gh-259/modules-final-macros.log",
+        "bytes": 74,
+        "sha256": "1e4f283d753b484af4cc846a30d30950381e46158229bb7deff97130a6bedac1"
+      }
+    },
+    {
+      "label": "core-plain",
+      "argv": [
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/examples/stable_collector_acceptance",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/harness-gate",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-29",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-21-plain",
+        "plain"
+      ],
+      "environment_overrides": {},
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": {
+        "path": "target/gh-259/modules-final-core-plain.log",
+        "bytes": 102,
+        "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+      }
+    },
+    {
+      "label": "core-partial",
+      "argv": [
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/examples/stable_collector_acceptance",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/harness-gate",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-29",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-21-partial",
+        "partial"
+      ],
+      "environment_overrides": {},
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": {
+        "path": "target/gh-259/modules-final-core-partial.log",
+        "bytes": 102,
+        "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+      }
+    },
+    {
+      "label": "core-modules",
+      "argv": [
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/examples/stable_collector_acceptance",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/harness-gate",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-29",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-21-modules",
+        "modules"
+      ],
+      "environment_overrides": {},
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": {
+        "path": "target/gh-259/modules-final-core-modules.log",
+        "bytes": 102,
+        "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+      }
+    },
+    {
+      "label": "core-boundaries",
+      "argv": [
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/examples/stable_collector_acceptance",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/harness-gate",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-29",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-21-boundaries",
+        "boundaries"
+      ],
+      "environment_overrides": {},
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": {
+        "path": "target/gh-259/modules-final-core-boundaries.log",
+        "bytes": 102,
+        "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+      }
+    },
+    {
+      "label": "core-features",
+      "argv": [
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/examples/stable_collector_acceptance",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/harness-gate",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-29",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-21-features",
+        "features"
+      ],
+      "environment_overrides": {},
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": {
+        "path": "target/gh-259/modules-final-core-features.log",
+        "bytes": 102,
+        "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+      }
+    },
+    {
+      "label": "core-registry",
+      "argv": [
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/examples/stable_collector_acceptance",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target/debug/harness-gate",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-29",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-21-registry",
+        "registry"
+      ],
+      "environment_overrides": {
+        "CARGO_HOME": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-29/registry-cargo-home"
+      },
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": {
+        "path": "target/gh-259/modules-final-core-registry.log",
+        "bytes": 102,
+        "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+      }
+    },
+    {
+      "label": "historical",
+      "argv": [
+        "python3",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/compare_historical_fixture.py",
+        "--binary",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/historical-15"
+      ],
+      "environment_overrides": null,
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": {
+        "path": "target/gh-259/modules-final-historical.log",
+        "bytes": 140,
+        "sha256": "e6da9415f0ea089ee30a84c20c16f5e133dff6e28e58ecfdf890c55815d7d1cf"
+      }
+    },
+    {
+      "label": "package",
+      "argv": [
+        "python3",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/prepare_release.py",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/package-15",
+        "--target-dir",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target",
+        "--toolchain",
+        "1.97.1",
+        "--acceptance",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-29/summary.json",
+        "8d0dce72299284754aea088009a3bb841d3da68ac7001c5c310d81ac41a5e363"
+      ],
+      "environment_overrides": null,
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": {
+        "path": "target/gh-259/modules-final-package.log",
+        "bytes": 148,
+        "sha256": "497c19879b99756fa4f1e245ca6fa61827e8cd9f1050e161a1ba381581760cfc"
+      }
+    },
+    {
+      "label": "lifecycle",
+      "argv": [
+        "python3",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/validate_lifecycle.py",
+        "--binary",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "--package",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/package-15/unsigned-package",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle-15"
+      ],
+      "environment_overrides": null,
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": {
+        "path": "target/gh-259/modules-final-lifecycle.log",
+        "bytes": 109,
+        "sha256": "816ab9bb6be8dc59b494eee55497a212099b73118641b1da1a8d93d2886d82e2"
+      }
+    },
+    {
+      "label": "download",
+      "argv": [
+        "python3",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/tools/quality/rust-stable-collector/validate_download.py",
+        "--binary",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "--lifecycle",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle-15",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/download-acceptance-04"
+      ],
+      "environment_overrides": null,
+      "environment_removed": [],
+      "exit_code": 0,
+      "log": {
+        "path": "target/gh-259/modules-final-download.log",
+        "bytes": 101,
+        "sha256": "6bc9a05bc00729063e6cb172b08ca516239837cdc5259d08c84623bafd4183a1"
+      }
+    }
+  ],
+  "release_build": {
+    "command": "env RUSTFLAGS= RUSTDOCFLAGS= CARGO_ENCODED_RUSTFLAGS= RUSTC_WRAPPER= RUSTC_WORKSPACE_WRAPPER= CARGO_TARGET_DIR=\"$PWD/target/gh-259/stable-target\" cargo +1.97.1 build --release --manifest-path tools/quality/rust-stable-collector/Cargo.toml --locked",
+    "exit_code": 0,
+    "log": {
+      "path": "target/gh-259/modules-build-final.log",
+      "bytes": 208,
+      "sha256": "3a28781908c5fe4c52a8aeae97310257a329fe7ef26af2fdac275f212ca9176f"
+    },
+    "reproduced_by_package_preparation": true
+  },
+  "runtime_inspection": {
+    "command": "readelf -d target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+    "exit_code": 0,
+    "record": {
+      "path": "target/gh-259/modules-readelf.log",
+      "bytes": 1537,
+      "sha256": "646fdc8eba191120319b93cf6cd2dc9623ce3e9924cf048582bd0b573ea2c7a9"
+    },
+    "needed": [
+      "libgcc_s.so.1",
+      "libc.so.6"
+    ],
+    "limits": "ELF inspection and command records do not establish a transitive process trace"
+  },
+  "series": "Metric definitions unchanged; the new executable digest changes binary-bound Core normalization and full series identity. No automatic historical/baseline compatibility or CRAP model adoption.",
+  "not_applicable": {
+    "commands": [
+      "harness-gate config check",
+      "harness-gate verify --profile ci --all"
+    ],
+    "reason": "No .harness-gate/flow.toml; no generic configuration invented"
+  },
+  "remaining": [
+    "Only actual Ubuntu 26.04/glibc 2.43 Linux x86_64 GNU with Rust 1.97.1/LLVM 22.1.6/cargo-llvm-cov 0.9.0 accepted locally",
+    "Rust 1.98.1 and matching tools unavailable; retained official-manifest Proxy CONNECT aborted record",
+    "Second runnable Linux environment and actual process tracing unavailable; retained container/user-namespace/ptrace denial records",
+    "Real Sigstore and public distribution not accepted; test RSA and mock Sigstore are insufficient",
+    "Complete compiler-input provenance, generated-owner coverage/CRAP, migration review, protected trust/bootstrap, production license review and historical upgrade compatibility unfinished"
+  ],
+  "artifact_scope": "Compact review metadata only. Original logs/raw captures remain at their recorded workspace paths. No toolchain, test keys, automation, fixtures or acceptance archive in payload.",
+  "documentation_validation": {
+    "command": "CARGO_TARGET_DIR=\"$PWD/target/gh-259/core-target\" python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+    "exit_code": 0,
+    "log": {
+      "path": "target/gh-259/modules-final-docs-complete.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "report": {
+      "path": "target/quality/docs-consistency.json",
+      "bytes": 1488,
+      "sha256": "3f70dfcd7f372df2b5948a6a6b9c4bbb5ba3eb49f12efd3227e350200ac78d4f"
+    },
+    "earlier_attempt": {
+      "exit_code": 1,
+      "report": {
+        "path": "target/gh-259/modules-docs-before-evidence.json",
+        "bytes": 1641,
+        "sha256": "fd8e4aa5c7c1e0ac1c2d75cb10b2954bbd9412c232f1fdf6306bfe42feab661c"
+      },
+      "log": {
+        "path": "target/gh-259/modules-final-docs.log",
+        "bytes": 79,
+        "sha256": "6fdde67acd13145abd556580c3ab8d9ea34bad99a09db00ccf28a3fbeabecb76"
+      },
+      "cause": "Started before module-owners.json was written; missing evidence link. Final rerun passed after evidence creation."
+    }
+  },
+  "whitespace_validation": {
+    "command": "git diff --check",
+    "exit_code": 0,
+    "log": {
+      "path": "target/gh-259/modules-final-whitespace.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

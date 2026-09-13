@@ -271,7 +271,7 @@ fn project(request: &Value, path: &Path, digest: &str) -> Result<Value> {
         let artifact = json!({"id":"source","kind":"raw","media_type":"application/json","path":name,"sha256":identity.sha256,"bytes":identity.bytes,"source":source,"context":inner["context"]});
         let capabilities: Vec<_> = METRICS.iter().map(|(metric,_)| {
             let available = supported && (*metric == "complexity.cyclomatic" || matches!(*metric, "coverage.function" | "coverage.region") && owner["coverage_state"] == "supported");
-            json!({"metric":metric,"state":if available {"supported"} else {"unsupported"},"reason":if available {if matches!(*metric, "coverage.function" | "coverage.region") {"exact source span and unique LLVM root function; explicit test spans excluded"} else {"lexical source decisions; no expansion or reachability claim"}} else {"source/coverage ownership or source activation is not certified"},"artifacts":["source"]})
+            json!({"metric":metric,"state":if available {"supported"} else {"unsupported"},"reason":if available {if matches!(*metric, "coverage.function" | "coverage.region") {"exact source span and unique LLVM free function; explicit test spans excluded"} else {"lexical source decisions; no expansion or reachability claim"}} else {"source/coverage ownership or source activation is not certified"},"artifacts":["source"]})
         }).collect();
         let mut metrics = Vec::new();
         if supported {

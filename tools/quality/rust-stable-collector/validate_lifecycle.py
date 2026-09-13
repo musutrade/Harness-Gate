@@ -321,7 +321,7 @@ exit 0
                'two_versions_bytes': sizes(root / 'versions' / first_id) + sizes(root / 'versions' / second_id),
                'interrupted_staging_bytes': sum(sizes(p) for p in (root / 'versions').glob('.staging-*')),
                'installation_bytes_including_interrupted_staging': sizes(root),
-               'network_download_bytes': 0, 'network_note': 'local directory inputs; downloader not implemented',
+               'network_download_bytes': 0, 'network_note': 'local directory inputs; HTTPS download is exercised separately by validate_download.py',
                'stale_staging_note': 'killed processes may leave unselected staging directories; no automatic garbage collection yet'}
     write(output / 'automation.json', commands)
     write(output / 'summary.json', summary)
