@@ -135,6 +135,10 @@ def acceptance(path, pin, binary):
     names = {check['name'] for check in checks}
     require(len(names) == len(checks) and len(checks) >= 74
             and {'doctor', 'plain', 'boundaries', 'features', 'verify', 'failed-test',
+                 'output-isolation-doctor-direct', 'output-isolation-doctor-alias',
+                 'output-isolation-doctor-parent', 'output-isolation-collect-direct',
+                 'output-isolation-collect-alias', 'output-isolation-collect-parent',
+                 'doctor-relative-output',
                  'corrupt-coverage', 'mixed-artifact', 'changed-source',
                  'negative-function-count', 'overflow-function-count',
                  'fractional-function-count', 'missing-function-regions',

@@ -109,6 +109,40 @@ def main():
     try:
         tools = run('doctor', ['doctor', project, output / 'doctor'], trace=True)
         request_path = write_request('plain', project)
+        # Include directory entries: file hashes alone miss an empty directory
+        # left behind by a rejected request. These are workspace-owned fixtures.
+        def project_snapshot():
+            return {str(path.relative_to(project)): 'directory' if path.is_dir() else digest(path)
+                    for path in project.rglob('*')}
+
+        before = project_snapshot()
+        alias = output / 'project-alias'
+        alias.symlink_to(project, target_is_directory=True)
+        isolation = []
+        for entry in ('doctor', 'collect'):
+            for kind, parent in (('direct', project), ('alias', alias),
+                                 ('parent', output / 'doctor' / '..' / project.name)):
+                destination = parent / f'rejected-{entry}-{kind}'
+                name = f'output-isolation-{entry}-{kind}'
+                if entry == 'doctor':
+                    command = ['doctor', project, destination]
+                else:
+                    request = json.loads(request_path.read_text())
+                    request['output_root'] = str(destination)
+                    mutated = output / f'{name}.json'
+                    mutated.write_text(json.dumps(request))
+                    command = ['collect', mutated]
+                error = json.loads(run(name, command, success=False))
+                assert error['state'] == 'measurement_error' and 'outside' in error['message']
+                assert not destination.exists() and project_snapshot() == before
+                isolation.append({'name': name, 'destination': str(destination),
+                                  'output_exists': False, 'project_unchanged': True})
+        alias.unlink()
+        relative = output / 'plain-doctor-relative'
+        run('doctor-relative-output', ['doctor', project, os.path.relpath(relative)])
+        assert (relative / 'doctor.json').is_file() and project_snapshot() == before
+        observations['output_isolation'] = {'before': before, 'after': project_snapshot(),
+                                            'cases': isolation, 'relative_output_created': True}
         anchor = run('plain', ['collect', request_path], trace=True)
         assert anchor['state'] == 'unsupported' and anchor['capture'] == 'complete'
         assert verify('verify', anchor)['core_acceptance'] == 'pending'

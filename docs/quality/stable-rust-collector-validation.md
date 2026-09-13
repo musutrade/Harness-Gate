@@ -5,6 +5,48 @@ complete; T3–T8 remain open. The [design](stable-rust-collector.md) defines th
 boundary. No Core required binding, threshold, baseline or historical evidence
 was changed. No compiler-private backend was built or executed for these results.
 
+## Output-directory isolation checkpoint
+
+The preceding release rejected output inside the measured project only after
+creating its directory. Real CLI reproductions retained five empty directories:
+three doctor paths and two collection paths using a symlink or `..`. Direct
+collection paths already failed before creation. File-only identity checks did
+not expose these empty directories. The [output-isolation evidence](stable-rust-candidate-evidence/output-isolation.json)
+preserves both original observations and fresh post-fix directory/file snapshots.
+
+The Rust runner now resolves the project and existing output parent, checks the
+boundary, then creates the output. Six rejected doctor/collect paths leave the
+measured tree unchanged; a relative sibling output still succeeds. These seven
+checks are required by package preparation and independently tested for omission.
+This covers path resolution before creation; concurrent filesystem replacement
+is not certified.
+
+The final stable 1.97.1 release is
+`adeaf2d1a53e182f810097161c93ec83d8b32bcc5afefd9ec67ed20f87402ed3`,
+3,488,488 bytes. It passes [120 capture checks](stable-rust-candidate-evidence/acceptance-output-isolation.json),
+26 macro checks, six authenticated Core fixture cases, 38 lifecycle checks and
+29 loopback HTTPS checks. Package preparation passes with this exact program.
+Candidate tests pass 21, formatting and all-target clippy pass, quality discovery
+passes 449 with 36 manual legacy skips, and release discovery passes 91.
+Unchanged Core source/dependencies retain the preceding 397-test nextest,
+formatting and clippy evidence. The initial formatter failure and package
+identity rejection after that formatting change are retained; the full runtime
+matrix was rerun against the final binary.
+
+The unsigned four-file payload is 4,802,098 bytes. Signed test bundles download
+4,802,567 bytes initially and 4,802,593 on upgrade. Two installed versions occupy
+9,605,160 bytes; interrupted staging adds 4,802,593, totaling 14,408,381 including
+installation metadata. The HTTPS matrix receives 37,554,339 response-body bytes
+across successful and failed transfers; cache and observed abandoned-download
+bytes are zero. These exclude headers, TLS overhead and unwritten audit from the
+killed process. RSA and loopback TLS use real test trust; Sigstore is mocked.
+
+Only the existing Rust 1.97.1 / LLVM 22.1.6 Ubuntu 26.04 Linux x86_64 environment
+was exercised. Second-toolchain/system validation, complete process tracing,
+generated-owner/input certification, production signing and reviewed migration
+remain incomplete. T3–T8 remain unchecked and release remains paused. The
+following records preserve earlier binaries and their separate evidence.
+
 ## Duplicate identity decoding checkpoint
 
 A fresh plain-fixture capture reproduced a concrete collector defect: when its

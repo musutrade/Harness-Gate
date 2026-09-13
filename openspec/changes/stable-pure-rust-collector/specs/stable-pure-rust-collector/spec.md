@@ -103,6 +103,20 @@ without implying certified source ownership or arbitrary build-script isolation.
 - WHEN stable dep-info reports a relative source path
 - THEN verification resolves it from that producer's observed compiler working directory and rejects missing or inconsistent producer records.
 
+### Requirement: Rejected output paths preserve the project
+
+Doctor and collection MUST resolve existing output-parent aliases and parent
+components and check the project boundary before creating an output directory.
+A rejected path inside the measured project MUST leave its files and directory
+entries unchanged. Valid relative doctor output and outside sibling directories
+remain permitted. This does not certify concurrent filesystem mutation isolation.
+
+#### Scenario: Aliased output inside the source tree
+
+- GIVEN an output parent that resolves into the measured project through a symlink or `..`
+- WHEN doctor or collection rejects the output path
+- THEN it reports measurement_error before creating directories or running tools, and the project tree is unchanged.
+
 ### Requirement: Unambiguous JSON identities
 
 Collection requests, capture manifests, doctor reports, dependency archive maps

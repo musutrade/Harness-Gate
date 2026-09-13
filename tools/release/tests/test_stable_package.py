@@ -77,7 +77,7 @@ class PreparationTests(unittest.TestCase):
                 registry_notices(package, lock)
 
     def test_acceptance_requires_anchor_same_binary_and_passed_checks(self):
-        value = json.loads((ROOT / 'docs/quality/stable-rust-candidate-evidence/acceptance-json.json').read_text())
+        value = json.loads((ROOT / 'docs/quality/stable-rust-candidate-evidence/acceptance-output-isolation.json').read_text())
         binary = value['binary']
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / 'summary.json'
@@ -91,6 +91,10 @@ class PreparationTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'candidate binary'):
                 acceptance(path, pin, dict(binary, bytes=0))
             for name in ('partial', 'certified-region-owners', 'duplicate-owner-region',
+                         'output-isolation-doctor-direct', 'output-isolation-doctor-alias',
+                         'output-isolation-doctor-parent', 'output-isolation-collect-direct',
+                         'output-isolation-collect-alias', 'output-isolation-collect-parent',
+                         'doctor-relative-output',
                          'owner-region-counter-disagreement', 'owner-region-summary-count',
                          'owner-region-summary-covered', 'negative-function-count', 'certified-function-owners',
                          'missing-llvm-owner', 'omitted-source-owners', 'changed-test-exclusions',
