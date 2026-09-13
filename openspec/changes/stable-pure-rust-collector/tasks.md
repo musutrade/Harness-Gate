@@ -33,7 +33,7 @@ for our function-like fixture; no patched compiler or fixed version was adopted.
 - [ ] T3: Implement pure-Rust entry, dependency checks, stable coverage collection and source complexity analysis without compiler-private APIs or Python runtime dependencies.
 - [ ] T4: Implement protocol-compatible validation/normalization, preserved Core authority and explicit capability/identity failures.
 - [ ] T5: Implement lightweight verified publication/installation/upgrade/rollback with user-installed dependencies and measured artifact sizes.
-- [ ] T6: Run real multi-toolchain, cross-host, negative, source-boundary and old/new measurement comparisons; review the new series transition without baseline reset.
+- [ ] T6: Run real current-stable-toolchain, cross-host, negative, source-boundary and old/new measurement comparisons; review the new series transition without baseline reset.
 - [ ] T7: Update CI with stable-only acceptance, publish support/limitations documentation and complete all required checks.
 - [ ] T8: Remove the legacy publication hold only with reviewed replacement acceptance; production publication remains separately protected.
 
@@ -46,7 +46,8 @@ release preparation and actual acceptance are complete.
 T2 inventory and implementation design: `docs/quality/stable-rust-collector.md`.
 Actual candidate execution and remaining acceptance:
 `docs/quality/stable-rust-collector-validation.md`. T3 has a runnable Rust capture
-and AST implementation, but the second toolchain remains unverified. T4 has
+and AST implementation. Operator acceptance covers target Rust 1.98.1;
+full semantic and cross-system acceptance remains open. T4 has
 a Core v2 adapter whose real signed transport and evidence checks accept verified
 lexical complexity and bounded function/code-region coverage while required line
 coverage and CRAP remain blocked. The same-source
@@ -61,7 +62,7 @@ unsigned candidate preparation with archive/source-authenticated dependency
 notices. Real lifecycle checks consume that payload and reject unsigned packages
 and re-signed overstated support metadata. This is review preparation only:
 protected production signing, trust bootstrap, downloader, license review and
-multi-toolchain/system acceptance remain open. T5 and T8 stay unchecked.
+current-stable/full two-system acceptance remain open. T5 and T8 stay unchecked.
 
 The T4 raw-evidence checkpoint validates the exercised public LLVM JSON structure,
 integer domains, region IDs, segments and summary arithmetic with duplicate-key
@@ -150,8 +151,9 @@ Actual code-region validation is recorded in
 five signed-request Core fixture cases, 17 candidate Rust tests and 38 lifecycle
 checks (test RSA, mocked Sigstore). Final release, capture and unsigned package
 share SHA-256 `e2e3296e90b8da095bfe98f504589faca27ade64565262697747567183cd3e6c`.
-Only Rust 1.97.1 on the recorded Ubuntu environment ran. T3–T8 remain unchecked;
-two-toolchain/system, real signing/process trace, complete owner/input boundaries
+That historical checkpoint ran Rust 1.97.1 only; the operator supplement below
+adds Rust 1.98.1 and bounded Ubuntu 24.04 results. T3–T8 remain unchecked;
+complete two-system, real signing, complete owner/input boundaries
 and reviewed migration remain required before removing the release hold.
 
 ## Bounded HTTPS lifecycle checkpoint (T5 remains incomplete)
@@ -220,3 +222,22 @@ these seven cases. Validation is recorded in `output-isolation.json` and
 `acceptance-output-isolation.json` in the candidate evidence directory. This fixes
 the reproduced failure side effect; it does not certify concurrent filesystem
 mutation isolation or complete T3–T8 and the retained release/migration blockers.
+
+## Operator recovery and current-stable scope (2026-09-13)
+
+Only Rust 1.98.1 is required for this candidate's build, plugin-specific CI and
+runtime acceptance. The operator's exact existing binary passed 125 traced
+capture checks and six traced authenticated Core fixtures on 1.98.1. Its Ubuntu
+24.04 plain-fixture checks establish a second userspace, not a full second-system
+matrix. Historical 1.97.1 records are retained without a dual-version gate.
+
+The inspected operator-patch Quality Script Tests job was cancelled after its six
+Core fixture successes. Diagnostic defaults and explicit CI arguments now agree
+on 1.98.1. New package preparation requires that compiler and same-binary
+current-stable acceptance. No original failing trace is ignored.
+
+See `docs/quality/stable-rust-collector-recovery.md` and `recovery-198.json` in the
+candidate evidence directory for the new build, focused stable macro diagnostic,
+validation limits and exact next actions. Stable generated-owner/counter evidence
+and reviewed required CRAP migration remain missing; T3–T8 stay unchecked, GH-259
+stays open, and the legacy release hold is retained.

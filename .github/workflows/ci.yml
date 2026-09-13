@@ -568,10 +568,10 @@ jobs:
             --output target/stable-candidate-checks/macros --trace
           diagnostic_llvm="$(rustc --print sysroot)/lib/rustlib/x86_64-unknown-linux-gnu/bin"
           python3 tools/quality/rust-stable-collector/diagnose_macro_spans.py \
-            --output target/stable-candidate-checks/macro-spans \
+            --output target/stable-candidate-checks/macro-spans --toolchain 1.98.1 \
             --llvm-cov "$diagnostic_llvm/llvm-cov" --llvm-profdata "$diagnostic_llvm/llvm-profdata"
           python3 tools/quality/rust-stable-collector/diagnose_derive_coverage.py \
-            --output target/stable-candidate-checks/derive-coverage \
+            --output target/stable-candidate-checks/derive-coverage --toolchain 1.98.1 \
             --llvm-cov "$diagnostic_llvm/llvm-cov" --llvm-profdata "$diagnostic_llvm/llvm-profdata"
           cargo build --manifest-path tools/harness-gate/Cargo.toml --bin harness-gate --example stable_collector_acceptance --locked
           for fixture in plain partial modules boundaries features registry; do
