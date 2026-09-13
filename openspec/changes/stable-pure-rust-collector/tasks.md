@@ -156,3 +156,13 @@ prior failed attempts and byte measurements are recorded in
 document. Second toolchain/system, actual process tracing, public distribution,
 real dual-signature, protected trust bootstrap and release review remain pending.
 These results do not complete T5 or T8, authorize publication or adopt a baseline.
+
+## Bounded execution audit checkpoint (T7 remains incomplete)
+
+Synthetic regression records confirmed that the previous execve audit skipped
+resumed arguments and accepted truncated/unfinished calls. The repository-only
+parser now joins calls by PID, requires complete decoded arguments, and rejects
+incomplete/ambiguous records. Six focused tests pass; before/after evidence is in
+`docs/quality/stable-rust-candidate-evidence/execution-audit.json`. This is parser
+validation, not actual tracing evidence. The Rust binary remains unchanged, and
+T3–T8 remain unchecked with the same release acceptance blockers.

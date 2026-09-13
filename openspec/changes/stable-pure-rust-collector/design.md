@@ -206,3 +206,13 @@ Real loopback TLS and test-RSA lifecycle fixtures validate this transport. Mocke
 Sigstore cannot satisfy production signing acceptance. Trusted public bootstrap,
 protected publication, two toolchains/systems and complete acceptance still block
 T5/T8; no release hold is removed by the downloader.
+
+## T7 execution trace completeness
+
+The repository-only required audit consumes untimestamped `strace -f` execve
+records. It joins unfinished/resumed calls by process ID before checking decoded
+arguments for forbidden runtimes/interfaces. Abbreviated, unreadable, unmatched,
+duplicate or incomplete records fail the audit; signal/exit records are allowed
+without discarding pending calls. The default environment pointer/count is not
+environment-content evidence. Synthetic parser regressions cannot establish
+actual process tracing or cross-host acceptance; T7 remains incomplete.
