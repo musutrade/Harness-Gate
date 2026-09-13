@@ -1,0 +1,2632 @@
+{
+  "schema": "rust-macro-span-diagnostic/v1",
+  "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "cargo_llvm_cov": "cargo-llvm-cov 0.9.0\n",
+  "external_tools": {
+    "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov": {
+      "sha256": "bb415d8767d2ad73d72c01941f409ffc8f9478747ec7c18a7a69356735551ed9",
+      "bytes": 639712
+    },
+    "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata": {
+      "sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+      "bytes": 666968
+    }
+  },
+  "source": {
+    "Cargo.lock": {
+      "sha256": "7e749927e1048ef9dd72dbdeff7e559d7415e1cd4eb387430059a3a7399a42d3",
+      "bytes": 1367
+    },
+    "Cargo.toml": {
+      "sha256": "f7e71f9c95397029349e3f44c39be846b6d016c097a54c068401dcdb09d7c1ad",
+      "bytes": 73
+    },
+    "README.md": {
+      "sha256": "9a81bebfc791481cd9601f28995e6a32f5cb103b02e98b39013f8bae71df56de",
+      "bytes": 1886
+    },
+    "consumer/Cargo.toml": {
+      "sha256": "116086e10273b649e4563f3ab01664372bb4711ff554c7ab3620621f178b4186",
+      "bytes": 188
+    },
+    "consumer/src/lib.rs": {
+      "sha256": "027aef5fc5707b7b1fbcbca814b8342de912599f7acd3b55dd73a5227e339e0a",
+      "bytes": 791
+    },
+    "generator/Cargo.toml": {
+      "sha256": "a15f42bd0ef45e1a2dfe2d0d621c05952437f29c171ffa36ea43433a4fcbe2e5",
+      "bytes": 233
+    },
+    "generator/src/lib.rs": {
+      "sha256": "afcffe5c527216247fdbffa9ef6e1d4543e1ee8e3742337f337d5cab3997ea13",
+      "bytes": 2448
+    },
+    "macros/Cargo.toml": {
+      "sha256": "3e7a9eeaf09af33c6d9ff22dec0f8890510bb9ac689bd61207f2899cac409760",
+      "bytes": 245
+    },
+    "macros/src/lib.rs": {
+      "sha256": "085a4a2684c9a9374e249218872be5fd18f4b8227b062c03785e635eb446546c",
+      "bytes": 289
+    }
+  },
+  "diagnostic_wrapper": {
+    "sha256": "455ec7617edc732633f66888d23b68340e0d9667c02bb33677302fb75798ee9e",
+    "bytes": 1378
+  },
+  "commands": [
+    {
+      "name": "rustc",
+      "argv": [
+        "rustc",
+        "+1.97.1",
+        "-vV"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "sha256": "b2bdf493bcf6d1dc55181a0efc2774b6d9cf7bf5c8dcc5bed592c994b2ad38c4",
+        "bytes": 196
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "name": "llvm-cov",
+      "argv": [
+        "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "sha256": "89c240b58fd13ae42f12709f4b977bfd5b6d360ef471fd93c591be13c17bcdf2",
+        "bytes": 85
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "name": "llvm-profdata",
+      "argv": [
+        "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "sha256": "89c240b58fd13ae42f12709f4b977bfd5b6d360ef471fd93c591be13c17bcdf2",
+        "bytes": 85
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "name": "cargo-llvm-cov",
+      "argv": [
+        "cargo",
+        "+1.97.1",
+        "llvm-cov",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "sha256": "5372e2711feafe05fff68f8681f01c798a6e5de8c9961d5d373b9a648c1951e2",
+        "bytes": 21
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "name": "original-default",
+      "argv": [
+        "cargo",
+        "+1.97.1",
+        "llvm-cov",
+        "--manifest-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/macro-span-diagnostic03/project/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--package",
+        "gate-observation-consumer",
+        "--json",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--output-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/macro-span-diagnostic03/original-default.json"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "sha256": "29c66b352a17d7339f709d7730bd45849fef4685f7497b64138c977ad828c2f5",
+        "bytes": 233
+      },
+      "stderr": {
+        "sha256": "62f6edf23ceafbf2271106b3703153bf36e82847a751fe458c4bbc52f74bb57c",
+        "bytes": 1069
+      }
+    },
+    {
+      "name": "original-branching",
+      "argv": [
+        "cargo",
+        "+1.97.1",
+        "llvm-cov",
+        "--manifest-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/macro-span-diagnostic03/project/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--package",
+        "gate-observation-consumer",
+        "--json",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--output-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/macro-span-diagnostic03/original-branching.json",
+        "--features",
+        "branching"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "sha256": "29c66b352a17d7339f709d7730bd45849fef4685f7497b64138c977ad828c2f5",
+        "bytes": 233
+      },
+      "stderr": {
+        "sha256": "2c4880340f5a8df534b76c349b34e683f2a12ffc2f640c1ba6666af60a5adeb8",
+        "bytes": 665
+      }
+    },
+    {
+      "name": "diagnostic-default",
+      "argv": [
+        "cargo",
+        "+1.97.1",
+        "llvm-cov",
+        "--manifest-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/macro-span-diagnostic03/project/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--package",
+        "gate-observation-consumer",
+        "--json",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--output-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/macro-span-diagnostic03/diagnostic-default.json"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "sha256": "29c66b352a17d7339f709d7730bd45849fef4685f7497b64138c977ad828c2f5",
+        "bytes": 233
+      },
+      "stderr": {
+        "sha256": "4dfc253d192f98b28393dd1ccf5a6264ed9dbcaeaf50a356f270a9d38db5136f",
+        "bytes": 4006
+      }
+    },
+    {
+      "name": "diagnostic-branching",
+      "argv": [
+        "cargo",
+        "+1.97.1",
+        "llvm-cov",
+        "--manifest-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/macro-span-diagnostic03/project/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--package",
+        "gate-observation-consumer",
+        "--json",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "--output-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/macro-span-diagnostic03/diagnostic-branching.json",
+        "--features",
+        "branching"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "sha256": "c96dda0d1f2eb052db3ccdc0947a5013665f4d432bbdc451f245f10ff22127d5",
+        "bytes": 233
+      },
+      "stderr": {
+        "sha256": "f1acd1bb4a7fa4e9ac53c113fa172819974a4f8190171cffef79323f7cf2a7c3",
+        "bytes": 4287
+      }
+    }
+  ],
+  "cleared_environment": [
+    "RUSTUP_TOOLCHAIN",
+    "RUSTC_BOOTSTRAP",
+    "RUSTFLAGS",
+    "RUSTDOCFLAGS",
+    "CARGO_ENCODED_RUSTFLAGS",
+    "RUSTC_WRAPPER",
+    "RUSTC_WORKSPACE_WRAPPER"
+  ],
+  "exports": {
+    "original-default": {
+      "identity": {
+        "sha256": "8835b1e3f773d5810c308d590f0903ac947000bcef9b4c88ba3ea738aeefa047",
+        "bytes": 5461
+      },
+      "consumer_functions": [
+        {
+          "branches": [],
+          "mcdc_records": [],
+          "count": 1,
+          "filenames": [
+            "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/macro-span-diagnostic03/project/consumer/src/lib.rs"
+          ],
+          "name": "_RNvNtCs3svnDxA0VHM_25gate_observation_consumer5testss_37generated_functions_execute_real_code",
+          "regions": [
+            [
+              15,
+              5,
+              15,
+              47,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              16,
+              9,
+              16,
+              19,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              16,
+              20,
+              16,
+              25,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              17,
+              9,
+              17,
+              19,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              17,
+              20,
+              17,
+              26,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              18,
+              9,
+              18,
+              19,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              18,
+              20,
+              18,
+              26,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              20,
+              5,
+              20,
+              6,
+              1,
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "branches": [],
+          "mcdc_records": [],
+          "count": 1,
+          "filenames": [
+            "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/macro-span-diagnostic03/project/consumer/src/lib.rs"
+          ],
+          "name": "_RNvNtCs3svnDxA0VHM_25gate_observation_consumer5testss_43configuration_selects_the_actual_invocation",
+          "regions": [
+            [
+              22,
+              5,
+              22,
+              53,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              23,
+              9,
+              23,
+              19,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              24,
+              13,
+              24,
+              23,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              25,
+              16,
+              25,
+              20,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              25,
+              46,
+              25,
+              47,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              25,
+              57,
+              25,
+              58,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              27,
+              5,
+              27,
+              6,
+              1,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "original-branching": {
+      "identity": {
+        "sha256": "b08fabaa8108b9900a1a66ecf9eb64c2fb48874107c8226ac319fc1478fef28d",
+        "bytes": 5461
+      },
+      "consumer_functions": [
+        {
+          "branches": [],
+          "mcdc_records": [],
+          "count": 1,
+          "filenames": [
+            "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/macro-span-diagnostic03/project/consumer/src/lib.rs"
+          ],
+          "name": "_RNvNtCsdJxti2VSswl_25gate_observation_consumer5testss_37generated_functions_execute_real_code",
+          "regions": [
+            [
+              15,
+              5,
+              15,
+              47,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              16,
+              9,
+              16,
+              19,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              16,
+              20,
+              16,
+              25,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              17,
+              9,
+              17,
+              19,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              17,
+              20,
+              17,
+              26,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              18,
+              9,
+              18,
+              19,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              18,
+              20,
+              18,
+              26,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              20,
+              5,
+              20,
+              6,
+              1,
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "branches": [],
+          "mcdc_records": [],
+          "count": 1,
+          "filenames": [
+            "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/macro-span-diagnostic03/project/consumer/src/lib.rs"
+          ],
+          "name": "_RNvNtCsdJxti2VSswl_25gate_observation_consumer5testss_43configuration_selects_the_actual_invocation",
+          "regions": [
+            [
+              22,
+              5,
+              22,
+              53,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              23,
+              9,
+              23,
+              19,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              24,
+              13,
+              24,
+              23,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              25,
+              16,
+              25,
+              20,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              25,
+              46,
+              25,
+              47,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              25,
+              57,
+              25,
+              58,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              27,
+              5,
+              27,
+              6,
+              1,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "diagnostic-default": {
+      "identity": {
+        "sha256": "7d817fba2bb487888056e22bdfd6c90313001fa36f88cd56193e109b3b828b04",
+        "bytes": 6990
+      },
+      "consumer_functions": [
+        {
+          "branches": [],
+          "mcdc_records": [],
+          "count": 1,
+          "filenames": [
+            "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/macro-span-diagnostic03/project/consumer/src/lib.rs"
+          ],
+          "name": "_RNvNtCs3svnDxA0VHM_25gate_observation_consumer5testss_37generated_functions_execute_real_code",
+          "regions": [
+            [
+              15,
+              5,
+              15,
+              47,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              16,
+              9,
+              16,
+              19,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              16,
+              20,
+              16,
+              25,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              17,
+              9,
+              17,
+              19,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              17,
+              20,
+              17,
+              26,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              18,
+              9,
+              18,
+              19,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              18,
+              20,
+              18,
+              26,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              20,
+              5,
+              20,
+              6,
+              1,
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "branches": [],
+          "mcdc_records": [],
+          "count": 1,
+          "filenames": [
+            "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/macro-span-diagnostic03/project/consumer/src/lib.rs"
+          ],
+          "name": "_RNvNtCs3svnDxA0VHM_25gate_observation_consumer5testss_43configuration_selects_the_actual_invocation",
+          "regions": [
+            [
+              22,
+              5,
+              22,
+              53,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              23,
+              9,
+              23,
+              19,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              24,
+              13,
+              24,
+              23,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              25,
+              16,
+              25,
+              20,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              25,
+              46,
+              25,
+              47,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              25,
+              57,
+              25,
+              58,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              27,
+              5,
+              27,
+              6,
+              1,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "diagnostic-branching": {
+      "identity": {
+        "sha256": "c4acd79e14ac8b2252ebbdca5198db8baaf81988c57fe0f95013c5301305e328",
+        "bytes": 6990
+      },
+      "consumer_functions": [
+        {
+          "branches": [],
+          "mcdc_records": [],
+          "count": 1,
+          "filenames": [
+            "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/macro-span-diagnostic03/project/consumer/src/lib.rs"
+          ],
+          "name": "_RNvNtCsdJxti2VSswl_25gate_observation_consumer5testss_37generated_functions_execute_real_code",
+          "regions": [
+            [
+              15,
+              5,
+              15,
+              47,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              16,
+              9,
+              16,
+              19,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              16,
+              20,
+              16,
+              25,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              17,
+              9,
+              17,
+              19,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              17,
+              20,
+              17,
+              26,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              18,
+              9,
+              18,
+              19,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              18,
+              20,
+              18,
+              26,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              20,
+              5,
+              20,
+              6,
+              1,
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "branches": [],
+          "mcdc_records": [],
+          "count": 1,
+          "filenames": [
+            "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/macro-span-diagnostic03/project/consumer/src/lib.rs"
+          ],
+          "name": "_RNvNtCsdJxti2VSswl_25gate_observation_consumer5testss_43configuration_selects_the_actual_invocation",
+          "regions": [
+            [
+              22,
+              5,
+              22,
+              53,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              23,
+              9,
+              23,
+              19,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              24,
+              13,
+              24,
+              23,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              25,
+              16,
+              25,
+              20,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              25,
+              46,
+              25,
+              47,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              25,
+              57,
+              25,
+              58,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              27,
+              5,
+              27,
+              6,
+              1,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "observations": {
+    "default": {
+      "owners": {
+        "plain": {
+          "output.0": {
+            "path": "output.0",
+            "kind": "ident",
+            "span": [
+              3,
+              1,
+              3,
+              33
+            ]
+          },
+          "output.1": {
+            "path": "output.1",
+            "kind": "ident",
+            "span": [
+              3,
+              1,
+              3,
+              33
+            ]
+          },
+          "output.2": {
+            "path": "output.2",
+            "kind": "ident",
+            "span": [
+              3,
+              20,
+              3,
+              25
+            ]
+          },
+          "output.3": {
+            "path": "output.3",
+            "kind": "Parenthesis",
+            "span": [
+              3,
+              1,
+              3,
+              33
+            ]
+          },
+          "output.3.0": {
+            "path": "output.3.0",
+            "kind": "ident",
+            "span": [
+              3,
+              1,
+              3,
+              33
+            ]
+          },
+          "output.3.1": {
+            "path": "output.3.1",
+            "kind": "punct",
+            "span": [
+              3,
+              1,
+              3,
+              33
+            ]
+          },
+          "output.3.2": {
+            "path": "output.3.2",
+            "kind": "ident",
+            "span": [
+              3,
+              1,
+              3,
+              33
+            ]
+          },
+          "output.4": {
+            "path": "output.4",
+            "kind": "punct",
+            "span": [
+              3,
+              1,
+              3,
+              33
+            ]
+          },
+          "output.5": {
+            "path": "output.5",
+            "kind": "punct",
+            "span": [
+              3,
+              1,
+              3,
+              33
+            ]
+          },
+          "output.6": {
+            "path": "output.6",
+            "kind": "ident",
+            "span": [
+              3,
+              1,
+              3,
+              33
+            ]
+          },
+          "output.7": {
+            "path": "output.7",
+            "kind": "Brace",
+            "span": [
+              3,
+              1,
+              3,
+              33
+            ]
+          },
+          "output.7.0": {
+            "path": "output.7.0",
+            "kind": "ident",
+            "span": [
+              3,
+              1,
+              3,
+              33
+            ]
+          }
+        },
+        "branch": {
+          "output.0": {
+            "path": "output.0",
+            "kind": "ident",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.1": {
+            "path": "output.1",
+            "kind": "ident",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.2": {
+            "path": "output.2",
+            "kind": "ident",
+            "span": [
+              4,
+              20,
+              4,
+              26
+            ]
+          },
+          "output.3": {
+            "path": "output.3",
+            "kind": "Parenthesis",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.3.0": {
+            "path": "output.3.0",
+            "kind": "ident",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.3.1": {
+            "path": "output.3.1",
+            "kind": "punct",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.3.2": {
+            "path": "output.3.2",
+            "kind": "ident",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.4": {
+            "path": "output.4",
+            "kind": "punct",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.5": {
+            "path": "output.5",
+            "kind": "punct",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.6": {
+            "path": "output.6",
+            "kind": "ident",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.7": {
+            "path": "output.7",
+            "kind": "Brace",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.7.0": {
+            "path": "output.7.0",
+            "kind": "ident",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.7.1": {
+            "path": "output.7.1",
+            "kind": "ident",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.7.2": {
+            "path": "output.7.2",
+            "kind": "punct",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.7.3": {
+            "path": "output.7.3",
+            "kind": "literal",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.7.4": {
+            "path": "output.7.4",
+            "kind": "Brace",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.7.4.0": {
+            "path": "output.7.4.0",
+            "kind": "literal",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.7.5": {
+            "path": "output.7.5",
+            "kind": "ident",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.7.6": {
+            "path": "output.7.6",
+            "kind": "Brace",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.7.6.0": {
+            "path": "output.7.6.0",
+            "kind": "literal",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          }
+        },
+        "unexecuted": {
+          "output.0": {
+            "path": "output.0",
+            "kind": "ident",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.1": {
+            "path": "output.1",
+            "kind": "ident",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.2": {
+            "path": "output.2",
+            "kind": "ident",
+            "span": [
+              5,
+              20,
+              5,
+              30
+            ]
+          },
+          "output.3": {
+            "path": "output.3",
+            "kind": "Parenthesis",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.3.0": {
+            "path": "output.3.0",
+            "kind": "ident",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.3.1": {
+            "path": "output.3.1",
+            "kind": "punct",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.3.2": {
+            "path": "output.3.2",
+            "kind": "ident",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.4": {
+            "path": "output.4",
+            "kind": "punct",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.5": {
+            "path": "output.5",
+            "kind": "punct",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.6": {
+            "path": "output.6",
+            "kind": "ident",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.7": {
+            "path": "output.7",
+            "kind": "Brace",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.7.0": {
+            "path": "output.7.0",
+            "kind": "ident",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.7.1": {
+            "path": "output.7.1",
+            "kind": "ident",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.7.2": {
+            "path": "output.7.2",
+            "kind": "punct",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.7.3": {
+            "path": "output.7.3",
+            "kind": "literal",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.7.4": {
+            "path": "output.7.4",
+            "kind": "Brace",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.7.4.0": {
+            "path": "output.7.4.0",
+            "kind": "literal",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.7.5": {
+            "path": "output.7.5",
+            "kind": "ident",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.7.6": {
+            "path": "output.7.6",
+            "kind": "Brace",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.7.6.0": {
+            "path": "output.7.6.0",
+            "kind": "literal",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          }
+        },
+        "configured": {
+          "output.0": {
+            "path": "output.0",
+            "kind": "ident",
+            "span": [
+              9,
+              1,
+              9,
+              38
+            ]
+          },
+          "output.1": {
+            "path": "output.1",
+            "kind": "ident",
+            "span": [
+              9,
+              1,
+              9,
+              38
+            ]
+          },
+          "output.2": {
+            "path": "output.2",
+            "kind": "ident",
+            "span": [
+              9,
+              20,
+              9,
+              30
+            ]
+          },
+          "output.3": {
+            "path": "output.3",
+            "kind": "Parenthesis",
+            "span": [
+              9,
+              1,
+              9,
+              38
+            ]
+          },
+          "output.3.0": {
+            "path": "output.3.0",
+            "kind": "ident",
+            "span": [
+              9,
+              1,
+              9,
+              38
+            ]
+          },
+          "output.3.1": {
+            "path": "output.3.1",
+            "kind": "punct",
+            "span": [
+              9,
+              1,
+              9,
+              38
+            ]
+          },
+          "output.3.2": {
+            "path": "output.3.2",
+            "kind": "ident",
+            "span": [
+              9,
+              1,
+              9,
+              38
+            ]
+          },
+          "output.4": {
+            "path": "output.4",
+            "kind": "punct",
+            "span": [
+              9,
+              1,
+              9,
+              38
+            ]
+          },
+          "output.5": {
+            "path": "output.5",
+            "kind": "punct",
+            "span": [
+              9,
+              1,
+              9,
+              38
+            ]
+          },
+          "output.6": {
+            "path": "output.6",
+            "kind": "ident",
+            "span": [
+              9,
+              1,
+              9,
+              38
+            ]
+          },
+          "output.7": {
+            "path": "output.7",
+            "kind": "Brace",
+            "span": [
+              9,
+              1,
+              9,
+              38
+            ]
+          },
+          "output.7.0": {
+            "path": "output.7.0",
+            "kind": "ident",
+            "span": [
+              9,
+              1,
+              9,
+              38
+            ]
+          }
+        }
+      },
+      "generated_tokens": {
+        "plain": "pub fn plain(x : i32) -> i32 { x }",
+        "branch": "pub fn branch(x : i32) -> i32 { if x > 0 { 1 } else { 0 } }",
+        "unexecuted": "pub fn unexecuted(x : i32) -> i32 { if x > 0 { 1 } else { 0 } }",
+        "configured": "pub fn configured(x : i32) -> i32 { x }"
+      },
+      "body_ranges": {
+        "plain": {
+          "body": [
+            3,
+            1,
+            3,
+            33
+          ],
+          "interior_tokens": 1,
+          "all_interior_ranges_equal_body": true
+        },
+        "branch": {
+          "body": [
+            4,
+            1,
+            4,
+            33
+          ],
+          "interior_tokens": 9,
+          "all_interior_ranges_equal_body": true
+        },
+        "unexecuted": {
+          "body": [
+            5,
+            1,
+            5,
+            37
+          ],
+          "interior_tokens": 9,
+          "all_interior_ranges_equal_body": true
+        },
+        "configured": {
+          "body": [
+            9,
+            1,
+            9,
+            38
+          ],
+          "interior_tokens": 1,
+          "all_interior_ranges_equal_body": true
+        }
+      }
+    },
+    "branching": {
+      "owners": {
+        "plain": {
+          "output.0": {
+            "path": "output.0",
+            "kind": "ident",
+            "span": [
+              3,
+              1,
+              3,
+              33
+            ]
+          },
+          "output.1": {
+            "path": "output.1",
+            "kind": "ident",
+            "span": [
+              3,
+              1,
+              3,
+              33
+            ]
+          },
+          "output.2": {
+            "path": "output.2",
+            "kind": "ident",
+            "span": [
+              3,
+              20,
+              3,
+              25
+            ]
+          },
+          "output.3": {
+            "path": "output.3",
+            "kind": "Parenthesis",
+            "span": [
+              3,
+              1,
+              3,
+              33
+            ]
+          },
+          "output.3.0": {
+            "path": "output.3.0",
+            "kind": "ident",
+            "span": [
+              3,
+              1,
+              3,
+              33
+            ]
+          },
+          "output.3.1": {
+            "path": "output.3.1",
+            "kind": "punct",
+            "span": [
+              3,
+              1,
+              3,
+              33
+            ]
+          },
+          "output.3.2": {
+            "path": "output.3.2",
+            "kind": "ident",
+            "span": [
+              3,
+              1,
+              3,
+              33
+            ]
+          },
+          "output.4": {
+            "path": "output.4",
+            "kind": "punct",
+            "span": [
+              3,
+              1,
+              3,
+              33
+            ]
+          },
+          "output.5": {
+            "path": "output.5",
+            "kind": "punct",
+            "span": [
+              3,
+              1,
+              3,
+              33
+            ]
+          },
+          "output.6": {
+            "path": "output.6",
+            "kind": "ident",
+            "span": [
+              3,
+              1,
+              3,
+              33
+            ]
+          },
+          "output.7": {
+            "path": "output.7",
+            "kind": "Brace",
+            "span": [
+              3,
+              1,
+              3,
+              33
+            ]
+          },
+          "output.7.0": {
+            "path": "output.7.0",
+            "kind": "ident",
+            "span": [
+              3,
+              1,
+              3,
+              33
+            ]
+          }
+        },
+        "branch": {
+          "output.0": {
+            "path": "output.0",
+            "kind": "ident",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.1": {
+            "path": "output.1",
+            "kind": "ident",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.2": {
+            "path": "output.2",
+            "kind": "ident",
+            "span": [
+              4,
+              20,
+              4,
+              26
+            ]
+          },
+          "output.3": {
+            "path": "output.3",
+            "kind": "Parenthesis",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.3.0": {
+            "path": "output.3.0",
+            "kind": "ident",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.3.1": {
+            "path": "output.3.1",
+            "kind": "punct",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.3.2": {
+            "path": "output.3.2",
+            "kind": "ident",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.4": {
+            "path": "output.4",
+            "kind": "punct",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.5": {
+            "path": "output.5",
+            "kind": "punct",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.6": {
+            "path": "output.6",
+            "kind": "ident",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.7": {
+            "path": "output.7",
+            "kind": "Brace",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.7.0": {
+            "path": "output.7.0",
+            "kind": "ident",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.7.1": {
+            "path": "output.7.1",
+            "kind": "ident",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.7.2": {
+            "path": "output.7.2",
+            "kind": "punct",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.7.3": {
+            "path": "output.7.3",
+            "kind": "literal",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.7.4": {
+            "path": "output.7.4",
+            "kind": "Brace",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.7.4.0": {
+            "path": "output.7.4.0",
+            "kind": "literal",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.7.5": {
+            "path": "output.7.5",
+            "kind": "ident",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.7.6": {
+            "path": "output.7.6",
+            "kind": "Brace",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          },
+          "output.7.6.0": {
+            "path": "output.7.6.0",
+            "kind": "literal",
+            "span": [
+              4,
+              1,
+              4,
+              33
+            ]
+          }
+        },
+        "unexecuted": {
+          "output.0": {
+            "path": "output.0",
+            "kind": "ident",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.1": {
+            "path": "output.1",
+            "kind": "ident",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.2": {
+            "path": "output.2",
+            "kind": "ident",
+            "span": [
+              5,
+              20,
+              5,
+              30
+            ]
+          },
+          "output.3": {
+            "path": "output.3",
+            "kind": "Parenthesis",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.3.0": {
+            "path": "output.3.0",
+            "kind": "ident",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.3.1": {
+            "path": "output.3.1",
+            "kind": "punct",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.3.2": {
+            "path": "output.3.2",
+            "kind": "ident",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.4": {
+            "path": "output.4",
+            "kind": "punct",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.5": {
+            "path": "output.5",
+            "kind": "punct",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.6": {
+            "path": "output.6",
+            "kind": "ident",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.7": {
+            "path": "output.7",
+            "kind": "Brace",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.7.0": {
+            "path": "output.7.0",
+            "kind": "ident",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.7.1": {
+            "path": "output.7.1",
+            "kind": "ident",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.7.2": {
+            "path": "output.7.2",
+            "kind": "punct",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.7.3": {
+            "path": "output.7.3",
+            "kind": "literal",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.7.4": {
+            "path": "output.7.4",
+            "kind": "Brace",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.7.4.0": {
+            "path": "output.7.4.0",
+            "kind": "literal",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.7.5": {
+            "path": "output.7.5",
+            "kind": "ident",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.7.6": {
+            "path": "output.7.6",
+            "kind": "Brace",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          },
+          "output.7.6.0": {
+            "path": "output.7.6.0",
+            "kind": "literal",
+            "span": [
+              5,
+              1,
+              5,
+              37
+            ]
+          }
+        },
+        "configured": {
+          "output.0": {
+            "path": "output.0",
+            "kind": "ident",
+            "span": [
+              7,
+              1,
+              7,
+              37
+            ]
+          },
+          "output.1": {
+            "path": "output.1",
+            "kind": "ident",
+            "span": [
+              7,
+              1,
+              7,
+              37
+            ]
+          },
+          "output.2": {
+            "path": "output.2",
+            "kind": "ident",
+            "span": [
+              7,
+              20,
+              7,
+              30
+            ]
+          },
+          "output.3": {
+            "path": "output.3",
+            "kind": "Parenthesis",
+            "span": [
+              7,
+              1,
+              7,
+              37
+            ]
+          },
+          "output.3.0": {
+            "path": "output.3.0",
+            "kind": "ident",
+            "span": [
+              7,
+              1,
+              7,
+              37
+            ]
+          },
+          "output.3.1": {
+            "path": "output.3.1",
+            "kind": "punct",
+            "span": [
+              7,
+              1,
+              7,
+              37
+            ]
+          },
+          "output.3.2": {
+            "path": "output.3.2",
+            "kind": "ident",
+            "span": [
+              7,
+              1,
+              7,
+              37
+            ]
+          },
+          "output.4": {
+            "path": "output.4",
+            "kind": "punct",
+            "span": [
+              7,
+              1,
+              7,
+              37
+            ]
+          },
+          "output.5": {
+            "path": "output.5",
+            "kind": "punct",
+            "span": [
+              7,
+              1,
+              7,
+              37
+            ]
+          },
+          "output.6": {
+            "path": "output.6",
+            "kind": "ident",
+            "span": [
+              7,
+              1,
+              7,
+              37
+            ]
+          },
+          "output.7": {
+            "path": "output.7",
+            "kind": "Brace",
+            "span": [
+              7,
+              1,
+              7,
+              37
+            ]
+          },
+          "output.7.0": {
+            "path": "output.7.0",
+            "kind": "ident",
+            "span": [
+              7,
+              1,
+              7,
+              37
+            ]
+          },
+          "output.7.1": {
+            "path": "output.7.1",
+            "kind": "ident",
+            "span": [
+              7,
+              1,
+              7,
+              37
+            ]
+          },
+          "output.7.2": {
+            "path": "output.7.2",
+            "kind": "punct",
+            "span": [
+              7,
+              1,
+              7,
+              37
+            ]
+          },
+          "output.7.3": {
+            "path": "output.7.3",
+            "kind": "literal",
+            "span": [
+              7,
+              1,
+              7,
+              37
+            ]
+          },
+          "output.7.4": {
+            "path": "output.7.4",
+            "kind": "Brace",
+            "span": [
+              7,
+              1,
+              7,
+              37
+            ]
+          },
+          "output.7.4.0": {
+            "path": "output.7.4.0",
+            "kind": "literal",
+            "span": [
+              7,
+              1,
+              7,
+              37
+            ]
+          },
+          "output.7.5": {
+            "path": "output.7.5",
+            "kind": "ident",
+            "span": [
+              7,
+              1,
+              7,
+              37
+            ]
+          },
+          "output.7.6": {
+            "path": "output.7.6",
+            "kind": "Brace",
+            "span": [
+              7,
+              1,
+              7,
+              37
+            ]
+          },
+          "output.7.6.0": {
+            "path": "output.7.6.0",
+            "kind": "literal",
+            "span": [
+              7,
+              1,
+              7,
+              37
+            ]
+          }
+        }
+      },
+      "generated_tokens": {
+        "plain": "pub fn plain(x : i32) -> i32 { x }",
+        "branch": "pub fn branch(x : i32) -> i32 { if x > 0 { 1 } else { 0 } }",
+        "unexecuted": "pub fn unexecuted(x : i32) -> i32 { if x > 0 { 1 } else { 0 } }",
+        "configured": "pub fn configured(x : i32) -> i32 { if x > 0 { 1 } else { 0 } }"
+      },
+      "body_ranges": {
+        "plain": {
+          "body": [
+            3,
+            1,
+            3,
+            33
+          ],
+          "interior_tokens": 1,
+          "all_interior_ranges_equal_body": true
+        },
+        "branch": {
+          "body": [
+            4,
+            1,
+            4,
+            33
+          ],
+          "interior_tokens": 9,
+          "all_interior_ranges_equal_body": true
+        },
+        "unexecuted": {
+          "body": [
+            5,
+            1,
+            5,
+            37
+          ],
+          "interior_tokens": 9,
+          "all_interior_ranges_equal_body": true
+        },
+        "configured": {
+          "body": [
+            7,
+            1,
+            7,
+            37
+          ],
+          "interior_tokens": 9,
+          "all_interior_ranges_equal_body": true
+        }
+      }
+    }
+  },
+  "compiler_internal_span_context": "not observable via this stable diagnostic",
+  "coverage_and_crap": "unsupported; missing business function records",
+  "process_trace": "not run",
+  "T4": "incomplete",
+  "driver": {
+    "path": "tools/quality/rust-stable-collector/diagnose_macro_spans.py",
+    "sha256": "55ad583969b49e804e74d7d7dc7e82cef39b040317e0333f2c5be3cf69aa1c08",
+    "bytes": 9156
+  },
+  "summary_identity": {
+    "path": "target/gh-259/macro-span-diagnostic03/summary.json",
+    "sha256": "4af4fe69e469aad38d9f5d27435db593395bde7f76cfcbdc8f4149912c238c9a",
+    "bytes": 52805
+  },
+  "compiler_source_inspection": [
+    {
+      "local_path": "target/gh-259/macro-rustc-coverage.rs",
+      "repository": "rust-lang/rust",
+      "ref": "1.97.1",
+      "path": "compiler/rustc_mir_transform/src/coverage/mod.rs",
+      "git_blob_sha": "be8b02f61133de09cdb4c33e473594216e26c09d",
+      "url": "https://github.com/rust-lang/rust/blob/1.97.1/compiler/rustc_mir_transform/src/coverage/mod.rs",
+      "file_identity": {
+        "path": "target/gh-259/macro-rustc-coverage.rs",
+        "sha256": "10f394020bbf395d03656cf3f48f66d097e46d9076e79cc2c0de4f76cef90729",
+        "bytes": 4309
+      }
+    },
+    {
+      "local_path": "target/gh-259/macro-covsrc0.rs",
+      "repository": "rust-lang/rust",
+      "ref": "1.97.1",
+      "path": "compiler/rustc_mir_transform/src/coverage/expansion.rs",
+      "git_blob_sha": "77aec902faad5795e9c48457ecdd2802fd65b4e2",
+      "url": "https://github.com/rust-lang/rust/blob/1.97.1/compiler/rustc_mir_transform/src/coverage/expansion.rs",
+      "file_identity": {
+        "path": "target/gh-259/macro-covsrc0.rs",
+        "sha256": "75c0a4d69071ee4282ce3a57ea81ccb88ff09d075582d9efe0498a9ec7ce62b9",
+        "bytes": 8782
+      }
+    },
+    {
+      "local_path": "target/gh-259/macro-covsrc1.rs",
+      "repository": "rust-lang/rust",
+      "ref": "1.97.1",
+      "path": "compiler/rustc_mir_transform/src/coverage/spans.rs",
+      "git_blob_sha": "bdc861e2cece7f69b0389487a36369eef85bdc35",
+      "url": "https://github.com/rust-lang/rust/blob/1.97.1/compiler/rustc_mir_transform/src/coverage/spans.rs",
+      "file_identity": {
+        "path": "target/gh-259/macro-covsrc1.rs",
+        "sha256": "60733e4beeec98c07e532c8a79c6a2a58197bcadbeae98c183e7a15ee7b78b93",
+        "bytes": 11087
+      }
+    },
+    {
+      "local_path": "target/gh-259/macro-covsrc2.rs",
+      "repository": "rust-lang/rust",
+      "ref": "1.97.1",
+      "path": "compiler/rustc_mir_transform/src/coverage/query.rs",
+      "git_blob_sha": "39e0769373ededc6c496037161ca515cb0999ac2",
+      "url": "https://github.com/rust-lang/rust/blob/1.97.1/compiler/rustc_mir_transform/src/coverage/query.rs",
+      "file_identity": {
+        "path": "target/gh-259/macro-covsrc2.rs",
+        "sha256": "1421b190c76c05895fd4793f621b1a44a32dbbc72f22e1b2d4e90680cddebfd2",
+        "bytes": 6679
+      }
+    },
+    {
+      "local_path": "target/gh-259/macro-mappings.rs",
+      "repository": "rust-lang/rust",
+      "ref": "1.97.1",
+      "path": "compiler/rustc_mir_transform/src/coverage/mappings.rs",
+      "git_blob_sha": "4581afa99a31bf41f576392cfda854a78eab0391",
+      "url": "https://github.com/rust-lang/rust/blob/1.97.1/compiler/rustc_mir_transform/src/coverage/mappings.rs",
+      "file_identity": {
+        "path": "target/gh-259/macro-mappings.rs",
+        "sha256": "eaf31bbacdb5ac3d784462ebda3fd621f013929b97f70d092299701d5248d9c4",
+        "bytes": 3329
+      }
+    },
+    {
+      "local_path": "target/gh-259/macro-hir-info.rs",
+      "repository": "rust-lang/rust",
+      "ref": "1.97.1",
+      "path": "compiler/rustc_mir_transform/src/coverage/hir_info.rs",
+      "git_blob_sha": "28fdc52b06cb9df21e6719160557e19f7801d4e4",
+      "url": "https://github.com/rust-lang/rust/blob/1.97.1/compiler/rustc_mir_transform/src/coverage/hir_info.rs",
+      "file_identity": {
+        "path": "target/gh-259/macro-hir-info.rs",
+        "sha256": "85b750d523034719cc649c1efa17b05b85cb864521d43556364460675b1f6fc6",
+        "bytes": 5141
+      }
+    }
+  ],
+  "inference": "Generated body/interior token ranges coincide, consistent with the pinned body-span filter; internal lowered spans and hygiene contexts are not observed. No compiler defect or fix is certified.",
+  "upstream": {
+    "submitted": false,
+    "merged": false,
+    "adopted_fixed_version": null
+  },
+  "earlier_failed_attempt": {
+    "command": "python3 tools/quality/rust-stable-collector/diagnose_macro_spans.py --output target/gh-259/macro-span-diagnostic",
+    "exit_code": 1,
+    "log": {
+      "path": "target/gh-259/macro-span-diagnostic/original-default.stderr",
+      "sha256": "2fd3c69b6776810cf082da71fa3e7c3882672ba606697d780a0455c176c7574b",
+      "bytes": 754
+    },
+    "impact": "Without explicit LLVM paths, cargo-llvm-cov attempted rustup component setup and failed on read-only download/toolchain storage. No coverage result. Driver revised to require existing matching tools."
+  },
+  "missing_tool_negative": {
+    "command": "python3 tools/quality/rust-stable-collector/diagnose_macro_spans.py --output target/gh-259/macro-span-missing-tool --llvm-cov /missing-gh259-llvm-cov --llvm-profdata /home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+    "exit_code": 1,
+    "log": {
+      "path": "target/gh-259/macro-span-missing-tool.log",
+      "sha256": "e7f88a0bbbad3c0a30301da4c25ea0969b303ca5e336aea8516a9b6b7cf30533",
+      "bytes": 707
+    },
+    "result": "FileNotFoundError before first Cargo command; no command logs produced"
+  },
+  "followup_validation": [
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "result": "444 tests OK; 36 manual legacy skips",
+      "log": {
+        "path": "target/gh-259/span-quality-tests-final.log",
+        "sha256": "32e2f93c115fe91b8667e684faeb49a419e9dccd12c03c4a03682f46af8a9f92",
+        "bytes": 77462
+      }
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/release/tests -v",
+      "result": "91 passed",
+      "log": {
+        "path": "target/gh-259/span-release-tests.log",
+        "sha256": "79cade4c45994f91d3653c140dd46b5c3fed2f573a96b592f36ea1e457697519",
+        "bytes": 14290
+      }
+    },
+    {
+      "command": "CARGO_TARGET_DIR=\"$PWD/target/gh-259/core-target\" python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "result": "passed",
+      "log": {
+        "path": "target/gh-259/span-docs-consistency-final.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    },
+    {
+      "command": "harness-gate config check; harness-gate verify --profile ci --all",
+      "result": "not applicable; no project .harness-gate/flow.toml"
+    }
+  ],
+  "initial_quality_failure": {
+    "command": "python3 -m unittest discover -s tools/quality/tests -v",
+    "result": "444 tests; one DocsExecutionTests error; 36 skipped",
+    "log": {
+      "path": "target/gh-259/span-quality-tests.log",
+      "sha256": "a751d49503f3d5d5f81f1415771922f50c9e08d18bddd88e6c2fcf8d25a57fd8",
+      "bytes": 78704
+    },
+    "investigation": "The suite began before the newly linked diagnostic evidence file was written. Its exact temporary docs report was not retained. Simulating the missing file reproduces dangling links; current links are valid. The five docs unit tests and full suite subsequently passed. No assertion or check was weakened.",
+    "docs_unit_recheck": {
+      "path": "target/gh-259/span-docs-unit-recheck.log",
+      "sha256": "d3a4099ec0b5e16447633a59dd009cf03b1115887450e713d64d88a2d83038d2",
+      "bytes": 2362
+    }
+  },
+  "unchanged_plugin_binary": {
+    "path": "target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+    "sha256": "8227f231adea15a433f194e67bfd45b0e2647911e628cece5f8b54a234b94f43",
+    "bytes": 2084496
+  }
+}

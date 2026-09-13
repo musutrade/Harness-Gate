@@ -5,6 +5,21 @@ complete; T3–T8 remain open. The [design](stable-rust-collector.md) defines th
 boundary. No Core required binding, threshold, baseline or historical evidence
 was changed. No compiler-private backend was built or executed for these results.
 
+## Macro span diagnostic follow-up
+
+The [stable span diagnostic](stable-rust-macro-observation.md#stable-span-diagnostic)
+ran eight commands, including four real test/coverage runs with original and
+logging-only wrappers in both configurations. Generated body/interior ranges
+coincide; the two consumer test-function exports are identical before/after
+logging. Source inspection suggests a compiler coverage span-filter interaction,
+but final internal spans/contexts remain unobserved. No upstream fix or generated
+coverage is claimed. The diagnostic uses explicit existing matching LLVM tools;
+the initial missing-component installation failure and subsequent pre-Cargo
+missing-tool rejection are preserved in the
+[diagnostic evidence](stable-rust-candidate-evidence/macro-span-diagnostic.json).
+Plugin source, linked generator and release binary are unchanged from the next
+section. T4 and release acceptance remain incomplete.
+
 ## Shared-generator checkpoint
 
 The current executable adds the [bounded macro source observer](stable-rust-macro-observation.md),

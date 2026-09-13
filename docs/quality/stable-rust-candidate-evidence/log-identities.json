@@ -1268,6 +1268,21 @@
       "bytes": 54390
     },
     {
+      "path": "target/gh-259/macro-covsrc0.rs",
+      "sha256": "75c0a4d69071ee4282ce3a57ea81ccb88ff09d075582d9efe0498a9ec7ce62b9",
+      "bytes": 8782
+    },
+    {
+      "path": "target/gh-259/macro-covsrc1.rs",
+      "sha256": "60733e4beeec98c07e532c8a79c6a2a58197bcadbeae98c183e7a15ee7b78b93",
+      "bytes": 11087
+    },
+    {
+      "path": "target/gh-259/macro-covsrc2.rs",
+      "sha256": "1421b190c76c05895fd4793f621b1a44a32dbbc72f22e1b2d4e90680cddebfd2",
+      "bytes": 6679
+    },
+    {
       "path": "target/gh-259/macro-docs-consistency-final.log",
       "sha256": "6fdde67acd13145abd556580c3ab8d9ea34bad99a09db00ccf28a3fbeabecb76",
       "bytes": 79
@@ -1303,9 +1318,19 @@
       "bytes": 2038
     },
     {
+      "path": "target/gh-259/macro-hir-info.rs",
+      "sha256": "85b750d523034719cc649c1efa17b05b85cb864521d43556364460675b1f6fc6",
+      "bytes": 5141
+    },
+    {
       "path": "target/gh-259/macro-lock.log",
       "sha256": "91e34b268869b383b209350cbf33a1f597ca6a6fa2fae44f8888f0d1d9e4e32f",
       "bytes": 414
+    },
+    {
+      "path": "target/gh-259/macro-mappings.rs",
+      "sha256": "eaf31bbacdb5ac3d784462ebda3fd621f013929b97f70d092299701d5248d9c4",
+      "bytes": 3329
     },
     {
       "path": "target/gh-259/macro-observation-initial/coverage.json",
@@ -1341,6 +1366,131 @@
       "path": "target/gh-259/macro-release-tests.log",
       "sha256": "1d26dfcf90260ac1c7bd5bc200d5303a69bedfa233ed39db2382f7324258a286",
       "bytes": 14291
+    },
+    {
+      "path": "target/gh-259/macro-rustc-coverage.rs",
+      "sha256": "10f394020bbf395d03656cf3f48f66d097e46d9076e79cc2c0de4f76cef90729",
+      "bytes": 4309
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic/original-default.stderr",
+      "sha256": "2fd3c69b6776810cf082da71fa3e7c3882672ba606697d780a0455c176c7574b",
+      "bytes": 754
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic03.log",
+      "sha256": "3e2b7e0529d3adc6c7c874e0b37b307e90d894b4b116f24bfda60b30b6ce5ea9",
+      "bytes": 57
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic03/cargo-llvm-cov.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic03/cargo-llvm-cov.stdout",
+      "sha256": "5372e2711feafe05fff68f8681f01c798a6e5de8c9961d5d373b9a648c1951e2",
+      "bytes": 21
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic03/diagnostic-branching.json",
+      "sha256": "c4acd79e14ac8b2252ebbdca5198db8baaf81988c57fe0f95013c5301305e328",
+      "bytes": 6990
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic03/diagnostic-branching.stderr",
+      "sha256": "f1acd1bb4a7fa4e9ac53c113fa172819974a4f8190171cffef79323f7cf2a7c3",
+      "bytes": 4287
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic03/diagnostic-branching.stdout",
+      "sha256": "c96dda0d1f2eb052db3ccdc0947a5013665f4d432bbdc451f245f10ff22127d5",
+      "bytes": 233
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic03/diagnostic-default.json",
+      "sha256": "7d817fba2bb487888056e22bdfd6c90313001fa36f88cd56193e109b3b828b04",
+      "bytes": 6990
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic03/diagnostic-default.stderr",
+      "sha256": "4dfc253d192f98b28393dd1ccf5a6264ed9dbcaeaf50a356f270a9d38db5136f",
+      "bytes": 4006
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic03/diagnostic-default.stdout",
+      "sha256": "29c66b352a17d7339f709d7730bd45849fef4685f7497b64138c977ad828c2f5",
+      "bytes": 233
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic03/llvm-cov.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic03/llvm-cov.stdout",
+      "sha256": "89c240b58fd13ae42f12709f4b977bfd5b6d360ef471fd93c591be13c17bcdf2",
+      "bytes": 85
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic03/llvm-profdata.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic03/llvm-profdata.stdout",
+      "sha256": "89c240b58fd13ae42f12709f4b977bfd5b6d360ef471fd93c591be13c17bcdf2",
+      "bytes": 85
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic03/original-branching.json",
+      "sha256": "b08fabaa8108b9900a1a66ecf9eb64c2fb48874107c8226ac319fc1478fef28d",
+      "bytes": 5461
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic03/original-branching.stderr",
+      "sha256": "2c4880340f5a8df534b76c349b34e683f2a12ffc2f640c1ba6666af60a5adeb8",
+      "bytes": 665
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic03/original-branching.stdout",
+      "sha256": "29c66b352a17d7339f709d7730bd45849fef4685f7497b64138c977ad828c2f5",
+      "bytes": 233
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic03/original-default.json",
+      "sha256": "8835b1e3f773d5810c308d590f0903ac947000bcef9b4c88ba3ea738aeefa047",
+      "bytes": 5461
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic03/original-default.stderr",
+      "sha256": "62f6edf23ceafbf2271106b3703153bf36e82847a751fe458c4bbc52f74bb57c",
+      "bytes": 1069
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic03/original-default.stdout",
+      "sha256": "29c66b352a17d7339f709d7730bd45849fef4685f7497b64138c977ad828c2f5",
+      "bytes": 233
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic03/rustc.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic03/rustc.stdout",
+      "sha256": "b2bdf493bcf6d1dc55181a0efc2774b6d9cf7bf5c8dcc5bed592c994b2ad38c4",
+      "bytes": 196
+    },
+    {
+      "path": "target/gh-259/macro-span-diagnostic03/summary.json",
+      "sha256": "4af4fe69e469aad38d9f5d27435db593395bde7f76cfcbdc8f4149912c238c9a",
+      "bytes": 52805
+    },
+    {
+      "path": "target/gh-259/macro-span-missing-tool.log",
+      "sha256": "e7f88a0bbbad3c0a30301da4c25ea0969b303ca5e336aea8516a9b6b7cf30533",
+      "bytes": 707
     },
     {
       "path": "target/gh-259/macro-unit.log",
@@ -1731,6 +1881,36 @@
       "path": "target/gh-259/release-tests.log",
       "bytes": 13468,
       "sha256": "118624b811f3b711508903f7407565682e426680aaf2a22dccfd997af43ef911"
+    },
+    {
+      "path": "target/gh-259/span-docs-consistency-final.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/span-docs-consistency.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/span-docs-unit-recheck.log",
+      "sha256": "d3a4099ec0b5e16447633a59dd009cf03b1115887450e713d64d88a2d83038d2",
+      "bytes": 2362
+    },
+    {
+      "path": "target/gh-259/span-quality-tests-final.log",
+      "sha256": "32e2f93c115fe91b8667e684faeb49a419e9dccd12c03c4a03682f46af8a9f92",
+      "bytes": 77462
+    },
+    {
+      "path": "target/gh-259/span-quality-tests.log",
+      "sha256": "a751d49503f3d5d5f81f1415771922f50c9e08d18bddd88e6c2fcf8d25a57fd8",
+      "bytes": 78704
+    },
+    {
+      "path": "target/gh-259/span-release-tests.log",
+      "sha256": "79cade4c45994f91d3653c140dd46b5c3fed2f573a96b592f36ea1e457697519",
+      "bytes": 14290
     },
     {
       "path": "target/gh-259/stable-final-clippy.log",
