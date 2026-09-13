@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Let staged partial quality profiles read host-owned state and keys while checking
+  source/configuration pins against the Git index; create contained empty evidence
+  directories in the private snapshot without importing working-tree artifacts.
+
 ## [0.4.1] - 2026-09-12
 
 ### Improved
