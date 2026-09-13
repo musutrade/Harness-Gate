@@ -270,8 +270,8 @@ fn project(request: &Value, path: &Path, digest: &str) -> Result<Value> {
         let identity = artifact::identity(&output.join(&name))?;
         let artifact = json!({"id":"source","kind":"raw","media_type":"application/json","path":name,"sha256":identity.sha256,"bytes":identity.bytes,"source":source,"context":inner["context"]});
         let capabilities: Vec<_> = METRICS.iter().map(|(metric,_)| {
-            let available = supported && (*metric == "complexity.cyclomatic" || *metric == "coverage.function" && owner["coverage_state"] == "supported");
-            json!({"metric":metric,"state":if available {"supported"} else {"unsupported"},"reason":if available {if *metric == "coverage.function" {"exact source span and unique LLVM root function; explicit test spans excluded"} else {"lexical source decisions; no expansion or reachability claim"}} else {"source/coverage ownership or source activation is not certified"},"artifacts":["source"]})
+            let available = supported && (*metric == "complexity.cyclomatic" || matches!(*metric, "coverage.function" | "coverage.region") && owner["coverage_state"] == "supported");
+            json!({"metric":metric,"state":if available {"supported"} else {"unsupported"},"reason":if available {if matches!(*metric, "coverage.function" | "coverage.region") {"exact source span and unique LLVM root function; explicit test spans excluded"} else {"lexical source decisions; no expansion or reachability claim"}} else {"source/coverage ownership or source activation is not certified"},"artifacts":["source"]})
         }).collect();
         let mut metrics = Vec::new();
         if supported {
@@ -282,6 +282,7 @@ fn project(request: &Value, path: &Path, digest: &str) -> Result<Value> {
                     "certified coverage owner missing"
                 );
                 metrics.push(json!({"name":"coverage.function","value":owner["coverage_owner"]["coverage_function"],"artifacts":["source"]}));
+                metrics.push(json!({"name":"coverage.region","value":owner["coverage_owner"]["coverage_region"],"artifacts":["source"]}));
             }
         }
         records.push(json!({"schema":"harness-evidence/v1","id":format!("stable-{}",hash(&subject["id"])?),"project":inner["project"],"component":subject["component"],"collector":inner["collector"],"series":description["series"],"subject":subject,"context":inner["context"],"source":source,"artifacts":[artifact],"capabilities":capabilities,"status":if supported {"measured"} else {"unavailable"},"metrics":metrics}));

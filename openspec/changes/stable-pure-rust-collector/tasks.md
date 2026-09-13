@@ -20,7 +20,8 @@ Actual candidate execution and remaining acceptance:
 `docs/quality/stable-rust-collector-validation.md`. T3 has a runnable Rust capture
 and AST implementation, but the second toolchain remains unverified. T4 has
 a Core v2 adapter whose real signed transport and evidence checks accept verified
-lexical complexity while required line/region coverage and CRAP remain blocked. The same-source
+lexical complexity and bounded function/code-region coverage while required line
+coverage and CRAP remain blocked. The same-source
 GH-220 historical probe preserves original anchors and records unequal measurement
 boundaries. T5 has Rust offline dual-verification transactions and real RSA tests;
 Sigstore cryptography, downloader, trusted bootstrap and protected release preparation
@@ -42,13 +43,14 @@ format contract: complete counter reconciliation, broad certified source owners 
 normalized coverage/CRAP are not complete. T4, T6–T8 remain unchecked; required
 metrics, migration review and the release hold are unchanged.
 
-The bounded T4 owner checkpoint adds `rust-llvm-exact-root-owner/v1-candidate`.
+The earlier bounded T4 owner checkpoint added `rust-llvm-exact-root-owner/v1-candidate`.
 ASCII source files containing unannotated, nongeneric root functions can join an
 exact unique LLVM region envelope to a source span; explicit test spans are
 excluded. Core accepts the resulting per-function execution ratio (1/1 or 0/1),
 not an intra-function coverage fraction. Missing/duplicate/cross-file owners and
 inconsistent entry counts are measurement errors; unsupported syntax and `impl
-Trait` never acquire coverage. Line/region coverage and all CRAP remain unsupported.
+Trait` never acquire coverage. At that checkpoint line/region coverage and all CRAP
+were unsupported; the v2 code-region checkpoint below supersedes the region limit.
 Actual owner mutations and authenticated Core checks are recorded in the validation
 record. T3–T8, migration review and the legacy release hold remain open.
 
@@ -95,3 +97,31 @@ required by package preparation. Full segment/region counter semantics remain
 incomplete, with no owner/CRAP expansion or migration. Validation details and
 remaining environment/release blockers are recorded in the validation document;
 T3–T8 remain unchecked.
+
+## Bounded code-region checkpoint (T4 remains incomplete)
+
+`rust-llvm-exact-root-owner/v2-candidate` extends the previous execution-only
+checkpoint with standard LLVM code-region coverage for the same exact root
+owners. Each distinct code-region span contributes one denominator entry; only
+its own nonzero counter contributes to covered. Duplicate spans and disagreement
+between all owner regions (including excluded tests) and the file summary fail
+measurement. Source activation/expansion boundaries do not broaden. Core receives
+`coverage.region` alongside lexical complexity and `coverage.function`.
+
+The real partial fixture exercises function execution 1/1 with region coverage
+5/6, plus an exported never-called owner at 0/1 and 0/3. Test code contributes to
+raw summaries but never to these production-owner ratios. This supersedes the
+execution-only checkpoint's region-unsupported statement; line coverage and all
+CRAP remain unsupported. The candidate does not select Core's CRAP model, change
+requiredness/thresholds, or authorize migration/baseline adoption. LLVM region
+coverage is not the historical MIR basic-block metric. T3–T8 remain open.
+
+Actual code-region validation is recorded in
+`docs/quality/stable-rust-collector-validation.md` and compact
+`stable-rust-candidate-evidence/region-coverage.json`: 92 real capture checks,
+five signed-request Core fixture cases, 17 candidate Rust tests and 38 lifecycle
+checks (test RSA, mocked Sigstore). Final release, capture and unsigned package
+share SHA-256 `e2e3296e90b8da095bfe98f504589faca27ade64565262697747567183cd3e6c`.
+Only Rust 1.97.1 on the recorded Ubuntu environment ran. T3–T8 remain unchecked;
+two-toolchain/system, real signing/process trace, complete owner/input boundaries
+and reviewed migration remain required before removing the release hold.
