@@ -2196,6 +2196,41 @@
       "path": "target/quality/docs-consistency.json",
       "bytes": 1488,
       "sha256": "23cc5b69a9bef3983cc948f186dacfeb93f60185342cb1455a8d85099e8deebb"
+    },
+    {
+      "path": "target/gh-259/trace-audit-before.json",
+      "bytes": 609,
+      "sha256": "422780792dc79bc3e2e0d5a3e3f7843be50955fd242bf3ef2980dc02abeda8fd"
+    },
+    {
+      "path": "target/gh-259/trace-audit-after.json",
+      "bytes": 610,
+      "sha256": "eddfc005ea0ec0c76404af8d67d333e21005793f24a1f3ade494c5f09bc8359c"
+    },
+    {
+      "path": "target/gh-259/trace-audit-tests.log",
+      "bytes": 1120,
+      "sha256": "6bc9243fb02f54676c0c64905dfb272ca20807631ea07f53725e358c9643f83c"
+    },
+    {
+      "path": "target/gh-259/trace-audit-quality-tests.log",
+      "bytes": 78306,
+      "sha256": "005ee3dbb2ec404c317143da700843b076179fa8810ac1b3cdbd2066b9c05f5b"
+    },
+    {
+      "path": "target/gh-259/trace-audit-docs-consistency.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-259/trace-audit-docs-consistency-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-259/trace-audit-whitespace.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     }
   ]
 }

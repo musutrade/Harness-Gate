@@ -1,0 +1,137 @@
+{
+  "schema": "rust-stable-execution-audit-regression/v1",
+  "scope": "Synthetic parser records only; no real strace, second host/toolchain, or signing acceptance. Repository development automation; no change to the Rust plugin binary.",
+  "before": [
+    {
+      "name": "resumed-private-argument",
+      "trace": "123 execve(\"/rust/bin/rustc\", [\"rustc\", <unfinished ...>\n123 <... execve resumed>\"-Zdump-mir=all\"], 0x0) = 0\n",
+      "accepted": true
+    },
+    {
+      "name": "truncated-argument",
+      "trace": "execve(\"/rust/bin/rustc\", [\"rustc\", \"long\"...], 0x0) = 0\n",
+      "accepted": true
+    },
+    {
+      "name": "incomplete-exec",
+      "trace": "123 execve(\"/rust/bin/rustc\", [\"rustc\", <unfinished ...>\n",
+      "accepted": true
+    }
+  ],
+  "after": [
+    {
+      "name": "resumed-private-argument",
+      "accepted": false,
+      "error": "execve(\"/rust/bin/rustc\", [\"rustc\",\"-Zdump-mir=all\"], 0x0) = 0"
+    },
+    {
+      "name": "truncated-argument",
+      "accepted": false,
+      "error": "incomplete or abbreviated execve: execve(\"/rust/bin/rustc\", [\"rustc\", \"long\"...], 0x0) = 0"
+    },
+    {
+      "name": "incomplete-exec",
+      "accepted": false,
+      "error": "unfinished execution trace: {'123': 'execve(\"/rust/bin/rustc\", [\"rustc\",'}"
+    }
+  ],
+  "validation": [
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/quality/tests",
+        "-p",
+        "test_stable_candidate.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "tests": 6,
+      "log": {
+        "path": "target/gh-259/trace-audit-tests.log",
+        "bytes": 1120,
+        "sha256": "6bc9243fb02f54676c0c64905dfb272ca20807631ea07f53725e358c9643f83c"
+      },
+      "scope": "Final parser after retaining argument whitespace when removing the unfinished-call separator."
+    },
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/quality/tests",
+        "-v"
+      ],
+      "exit_code": 0,
+      "tests": 449,
+      "skipped": 36,
+      "log": {
+        "path": "target/gh-259/trace-audit-quality-tests.log",
+        "bytes": 78306,
+        "sha256": "005ee3dbb2ec404c317143da700843b076179fa8810ac1b3cdbd2066b9c05f5b"
+      },
+      "scope": "Full suite began before the final separator-whitespace refinement; final affected parser tests were rerun separately, six passed. Other source unchanged."
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/quality/docs_consistency.py",
+        "--output",
+        "target/quality/docs-consistency.json"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target"
+      },
+      "exit_code": 0,
+      "log": {
+        "path": "target/gh-259/trace-audit-docs-consistency-final.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "report": {
+        "path": "target/quality/docs-consistency.json",
+        "bytes": 1488,
+        "sha256": "dec2655bfc2df4e17c9607530e7930e9ccc8a2fb23f56f18cc38564f97e68d94"
+      }
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "target/gh-259/trace-audit-whitespace.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "parser_boundary": "Untimestamped execve-only strace output. Joins unfinished/resumed records by PID; rejects abbreviated, incomplete, unreadable and unrecognized records. Decodes quoted arguments before forbidden tool/flag checks. Environment pointers/counts do not expose environment contents and are not claimed as environment audit.",
+  "unchanged_binary_sha256": "b876d72b536ff2a809bea7da62a7d4e1b33a670666cca99438462e456f3e3b95",
+  "acceptance_complete": false,
+  "logs": [
+    {
+      "path": "target/gh-259/trace-audit-before.json",
+      "bytes": 609,
+      "sha256": "422780792dc79bc3e2e0d5a3e3f7843be50955fd242bf3ef2980dc02abeda8fd"
+    },
+    {
+      "path": "target/gh-259/trace-audit-after.json",
+      "bytes": 610,
+      "sha256": "eddfc005ea0ec0c76404af8d67d333e21005793f24a1f3ade494c5f09bc8359c"
+    }
+  ],
+  "reused_unchanged_validation": "Core nextest 397, Core/candidate fmt and clippy, release 91, generic capture 92, macro 26, five authenticated Core fixtures, lifecycle 38 and HTTPS 29 from https-download.json; Rust source, locks and executable identity checked unchanged.",
+  "not_applicable": [
+    "harness-gate config check",
+    "harness-gate verify --profile ci --all"
+  ],
+  "not_applicable_reason": "No project-local .harness-gate/flow.toml declaring ci."
+}

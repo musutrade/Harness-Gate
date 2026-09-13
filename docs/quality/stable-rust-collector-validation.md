@@ -5,6 +5,28 @@ complete; T3–T8 remain open. The [design](stable-rust-collector.md) defines th
 boundary. No Core required binding, threshold, baseline or historical evidence
 was changed. No compiler-private backend was built or executed for these results.
 
+## Execution audit parser checkpoint
+
+The required CI audit previously skipped resumed `execve` lines and accepted
+truncated or unfinished calls. Synthetic records reproduce all three gaps. The
+repository audit now reconstructs calls by PID, requires complete executable and
+argument strings, decodes escapes before checking forbidden tools/flags, and
+rejects unmatched, duplicate, unreadable or incomplete records. Six focused tests
+cover those failures, interleaved processes, normal signals, failed executable
+lookups and literal ellipses. The [regression evidence](stable-rust-candidate-evidence/execution-audit.json)
+records the original acceptance and corrected rejection.
+
+The full quality suite passes 449 tests with 36 manual legacy skips. After the
+final separator-whitespace refinement, all six affected parser tests pass again.
+Docs consistency passes. Unchanged Core/release/runtime checks retain their
+preceding HTTPS checkpoint evidence.
+
+This validates the parser only. No actual process tracing became available, and
+strace's default environment pointer/count does not reveal environment contents.
+The Rust binary, package and previous runtime results below are unchanged. T3–T8
+remain incomplete; second-toolchain/system, real process tracing/signing, complete
+input/owner certification and reviewed migration still block release acceptance.
+
 ## HTTPS lifecycle checkpoint
 
 The candidate now implements `download-install` in Rust using pinned ureq/rustls.
