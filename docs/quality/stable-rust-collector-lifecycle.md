@@ -135,7 +135,7 @@ This is an auditable license inventory; production license review remains requir
 ```bash
 python3 tools/quality/rust-stable-collector/prepare_release.py \
   --output target/candidate-package \
-  --target-dir "$PWD/target/stable-build" --toolchain 1.97.1 \
+  --target-dir "$PWD/target/stable-build" --toolchain 1.98.1 \
   --acceptance target/candidate-acceptance/summary.json '<reviewed SHA-256>'
 ```
 

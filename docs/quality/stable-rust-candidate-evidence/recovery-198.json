@@ -1,0 +1,578 @@
+{
+  "schema": "gh259-recovery-198/v1",
+  "state": "partial-candidate-blocked",
+  "remote_parent": "231edba33548db64ee5f7644c2da7a2e6fbaf161",
+  "required_rust": "1.98.1",
+  "required_historical_rust": false,
+  "compiler": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.1\nLLVM version: 22.1.8\n",
+  "binary": {
+    "sha256": "60db68068ea8fee348e0b9e00fb3619ef060a0fc7e1ec2a6a6f525760b1b06f7",
+    "bytes": 3497880
+  },
+  "ci": {
+    "run": 34787905972,
+    "head": "cc1681ed085469e02b8115c87e22839b9e2dd7f1",
+    "quality_job": 103806637783,
+    "conclusion": "cancelled",
+    "observed_capture_checks": 125,
+    "observed_macro_checks": 26,
+    "observed_core_successes": 6,
+    "cancellation_time": "2026-09-13T22:57:14.3414194Z",
+    "log": {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/quality-script-tests-103806637783.log",
+      "sha256": "1f14e4d0b07bfaeddf8ed37fbd58ffdb46bda8f3ed8a717116f9f80e1fcbfdea",
+      "bytes": 198704
+    },
+    "original_trace_failure_waived": false
+  },
+  "operator": {
+    "summary": {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/docs/quality/stable-rust-candidate-evidence/operator-unblock.json",
+      "sha256": "3c0a666e7381e29c2b8bcf49af49bb4565b42ff2db3258b08c32d4bfefa14f48",
+      "bytes": 2012
+    },
+    "copied_inventory": {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/operator-gh259-evidence-sha256.json",
+      "sha256": "1421c335188e8b804016d90d7d3f2ded836005342d69b5abe985ae65ae40b69a",
+      "bytes": 210785
+    },
+    "copied_files_hash_verified": 1656,
+    "original_external_workspace_accessed": false,
+    "covers_new_binary": false
+  },
+  "commands": [
+    {
+      "name": "macro-spans",
+      "command": [
+        "python3",
+        "tools/quality/rust-stable-collector/diagnose_macro_spans.py",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/macro-spans",
+        "--llvm-cov",
+        "/home/gem/.rustup/toolchains/1.98.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+        "--llvm-profdata",
+        "/home/gem/.rustup/toolchains/1.98.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "derive-coverage",
+      "command": [
+        "python3",
+        "tools/quality/rust-stable-collector/diagnose_derive_coverage.py",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/derive-coverage",
+        "--llvm-cov",
+        "/home/gem/.rustup/toolchains/1.98.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+        "--llvm-profdata",
+        "/home/gem/.rustup/toolchains/1.98.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "build",
+      "command": [
+        "strace",
+        "-f",
+        "-q",
+        "-s",
+        "16384",
+        "-e",
+        "trace=execve",
+        "-o",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/build.execve",
+        "cargo",
+        "build",
+        "--manifest-path",
+        "tools/quality/rust-stable-collector/Cargo.toml",
+        "--release",
+        "--locked",
+        "--offline"
+      ],
+      "exit_code": 1
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--manifest-path",
+        "tools/quality/rust-stable-collector/Cargo.toml",
+        "--release",
+        "--locked",
+        "--offline"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target",
+        "RUSTUP_TOOLCHAIN": "1.98.1",
+        "RUSTFLAGS": "",
+        "RUSTDOCFLAGS": "",
+        "CARGO_ENCODED_RUSTFLAGS": "",
+        "RUSTC_WRAPPER": "",
+        "RUSTC_WORKSPACE_WRAPPER": ""
+      },
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "tools/quality/rust-stable-collector/validate_stable_candidate.py",
+        "--binary",
+        "target/gh-259/stable-target/release/rust-stable-collector",
+        "--output",
+        "target/gh-259/recovery-198/capture"
+      ],
+      "toolchain": "1.98.1",
+      "exit_code": 1,
+      "trace": false
+    },
+    {
+      "command": [
+        "python3",
+        "tools/quality/rust-stable-collector/validate_stable_candidate.py",
+        "--binary",
+        "target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "--output",
+        "target/gh-259/recovery-198/capture"
+      ],
+      "toolchain": "1.98.1",
+      "exit_code": 1,
+      "trace": false
+    },
+    {
+      "command": [
+        "python3",
+        "tools/quality/rust-stable-collector/validate_stable_candidate.py",
+        "--binary",
+        "target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+        "--output",
+        "target/gh-259/recovery-198/capture-clean"
+      ],
+      "toolchain": "1.98.1",
+      "exit_code": 0,
+      "trace": false
+    },
+    {
+      "command": [
+        "python3",
+        "tools/quality/rust-stable-collector/prepare_release.py",
+        "--output",
+        "target/gh-259/recovery-198/package",
+        "--target-dir",
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target",
+        "--toolchain",
+        "1.98.1",
+        "--acceptance",
+        "target/gh-259/recovery-198/capture-clean/summary.json",
+        "05324e7c40044736fced08208707fdf5422a5b1747e5b1f1193c27c3eb81d0c0"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "tools/quality/rust-stable-collector/Cargo.toml",
+        "--locked",
+        "--offline"
+      ],
+      "toolchain": "1.98.1",
+      "exit_code": 0
+    },
+    {
+      "name": "quality-tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/quality/tests",
+        "-v"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "release-tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/release/tests",
+        "-v"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "capture": {
+    "summary": {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/capture-clean/summary.json",
+      "sha256": "05324e7c40044736fced08208707fdf5422a5b1747e5b1f1193c27c3eb81d0c0",
+      "bytes": 32263
+    },
+    "checks_passed": 125,
+    "execve_trace": "not performed",
+    "capture_bytes": 50203,
+    "persistent_candidate_cache_bytes": 0,
+    "core_authentication_for_new_binary": "not rerun; existing operator receipt identifies previous binary",
+    "second_system_for_new_binary": "not run"
+  },
+  "package": {
+    "preparation": {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/package/preparation.json",
+      "sha256": "de2882b70ee577e873946a653932c8255c0bc23ce276aae9c4a65ed56e0cc1f7",
+      "bytes": 47396
+    },
+    "state": "unsigned-candidate-review-required",
+    "payload": {
+      "LICENSE": {
+        "bytes": 2545341,
+        "sha256": "c5c62c170a6c4f67b3814d0f324e678741fc35cdef33d13a82c0ca2af8a92a16"
+      },
+      "harness-gate-rust-stable-collector": {
+        "bytes": 3497880,
+        "sha256": "60db68068ea8fee348e0b9e00fb3619ef060a0fc7e1ec2a6a6f525760b1b06f7"
+      },
+      "support.json": {
+        "bytes": 924,
+        "sha256": "019f02e9ba7c9898d38707a9763142ad92492a8952a49bd9e7c90313bfaaca72"
+      }
+    },
+    "inventory": {
+      "bytes": 563,
+      "sha256": "37bd587ca912aeb33036370d3dc31d8c4399d04bbb6f5225e6bff6495a48cfa9"
+    },
+    "unsigned_package_bytes": 6044708,
+    "network_download_bytes": 0,
+    "installed_bytes": null,
+    "upgrade_download_bytes": null,
+    "signed_package_bytes": null,
+    "publication_authorized": false
+  },
+  "macro": {
+    "summary": {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/macro-spans/summary.json",
+      "sha256": "9a57445311e3901dde499949d47e9a8aef45a04bc169121e674b1cc5941f50d5",
+      "bytes": 52821
+    },
+    "commands_passed": 8,
+    "coverage_runs": {
+      "original-default": {
+        "identity": {
+          "sha256": "f194462c2a6ac05bd35e30a3d0c58e073a5b5d5957552d91d026ff52c877a04c",
+          "bytes": 5470
+        },
+        "consumer_function_names": [
+          "_RNvNtCs5MDgDsjzht2_25gate_observation_consumer5testss_37generated_functions_execute_real_code",
+          "_RNvNtCs5MDgDsjzht2_25gate_observation_consumer5testss_43configuration_selects_the_actual_invocation"
+        ]
+      },
+      "original-branching": {
+        "identity": {
+          "sha256": "fe23e623f6e9859e283d2e610fd7576de185468a6df65adc8aa4e8a79aca54c5",
+          "bytes": 5470
+        },
+        "consumer_function_names": [
+          "_RNvNtCs4MUFZ3aXzJG_25gate_observation_consumer5testss_37generated_functions_execute_real_code",
+          "_RNvNtCs4MUFZ3aXzJG_25gate_observation_consumer5testss_43configuration_selects_the_actual_invocation"
+        ]
+      },
+      "diagnostic-default": {
+        "identity": {
+          "sha256": "a84ec6af10620fa9619aef3fb57a5615077176d5e6fd9ec6d2fb2e9c0a18f7cb",
+          "bytes": 7000
+        },
+        "consumer_function_names": [
+          "_RNvNtCs5MDgDsjzht2_25gate_observation_consumer5testss_37generated_functions_execute_real_code",
+          "_RNvNtCs5MDgDsjzht2_25gate_observation_consumer5testss_43configuration_selects_the_actual_invocation"
+        ]
+      },
+      "diagnostic-branching": {
+        "identity": {
+          "sha256": "4c9a96f65da2642706dc7e66b38424e147e677b47b7bbbc94d35d23acff914a1",
+          "bytes": 7000
+        },
+        "consumer_function_names": [
+          "_RNvNtCs4MUFZ3aXzJG_25gate_observation_consumer5testss_37generated_functions_execute_real_code",
+          "_RNvNtCs4MUFZ3aXzJG_25gate_observation_consumer5testss_43configuration_selects_the_actual_invocation"
+        ]
+      }
+    },
+    "missing_generated_owners": [
+      "plain",
+      "branch",
+      "unexecuted",
+      "configured"
+    ],
+    "source": {
+      "Cargo.lock": {
+        "sha256": "7e749927e1048ef9dd72dbdeff7e559d7415e1cd4eb387430059a3a7399a42d3",
+        "bytes": 1367
+      },
+      "Cargo.toml": {
+        "sha256": "f7e71f9c95397029349e3f44c39be846b6d016c097a54c068401dcdb09d7c1ad",
+        "bytes": 73
+      },
+      "README.md": {
+        "sha256": "9a81bebfc791481cd9601f28995e6a32f5cb103b02e98b39013f8bae71df56de",
+        "bytes": 1886
+      },
+      "consumer/Cargo.toml": {
+        "sha256": "116086e10273b649e4563f3ab01664372bb4711ff554c7ab3620621f178b4186",
+        "bytes": 188
+      },
+      "consumer/src/lib.rs": {
+        "sha256": "027aef5fc5707b7b1fbcbca814b8342de912599f7acd3b55dd73a5227e339e0a",
+        "bytes": 791
+      },
+      "generator/Cargo.toml": {
+        "sha256": "a15f42bd0ef45e1a2dfe2d0d621c05952437f29c171ffa36ea43433a4fcbe2e5",
+        "bytes": 233
+      },
+      "generator/src/lib.rs": {
+        "sha256": "afcffe5c527216247fdbffa9ef6e1d4543e1ee8e3742337f337d5cab3997ea13",
+        "bytes": 2448
+      },
+      "macros/Cargo.toml": {
+        "sha256": "3e7a9eeaf09af33c6d9ff22dec0f8890510bb9ac689bd61207f2899cac409760",
+        "bytes": 245
+      },
+      "macros/src/lib.rs": {
+        "sha256": "085a4a2684c9a9374e249218872be5fd18f4b8227b062c03785e635eb446546c",
+        "bytes": 289
+      }
+    },
+    "external_tools": {
+      "/home/gem/.rustup/toolchains/1.98.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov": {
+        "sha256": "59c1562433e039dec2372748b118aa9b326a4864f8a654e05fb015c168ab447c",
+        "bytes": 639704
+      },
+      "/home/gem/.rustup/toolchains/1.98.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata": {
+        "sha256": "bb172cb274d47466f00408a9c279154c86d2b0cafc652f2defc54970d298b271",
+        "bytes": 666984
+      }
+    },
+    "observed_body_ranges": {
+      "default": {
+        "plain": {
+          "body": [
+            3,
+            1,
+            3,
+            33
+          ],
+          "interior_tokens": 1,
+          "all_interior_ranges_equal_body": true
+        },
+        "branch": {
+          "body": [
+            4,
+            1,
+            4,
+            33
+          ],
+          "interior_tokens": 9,
+          "all_interior_ranges_equal_body": true
+        },
+        "unexecuted": {
+          "body": [
+            5,
+            1,
+            5,
+            37
+          ],
+          "interior_tokens": 9,
+          "all_interior_ranges_equal_body": true
+        },
+        "configured": {
+          "body": [
+            9,
+            1,
+            9,
+            38
+          ],
+          "interior_tokens": 1,
+          "all_interior_ranges_equal_body": true
+        }
+      },
+      "branching": {
+        "plain": {
+          "body": [
+            3,
+            1,
+            3,
+            33
+          ],
+          "interior_tokens": 1,
+          "all_interior_ranges_equal_body": true
+        },
+        "branch": {
+          "body": [
+            4,
+            1,
+            4,
+            33
+          ],
+          "interior_tokens": 9,
+          "all_interior_ranges_equal_body": true
+        },
+        "unexecuted": {
+          "body": [
+            5,
+            1,
+            5,
+            37
+          ],
+          "interior_tokens": 9,
+          "all_interior_ranges_equal_body": true
+        },
+        "configured": {
+          "body": [
+            7,
+            1,
+            7,
+            37
+          ],
+          "interior_tokens": 9,
+          "all_interior_ranges_equal_body": true
+        }
+      }
+    },
+    "compiler_internal_context": "not observable via this stable diagnostic",
+    "T4": "incomplete"
+  },
+  "derive": {
+    "runtime_198": "blocked before tests: rustfmt component missing",
+    "commands": {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/derive-coverage/commands.json",
+      "sha256": "02a1dbccfd596acd86754f80bc49e79235210386ebc2564b7707d2285bbb5285",
+      "bytes": 4614
+    },
+    "compiler_source": [
+      {
+        "path": "compiler/rustc_mir_transform/src/coverage/query.rs",
+        "blob": "39e0769373ededc6c496037161ca515cb0999ac2",
+        "local_copy": {
+          "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/query.rs",
+          "sha256": "1421b190c76c05895fd4793f621b1a44a32dbbc72f22e1b2d4e90680cddebfd2",
+          "bytes": 6679
+        }
+      },
+      {
+        "path": "compiler/rustc_builtin_macros/src/deriving/generic/mod.rs",
+        "blob": "ff6b15b173ed172bb99b4c28137723105afe6207",
+        "local_copy": {
+          "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/deriving-generic.rs",
+          "sha256": "a925fa1ee9e3a8478c3f5c2a7d1bc296e6e9efb21e1dbff90715fff1780e92ee",
+          "bytes": 63971
+        }
+      }
+    ],
+    "finding": "automatically_derived implementations remain excluded from coverage instrumentation at installed rustc commit"
+  },
+  "checks": {
+    "candidate_rust_tests": 22,
+    "quality_tests": 449,
+    "quality_skips_manual_legacy": 36,
+    "release_tests": 92,
+    "core_required_checks": "reuse unchanged Core validation: 397 nextest, fmt and clippy; no rerun in this bounded recovery",
+    "project_config_commands": "not applicable: no .harness-gate/flow.toml",
+    "docs_consistency": {
+      "result": "passed",
+      "exit_code": 0,
+      "initial_failure": "linked recovery-198.json had not yet been written",
+      "initial_report": {
+        "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/docs-consistency-initial.json",
+        "sha256": "678fdb5fbcc40af23179c2a04c50f730860acc7f01c99fe58ccebc75ddfa812c",
+        "bytes": 1638
+      },
+      "final_report": {
+        "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/quality/docs-consistency.json",
+        "sha256": "51f054c8ca6f2bac1fdfe75d71c57427a8ab0db7cbe407aab7ce0fea7ddbdfde",
+        "bytes": 1488
+      },
+      "final_command": {
+        "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/docs-consistency-final-command.json",
+        "sha256": "5087182a2122197ade52fb5b655715160950ca4f1493e6437de8cd31cd2a61f3",
+        "bytes": 156
+      }
+    }
+  },
+  "blocked": [
+    "generated-owner coverage and stable derived instrumentation",
+    "required CRAP model and reviewed measurement migration",
+    "new-binary process audit and full two-system acceptance",
+    "production dual-signature and protected release acceptance"
+  ],
+  "upstream_capability_requests": {
+    "submitted": false,
+    "merged": false,
+    "adopted_version": null
+  },
+  "release_hold": true,
+  "issue_close_authorized": false,
+  "logs": [
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/build-untraced.log",
+      "sha256": "f1dfabd55aeac9152ab96eac6f4869eb6588cdb8ee599ee8180f64f8f66b2641",
+      "bytes": 3060
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/build.log",
+      "sha256": "0f03f283f4bca422554bd2bc856f8f7511c4bea06e69bff745781b6a88312755",
+      "bytes": 147
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/capture.log",
+      "sha256": "5cc2cef5ae6612f0c00feaba87631c45c9d16c8ff3ea8c4d7f78709e0e034b72",
+      "bytes": 787
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/capture-corrected.log",
+      "sha256": "d6bb143b23d1a8b3d480b08491e2cfbefe3d147d45687f7326f0d6a6c88c9f9b",
+      "bytes": 859
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/capture-clean.log",
+      "sha256": "73d0b561e014f19be4de29de5ca72ae1a4c4d34a7acf74eab5763f1b32c33b31",
+      "bytes": 131
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/macro-spans.log",
+      "sha256": "3e2b7e0529d3adc6c7c874e0b37b307e90d894b4b116f24bfda60b30b6ce5ea9",
+      "bytes": 57
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/derive-coverage.log",
+      "sha256": "50e14f9ff8c84c58e934cd63716e5e7db45b61ca13d676b50edd5853331740d2",
+      "bytes": 938
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/package.log",
+      "sha256": "6e8594835d80d4595d0be731250b3f149f283c30e9dfa7c6f00001c05bd35911",
+      "bytes": 158
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/candidate-tests.log",
+      "sha256": "1624cfb55f32db8dae84ec6a486f4121b1884f000266dc92dbe4fa4d8897b1ea",
+      "bytes": 5133
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/quality-tests.log",
+      "sha256": "cbcb4c78beeffdae8079ee7cc38532ca920e993a5326f83d533e72dd704efd1c",
+      "bytes": 78307
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/release-tests.log",
+      "sha256": "fb9344ada27cc268650b81d8ed8983100240243b02fea2e1584d56e39ccb1a30",
+      "bytes": 14446
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/elf-dynamic.log",
+      "sha256": "00f6edb4fd850ac37df2a6e0221d8253e3841891640be06777c724e9290217dd",
+      "bytes": 1537
+    }
+  ]
+}

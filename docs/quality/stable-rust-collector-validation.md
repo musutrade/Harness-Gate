@@ -642,45 +642,34 @@ full rerun uses the completed documentation. Compiler-private test classes now
 require an explicit manual-experiment opt-in;
 required CI retains all other existing checks and does not bootstrap that backend.
 
-## Acceptance still blocked or unimplemented
+## Current acceptance limits (operator recovery, 2026-09-13)
 
-- Rust 1.98.1 is not installed. The [official release index](https://blog.rust-lang.org/releases/)
-  was checked on 2026-09-13: 1.97.1 was released on July 16 and 1.98.1 on
-  September 3. Fetching the installable stable manifest from this workspace failed
-  `curl: (56) Proxy CONNECT aborted`. Only installed 1.97.1 was executed;
-  the second candidate's interfaces and runtime remain unverified.
-  Doctor's candidate allowlist is not evidence of support for both versions.
-- A second runnable system was unavailable: Docker socket access was denied.
-  The available unprivileged `bwrap` route also failed with exit 1 because the
-  sandbox denied creating a user namespace. The [namespace probe record](stable-rust-candidate-evidence/namespace-environment.json)
-  preserves its exact command and error; it is an availability check, not a run
-  on another system. Only the environment above has been exercised; there is no
-  released support platform yet and no claim covering all Linux systems.
-- `strace` is installed but the sandbox rejects `PTRACE_TRACEME` and
-  `PTRACE_SEIZE`. Local command records, build logs and ELF inspection passed;
-  a complete transitive `execve` audit did not run. Required CI now requests real
-  release-build and runtime traces and fails if tracing fails; CI is pending.
-- The Core candidate certifies lexical complexity and bounded function execution
-  and code-region coverage for the declared limited owners. It does not certify line
-  coverage or CRAP and does not replace existing required measurements. Production request signing and project integration remain open.
-- Complete compiler input provenance, broader certified source/coverage owners, comprehensive
-  adversarial coverage formats, complete negative matrices and reviewed migration
-  still need implementation/acceptance. No MIR backend was rerun and
-  original historical anchors remain untouched.
-- Rust offline verification/install/upgrade/rollback now pass real RSA and
-  transaction tests. Unsigned package preparation and an authenticated notice inventory
-  are implemented. Protected signing/publication, production license review, trusted
-  bootstrap and full release acceptance remain open. The HTTPS checkpoint above
-  adds explicit pinned transport and measured body/cache bytes; public distribution
-  and production signature acceptance remain pending.
-  The Sigstore verifier is unavailable locally (`cosign version`: no such file
-  or directory). The [continuation probes](stable-rust-candidate-evidence/continuation-environment.json)
-  retain this error and the installed toolchain list.
-  No production signing was simulated
-  or claimed; no user installation was changed. The release hold remains.
+The earlier environment probes remain historical evidence. The operator has now
+installed Rust 1.98.1 and matching LLVM tools, exercised the existing candidate
+with 125 traced capture checks and six authenticated Core fixtures, and exercised
+its plain fixture in Ubuntu 24.04. See the [operator record](stable-rust-candidate-evidence/operator-unblock.json)
+and [recovery/blocker report](stable-rust-collector-recovery.md) for exact identities.
+Only current stable Rust 1.98.1 is a completion requirement; 1.97.1 results remain
+historical. The Ubuntu run uses a second userspace on the same kernel and does
+not establish the full two-system matrix or acceptance of a newly rebuilt binary.
 
-GH-259 must remain open after this checkpoint. T8 and production publication
-cannot proceed on this evidence.
+- Generated source/coverage ownership and required CRAP remain blocked. Stable
+  macro diagnostics still omit business function records. Core accepts the bounded
+  lexical complexity and function/code-region coverage only; line coverage and
+  CRAP remain unsupported. Existing required bindings and baselines are unchanged.
+- Complete compiler-input provenance, broader owners, full adversarial and
+  cross-system matrices, authenticated project integration and reviewed measurement
+  migration remain open. No legacy backend was rebuilt or rerun.
+- The sandbox still denies local ptrace. Operator traces authenticate their exact
+  candidate; new 1.98.1 build tracing requires a permitted CI/operator environment.
+  The inspected Quality Script Tests job was cancelled after six Core successes,
+  so it does not establish a completed required CI run.
+- Pinned cosign 3.1.3 and a public trust root are now available. Production
+  signature acceptance, trusted bootstrap, license review and protected release
+  acceptance remain open; there is no private production signing key or authority
+  to publish. Prior missing-cosign probes are historical, not current blockers.
+
+GH-259 and T3–T8 remain open. The release hold remains in force.
 
 The aggregate-checkpoint lifecycle invocation first named a nonexistent package
 subdirectory (`lifecycle-11-setup-failed.log`, FileNotFoundError). No lifecycle

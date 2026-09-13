@@ -60,7 +60,7 @@ def identity(path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', required=True, type=Path)
-    parser.add_argument('--toolchain', default='1.97.1')
+    parser.add_argument('--toolchain', default='1.98.1')
     parser.add_argument('--llvm-cov', required=True, type=Path)
     parser.add_argument('--llvm-profdata', required=True, type=Path)
     args = parser.parse_args()

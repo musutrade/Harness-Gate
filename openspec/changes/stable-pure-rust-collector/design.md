@@ -106,14 +106,14 @@ This happens after both signature checks and before repeated payload/trust ident
 validation. Repository automation builds a separate test-version executable to
 exercise upgrade by the installed old program and rollback by the installed new
 program. Its source delta is version metadata only; it is not historical release
-compatibility or a replacement for the two-toolchain/two-system acceptance.
+compatibility or a replacement for the current-stable/two-system acceptance.
 
 The next T5 checkpoint adds a Rust-validated support schema and locked offline
 unsigned candidate preparation with archive/source-authenticated dependency
 notices. Real lifecycle checks consume that payload and reject unsigned packages
 and re-signed overstated support metadata. This is review preparation only:
 protected production signing, trust bootstrap, downloader, license review and
-multi-toolchain/system acceptance remain open. T5 and T8 stay unchecked.
+current-stable/full two-system acceptance remain open. T5 and T8 stay unchecked.
 
 The T4 raw-evidence checkpoint validates the exercised public LLVM JSON structure,
 integer domains, region IDs, segments and summary arithmetic with duplicate-key
@@ -215,7 +215,7 @@ network framing is not claimed as measured. Failures preserve the active version
 
 Real loopback TLS and test-RSA lifecycle fixtures validate this transport. Mocked
 Sigstore cannot satisfy production signing acceptance. Trusted public bootstrap,
-protected publication, two toolchains/systems and complete acceptance still block
+protected publication, current stable Rust/full two-system and complete acceptance still block
 T5/T8; no release hold is removed by the downloader.
 
 ## T7 execution trace completeness
@@ -269,3 +269,14 @@ project mutation even when file identities are unchanged. Both doctor and direct
 collection requests exercise direct, aliased and parent-component paths; valid
 relative doctor output and a sibling sharing the project-name prefix remain
 usable. Package preparation requires these regression cases.
+
+### Current-stable recovery scope
+
+The latest user direction replaces dual-toolchain acceptance with Rust 1.98.1
+only for candidate builds, required plugin CI and target acceptance. Historical
+1.97.1 observations remain immutable reference evidence. Package preparation
+rejects historical build selection and requires pinned current-stable acceptance
+for the exact built binary. Two-system validation, generated-owner certification,
+required CRAP/migration review and protected signatures remain independent gates.
+See `docs/quality/stable-rust-collector-recovery.md` for the operator evidence and
+remaining stable compiler capability requests.

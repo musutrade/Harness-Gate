@@ -10,10 +10,17 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / 'tools/quality/rust-stable-collector'))
-from prepare_release import acceptance, identity, registry_notices, strict_json
+from prepare_release import acceptance, identity, prepare, registry_notices, strict_json
 
 
 class PreparationTests(unittest.TestCase):
+    def test_historical_toolchain_cannot_prepare_new_candidate(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary) / 'new-parent' / 'package'
+            with self.assertRaisesRegex(ValueError, 'requires Rust 1.98.1'):
+                prepare(output, ROOT / 'target' / 'unused', '1.97.1', [])
+            self.assertFalse(output.parent.exists())
+
     def package(self, root, files=None, extra_member=None):
         files = files if files is not None else {'Cargo.toml': '[package]\nname="example"\n', 'LICENSE': 'test license\n'}
         source = root / 'registry/src/index/example-1.0.0'
