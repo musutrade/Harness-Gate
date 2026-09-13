@@ -59,7 +59,7 @@ passed eligibility, four-platform builds, quality gates, signing, GitHub publica
 and the separate protected crates.io job. The normal workflow already publishes
 the crate; no second cargo publication workflow is needed.
 
-Rust collector 0.1.0-rc.1 and installer 0.1.0-rc.2 use their separate immutable
+Rust collector 0.1.0-rc.2 and installer 0.1.0-rc.3 use their separate immutable
 tags and the existing collector workflow. Its dedicated environment uses the
 owner-approved single-maintainer v2 policy: required pinned-owner review,
 self-review allowed, no admin bypass and main-only deployment. This replaces the

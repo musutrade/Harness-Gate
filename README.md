@@ -78,13 +78,13 @@ tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.1):
 - **Windows (x86_64)**: `harness-gate-windows-amd64.exe`
 
 The checked installer verifies the checksum manifest and Sigstore certificate
-before changing the installation directory. Download the script from the same
-immutable tag, then pass that tag explicitly:
+before changing the installation directory. Download the current installer from
+the pinned source revision, then select the immutable Core release explicitly:
 
 ```bash
 curl --fail --show-error --location --proto '=https' --tlsv1.2 \
   -o /tmp/harness-gate-install.sh \
-  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.4.1/install.sh
+  https://raw.githubusercontent.com/musutrade/Harness-Gate/13722b0ba8781be106c160c422c07fbacb1bdc6e/install.sh
 bash /tmp/harness-gate-install.sh --version v0.4.1
 harness-gate --version
 ```
@@ -117,13 +117,13 @@ signatures are checked before installation. Disk usage is larger than download
 size because the installed runtime and signed archive are retained for rollback.
 
 This initial Rust plugin is certified only for the exact Linux x86_64 ABI listed
-in its [installer release](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-installer-v0.1.0-rc.2).
+in its [installer release](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-installer-v0.1.0-rc.3).
 Unsupported hosts fail before downloading the toolchain; Core remains available
-on its supported platforms. This installer version delivers the unchanged
-`rust-collector-v0.1.0-rc.1` payload. Installer and plugin versions are independent.
-The RC measurement compatibility receipt pins **Core 0.4.0**, not 0.4.1.
-Core 0.4.1 installation is verified; a new native compatibility receipt is still
-needed before claiming that Core/plugin pair is certified. See [current status](docs/release-status.md#compatibility).
+on its supported platforms. Installer `0.1.0-rc.3` delivers plugin
+`rust-collector-v0.1.0-rc.2`, whose reviewed compatibility receipt includes
+**Core 0.4.1** on that exact host. Installer and plugin versions are independent.
+The original native capture is reused with verified identical runtime bytes;
+see [current status and receipts](docs/release-status.md#compatibility).
 
 For offline installation, prepare the [complete offline kit](docs/quality/rust-collector-installation.md#offline-installation), then run:
 
