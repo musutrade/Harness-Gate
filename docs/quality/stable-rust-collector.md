@@ -3,8 +3,9 @@
 GH-259 is **not complete**. The executable in
 [`tools/quality/rust-stable-collector`](../../tools/quality/rust-stable-collector)
 performs real stable coverage capture and Rust syntax analysis. It is a developer
-candidate, not an authenticated Core adapter, supported release or installer.
-Its successful capture reports `state: unsupported`, `core_acceptance: pending`.
+candidate with a Core v2 adapter for verified lexical complexity and an offline
+Rust installation transaction. It is not a supported release. Capture alone reports `state: unsupported`,
+`core_acceptance: pending`; the separate authenticated conversion is described below.
 Do not configure it as a replacement for required measurements.
 
 This implements the direction read from
@@ -21,13 +22,13 @@ reference for accepted boundaries and Core authority. The implementation invento
 
 | Existing implementation | Responsibility | Replacement decision |
 | --- | --- | --- |
-| `rust_collector_entry.py`, `rust_collector_project.py` | Entry, doctor, Cargo orchestration, authenticated request bindings, normalized evidence and exits | Rust `main`, `process`, `tools`, `collect`; protocol authentication/normalization still T4 |
+| `rust_collector_entry.py`, `rust_collector_project.py` | Entry, doctor, Cargo orchestration, authenticated request bindings, normalized evidence and exits | Rust `main`, `process`, `tools`, `collect`, `adapter`; Core authenticates requests and Rust normalizes verified lexical owners |
 | `rust_collector_contract.py`, `collector_runner.py` | Development protocol and typed outcomes | Preserve semantics; do not confuse the development envelope with released Core v2 |
 | `rust_native_driver.py`, `rust-native-driver/`, `rust_native_classify.py` | Compiler-private inventory, native counter capture, source ownership/classification | Historical/manual experiments only; no required build or runtime dependency |
 | `rust_native.py`, `rust-measure/src/native.rs` | Unstable MIR text capture/parsing and replay | No reuse in the candidate |
 | `rust-measure/` source analyzer | Stable syntax parsing plus broader metric aggregation | Reuse the parser approach only; new analyzer has an explicit lexical series and unsupported owners |
 | `rust-collector-runtime/`, `build_rust_collector.py`, `rust_collector_delivery.py` | Python/shell launchers, compiler/C/Python environment assembly, exact host checks | Replace installed implementation with one Rust executable; no bundled toolchain or publisher kernel fingerprint |
-| `tools/release/install_collector.py`, `friendly_collector_install.py`, `collector_light_install.py` | Verification, shared component store, install/update/select/rollback | Port user lifecycle to Rust; retain protected release verification principles, not Python runtime calls |
+| `tools/release/install_collector.py`, `friendly_collector_install.py`, `collector_light_install.py` | Verification, shared component store, install/update/select/rollback | Rust `release` implements offline verification/install/upgrade/rollback; downloader and protected release preparation remain pending |
 | `tools/release/*collector*`, `rust-collector-release.yml` | Signing packets, RSA/Sigstore verification, publication policy and rehearsal | Repository automation may remain Python; hold remains until the replacement contract and T8 acceptance |
 | Core `process/adapter.rs`, `config/quality/collectors.rs`, quality evidence/policy modules | Signature, replay protection, generic envelope, series/claims, thresholds and final decisions | Existing Core remains authoritative; no policy or baseline changes in this stage |
 
@@ -36,7 +37,8 @@ The final installed program is planned to remain one executable,
 analysis, normalization, verification, install, upgrade and rollback modules.
 No additional implementation daemon, private compiler helper, shell or Python
 launcher is planned. A target payload needs this executable, licenses/notices,
-an adapter descriptor, support/series metadata and authenticated release inventory.
+support/series metadata and authenticated release inventory/signature. The adapter
+binding is project-specific and is not a bundled user configuration.
 Acceptance archives and external compiler archives are not runtime payloads.
 The current crate is a standalone workspace, release-stripped with LTO, MSRV 1.97.1.
 No artifact from it is currently approved for installation.
@@ -71,7 +73,7 @@ and lifecycle code must implement verification in Rust or document stable public
 verification tools; it must not invoke existing Python verifier modules. Their
 dependency requirements are not yet finalized or accepted.
 
-### Identity and Core protocol work remaining (T4)
+### Identity and Core protocol (T4, partial)
 
 The candidate request records canonical project/output roots, hashes of source
 files and lockfiles, effective Cargo configuration files, exact tool bytes/version
@@ -91,22 +93,41 @@ Root-level test/example/bench paths and build.rs are omitted from lexical analys
 workspace-wide production classification is still pending. No secret signing key
 or credentials belong in the capture environment.
 
-The replacement adapter must consume Core protocol version 2 with result schema
+The candidate adapter consumes Core protocol version 2 with result schema
 `1`: adapter declaration/signature, invocation/step identity, timeout, configuration
 digest, artifact root, nonce/time window, args/environment/capabilities and input.
 Core verifies Ed25519 signatures over its canonical request, executable digest,
-capabilities and replay state. The collector must preserve the corresponding
+capabilities and replay state. The collector preserves the corresponding
 bindings when reading `harness-project-collector-request/v1` (project, collector,
 context, roots, selection and subject/capability/series bindings).
 
 The generic response requires schema version `1`, matching invocation, transport
 `status: PASS`, retained artifacts and a
 `harness-project-collector-response/v1` collection. This transport status cannot
-mean quality acceptance. Rust normalization must validate every claimed source,
-configuration, file, tool, owner and series; unknown mappings produce unsupported
-or measurement errors. It must preserve `supported`, `unsupported`, `not_configured`, `not_collected`,
-`not_applicable` and `measurement_error`, and propagate tool failures without usable partial measurements. The current candidate
-implements none of this envelope and cannot be accepted by Core as evidence.
+mean quality acceptance. `describe` verifies the anchored capture, recomputes source
+analysis, and produces a Core series and lexical owner inventory. The series binds
+collector bytes, exact tool identities, rule, runtime, target and metric contracts.
+The `adapter --binding FILE --binding-sha256 SHA256` arguments are signed by Core's
+caller. The pinned `rust-stable-core-binding/v1` file binds that description, the
+project, capture anchors, complete input, configuration digest and invocation.
+No trust key comes from the capture. Core authenticates before spawning the adapter;
+direct execution by itself does not authenticate a request.
+
+The Rust adapter rejects duplicate JSON keys, changed bindings, mismatched executable,
+source, context target, workspace, series, claims and ambiguous/missing owners. It
+requires all five metric contracts for each selected function. Verified ordinary
+lexical owners can emit `complexity.cyclomatic`; function/line/region coverage and
+CRAP explicitly emit `unsupported`, with no fabricated values. A file containing
+uncertified activation/expansion also makes its complexity unavailable. Per-owner
+artifacts bind source facts, context, series and capture anchors. Input identities
+are rechecked after conversion; failure returns nonzero and no successful envelope.
+
+The repository's Rust `stable_collector_acceptance` example exercises the actual
+Core CLI signature/nonce/expiry transport, then Core's evidence validation and
+requiredness evaluation. Plain complexity is accepted as the new series; required
+CRAP remains blocked. This uses a clearly named test-only signing key, not protected
+production signing. General dependency provenance, certified coverage normalization
+and full T4 acceptance remain open.
 
 ### Source/coverage boundaries
 
@@ -135,14 +156,17 @@ instrumentation exports zero branch regions.
 
 ### Independent lifecycle and migration (T5–T8)
 
-The Rust lifecycle must verify the approved release inventory, signature identity,
-integrity and provenance before unpacking/selecting a target. Protected signing
-permissions, pinned trust roots and no unsigned fallback remain requirements.
-Install into a fresh version directory, sync verified content, then atomically
-select it; interrupted upgrades leave the previous selection usable. Reverify
-rollback targets before switching, preserve a working selection on failure, and
-test tampering, interrupted extraction/selection and rollback failure. These
-operations do not yet exist in this candidate.
+The Rust `release` module now verifies local flat bundles and atomically selects
+installed versions. Its [offline lifecycle contract](stable-rust-collector-lifecycle.md)
+defines the five assets, externally pinned trust and commands. Both in-process
+RSA and external Sigstore verification must succeed; no unsigned fallback exists.
+A per-root lock serializes transactions. Verified files are synced before the
+`current` symlink is atomically replaced; rollback re-verifies its target.
+The real fixture demonstrates RSA verification, upgrade/rollback, corruption and
+interruption recovery. Sigstore invocation is mocked in this fixture, explicitly
+not production signature acceptance. The downloader, trusted bootstrap, protected
+package preparation, complete license inventory and real Sigstore acceptance remain
+open. Interrupted staging has no automatic garbage collection yet.
 
 Collector version, external Rust/LLVM selection and Core version are independent.
 An accepted collector update should download only its changed program/metadata;
@@ -158,9 +182,11 @@ ratchets or baselines. New source/coverage series need explicit migration review
 | Existing standard coverage history | `llvm-file-summary-unfiltered/1` | Remains its own historical series; candidate is not a relabelled equivalent |
 
 Historical `docs/quality/rust-native-inventory-replay.json` and associated original
-paths/anchors are unchanged. No old backend ran for this stage. There is not yet
-a same-fixture authenticated old/new comparison; the semantic table above is not
-T6 numerical acceptance. T8 cannot remove the publication hold until Core,
+paths/anchors are unchanged. No old backend ran for this stage. The
+[same-source historical probe](stable-rust-collector-migration.md) records actual
+new capture against an original GH-220 fixture and its anchored archived report;
+it does not recertify the historical backend or establish equivalence. T8 cannot
+remove the publication hold until full Core,
 cross-toolchain/system, signed lifecycle and migration acceptance are complete.
 
 ## Running the developer candidate
@@ -191,3 +217,29 @@ those traces for forbidden subprocesses/flags, and uploads evidence. Existing
 Core jobs and required aggregate names remain unchanged. Compiler-private native
 test classes now require `HARNESS_GATE_LEGACY_EXPERIMENT=1` explicitly; their old
 host/tool/archive requirements still apply in manual experiments.
+
+### Authenticated candidate and historical acceptance
+
+The following development commands use fresh output directories and the actual Core
+executable. The example creates a test-only key; users must not adopt that key.
+
+```sh
+CARGO_TARGET_DIR="$PWD/target/stable-build" cargo +1.97.1 build \
+  --manifest-path tools/harness-gate/Cargo.toml --locked \
+  --bin harness-gate --example stable_collector_acceptance
+python3 tools/quality/rust-stable-collector/validate_stable_candidate.py \
+  --binary target/stable-build/release/harness-gate-rust-stable-collector \
+  --output target/stable-review/acceptance
+for fixture in plain boundaries features; do
+  target/stable-build/debug/examples/stable_collector_acceptance \
+    target/stable-build/release/harness-gate-rust-stable-collector \
+    target/stable-build/debug/harness-gate target/stable-review/acceptance \
+    "target/stable-review/core-${fixture}" "$fixture"
+done
+python3 tools/quality/rust-stable-collector/compare_historical_fixture.py \
+  --binary target/stable-build/release/harness-gate-rust-stable-collector \
+  --output target/stable-review/historical
+```
+
+These checks do not install a collector, replace project configuration or accept a
+baseline. Required CI traces the Core/example/adapter processes as well as capture.

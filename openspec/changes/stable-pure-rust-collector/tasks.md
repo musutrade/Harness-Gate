@@ -19,6 +19,10 @@ T2 inventory and implementation design: `docs/quality/stable-rust-collector.md`.
 Actual candidate execution and remaining acceptance:
 `docs/quality/stable-rust-collector-validation.md`. T3 has a runnable Rust capture
 and AST implementation, but the second toolchain remains unverified. T4 has
-integrity checks only; Core authentication/normalization is pending. T5 lifecycle,
-T6 certified migration/matrix, complete T7 acceptance and T8 remain unchecked.
-The successful candidate deliberately cannot satisfy required Core measurements.
+a Core v2 adapter whose real signed transport and evidence checks accept verified
+lexical complexity while required coverage/CRAP remains blocked. The same-source
+GH-220 historical probe preserves original anchors and records unequal measurement
+boundaries. T5 has Rust offline dual-verification transactions and real RSA tests;
+Sigstore cryptography, downloader, trusted bootstrap and protected release preparation
+remain pending. T6 reviewed migration/full matrix, complete T7 acceptance
+and T8 remain unchecked. No existing required binding or baseline is replaced.

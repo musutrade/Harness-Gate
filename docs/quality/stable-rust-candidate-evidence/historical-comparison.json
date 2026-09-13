@@ -1,0 +1,334 @@
+{
+  "schema": "rust-stable-historical-comparison/v1",
+  "state": "migration-review-required",
+  "collector_sha256": "a7e348c64089cbb592e1b094558b937066748c9979ba253218521511c1693a79",
+  "historical": {
+    "archive": "docs/quality/gh-220/native-fixtures.tar.gz",
+    "archive_sha256": "0ceb9051ec35c0047bb2c083fab25fb1ba0f72a120b147d1ad3307889ef10391",
+    "index": "docs/quality/gh-220/native-fixtures.json",
+    "original_workspace_path": "target/gh-220/native-tests/tmps4u3czr1/complete",
+    "members": {
+      "complete/evidence.json": "8ddb8b0fd9f5bd5c402e0754ec0846a54b6e5da8c13876462d1b28bb4479e683",
+      "complete/report.json": "e728a77f257929c7dc4463df778814998e8699f76af9c22c3bb79a2435f71f4d",
+      "complete/raw/source.rs": "5848ae7e66cdec35029a945b55d6f4b972c4f1b51256d1e050bba5cb45f0722d"
+    },
+    "source_sha256": "5848ae7e66cdec35029a945b55d6f4b972c4f1b51256d1e050bba5cb45f0722d",
+    "series": {
+      "complexity": "mir-normal-cfg/1",
+      "id": "rust-native-production-experiment/1",
+      "instances": "same-mir-owner-sum-counters/1",
+      "lines": "any-owned-code-region/1",
+      "mapping": "mir-instrument-coverage-exact-regions/1",
+      "selection": "single-crate-no-test-cfg/1"
+    },
+    "scope": "standalone-single-file-fixture",
+    "coverage": {
+      "functions": {
+        "count": 8,
+        "covered": 7
+      },
+      "lines": {
+        "count": 19,
+        "covered": 17
+      },
+      "regions": {
+        "count": 36,
+        "covered": 28
+      }
+    },
+    "backend_complete": false,
+    "source_provenance_complete": false,
+    "functions": [
+      {
+        "name": "closure::{closure#0}",
+        "kind": "closure",
+        "cc": 2,
+        "count": 1,
+        "crap_exact": [
+          2,
+          1
+        ]
+      },
+      {
+        "name": "closure",
+        "kind": "function",
+        "cc": 1,
+        "count": 1,
+        "crap_exact": [
+          1,
+          1
+        ]
+      },
+      {
+        "name": "first",
+        "kind": "function",
+        "cc": 2,
+        "count": 1,
+        "crap_exact": [
+          2,
+          1
+        ]
+      },
+      {
+        "name": "future::{closure#0}",
+        "kind": "async-body",
+        "cc": 2,
+        "count": 0,
+        "crap_exact": [
+          6,
+          1
+        ]
+      },
+      {
+        "name": "future",
+        "kind": "function",
+        "cc": 1,
+        "count": 1,
+        "crap_exact": [
+          1,
+          1
+        ]
+      },
+      {
+        "name": "generic",
+        "kind": "function",
+        "cc": 1,
+        "count": 2,
+        "crap_exact": [
+          1,
+          1
+        ]
+      },
+      {
+        "name": "main",
+        "kind": "function",
+        "cc": 1,
+        "count": 1,
+        "crap_exact": [
+          1,
+          1
+        ]
+      },
+      {
+        "name": "second",
+        "kind": "function",
+        "cc": 2,
+        "count": 1,
+        "crap_exact": [
+          2,
+          1
+        ]
+      }
+    ],
+    "threshold_failures": [
+      "closure::{closure#0}",
+      "future::{closure#0}"
+    ],
+    "authentication": "original manifest/source anchors checked; report is an archived summary, not re-certified"
+  },
+  "stable": {
+    "anchor": {
+      "capture": "complete",
+      "core_acceptance": "pending",
+      "manifest_sha256": "edd5eabfd7cf07ec23510a6321271e5a451560b8c963dd74e395a0e36fc2abea",
+      "request_sha256": "f13202050cfeebd23a9fc57b35a881435dc9b9451c11bd7d13454dde9dbe106d",
+      "state": "unsupported"
+    },
+    "series": {
+      "collector": {
+        "name": "harness-gate-rust-stable-collector",
+        "version": "0.1.0-candidate.1"
+      },
+      "id": "measurement-series/v1:c83666ebd0b8ded37dd078faef28b22205d72619145a4335363ec41a1175ac56",
+      "metrics": [
+        {
+          "name": "complexity.cyclomatic",
+          "type": "count"
+        },
+        {
+          "name": "coverage.function",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.line",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.region",
+          "type": "ratio"
+        },
+        {
+          "name": "risk.crap",
+          "type": "rational"
+        }
+      ],
+      "name": "rust-stable-lexical-candidate",
+      "normalization": {
+        "name": "stable-rust-core-candidate",
+        "version": "a7e348c64089cbb592e1b094558b937066748c9979ba253218521511c1693a79"
+      },
+      "rule": {
+        "name": "rust-source-decisions",
+        "version": "rust-source-decisions/v1-candidate"
+      },
+      "runtime": {
+        "name": "rustc",
+        "version": "8bab26f4f68e0e26f0bb7960be334d5b520ea452"
+      },
+      "source_identity": {
+        "name": "rust-lexical-source-span",
+        "version": "1"
+      },
+      "target": "x86_64-unknown-linux-gnu",
+      "tool": {
+        "name": "stable-rust-coverage-tools",
+        "version": "f6cf1932ab62a9b43f6f09107f1ce8720d686a3841908e02cfc80d7c9048acd2"
+      }
+    },
+    "llvm_totals": {
+      "branches": {
+        "count": 0,
+        "covered": 0,
+        "notcovered": 0,
+        "percent": 0
+      },
+      "functions": {
+        "count": 7,
+        "covered": 6,
+        "percent": 85.71428571428571
+      },
+      "instantiations": {
+        "count": 9,
+        "covered": 8,
+        "percent": 88.88888888888889
+      },
+      "lines": {
+        "count": 21,
+        "covered": 18,
+        "percent": 85.71428571428571
+      },
+      "mcdc": {
+        "count": 0,
+        "covered": 0,
+        "notcovered": 0,
+        "percent": 0
+      },
+      "regions": {
+        "count": 31,
+        "covered": 24,
+        "notcovered": 7,
+        "percent": 77.41935483870968
+      }
+    },
+    "owners": [
+      {
+        "discriminator": "rust-source-span/v1:071ee8c14510d36b6125c0a18b191114a6ce559d50cf49a96579a1e50d1c07a0",
+        "file_supported": false,
+        "function": {
+          "complexity": null,
+          "name": "future",
+          "reasons": [
+            "async lowering owner not certified"
+          ],
+          "span": [
+            13,
+            1,
+            15,
+            2
+          ],
+          "state": "unsupported"
+        },
+        "path": "source.rs",
+        "source_sha256": "5848ae7e66cdec35029a945b55d6f4b972c4f1b51256d1e050bba5cb45f0722d"
+      },
+      {
+        "discriminator": "rust-source-span/v1:e89cd0005c1095fd636853268dd102c12e58cb8646e81875f8aecdae5c8ffc4c",
+        "file_supported": false,
+        "function": {
+          "complexity": null,
+          "name": "closure",
+          "reasons": [
+            "closure owner not certified; no parent coverage inheritance"
+          ],
+          "span": [
+            17,
+            1,
+            20,
+            2
+          ],
+          "state": "unsupported"
+        },
+        "path": "source.rs",
+        "source_sha256": "5848ae7e66cdec35029a945b55d6f4b972c4f1b51256d1e050bba5cb45f0722d"
+      },
+      {
+        "discriminator": "rust-source-span/v1:4d6fbbf27ff8a13a35fe16d3710f2bf55987191d174c6f2122829dab0ccbc994",
+        "file_supported": false,
+        "function": {
+          "complexity": null,
+          "name": "generic",
+          "reasons": [
+            "generic instantiation owner not certified"
+          ],
+          "span": [
+            22,
+            1,
+            22,
+            39
+          ],
+          "state": "unsupported"
+        },
+        "path": "source.rs",
+        "source_sha256": "5848ae7e66cdec35029a945b55d6f4b972c4f1b51256d1e050bba5cb45f0722d"
+      },
+      {
+        "discriminator": "rust-source-span/v1:a198575379fe1a916c26dd7c06697dc4495ae5e3cda9b5a36d12fc90441fe01b",
+        "file_supported": false,
+        "function": {
+          "complexity": null,
+          "name": "conditional",
+          "reasons": [
+            "unresolved attribute: # [cfg (feature = \"extra\")]"
+          ],
+          "span": [
+            24,
+            1,
+            25,
+            29
+          ],
+          "state": "unsupported"
+        },
+        "path": "source.rs",
+        "source_sha256": "5848ae7e66cdec35029a945b55d6f4b972c4f1b51256d1e050bba5cb45f0722d"
+      },
+      {
+        "discriminator": "rust-source-span/v1:26eca8f5b8d23c1333f20c2f5655ce250f7c32cb7d10fc9a7058f1111b89f068",
+        "file_supported": false,
+        "function": {
+          "complexity": null,
+          "name": "main",
+          "reasons": [
+            "unresolved attribute: # [cfg (feature = \"extra\")]"
+          ],
+          "span": [
+            33,
+            1,
+            42,
+            2
+          ],
+          "state": "unsupported"
+        },
+        "path": "source.rs",
+        "source_sha256": "5848ae7e66cdec35029a945b55d6f4b972c4f1b51256d1e050bba5cb45f0722d"
+      }
+    ],
+    "build_boundary": "Cargo harness=false test target runs unchanged source main; no claim of identical native build flags"
+  },
+  "migration": {
+    "comparable_series": false,
+    "baseline_adopted": false,
+    "required_binding_changed": false,
+    "function_coverage_and_crap": "unsupported",
+    "raw_coverage": "standard LLVM totals are diagnostic; test/production boundary is not certified"
+  }
+}

@@ -41,5 +41,10 @@ has been implemented, certified or published.
 A runnable stable Rust capture/source-analysis candidate now exercises the
 [implementation contract](../quality/stable-rust-collector.md). Its
 [actual validation](../quality/stable-rust-collector-validation.md) is partial:
-Core adapter authentication, signed lifecycle and the acceptance matrix remain
-pending. This does not change the publication hold or accepted series.
+real Core request authentication and evidence validation now accept verified
+lexical complexity in a separate candidate series. Coverage/CRAP remains unsupported;
+Rust offline signed lifecycle transactions now have real RSA and interruption tests;
+real Sigstore verification, protected release preparation and the cross-toolchain/system
+acceptance matrix remain pending.
+The same-source historical comparison preserves the original report anchors.
+This does not change the publication hold or accepted series.
