@@ -166,3 +166,14 @@ incomplete/ambiguous records. Six focused tests pass; before/after evidence is i
 `docs/quality/stable-rust-candidate-evidence/execution-audit.json`. This is parser
 validation, not actual tracing evidence. The Rust binary remains unchanged, and
 T3–T8 remain unchecked with the same release acceptance blockers.
+
+The T4 inline-module checkpoint implements `rust-llvm-exact-free-owner/v3-candidate`.
+An identical-source before/after fixture changes three ordinary module owners
+from unsupported to independently verified results: lexical complexities 2/1/2,
+execution counts 1/0/2 and code-region ratios 4/5, 0/3, 5/5. Missing, duplicate
+and inherited-count mutations fail; real annotated/cfg variants remain unsupported.
+Candidate Rust tests and real generic capture checks cover the new scope; Core
+acceptance and package preparation require the module cases. Exact commands and
+final results are in the candidate validation record. This does not certify
+generated owners or complete T3–T8. Metric definitions are unchanged; the new
+binary-bound Core series identity does not authorize baseline compatibility.

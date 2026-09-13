@@ -216,3 +216,19 @@ duplicate or incomplete records fail the audit; signal/exit records are allowed
 without discarding pending calls. The default environment pointer/count is not
 environment-content evidence. Synthetic parser regressions cannot establish
 actual process tracing or cross-host acceptance; T7 remains incomplete.
+
+## Inline-module owner checkpoint (T4 remains incomplete)
+
+`rust-llvm-exact-free-owner/v3-candidate` extends exact-span matching to ordinary
+free functions inside unannotated inline modules. Source scope qualification
+distinguishes repeated basenames; every source owner still needs one unique,
+single-file LLVM owner and reconciled code-region counters. Annotated/external
+modules, impl/trait scopes, cfg, generics and expansion remain uncertified.
+The actual fixture distinguishes two same-named functions with different
+execution/region results and a nested never-called function; test spans are
+excluded explicitly. Missing/duplicate owner and positive-count inheritance
+mutations fail measurement, while compilable annotated/cfg variants return
+unsupported. The rule version changes; metric definitions, Core authority and
+migration requirements remain unchanged. The new binary-bound normalization
+produces a different full Core measurement-series identity. Signed support
+metadata must name this rule; no existing baseline compatibility is assumed.
