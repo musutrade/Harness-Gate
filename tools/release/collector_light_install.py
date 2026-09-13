@@ -19,6 +19,15 @@ def self_check(root, manifest=None):
     env = {'PATH': str(root / 'bin') + ':/usr/bin:/bin', 'LANG': 'C',
            'LD_LIBRARY_PATH': str(root / 'lib') + ':' + str(root / 'rust/lib'),
            'PYTHONDONTWRITEBYTECODE': '1'}
+    requirements = assets.contract.dependencies.requirements_for_manifest(manifest)
+    if requirements:
+        inventory = assets.read(root / 'runtime.json')
+        assets.require(inventory['schema'] == 'rust-collector-runtime/2' and
+                       inventory['runtime_requirements'] == requirements, 'runtime dependency declaration differs from signed manifest')
+        assets.contract.dependencies.probe(requirements)
+        result = subprocess.run([str(root / 'bin/harness-gate-rust-collector'), 'doctor', '--json'],
+                                env=env, capture_output=True, text=True, timeout=60)
+        assets.require(result.returncode == 0, 'runtime dependency self-check failed: ' + result.stderr[-4000:])
     for row in manifest['tools']:
         if row['name'] in ('driver', 'rustc-driver-library'):
             assets.require(row['version'] == 'sha256:' + row['sha256'], 'wrong compiler-private identity')
@@ -36,6 +45,13 @@ def self_check(root, manifest=None):
     # This disposable diagnostic never adopts a project's policy or baseline.
     with tempfile.TemporaryDirectory(prefix='collector-selfcheck-', dir=root.parent) as temporary:
         work = Path(temporary)
+        if requirements:
+            c_source = work / 'dependency.c'
+            c_source.write_text('#include <openssl/sha.h>\nint main(void) { unsigned char out[32]; return SHA256((const unsigned char*)"test",4,out) ? 0 : 1; }\n')
+            c_binary = work / 'dependency'
+            for argv in ([str(root / 'bin/cc'), str(c_source), '-lcrypto', '-o', str(c_binary)], [str(c_binary)]):
+                result = subprocess.run(argv, cwd=work, env=env, capture_output=True, text=True, timeout=60)
+                assets.require(result.returncode == 0, 'C/OpenSSL dependency self-check failed: ' + result.stderr[-4000:])
         source = work / 'fixture.rs'
         source.write_text('fn main() { let n = std::hint::black_box(1); assert!(n > 0); }\n')
         env.update(PATH=str(root / 'bin'), TMPDIR=str(work), CARGO_HOME=str(work / 'cargo'),
@@ -84,11 +100,10 @@ def prune_cache(cache, maximum, protected=()):
 
 def install(catalog, root, cache, offline, *, mode, policy, reuse, plan_only, cache_limit):
     assets.require(root.resolve() != cache.resolve(), 'installation root and cache must differ')
-    from friendly_collector_install import fetch, provision
+    from friendly_collector_install import fetch, provision, check_host
     descriptor = catalog['components']  # authenticated capsule embeds the entire plan
     assets.require(descriptor['archive_sha256'] == catalog['archive_sha256'], 'wrong component archive')
-    assets.require(assets.probe_host(catalog['trust']['host']) == catalog['host_abi'],
-                   'incompatible host ABI; no compatible components published for this host')
+    check_host(catalog)
     with lifecycle.locked(cache), lifecycle.locked(root):
         plan, sources = components.plan(descriptor, root, cache, mode=mode, reuse=reuse)
         controls = catalog['controls']

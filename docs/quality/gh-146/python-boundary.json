@@ -765,6 +765,22 @@
       "authoritative_status": "Host authenticates distribution and requests; Core decides requiredness and final outcomes.",
       "final_disposition": "Retain ecosystem measurement compatibility checks; GH-230 fixture evidence is separate from native project acceptance.",
       "sha256": "c720bd954ea923a0c980df3917ee93c838dbb7c7d2bb4e0dd6989c5061aa6ae6"
+    },
+    {
+      "module": "tools/quality/rust_runtime_requirements.py",
+      "category": "A",
+      "purpose": "Derive and probe signed Rust collector runtime dependency capabilities.",
+      "callers": [
+        "tools/quality/build_rust_collector.py",
+        "tools/quality/rust_collector_contract.py",
+        "tools/quality/rust_collector_entry.py",
+        "tools/release/collector_assets.py"
+      ],
+      "ci_role": "Dependency bounds, missing libraries and legacy compatibility regression.",
+      "release_impact": "New signed delivery v3 installation compatibility only; no release approval.",
+      "authoritative_status": "Runtime dependency validation; Rust Core retains quality policy decisions.",
+      "final_disposition": "Retain bounded publisher inventory and runtime capability probe.",
+      "sha256": "e3431720dfb73fbae0ed3ba6fe90516ef12b5ff3c82fc002c5236f78924f67e5"
     }
   ],
   "schema": "python-product-boundary/v1",

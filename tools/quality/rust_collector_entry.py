@@ -17,6 +17,7 @@ import rust_native_classify as classifier
 import collector_runner as runner
 import rust_collector_project as project
 import rust_collector_delivery as delivery
+import rust_runtime_requirements as dependencies
 from rust_collector_contract import MeasurementComplete, MeasurementFailure
 
 
@@ -38,12 +39,16 @@ def measure_capture(directory, anchor):
 
 def doctor(root):
     inventory = json.loads((root / 'runtime.json').read_text())
-    expected = inventory['host']
-    observed = {'system': platform.system(), 'machine': platform.machine(),
-                'kernel': platform.release(), 'glibc': os.confstr('CS_GNU_LIBC_VERSION')}
-    native.require(all(observed[k] == expected[k] for k in observed), 'unsupported host ABI')
-    for row in expected['libraries'].values():
-        native.require(native.file_hash(row['source']) == row['sha256'], 'host runtime changed')
+    if inventory['schema'] == 'rust-collector-runtime/2':
+        observed = dependencies.probe(inventory['runtime_requirements'])
+    else:
+        native.require(inventory['schema'] == 'rust-collector-runtime/1', 'unknown runtime schema')
+        expected = inventory['host']
+        observed = {'system': platform.system(), 'machine': platform.machine(),
+                    'kernel': platform.release(), 'glibc': os.confstr('CS_GNU_LIBC_VERSION')}
+        native.require(all(observed[k] == expected[k] for k in observed), 'unsupported host ABI')
+        for row in expected['libraries'].values():
+            native.require(native.file_hash(row['source']) == row['sha256'], 'host runtime changed')
     for name, row in inventory['payload'].items():
         path = root / name
         native.require(not Path(name).is_absolute() and '..' not in Path(name).parts,

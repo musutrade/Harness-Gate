@@ -46,7 +46,7 @@ only. They do not establish native positive measurement or delivery compatibilit
 
 ## Manifest and compatibility matrix
 
-New candidates use `rust-collector-delivery/v2`, defined by the
+Version 2 candidates use `rust-collector-delivery/v2`, defined by the
 [plugin manifest schema](../../tools/quality/schema/rust-collector-plugin.schema.json).
 The package pins compiler, tools, normalization code, payloads and compatibility.
 Project subjects, configuration digest and normalized series belong to the host's
@@ -108,6 +108,34 @@ negatives). Retain source, executable binaries, profiles, exports, inventory,
 commands/results, tool hashes and independent anchors with the receipt. A missing
 receipt, partial export or missing original binary is not positive native evidence.
 Distribution signatures do not authenticate runtime captures.
+
+## Dependency-based installation (v3, unreleased)
+
+New runtime schema `rust-collector-runtime/2` produces manifest
+`rust-collector-delivery/v3`, defined by the
+[dependency manifest schema](../../tools/quality/schema/rust-collector-dependencies.schema.json).
+This version explicitly changes the ABI matching rule above: Linux architecture,
+actual minimum glibc requirements and loadable host libraries determine runtime
+compatibility. The publisher derives minimum versions from required ELF symbols;
+SDK link inputs are excluded from loaded-runtime requirements and tested by an
+actual compile/run diagnostic. Kernel and build-host library fingerprint equality
+are no longer installation conditions. Missing private compiler, LLVM, Python and
+C/OpenSSL components use the shared, pinned component acquisition path.
+
+Preflight still requires exactly one authenticated reviewed receipt matching the
+manifest digest, exact Core/protocol and private tool identities. The reviewed
+host must also satisfy the declared dependency bounds. Changes to declarations
+invalidate the manifest receipt binding. Private executable and payload hashes,
+signatures, capture anchors, project configuration and series/lineage checks retain
+their existing meaning. v1/v2 manifests keep exact environment matching; their
+signatures cannot authorize a v3 reinterpretation.
+
+The new installer carries its independently pinned OpenSSL verifier, so user
+OpenSSL paths and bytes are not an installation prerequisite. Before activation,
+it verifies all payload bytes, loads required libraries and runs C/OpenSSL and
+Rust compile/execute/coverage diagnostics. Failure leaves the previous selection
+intact. This implementation is not itself a protected release or a new production
+compatibility receipt. See [ADR 0052](../adr/0052-dependency-based-collector-compatibility.md).
 
 ## Relocation and series transition
 

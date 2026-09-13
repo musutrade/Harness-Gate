@@ -86,13 +86,22 @@ def fetch(row, base, cache, offline=None):
     return target
 
 
+def check_host(catalog):
+    if catalog.get('schema') == 'rust-collector-user-install/v3':
+        return assets.contract.dependencies.probe(catalog['runtime_requirements'])
+    assets.require(assets.probe_host(catalog['trust']['host']) == catalog['host_abi'],
+                   'incompatible legacy host ABI; select a dependency-capable installer')
+
+
 def provision(catalog, directory, cache, offline):
     profile = catalog['trust']
     trust = dict(profile['host'])
     assets.require(trust['schema'] == 'rust-collector-host-trust/v2', 'dual-signature production trust required')
-    # The profile is authenticated with the installer, never chosen by a plugin.
-    assets.require(assets.probe_host(trust) == catalog['host_abi'],
-                   'This Rust plugin does not support this host yet; Core can be installed separately.')
+    # The authenticated bootstrap owns the verifier. A user's OpenSSL path or
+    # build-host library hashes must not select or reject the v3 private verifier.
+    check_host(catalog)
+    if catalog.get('schema') == 'rust-collector-user-install/v3':
+        trust['openssl'] = str(Path(__file__).resolve().parents[2] / 'bin/openssl')
     assets.require(assets.sha(Path(trust['openssl'])) == trust['openssl_sha256'], 'unsupported host verifier')
     directory.mkdir(parents=True, exist_ok=True, mode=0o700)
     assets.require(not directory.is_symlink(), 'unsafe trust directory')
@@ -126,7 +135,7 @@ def provision(catalog, directory, cache, offline):
 
 def install(catalog, root, cache, offline=None, *, mode='auto', policy='deny', reuse=None,
             plan_only=False, cache_limit=512 * 1024**2):
-    if catalog['schema'] == 'rust-collector-user-install/v2':
+    if catalog['schema'] in ('rust-collector-user-install/v2', 'rust-collector-user-install/v3'):
         import collector_light_install
         return collector_light_install.install(catalog, root.absolute(), cache.absolute(), offline,
             mode=mode, policy=policy, reuse=reuse, plan_only=plan_only, cache_limit=cache_limit)

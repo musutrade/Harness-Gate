@@ -1,0 +1,51 @@
+{
+  "status": "pass",
+  "scope": "development runtime dependency compatibility; not production release acceptance",
+  "host": {
+    "target": "x86_64-unknown-linux-gnu",
+    "glibc": "glibc 2.39",
+    "kernel": "6.8.0-139-generic",
+    "runtime_dependencies_sha256": "59b2f56e46d66a0755c1dda707523e6beb443bc40ea07b1ad546eca8dc56e891"
+  },
+  "runtime_requirements": {
+    "commands": [
+      "sh"
+    ],
+    "libc_min": "2.38",
+    "libraries": [
+      "ld-linux-x86-64.so.2",
+      "libc.so.6",
+      "libdl.so.2",
+      "libm.so.6",
+      "libpthread.so.0",
+      "librt.so.1"
+    ],
+    "machine": "x86_64",
+    "schema": "rust-runtime-requirements/v1",
+    "system": "Linux"
+  },
+  "runtime_inventory_sha256": "81bfd0d30e60f251833fd593572aef475155cd637afec99b7e0ac2b5fb260eb4",
+  "checks": {
+    "doctor": 0,
+    "c_compile": 0,
+    "c_execute": 0,
+    "rust_compile_execute_coverage": 0
+  },
+  "tests": {
+    "quality_scripts": {
+      "run": 424,
+      "skipped": 3,
+      "status": "pass"
+    },
+    "release_contracts": {
+      "run": 87,
+      "status": "pass"
+    },
+    "native_runtime": {
+      "run": 12,
+      "skipped": 0,
+      "status": "pass"
+    },
+    "docs_consistency": "pass"
+  }
+}
