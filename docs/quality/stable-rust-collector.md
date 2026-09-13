@@ -10,7 +10,7 @@ Do not configure it as a replacement for required measurements.
 
 This implements the direction read from
 [PR 260](https://github.com/musutrade/Harness-Gate/pull/260), commit
-`65a0787d24096c0122edf34ad50f09a0eaa269d9`. The policy, ADR 0053 and legacy
+`c2f7c14fbee0245e3a48176f7a768f6d3fd1a041`. The policy, ADR 0053 and legacy
 publication hold are included here because that policy branch was not merged into
 this checkout. [Local evidence and remaining acceptance](stable-rust-collector-validation.md)
 distinguish actual results from planned work.
@@ -42,6 +42,12 @@ binding is project-specific and is not a bundled user configuration.
 Acceptance archives and external compiler archives are not runtime payloads.
 The current crate is a standalone workspace, release-stripped with LTO, MSRV 1.97.1.
 No artifact from it is currently approved for installation.
+
+The executable also statically links our ordinary Rust shared generator for the
+two identified macro templates. [Macro source observations](stable-rust-macro-observation.md)
+bind source/version, invocation, requested configuration and generated owners.
+They remain separate diagnostic facts: generated-function execution coverage and
+CRAP are unsupported and cannot replace authenticated Core evidence.
 
 ### External dependencies and selection
 

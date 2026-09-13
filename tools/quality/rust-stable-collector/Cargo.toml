@@ -7,6 +7,7 @@ publish = false
 license = "MIT"
 
 [dependencies]
+gate-observation-generator = { path = "../fixtures/rust-macro-observation/generator" }
 anyhow = "=1.0.104"
 libc = "=0.2.189"
 proc-macro2 = { version = "=1.0.106", features = ["span-locations"] }

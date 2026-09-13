@@ -1,5 +1,12 @@
 # Tasks
 
+T4 also includes the PR 260 source-level macro/derive investigation and shared
+generation contract: bind source/version, invocation/config/target and ownership;
+distinguish generated code from macro implementation; track upstream submission,
+merge and adopted version separately. The bounded Rust observation implementation
+is recorded in `docs/quality/stable-rust-macro-observation.md`. General authenticated
+collection and generated-function coverage remain blocked. T4 stays unchecked.
+
 - [x] T1: Record the user-approved normative policy and guard legacy publication.
 - [x] T2: Inventory legacy collector/runtime/installer behavior and stable CI; define the pure-Rust replacement contract and supported measurement boundaries.
 - [ ] T3: Implement pure-Rust entry, dependency checks, stable coverage collection and source complexity analysis without compiler-private APIs or Python runtime dependencies.
