@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Finalize large Core-owned native quality JSON with bounded field redaction and exact output digest checks; retain external evidence limits and the invocation byte budget. Preserve all quality records and valid JSON instead of failing report publication solely because a generated report exceeds the per-text-file limit.
+
 - Let staged partial quality profiles read host-owned state and keys while checking
   source/configuration pins against the Git index; create contained empty evidence
   directories in the private snapshot without importing working-tree artifacts.
