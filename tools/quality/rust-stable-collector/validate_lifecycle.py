@@ -16,6 +16,7 @@ import subprocess
 import time
 
 from validate_stable_candidate import check_trace
+from validate_upgrade import build_programs
 
 PROGRAM = 'harness-gate-rust-stable-collector'
 IDENTITY = 'https://github.com/musutrade/Harness-Gate/.github/workflows/rust-collector-release.yml@refs/heads/main'
@@ -52,11 +53,18 @@ def main():
     commands = []
     checks = []
 
-    def automation(argv):
-        result = subprocess.run(list(map(str, argv)), capture_output=True, timeout=60)
+    def automation(argv, timeout=60, env=None):
+        result = subprocess.run(list(map(str, argv)), capture_output=True, timeout=timeout, env=env)
         commands.append({'argv': list(map(str, argv)), 'exit_code': result.returncode,
-                         'stderr': result.stderr.decode()})
+                         'stdout': result.stdout.decode(), 'stderr': result.stderr.decode()})
+        write(output / 'automation.json', commands)
         assert result.returncode == 0, commands[-1]
+        return result.stdout.decode()
+
+    version, upgrade_version, upgrade_binary, fixture_programs = build_programs(output, automation, sha)
+    assert sha(binary) != sha(upgrade_binary)
+    assert automation([binary, '--version']) == f'{PROGRAM} {version}\n'
+    assert automation([upgrade_binary, '--version']) == f'{PROGRAM} {upgrade_version}\n'
 
     automation(['openssl', 'genpkey', '-algorithm', 'RSA', '-pkeyopt', 'rsa_keygen_bits:2048', '-out', private])
     automation(['openssl', 'pkey', '-in', private, '-pubout', '-out', public])
@@ -79,13 +87,14 @@ exit 0
                    'trusted_root': str(trust_root), 'trusted_root_sha256': sha(trust_root)}
     write(trust, trust_value)
 
-    def bundle(version):
+    def bundle(version, executable):
         directory = output / f'package-{version}'
         directory.mkdir()
-        shutil.copyfile(binary, directory / PROGRAM)
+        shutil.copyfile(executable, directory / PROGRAM)
         shutil.copyfile(prepared / 'LICENSE', directory / 'LICENSE')
         support = json.loads((prepared / 'support.json').read_text())
         support['release_version'] = version
+        support['program'] = {'sha256': sha(executable), 'bytes': executable.stat().st_size}
         write(directory / 'support.json', support)
         files = {name: {'sha256': sha(directory / name), 'bytes': (directory / name).stat().st_size}
                  for name in (PROGRAM, 'LICENSE', 'support.json')}
@@ -98,7 +107,7 @@ exit 0
               'sigstore_bundle': {'test_only_mock': True}})
         return directory
 
-    first, second = bundle('0.1.0-candidate.1'), bundle('0.1.0-candidate.2')
+    first, second = bundle(version, binary), bundle(upgrade_version, upgrade_binary)
     first_id, second_id = sha(first / 'release-inventory.json'), sha(second / 'release-inventory.json')
 
     def run(name, argv, success=True):
@@ -123,16 +132,62 @@ exit 0
     assert verified['inventory_sha256'] == first_id
     installed = install('install', first)
     assert installed['current'] == first_id and installed['previous'] is None
-    automation([root / 'current' / PROGRAM, '--version'])
+    assert automation([root / 'current' / PROGRAM, '--version']) == f'{PROGRAM} {version}\n'
+    # The installed old program performs the actual upgrade; the installed new
+    # program performs rollback. Invocation through the original binary alone
+    # would not exercise lifecycle compatibility between the two executables.
+    launcher = binary
+    binary = root / 'current' / PROGRAM
     upgraded = install('upgrade', second)
     assert upgraded['current'] == second_id and upgraded['previous'] == first_id
+    assert sha(root / 'current' / PROGRAM) == sha(upgrade_binary)
+    assert automation([root / 'current' / PROGRAM, '--version']) == f'{PROGRAM} {upgrade_version}\n'
     rolled_back = run('rollback', ['rollback', root, first_id, trust, sha(trust)])
+    binary = launcher
     assert rolled_back['current'] == first_id and rolled_back['previous'] == second_id
     assert (root / 'versions' / second_id / PROGRAM).is_file()
 
     def unchanged():
         assert os.readlink(root / 'current') == f'versions/{first_id}'
         assert sha(root / 'current' / PROGRAM) == sha(binary)
+
+    def resign(directory):
+        support = json.loads((directory / 'support.json').read_text())
+        support['program'] = {'sha256': sha(directory / PROGRAM), 'bytes': (directory / PROGRAM).stat().st_size}
+        write(directory / 'support.json', support)
+        inventory = json.loads((directory / 'release-inventory.json').read_text())
+        inventory['files'] = {name: {'sha256': sha(directory / name), 'bytes': (directory / name).stat().st_size}
+                              for name in (PROGRAM, 'LICENSE', 'support.json')}
+        write(directory / 'release-inventory.json', inventory)
+        signature = host / 'resigned.sig'
+        automation(['openssl', 'dgst', '-sha256', '-sign', private, '-out', signature, directory / 'release-inventory.json'])
+        envelope = json.loads((directory / 'release-inventory.sig').read_text())
+        envelope['rsa_signature'] = base64.b64encode(signature.read_bytes()).decode()
+        write(directory / 'release-inventory.sig', envelope)
+
+    for name, executable, expected_error in (
+        ('program-version-mismatch', upgrade_binary, 'version mismatch'),
+        ('program-nonzero', fixture_programs['program-nonzero'], 'exit status: 23'),
+        ('program-timeout', fixture_programs['program-timeout'], 'timeout'),
+        ('program-mutates-stage', fixture_programs['program-mutates-stage'], 'staged payload changed'),
+        ('program-invalid-elf', None, 'launch check failed'),
+    ):
+        broken = output / name
+        shutil.copytree(first, broken)
+        if executable is None:
+            header = bytearray(64)
+            header[:6] = b'\x7fELF\x02\x01'
+            header[18] = 62
+            (broken / PROGRAM).write_bytes(header)
+        else:
+            shutil.copyfile(executable, broken / PROGRAM)
+        resign(broken)
+        started = time.monotonic()
+        error = install(name, broken, False)
+        assert expected_error in error, error
+        if name == 'program-timeout':
+            assert 60 <= time.monotonic() - started < 70
+        unchanged()
 
     for name, mutation in (
         ('bad-rsa', lambda p: write(p / 'release-inventory.sig', {'schema': 'rust-collector-signatures/v2', 'rsa_signature': base64.b64encode(bytes(256)).decode(), 'sigstore_bundle': {'test_only_mock': True}})),
@@ -147,6 +202,8 @@ exit 0
         shutil.copytree(first, broken)
         mutation(broken)
         install(name, broken, False)
+        if name in ('bad-rsa', 'missing-sigstore'):
+            assert not list((output / f'log-{name}/commands').glob('*.json')), 'unauthenticated program executed'
         unchanged()
 
     # These are re-signed with the real test RSA key, so failure proves the
@@ -191,6 +248,7 @@ exit 0
     rejected_trust = host / 'rejecting-trust.json'
     write(rejected_trust, dict(trust_value, cosign_sha256=sha(verifier)))
     assert 'Sigstore' in install('verifier-nonzero', second, False, rejected_trust)
+    assert len(list((output / 'log-verifier-nonzero/commands').glob('*.json'))) == 1, 'program executed after failed Sigstore check'
     unchanged()
     verifier.write_bytes(saved)
 
@@ -247,16 +305,19 @@ exit 0
     verifier.write_bytes(saved)
     install('retry-after-interruption', second)
     assert os.readlink(root / 'current') == f'versions/{second_id}'
-    automation([root / 'current' / PROGRAM, '--version'])
+    assert automation([root / 'current' / PROGRAM, '--version']) == f'{PROGRAM} {upgrade_version}\n'
     run('final-rollback', ['rollback', root, first_id, trust, sha(trust)])
     unchanged()
     sizes = lambda path: sum(p.stat().st_size for p in path.rglob('*') if p.is_file() and not p.is_symlink())
     summary = {'schema': 'rust-stable-lifecycle-acceptance/v1', 'collector_sha256': sha(binary),
+               'upgrade_collector_sha256': sha(upgrade_binary), 'upgrade_version': upgrade_version,
+               'upgrade_scope': 'separately compiled test version of the same implementation; no production or historical release compatibility claim',
                'rsa': 'real RSA-2048/SHA-256 signatures; repository-generated test key',
                'sigstore': 'MOCK invocation/exit behavior only; no cryptographic or production acceptance',
                'production_signature': False, 'checks': checks,
                'first_install': installed, 'upgrade': upgraded, 'rollback': rolled_back,
                'package_bytes': sizes(first),
+               'upgrade_package_bytes': sizes(second),
                'two_versions_bytes': sizes(root / 'versions' / first_id) + sizes(root / 'versions' / second_id),
                'interrupted_staging_bytes': sum(sizes(p) for p in (root / 'versions').glob('.staging-*')),
                'installation_bytes_including_interrupted_staging': sizes(root),

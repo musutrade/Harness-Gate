@@ -1,6 +1,6 @@
 {
   "acceptance_records": [
-    "46ef2648aef792baa0d2d78693c86aed99e8ee77c750c3837f6efc1ee59354d6"
+    "77586541a69e4898553c9e90b82ed2a71771905f87c211abf5b0a39d6ab3acd2"
   ],
   "commands": [
     {
@@ -56,7 +56,7 @@
       ],
       "exit_code": 0,
       "stderr_sha256": "0b5fe2277fd2b29cc111b76604c482f8ec516047dbc0954657203c5614f4e4db",
-      "stdout_sha256": "ff9f33ee354dd1fdc2efe3cd5eb27e3820e96d01e9172d961ffc65f8c6fa87aa"
+      "stdout_sha256": "594dff25c4e1f1dace36848a502eb2cf3fb0d05067ad2b26d3b38fb171a65f1b"
     }
   ],
   "compiler": {
@@ -814,7 +814,7 @@
   ],
   "inventory": {
     "bytes": 563,
-    "sha256": "2bee57354c56d651abdf32fe3ab0bd54ed262b8e2a0a3920d1c8c3d0b52d70ab"
+    "sha256": "dd0066e83f0f98c3c792c4f72cd4f6fc72eba336febb6273e262c1f322c5211f"
   },
   "license_scope": "conservative filtered Cargo graph including build dependencies plus Rust library notices",
   "network_download_bytes": 0,
@@ -824,12 +824,12 @@
       "sha256": "651f110cfd7fdf25f73e057669e8c421ed9911049d62e15d9211d3be2655d756"
     },
     "harness-gate-rust-stable-collector": {
-      "bytes": 1993544,
-      "sha256": "fabd9588da2be024913375d1e284238d77e5c964cb107ddaeb844d87acc9e99e"
+      "bytes": 1994248,
+      "sha256": "05b61f7047ac8e204d0ac0fb658164ac48e7022498672f351147a8a6fe80a9ef"
     },
     "support.json": {
       "bytes": 924,
-      "sha256": "7fe5bbcdc8169616a71deb26a440d89531453c908ee60373260b1ca647fd7a31"
+      "sha256": "2192fde6855e1c552d9242228f39c57135baefcc6b7405a48f612878be256d54"
     }
   },
   "production_ready": false,
@@ -904,8 +904,8 @@
       "sha256": "0bc1aa5b5928ff2e9fb1baabf7acf8686063406f204159a58f3928e23b67bb05"
     },
     "tools/quality/rust-stable-collector/src/release.rs": {
-      "bytes": 19478,
-      "sha256": "cf64e65054aecb59d0de8a444640fea0c66e0ad13f6d355dbd19df1648e2ddda"
+      "bytes": 20140,
+      "sha256": "0d042f8a57ed8c02b060e1f941edff2495d09b5d0ca50331574b095379d03b83"
     },
     "tools/quality/rust-stable-collector/src/source.rs": {
       "bytes": 9398,
@@ -925,5 +925,5 @@
     }
   },
   "state": "unsigned-candidate-review-required",
-  "unsigned_package_bytes": 3124178
+  "unsigned_package_bytes": 3124882
 }

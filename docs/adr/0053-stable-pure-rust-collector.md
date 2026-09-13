@@ -56,6 +56,14 @@ and re-signed overstated support metadata. This is review preparation only:
 protected production signing, trust bootstrap, downloader, license review and
 multi-toolchain/system acceptance remain open. T5 and T8 stay unchecked.
 
+Activation now requires a bounded successful launch of the authenticated staged
+program and an exact signed-version response, after both signatures pass. Payload
+and trust identities are rechecked before selection changes. A separate stable
+test-version build exercises executable upgrade and rollback; this is local
+compatibility within this implementation, not historical or production acceptance.
+Signature failures must never reach the launch check. T5/T8 and the release hold
+remain unchanged until the remaining acceptance and release trust work is reviewed.
+
 The T4 raw-evidence checkpoint validates the exercised public LLVM JSON structure,
 integer domains, region IDs, segments and summary arithmetic with duplicate-key
 rejection. Thirteen mutations of real exports now fail after test-only manifest
