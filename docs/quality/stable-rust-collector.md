@@ -40,7 +40,9 @@ launcher is planned. A target payload needs this executable, licenses/notices,
 support/series metadata and authenticated release inventory/signature. The adapter
 binding is project-specific and is not a bundled user configuration.
 Acceptance archives and external compiler archives are not runtime payloads.
-The current crate is a standalone workspace, release-stripped with LTO, MSRV 1.97.1.
+The current crate is a standalone workspace, release-stripped with LTO, a manifest language floor of 1.97.1.
+Current candidate builds and required runtime acceptance use Rust 1.98.1 only;
+the manifest floor and retained doctor allowlist do not promise historical support.
 No artifact from it is currently approved for installation.
 
 The executable also statically links our ordinary Rust shared generator for the
@@ -67,9 +69,9 @@ missing tools fail with explicit installation hints. For an already reviewed
 project toolchain, the user can deliberately run:
 
 ```sh
-rustup toolchain install 1.97.1 --profile minimal
-rustup component add llvm-tools-preview --toolchain 1.97.1
-cargo +1.97.1 install cargo-llvm-cov --version 0.9.0 --locked
+rustup toolchain install 1.98.1 --profile minimal
+rustup component add llvm-tools-preview --toolchain 1.98.1
+cargo +1.98.1 install cargo-llvm-cov --version 0.9.0 --locked
 ```
 
 These commands install dependencies; the plugin does not execute them. Linux
@@ -299,7 +301,7 @@ paths/anchors are unchanged. No old backend ran for this stage. The
 new capture against an original GH-220 fixture and its anchored archived report;
 it does not recertify the historical backend or establish equivalence. T8 cannot
 remove the publication hold until full Core,
-cross-toolchain/system, signed lifecycle and migration acceptance are complete.
+current-stable/full two-system, signed lifecycle and migration acceptance are complete.
 
 ## Running the developer candidate
 
@@ -307,7 +309,7 @@ After explicitly provisioning dependencies, run from this repository. Outputs
 must not be inside the measured fixture. Choose new output directories each time.
 
 ```sh
-CARGO_TARGET_DIR="$PWD/target/stable-build" cargo +1.97.1 build \
+CARGO_TARGET_DIR="$PWD/target/stable-build" cargo +1.98.1 build \
   --manifest-path tools/quality/rust-stable-collector/Cargo.toml --release --locked
 mkdir -p target/stable-review
 target/stable-build/release/harness-gate-rust-stable-collector doctor \
@@ -336,7 +338,7 @@ The following development commands use fresh output directories and the actual C
 executable. The example creates a test-only key; users must not adopt that key.
 
 ```sh
-CARGO_TARGET_DIR="$PWD/target/stable-build" cargo +1.97.1 build \
+CARGO_TARGET_DIR="$PWD/target/stable-build" cargo +1.98.1 build \
   --manifest-path tools/harness-gate/Cargo.toml --locked \
   --bin harness-gate --example stable_collector_acceptance
 python3 tools/quality/rust-stable-collector/validate_stable_candidate.py \
@@ -355,3 +357,18 @@ python3 tools/quality/rust-stable-collector/compare_historical_fixture.py \
 
 These checks do not install a collector, replace project configuration or accept a
 baseline. Required CI traces the Core/example/adapter processes as well as capture.
+
+## Current candidate platform observations
+
+| Platform / toolchain | Actual evidence | Support limit |
+| --- | --- | --- |
+| Linux x86_64 GNU, operator host, Rust 1.98.1 / LLVM 22.1.8 | Existing binary: 125 traced captures and six traced authenticated Core fixtures | Bounded candidate owners only; CRAP blocked |
+| Ubuntu 24.04 x86_64 GNU, Rust 1.98.1 / LLVM 22.1.8 | Same existing binary: doctor/prepare/collect/verify with traces | Plain fixture, shared host kernel; full second-system acceptance open |
+| Rust 1.97.1 | Retained historical records | No required CI or new package preparation requirement |
+| Other platforms | No acceptance | No support claim |
+
+The [recovery record](stable-rust-collector-recovery.md) distinguishes the operator
+binary from the new 1.98.1 build. Future current-stable upgrades require a new
+build and actual interface/format/runtime validation with matching LLVM; they do
+not establish compatibility with every historical compiler. No released support
+platform is declared before the remaining acceptance and release review.

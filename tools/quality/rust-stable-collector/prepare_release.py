@@ -190,7 +190,7 @@ def acceptance(path, pin, binary):
 
 
 def prepare(output, target_dir, toolchain, observations):
-    require(toolchain in ('1.97.1', '1.98.1'), 'explicit candidate stable toolchain required')
+    require(toolchain == '1.98.1', 'current candidate build requires Rust 1.98.1')
     require(not output.exists() and not output.is_symlink(), 'output must be fresh')
     require(target_dir.is_absolute() and target_dir.is_relative_to(ROOT / 'target'),
             'build target must stay in this workspace target directory')
@@ -253,6 +253,8 @@ def prepare(output, target_dir, toolchain, observations):
         observed = [acceptance(path, pin, binary_id) for path, pin in observations]
         require(observed and len({o['acceptance_sha256'] for o in observed}) == len(observed),
                 'unique pinned acceptance records required')
+        require(any(o['rust'] == toolchain for o in observed),
+                'current stable runtime acceptance required for the built program')
         # Check post-build inputs as well; cached build input is not assumed clean.
         for package in metadata['packages']:
             if package['source']:
@@ -284,7 +286,7 @@ def prepare(output, target_dir, toolchain, observations):
             'inventory': identity(package / 'release-inventory.json'),
             'unsigned_package_bytes': sum(p.stat().st_size for p in package.iterdir()),
             'network_download_bytes': 0, 'signed_package_bytes': None,
-            'publication_blockers': ['reviewed measurement migration', 'two toolchains and two systems',
+            'publication_blockers': ['reviewed measurement migration', 'current stable Rust and complete two-system acceptance',
                 'production license review', 'real dual-signature acceptance', 'protected release approval'],
             'acceptance_records': [o['acceptance_sha256'] for o in observed]})
         require(identity(binary) == binary_id and identity(package / PROGRAM) == binary_id,
@@ -299,7 +301,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--target-dir', type=Path, required=True)
-    parser.add_argument('--toolchain', choices=('1.97.1', '1.98.1'), required=True)
+    parser.add_argument('--toolchain', choices=('1.98.1',), required=True)
     parser.add_argument('--acceptance', nargs=2, action='append', required=True, metavar=('SUMMARY', 'SHA256'))
     args = parser.parse_args()
     result = prepare(args.output.absolute(), args.target_dir.resolve(), args.toolchain,
