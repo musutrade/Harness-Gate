@@ -6,6 +6,9 @@ distinguish generated code from macro implementation; track upstream submission,
 merge and adopted version separately. The bounded Rust observation implementation
 is recorded in `docs/quality/stable-rust-macro-observation.md`. General authenticated
 collection and generated-function coverage remain blocked. T4 stays unchecked.
+The follow-up stable span diagnostic has four actual original/diagnostic coverage
+runs and pins the equal body/interior source ranges. It narrows the compiler
+mapping investigation without claiming internal trace evidence or an upstream fix.
 
 - [x] T1: Record the user-approved normative policy and guard legacy publication.
 - [x] T2: Inventory legacy collector/runtime/installer behavior and stable CI; define the pure-Rust replacement contract and supported measurement boundaries.

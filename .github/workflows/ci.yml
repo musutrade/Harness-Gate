@@ -561,6 +561,10 @@ jobs:
           python3 tools/quality/rust-stable-collector/validate_macro_templates.py \
             --binary target/stable-candidate-build/release/harness-gate-rust-stable-collector \
             --output target/stable-candidate-checks/macros --trace
+          diagnostic_llvm="$(rustc --print sysroot)/lib/rustlib/x86_64-unknown-linux-gnu/bin"
+          python3 tools/quality/rust-stable-collector/diagnose_macro_spans.py \
+            --output target/stable-candidate-checks/macro-spans \
+            --llvm-cov "$diagnostic_llvm/llvm-cov" --llvm-profdata "$diagnostic_llvm/llvm-profdata"
           cargo build --manifest-path tools/harness-gate/Cargo.toml --bin harness-gate --example stable_collector_acceptance --locked
           for fixture in plain partial boundaries features registry; do
             candidate_env=()
