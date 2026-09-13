@@ -1,0 +1,29 @@
+{
+  "schema": "rust-stable-continuation-environment/v1",
+  "observations": [
+    {
+      "command": [
+        "rustup",
+        "toolchain",
+        "list"
+      ],
+      "exit_code": 0,
+      "stdout": "stable-x86_64-unknown-linux-gnu (active, default)\nnightly-x86_64-unknown-linux-gnu\n1.97.1-x86_64-unknown-linux-gnu\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "cosign",
+        "version"
+      ],
+      "error": "[Errno 2] No such file or directory: 'cosign'"
+    }
+  ],
+  "official_release_check": {
+    "checked_date": "2026-09-13",
+    "source": "https://blog.rust-lang.org/releases/",
+    "rust_1_97_1_released": "2026-07-16",
+    "rust_1_98_1_released": "2026-09-03",
+    "execution_1_98_1": false
+  }
+}

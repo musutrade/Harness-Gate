@@ -123,8 +123,8 @@
       "anchors": {
         "capture": "complete",
         "core_acceptance": "pending",
-        "manifest_sha256": "7e0abd7caf0b7652001707a20a408c17d2cc4476141922155fed220d92f76aa2",
-        "request_sha256": "ab000d43c7284b29ad046fb3df8abdb6bbe0274dd029a27d20976146da8583af",
+        "manifest_sha256": "b685be137884bbe57bfbc6805812c1733059ecfb1dd463139a6731336c12a54d",
+        "request_sha256": "443d695ea78ff4bd50f89eecba856ad892bd1172413325cdacbc9293215cc21f",
         "state": "unsupported"
       },
       "llvm_totals_test_inclusive": {
@@ -193,8 +193,8 @@
       "anchors": {
         "capture": "complete",
         "core_acceptance": "pending",
-        "manifest_sha256": "89dc0ab11ee0269a63e4cd43559a58cb85801ed3bf2ce147c73f7c5d3dee6dda",
-        "request_sha256": "2b341ffc23ed795a5dbfbb8b8ce5973eb20a91fbdb6385d30bc9fb979b91ca25",
+        "manifest_sha256": "e936b5a12ccb2c006c38c662d77921cfa049fb6ccd90ff77c9b9710fdfdb3d0f",
+        "request_sha256": "76da7c6d5c01de001165a0cd040231834431ebfb091d62224086c62ec162b3b5",
         "state": "unsupported"
       },
       "llvm_totals_test_inclusive": {
@@ -314,8 +314,8 @@
       "anchors": {
         "capture": "complete",
         "core_acceptance": "pending",
-        "manifest_sha256": "45c0a3371cb6c94068eb6a6b8953fca419b1a2ab9429bd04df84c5cb2536f718",
-        "request_sha256": "0f40a8fe2708b46dd1644b6cbe9af8b1ba89400998bdbc2eeb212bfac6026724",
+        "manifest_sha256": "896bd091f02aaa4595b75e3d4dcd41dc3d7dca99f4c5c6c7e7132b4745f430c0",
+        "request_sha256": "33e8b2d7880c6fa2ba908daf15f0a206bd87e63f5c93f53099ef0aa0a2c2149a",
         "state": "unsupported"
       },
       "llvm_totals_test_inclusive": {
@@ -487,13 +487,13 @@
     "llvm": "22.1.6"
   },
   "binary": {
-    "sha256": "4baf3660d4d4bb0e1400c6f2e9a1ba2e52ac2a769607a33c90719b27bcbb645c",
-    "bytes": 1408760
+    "sha256": "a7e348c64089cbb592e1b094558b937066748c9979ba253218521511c1693a79",
+    "bytes": 1681064
   },
   "capture_bytes": 42063,
   "persistent_candidate_cache_bytes": 0,
   "execve_trace": "not performed",
-  "core_protocol_authentication": "not implemented",
-  "release_signature_lifecycle": "not implemented",
+  "core_protocol_authentication": "not exercised by this capture suite; see separate Core acceptance",
+  "release_signature_lifecycle": "not exercised by this capture suite; see separate lifecycle acceptance",
   "second_toolchain_and_system": "not established by this invocation"
 }

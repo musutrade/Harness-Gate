@@ -169,7 +169,8 @@ def main():
             'capture_bytes': sum(p.stat().st_size for p in (output / 'capture-plain').rglob('*') if p.is_file()),
             'persistent_candidate_cache_bytes': 0,
             'execve_trace': 'verified' if args.trace else 'not performed',
-            'core_protocol_authentication': 'not implemented', 'release_signature_lifecycle': 'not implemented',
+            'core_protocol_authentication': 'not exercised by this capture suite; see separate Core acceptance',
+            'release_signature_lifecycle': 'not exercised by this capture suite; see separate lifecycle acceptance',
             'second_toolchain_and_system': 'not established by this invocation',
         }
         (output / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')

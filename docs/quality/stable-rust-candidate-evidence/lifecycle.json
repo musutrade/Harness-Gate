@@ -1,0 +1,159 @@
+{
+  "schema": "rust-stable-lifecycle-acceptance/v1",
+  "collector_sha256": "a7e348c64089cbb592e1b094558b937066748c9979ba253218521511c1693a79",
+  "rsa": "real RSA-2048/SHA-256 signatures; repository-generated test key",
+  "sigstore": "MOCK invocation/exit behavior only; no cryptographic or production acceptance",
+  "production_signature": false,
+  "checks": [
+    {
+      "name": "verify",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "install",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "upgrade",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "rollback",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "bad-rsa",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "missing-sigstore",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "tampered-program",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "mixed-inventory",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "extra-asset",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "symlink-asset",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "duplicate-json",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "changed-verifier-pin",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "verifier-nonzero",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "verifier-timeout",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "missing-verifier",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "symlink-root",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "corrupt-rollback",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "nonexecutable-rollback",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "concurrent-install",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "interrupted-upgrade-preserves-current",
+      "exit_code": -9,
+      "passed": true
+    },
+    {
+      "name": "retry-after-interruption",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "final-rollback",
+      "exit_code": 0,
+      "passed": true
+    }
+  ],
+  "first_install": {
+    "current": "dec866086d893f842ac7128f93165a03b82a22f58cda6936b0249034c7e3b6df",
+    "download_bytes": 0,
+    "executable": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle-03/installation/current/harness-gate-rust-stable-collector",
+    "installed_version_bytes": 1682216,
+    "package_bytes": 1682216,
+    "previous": null,
+    "schema": "rust-stable-installation/v1",
+    "trust_sha256": "efefb53c97cbf92a5405eaff57bd5fd907c059037462f8ef4b160f49bae0b14e",
+    "version": "0.1.0-candidate.1"
+  },
+  "upgrade": {
+    "current": "d7c2422338bb64672f999ade93a4385dabfc647e57b39fcb55da568437b41d0f",
+    "download_bytes": 0,
+    "executable": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle-03/installation/current/harness-gate-rust-stable-collector",
+    "installed_version_bytes": 1682216,
+    "package_bytes": 1682216,
+    "previous": "dec866086d893f842ac7128f93165a03b82a22f58cda6936b0249034c7e3b6df",
+    "schema": "rust-stable-installation/v1",
+    "trust_sha256": "efefb53c97cbf92a5405eaff57bd5fd907c059037462f8ef4b160f49bae0b14e",
+    "version": "0.1.0-candidate.2"
+  },
+  "rollback": {
+    "current": "dec866086d893f842ac7128f93165a03b82a22f58cda6936b0249034c7e3b6df",
+    "download_bytes": 0,
+    "executable": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle-03/installation/current/harness-gate-rust-stable-collector",
+    "installed_version_bytes": 1682216,
+    "package_bytes": 1682216,
+    "previous": "d7c2422338bb64672f999ade93a4385dabfc647e57b39fcb55da568437b41d0f",
+    "schema": "rust-stable-installation/v1",
+    "trust_sha256": "efefb53c97cbf92a5405eaff57bd5fd907c059037462f8ef4b160f49bae0b14e",
+    "version": "0.1.0-candidate.1"
+  },
+  "package_bytes": 1682216,
+  "two_versions_bytes": 3364432,
+  "interrupted_staging_bytes": 1682216,
+  "installation_bytes_including_interrupted_staging": 5047257,
+  "network_download_bytes": 0,
+  "network_note": "local directory inputs; downloader not implemented",
+  "stale_staging_note": "killed processes may leave unselected staging directories; no automatic garbage collection yet"
+}
