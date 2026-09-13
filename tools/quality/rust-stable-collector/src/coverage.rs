@@ -5,6 +5,15 @@ use anyhow::{ensure, Context, Result};
 use serde_json::Value;
 use std::collections::BTreeSet;
 
+const SUMMARY_KEYS: [&str; 6] = [
+    "lines",
+    "functions",
+    "instantiations",
+    "regions",
+    "branches",
+    "mcdc",
+];
+
 pub fn parse(bytes: &[u8]) -> Result<Value> {
     crate::strict_json::parse_coverage(bytes).context("invalid LLVM JSON")
 }
@@ -80,14 +89,7 @@ fn mcdc(value: &Value) -> Result<()> {
 }
 
 fn summary(value: &Value) -> Result<()> {
-    for key in [
-        "lines",
-        "functions",
-        "instantiations",
-        "regions",
-        "branches",
-        "mcdc",
-    ] {
+    for key in SUMMARY_KEYS {
         let row = &value[key];
         let total = count(&row["count"])?;
         let covered = count(&row["covered"])?;
@@ -112,6 +114,27 @@ fn summary(value: &Value) -> Result<()> {
         );
         if key == "mcdc" {
             ensure!(total == 0, "unsupported LLVM MC/DC summary");
+        }
+    }
+    Ok(())
+}
+
+fn reconcile_totals(files: &[Value], totals: &Value) -> Result<()> {
+    // LLVM 22.1.6 CoverageExporterJson::renderRoot uses prepareFileReports,
+    // which adds every file report into Totals. Percentages are recomputed,
+    // never added. This checks consistency, not source ownership or CRAP.
+    for key in SUMMARY_KEYS {
+        for field in ["count", "covered"] {
+            let mut sum = 0_u64;
+            for file in files {
+                sum = sum
+                    .checked_add(count(&file["summary"][key][field])?)
+                    .context("LLVM file summary sum overflow")?;
+            }
+            ensure!(
+                sum == count(&totals[key][field])?,
+                "LLVM {key} total {field} differs from file summaries"
+            );
         }
     }
     Ok(())
@@ -173,6 +196,7 @@ pub fn validate(value: &Value) -> Result<()> {
         }
     }
     summary(&object["totals"])?;
+    reconcile_totals(files, &object["totals"])?;
     let functions = array(&object["functions"])?;
     ensure!(!functions.is_empty(), "empty LLVM functions");
     for function in functions {
@@ -194,6 +218,28 @@ pub fn validate(value: &Value) -> Result<()> {
 mod tests {
     use super::*;
     use serde_json::json;
+
+    #[test]
+    fn totals_sum_files_without_adding_percentages_or_wrapping() {
+        let summary = |count, covered| {
+            let mut rows = serde_json::Map::new();
+            for key in SUMMARY_KEYS {
+                rows.insert(key.into(), json!({"count": count, "covered": covered}));
+            }
+            Value::Object(rows)
+        };
+        let files = [
+            json!({"summary": summary(3_u64, 1_u64)}),
+            json!({"summary": summary(5, 4)}),
+        ];
+        assert!(reconcile_totals(&files, &summary(8, 5)).is_ok());
+        assert!(reconcile_totals(&files, &summary(8, 4)).is_err());
+        assert!(reconcile_totals(&files, &summary(7, 5)).is_err());
+        let huge = json!({"summary": summary(i64::MAX as u64, 0)});
+        let error =
+            reconcile_totals(&[huge.clone(), huge.clone(), huge], &summary(0, 0)).unwrap_err();
+        assert!(error.to_string().contains("sum overflow"));
+    }
 
     #[test]
     fn region_ids_counts_and_order_are_checked() {
