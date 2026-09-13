@@ -569,6 +569,9 @@ jobs:
           python3 tools/quality/rust-stable-collector/diagnose_macro_spans.py \
             --output target/stable-candidate-checks/macro-spans \
             --llvm-cov "$diagnostic_llvm/llvm-cov" --llvm-profdata "$diagnostic_llvm/llvm-profdata"
+          python3 tools/quality/rust-stable-collector/diagnose_derive_coverage.py \
+            --output target/stable-candidate-checks/derive-coverage \
+            --llvm-cov "$diagnostic_llvm/llvm-cov" --llvm-profdata "$diagnostic_llvm/llvm-profdata"
           cargo build --manifest-path tools/harness-gate/Cargo.toml --bin harness-gate --example stable_collector_acceptance --locked
           for fixture in plain partial modules boundaries features registry; do
             candidate_env=()
