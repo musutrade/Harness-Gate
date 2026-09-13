@@ -99,8 +99,16 @@ are included in the plugin payload.
    [coverage eligibility query](https://github.com/rust-lang/rust/blob/48a229ceaefd4985c50990b14116b6d856af0985/compiler/rustc_mir_transform/src/coverage/query.rs#L59)
    excludes those implementations and nested bodies from instrumentation. This is
    source-confirmed compiler policy. The earlier six-test derive reproduction is
-   historical 1.97.1 evidence. The 1.98.1 runtime reproduction stopped at missing
-   rustfmt; it is not counted as passed.
+   historical 1.97.1 evidence. The complete 1.98.1 diagnostic stopped at missing
+   rustfmt; it is not counted as passed. A separate runtime-only continuation used
+   the unchanged fixture with matching 1.98.1 LLVM tools: default/extra each passed
+   three tests and exported eight ordinary/manual owners, including an unexecuted
+   wrapper with count zero. Both exports omit all four derived clone owners and
+   the annotated control. This independently confirms the runtime boundary on
+   current stable without changing business code or waiving the formatting check.
+   Source/tool identities, commands, exports and the standalone driver identity
+   are retained under `target/gh-259/continuation-2/derive-runtime/` and summarized
+   in `recovery-198.json`. These runs have no process trace and do not certify CRAP.
 3. **Required CRAP and migration.** Shared source generation supplies bounded
    complexity, not missing execution evidence. The current Core adapter does not
    certify any function CRAP, including plain owners. It must continue to block
@@ -134,7 +142,7 @@ adopted fix version: none**. This is a prepared request and reproduction, not an
 upstream submission. The separately tracked attribute-macro PR is not an adopted
 fix for these fixtures.
 
-The immediate operator/CI action is to finish the 1.98.1 derive diagnostic with
+The remaining operator/CI action is to finish the complete 1.98.1 derive diagnostic with
 rustfmt (`rustup component add --toolchain 1.98.1 rustfmt`), and obtain a permitted
 trace for the new build/runtime. CI already installs rustfmt and matching LLVM.
 No global toolchain default was changed here. Further implementation of generated

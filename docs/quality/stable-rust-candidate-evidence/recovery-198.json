@@ -444,7 +444,7 @@
     "T4": "incomplete"
   },
   "derive": {
-    "runtime_198": "blocked before tests: rustfmt component missing",
+    "runtime_198": "complete diagnostic blocked at rustfmt; independent runtime-only reproduction passed six tests and confirmed absent derived owners",
     "commands": {
       "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/recovery-198/derive-coverage/commands.json",
       "sha256": "02a1dbccfd596acd86754f80bc49e79235210386ebc2564b7707d2285bbb5285",
@@ -470,7 +470,377 @@
         }
       }
     ],
-    "finding": "automatically_derived implementations remain excluded from coverage instrumentation at installed rustc commit"
+    "finding": "automatically_derived implementations remain excluded from coverage instrumentation at installed rustc commit",
+    "runtime_only_continuation": {
+      "summary": {
+        "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/summary.json",
+        "sha256": "d2c0bd0d7241927ffddc5ccd08824c61f9e1a614346ca169e85d90531394e624",
+        "bytes": 6823
+      },
+      "observations": {
+        "schema": "gh259-derive-runtime-only/v1",
+        "scope": "fixed built-in Clone fixture only",
+        "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.1\nLLVM version: 22.1.8\n",
+        "cargo_llvm_cov": "cargo-llvm-cov 0.9.0\n",
+        "tools": {
+          "llvm-cov": {
+            "path": "/home/gem/.rustup/toolchains/1.98.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+            "sha256": "59c1562433e039dec2372748b118aa9b326a4864f8a654e05fb015c168ab447c",
+            "bytes": 639704
+          },
+          "llvm-profdata": {
+            "path": "/home/gem/.rustup/toolchains/1.98.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+            "sha256": "bb172cb274d47466f00408a9c279154c86d2b0cafc652f2defc54970d298b271",
+            "bytes": 666984
+          }
+        },
+        "source": {
+          "Cargo.lock": {
+            "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/project/Cargo.lock",
+            "sha256": "e9d4003f003dab031a4df3f36cfef42700279e599283b5484e8feef4dd299efb",
+            "bytes": 170
+          },
+          "Cargo.toml": {
+            "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/project/Cargo.toml",
+            "sha256": "7c3657be003e42ce159e1879a759bf0116e9f3f4ff619a81eb6ed07d616b365a",
+            "bytes": 139
+          },
+          "README.md": {
+            "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/project/README.md",
+            "sha256": "40968fdc54e1050000f08e5fae2b193cb0a3c048ace5c5d648b75fa9105cdf7b",
+            "bytes": 1808
+          },
+          "src/lib.rs": {
+            "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/project/src/lib.rs",
+            "sha256": "c040548c9c57af0fb58fabc297ee750eb530cf2da657828b60dcda3765fd8fa5",
+            "bytes": 1747
+          }
+        },
+        "driver": {
+          "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive_runtime.py",
+          "sha256": "b05ebc73f569c96a55c7c3d8735eb70fc1ece85ce8ef239855b28007a046d753",
+          "bytes": 5247
+        },
+        "commands": {
+          "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/commands.json",
+          "sha256": "c07d232c8f7c14cb7b73d2a06a83958be9045ba8c96b60a4f6a0d27f5c8c33b3",
+          "bytes": 6660
+        },
+        "exports": {
+          "default": {
+            "export": {
+              "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/default.json",
+              "sha256": "2f13c59591159ac412da0f81a65bb68ee3d7b9700ef83e46c1092fddd68508b3",
+              "bytes": 6762
+            },
+            "owners": {
+              "24": {
+                "fixture_owner": "clone_configured",
+                "count": 1,
+                "symbol": "_RNvCs8bcJzok8C8t_26gate_derive_coverage_probe16clone_configured"
+              },
+              "14": {
+                "fixture_owner": "clone_one",
+                "count": 1,
+                "symbol": "_RNvCs8bcJzok8C8t_26gate_derive_coverage_probe9clone_one"
+              },
+              "17": {
+                "fixture_owner": "clone_two",
+                "count": 1,
+                "symbol": "_RNvCs8bcJzok8C8t_26gate_derive_coverage_probe9clone_two"
+              },
+              "40": {
+                "fixture_owner": "Manual::clone",
+                "count": 1,
+                "symbol": "_RNvXCs8bcJzok8C8t_26gate_derive_coverage_probeNtB2_6ManualNtNtCsgxBkk5gSRhY_4core5clone5Clone5clone"
+              },
+              "21": {
+                "fixture_owner": "clone_unused",
+                "count": 0,
+                "symbol": "_RNvCs8bcJzok8C8t_26gate_derive_coverage_probe12clone_unused"
+              },
+              "66": {
+                "fixture_owner": "configured_derive_executes",
+                "count": 1,
+                "symbol": "_RNvNtCs8bcJzok8C8t_26gate_derive_coverage_probe5testss_26configured_derive_executes"
+              },
+              "56": {
+                "fixture_owner": "annotation_control_executes",
+                "count": 1,
+                "symbol": "_RNvNtCs8bcJzok8C8t_26gate_derive_coverage_probe5testss_27annotation_control_executes"
+              },
+              "61": {
+                "fixture_owner": "distinct_derive_inputs_execute",
+                "count": 1,
+                "symbol": "_RNvNtCs8bcJzok8C8t_26gate_derive_coverage_probe5testss_30distinct_derive_inputs_execute"
+              }
+            },
+            "tests_passed": 3,
+            "configured_test_result": 7,
+            "absent_derived_owners": [
+              "One::clone",
+              "Two::clone",
+              "Unused::clone",
+              "Configured::clone"
+            ],
+            "absent_annotation_control": "Annotated::clone"
+          },
+          "extra": {
+            "export": {
+              "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/extra.json",
+              "sha256": "58db94411592c626ca0c0dcf09f2d04eeef6084c36ffc5ed5c50193d70f0072a",
+              "bytes": 6762
+            },
+            "owners": {
+              "24": {
+                "fixture_owner": "clone_configured",
+                "count": 1,
+                "symbol": "_RNvCs2rhZA0RT4AA_26gate_derive_coverage_probe16clone_configured"
+              },
+              "14": {
+                "fixture_owner": "clone_one",
+                "count": 1,
+                "symbol": "_RNvCs2rhZA0RT4AA_26gate_derive_coverage_probe9clone_one"
+              },
+              "17": {
+                "fixture_owner": "clone_two",
+                "count": 1,
+                "symbol": "_RNvCs2rhZA0RT4AA_26gate_derive_coverage_probe9clone_two"
+              },
+              "40": {
+                "fixture_owner": "Manual::clone",
+                "count": 1,
+                "symbol": "_RNvXCs2rhZA0RT4AA_26gate_derive_coverage_probeNtB2_6ManualNtNtCsgxBkk5gSRhY_4core5clone5Clone5clone"
+              },
+              "21": {
+                "fixture_owner": "clone_unused",
+                "count": 0,
+                "symbol": "_RNvCs2rhZA0RT4AA_26gate_derive_coverage_probe12clone_unused"
+              },
+              "66": {
+                "fixture_owner": "configured_derive_executes",
+                "count": 1,
+                "symbol": "_RNvNtCs2rhZA0RT4AA_26gate_derive_coverage_probe5testss_26configured_derive_executes"
+              },
+              "56": {
+                "fixture_owner": "annotation_control_executes",
+                "count": 1,
+                "symbol": "_RNvNtCs2rhZA0RT4AA_26gate_derive_coverage_probe5testss_27annotation_control_executes"
+              },
+              "61": {
+                "fixture_owner": "distinct_derive_inputs_execute",
+                "count": 1,
+                "symbol": "_RNvNtCs2rhZA0RT4AA_26gate_derive_coverage_probe5testss_30distinct_derive_inputs_execute"
+              }
+            },
+            "tests_passed": 3,
+            "configured_test_result": 9,
+            "absent_derived_owners": [
+              "One::clone",
+              "Two::clone",
+              "Unused::clone",
+              "Configured::clone"
+            ],
+            "absent_annotation_control": "Annotated::clone"
+          }
+        },
+        "formatting": "not run: 1.98.1 rustfmt unavailable; full diagnostic remains incomplete",
+        "process_trace": "not run",
+        "CRAP": "unsupported; absent owners are not zero coverage",
+        "T4": "incomplete"
+      },
+      "command_records": {
+        "commands": [
+          {
+            "name": "sysroot",
+            "argv": [
+              "rustc",
+              "+1.98.1",
+              "--print",
+              "sysroot"
+            ],
+            "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/project",
+            "exit_code": 0,
+            "stdout": {
+              "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/sysroot.stdout",
+              "sha256": "9e5545e63b0a62f950dbcc63d5c6c43b04df022c7a924dafed3121cbc7479480",
+              "bytes": 61
+            },
+            "stderr": {
+              "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/sysroot.stderr",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "bytes": 0
+            }
+          },
+          {
+            "name": "rustc",
+            "argv": [
+              "rustc",
+              "+1.98.1",
+              "-vV"
+            ],
+            "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/project",
+            "exit_code": 0,
+            "stdout": {
+              "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/rustc.stdout",
+              "sha256": "778fbc643a806f0dd123c056e66201d7e8a56a61928ec0a33171be8d6c2d5a37",
+              "bytes": 196
+            },
+            "stderr": {
+              "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/rustc.stderr",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "bytes": 0
+            }
+          },
+          {
+            "name": "llvm-cov",
+            "argv": [
+              "/home/gem/.rustup/toolchains/1.98.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+              "--version"
+            ],
+            "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/project",
+            "exit_code": 0,
+            "stdout": {
+              "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/llvm-cov.stdout",
+              "sha256": "5ae7a612628be9b747b73e340d6294bd2c3311a3a5a4898098dab82e260ae519",
+              "bytes": 85
+            },
+            "stderr": {
+              "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/llvm-cov.stderr",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "bytes": 0
+            }
+          },
+          {
+            "name": "llvm-profdata",
+            "argv": [
+              "/home/gem/.rustup/toolchains/1.98.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+              "--version"
+            ],
+            "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/project",
+            "exit_code": 0,
+            "stdout": {
+              "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/llvm-profdata.stdout",
+              "sha256": "5ae7a612628be9b747b73e340d6294bd2c3311a3a5a4898098dab82e260ae519",
+              "bytes": 85
+            },
+            "stderr": {
+              "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/llvm-profdata.stderr",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "bytes": 0
+            }
+          },
+          {
+            "name": "cargo-llvm-cov",
+            "argv": [
+              "cargo",
+              "+1.98.1",
+              "llvm-cov",
+              "--version"
+            ],
+            "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/project",
+            "exit_code": 0,
+            "stdout": {
+              "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/cargo-llvm-cov.stdout",
+              "sha256": "5372e2711feafe05fff68f8681f01c798a6e5de8c9961d5d373b9a648c1951e2",
+              "bytes": 21
+            },
+            "stderr": {
+              "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/cargo-llvm-cov.stderr",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "bytes": 0
+            }
+          },
+          {
+            "name": "default",
+            "argv": [
+              "cargo",
+              "+1.98.1",
+              "llvm-cov",
+              "--locked",
+              "--offline",
+              "--json",
+              "--target",
+              "x86_64-unknown-linux-gnu",
+              "--output-path",
+              "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/default.json"
+            ],
+            "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/project",
+            "exit_code": 0,
+            "stdout": {
+              "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/default.stdout",
+              "sha256": "7819b8cc2ed6377d16ce59799eed73e853cbe808f1b775221a2de933d40df5ac",
+              "bytes": 256
+            },
+            "stderr": {
+              "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/default.stderr",
+              "sha256": "3b071cdcfbf6c0845b1046ac10d30b222256cc8d9349259558b2c0210f37b105",
+              "bytes": 665
+            }
+          },
+          {
+            "name": "extra",
+            "argv": [
+              "cargo",
+              "+1.98.1",
+              "llvm-cov",
+              "--locked",
+              "--offline",
+              "--json",
+              "--target",
+              "x86_64-unknown-linux-gnu",
+              "--output-path",
+              "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/extra.json",
+              "--features",
+              "extra"
+            ],
+            "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/project",
+            "exit_code": 0,
+            "stdout": {
+              "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/extra.stdout",
+              "sha256": "f92de389f7835e51969190288f643225dcd9834e5428b7260e2f323bcb7e666e",
+              "bytes": 256
+            },
+            "stderr": {
+              "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/extra.stderr",
+              "sha256": "5d17ffc7f3dcd916e4648136289d2fde5e3c2fde6d98c79977dddd3177f332ba",
+              "bytes": 663
+            }
+          }
+        ],
+        "cleared_environment": [
+          "RUSTUP_TOOLCHAIN",
+          "RUSTC_BOOTSTRAP",
+          "RUSTFLAGS",
+          "RUSTDOCFLAGS",
+          "CARGO_ENCODED_RUSTFLAGS",
+          "RUSTC_WRAPPER",
+          "RUSTC_WORKSPACE_WRAPPER"
+        ],
+        "environment_overrides": {
+          "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/derive-runtime/build",
+          "LLVM_COV": "/home/gem/.rustup/toolchains/1.98.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+          "LLVM_PROFDATA": "/home/gem/.rustup/toolchains/1.98.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata"
+        }
+      },
+      "docs_consistency": {
+        "command": [
+          "python3",
+          "tools/quality/docs_consistency.py",
+          "--output",
+          "target/gh-259/continuation-2/docs-consistency.json"
+        ],
+        "environment": {
+          "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/core-target"
+        },
+        "exit_code": 0,
+        "report": {
+          "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/continuation-2/docs-consistency.json",
+          "sha256": "6017656bbc8880038f5cc7d9d1058d9f0f806fff978bb489d637da9ce1d33eab",
+          "bytes": 1488
+        }
+      }
+    }
   },
   "checks": {
     "candidate_rust_tests": 22,
