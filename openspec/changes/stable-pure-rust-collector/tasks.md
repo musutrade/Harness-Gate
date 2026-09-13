@@ -12,3 +12,12 @@
 Documentation or a prototype alone does not complete T2–T8. The policy PR closes
 only T1; the implementation issue remains open until the runnable replacement,
 release preparation and actual acceptance are complete.
+
+## Macro observation work under T4
+
+- [x] Validate shared generation in a normal Rust library with an actual proc-macro consumer, different inputs and feature selections.
+- [ ] Bind structured observations to source/configuration and unambiguous generated owners.
+- [ ] Verify actual stable coverage for executed/unexecuted owners, nested expansions and a deliberately faulty mapping.
+- [ ] Prepare a focused upstream PR only for a reproduced library defect; track deployed fixes separately.
+
+The first prototype does not complete T4 or authorize changing the accepted series.

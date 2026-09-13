@@ -50,3 +50,23 @@ Validation must include the same derive/macro source used with different invocat
 inputs/configuration, generated owners with different execution outcomes, and a faulty
 mapping repaired by a source-level patch. Do not change business behavior or metric
 semantics solely to make a gate pass. Unresolved required measurements remain blocking.
+
+## Shared generation and structured observations
+
+For a diagnosed procedural-macro gap, prototype extracting generation into a normal
+Rust library called by both the macro entry and the analysis integration. Prefer
+optional structured observations from that same generation path over a duplicated
+expansion implementation. Bind observations to dependency/source versions, invocation
+inputs, cfg/features/target/build context and generated owners. Do not assume that
+TokenStream text preserves hygiene, nested expansion or final coverage ownership.
+
+The bounded Rust-only fixture at tools/quality/fixtures/rust-macro-observation proves
+shared generation and execution under different invocations/features only. Production
+adoption additionally requires real coverage alignment, unexecuted and ambiguous
+owners, nested macros and a faulty-mapping regression. Keep missing evidence blocking.
+No third-party library modifications are justified until a concrete defect is reproduced.
+
+Keep code expansion size and cognitive complexity separate from the cyclomatic
+complexity used by CRAP. Do not introduce macro-stats, cargo-expand or other unstable
+compiler options into official collection or required CI. Visualization and tracing
+ideas may guide implementation without adding those tools as user dependencies.
