@@ -552,7 +552,8 @@ jobs:
             -u RUSTC_WRAPPER -u RUSTC_WORKSPACE_WRAPPER \
             cargo test --manifest-path tools/quality/rust-stable-collector/Cargo.toml --locked
           cargo clippy --manifest-path tools/quality/rust-stable-collector/Cargo.toml --all-targets --locked -- -D warnings
-          strace -f -qq -s 16384 -e trace=execve -o target/stable-candidate-checks/build.execve \
+          # Retain process exit records; -qq suppresses lifecycle evidence.
+          strace -f -q -s 16384 -e trace=execve -o target/stable-candidate-checks/build.execve \
             cargo build --manifest-path tools/quality/rust-stable-collector/Cargo.toml --release --locked
           python3 -c 'from pathlib import Path; import sys; sys.path.insert(0, "tools/quality/rust-stable-collector"); from validate_stable_candidate import check_trace; check_trace(Path("target/stable-candidate-checks/build.execve"))'
           # The collector rejects inherited compiler injection, including empty flags.
@@ -578,7 +579,7 @@ jobs:
             if [ "$fixture" = registry ]; then
               candidate_env=(env "CARGO_HOME=$PWD/target/stable-candidate-checks/runtime/registry-cargo-home")
             fi
-            "${candidate_env[@]}" strace -f -qq -s 16384 -e trace=execve -o "target/stable-candidate-checks/core-${fixture}.execve" \
+            "${candidate_env[@]}" strace -f -q -s 16384 -e trace=execve -o "target/stable-candidate-checks/core-${fixture}.execve" \
               target/stable-candidate-build/debug/examples/stable_collector_acceptance \
                 target/stable-candidate-build/release/harness-gate-rust-stable-collector \
                 target/stable-candidate-build/debug/harness-gate \
