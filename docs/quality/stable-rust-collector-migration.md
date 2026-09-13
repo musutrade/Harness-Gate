@@ -78,3 +78,12 @@ repository development automation; the measured plugin executes only Rust and
 its declared external tools. New raw captures remain at
 `target/gh-259/historical-12/`; runtime payloads do not include the old archive or
 these acceptance captures.
+
+The v3 candidate also verifies unannotated inline-module free functions against
+exact LLVM source spans. Two same-named owners receive separate 4/5 and 5/5
+region ratios; a nested unexecuted owner receives 0/3. This expands supported
+owner placement without changing metric definitions. Its new executable digest
+changes the Core normalization and complete measurement-series identity. The
+v3 support contract is not compatible by assertion with old v2 support metadata;
+no historical install/upgrade compatibility or baseline adoption is claimed.
+The original archived MIR evidence and comparison anchors above remain unchanged.

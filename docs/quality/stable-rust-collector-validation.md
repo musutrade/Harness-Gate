@@ -5,6 +5,61 @@ complete; T3–T8 remain open. The [design](stable-rust-collector.md) defines th
 boundary. No Core required binding, threshold, baseline or historical evidence
 was changed. No compiler-private backend was built or executed for these results.
 
+## Inline-module owner checkpoint
+
+The current release binary is
+`6addb9cf8c716304464f756c3f6e37e402bf65823cb0ba418f610572770e6701`,
+3,475,840 bytes, built with stable Rust 1.97.1. Package preparation reproduced
+that digest. The previous binary and this one compiled and measured the exact
+same fixture source/manifest/lock identities. The previous owner rule returned
+unsupported for all three functions; the v3 rule now verifies them independently:
+
+| Source owner | Lexical complexity | Executions | Function coverage | Code-region coverage |
+| --- | --- | --- | --- | --- |
+| `left::classify` | 2 | 1 | 1/1 | 4/5 |
+| `left::nested::never_called` | 1 | 0 | 0/1 | 0/3 |
+| `right::classify` | 2 | 2 | 1/1 | 5/5 |
+
+Exact spans and qualified source names distinguish repeated basenames. Missing
+owners, duplicate owners and positive region counts on the unexecuted function
+fail verification. Those three negative checks mutate actual LLVM exports and
+re-anchor the test manifest to exercise semantic verification; they are not
+claims of compiler-generated corrupt data. Real annotated/cfg module variants
+compile and execute but remain unsupported. Two explicit test-module spans are
+excluded from production owners. Core accepts all three authenticated records
+and blocks required CRAP, as well as identity, signature, expiry and replay errors.
+
+The final executable passes 20 Rust tests, 105 generic capture checks, 26 macro
+checks, six authenticated Core fixture cases, 38 local lifecycle checks and
+29 real loopback HTTPS checks. Core nextest passes 397 tests; candidate/Core
+formatting and all-target clippy pass. Quality discovery passes 449 tests with
+36 explicitly manual legacy skips; release discovery passes 91 tests. Exact
+commands, environment adjustments, source/binary identities and original log
+anchors are in the [module evidence](stable-rust-candidate-evidence/module-owners.json).
+The [capture summary](stable-rust-candidate-evidence/acceptance-modules.json)
+retains all 105 check results. CI and package preparation require the new cases.
+
+The unsigned four-file payload is 4,789,450 bytes. Signed test bundle downloads
+are 4,789,919 bytes initially and 4,789,945 bytes for a separately compiled
+upgrade. Local installation retains 9,579,864 bytes for two versions, plus
+4,789,945 bytes from interrupted staging, totaling 14,370,437 with metadata.
+The separate HTTPS matrix reads 37,465,803 response-body bytes, including failed
+transfers; headers, TLS/proxy overhead and the killed process's unwritten audit
+are excluded. Observed abandoned download bytes and download cache are both zero.
+TLS and test-key RSA are real; Sigstore is mocked. The local lifecycle raw
+summary retains an obsolete descriptive “downloader not implemented” note; its
+zero network bytes describe that local-input matrix. The automation note is now
+corrected, and the separate HTTPS record proves the download behavior.
+
+Metric definitions are unchanged, but the new binary-bound Core normalization
+creates a different full measurement-series identity. No baseline compatibility,
+CRAP model selection or historical install/upgrade compatibility is implied.
+Only the existing Rust 1.97.1/LLVM 22.1.6 Ubuntu 26.04 Linux x86_64 environment
+was exercised. The second toolchain/system, actual process tracing, real Sigstore,
+complete generated-owner/input certification and reviewed migration remain
+unverified. T3–T8 and the release hold remain open. The records below describe
+previous checkpoints and preserve their original binary and evidence identities.
+
 ## Execution audit parser checkpoint
 
 The required CI audit previously skipped resumed `execve` lines and accepted

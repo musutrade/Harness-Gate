@@ -1,9 +1,11 @@
-//! Narrow source/LLVM ownership proof for ASCII, unannotated root functions.
+//! Exact source/LLVM ownership proof for ASCII, unannotated free functions.
 //! No demangling, macro expansion, line coverage or parent-count inheritance.
 use crate::source;
 use anyhow::{ensure, Context, Result};
 use serde_json::{json, Value};
 use std::{collections::BTreeSet, fs, path::Path};
+
+pub const RULE: &str = "rust-llvm-exact-free-owner/v3-candidate";
 
 type Position = (u64, u64);
 fn span(value: &Value) -> Result<(Position, Position)> {
@@ -25,7 +27,7 @@ pub fn file(root: &Path, path: &str, raw: &Value) -> Result<Value> {
     let functions = inventory["functions"]
         .as_array()
         .context("source functions")?;
-    let unsupported = || json!({"state":"unsupported","reason":"requires ASCII source containing only unannotated, nongeneric root function owners; expansion/activation not certified","functions":[]});
+    let unsupported = || json!({"state":"unsupported","reason":"requires ASCII source containing only unannotated, nongeneric free functions at root or in unannotated inline modules; expansion/activation not certified","functions":[]});
     if !text.is_ascii()
         || !inventory["unsupported"]
             .as_array()
@@ -141,9 +143,7 @@ pub fn file(root: &Path, path: &str, raw: &Value) -> Result<Value> {
         summary["count"] == file_regions && summary["covered"] == file_covered,
         "LLVM owner regions disagree with file summary"
     );
-    Ok(
-        json!({"state":"supported","rule":"rust-llvm-exact-root-owner/v2-candidate","functions":mapped,"excluded":excluded}),
-    )
+    Ok(json!({"state":"supported","rule":RULE,"functions":mapped,"excluded":excluded}))
 }
 
 #[cfg(test)]
@@ -158,7 +158,9 @@ mod tests {
             "#[inline] fn f() {}",
             "fn f() { let x = || 1; }",
             "fn café() {}",
-            "mod m { fn f() {} }",
+            "#[cfg(feature=\"x\")] mod m { fn f() {} }",
+            "#[allow(dead_code)] mod m { fn f() {} }",
+            "struct S; impl S { fn f() {} }",
         ] {
             fs::write(dir.path().join("lib.rs"), source).unwrap();
             assert_eq!(

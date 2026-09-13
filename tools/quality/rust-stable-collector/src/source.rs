@@ -34,6 +34,8 @@ pub struct Inventory {
     stack: Vec<usize>,
     #[serde(skip)]
     inherited: BTreeSet<String>,
+    #[serde(skip)]
+    uncertified_coverage_scopes: usize,
 }
 
 fn coordinates(span: Span) -> [usize; 4] {
@@ -114,7 +116,9 @@ impl Inventory {
             span: [start.line, start.column + 1, end.line, end.column + 1],
             state: "supported",
             complexity: Some(1),
-            coverage_eligible: self.scope.is_empty() && attrs.is_empty() && reasons.is_empty(),
+            coverage_eligible: self.uncertified_coverage_scopes == 0
+                && attrs.is_empty()
+                && reasons.is_empty(),
             reasons,
         });
         self.visit_signature(sig);
@@ -135,9 +139,12 @@ impl<'ast> Visit<'ast> for Inventory {
         if node.content.is_none() {
             self.unsupported("external module activation/ownership not certified");
         }
+        let uncertified = usize::from(!node.attrs.is_empty() || node.content.is_none());
+        self.uncertified_coverage_scopes += uncertified;
         self.scope.push(node.ident.to_string());
         visit::visit_item_mod(self, node);
         self.scope.pop();
+        self.uncertified_coverage_scopes -= uncertified;
         self.inherited = previous;
     }
     fn visit_item_impl(&mut self, node: &'ast syn::ItemImpl) {
@@ -148,7 +155,9 @@ impl<'ast> Visit<'ast> for Inventory {
                 .insert("generic or trait impl owner not certified".into());
         }
         self.scope.push(node.self_ty.to_token_stream().to_string());
+        self.uncertified_coverage_scopes += 1;
         visit::visit_item_impl(self, node);
+        self.uncertified_coverage_scopes -= 1;
         self.scope.pop();
         self.inherited = previous;
     }
@@ -157,7 +166,9 @@ impl<'ast> Visit<'ast> for Inventory {
         self.inherited
             .insert("trait default owner not certified".into());
         self.scope.push(node.ident.to_string());
+        self.uncertified_coverage_scopes += 1;
         visit::visit_item_trait(self, node);
+        self.uncertified_coverage_scopes -= 1;
         self.scope.pop();
         self.inherited = previous;
     }
@@ -230,6 +241,35 @@ pub fn analyze(source: &str) -> Result<Inventory> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn inline_modules_preserve_free_function_owners_and_scope_boundaries() {
+        let inventory = analyze("mod left { fn f() {} mod nested { fn unused() {} } } mod right { fn f() {} } #[allow(dead_code)] mod annotated { fn f() {} } struct S; impl S { fn f() {} } fn root() {}").unwrap();
+        assert_eq!(
+            inventory
+                .functions
+                .iter()
+                .map(|f| (f.name.as_str(), f.coverage_eligible))
+                .collect::<Vec<_>>(),
+            [
+                ("left::f", true),
+                ("left::nested::unused", true),
+                ("right::f", true),
+                ("annotated::f", false),
+                ("S::f", false),
+                ("root", true)
+            ]
+        );
+        for text in [
+            "#[cfg(feature=\"x\")] mod m { fn f() {} }",
+            "fn outer() { mod m { fn inner() {} } }",
+        ] {
+            assert!(analyze(text)
+                .unwrap()
+                .functions
+                .iter()
+                .all(|f| !f.coverage_eligible));
+        }
+    }
     #[test]
     fn explicit_decisions_and_unexecuted_source_functions() {
         let inventory = analyze("fn branch(x: bool) { if x && x { } else { } } fn unused() {} #[cfg(test)] mod tests { #[test] fn t() { panic!() } }").unwrap();

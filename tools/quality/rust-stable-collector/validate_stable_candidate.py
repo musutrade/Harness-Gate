@@ -16,6 +16,7 @@ import subprocess
 
 from validate_registry_dependencies import validate as validate_registry
 from validate_compiler_inputs import validate as validate_compiler_inputs
+from validate_module_owners import validate as validate_module_owners
 
 
 def digest(path):
@@ -135,6 +136,7 @@ def main():
         partial_raw = json.loads((output / 'capture-partial/coverage.json').read_text())
         assert partial_raw['data'][0]['totals']['regions']['count'] > 9, 'raw tests must be excluded from normalized owners'
         observations['partial'] = {'anchors': partial_anchor, 'function_owners': partial_owners, 'llvm_totals_test_inclusive': partial_raw['data'][0]['totals']}
+        observations['modules'] = validate_module_owners(output, run, write_request, digest)
 
         assert not list((output / 'capture-plain').glob('build-*'))
         assert 'output must be a new directory' in run('stale-output', ['collect', request_path], success=False)

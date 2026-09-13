@@ -220,3 +220,21 @@ release, accept unsigned assets, download a toolchain or install host trust.
 - GIVEN a usable installed version
 - WHEN the download process is killed before verification and selection
 - THEN the old selection remains intact, retries use new staging, and any retained partial stage is accounted for separately without claiming a complete transfer audit.
+
+### Requirement: Exact inline-module free-function ownership
+
+The candidate SHALL certify unannotated nongeneric free functions at the root
+or in unannotated inline modules only when their exact source spans uniquely
+match single-file LLVM owners with verified code-region counters. Qualified
+names SHALL distinguish same-named functions in separate modules.
+
+#### Scenario: Distinct and unexecuted inline-module owners
+- **WHEN** two same-named module functions execute differently and a nested
+  exported function is never called
+- **THEN** each receives its own verified execution and region counts
+- **AND** missing/duplicate owners or positive counts on an unexecuted owner
+  fail measurement, with no parent-count inheritance
+- **AND** annotated/cfg module variants remain unsupported, without changing
+  metric definitions, thresholds, requiredness, CRAP support or existing baselines
+- **AND** the new binary-bound Core series identity is preserved without assuming
+  compatibility with an existing baseline

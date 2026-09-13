@@ -141,3 +141,9 @@ execution-only checkpoint's region-unsupported statement; line coverage and all
 CRAP remain unsupported. The candidate does not select Core's CRAP model, change
 requiredness/thresholds, or authorize migration/baseline adoption. LLVM region
 coverage is not the historical MIR basic-block metric. T3–T8 remain open.
+
+The bounded T4 source-owner implementation now covers ordinary unannotated
+free functions in unannotated inline modules using exact LLVM/source spans.
+The v3 owner rule preserves metric definitions and Core migration authority;
+real same-name, nested and never-called owners are independently checked.
+Generated owners and broader activation semantics remain uncertified.

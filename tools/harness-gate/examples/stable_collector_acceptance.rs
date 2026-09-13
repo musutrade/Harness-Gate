@@ -152,7 +152,7 @@ fn run() -> Result<()> {
     let args: Vec<_> = env::args_os().skip(1).collect();
     ensure!(
         args.len() == 5,
-        "usage: stable_collector_acceptance COLLECTOR CORE CAPTURE_ACCEPTANCE NEW_OUTPUT plain|partial|boundaries|features|registry"
+        "usage: stable_collector_acceptance COLLECTOR CORE CAPTURE_ACCEPTANCE NEW_OUTPUT plain|partial|modules|boundaries|features|registry"
     );
     let binary = Path::new(&args[0]).canonicalize()?;
     let core = Path::new(&args[1]).canonicalize()?;
@@ -161,7 +161,15 @@ fn run() -> Result<()> {
     let root = Path::new(&args[3]).canonicalize()?;
     let case = args[4].to_str().context("fixture name")?;
     ensure!(
-        ["plain", "partial", "boundaries", "features", "registry"].contains(&case),
+        [
+            "plain",
+            "partial",
+            "modules",
+            "boundaries",
+            "features",
+            "registry"
+        ]
+        .contains(&case),
         "unknown fixture"
     );
     let anchor = read(&capture_root.join(format!("{case}.stdout")))?;
@@ -281,6 +289,39 @@ fn run() -> Result<()> {
                 ],
             "real region coverage: {regions:?}"
         );
+    } else if case == "modules" {
+        ensure!(
+            counts == vec![json!(2), json!(1), json!(2)],
+            "module lexical counts"
+        );
+        for (record, (covered, total, executed)) in
+            records
+                .as_array()
+                .unwrap()
+                .iter()
+                .zip([(4, 5, 1), (0, 3, 0), (5, 5, 1)])
+        {
+            let metrics = record["metrics"].as_array().unwrap();
+            for (name, expected) in [
+                (
+                    "coverage.function",
+                    json!({"type":"ratio","covered":executed,"total":1}),
+                ),
+                (
+                    "coverage.region",
+                    json!({"type":"ratio","covered":covered,"total":total}),
+                ),
+            ] {
+                ensure!(
+                    metrics
+                        .iter()
+                        .find(|m| m["name"] == name)
+                        .context("module metric missing")?["value"]
+                        == expected,
+                    "module {name} differs"
+                );
+            }
+        }
     } else if case == "registry" {
         ensure!(counts == vec![json!(1)], "registry lexical count");
         let metric = records[0]["metrics"]

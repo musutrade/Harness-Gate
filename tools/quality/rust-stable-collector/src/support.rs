@@ -1,5 +1,5 @@
 //! Signed metadata describes a candidate, never authorizes a measurement migration.
-use crate::{artifact::FileIdentity, source};
+use crate::{artifact::FileIdentity, ownership, source};
 use anyhow::{ensure, Result};
 use serde::Deserialize;
 
@@ -53,7 +53,7 @@ impl Support {
             self.release_status == "candidate-review-required"
                 && self.complexity_series == source::SERIES
                 && self.coverage_series == "rust-llvm-source-coverage/v1-candidate"
-                && self.function_coverage == "rust-llvm-exact-root-owner/v2-candidate"
+                && self.function_coverage == ownership::RULE
                 && self.function_crap == "unsupported",
             "support metadata overstates candidate capabilities or release status"
         );

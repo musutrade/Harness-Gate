@@ -35,7 +35,7 @@ duplicate keys, trailing data and unknown envelope fields are rejected. Payload
 hash/length, exact inventory, target and ELF architecture are checked before
 selection. The typed `rust-stable-support/v1` document must bind the release,
 program and license identities and declare the exact candidate series,
-`rust-llvm-exact-root-owner/v2-candidate` function execution and code-region coverage, unsupported
+`rust-llvm-exact-free-owner/v3-candidate` function execution and code-region coverage, unsupported
 CRAP and `candidate-review-required` status. Unknown fields,
 empty/duplicate acceptance anchors and overstated capabilities fail even when the
 inventory has a valid signature. Observations identify actual acceptance records;
