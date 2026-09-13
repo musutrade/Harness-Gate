@@ -170,9 +170,10 @@ pub fn capture(
         records: BTreeMap::new(),
     };
     for path in paths {
-        let cwd = directories
+        let producer = directories
             .get(&path)
             .context("compiler input cwd missing")?;
+        let cwd = &producer.cwd;
         ensure!(
             inventory.roots.contains(cwd),
             "compiler cwd outside authenticated packages"
@@ -182,6 +183,7 @@ pub fn capture(
             "dep-info too large"
         );
         let raw = fs::read_to_string(&path)?;
+        verify_raw(&raw, &producer.identity)?;
         let mut inputs = BTreeMap::new();
         for token in parse(&raw)? {
             let path = resolve(&token, cwd)?;
@@ -266,7 +268,9 @@ pub fn verify(
     let mut generated = BTreeSet::new();
     for (name, record) in proof.records {
         ensure!(
-            directories.get(&proof.scratch.join(&name)) == Some(&record.cwd)
+            directories
+                .get(&proof.scratch.join(&name))
+                .is_some_and(|p| p.cwd == record.cwd)
                 && inventory.roots.contains(&record.cwd),
             "compiler cwd identity differs"
         );
@@ -281,6 +285,10 @@ pub fn verify(
             parse(&record.raw)? == record.inputs.keys().cloned().collect(),
             "dep-info input set differs"
         );
+        verify_raw(
+            &record.raw,
+            &directories[&proof.scratch.join(&name)].identity,
+        )?;
         for (token, input) in record.inputs {
             if input.generated {
                 ensure!(
@@ -326,9 +334,34 @@ pub fn verify(
     Ok(())
 }
 
+fn verify_raw(raw: &str, identity: &FileIdentity) -> Result<()> {
+    ensure!(
+        raw.len() as u64 == identity.bytes && artifact::digest(raw.as_bytes()) == identity.sha256,
+        "compiler dep-info bytes differ from producer"
+    );
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn producer_identity_binds_ignored_comments_and_exact_bytes() {
+        let raw = "a: src/lib.rs\n# env-dep:EXAMPLE=observed\n";
+        let identity = FileIdentity {
+            sha256: artifact::digest(raw.as_bytes()),
+            bytes: raw.len() as u64,
+        };
+        verify_raw(raw, &identity).unwrap();
+        for altered in [
+            raw.replace("observed", "modified"),
+            raw.replace("# env-dep:EXAMPLE=observed\n", ""),
+            format!("{raw}\n"),
+        ] {
+            assert_eq!(parse(raw).unwrap(), parse(&altered).unwrap());
+            assert!(verify_raw(&altered, &identity).is_err());
+        }
+    }
     #[test]
     fn make_dep_info_is_parsed_without_interpreting_make_expressions() {
         assert_eq!(

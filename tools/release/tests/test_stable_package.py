@@ -77,7 +77,7 @@ class PreparationTests(unittest.TestCase):
                 registry_notices(package, lock)
 
     def test_acceptance_requires_anchor_same_binary_and_passed_checks(self):
-        value = json.loads((ROOT / 'docs/quality/stable-rust-candidate-evidence/acceptance-output-isolation.json').read_text())
+        value = json.loads((ROOT / 'docs/quality/stable-rust-candidate-evidence/acceptance-dep-info.json').read_text())
         binary = value['binary']
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / 'summary.json'
@@ -100,6 +100,8 @@ class PreparationTests(unittest.TestCase):
                          'missing-llvm-owner', 'omitted-source-owners', 'changed-test-exclusions',
                          'total-lines-count', 'total-functions-covered', 'file-summary-disagreement',
                          'external-include-bytes', 'wrong-compiler-cwd', 'omitted-dep-info-producer',
+                         'unobserved-env-dep', 'changed-env-dep', 'omitted-env-dep',
+                         'missing-dep-info-identity', 'changed-dep-info-identity',
                          'modules', 'certified-module-owners', 'missing-module-owner',
                          'duplicate-module-owner', 'module-parent-count-inheritance',
                          'restored-module-owners', 'module-attribute', 'describe-module-attribute',

@@ -175,7 +175,9 @@ def acceptance(path, pin, binary):
                  'external-include-bytes', 'external-include-rust', 'external-path-module',
                  'workspace-include-bytes', 'verify-workspace-include', 'empty-compiler-proof',
                  'omitted-compiler-input', 'malformed-dep-info', 'wrong-compiler-cwd',
-                 'omitted-dep-info-producer', 'restored-compiler-input-proof'} <= names
+                 'omitted-dep-info-producer', 'restored-compiler-input-proof',
+                 'unobserved-env-dep', 'changed-env-dep', 'omitted-env-dep',
+                 'missing-dep-info-identity', 'changed-dep-info-identity'} <= names
             and all(check['passed'] is True for check in checks),
             'candidate acceptance is incomplete or failed')
     tools = value['tools']

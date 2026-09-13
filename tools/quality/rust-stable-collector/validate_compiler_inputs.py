@@ -33,7 +33,7 @@ def validate(output, run, digest, trace):
     collect('external-path-module', '#[path = "../../outside.rs"] mod outside;\n', False)
 
     (project / 'data.txt').write_text('authenticated data')
-    capture, anchor = collect('workspace-include-bytes', 'pub const DATA: &[u8] = include_bytes!("../data.txt");\n', True)
+    capture, anchor = collect('workspace-include-bytes', 'pub const DATA: &[u8] = include_bytes!("../data.txt");\npub const PACKAGE: &str = env!("CARGO_PKG_NAME");\n', True)
     args = ['verify', capture, anchor['manifest_sha256'], anchor['request_sha256']]
     run('verify-workspace-include', args)
     proof_path = capture / 'compiler-inputs.json'
@@ -42,6 +42,8 @@ def validate(output, run, digest, trace):
     original_manifest = manifest_path.read_bytes()
     proof = json.loads(original_proof)
     assert any(str(project / 'data.txt') == item['path'] for record in proof['records'].values() for item in record['inputs'].values())
+    env_record = next(name for name, record in proof['records'].items() if '# env-dep:CARGO_PKG_NAME=' in record['raw'])
+    env_line = next(line for line in proof['records'][env_record]['raw'].splitlines(keepends=True) if line.startswith('# env-dep:CARGO_PKG_NAME='))
 
     def mutated(label, change, error):
         value = json.loads(original_proof)
@@ -58,8 +60,28 @@ def validate(output, run, digest, trace):
         mutated('malformed-dep-info', lambda value: next(iter(value['records'].values())).update(raw='a: $(untrusted)'), 'unsupported dep-info syntax')
         mutated('wrong-compiler-cwd', lambda value: next(iter(value['records'].values())).update(cwd=str(output)), 'compiler cwd identity differs')
         mutated('omitted-dep-info-producer', lambda value: value.update(records={'unobserved.d': next(iter(value['records'].values()))}), 'compiler dep-info producer set differs')
+        mutated('unobserved-env-dep', lambda value: value['records'][env_record].update(raw=value['records'][env_record]['raw'] + '\n# env-dep:GH259_UNOBSERVED=changed\n'), 'compiler dep-info bytes differ from producer')
+        mutated('changed-env-dep', lambda value: value['records'][env_record].update(raw=value['records'][env_record]['raw'].replace(env_line, '# env-dep:CARGO_PKG_NAME=changed\n')), 'compiler dep-info bytes differ from producer')
+        mutated('omitted-env-dep', lambda value: value['records'][env_record].update(raw=value['records'][env_record]['raw'].replace(env_line, '')), 'compiler dep-info bytes differ from producer')
     finally:
         proof_path.write_bytes(original_proof)
+        manifest_path.write_bytes(original_manifest)
+    producer_path = next(path for path in (capture / 'compiler-invocations').iterdir() if json.loads(path.read_text()).get('dep_info_identity'))
+    original_producer = producer_path.read_bytes()
+    try:
+        for label, identity, error in [
+            ('missing-dep-info-identity', None, 'compiler dep-info identity missing'),
+            ('changed-dep-info-identity', {'bytes': 1, 'sha256': '0' * 64}, 'compiler dep-info bytes differ from producer'),
+        ]:
+            invocation = json.loads(original_producer)
+            invocation['dep_info_identity'] = identity
+            producer_path.write_text(json.dumps(invocation))
+            manifest = json.loads(original_manifest)
+            manifest['files'][str(producer_path.relative_to(capture))] = {'sha256': digest(producer_path), 'bytes': producer_path.stat().st_size}
+            manifest_path.write_text(json.dumps(manifest))
+            assert error in run(label, ['verify', capture, digest(manifest_path), anchor['request_sha256']], success=False)
+    finally:
+        producer_path.write_bytes(original_producer)
         manifest_path.write_bytes(original_manifest)
     run('restored-compiler-input-proof', args)
 
@@ -73,4 +95,5 @@ def validate(output, run, digest, trace):
         assert digest(generated_capture / 'compiler-generated' / item['identity']['sha256']) == item['identity']['sha256']
     return {'external_inputs': 'three real captures blocked before manifest',
             'workspace_data': 'identity verified', 'generated_inputs': len(generated),
-            'scope': 'observed rustc dep-info file inputs only; arbitrary build-script reads and environment are not certified'}
+            'dep_info_bytes': 'compiler-output digest binds complete dep-info including three env-dep mutations; absent and inconsistent producer identities rejected',
+            'scope': 'observed rustc dep-info bytes and file inputs only; environment semantics, arbitrary build-script reads and environment closure are not certified'}
