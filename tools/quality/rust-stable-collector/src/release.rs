@@ -365,20 +365,35 @@ fn snapshot(
         "verifier changed trust root"
     );
     trust(host, host_digest, bundle, install)?;
-    for (name, expected) in &inventory.files {
+    let check_stage = || -> Result<()> {
+        for (name, expected) in &inventory.files {
+            ensure!(
+                artifact::identity(&stage.path().join(name))? == *expected,
+                "staged payload changed"
+            );
+        }
         ensure!(
-            artifact::identity(&stage.path().join(name))? == *expected,
-            "staged payload changed"
+            read(&stage.path().join(INVENTORY), LIMIT)? == raw,
+            "staged inventory changed"
         );
-    }
+        ensure!(
+            artifact::inventory(stage.path(), false)? == staged_identity,
+            "staged release changed during verification"
+        );
+        Ok(())
+    };
+    check_stage()?;
+    // Execute only the authenticated snapshot, after both signature checks.
+    // This checks launch/version compatibility, not measurement certification.
+    let version = runner
+        .text(&stage.path().join(PROGRAM), &["--version"])
+        .context("authenticated release program launch check failed")?;
     ensure!(
-        read(&stage.path().join(INVENTORY), LIMIT)? == raw,
-        "staged inventory changed"
+        version == format!("{PROGRAM} {}\n", inventory.version),
+        "authenticated release program version mismatch"
     );
-    ensure!(
-        artifact::inventory(stage.path(), false)? == staged_identity,
-        "staged release changed during verification"
-    );
+    check_stage()?;
+    trust(host, host_digest, bundle, install)?;
     fs::set_permissions(stage.path(), fs::Permissions::from_mode(0o755))?;
     sync_dir(stage.path())?;
     Ok(Verified {

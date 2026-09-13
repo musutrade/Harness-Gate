@@ -52,6 +52,14 @@ the [lifecycle contract](../../../docs/quality/stable-rust-collector-lifecycle.m
 The local suite uses real RSA signatures and an explicitly mocked Sigstore command;
 it does not establish production trust or T5 completion. No release hold is removed.
 
+Before activation, the authenticated staged executable must launch successfully
+within the process deadline and report the exact signed version through `--version`.
+This happens after both signature checks and before repeated payload/trust identity
+validation. Repository automation builds a separate test-version executable to
+exercise upgrade by the installed old program and rollback by the installed new
+program. Its source delta is version metadata only; it is not historical release
+compatibility or a replacement for the two-toolchain/two-system acceptance.
+
 The next T5 checkpoint adds a Rust-validated support schema and locked offline
 unsigned candidate preparation with archive/source-authenticated dependency
 notices. Real lifecycle checks consume that payload and reject unsigned packages

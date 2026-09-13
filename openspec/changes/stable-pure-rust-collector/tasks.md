@@ -75,3 +75,15 @@ builds establish relative-path resolution from the observed compiler cwd. This i
 not arbitrary build-script/environment closure or a transitive process audit.
 The validation record retains the original external-input reproduction and all
 limits. T3–T8 and the publication hold remain open.
+
+The bounded T5 activation checkpoint reproduces acceptance of a signed version
+that differs from the executable's actual version, then adds authenticated,
+bounded launch/version validation and post-launch payload/trust checks before
+selection. The current binary passes 38 lifecycle checks, including an independently
+compiled test-version upgrade and rollback executed by the installed programs.
+Wrong versions, nonzero exit, timeout, invalid ELF and staged-file mutation preserve
+the prior installation. Test RSA is real; Sigstore remains mocked. The second build
+uses the same implementation and does not establish historical/production upgrade
+compatibility. All 74 collection checks, four Core cases, 16 Rust tests and quality
+checks were rerun; exact results are in the validation record. T5 and T8 remain
+unchecked pending the full release acceptance and protected publication contract.
