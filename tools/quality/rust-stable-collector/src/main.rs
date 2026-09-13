@@ -1,8 +1,11 @@
 //! Stable-interface collection candidate. No gate policy or migration authority.
+mod adapter;
 mod artifact;
 mod collect;
 mod process;
+mod release;
 mod source;
+mod strict_json;
 mod tools;
 
 use anyhow::{bail, Result};
@@ -20,13 +23,18 @@ fn run() -> Result<()> {
             artifact::write(&runner.root.join("doctor.json"), &tools)?;
             println!("{}", serde_json::to_string(&tools)?);
         }
+        ["release-verify", bundle, trust, digest, log] => println!("{}", release::verify(Path::new(bundle), Path::new(trust), digest, Path::new(log))?),
+        ["install", bundle, trust, digest, root, log] => println!("{}", release::install(Path::new(bundle), Path::new(trust), digest, Path::new(root), Path::new(log))?),
+        ["rollback", root, version, trust, digest, log] => println!("{}", release::rollback(Path::new(root), version, Path::new(trust), digest, Path::new(log))?),
+        ["adapter", "--binding", path, "--binding-sha256", digest] => println!("{}", adapter::run(Path::new(path), digest)?),
+        ["describe", root, anchor, request_digest] => println!("{}", adapter::describe(Path::new(root), anchor, request_digest)?),
         ["collect", request] => println!("{}", collect::collect(Path::new(request))?),
         ["prepare", project, output, doctor] => println!("{}", collect::prepare(Path::new(project), Path::new(output), Path::new(doctor))?),
         ["verify", directory, anchor, request_digest] => {
             collect::verify(Path::new(directory), anchor, request_digest)?;
             println!("{}", json!({"schema":"rust-stable-verification/v1", "integrity":"verified", "core_acceptance":"pending"}));
         }
-        _ => bail!("usage: harness-gate-rust-stable-collector --version | doctor PROJECT NEW_OUTPUT | prepare PROJECT NEW_OUTPUT DOCTOR.json | collect REQUEST.json | verify OUTPUT MANIFEST_SHA256 REQUEST_SHA256"),
+        _ => bail!("usage: harness-gate-rust-stable-collector --version | doctor PROJECT NEW_OUTPUT | prepare PROJECT NEW_OUTPUT DOCTOR.json | collect REQUEST.json | verify OUTPUT MANIFEST_SHA256 REQUEST_SHA256 | describe OUTPUT MANIFEST_SHA256 REQUEST_SHA256 | adapter --binding FILE --binding-sha256 SHA256 | release-verify BUNDLE TRUST TRUST_SHA256 NEW_LOG | install BUNDLE TRUST TRUST_SHA256 ROOT NEW_LOG | rollback ROOT INVENTORY_SHA256 TRUST TRUST_SHA256 NEW_LOG"),
     }
     Ok(())
 }

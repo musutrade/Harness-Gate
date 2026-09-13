@@ -39,3 +39,15 @@ boundaries, Core v2 integration design and lifecycle plan are recorded in
 [Validation](../../../docs/quality/stable-rust-collector-validation.md) records
 actual results separately from pending acceptance. This checkpoint does not
 authorize a required-series replacement or release-hold removal.
+
+The candidate now implements signed-argument capture bindings and generic Core
+evidence for verified lexical complexity, with explicit unsupported coverage/CRAP.
+Actual Core acceptance uses a test-only key and preserves required-risk blocking.
+The [historical comparison](../../../docs/quality/stable-rust-collector-migration.md)
+uses original source bytes and anchored report members without running the old
+backend or changing historical evidence. This remains partial T4/T6 acceptance.
+
+Rust offline release verification, installation, upgrade and rollback now implement
+the [lifecycle contract](../../../docs/quality/stable-rust-collector-lifecycle.md).
+The local suite uses real RSA signatures and an explicitly mocked Sigstore command;
+it does not establish production trust or T5 completion. No release hold is removed.
