@@ -123,6 +123,52 @@ items and unreviewed cfg return `unsupported` with an explicit boundary and no
 partial successful function inventory. Known templates are `supported` only for
 their stated source complexity. All coverage/CRAP fields contain no numeric fallback.
 
+## Built-in derive: a separate, reproduced eligibility boundary
+
+The [Clone fixture](../../tools/quality/fixtures/rust-derive-coverage/README.md)
+pins four derive inputs, the target, lockfile and the `default`/`extra` feature
+configurations. Both configurations execute three tests. Different inputs return
+3 and 8; the configured input returns 7 or 9. The `Unused` type and its wrapper
+remain unexecuted. This uses the same built-in derive implementation in the
+recorded compiler, not a second implementation of its generation logic.
+
+On rustc commit `8bab26f4f68e0e26f0bb7960be334d5b520ea452`, matching LLVM 22.1.6
+exports eight owners in each configuration: four ordinary wrappers, a manual
+`Clone::clone` control and three tests. It exports none of the four derived clone
+methods. The unexecuted wrapper has a real zero record; the unexecuted derived
+method has no record. These are different evidence states.
+
+The source-level cause is distinct from the function-like macro's span issue:
+the pinned [derive generator](https://github.com/rust-lang/rust/blob/8bab26f4f68e0e26f0bb7960be334d5b520ea452/compiler/rustc_builtin_macros/src/deriving/generic/mod.rs#L800)
+adds `automatically_derived`, and the pinned
+[coverage eligibility rule](https://github.com/rust-lang/rust/blob/8bab26f4f68e0e26f0bb7960be334d5b520ea452/compiler/rustc_mir_transform/src/coverage/query.rs#L59-L66)
+excludes those implementations. A hand-written control with that attribute also
+has no exported owner; the same method body without the attribute has count 1.
+This reproducible difference is consistent with the explicit compiler rule. No
+compiler internals were executed or traced by the diagnostic, and no parser or
+third-party macro defect is claimed.
+
+The collector does not strip attributes, replace business derives, inherit wrapper
+coverage or turn missing methods into zero. Such changes would not authenticate
+the original derived method's coverage. `Clone` coverage/CRAP remains unsupported;
+this experiment makes that refusal specific, rather than treating all macros as
+one unexplained limitation. Source complexity and final generated owner mapping
+for arbitrary derives still require separate work.
+
+[derive-coverage-diagnostic.json](stable-rust-candidate-evidence/derive-coverage-diagnostic.json)
+records source/tool identities, original export paths/hashes, results and the
+initial missing-tool attempt. The repository-only driver runs in stable CI and
+requires existing matching LLVM tools. No dependency is installed. This is one
+compiler on one Linux environment, not the missing second-toolchain/system
+acceptance, process trace or authenticated Core evidence.
+
+The capability request remains pending: provide a supported stable way to obtain
+original derived-method coverage with verifiable owner identity. No upstream
+request or fix has been submitted, merged or adopted for this fixture. A future
+solution must preserve original program behavior and pass different-input,
+configuration and unused-owner cases. The related attribute-macro PR below has
+not been shown to change this separate eligibility rule.
+
 ## Remaining source-level work
 
 This first-party integration is in draft PR 261; it is not an upstream fix.
@@ -132,6 +178,7 @@ This first-party integration is in draft PR 261; it is not an upstream fix.
 | Third-party parser/macro defect | No concrete defect established; no speculative PR | No | No |
 | Related upstream proc-macro coverage work | Existing rust-lang/rust issue 131119 and PR 158276; not submitted by this project | PR open at inspected head; not merged | None; applicability to this fixture unverified |
 | This fixture's missing generated-function coverage capability | Reproducer/exports recorded here; no exact-match capability request submitted | No | No |
+| Built-in Clone derived-method coverage | Pinned eligibility rule and real annotation control reproduced; capability request pending | No | No |
 | First-party dependency build-input certification | Refusal reproduced; implementation pending | No | No |
 
 ### Related upstream work and applicability

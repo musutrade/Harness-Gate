@@ -1,0 +1,271 @@
+{
+  "schema": "rust-derive-coverage-diagnostic/v1",
+  "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "cargo_llvm_cov": "cargo-llvm-cov 0.9.0\n",
+  "target": "x86_64-unknown-linux-gnu",
+  "source": {
+    "Cargo.lock": {
+      "sha256": "e9d4003f003dab031a4df3f36cfef42700279e599283b5484e8feef4dd299efb",
+      "bytes": 170
+    },
+    "Cargo.toml": {
+      "sha256": "7c3657be003e42ce159e1879a759bf0116e9f3f4ff619a81eb6ed07d616b365a",
+      "bytes": 139
+    },
+    "README.md": {
+      "sha256": "40968fdc54e1050000f08e5fae2b193cb0a3c048ace5c5d648b75fa9105cdf7b",
+      "bytes": 1808
+    },
+    "src/lib.rs": {
+      "sha256": "c040548c9c57af0fb58fabc297ee750eb530cf2da657828b60dcda3765fd8fa5",
+      "bytes": 1747
+    }
+  },
+  "external_tools": {
+    "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov": {
+      "sha256": "bb415d8767d2ad73d72c01941f409ffc8f9478747ec7c18a7a69356735551ed9",
+      "bytes": 639712
+    },
+    "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata": {
+      "sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+      "bytes": 666968
+    }
+  },
+  "cleared_environment": [
+    "RUSTUP_TOOLCHAIN",
+    "RUSTC_BOOTSTRAP",
+    "RUSTFLAGS",
+    "RUSTDOCFLAGS",
+    "CARGO_ENCODED_RUSTFLAGS",
+    "RUSTC_WRAPPER",
+    "RUSTC_WORKSPACE_WRAPPER"
+  ],
+  "environment_overrides": {
+    "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/derive-diagnostic01/build",
+    "LLVM_COV": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+    "LLVM_PROFDATA": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata"
+  },
+  "scope": "built-in Clone and explicit annotation control only",
+  "derived_coverage_and_crap": "unsupported; absent function records are not zero",
+  "process_trace": "not run",
+  "T4": "incomplete",
+  "raw_summary": {
+    "path": "target/gh-259/derive-diagnostic01/summary.json",
+    "sha256": "2060a2e6a18d885fa67f4daffacb00a2a33a9f717bc57235df8b9595869af5e7",
+    "bytes": 33874
+  },
+  "command_record": {
+    "path": "target/gh-259/derive-diagnostic01/commands.json",
+    "sha256": "a9912a190335a3137a93170a87d95b8b19f12fc76e3e6109c07ad93d3a277a21",
+    "bytes": 6417
+  },
+  "driver": {
+    "path": "tools/quality/rust-stable-collector/diagnose_derive_coverage.py",
+    "sha256": "01edfa9d9e42995a55f6cb2ae828555160acfb68612697faeed03ee355e14860",
+    "bytes": 7258
+  },
+  "reproduce_argv": [
+    "python3",
+    "tools/quality/rust-stable-collector/diagnose_derive_coverage.py",
+    "--output",
+    "target/gh-259/derive-diagnostic01",
+    "--llvm-cov",
+    "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+    "--llvm-profdata",
+    "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata"
+  ],
+  "compiler_source": [
+    {
+      "url": "https://github.com/rust-lang/rust/blob/8bab26f4f68e0e26f0bb7960be334d5b520ea452/compiler/rustc_builtin_macros/src/deriving/generic/mod.rs",
+      "path": "target/gh-259/derive-probe/generic.rs",
+      "sha256": "d8bda03e0e963011452558a0ba1605a63c2a4e1dfe353008c5e52877f99f531f",
+      "bytes": 63956,
+      "lines": [
+        800
+      ]
+    },
+    {
+      "url": "https://github.com/rust-lang/rust/blob/8bab26f4f68e0e26f0bb7960be334d5b520ea452/compiler/rustc_mir_transform/src/coverage/query.rs",
+      "path": "target/gh-259/derive-probe/query.rs",
+      "sha256": "1421b190c76c05895fd4793f621b1a44a32dbbc72f22e1b2d4e90680cddebfd2",
+      "bytes": 6679,
+      "lines": [
+        59,
+        66
+      ]
+    }
+  ],
+  "exports": {
+    "default": {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/derive-diagnostic01/default.json",
+      "sha256": "b4aa28732357ed12716095b9998594105e8798aa6d386bdd49e0906bad93ed45",
+      "bytes": 6662,
+      "owners": {
+        "24": {
+          "fixture_owner": "clone_configured",
+          "count": 1,
+          "symbol": "_RNvCsfXEhSuXM5Bu_26gate_derive_coverage_probe16clone_configured"
+        },
+        "14": {
+          "fixture_owner": "clone_one",
+          "count": 1,
+          "symbol": "_RNvCsfXEhSuXM5Bu_26gate_derive_coverage_probe9clone_one"
+        },
+        "17": {
+          "fixture_owner": "clone_two",
+          "count": 1,
+          "symbol": "_RNvCsfXEhSuXM5Bu_26gate_derive_coverage_probe9clone_two"
+        },
+        "40": {
+          "fixture_owner": "Manual::clone",
+          "count": 1,
+          "symbol": "_RNvXCsfXEhSuXM5Bu_26gate_derive_coverage_probeNtB2_6ManualNtNtCs4NRVxsYgnAr_4core5clone5Clone5clone"
+        },
+        "21": {
+          "fixture_owner": "clone_unused",
+          "count": 0,
+          "symbol": "_RNvCsfXEhSuXM5Bu_26gate_derive_coverage_probe12clone_unused"
+        },
+        "66": {
+          "fixture_owner": "configured_derive_executes",
+          "count": 1,
+          "symbol": "_RNvNtCsfXEhSuXM5Bu_26gate_derive_coverage_probe5testss_26configured_derive_executes"
+        },
+        "56": {
+          "fixture_owner": "annotation_control_executes",
+          "count": 1,
+          "symbol": "_RNvNtCsfXEhSuXM5Bu_26gate_derive_coverage_probe5testss_27annotation_control_executes"
+        },
+        "61": {
+          "fixture_owner": "distinct_derive_inputs_execute",
+          "count": 1,
+          "symbol": "_RNvNtCsfXEhSuXM5Bu_26gate_derive_coverage_probe5testss_30distinct_derive_inputs_execute"
+        }
+      },
+      "configured_test_result": 7,
+      "missing_derived_owners": [
+        "One::clone",
+        "Two::clone",
+        "Unused::clone",
+        "Configured::clone"
+      ],
+      "missing_control_owner": "Annotated::clone"
+    },
+    "extra": {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/derive-diagnostic01/extra.json",
+      "sha256": "05e10bbdbe93b5f290366974bc42a845633ade314da78d79693c9e5236ea655f",
+      "bytes": 6662,
+      "owners": {
+        "21": {
+          "fixture_owner": "clone_unused",
+          "count": 0,
+          "symbol": "_RNvCsgEzvbMI3RJC_26gate_derive_coverage_probe12clone_unused"
+        },
+        "66": {
+          "fixture_owner": "configured_derive_executes",
+          "count": 1,
+          "symbol": "_RNvNtCsgEzvbMI3RJC_26gate_derive_coverage_probe5testss_26configured_derive_executes"
+        },
+        "56": {
+          "fixture_owner": "annotation_control_executes",
+          "count": 1,
+          "symbol": "_RNvNtCsgEzvbMI3RJC_26gate_derive_coverage_probe5testss_27annotation_control_executes"
+        },
+        "61": {
+          "fixture_owner": "distinct_derive_inputs_execute",
+          "count": 1,
+          "symbol": "_RNvNtCsgEzvbMI3RJC_26gate_derive_coverage_probe5testss_30distinct_derive_inputs_execute"
+        },
+        "24": {
+          "fixture_owner": "clone_configured",
+          "count": 1,
+          "symbol": "_RNvCsgEzvbMI3RJC_26gate_derive_coverage_probe16clone_configured"
+        },
+        "14": {
+          "fixture_owner": "clone_one",
+          "count": 1,
+          "symbol": "_RNvCsgEzvbMI3RJC_26gate_derive_coverage_probe9clone_one"
+        },
+        "17": {
+          "fixture_owner": "clone_two",
+          "count": 1,
+          "symbol": "_RNvCsgEzvbMI3RJC_26gate_derive_coverage_probe9clone_two"
+        },
+        "40": {
+          "fixture_owner": "Manual::clone",
+          "count": 1,
+          "symbol": "_RNvXCsgEzvbMI3RJC_26gate_derive_coverage_probeNtB2_6ManualNtNtCs4NRVxsYgnAr_4core5clone5Clone5clone"
+        }
+      },
+      "configured_test_result": 9,
+      "missing_derived_owners": [
+        "One::clone",
+        "Two::clone",
+        "Unused::clone",
+        "Configured::clone"
+      ],
+      "missing_control_owner": "Annotated::clone"
+    }
+  },
+  "validation": {
+    "diagnostic_exit_code": 0,
+    "configurations": 2,
+    "tests_per_configuration": 3,
+    "commands": 7,
+    "core_protocol": "not exercised by this diagnostic",
+    "runtime_candidate": "unchanged from checkpoint18",
+    "initial_missing_tool": {
+      "command": "/home/gem/.rustup/toolchains/1.97.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov --version",
+      "error": "FileNotFoundError: [Errno 2] No such file or directory",
+      "impact": "No LLVM version check or coverage ran in initial attempt; existing matching stable-sysroot tools used in successful rerun",
+      "completed_commands": {
+        "path": "target/gh-259/derive-probe/commands.json",
+        "sha256": "9b5c140634c92114045b3934dbf633d1475e209a5314533f9e3f19f8eaaa15aa",
+        "bytes": 1881
+      }
+    },
+    "docs_consistency": {
+      "command": "CARGO_TARGET_DIR=\"$PWD/target/gh-259/core-target\" python3 tools/quality/docs_consistency.py --output target/gh-259/derive-docs-consistency.json",
+      "exit_code": 0
+    },
+    "whitespace": {
+      "command": "git diff --check",
+      "exit_code": 0
+    },
+    "unchanged_candidate_binary": {
+      "bytes": 3475840,
+      "sha256": "6addb9cf8c716304464f756c3f6e37e402bf65823cb0ba418f610572770e6701"
+    },
+    "quality_tests": {
+      "command": "CARGO_TARGET_DIR=\"$PWD/target/gh-259/core-target\" python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 0,
+      "result": [
+        "Ran 449 tests in 174.121s",
+        "OK (skipped=36)"
+      ],
+      "log": "target/gh-259/derive-quality-tests.log",
+      "log_sha256": "8a2a740f8d9678236e6af9b5cbc722acd95258fc77ecf5b9c0a2176cd60c1e59"
+    },
+    "retained_checks": {
+      "source": "docs/quality/stable-rust-candidate-evidence/module-owners.json",
+      "note": "Core nextest/fmt/clippy and candidate release/runtime evidence from unchanged checkpoint18 were not repeated for this fixture/diagnostic/docs change."
+    },
+    "project_gate": "not applicable: .harness-gate/flow.toml absent"
+  },
+  "upstream": {
+    "root_cause": "explicit compiler eligibility exclusion; no third-party defect established",
+    "request_submitted": false,
+    "fix_merged": false,
+    "fixed_version_adopted": null,
+    "capability": "stable original derived-method coverage with verifiable owner identity",
+    "temporary_patch": null
+  },
+  "limitations": [
+    "one installed compiler; 1.98.1 acceptance remains blocked",
+    "one Linux environment; no second-system validation",
+    "no process trace; ptrace denied in existing environment probe",
+    "no certified derived complexity, coverage or CRAP",
+    "does not authenticate general proc-macro dependency inputs or final expansion",
+    "release hold and T3-T8 remain open"
+  ]
+}

@@ -1,5 +1,12 @@
 # Tasks
 
+The built-in `Clone` derive follow-up fixes four invocation inputs and two feature
+configurations, reproduces absent derived owners with an annotated/manual control,
+and pins the compiler's explicit eligibility rule. See `derive-coverage-diagnostic.json`
+in the candidate evidence directory. Six real tests pass, but this is a diagnosed
+capability gap, not a derive coverage fix or T4 completion; upstream request,
+merge and adoption are all pending.
+
 T4 also includes the PR 260 source-level macro/derive investigation and shared
 generation contract: bind source/version, invocation/config/target and ownership;
 distinguish generated code from macro implementation; track upstream submission,
