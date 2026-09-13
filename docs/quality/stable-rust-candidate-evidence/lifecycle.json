@@ -1,10 +1,15 @@
 {
   "schema": "rust-stable-lifecycle-acceptance/v1",
-  "collector_sha256": "a7e348c64089cbb592e1b094558b937066748c9979ba253218521511c1693a79",
+  "collector_sha256": "f4f71cc58f51194ab4b9c9c976bd34360ddb0bf471c414f7c7439949353ee81e",
   "rsa": "real RSA-2048/SHA-256 signatures; repository-generated test key",
   "sigstore": "MOCK invocation/exit behavior only; no cryptographic or production acceptance",
   "production_signature": false,
   "checks": [
+    {
+      "name": "unsigned-package-rejected",
+      "exit_code": 1,
+      "passed": true
+    },
     {
       "name": "verify",
       "exit_code": 0,
@@ -57,6 +62,56 @@
     },
     {
       "name": "duplicate-json",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "support-schema",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "support-release",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "support-target",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "support-program",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "support-license",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "support-crap",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "support-published",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "support-no-observations",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "support-duplicate-observations",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "support-unknown-field",
       "exit_code": 1,
       "passed": true
     },
@@ -117,42 +172,42 @@
     }
   ],
   "first_install": {
-    "current": "dec866086d893f842ac7128f93165a03b82a22f58cda6936b0249034c7e3b6df",
+    "current": "2c61cc669daf7d92ad727b25026a1a57248b8e46abfd70dacc3bfe693aa3a264",
     "download_bytes": 0,
-    "executable": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle-03/installation/current/harness-gate-rust-stable-collector",
-    "installed_version_bytes": 1682216,
-    "package_bytes": 1682216,
+    "executable": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle-04/installation/current/harness-gate-rust-stable-collector",
+    "installed_version_bytes": 2775804,
+    "package_bytes": 2775804,
     "previous": null,
     "schema": "rust-stable-installation/v1",
-    "trust_sha256": "efefb53c97cbf92a5405eaff57bd5fd907c059037462f8ef4b160f49bae0b14e",
+    "trust_sha256": "cf827cf0c02e1fe22097ad37221c6404c39fc346c2257f0afcb6bb4e4cae5372",
     "version": "0.1.0-candidate.1"
   },
   "upgrade": {
-    "current": "d7c2422338bb64672f999ade93a4385dabfc647e57b39fcb55da568437b41d0f",
+    "current": "13c50145f7ce21eaa61966274c926c229dec719a0cc42a78a6bbb057957d5586",
     "download_bytes": 0,
-    "executable": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle-03/installation/current/harness-gate-rust-stable-collector",
-    "installed_version_bytes": 1682216,
-    "package_bytes": 1682216,
-    "previous": "dec866086d893f842ac7128f93165a03b82a22f58cda6936b0249034c7e3b6df",
+    "executable": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle-04/installation/current/harness-gate-rust-stable-collector",
+    "installed_version_bytes": 2775804,
+    "package_bytes": 2775804,
+    "previous": "2c61cc669daf7d92ad727b25026a1a57248b8e46abfd70dacc3bfe693aa3a264",
     "schema": "rust-stable-installation/v1",
-    "trust_sha256": "efefb53c97cbf92a5405eaff57bd5fd907c059037462f8ef4b160f49bae0b14e",
+    "trust_sha256": "cf827cf0c02e1fe22097ad37221c6404c39fc346c2257f0afcb6bb4e4cae5372",
     "version": "0.1.0-candidate.2"
   },
   "rollback": {
-    "current": "dec866086d893f842ac7128f93165a03b82a22f58cda6936b0249034c7e3b6df",
+    "current": "2c61cc669daf7d92ad727b25026a1a57248b8e46abfd70dacc3bfe693aa3a264",
     "download_bytes": 0,
-    "executable": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle-03/installation/current/harness-gate-rust-stable-collector",
-    "installed_version_bytes": 1682216,
-    "package_bytes": 1682216,
-    "previous": "d7c2422338bb64672f999ade93a4385dabfc647e57b39fcb55da568437b41d0f",
+    "executable": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/lifecycle-04/installation/current/harness-gate-rust-stable-collector",
+    "installed_version_bytes": 2775804,
+    "package_bytes": 2775804,
+    "previous": "13c50145f7ce21eaa61966274c926c229dec719a0cc42a78a6bbb057957d5586",
     "schema": "rust-stable-installation/v1",
-    "trust_sha256": "efefb53c97cbf92a5405eaff57bd5fd907c059037462f8ef4b160f49bae0b14e",
+    "trust_sha256": "cf827cf0c02e1fe22097ad37221c6404c39fc346c2257f0afcb6bb4e4cae5372",
     "version": "0.1.0-candidate.1"
   },
-  "package_bytes": 1682216,
-  "two_versions_bytes": 3364432,
-  "interrupted_staging_bytes": 1682216,
-  "installation_bytes_including_interrupted_staging": 5047257,
+  "package_bytes": 2775804,
+  "two_versions_bytes": 5551608,
+  "interrupted_staging_bytes": 2775804,
+  "installation_bytes_including_interrupted_staging": 8328027,
   "network_download_bytes": 0,
   "network_note": "local directory inputs; downloader not implemented",
   "stale_staging_note": "killed processes may leave unselected staging directories; no automatic garbage collection yet"

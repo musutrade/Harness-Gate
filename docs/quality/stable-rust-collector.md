@@ -28,7 +28,7 @@ reference for accepted boundaries and Core authority. The implementation invento
 | `rust_native.py`, `rust-measure/src/native.rs` | Unstable MIR text capture/parsing and replay | No reuse in the candidate |
 | `rust-measure/` source analyzer | Stable syntax parsing plus broader metric aggregation | Reuse the parser approach only; new analyzer has an explicit lexical series and unsupported owners |
 | `rust-collector-runtime/`, `build_rust_collector.py`, `rust_collector_delivery.py` | Python/shell launchers, compiler/C/Python environment assembly, exact host checks | Replace installed implementation with one Rust executable; no bundled toolchain or publisher kernel fingerprint |
-| `tools/release/install_collector.py`, `friendly_collector_install.py`, `collector_light_install.py` | Verification, shared component store, install/update/select/rollback | Rust `release` implements offline verification/install/upgrade/rollback; downloader and protected release preparation remain pending |
+| `tools/release/install_collector.py`, `friendly_collector_install.py`, `collector_light_install.py` | Verification, shared component store, install/update/select/rollback | Rust `release` implements offline verification/install/upgrade/rollback; unsigned preparation is implemented; downloader and protected signing remain pending |
 | `tools/release/*collector*`, `rust-collector-release.yml` | Signing packets, RSA/Sigstore verification, publication policy and rehearsal | Repository automation may remain Python; hold remains until the replacement contract and T8 acceptance |
 | Core `process/adapter.rs`, `config/quality/collectors.rs`, quality evidence/policy modules | Signature, replay protection, generic envelope, series/claims, thresholds and final decisions | Existing Core remains authoritative; no policy or baseline changes in this stage |
 
@@ -164,8 +164,8 @@ A per-root lock serializes transactions. Verified files are synced before the
 `current` symlink is atomically replaced; rollback re-verifies its target.
 The real fixture demonstrates RSA verification, upgrade/rollback, corruption and
 interruption recovery. Sigstore invocation is mocked in this fixture, explicitly
-not production signature acceptance. The downloader, trusted bootstrap, protected
-package preparation, complete license inventory and real Sigstore acceptance remain
+not production signature acceptance. The downloader, trusted bootstrap,
+protected signing, production license review and real Sigstore acceptance remain
 open. Interrupted staging has no automatic garbage collection yet.
 
 Collector version, external Rust/LLVM selection and Core version are independent.

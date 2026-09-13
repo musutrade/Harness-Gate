@@ -539,6 +539,12 @@ jobs:
         env:
           CARGO_TARGET_DIR: ${{ github.workspace }}/target/stable-candidate-build
           RUSTUP_TOOLCHAIN: 1.97.1
+          # Match unsigned preparation's explicit build environment before capture.
+          RUSTFLAGS: ""
+          RUSTDOCFLAGS: ""
+          CARGO_ENCODED_RUSTFLAGS: ""
+          RUSTC_WRAPPER: ""
+          RUSTC_WORKSPACE_WRAPPER: ""
         run: |
           mkdir -p target/stable-candidate-checks
           cargo fmt --manifest-path tools/quality/rust-stable-collector/Cargo.toml -- --check
@@ -563,8 +569,14 @@ jobs:
           python3 tools/quality/rust-stable-collector/compare_historical_fixture.py \
             --binary target/stable-candidate-build/release/harness-gate-rust-stable-collector \
             --output target/stable-candidate-checks/historical
+          python3 tools/quality/rust-stable-collector/prepare_release.py \
+            --output target/stable-candidate-checks/package \
+            --target-dir "$CARGO_TARGET_DIR" --toolchain 1.97.1 \
+            --acceptance target/stable-candidate-checks/runtime/summary.json \
+              "$(sha256sum target/stable-candidate-checks/runtime/summary.json | cut -d ' ' -f 1)"
           python3 tools/quality/rust-stable-collector/validate_lifecycle.py \
             --binary target/stable-candidate-build/release/harness-gate-rust-stable-collector \
+            --package target/stable-candidate-checks/package/unsigned-package \
             --output target/stable-candidate-checks/lifecycle --trace
           readelf -d target/stable-candidate-build/release/harness-gate-rust-stable-collector \
             > target/stable-candidate-checks/dynamic-libraries.txt

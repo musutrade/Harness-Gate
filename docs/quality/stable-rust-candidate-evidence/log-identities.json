@@ -1,6 +1,6 @@
 {
   "schema": "rust-stable-candidate-log-identities/v1",
-  "note": "Workspace-only execution logs, not a distributed acceptance archive. Includes superseded failed quality-tests-02.log; validation record identifies each actual result.",
+  "note": "Workspace execution logs, not distributed acceptance archives. Includes superseded failures (quality-tests-02.log, package-01.log); validation record names the final successful results.",
   "logs": [
     {
       "path": "target/gh-259/stable-lifecycle-build-02.log",
@@ -101,6 +101,111 @@
       "path": "target/gh-259/toolchain-download.log",
       "bytes": 268,
       "sha256": "3b3d53e6a9649cf00fd9b66d98a601b825f873a8a40b5abb56ec3277bd16bc78"
+    },
+    {
+      "path": "target/gh-259/stable-package-build-01.log",
+      "bytes": 208,
+      "sha256": "8e52260d12904733a164f6ed7c46c9e4c8218831bf616cb411fd532a83dd4411"
+    },
+    {
+      "path": "target/gh-259/stable-package-tests-01.log",
+      "bytes": 1071,
+      "sha256": "f42fedb161c02a1f8ed1af336c46f223b6c855b6e6e1be8a670287ca75956151"
+    },
+    {
+      "path": "target/gh-259/stable-package-fmt-01.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-259/stable-package-clippy-01.log",
+      "bytes": 217,
+      "sha256": "935b182f163011b157b4ce7af0f09fffe9b6f816250dd09c977f7e846b957fa1"
+    },
+    {
+      "path": "target/gh-259/acceptance-09.log",
+      "bytes": 117,
+      "sha256": "e0e697d7b758cf9a0dee14e331478df7d202773ff81ad0df07841acfbfda5efe"
+    },
+    {
+      "path": "target/gh-259/acceptance-10.log",
+      "bytes": 117,
+      "sha256": "f31750f3ea2d02cb48b34181352558b66a08499cb87237eb0dc7eddd8791fc34"
+    },
+    {
+      "path": "target/gh-259/package-01.log",
+      "bytes": 1506,
+      "sha256": "6c9499cdadfbcbc897083553d66cd82134268f487a7d0af2fa73ceadcfa42173"
+    },
+    {
+      "path": "target/gh-259/package-02.log",
+      "bytes": 148,
+      "sha256": "b7ac4e6a5ea1cd55e32b47e6b03f8a2ea7245cdf2fda5dfb3606842dfbc50f29"
+    },
+    {
+      "path": "target/gh-259/historical-03.log",
+      "bytes": 140,
+      "sha256": "b1199267af6486e5070368e4d974015cd623ac6c57dc222f00719b10681bebf0"
+    },
+    {
+      "path": "target/gh-259/lifecycle-04.log",
+      "bytes": 109,
+      "sha256": "4c945b0d1db8ab5a14288f8fce0c0369341ab27669b1a15ccee74b871c2f863c"
+    },
+    {
+      "path": "target/gh-259/quality-tests-05.log",
+      "bytes": 77461,
+      "sha256": "4e7fb5d04bf92b5ed09a800d2c946004dca572464de1e9bc150bcbf0e7ea0711"
+    },
+    {
+      "path": "target/gh-259/release-tests-02.log",
+      "bytes": 14290,
+      "sha256": "5e7d16e19198c40123bb9f27812667b3ac9964fccca0a478e13959beb58b4024"
+    },
+    {
+      "path": "target/gh-259/package-tests-01.log",
+      "bytes": 920,
+      "sha256": "0455632d8afc01370514d91fcd20b2662f6c9de5ed89216fde72eed5af4e2dc3"
+    },
+    {
+      "path": "target/gh-259/docs-consistency-05.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-259/package-ci-build-01.log",
+      "bytes": 62,
+      "sha256": "765f1396d07f30f3a451cd3f9d9cad4e83c92c8e0aecf955ffc09061a6cf1e02"
+    },
+    {
+      "path": "target/gh-259/core-acceptance-plain-06.log",
+      "bytes": 102,
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+    },
+    {
+      "path": "target/gh-259/core-acceptance-boundaries-06.log",
+      "bytes": 102,
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+    },
+    {
+      "path": "target/gh-259/core-acceptance-features-06.log",
+      "bytes": 102,
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+    },
+    {
+      "path": "target/gh-259/package-ci-policy-01.log",
+      "bytes": 464,
+      "sha256": "91c8116c29fe54096f5f12999d2cdab634a9a8d3d232cb53132ed5c8ba12dfdc"
+    },
+    {
+      "path": "target/gh-259/package-ci-topology-01.log",
+      "bytes": 1094,
+      "sha256": "fa258633213cc200ec0770813d750f05782a3dbcef0268894ac8bf2c083ac2f2"
+    },
+    {
+      "path": "target/gh-259/docs-consistency-06.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     }
   ]
 }

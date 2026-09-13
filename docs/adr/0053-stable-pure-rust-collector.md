@@ -48,3 +48,10 @@ real Sigstore verification, protected release preparation and the cross-toolchai
 acceptance matrix remain pending.
 The same-source historical comparison preserves the original report anchors.
 This does not change the publication hold or accepted series.
+
+The next T5 checkpoint adds a Rust-validated support schema and locked offline
+unsigned candidate preparation with archive/source-authenticated dependency
+notices. Real lifecycle checks consume that payload and reject unsigned packages
+and re-signed overstated support metadata. This is review preparation only:
+protected production signing, trust bootstrap, downloader, license review and
+multi-toolchain/system acceptance remain open. T5 and T8 stay unchecked.
