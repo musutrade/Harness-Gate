@@ -12,6 +12,7 @@ import json
 
 import collector_runner as runner
 import harness_evidence as evidence
+import rust_runtime_requirements as dependencies
 
 
 class DeliveryError(ValueError):
@@ -29,7 +30,9 @@ def fingerprint(value):
 
 def validate(value, definition):
     try:
-        filename = ('rust-collector-plugin.schema.json'
+        filename = ('rust-collector-dependencies.schema.json'
+                    if definition == 'Manifest' and isinstance(value, dict) and value.get('schema') == 'rust-collector-delivery/v3'
+                    else 'rust-collector-plugin.schema.json'
                     if definition == 'Manifest' and isinstance(value, dict) and
                     value.get('schema') == 'rust-collector-delivery/v2'
                     else 'rust-collector-delivery.schema.json')
@@ -51,6 +54,7 @@ def load_manifest(raw):
 
 def validate_manifest(manifest):
     validate(manifest, 'Manifest')
+    dependencies.requirements_for_manifest(manifest)
     payloads = manifest['payloads']
     paths = [p['path'] for p in payloads]
     require(len(paths) == len(set(paths)), 'duplicate payload path')
@@ -80,7 +84,11 @@ def preflight(manifest, matrix, observed):
     validate(matrix, 'Matrix')
     validate(observed, 'Environment')
     require(observed['core'] in manifest['core_compatibility'], 'undeclared Core identity')
-    require(manifest['host_abi'] == observed['host_abi'], 'unsupported host ABI')
+    requirements = dependencies.requirements_for_manifest(manifest)
+    if requirements:
+        dependencies.check_abi(requirements, observed['host_abi'])
+    else:
+        require(manifest['host_abi'] == observed['host_abi'], 'unsupported host ABI')
     expected_tools = {t['name']: (t['sha256'], t['version']) for t in manifest['tools']}
     actual_tools = {t['name']: (t['sha256'], t['version']) for t in observed['tools']}
     require(len(actual_tools) == len(observed['tools']) and actual_tools == expected_tools,
@@ -88,8 +96,18 @@ def preflight(manifest, matrix, observed):
     require(observed['protocol'] == manifest['protocol'], 'incompatible protocol')
     identity = {'manifest_sha256': fingerprint(manifest),
                 'environment': observed}
-    matches = [row for row in matrix['tested']
-               if {k: row[k] for k in identity} == identity]
+    if requirements:
+        # A v3 signature authorizes the declared dependency capabilities; the
+        # reviewed receipt still binds this manifest, exact tools, Core and protocol.
+        def compatible(row):
+            if row['manifest_sha256'] != identity['manifest_sha256']:
+                return False
+            dependencies.check_abi(requirements, row['environment']['host_abi'])
+            return all(row['environment'][key] == observed[key] for key in ('core', 'protocol', 'tools'))
+        matches = [row for row in matrix['tested'] if compatible(row)]
+    else:
+        matches = [row for row in matrix['tested']
+                   if {k: row[k] for k in identity} == identity]
     require(len(matches) == 1, 'unknown/ambiguous tested Core/protocol/ABI combination')
     return matches[0]['receipt']
 

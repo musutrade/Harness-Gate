@@ -51,7 +51,7 @@ def preflight(packet_path, digest, source, client):
         assets.require(path.is_absolute() and not path.resolve().is_relative_to(directory.resolve()),
                        'independent absolute host verifier required')
         production.pinned(path, trust[name + '_sha256'])
-    assets.require(assets.probe_host(trust) == manifest['host_abi'], 'unsupported signing host ABI')
+    assets.check_host(manifest, trust)
     return packet, directory, output, trust
 
 

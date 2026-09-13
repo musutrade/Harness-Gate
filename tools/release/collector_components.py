@@ -82,8 +82,10 @@ def host_candidates(row, sysroot):
         yield Path('/usr/bin') / name[len('link/bin/'):]
     if name.startswith('link/gcc/'):
         suffix = name[len('link/gcc/'):]
-        for base in ('/usr/lib/gcc/x86_64-linux-gnu/15', '/usr/libexec/gcc/x86_64-linux-gnu/15'):
-            yield Path(base) / suffix
+        for parent in ('/usr/lib/gcc/x86_64-linux-gnu', '/usr/libexec/gcc/x86_64-linux-gnu'):
+            for base in sorted(Path(parent).glob('*')):
+                if base.is_dir():
+                    yield base / suffix
         if suffix in ('as', 'ld'):
             yield Path('/usr/bin') / suffix
     if name.startswith(('lib/', 'rust/lib/')):

@@ -20,7 +20,7 @@ import tarfile
 import tomllib
 
 ROOT = Path(__file__).resolve().parent
-MODULES = ('rust_collector_entry', 'rust_native_driver', 'rust_native_classify', 'rust_collector_contract',
+MODULES = ('rust_runtime_requirements', 'rust_collector_entry', 'rust_native_driver', 'rust_native_classify', 'rust_collector_contract',
            'rust_collector_project', 'rust_collector_delivery', 'collector_runner', 'harness_evidence',
            'project_model', 'quality_evidence')
 HOST_LIBS = {'libc.so.6', 'libm.so.6', 'libpthread.so.0', 'libdl.so.2',
@@ -88,15 +88,19 @@ def inventory(driver, sysroot, crate_cache, rustc_dev, build_record):
     add(ROOT / 'rust-collector-runtime/cc', 'bin/cc')
     # Cargo dependencies compile C as well as link Rust. Ship the compiler,
     # assembler and headers instead of depending on a host C toolchain.
-    add('/usr/bin/cc', 'link/bin/gcc')
+    cc = Path(shutil.which('cc') or '/usr/bin/cc').resolve(strict=True)
+    gcc_library = Path(command(str(cc), '-print-libgcc-file-name')).resolve(strict=True).parent
+    gcc_include = Path(command(str(cc), '-print-file-name=include')).resolve(strict=True)
+    add(cc, 'link/bin/gcc')
     add('/usr/bin/ld.bfd', 'link/gcc/ld')
     add('/usr/bin/as', 'link/gcc/as')
     for name in ('ar', 'ranlib'):
         add('/usr/bin/' + name, 'bin/' + name)
     add('/usr/bin/pkgconf', 'link/bin/pkgconf')
     for name in ('cc1', 'collect2', 'lto-wrapper', 'liblto_plugin.so', 'lto1'):
-        add('/usr/libexec/gcc/x86_64-linux-gnu/15/' + name, 'link/gcc/' + name)
-    tree('/usr/lib/gcc/x86_64-linux-gnu/15/include', 'link/gcc/include')
+        tool = command(str(cc), '-print-prog-name=' + name) if name != 'liblto_plugin.so' else command(str(cc), '-print-file-name=' + name)
+        add(tool, 'link/gcc/' + name)
+    tree(gcc_include, 'link/gcc/include')
     for package in ('libc6-dev', 'linux-libc-dev', 'libssl-dev'):
         for name in command('dpkg-query', '-L', package).splitlines():
             path = Path(name)
@@ -107,7 +111,7 @@ def inventory(driver, sysroot, crate_cache, rustc_dev, build_record):
             'link/sysroot/usr/lib/x86_64-linux-gnu/' + name + '.so')
         for directory in ('lib', 'rust/lib'):
             add('/usr/lib/x86_64-linux-gnu/' + name + '.so.3', directory + '/' + name + '.so.3')
-    tree('/usr/lib/gcc/x86_64-linux-gnu/15', 'link/gcc',
+    tree(gcc_library, 'link/gcc',
          lambda p: p.suffix in ('.o', '.a', '.so'))
     for name in ('Scrt1.o', 'crt1.o', 'crti.o', 'crtn.o', 'libc.so',
                  'libc.so.6', 'libc_nonshared.a', 'libm.so', 'libm.so.6',
@@ -146,9 +150,12 @@ def inventory(driver, sysroot, crate_cache, rustc_dev, build_record):
         crates.append({'name': name, 'sha256': package['checksum'],
                        'license': metadata['package']['license'], 'notices': notices})
     packages = {}
-    for package in ('python3.14', 'python3.14-minimal', 'gcc-15-base',
-                    'gcc-15-x86-64-linux-gnu', 'libgcc-15-dev', 'binutils-x86-64-linux-gnu',
-                    'libc6-dev', 'libc6', 'linux-libc-dev', 'libssl-dev', 'pkgconf-bin'):
+    compiler_packages = {command('dpkg-query', '-S', str(path)).split(': ')[0].split(':')[0]
+                         for path in (cc, Path(files['link/gcc/cc1']['source']), gcc_library / 'libgcc.a')}
+    python_name = 'python' + str(sys.version_info.major) + '.' + str(sys.version_info.minor)
+    for package in sorted(compiler_packages | {python_name, python_name + '-minimal',
+                         'binutils-x86-64-linux-gnu', 'libc6-dev', 'libc6',
+                         'linux-libc-dev', 'libssl-dev', 'pkgconf-bin'}):
         add('/usr/share/doc/' + package + '/copyright', 'licenses/' + package + '/copyright')
         packages[package] = command('dpkg-query', '-W', '-f=${Version}', package)
     tree('/usr/share/common-licenses', 'licenses/common')
@@ -228,8 +235,10 @@ def build(lock, output):
         target.chmod(row['mode'])
     # The assembly inventory is not a signed delivery manifest/compatibility receipt.
     payload = {name: {k: v for k, v in row.items() if k != 'source'} for name, row in lock['files'].items()}
-    (output / 'runtime.json').write_text(json.dumps({'schema': 'rust-collector-runtime/1',
-        'host': lock['host'], 'payload': payload}, sort_keys=True, indent=2) + '\n')
+    import rust_runtime_requirements as dependencies
+    requirements = dependencies.derive(output)
+    (output / 'runtime.json').write_text(json.dumps({'schema': 'rust-collector-runtime/2',
+        'host': lock['host'], 'runtime_requirements': requirements, 'payload': payload}, sort_keys=True, indent=2) + '\n')
     (output / 'runtime.json').chmod(0o644)
     for path in [output, *output.rglob('*')]:
         if path.is_dir():

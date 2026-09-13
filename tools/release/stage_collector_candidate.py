@@ -44,6 +44,9 @@ def stage(runtime, core, core_id, source, binding, output):
         'dependency_inventory_sha256': assets.sha(runtime / 'runtime.json'),
         'license_inventory_sha256': assets.contract.fingerprint({k: v for k, v in inventory['payload'].items()
                                                                if k.startswith('licenses/')})}
+    if inventory['schema'] == 'rust-collector-runtime/2':
+        manifest['schema'] = 'rust-collector-delivery/v3'
+        manifest['runtime_requirements'] = inventory['runtime_requirements']
     assets.contract.validate_manifest(manifest)
     output.mkdir(parents=True)
     shutil.copyfile(str(runtime) + '.tar', output / 'collector.tar')

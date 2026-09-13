@@ -78,7 +78,7 @@ def preflight(packet_path, digest, source, client):
     for name in ('openssl', 'public_key', 'cosign', 'trusted_root'):
         assets.require(Path(trust[name]).is_absolute(), 'trust paths must be absolute')
         pinned(Path(trust[name]), trust[name + '_sha256'])
-    assets.require(assets.probe_host(trust) == manifest['host_abi'], 'unsupported signing host ABI')
+    assets.check_host(manifest, trust)
     # Contract preflight proves the exact approved matrix row, not broad Linux support.
     receipt = assets.contract.preflight(manifest, assets.read(inputs['compatibility']),
                                         assets.read(inputs['observed_environment']))

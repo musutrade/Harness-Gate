@@ -175,5 +175,14 @@ def verify(directory, trust, tag, *, archive_sha256=None):
             and predicate['source_commit'] == manifest['source_commit'], 'untrusted workflow identity')
     from collector_release_policy import validate_receipt
     validate_receipt(predicate['eligibility'], tag, manifest['source_commit'])
-    require(probe_host(trust) == manifest['host_abi'], 'unsupported host ABI')
+    check_host(manifest, trust)
     return manifest
+
+
+def check_host(manifest, trust):
+    requirements = contract.dependencies.requirements_for_manifest(manifest)
+    if requirements:
+        return contract.dependencies.probe(requirements)
+    observed = probe_host(trust)
+    require(observed == manifest['host_abi'], 'unsupported host ABI')
+    return observed

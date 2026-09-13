@@ -45,10 +45,16 @@ compile/run/coverage self-check automatically; it never adopts project baselines
 Core, collector delivery version and component content revisions are separate.
 `component_versions` reports independent Rust/LLVM, C linker, Python, runtime-library,
 license and plugin revisions. The signed manifest remains the compatibility authority:
-protocol, exact Core version/commit/digest matrix, host ABI/library fingerprints,
-compiler/LLVM versions and bytes, and measurement/normalization identities.
-A similar version string is insufficient. Unsupported host tuples stop before runtime
-acquisition; missing compatible components are identified in the plan.
+protocol, exact Core version/commit/digest matrix, compiler/LLVM versions and bytes,
+and measurement/normalization identities. New v3 manifests declare the actual minimum
+glibc and required runtime libraries. Kernel releases and build-host library hashes
+are diagnostic; they do not reject an otherwise compatible machine. The publisher
+derives requirements from packaged executable dependencies. Installation verifies
+library loading and compiles/runs private C/OpenSSL and Rust coverage diagnostics
+before activation. Users do not need to install a matching C compiler or OpenSSL.
+Missing pinned components are acquired once and reused. Legacy v1/v2 signed releases
+retain their original exact-host contract; this change needs a newly published installer.
+See [the compatibility decision](../adr/0052-dependency-based-collector-compatibility.md).
 
 Run the new authenticated installer to upgrade. Only changed or missing objects are
 acquired. Preparation, original release authentication, complete payload verification
