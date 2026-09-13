@@ -92,6 +92,8 @@ jobs:
             --packet "$APPROVAL_PACKET" --packet-sha256 "$APPROVAL_SHA256" \
             --source "$SOURCE_SHA" --directory target/collector-production/assets --private-key "$key"
       - name: Publish exactly six assets as a draft and independently download and verify
+        env:
+          GODEBUG: http2client=0
         shell: bash
         run: |
           set -euo pipefail
