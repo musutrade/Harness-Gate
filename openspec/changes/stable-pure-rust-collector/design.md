@@ -244,3 +244,17 @@ required and does not excuse ambiguous JSON. Test-only re-anchoring isolates thi
 semantic defect; it is not signature forgery or producer-authentication evidence.
 Both key orders must fail, and ambiguous collection input must fail before output
 creation. Package preparation requires those actual CLI regression observations.
+
+
+### Output-path rejection before mutation
+
+The runner canonicalizes the project and the existing output parent, joins the
+new directory name, then checks the project boundary before creating anything.
+This covers symlink parents and `..` components that lexical request validation
+alone cannot resolve. A post-creation boundary check remains, but this sequence
+is not claimed to isolate concurrent parent-directory replacement. Acceptance
+compares directory entries as well as file hashes: an empty directory is a
+project mutation even when file identities are unchanged. Both doctor and direct
+collection requests exercise direct, aliased and parent-component paths; valid
+relative doctor output and a sibling sharing the project-name prefix remain
+usable. Package preparation requires these regression cases.

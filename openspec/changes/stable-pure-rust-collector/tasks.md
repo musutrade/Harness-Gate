@@ -200,3 +200,16 @@ in the candidate evidence directory for actual commands, identities and scope.
 This closes the concrete decoder defect only; T3–T8 and release/migration blockers
 remain open. No threshold, baseline, existing required binding or old evidence is
 changed.
+
+
+## Output isolation follow-up
+
+T4's runner now validates the canonical output parent before directory creation.
+The previous program rejected aliased/parent-component collection output but
+left an empty directory in the project; doctor also reproduced this for direct
+paths. Regression acceptance compares directory entries and file hashes for both
+entry points and retains a valid relative-output case. Package preparation requires
+these seven cases. Validation is recorded in `output-isolation.json` and
+`acceptance-output-isolation.json` in the candidate evidence directory. This fixes
+the reproduced failure side effect; it does not certify concurrent filesystem
+mutation isolation or complete T3–T8 and the retained release/migration blockers.
