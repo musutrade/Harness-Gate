@@ -59,6 +59,13 @@ measurement. Installation does not provision a project's trusted state.
 See the [installation/offline/lifecycle guide](quality/rust-collector-installation.md).
 Private signing keys and Arc Admin business source are not part of this handoff.
 
+## Core 0.4.2 preparation
+
+Core 0.4.2 is being prepared to ship both verified fixes; it is not yet published.
+Core 0.4.1 and RC2 remain the published tuple until the new exact binary, plugin
+manifest, installer and compatibility receipts are published together. Existing
+versions and assets are retained.
+
 ## Issues and Arc Admin
 
 | Issue | Current disposition |
