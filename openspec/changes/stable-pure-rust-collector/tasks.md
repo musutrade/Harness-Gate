@@ -14,6 +14,13 @@ in the candidate evidence directory. Six real tests pass, but this is a diagnose
 capability gap, not a derive coverage fix or T4 completion; upstream request,
 merge and adoption are all pending.
 
+A separate current-stable runtime-only continuation now confirms the built-in
+Clone boundary on 1.98.1: two configurations, six passing tests, eight ordinary/
+manual owners per export, and absent derived/annotated owners. The unchanged
+fixture and tool identities are recorded in `recovery-198.json`. The complete
+diagnostic still lacks local rustfmt; no formatting or process-audit pass is
+claimed. This confirms the capability blocker, not T4 completion.
+
 T4 also includes the PR 260 source-level macro/derive investigation and shared
 generation contract: bind source/version, invocation/config/target and ownership;
 distinguish generated code from macro implementation; track upstream submission,
