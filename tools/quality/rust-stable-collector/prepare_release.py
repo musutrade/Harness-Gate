@@ -128,7 +128,7 @@ def acceptance(path, pin, binary):
             'acceptance does not identify this candidate binary')
     checks = value['checks']
     names = {check['name'] for check in checks}
-    require(len(names) == len(checks) and len(checks) >= 59
+    require(len(names) == len(checks) and len(checks) >= 74
             and {'doctor', 'plain', 'boundaries', 'features', 'verify', 'failed-test',
                  'corrupt-coverage', 'mixed-artifact', 'changed-source',
                  'negative-function-count', 'overflow-function-count',
@@ -145,7 +145,11 @@ def acceptance(path, pin, binary):
                  'changed-registry-archive', 'changed-registry-source',
                  'poisoned-registry-before-build', 'extra-registry-source',
                  'registry-source-symlink', 'omitted-dependency-provenance',
-                 'omitted-metadata-dependency', 'restored-registry-integrity'} <= names
+                 'omitted-metadata-dependency', 'restored-registry-integrity',
+                 'external-include-bytes', 'external-include-rust', 'external-path-module',
+                 'workspace-include-bytes', 'verify-workspace-include', 'empty-compiler-proof',
+                 'omitted-compiler-input', 'malformed-dep-info', 'wrong-compiler-cwd',
+                 'omitted-dep-info-producer', 'restored-compiler-input-proof'} <= names
             and all(check['passed'] is True for check in checks),
             'candidate acceptance is incomplete or failed')
     tools = value['tools']

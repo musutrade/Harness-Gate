@@ -91,7 +91,8 @@ class PreparationTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'candidate binary'):
                 acceptance(path, pin, dict(binary, bytes=0))
             for name in ('negative-function-count', 'certified-function-owners',
-                         'missing-llvm-owner', 'omitted-source-owners', 'changed-test-exclusions'):
+                         'missing-llvm-owner', 'omitted-source-owners', 'changed-test-exclusions',
+                         'external-include-bytes', 'wrong-compiler-cwd', 'omitted-dep-info-producer'):
                 semantic = next(check for check in value['checks'] if check['name'] == name)
                 semantic['name'] = 'unrelated-placeholder'
                 with self.assertRaisesRegex(ValueError, 'incomplete or failed'):

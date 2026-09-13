@@ -14,13 +14,13 @@ installation fingerprint. Rust 1.97.1 reports commit
 matching external LLVM tools report `22.1.6-rust-1.97.1-stable`.
 External cargo-llvm-cov is 0.9.0. The actual export format is LLVM JSON 3.1.0.
 
-The candidate binary is **1,872,168 bytes**, SHA-256
-`b00cc80c9aa89bd48e8881e628be65d44e1500b8cca693e8f22cb42f92bd7fc3`.
+The candidate binary is **1,993,544 bytes**, SHA-256
+`fabd9588da2be024913375d1e284238d77e5c964cb107ddaeb844d87acc9e99e`.
 ELF `NEEDED` entries are `libgcc_s.so.1` and `libc.so.6`; no Python or compiler
 private shared library appears. This observation alone is not a transitive
-process audit. The plain capture occupies 42,767 bytes. Its temporary Cargo
+process audit. The plain capture occupies 48,545 bytes. Its temporary Cargo
 build directory is removed and persistent candidate cache is zero bytes.
-The actual unsigned candidate package occupies 3,002,802 bytes: program 1,872,168,
+The actual unsigned candidate package occupies 3,124,178 bytes: program 1,993,544,
 collected licenses 1,129,147, support metadata 924 and inventory 563 bytes. The
 [preparation record](stable-rust-candidate-evidence/preparation.json) binds the
 locked build, 74 registry dependency notice inventories, Rust library notices and
@@ -28,9 +28,9 @@ acceptance for that exact executable. It retains conservative build-dependency
 notices; production license review remains open. Full notices and build logs are
 in the workspace review directory, without repackaged raw dependency archives.
 
-The local test-only signed package and one installed version occupy 3,003,271
-bytes each. Two retained versions occupy 6,006,542 bytes. Interrupted staging
-occupies 3,003,271 bytes; the exercised root totals 9,010,428 bytes including
+The local test-only signed package and one installed version occupy 3,124,647
+bytes each. Two retained versions occupy 6,249,294 bytes. Interrupted staging
+occupies 3,124,647 bytes; the exercised root totals 9,374,556 bytes including
 verification metadata. Local input operations downloaded zero bytes; a network
 downloader is not implemented. The prepared package is deliberately unsigned;
 the lifecycle package uses test RSA and mocked Sigstore metadata. These sizes are
@@ -38,7 +38,7 @@ actual candidate measurements, not a production archive/download claim. Build
 targets and acceptance logs are not runtime payloads.
 
 The checked-in [acceptance summary](stable-rust-candidate-evidence/acceptance.json)
-contains actual tool hashes, binary identity, all 59 checks, raw totals and
+contains actual tool hashes, binary identity, all 74 checks, raw totals and
 capture/request anchors. [Environment probes](stable-rust-candidate-evidence/environment.json)
 record exact commands, errors and outputs. [ELF dependencies](stable-rust-candidate-evidence/dynamic-libraries.txt)
 record the binary inspection. The [log identity index](stable-rust-candidate-evidence/log-identities.json)
@@ -48,7 +48,7 @@ historical evidence. The separate [plain](stable-rust-candidate-evidence/core-pl
 [features](stable-rust-candidate-evidence/core-features.json) and
 [registry](stable-rust-candidate-evidence/core-registry.json) summaries record
 authenticated Core acceptance using an explicitly test-only key, not production signing. Full captures/logs remain
-under `target/gh-259/acceptance-16/` in the execution workspace; the summary is
+under `target/gh-259/acceptance-20/` in the execution workspace; the summary is
 not a standalone verifiable capture archive. CI uploads its own complete captures.
 
 ## Real fixture observations
@@ -73,7 +73,7 @@ owner mapping. Uninstantiated generic ownership remains unproven. The exact root
 (1/1 and 0/1) after excluding explicit test spans. All candidate function CRAP
 and normalized line/region coverage remain unsupported.
 
-The 59 actual checks include valid capture/integrity verification, stale output,
+The 74 actual checks include valid capture/integrity verification, stale output,
 wrong request/manifest anchors, damaged and mixed artifacts, changed source,
 restored source, boundary/features captures, wrong tool identity, injected Cargo
 configuration, missing tools, inherited compiler flags, unavailable project pin,
@@ -113,7 +113,7 @@ The binary digest in Core normalization identity distinguishes this checkpoint
 from earlier candidate evidence; no existing series is silently upgraded.
 
 The [registry acceptance record](stable-rust-candidate-evidence/registry.json)
-adds 13 checks, bringing the suite to 59. The preceding binary rejected the real
+added 13 checks; compiler-input checks below bring the current suite to 74. The preceding binary rejected the real
 locked `itoa` fixture before implementation. This binary compiles/tests it offline,
 certifies its root owner, and authenticates 14 cached package files against the
 explicit `.crate` checksum. Changed archives, modified/extra/symlinked cached files,
@@ -125,12 +125,35 @@ is forged. Tests mutate and restore only the isolated workspace cache.
 That fixture cache occupies 134,385 bytes
 (15,935 archive, 51,103
 extracted files, 9,826 index); its capture occupies
-53,990 bytes. These are user dependency/test inputs, separate
+64,675 bytes. These are user dependency/test inputs, separate
 from the plugin's zero-byte persistent cache and four-file release payload. Test
 setup copies the already provisioned crate locally; zero network bytes were fetched.
-Complete compiler input closure, including external `include!`/path inputs, remains
-unaccepted. Registry build scripts/proc macros, inactive lock packages, Git and
+Observed external `include!`/path inputs now block capture, as described below.
+Arbitrary build-script reads and environment closure remain uncertified. Registry build scripts/proc macros, inactive lock packages, Git and
 custom registries are rejected; this is a bounded package provenance implementation.
+
+The [compiler-input record](stable-rust-candidate-evidence/compiler-inputs.json)
+retains a real preceding-binary reproduction: an external `include_bytes!` file
+changed after capture, yet verification returned exit 0. The new collector checks
+observed stable dep-info against authenticated workspace/registry files. Three
+real captures using external `include_bytes!`, `include!` and `#[path]` fail before
+emitting a manifest. A project-internal data file is captured and verified.
+Re-anchored empty proofs, missing inputs, Make expressions, wrong compiler cwd
+and unmatched producer sets fail. Generated source bytes from the boundary fixture
+are retained by hash while their owners remain unsupported. These add 15 command
+checks, for 74 total. Compiler wrapper records include actual rustc arguments,
+working directory and exit status; they do not prove arbitrary build-script reads,
+environment completeness or transitive process tracing.
+
+The first dep-info implementation rejected the real registry's relative
+`src/lib.rs` as ambiguous (`acceptance-17.log`). The public Cargo wrapper supplies
+the actual producer cwd, resolving that failure. `acceptance-18.log` records a
+negative test expecting a producer-set error after deleting its only record; the
+empty-proof check correctly fired first. The revised test retains an unmatched
+record and exercises the intended check. Package preparation then correctly
+rejected a binary/acceptance digest mismatch (`package-07.log`); the final
+preparation artifact was revalidated in `acceptance-20`, all four Core cases,
+historical comparison and lifecycle checks. No acceptance anchor was bypassed.
 
 Rust unit tests separately exercise nonzero exit, timeout/process-group cleanup,
 missing executable, source decisions/unsupported owners, symlinks, tampering,
@@ -142,12 +165,12 @@ not cross-host acceptance.
 
 The same collector binary was used by all four real Core acceptance cases. The
 plain/boundary cases are at
-`target/gh-259/core-acceptance-{plain,boundaries,features}-10/`. Each invokes the
+`target/gh-259/core-acceptance-{plain,boundaries,features}-12/`. Each invokes the
 actual Core CLI with a signed v2 request, then runs Core's generic evidence
 validation and requiredness evaluator. Plain produces two verified complexity
 counts, 3 and 1, plus verified per-function execution ratios 1/1 and 0/1. Boundary fixtures produce unavailable evidence with unsupported
 capabilities and no metrics. Required CRAP blocks in every case. The registry fixture at
-`target/gh-259/core-acceptance-registry-11/` adds CC 1 and execution coverage 1/1.
+`target/gh-259/core-acceptance-registry-13/` adds CC 1 and execution coverage 1/1.
 It runs with the same isolated `CARGO_HOME` used for capture. The first attempt
 with the host Cargo home correctly failed configuration identity verification
 (`core-acceptance-registry-10.log`); no identity check was bypassed.
@@ -192,7 +215,7 @@ Unsigned preparation fails if an acceptance pin, binary identity, archived licen
 or unpacked build source does not match; six automated preparation tests cover
 these boundaries. The first actual preparation rejected acceptance for an earlier
 binary (`package-01.log`); the final binary was recaptured before successful
-preparation (`package-06.log`).
+preparation (`package-08.log`).
 
 ## Commands and results
 
@@ -203,25 +226,25 @@ this workspace because the default `/home/gem/cargo-target` is read-only.
 
 | Command | Actual result and log under `target/gh-259/` |
 | --- | --- |
-| `CARGO_TARGET_DIR="$PWD/target/gh-259/stable-target" RUSTFLAGS= CARGO_ENCODED_RUSTFLAGS= RUSTC_WRAPPER= RUSTC_WORKSPACE_WRAPPER= cargo +1.97.1 build --manifest-path tools/quality/rust-stable-collector/Cargo.toml --release --locked --offline` | Passed initial build; final artifact rebuilt by preparation below; `dependencies-build-01.log` |
-| Same target, `cargo +1.97.1 test --manifest-path tools/quality/rust-stable-collector/Cargo.toml --locked --offline` | 13 passed; `dependencies-tests-01.log` |
-| `cargo +1.97.1 fmt --manifest-path tools/quality/rust-stable-collector/Cargo.toml -- --check` | Passed; `dependencies-fmt-01.log` |
-| Same target, `cargo +1.97.1 clippy --manifest-path tools/quality/rust-stable-collector/Cargo.toml --all-targets --locked --offline -- -D warnings` | Passed; `dependencies-clippy-01.log` |
-| `python3 tools/quality/rust-stable-collector/validate_stable_candidate.py --binary target/gh-259/stable-target/release/harness-gate-rust-stable-collector --output target/gh-259/acceptance-16` | 59 passed; `acceptance-16.log` |
+| `CARGO_TARGET_DIR="$PWD/target/gh-259/stable-target" cargo +1.97.1 build --manifest-path tools/quality/rust-stable-collector/Cargo.toml --release --locked --offline` | Passed development build; final artifact rebuilt with preparation environment and revalidated below; `compiler-input-build-02.log` |
+| Same target, `cargo +1.97.1 test --manifest-path tools/quality/rust-stable-collector/Cargo.toml --locked --offline` | 16 passed; `compiler-input-tests-02.log` |
+| `cargo +1.97.1 fmt --manifest-path tools/quality/rust-stable-collector/Cargo.toml -- --check` | Passed; `compiler-inputs-fmt-01.log` |
+| Same target, `cargo +1.97.1 clippy --manifest-path tools/quality/rust-stable-collector/Cargo.toml --all-targets --locked --offline -- -D warnings` | Passed; `compiler-inputs-clippy-01.log` |
+| `python3 tools/quality/rust-stable-collector/validate_stable_candidate.py --binary target/gh-259/stable-target/release/harness-gate-rust-stable-collector --output target/gh-259/acceptance-20` | 74 passed; `acceptance-20.log` |
 | `env -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u http_proxy -u https_proxy -u all_proxy CARGO_TARGET_DIR="$PWD/target/gh-259/core-target" cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked` | 397 passed; `core-nextest-02.log` |
 | `cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check` | Passed; `core-registry-fmt-01.log` |
 | `CARGO_TARGET_DIR="$PWD/target/gh-259/core-target" cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings` | Passed; `core-registry-clippy-01.log` |
-| `CARGO_TARGET_DIR="$PWD/target/gh-259/quality-target" python3 -m unittest discover -s tools/quality/tests -v` | 444 tests OK, 36 skipped; `quality-tests-08.log` |
-| `python3 -m unittest discover -s tools/release/tests -v` | 91 passed; `release-tests-08.log` |
+| `CARGO_TARGET_DIR="$PWD/target/gh-259/quality-target" python3 -m unittest discover -s tools/quality/tests -v` | 444 tests OK, 36 skipped; `quality-tests-09.log` |
+| `python3 -m unittest discover -s tools/release/tests -v` | 91 passed; `release-tests-10.log` |
 | `python3 -m unittest discover -s tools/release/tests -p test_stable_collector_policy.py -v` | 2 passed after CI build environment alignment; `package-ci-policy-01.log` |
 | `CARGO_TARGET_DIR="$PWD/target/gh-259/quality-target" python3 -m unittest discover -s tools/quality/tests -p test_ci_topology.py -v` | 7 passed after CI build environment alignment; `package-ci-topology-01.log` |
-| `CARGO_TARGET_DIR="$PWD/target/gh-259/core-target" python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json` | Passed; `docs-consistency-09.log` |
+| `CARGO_TARGET_DIR="$PWD/target/gh-259/core-target" python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json` | Passed; `docs-consistency-10.log` |
 | Same Core target, `cargo build --manifest-path tools/harness-gate/Cargo.toml --example stable_collector_acceptance --locked --offline` | Passed; `core-registry-build-01.log` |
-| `target/gh-259/core-target/debug/examples/stable_collector_acceptance target/gh-259/stable-target/release/harness-gate-rust-stable-collector target/gh-259/core-target/debug/harness-gate target/gh-259/acceptance-16 target/gh-259/core-acceptance-${fixture}-10 $fixture` for `plain boundaries features` | All three passed; matching `core-acceptance-${fixture}-10.log` |
-| `CARGO_HOME="$PWD/target/gh-259/acceptance-16/registry-cargo-home" target/gh-259/core-target/debug/examples/stable_collector_acceptance target/gh-259/stable-target/release/harness-gate-rust-stable-collector target/gh-259/core-target/debug/harness-gate target/gh-259/acceptance-16 target/gh-259/core-acceptance-registry-11 registry` | Passed; `core-acceptance-registry-11.log` |
-| `python3 tools/quality/rust-stable-collector/compare_historical_fixture.py --binary target/gh-259/stable-target/release/harness-gate-rust-stable-collector --output target/gh-259/historical-06` | Passed; `historical-06.log` |
-| `python3 tools/quality/rust-stable-collector/validate_lifecycle.py --binary target/gh-259/stable-target/release/harness-gate-rust-stable-collector --package target/gh-259/package-06/unsigned-package --output target/gh-259/lifecycle-08` | 33 passed; real RSA, mocked Sigstore; `lifecycle-08.log` |
-| `python3 tools/quality/rust-stable-collector/prepare_release.py --output target/gh-259/package-06 --target-dir "$PWD/target/gh-259/stable-target" --toolchain 1.97.1 --acceptance target/gh-259/acceptance-16/summary.json 3ba6137f8f0b84356233a9d69a373ae3af7da9c395b2f5570510a9434e07d7d2` | Passed locked offline build and package preparation; `package-06.log` and `package-06/preparation.json` |
+| `target/gh-259/core-target/debug/examples/stable_collector_acceptance target/gh-259/stable-target/release/harness-gate-rust-stable-collector target/gh-259/core-target/debug/harness-gate target/gh-259/acceptance-20 target/gh-259/core-acceptance-${fixture}-12 $fixture` for `plain boundaries features` | All three passed; matching `core-acceptance-${fixture}-12.log` |
+| `CARGO_HOME="$PWD/target/gh-259/acceptance-20/registry-cargo-home" target/gh-259/core-target/debug/examples/stable_collector_acceptance target/gh-259/stable-target/release/harness-gate-rust-stable-collector target/gh-259/core-target/debug/harness-gate target/gh-259/acceptance-20 target/gh-259/core-acceptance-registry-13 registry` | Passed; `core-acceptance-registry-13.log` |
+| `python3 tools/quality/rust-stable-collector/compare_historical_fixture.py --binary target/gh-259/stable-target/release/harness-gate-rust-stable-collector --output target/gh-259/historical-08` | Passed; `historical-08.log` |
+| `python3 tools/quality/rust-stable-collector/validate_lifecycle.py --binary target/gh-259/stable-target/release/harness-gate-rust-stable-collector --package target/gh-259/package-08/unsigned-package --output target/gh-259/lifecycle-09` | 33 passed; real RSA, mocked Sigstore; `lifecycle-09.log` |
+| `python3 tools/quality/rust-stable-collector/prepare_release.py --output target/gh-259/package-08 --target-dir "$PWD/target/gh-259/stable-target" --toolchain 1.97.1 --acceptance target/gh-259/acceptance-20/summary.json 46ef2648aef792baa0d2d78693c86aed99e8ee77c750c3837f6efc1ee59354d6` | Passed locked offline build and package preparation; `package-08.log` and `package-08/preparation.json` |
 | `harness-gate config check`; `harness-gate verify --profile ci --all` | Not applicable: no `.harness-gate/flow.toml` declaring `ci`; neither was run |
 
 The registry suite first hit an offline test-setup failure while resolving the

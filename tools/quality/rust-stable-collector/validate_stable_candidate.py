@@ -14,6 +14,7 @@ import shutil
 import subprocess
 
 from validate_registry_dependencies import validate as validate_registry
+from validate_compiler_inputs import validate as validate_compiler_inputs
 
 
 def digest(path):
@@ -202,6 +203,7 @@ def main():
             assert inventory['unsupported'] and 'build.rs' in data['excluded_paths']
 
         observations["registry"] = validate_registry(output, run, digest, True)
+        observations["compiler_inputs"] = validate_compiler_inputs(output, run, digest, True)
 
         changed_tools = json.loads(request_path.read_text())
         changed_tools['output_root'] = str(output / 'capture-wrong-tools')

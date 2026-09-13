@@ -63,3 +63,15 @@ unsupported. Runtime code does not infer Cargo's private cache layout or downloa
 inputs. The isolated real itoa fixture and cache/archive/proof mutations extend
 acceptance without changing Core thresholds, requiredness or migration policy.
 T3–T8 remain unchecked pending the complete matrix and release contract.
+
+The bounded compiler-input checkpoint extends T3/T4 with the same Rust executable
+acting through Cargo's public RUSTC_WRAPPER protocol. It records unchanged compiler
+arguments, pinned rustc, actual working directory and exit status, then reconciles
+stable Makefile dep-info with workspace/registry source identities. External
+includes and path modules fail before evidence publication; generated input bytes
+are retained without certifying generated owners. Verification requires the same
+producer and input sets, even after a test manifest is re-anchored. Real registry
+builds establish relative-path resolution from the observed compiler cwd. This is
+not arbitrary build-script/environment closure or a transitive process audit.
+The validation record retains the original external-input reproduction and all
+limits. T3–T8 and the publication hold remain open.

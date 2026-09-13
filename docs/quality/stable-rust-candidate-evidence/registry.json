@@ -1,15 +1,15 @@
 {
   "schema": "rust-stable-registry-acceptance/v1",
   "collector": {
-    "sha256": "b00cc80c9aa89bd48e8881e628be65d44e1500b8cca693e8f22cb42f92bd7fc3",
-    "bytes": 1872168
+    "sha256": "fabd9588da2be024913375d1e284238d77e5c964cb107ddaeb844d87acc9e99e",
+    "bytes": 1993544
   },
   "observations": {
     "anchors": {
       "capture": "complete",
       "core_acceptance": "pending",
-      "manifest_sha256": "15f25ac35b0b35651230c533f074bcc014a9d2015bb9eb9a5f3052aafc7138c7",
-      "request_sha256": "721cd787b277ad9d198e0fc018f2bcad6c5cce9009210a4dcb3c948de73beb34",
+      "manifest_sha256": "f2d789fe6cd41ca300dba3414dd5f1cc4f062a76ec9dd3ca05b962b0a91a4ca5",
+      "request_sha256": "7b2cdac277ff2a479fe699456167a3409c27d8cf64eec54ad6f910e2333b8a78",
       "state": "unsupported"
     },
     "archive_sha256": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682",
@@ -22,10 +22,10 @@
       "--locked",
       "--offline",
       "--manifest-path",
-      "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-16/project-registry/Cargo.toml"
+      "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-20/project-registry/Cargo.toml"
     ],
     "setup_is_repository_automation": true,
-    "isolated_cargo_home": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-16/registry-cargo-home",
+    "isolated_cargo_home": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-20/registry-cargo-home",
     "network_download_bytes": 0,
     "scope": "single locked crates.io dependency; local cache copied by test setup"
   },
@@ -43,7 +43,7 @@
   "explicit_archive_bytes": 15935,
   "extracted_package_bytes": 51103,
   "index_bytes": 9826,
-  "capture_bytes": 53990,
+  "capture_bytes": 64675,
   "network_download_bytes": 0,
-  "scope": "Package-directory provenance, not complete compiler input closure. Cargo cache layout is used only in repository test setup."
+  "scope": "Authenticated package directories and observed compiler dep-info file inputs; arbitrary build-script reads and environment are not certified. Cargo cache layout is used only in repository test setup."
 }

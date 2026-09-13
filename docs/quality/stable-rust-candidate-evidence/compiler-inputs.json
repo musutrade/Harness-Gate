@@ -1,0 +1,28 @@
+{
+  "schema": "rust-stable-compiler-input-acceptance/v1",
+  "collector": {
+    "sha256": "fabd9588da2be024913375d1e284238d77e5c964cb107ddaeb844d87acc9e99e",
+    "bytes": 1993544
+  },
+  "observations": {
+    "external_inputs": "three real captures blocked before manifest",
+    "workspace_data": "identity verified",
+    "generated_inputs": 1,
+    "scope": "observed rustc dep-info file inputs only; arbitrary build-script reads and environment are not certified"
+  },
+  "prior_reproduction": {
+    "prior_binary": "b00cc80c9aa89bd48e8881e628be65d44e1500b8cca693e8f22cb42f92bd7fc3",
+    "command": [
+      "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+      "verify",
+      "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/input-reproduction-01/capture",
+      "2af3670fef9f43be56e8ad6020e358ef1ff15e93c4b6bcc25961d94132e73df3",
+      "0be548a1eb318e756aa038d9a1c05c5cbbdde10e19f63860a6e095b2530206f0"
+    ],
+    "exit_code": 0,
+    "unanchored_external_input_mutation_accepted": true
+  },
+  "plain_dep_info_records": 1,
+  "plain_compiler_invocations": 8,
+  "scope": "Observed public Cargo wrapper invocations and rustc dep-info, not arbitrary build-script/environment closure or a transitive process audit."
+}
