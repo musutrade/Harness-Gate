@@ -144,3 +144,42 @@ capability MUST NOT enable CRAP or an existing required binding without review.
 - GIVEN an anchored export whose file and total summaries agree but disagree with its owners' region counts or covered regions
 - WHEN the candidate verifies the evidence
 - THEN measurement fails before emitting normalized evidence.
+
+### Requirement: Evidence-backed macro support and focused source fixes
+
+Source availability alone MUST NOT certify an accurate generated-code metric.
+Macro presence alone MUST NOT justify blanket unsupported classification. A concrete
+defect MUST have a minimal reproducer, identified responsible layer and tracked focused
+fix or capability request. Fixed source/version and real regression evidence MUST be
+verified before promoting support; upstream PR submission alone is insufficient.
+
+#### Scenario: Same macro implementation, different invocation
+
+- GIVEN the same dependency source used with different invocation inputs or build configuration
+- WHEN generated-code complexity or coverage is collected
+- THEN the collector binds each result to its actual generated owners/configuration and execution evidence rather than assigning a value from the macro implementation source.
+
+#### Scenario: Mapping defect in an available dependency
+
+- GIVEN a reproducible source/coverage ownership defect
+- WHEN a source-level dependency patch is proposed
+- THEN a focused PR and regression fixture track the fix, and support is promoted only after the fixed dependency version and actual measurement outcomes are validated.
+
+### Requirement: Shared template observations stay separate from execution evidence
+
+The bounded candidate observer MUST reuse the first-party macro's ordinary Rust
+parser/generator and bind its exact implementation, dependency lock, invocation,
+requested feature/target and generated owner. Source observations MUST NOT be
+accepted as compiler execution attestations or normalized Core coverage/CRAP.
+
+#### Scenario: Configuration changes the shared generated function
+
+- GIVEN the same authenticated template sources and a consumer with default and branching invocations
+- WHEN both requested configurations are observed and verified
+- THEN the configured template has complexity 1 or 2 under its declared series, while generated-function coverage and CRAP remain unsupported until actual counters/owners are certified.
+
+#### Scenario: Forged or ambiguous structured observations
+
+- GIVEN changed source/model identities, a wrong anchor, forged coverage zero, mixed configurations or duplicate generated owners
+- WHEN the candidate observes or verifies the result
+- THEN it fails measurement without emitting certified metrics; unvalidated nested/derive/cfg inputs yield an explicit unsupported result with no partial function observations.

@@ -108,6 +108,16 @@
       "sha256": "60848db3d1742b91dacdccfb18486318700967f42baa2bdba52829a71fb95d73"
     },
     {
+      "path": "target/gh-259/acceptance26.log",
+      "sha256": "74df6220f1fed1788e6fdb412da3412e5662ad0403eefdbedb780a052ad940b5",
+      "bytes": 116
+    },
+    {
+      "path": "target/gh-259/acceptance26/summary.json",
+      "sha256": "638af56a53cf231f3526c4a4ac40937ce3ac3be056261e66343bfaa306f84cda",
+      "bytes": 24072
+    },
+    {
       "path": "target/gh-259/aggregate-build-01.log",
       "bytes": 208,
       "sha256": "572956632defab8aa0d34f62ea909eafe9aee02ce1ce206a08a8db00d404f2c5"
@@ -443,9 +453,29 @@
       "sha256": "b81be4260d41a4b45534765cc6c2fee0720feac37a6483cd739f944fbf8752c5"
     },
     {
+      "path": "target/gh-259/core-boundaries-18.log",
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb",
+      "bytes": 102
+    },
+    {
+      "path": "target/gh-259/core-boundaries-18/summary.json",
+      "sha256": "5e1143b8043617a9f23eccf2018b01b4e152a980c939b063263ca4e8169abfca",
+      "bytes": 5129
+    },
+    {
       "path": "target/gh-259/core-clippy-02.log",
       "bytes": 166,
       "sha256": "ae09ac076cf225f8ac32f26d4256bade7b44156517c63afa0fee9655ef1bdcb8"
+    },
+    {
+      "path": "target/gh-259/core-features-18.log",
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb",
+      "bytes": 102
+    },
+    {
+      "path": "target/gh-259/core-features-18/summary.json",
+      "sha256": "d1b8a2d2b61e839aeab16924de39da6dd8b81b74b6a40b73a96f5e2914a41efa",
+      "bytes": 5125
     },
     {
       "path": "target/gh-259/core-fmt-02.log",
@@ -471,6 +501,36 @@
       "path": "target/gh-259/core-owner-fmt-01.log",
       "bytes": 0,
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-259/core-partial-18.log",
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb",
+      "bytes": 102
+    },
+    {
+      "path": "target/gh-259/core-partial-18/summary.json",
+      "sha256": "8337d729c55f6c4d960c606480ab8a50b4e31fd63b5a770b7c739e10f0f442e3",
+      "bytes": 4446
+    },
+    {
+      "path": "target/gh-259/core-plain-18.log",
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb",
+      "bytes": 102
+    },
+    {
+      "path": "target/gh-259/core-plain-18/summary.json",
+      "sha256": "8f0ab383e265d9c1e3e8b4522002dc6090cf9bd493f5dd0e6fde320cb8773b17",
+      "bytes": 4442
+    },
+    {
+      "path": "target/gh-259/core-registry-18.log",
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb",
+      "bytes": 102
+    },
+    {
+      "path": "target/gh-259/core-registry-18/summary.json",
+      "sha256": "1ff4d57eab144a8ba3bf5234e18d5da68c0e17aa06bb1746d65c5af24e58b78b",
+      "bytes": 4202
     },
     {
       "path": "target/gh-259/core-registry-build-01.log",
@@ -808,6 +868,26 @@
       "sha256": "a16c1ac62c4d0adf9df8f300a5fedf0697721e0653d2db2aff3548489eeb45ad"
     },
     {
+      "path": "target/gh-259/lifecycle13.log",
+      "sha256": "2461c8b332bc53cb0929bf1fb3ae72e5f1846a1af52f3dc42426448f5fee7d83",
+      "bytes": 108
+    },
+    {
+      "path": "target/gh-259/lifecycle13/automation.json",
+      "sha256": "fa0b819b3f8979b3844bd60eb5d395379d2532f3f5e04d3bd594d0c02d756139",
+      "bytes": 17062
+    },
+    {
+      "path": "target/gh-259/lifecycle13/summary.json",
+      "sha256": "1a742f32d9c86ed4df82d5ad8f53ddd777692ccf432dc3596812bba7c6f2b798",
+      "bytes": 6259
+    },
+    {
+      "path": "target/gh-259/lifecycle13/upgrade-build.json",
+      "sha256": "ea57848eb1207b8dcc3cf38277d1d1f93406edbc0ab7924c852d9e8b9d03852f",
+      "bytes": 6664
+    },
+    {
       "path": "target/gh-259/llvm-22.1.6-CoverageSummaryInfo.cpp",
       "bytes": 4615,
       "sha256": "e29773f34d1d649a4b48332773e79c572241ab0e445171bee27e5b8dd868c970"
@@ -816,6 +896,456 @@
       "path": "target/gh-259/loopback-probe-01.log",
       "bytes": 54,
       "sha256": "64b25d9f65009059d130342854aec85fb65354279726082397103f15d611c52c"
+    },
+    {
+      "path": "target/gh-259/macro-acceptance.log",
+      "sha256": "1e4f283d753b484af4cc846a30d30950381e46158229bb7deff97130a6bedac1",
+      "bytes": 74
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/archives.json",
+      "sha256": "59b61cb007eb852b05d24fd9ffe405308285bcfbdc6b52d4bee8f3717a9b014a",
+      "bytes": 634
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/branching-coverage.json",
+      "sha256": "19a30fc6d0cb0282c972e69dc9b933b0e16c7380642fb22583e553c5ecd6a9d0",
+      "bytes": 5398
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/branching.json",
+      "sha256": "52b0787f56a640cd9454a58e22e67dee568194507a8a0fa28903d1fd5f973a87",
+      "bytes": 7039
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/capture-blocked.stderr",
+      "sha256": "da76262fa0c3794061509dcf554fdfebe221cf5c71281d736f6429288e9356e9",
+      "bytes": 121
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/capture-blocked.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/cfg.json",
+      "sha256": "834357b54d39f470058131472cf2e65cc73dc13e957c929f259c6df03b8c703f",
+      "bytes": 2993
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/cfg.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/cfg.stdout",
+      "sha256": "3839d50dbd2c8c9dfa966c09eb4ba7bb1ad3b44687f9f076ccf97cc7bf508f6b",
+      "bytes": 91
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/changed-Cargo.lock.stderr",
+      "sha256": "f8bd80e3c5b6b2e45b5a9b474e115cc2618b5bac8c4095ca1cb01329a386e773",
+      "bytes": 138
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/changed-Cargo.lock.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/changed-consumer-Cargo.toml.stderr",
+      "sha256": "ab9bc0649b07e747ba9a87247204c161152be097138b50c4c80062a3be9531a5",
+      "bytes": 147
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/changed-consumer-Cargo.toml.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/changed-feature.json",
+      "sha256": "42e03c7a98e034f99bf79441ed23a0c7b7b3fe03479f40981a2bb4c87c44ab67",
+      "bytes": 5208
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/changed-feature.stderr",
+      "sha256": "7d15c617c756b1be5d749d6e66c4e8ae80d901f489be4382b908b9e07ce74059",
+      "bytes": 129
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/changed-feature.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/changed-generator-src-lib.rs.stderr",
+      "sha256": "6988118aca070b364b1110f84ec4c85b70494fae8ebd0475acff2a0850ae5d30",
+      "bytes": 148
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/changed-generator-src-lib.rs.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/changed-macros-src-lib.rs.stderr",
+      "sha256": "0e48e72501cd556b228f20addfd3b9e2169fbe03b7e7a7e7f6463f05713346af",
+      "bytes": 145
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/changed-macros-src-lib.rs.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/coverage-branching.stderr",
+      "sha256": "e134dc41fe8beffa164197ce896344d26267bba95d0f54a3c84a1766b101add9",
+      "bytes": 644
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/coverage-branching.stdout",
+      "sha256": "29c66b352a17d7339f709d7730bd45849fef4685f7497b64138c977ad828c2f5",
+      "bytes": 233
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/coverage-default.stderr",
+      "sha256": "ac24c39a4ab6b9d130f0ecd2acb9160179e12fa2fe9266d530931dd9ebacaebf",
+      "bytes": 1034
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/coverage-default.stdout",
+      "sha256": "29c66b352a17d7339f709d7730bd45849fef4685f7497b64138c977ad828c2f5",
+      "bytes": 233
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/default-coverage.json",
+      "sha256": "bf8470ae02203e74251f27e1e16c2addd2b70ffb0c5aebdc270b9548307cd7a1",
+      "bytes": 5398
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/default.json",
+      "sha256": "e61e7525854bacff2f675078fb02edd45a4b9e92a365976f57de8247195b7964",
+      "bytes": 7014
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/derive.json",
+      "sha256": "7f427b21fa78c4e8c29d800404457854cfe49e058a0240f330531950d07ce6eb",
+      "bytes": 3042
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/derive.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/derive.stdout",
+      "sha256": "009987a15c3f931a88de77330e967054eca4ebde030720564780d8b3ef05fca7",
+      "bytes": 91
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/doctor.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/doctor.stdout",
+      "sha256": "7ab4bcc223331d2a9838eb2bf6354fc671933713c13040c58ea169eff3425c08",
+      "bytes": 1909
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/duplicate-invocation.stderr",
+      "sha256": "f234b1622d82a8368cb653f862c890e1bc7a3a0886117773d4c0b679a64d4400",
+      "bytes": 114
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/duplicate-invocation.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/duplicate-owner-claim.json",
+      "sha256": "3b3d9a2e8b447ebdfa0800d0fdce88b03cd1862020ecb3a192fabab44cf31647",
+      "bytes": 5910
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/duplicate-owner-claim.stderr",
+      "sha256": "7d15c617c756b1be5d749d6e66c4e8ae80d901f489be4382b908b9e07ce74059",
+      "bytes": 129
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/duplicate-owner-claim.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/forged-coverage.json",
+      "sha256": "49b1f25e2931584a2a0f3510f61b9e700628e8272da15ab7eedf80418d47f6b4",
+      "bytes": 5149
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/forged-coverage.stderr",
+      "sha256": "7d15c617c756b1be5d749d6e66c4e8ae80d901f489be4382b908b9e07ce74059",
+      "bytes": 129
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/forged-coverage.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/mixed-config-owner.json",
+      "sha256": "0ec9ad6a0da8b72f9f0cd2015280e38acfa31defd2ad85d79ef60d1f40e5b3c4",
+      "bytes": 5199
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/mixed-config-owner.stderr",
+      "sha256": "7d15c617c756b1be5d749d6e66c4e8ae80d901f489be4382b908b9e07ce74059",
+      "bytes": 129
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/mixed-config-owner.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/nested.json",
+      "sha256": "b340f9f5d7b4030c048a481a27d7c67531d32e67476af6168e37b5f3535947a8",
+      "bytes": 3042
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/nested.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/nested.stdout",
+      "sha256": "517dfc9b4bc1a09de2b03f05a398106b00a351db070ffeca3c839985220c41ca",
+      "bytes": 91
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/observe-branching.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/observe-branching.stdout",
+      "sha256": "953c7979fe8fd18d61920141622ae9eb961de113f971c44ee6d3351840ae5a67",
+      "bytes": 91
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/observe-default.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/observe-default.stdout",
+      "sha256": "c43d4766252e14a8dada4fc8b9eba8eb631deaf09b0c9741cb6be2674d1f4271",
+      "bytes": 91
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/prepare.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/prepare.stdout",
+      "sha256": "da7f061669dddcfaaf9f6ea7e2737ae25a202fd40cb5a08431564bc8944d86ee",
+      "bytes": 3972
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/request.json",
+      "sha256": "da7f061669dddcfaaf9f6ea7e2737ae25a202fd40cb5a08431564bc8944d86ee",
+      "bytes": 3972
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/source-drift.stderr",
+      "sha256": "7d15c617c756b1be5d749d6e66c4e8ae80d901f489be4382b908b9e07ce74059",
+      "bytes": 129
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/source-drift.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/summary.json",
+      "sha256": "a8501b3cf3d489db5479a1fe798c16305dde5d131639317433e8696e8b5ce214",
+      "bytes": 30749
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/tests-branching.stderr",
+      "sha256": "cf7e115af88858684f859d6f11ca8b75f808518842ce5eae817e18a067d367a4",
+      "bytes": 825
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/tests-branching.stdout",
+      "sha256": "090f1e79cccbd656fb11b9d60aeaca59150df857dbd01d2ce580777d5cbb19a8",
+      "bytes": 926
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/tests-default.stderr",
+      "sha256": "30425b28d79a4509846b865cb339fe14f760a08d8223b81dd5419de4a3ac74c2",
+      "bytes": 1217
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/tests-default.stdout",
+      "sha256": "090f1e79cccbd656fb11b9d60aeaca59150df857dbd01d2ce580777d5cbb19a8",
+      "bytes": 926
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/verify-branching.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/verify-branching.stdout",
+      "sha256": "ba78f3c12461062ba66f78345f2d599a655e75f97eef8eb8093048cd6f5301b6",
+      "bytes": 126
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/verify-default.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/verify-default.stdout",
+      "sha256": "ba78f3c12461062ba66f78345f2d599a655e75f97eef8eb8093048cd6f5301b6",
+      "bytes": 126
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/wrong-anchor.stderr",
+      "sha256": "d8cb619d08e911a269b634992de9d2c285e2b671899593ae544fa863f137a785",
+      "bytes": 108
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/wrong-anchor.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/wrong-target.json",
+      "sha256": "6450b14567cfdffc19fb247a725fe54cd1756040cfd738d0249e878fb098fa0c",
+      "bytes": 5207
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/wrong-target.stderr",
+      "sha256": "7d15c617c756b1be5d749d6e66c4e8ae80d901f489be4382b908b9e07ce74059",
+      "bytes": 129
+    },
+    {
+      "path": "target/gh-259/macro-acceptance/wrong-target.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-build-final.log",
+      "sha256": "a161e3e6571577df8963aa650970ab6d6b2ad59d1f573c8674a66ce2ed5081e8",
+      "bytes": 208
+    },
+    {
+      "path": "target/gh-259/macro-build.log",
+      "sha256": "79da895a65e6d009fccf8f5e50779ea3c02a3b2499e7ce539d0207f40c3ef229",
+      "bytes": 353
+    },
+    {
+      "path": "target/gh-259/macro-clippy.log",
+      "sha256": "355365f5cb67cdd35f90dc4ff9ba0a4131ecc6a54f1cf02779e260ad9e895c59",
+      "bytes": 362
+    },
+    {
+      "path": "target/gh-259/macro-core-clippy.log",
+      "sha256": "f2066ca264b9a8598ecd436c70919e1efe1acea4098ad2a13b5d82d67bc049ec",
+      "bytes": 72
+    },
+    {
+      "path": "target/gh-259/macro-core-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-core-nextest.log",
+      "sha256": "09e6d948885e2ee511925b8236d328a4e8f90b08b528ad7a744afff9e622fbea",
+      "bytes": 54390
+    },
+    {
+      "path": "target/gh-259/macro-docs-consistency-final.log",
+      "sha256": "6fdde67acd13145abd556580c3ab8d9ea34bad99a09db00ccf28a3fbeabecb76",
+      "bytes": 79
+    },
+    {
+      "path": "target/gh-259/macro-docs-consistency-workspace.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-docs-consistency.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-docs-default-cargo.log",
+      "sha256": "1518f5efe4e6f2ab73a01b43187054665d70adad18be3c687269a0d7028ada40",
+      "bytes": 120
+    },
+    {
+      "path": "target/gh-259/macro-dynamic-libraries.txt",
+      "sha256": "dd95b2d5d9b07e94f608b69449598b0b4d2e5159d1f4ed3092daafa20288ab89",
+      "bytes": 1535
+    },
+    {
+      "path": "target/gh-259/macro-fixture-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "target/gh-259/macro-fixture-tests.log",
+      "sha256": "1068e8af73cf540ab399471adbc20c5eefb30d12004f3af57be63a14535c8ae2",
+      "bytes": 2038
+    },
+    {
+      "path": "target/gh-259/macro-lock.log",
+      "sha256": "91e34b268869b383b209350cbf33a1f597ca6a6fa2fae44f8888f0d1d9e4e32f",
+      "bytes": 414
+    },
+    {
+      "path": "target/gh-259/macro-observation-initial/coverage.json",
+      "sha256": "0efcf6aaa767b78c3601305512dc71ff52fb0e0ffcee88f307f1986bb81f56ef",
+      "bytes": 4972
+    },
+    {
+      "path": "target/gh-259/macro-observation-initial/coverage.log",
+      "sha256": "ae0554ca5c190e51d94232000c52ddc7b9388b02027a17456436c9c1e9c24d2c",
+      "bytes": 1233
+    },
+    {
+      "path": "target/gh-259/macro-observation-initial/span-coverage.json",
+      "sha256": "11fe6a869751442ef5fa9bed1dfc4455e557f2194ea57b345a22fdae6df4644d",
+      "bytes": 4940
+    },
+    {
+      "path": "target/gh-259/macro-observation-initial/span-coverage.log",
+      "sha256": "674d9e81599800217e5e3e4c3a90a42aefe5811f0a465c0e69fcdaeb744db12e",
+      "bytes": 1178
+    },
+    {
+      "path": "target/gh-259/macro-observation-initial/tests.log",
+      "sha256": "0c41f00c43599cbab8c69cd2d732ed124ebbacf3b4806b40012451c428acaf4e",
+      "bytes": 2003
+    },
+    {
+      "path": "target/gh-259/macro-quality-tests.log",
+      "sha256": "fcad18a98baa0e174953d747e2d3b0ba2a09804f66ed1821aac01e1eacb94932",
+      "bytes": 77463
+    },
+    {
+      "path": "target/gh-259/macro-release-tests.log",
+      "sha256": "1d26dfcf90260ac1c7bd5bc200d5303a69bedfa233ed39db2382f7324258a286",
+      "bytes": 14291
+    },
+    {
+      "path": "target/gh-259/macro-unit.log",
+      "sha256": "c574c42e405b72b4117ed27c0371dbcd8594c897c9416ae029d73abbbfb33d16",
+      "bytes": 2155
     },
     {
       "path": "target/gh-259/ownership-build-02.log",
@@ -931,6 +1461,16 @@
       "path": "target/gh-259/package-tests-01.log",
       "bytes": 920,
       "sha256": "0455632d8afc01370514d91fcd20b2662f6c9de5ed89216fde72eed5af4e2dc3"
+    },
+    {
+      "path": "target/gh-259/package13.log",
+      "sha256": "dcf1455000cf06f30940cfe8486a923c1ea835fce0aa016db9ef95cd61baed02",
+      "bytes": 147
+    },
+    {
+      "path": "target/gh-259/package13/preparation.json",
+      "sha256": "1f9c3881e5735df8a878f865638d876f2248d5bc51186ef2384b148f1ec37b9a",
+      "bytes": 39546
     },
     {
       "path": "target/gh-259/quality-tests-02.log",

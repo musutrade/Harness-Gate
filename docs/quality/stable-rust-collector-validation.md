@@ -5,7 +5,47 @@ complete; T3–T8 remain open. The [design](stable-rust-collector.md) defines th
 boundary. No Core required binding, threshold, baseline or historical evidence
 was changed. No compiler-private backend was built or executed for these results.
 
-## Actual environment and artifact
+## Shared-generator checkpoint
+
+The current executable adds the [bounded macro source observer](stable-rust-macro-observation.md),
+sharing our ordinary Rust generator with the actual procedural macro. Its release
+SHA-256 is `8227f231adea15a433f194e67bfd45b0e2647911e628cece5f8b54a234b94f43`
+and its size is 2,084,496 bytes. The [macro regression record](stable-rust-candidate-evidence/macro-observation.json)
+contains 26 successful checks and the actual consumer LLVM function records for
+default and branching configurations. Both configurations execute generated code,
+but the export has only two consumer test functions and no generated business
+function record. No zero coverage or CRAP is inferred. Authenticated macro capture
+separately remains blocked on registry build-script/proc-macro input certification.
+
+The final binary passed 92 generic capture checks in `target/gh-259/acceptance26/`
+and five authenticated Core fixtures in `target/gh-259/core-*-18/`. The unsigned
+four-file package is 3,215,130 bytes (`target/gh-259/package13/`); it includes the
+same 1,129,147 bytes of notices, 924 bytes of support metadata and 563-byte inventory.
+It carries no fixture source, test automation, compiler or evidence archive.
+The source/build inventory now binds the linked first-party generator and model
+manifests/lock. Production signature, license and cross-environment acceptance
+remain pending. The summaries below describe the preceding checkpoint and retain
+their original binary/artifact identities; they are not evidence for this binary.
+
+Validation for the new checkpoint: 19 Rust unit tests, four fixture workspace tests,
+26 macro checks, 92 generic checks and all five Core fixtures passed. The repository
+Core nextest suite passed 397 tests with only proxy variables removed from its
+process environment; no Core behavior changed. Quality unittest discovery reports
+444 tests, OK with 36 explicitly manual legacy skips. Release tests report 91 OK.
+Core/candidate clippy and formatting checks passed. Full commands, current byte
+measurements and remaining limitations are indexed in the
+[checkpoint evidence](stable-rust-candidate-evidence/macro-checkpoint.json).
+The lifecycle suite passed 38 checks using test RSA keys and mocked Sigstore.
+Its signed test packages are 3,215,599 bytes initially and 3,215,705 bytes for the
+separately compiled upgrade. Two installed versions occupy 6,431,304 bytes;
+including interrupted staging and installation metadata the measured footprint
+is 9,647,637 bytes. Actual network download bytes are zero: this is local lifecycle
+validation, not a production download or signature acceptance claim.
+Local process tracing remains unavailable; CI requires actual tracing. Rust 1.98.1,
+a second runnable Linux environment and real Sigstore acceptance remain unverified.
+No project `.harness-gate/flow.toml` exists: config check and verify ci are not applicable.
+
+## Preceding environment and artifact checkpoint
 
 The same release binary ran all collection and Core checks on Ubuntu 26.04, Linux x86_64
 GNU, glibc 2.43. The host kernel is recorded only as an observation, not an

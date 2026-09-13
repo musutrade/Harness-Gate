@@ -20,6 +20,7 @@ PROGRAM = 'harness-gate-rust-stable-collector'
 TARGET = 'x86_64-unknown-linux-gnu'
 ROOT = Path(__file__).resolve().parents[3]
 CRATE = ROOT / 'tools/quality/rust-stable-collector'
+MACRO_MODEL = ROOT / 'tools/quality/fixtures/rust-macro-observation'
 
 
 def require(condition, message):
@@ -62,7 +63,11 @@ def write(path, value):
 
 def source_identity():
     paths = [CRATE / 'Cargo.toml', CRATE / 'Cargo.lock', ROOT / 'LICENSE',
-             CRATE / 'prepare_release.py', *sorted((CRATE / 'src').glob('*.rs'))]
+             CRATE / 'prepare_release.py', *sorted((CRATE / 'src').glob('*.rs')),
+             MACRO_MODEL / 'Cargo.toml', MACRO_MODEL / 'Cargo.lock',
+             MACRO_MODEL / 'generator/Cargo.toml', MACRO_MODEL / 'generator/src/lib.rs',
+             MACRO_MODEL / 'macros/Cargo.toml', MACRO_MODEL / 'macros/src/lib.rs',
+             MACRO_MODEL / 'consumer/Cargo.toml']
     return {str(p.relative_to(ROOT)): identity(p) for p in paths}
 
 
@@ -212,7 +217,8 @@ def prepare(output, target_dir, toolchain, observations):
         dependencies = []
         for package in sorted(metadata['packages'], key=lambda p: (p['name'], p['version'])):
             if package['source'] is None:
-                require(Path(package['manifest_path']) == CRATE / 'Cargo.toml',
+                require(Path(package['manifest_path']) in (
+                    CRATE / 'Cargo.toml', MACRO_MODEL / 'generator/Cargo.toml'),
                         'unexpected local release dependency')
                 continue
             notices, provenance = registry_notices(package, lock)

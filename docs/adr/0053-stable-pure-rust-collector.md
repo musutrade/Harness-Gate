@@ -2,6 +2,13 @@
 
 Status: Accepted direction; replacement implementation and release acceptance pending.
 
+The shared-generator T4 checkpoint is documented in
+[`stable-rust-macro-observation.md`](../quality/stable-rust-macro-observation.md).
+The Rust collector and first-party process macro reuse one ordinary Rust library;
+bound source observations do not certify final expansion or execution coverage.
+Real missing-export and dependency-input blockers keep T4 and release acceptance
+open. No third-party defect or adopted upstream fix is claimed.
+
 ## Context
 
 The old Rust collector links compiler-private libraries using instability escape
