@@ -14,6 +14,8 @@ import tarfile
 import uuid
 
 import collector_assets as assets
+import collector_receipt as receipt
+import collector_store as store
 
 require = assets.require
 DELIVERY = '.delivery'
@@ -57,7 +59,7 @@ def tree_check(root, names, *, complete):
             if stat.S_ISDIR(mode.st_mode):
                 require(relative in dirs, 'extra installed directory')
             else:
-                assets.regular(path)
+                receipt.regular(path)
                 require(relative in expected, 'extra installed payload')
                 found.add(relative)
     require(not complete or found == expected, 'missing installed payload')
@@ -162,20 +164,61 @@ def installed(root, selected, trust):
     path = root / 'versions' / assets.version(selected)
     require(path.is_dir() and not path.is_symlink(), 'version not installed')
     require(not (path / DELIVERY).is_symlink(), 'unsafe delivery metadata link')
-    manifest = assets.verify(path / DELIVERY, trust, 'rust-collector-v' + selected)
-    names = payload_names(manifest) + [DELIVERY + '/' + n for n in assets.ASSETS + assets.CONTROL]
+    manifest, controls = verify_directory(path, trust, 'rust-collector-v' + selected)
+    names = payload_names(manifest) + [DELIVERY + '/' + n for n in controls]
     tree_check(path, names, complete=True)
-    for row in manifest['payloads']:
-        require(assets.sha(path / row['path']) == row['sha256'], 'installed payload checksum mismatch')
-    with tarfile.open(path / DELIVERY / 'collector.tar', 'r:') as archive:
-        for member in archive:
-            if member.isfile():
-                require(stat.S_IMODE((path / assets.safe_name(member.name)).stat().st_mode) == member.mode,
-                        'installed payload mode mismatch')
     return path, names
 
 
-def install(root, release, trust, tag, checkpoint=lambda _: None):
+def verify_directory(path, trust, tag):
+    metadata = path / DELIVERY
+    replay = metadata / receipt.NAME
+    if replay.exists() or replay.is_symlink():
+        assets.regular(replay)
+        manifest = assets.contract.load_manifest((metadata / 'manifest.json').read_bytes())
+        digest = receipt.verify(assets.read(replay), path, manifest)
+        manifest = assets.verify(metadata, trust, tag, archive_sha256=digest)
+        controls = list(assets.ASSETS[1:] + assets.CONTROL) + [receipt.NAME]
+        if (metadata / 'collector.tar').exists():
+            controls.append('collector.tar')
+    else:
+        manifest = assets.verify(metadata, trust, tag)
+        controls = list(assets.ASSETS + assets.CONTROL)
+        for row in manifest['payloads']:
+            receipt.regular(path / row['path'])
+            require(assets.sha(path / row['path']) == row['sha256'], 'installed payload checksum mismatch')
+        with tarfile.open(metadata / 'collector.tar', 'r:') as archive:
+            for member in archive:
+                if member.isfile():
+                    require(stat.S_IMODE((path / assets.safe_name(member.name)).stat().st_mode) == member.mode,
+                            'installed payload mode mismatch')
+    return manifest, controls
+
+
+def compact(root, path, trust, tag):
+    """Verify first; receipt + archive is a recoverable intermediate format."""
+    manifest, _ = verify_directory(path, trust, tag)
+    archive = path / DELIVERY / 'collector.tar'
+    replay = path / DELIVERY / receipt.NAME
+    if not replay.exists():
+        value = receipt.create(archive)
+        require(receipt.verify(value, path, manifest) == assets.sha(archive), 'receipt archive checksum mismatch')
+        # Keep incomplete receipt writes outside the verified version tree.
+        temporary = root / 'migration-receipt.json'
+        atomic(temporary, value)
+        os.replace(temporary, replay)
+        sync(replay.parent)
+    verify_directory(path, trust, tag)
+    archive.unlink(missing_ok=True)
+    sync(path / DELIVERY)
+    for row in manifest['payloads']:
+        store.share(root, path / row['path'], row['sha256'])
+        sync((path / row['path']).parent)
+    sync(store.directory(root))
+    verify_directory(path, trust, tag)
+
+
+def install(root, release, trust, tag, checkpoint=lambda _: None, *, self_check=None):
     with locked(root):
         # Snapshot only fixed release names. Verification operates on private bytes.
         require(set(p.name for p in release.iterdir()) == set(assets.ASSETS + assets.CONTROL),
@@ -195,11 +238,15 @@ def install(root, release, trust, tag, checkpoint=lambda _: None):
         selected = assets.version(manifest['collector']['version'])
         destination = root / 'versions' / selected
         require(not destination.exists() and not destination.is_symlink(), 'version already installed; use select')
-        names = payload_names(manifest) + controls
+        names = payload_names(manifest) + controls + [DELIVERY + '/' + receipt.NAME]
         atomic(root / 'transaction.json', {'directory': stage_name, 'files': names})
         checkpoint('verified')
         extract(stage / DELIVERY / 'collector.tar', stage, manifest)
-        tree_check(stage, names, complete=True)
+        tree_check(stage, payload_names(manifest) + controls, complete=True)
+        compact(root, stage, trust, tag)
+        if self_check is not None:
+            self_check(stage)
+            verify_directory(stage, trust, tag)
         checkpoint('extracted')
         os.rename(stage, destination)
         sync(root / 'versions')
@@ -244,6 +291,14 @@ def main():
     for action in ('select', 'rollback', 'uninstall'):
         sub.add_parser(action).add_argument('--version', required=True)
     sub.add_parser('recover')
+    sub.add_parser('usage')
+    sub.add_parser('migrate')
+    command = sub.add_parser('cleanup')
+    command.add_argument('--keep', type=int, default=2, help='previous versions to retain, in addition to current')
+    command.add_argument('--dry-run', action='store_true')
+    command = sub.add_parser('export')
+    command.add_argument('--version', required=True)
+    command.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     trust = assets.read(args.trust)
     if args.action == 'install':
@@ -252,9 +307,18 @@ def main():
         print(select(args.root, args.version, trust))
     elif args.action == 'uninstall':
         uninstall(args.root, args.version, trust)
+    elif args.action in ('migrate', 'export'):
+        import collector_maintenance as maintenance
+        result = (maintenance.migrate(args.root, trust) if args.action == 'migrate' else
+                  maintenance.export(args.root, args.version, trust, args.output))
+        print(json.dumps(result, sort_keys=True))
     else:
         with locked(args.root):
-            pass
+            if args.action == 'usage':
+                print(json.dumps(store.usage(args.root), sort_keys=True))
+            elif args.action == 'cleanup':
+                import collector_maintenance as maintenance
+                print(json.dumps(maintenance.cleanup_locked(args.root, trust, args.keep, dry_run=args.dry_run), sort_keys=True))
 
 
 if __name__ == '__main__':
