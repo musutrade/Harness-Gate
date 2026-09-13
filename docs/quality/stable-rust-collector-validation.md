@@ -313,8 +313,11 @@ required CI retains all other existing checks and does not bootstrap that backen
   the second candidate's interfaces and runtime remain unverified.
   Doctor's candidate allowlist is not evidence of support for both versions.
 - A second runnable system was unavailable: Docker socket access was denied.
-  Only the environment above has been exercised; there is no released support
-  platform yet and no claim covering all Linux systems.
+  The available unprivileged `bwrap` route also failed with exit 1 because the
+  sandbox denied creating a user namespace. The [namespace probe record](stable-rust-candidate-evidence/namespace-environment.json)
+  preserves its exact command and error; it is an availability check, not a run
+  on another system. Only the environment above has been exercised; there is no
+  released support platform yet and no claim covering all Linux systems.
 - `strace` is installed but the sandbox rejects `PTRACE_TRACEME` and
   `PTRACE_SEIZE`. Local command records, build logs and ELF inspection passed;
   a complete transitive `execve` audit did not run. Required CI now requests real

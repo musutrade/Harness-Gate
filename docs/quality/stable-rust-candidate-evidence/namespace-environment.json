@@ -1,0 +1,32 @@
+{
+  "schema": "rust-stable-namespace-probe/v1",
+  "recorded_at": "2026-09-13T18:55:53.129163+00:00",
+  "observations": [
+    {
+      "argv": [
+        "timeout",
+        "10",
+        "bwrap",
+        "--unshare-user",
+        "--unshare-pid",
+        "--ro-bind",
+        "/",
+        "/",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "/usr/bin/true"
+      ],
+      "exit_code": 1,
+      "stderr": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.\n",
+      "claim": "Namespace availability probe only; no second operating system was run."
+    }
+  ],
+  "acceptance": {
+    "second_system_executed": false,
+    "second_toolchain_executed": false,
+    "production_sigstore_verified": false
+  },
+  "impact": "The available unprivileged namespace route cannot provide a second Linux runtime in this workspace. This probe does not run a different system or replace the required cross-system acceptance."
+}
