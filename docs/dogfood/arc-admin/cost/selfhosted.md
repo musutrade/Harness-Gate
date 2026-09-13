@@ -1,5 +1,7 @@
 # GH-206 bounded self-hosted cost measurements
 
+> Historical receipt: this page records the dated experiment below. For current native integration, released fixes and scoped cost observations, see the [2026-09-13 acceptance record](../../../quality/arc-native-20260913/README.md) and [release status](../../../release-status.md). Historical failures are preserved.
+
 [Actions run](https://github.com/musutrade/Harness-Gate/actions/runs/34454586298) and [job](https://github.com/musutrade/Harness-Gate/actions/runs/34454586298/job/102797907379) measured Arc-Admin
 `9982ed556eaf997910824d7b682946147c81a16a` using Harness-Gate `19a264e2b1992a5355166ca46e87fba766fa30d8` on the temporary
 `gh206-cost-temporary` runner. [Derived report](selfhosted-report.json),

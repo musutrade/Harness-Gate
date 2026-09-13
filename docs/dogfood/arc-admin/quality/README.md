@@ -1,5 +1,7 @@
 # Arc-Admin generic quality configuration (GH-203)
 
+> Historical receipt: this page records the dated experiment below. For current native integration, released fixes and scoped cost observations, see the [2026-09-13 acceptance record](../../../quality/arc-native-20260913/README.md) and [release status](../../../release-status.md). Historical failures are preserved.
+
 This reviewable shadow configuration implements OpenSpec tasks 4.1–4.4 against the [frozen Arc-Admin baseline](../README.md) and [GH-202 execution import](../import/README.md). GH-204 subsequently staged it in a disposable pinned Arc-Admin snapshot: [shadow observation](../shadow/README.md) records production loading rejection before execution. Successful runtime parity, cost measurement and authority transfer remain pending.
 
 To stage it in Arc-Admin, place `quality.toml` at `.harness-gate/quality.toml` and `packs/` at `.harness-gate/packs/`, beside the unchanged imported `flow.toml`. These files compose the existing `angular-rust-postgres` packs, with Arc-Admin identity, the imported profile vocabulary and a required baseline provider. They do not add a project-local flow to Harness-Gate's own repository.
