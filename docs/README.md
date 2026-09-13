@@ -13,7 +13,7 @@ was true when recorded; use the current guides below for installation and use.
 | Configure quality / 质量配置 | [Quality configuration](quality-configuration.md), [trusted collectors](quality-collectors.md) |
 | Diagnose failures / 排查 | [Failure codes](failure-codes.md), [中文修复路径](../README.zh-CN.md#常见修复路径) |
 | Release or contribute / 发布与贡献 | [Release governance](release-governance.md), [contributing](../CONTRIBUTING.md), [engineering policy](engineering-policy.md), [CI guide](quality/ci-topology/README.md) |
-| Review delivered work / 验收与待办 | [Current release and issue status](release-status.md), [historical specifications](specs/README.md), [decisions](adr/README.md) |
+| Review delivered work / 验收与待办 | [Current release and issue status](release-status.md), [Arc Admin native acceptance](quality/arc-native-20260913/README.md), [historical specifications](specs/README.md), [decisions](adr/README.md) |
 
 Core installation, collector installation, native measurement certification and
 project policy adoption are separate milestones. A preset or an installed plugin

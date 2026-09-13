@@ -13,7 +13,7 @@ It handles changed paths, secret scanning, architecture auditing, environment va
 
 ## Current releases
 
-Core **0.4.2** includes staged-host input and large native-report fixes; publication status is recorded below. Rust-specific native measurement is an optional, independently installed plugin; Core owns orchestration and quality decisions. See the [documentation index](docs/README.md) and [release status, acceptance and remaining work](docs/release-status.md).
+Core **0.4.2** is published with staged-host input and large native-report fixes. Rust-specific native measurement is an optional, independently installed plugin; Core owns orchestration and quality decisions. See the [documentation index](docs/README.md) and [release status, acceptance and remaining work](docs/release-status.md).
 
 ## Navigation
 
@@ -84,7 +84,7 @@ the pinned source revision, then select the immutable Core release explicitly:
 ```bash
 curl --fail --show-error --location --proto '=https' --tlsv1.2 \
   -o /tmp/harness-gate-install.sh \
-  https://raw.githubusercontent.com/musutrade/Harness-Gate/13722b0ba8781be106c160c422c07fbacb1bdc6e/install.sh
+  https://raw.githubusercontent.com/musutrade/Harness-Gate/9ffa2b829ec25ca54fcb00a9bc720284c3913924/install.sh
 bash /tmp/harness-gate-install.sh --version v0.4.2
 harness-gate --version
 ```
