@@ -51,3 +51,10 @@ Rust offline release verification, installation, upgrade and rollback now implem
 the [lifecycle contract](../../../docs/quality/stable-rust-collector-lifecycle.md).
 The local suite uses real RSA signatures and an explicitly mocked Sigstore command;
 it does not establish production trust or T5 completion. No release hold is removed.
+
+The next T5 checkpoint adds a Rust-validated support schema and locked offline
+unsigned candidate preparation with archive/source-authenticated dependency
+notices. Real lifecycle checks consume that payload and reject unsigned packages
+and re-signed overstated support metadata. This is review preparation only:
+protected production signing, trust bootstrap, downloader, license review and
+multi-toolchain/system acceptance remain open. T5 and T8 stay unchecked.

@@ -26,3 +26,10 @@ boundaries. T5 has Rust offline dual-verification transactions and real RSA test
 Sigstore cryptography, downloader, trusted bootstrap and protected release preparation
 remain pending. T6 reviewed migration/full matrix, complete T7 acceptance
 and T8 remain unchecked. No existing required binding or baseline is replaced.
+
+The next T5 checkpoint adds a Rust-validated support schema and locked offline
+unsigned candidate preparation with archive/source-authenticated dependency
+notices. Real lifecycle checks consume that payload and reject unsigned packages
+and re-signed overstated support metadata. This is review preparation only:
+protected production signing, trust bootstrap, downloader, license review and
+multi-toolchain/system acceptance remain open. T5 and T8 stay unchecked.

@@ -6,6 +6,7 @@ mod process;
 mod release;
 mod source;
 mod strict_json;
+mod support;
 mod tools;
 
 use anyhow::{bail, Result};
