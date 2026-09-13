@@ -86,7 +86,7 @@ def main():
         invocation = [str(binary), *map(str, command)]
         trace_path = output / f'{name}.execve'
         if args.trace and trace:
-            invocation = ['strace', '-f', '-qq', '-s', '16384', '-e', 'trace=execve', '-o', str(trace_path), *invocation]
+            invocation = ['strace', '-f', '-q', '-s', '16384', '-e', 'trace=execve', '-o', str(trace_path), *invocation]
         result = subprocess.run(invocation, capture_output=True, env=env, timeout=360)
         (output / f'{name}.stdout').write_bytes(result.stdout)
         (output / f'{name}.stderr').write_bytes(result.stderr)

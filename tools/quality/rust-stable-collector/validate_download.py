@@ -142,7 +142,7 @@ def main():
 
     def traced(argv, name):
         if args.trace:
-            return ['strace', '-f', '-qq', '-s', '16384', '-e', 'trace=execve', '-o', str(output / f'{name}.execve'), *argv]
+            return ['strace', '-f', '-q', '-s', '16384', '-e', 'trace=execve', '-o', str(output / f'{name}.execve'), *argv]
         return argv
 
     def audit_trace(name):
