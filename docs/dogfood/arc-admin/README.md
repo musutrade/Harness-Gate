@@ -1,5 +1,7 @@
 # Arc-Admin assurance before state
 
+> Historical source/evidence snapshot: recorded file hashes in this directory are preserved. For the completed current native integration, released Core fixes and scoped cost observation, see the [2026-09-13 acceptance](../../quality/arc-native-20260913/README.md) and [release status](../../release-status.md).
+
 GH-208 [final recommendation and rollback boundary](decision/README.md): **no
 authority transfer**. Retain `cargo flow` and bounded shadow mode; native quality,
 host/hook/CI parity and complete cost acceptance remain blocked. The complete

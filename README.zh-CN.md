@@ -13,7 +13,7 @@
 
 ## 当前版本
 
-Core **0.4.2** 包含暂存区主机输入与大型原生报告修复，发布进度以交付状态为准。Rust 原生测量通过独立安装、独立版本的可选插件提供；Core 负责编排和质量决策。文档入口见[文档目录](docs/README.md)，发布凭据与剩余工作见[交付状态](docs/release-status.md)。
+Core **0.4.2** 已发布，修复暂存区主机输入与大型原生报告发布问题。Rust 原生测量通过独立安装、独立版本的可选插件提供；Core 负责编排和质量决策。文档入口见[文档目录](docs/README.md)，发布凭据与剩余工作见[交付状态](docs/release-status.md)。
 
 ## 阅读导航
 
@@ -76,7 +76,7 @@ cargo install harness-gate --version 0.4.2 --locked
 ```bash
 curl --fail --show-error --location --proto '=https' --tlsv1.2 \
   -o /tmp/harness-gate-install.sh \
-  https://raw.githubusercontent.com/musutrade/Harness-Gate/13722b0ba8781be106c160c422c07fbacb1bdc6e/install.sh
+  https://raw.githubusercontent.com/musutrade/Harness-Gate/9ffa2b829ec25ca54fcb00a9bc720284c3913924/install.sh
 bash /tmp/harness-gate-install.sh --version v0.4.2
 harness-gate --version
 ```
