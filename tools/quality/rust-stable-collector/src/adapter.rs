@@ -1,6 +1,6 @@
 //! Core authenticates protocol-v2 requests before spawning this adapter. Signed
 //! arguments pin a capture binding; this module never signs or adopts baselines.
-use crate::{artifact, collect, source};
+use crate::{artifact, collect, coverage, ownership, source};
 use anyhow::{ensure, Context, Result};
 use serde_json::{json, Value};
 use std::{collections::BTreeSet, env, fs, io::Read, path::Path};
@@ -61,6 +61,7 @@ pub fn describe(root: &Path, anchor: &str, request_digest: &str) -> Result<Value
     });
     series["id"] = json!(format!("measurement-series/v1:{}", hash(&series)?));
     let analysis = read(&root.join("source-analysis.json"))?;
+    let raw = coverage::parse(&fs::read(root.join("coverage.json"))?)?;
     let mut owners = Vec::new();
     for (path, file) in analysis["files"].as_object().context("source inventory")? {
         // Recompute facts from the currently pinned source, not supplied metrics.
@@ -71,10 +72,12 @@ pub fn describe(root: &Path, anchor: &str, request_digest: &str) -> Result<Value
             fresh == *file,
             "source analysis differs from recomputed facts"
         );
+        let mapping = ownership::file(Path::new(text(&request, "project_root")?), path, &raw)?;
         for function in file["functions"].as_array().context("function inventory")? {
             owners.push(json!({"path":path,"source_sha256":request["source_files"][path]["sha256"],
                 "discriminator":format!("rust-source-span/v1:{}", hash(&json!({"name":function["name"],"span":function["span"]}))?),
-                "function":function,"file_supported":file["unsupported"].as_array().is_some_and(Vec::is_empty)}));
+                "coverage_owner": mapping["functions"].as_array().context("mapped owners")?.iter().find(|o| o["name"] == function["name"] && o["span"] == function["span"]),
+                "coverage_state":mapping["state"],"function":function,"file_supported":file["unsupported"].as_array().is_some_and(Vec::is_empty)}));
         }
     }
     Ok(
@@ -267,10 +270,21 @@ fn project(request: &Value, path: &Path, digest: &str) -> Result<Value> {
         let identity = artifact::identity(&output.join(&name))?;
         let artifact = json!({"id":"source","kind":"raw","media_type":"application/json","path":name,"sha256":identity.sha256,"bytes":identity.bytes,"source":source,"context":inner["context"]});
         let capabilities: Vec<_> = METRICS.iter().map(|(metric,_)| {
-            let available = *metric == "complexity.cyclomatic" && supported;
-            json!({"metric":metric,"state":if available {"supported"} else {"unsupported"},"reason":if available {"lexical source decisions; no expansion or reachability claim"} else {"source/coverage ownership or source activation is not certified"},"artifacts":["source"]})
+            let available = supported && (*metric == "complexity.cyclomatic" || *metric == "coverage.function" && owner["coverage_state"] == "supported");
+            json!({"metric":metric,"state":if available {"supported"} else {"unsupported"},"reason":if available {if *metric == "coverage.function" {"exact source span and unique LLVM root function; explicit test spans excluded"} else {"lexical source decisions; no expansion or reachability claim"}} else {"source/coverage ownership or source activation is not certified"},"artifacts":["source"]})
         }).collect();
-        records.push(json!({"schema":"harness-evidence/v1","id":format!("stable-{}",hash(&subject["id"])?),"project":inner["project"],"component":subject["component"],"collector":inner["collector"],"series":description["series"],"subject":subject,"context":inner["context"],"source":source,"artifacts":[artifact],"capabilities":capabilities,"status":if supported {"measured"} else {"unavailable"},"metrics":if supported {vec![json!({"name":"complexity.cyclomatic","value":{"type":"count","value":owner["function"]["complexity"]},"artifacts":["source"]})]} else {vec![]}}));
+        let mut metrics = Vec::new();
+        if supported {
+            metrics.push(json!({"name":"complexity.cyclomatic","value":{"type":"count","value":owner["function"]["complexity"]},"artifacts":["source"]}));
+            if owner["coverage_state"] == "supported" {
+                ensure!(
+                    !owner["coverage_owner"].is_null(),
+                    "certified coverage owner missing"
+                );
+                metrics.push(json!({"name":"coverage.function","value":owner["coverage_owner"]["coverage_function"],"artifacts":["source"]}));
+            }
+        }
+        records.push(json!({"schema":"harness-evidence/v1","id":format!("stable-{}",hash(&subject["id"])?),"project":inner["project"],"component":subject["component"],"collector":inner["collector"],"series":description["series"],"subject":subject,"context":inner["context"],"source":source,"artifacts":[artifact],"capabilities":capabilities,"status":if supported {"measured"} else {"unavailable"},"metrics":metrics}));
         artifacts.push(artifact);
     }
     // Recheck every pinned input after conversion; partial files on failure never

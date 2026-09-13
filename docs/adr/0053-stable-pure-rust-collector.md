@@ -42,7 +42,7 @@ A runnable stable Rust capture/source-analysis candidate now exercises the
 [implementation contract](../quality/stable-rust-collector.md). Its
 [actual validation](../quality/stable-rust-collector-validation.md) is partial:
 real Core request authentication and evidence validation now accept verified
-lexical complexity in a separate candidate series. Coverage/CRAP remains unsupported;
+lexical complexity in a separate candidate series. Line/region coverage and CRAP remain unsupported;
 Rust offline signed lifecycle transactions now have real RSA and interruption tests;
 real Sigstore verification, protected release preparation and the cross-toolchain/system
 acceptance matrix remain pending.
@@ -63,3 +63,13 @@ re-anchoring, and package preparation requires those checks. This remains a raw
 format contract: aggregate/counter reconciliation, certified source owners and
 normalized coverage/CRAP are not complete. T4, T6–T8 remain unchecked; required
 metrics, migration review and the release hold are unchanged.
+
+The bounded T4 owner checkpoint adds `rust-llvm-exact-root-owner/v1-candidate`.
+ASCII source files containing unannotated, nongeneric root functions can join an
+exact unique LLVM region envelope to a source span; explicit test spans are
+excluded. Core accepts the resulting per-function execution ratio (1/1 or 0/1),
+not an intra-function coverage fraction. Missing/duplicate/cross-file owners and
+inconsistent entry counts are measurement errors; unsupported syntax and `impl
+Trait` never acquire coverage. Line/region coverage and all CRAP remain unsupported.
+Actual owner mutations and authenticated Core checks are recorded in the validation
+record. T3–T8, migration review and the legacy release hold remain open.

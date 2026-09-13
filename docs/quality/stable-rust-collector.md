@@ -3,7 +3,7 @@
 GH-259 is **not complete**. The executable in
 [`tools/quality/rust-stable-collector`](../../tools/quality/rust-stable-collector)
 performs real stable coverage capture and Rust syntax analysis. It is a developer
-candidate with a Core v2 adapter for verified lexical complexity and an offline
+candidate with a Core v2 adapter for verified lexical complexity and bounded function execution coverage and an offline
 Rust installation transaction. It is not a supported release. Capture alone reports `state: unsupported`,
 `core_acceptance: pending`; the separate authenticated conversion is described below.
 Do not configure it as a replacement for required measurements.
@@ -116,17 +116,18 @@ direct execution by itself does not authenticate a request.
 The Rust adapter rejects duplicate JSON keys, changed bindings, mismatched executable,
 source, context target, workspace, series, claims and ambiguous/missing owners. It
 requires all five metric contracts for each selected function. Verified ordinary
-lexical owners can emit `complexity.cyclomatic`; function/line/region coverage and
-CRAP explicitly emit `unsupported`, with no fabricated values. A file containing
+lexical owners can emit `complexity.cyclomatic`. Eligible owners also emit
+`coverage.function` as executed functions / functions (1/1 or 0/1 for one owner).
+Line/region coverage and CRAP explicitly emit `unsupported`, with no fabricated values. A file containing
 uncertified activation/expansion also makes its complexity unavailable. Per-owner
 artifacts bind source facts, context, series and capture anchors. Input identities
 are rechecked after conversion; failure returns nonzero and no successful envelope.
 
 The repository's Rust `stable_collector_acceptance` example exercises the actual
 Core CLI signature/nonce/expiry transport, then Core's evidence validation and
-requiredness evaluation. Plain complexity is accepted as the new series; required
+requiredness evaluation. Plain complexity and function execution coverage are accepted as the new series; required
 CRAP remains blocked. This uses a clearly named test-only signing key, not protected
-production signing. General dependency provenance, certified coverage normalization
+production signing. General dependency provenance, broader coverage normalization
 and full T4 acceptance remain open.
 
 ### Source/coverage boundaries
@@ -139,15 +140,30 @@ does not claim compilation, reachability or expansion of every parsed source.
 
 | Construct | Current real behavior | Certification boundary |
 | --- | --- | --- |
-| Ordinary function, including never-called | Lexical complexity supported; raw LLVM may report count zero | No function coverage/CRAP join |
-| Direct `#[test]` or `#[cfg(test)]` function/module | Excluded from lexical analysis | Raw coverage still includes tests; production coverage unsupported |
+| Unannotated root function, including never-called | Lexical complexity and exact-owner function execution ratio | ASCII, single-file LLVM owner; no intra-function coverage/CRAP join |
+| Direct `#[test]` or `#[cfg(test)]` function/module | Explicit source spans excluded from certified function owners | Raw file totals still include tests; no production line/region fraction |
 | Macro/derive/include-generated code | Expansion/attribute recorded as unsupported | No generated owner inferred from parent/file totals |
 | Async/closure/nested function | Affected lexical function is unsupported with null complexity | Constructor, future body and closure owners are never merged |
-| Generic function, generic/trait impl, trait default | Unsupported owner with null complexity | No instantiation or unused-generic denominator claim |
+| Generic function, `impl Trait`, generic/trait impl, trait default | Unsupported owner with null complexity | No instantiation or unused-generic denominator claim |
 | cfg/features and other unresolved attributes | Cargo features are recorded/executed; affected lexical owner unsupported | Parsed inactive source is not called active production code |
 | External module declaration | Activation/ownership unsupported | No implicit module-to-coverage certification |
 | Build script output | Build script runs; no instrumentation of the host build script | Generated paths/raw export retained; production owner unsupported |
 | Parse/tool/identity/format error | `measurement_error`, nonzero process exit | No successful evidence manifest |
+
+Function ownership uses `rust-llvm-exact-root-owner/v1-candidate`: every function
+in an eligible source file must be an unannotated, nongeneric root function with
+no uncertified syntax; non-ASCII files, module/impl methods and annotated functions
+remain unsupported for this mapping. LLVM records must name exactly that source
+file and contain only code regions. Their exact minimum start / maximum exclusive
+end must uniquely equal one source function span or lie wholly inside one explicit
+test exclusion. Each source owner requires exactly one LLVM record; symbols must
+be unique. The first region must start at the owner boundary and agree with the
+execution count. A zero execution count cannot accompany executed regions. Missing,
+duplicate, cross-file or ambiguous owners fail with `measurement_error`; no missing
+function is assigned a zero. Collection and verification recompute source analysis
+from pinned files, including its complete file set. Symbol suffixes are never used
+as the mapping algorithm. This narrow contract was actually exercised only with
+the recorded Rust 1.97.1 fixture; broader syntax/toolchain certification remains open.
 
 All function CRAP is currently unsupported, including simple functions. Raw LLVM
 JSON `3.1.0` is preserved under `rust-llvm-source-coverage/v1-candidate`; schema

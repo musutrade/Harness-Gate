@@ -286,6 +286,96 @@
       "path": "target/gh-259/core-acceptance-features-07.log",
       "bytes": 102,
       "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+    },
+    {
+      "path": "target/gh-259/ownership-build-02.log",
+      "bytes": 208,
+      "sha256": "9b5bc3c40812e435be9499bbaaa7db1d6d4046449208edc315065bde5740a40e"
+    },
+    {
+      "path": "target/gh-259/ownership-tests-03.log",
+      "bytes": 1213,
+      "sha256": "1e1498a0bb5d2cc8df6e2718486456f8a1f4e6be743d5e5fa485210b98f6e2ed"
+    },
+    {
+      "path": "target/gh-259/ownership-fmt-01.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-259/ownership-clippy-01.log",
+      "bytes": 217,
+      "sha256": "04a58a054d8504399bd4a1de4e38f9d582a1bc043cd5a841babf151b98eb3276"
+    },
+    {
+      "path": "target/gh-259/core-owner-build-01.log",
+      "bytes": 166,
+      "sha256": "164adc655d2aea101a4a30f76b8de50ff3fcac7d212e097024e5bc06745c0d0a"
+    },
+    {
+      "path": "target/gh-259/core-owner-fmt-01.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-259/core-owner-clippy-01.log",
+      "bytes": 166,
+      "sha256": "63dffa3ae43d4728da9399c205e127ed68e0fecd66cfab6d093887b64acaafd7"
+    },
+    {
+      "path": "target/gh-259/quality-tests-07.log",
+      "bytes": 77461,
+      "sha256": "b90770eddb4287ad4d106af31ae1e185b041dd46594e2ff68396a78d4caaaa82"
+    },
+    {
+      "path": "target/gh-259/release-tests-06.log",
+      "bytes": 15859,
+      "sha256": "d6c58027201e2cf3379bee7932c5aa16a3b390b7cf9d3a7f2a5b4a56d22b46ca"
+    },
+    {
+      "path": "target/gh-259/release-tests-07.log",
+      "bytes": 14290,
+      "sha256": "9fd8cef4bccc151997766776829e1fa104b98aeb3596a1fcc7ccdb58c812bee4"
+    },
+    {
+      "path": "target/gh-259/acceptance-14.log",
+      "bytes": 117,
+      "sha256": "670074785facdb8c9037c99c332bd2c4d6d7b38cf39e1fd7f5f39d70bf7fc0bc"
+    },
+    {
+      "path": "target/gh-259/package-05.log",
+      "bytes": 148,
+      "sha256": "652282f97ecf2bcf8f2ed7d5140371d7437c6c6cd8d1b23f793068fcbb299c68"
+    },
+    {
+      "path": "target/gh-259/historical-05.log",
+      "bytes": 140,
+      "sha256": "0bdd035908c1fe71154d6b3c9d961cf6d1c6181ed6685a442282f463c8487e02"
+    },
+    {
+      "path": "target/gh-259/lifecycle-07.log",
+      "bytes": 109,
+      "sha256": "c6c04e55a3ba406a733332c08e855d11d75886fea0d6e23cb7339f90c135f7ba"
+    },
+    {
+      "path": "target/gh-259/docs-consistency-08.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-259/core-acceptance-plain-09.log",
+      "bytes": 102,
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+    },
+    {
+      "path": "target/gh-259/core-acceptance-boundaries-09.log",
+      "bytes": 102,
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
+    },
+    {
+      "path": "target/gh-259/core-acceptance-features-09.log",
+      "bytes": 102,
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb"
     }
   ]
 }

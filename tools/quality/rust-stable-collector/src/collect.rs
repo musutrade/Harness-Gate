@@ -1,7 +1,7 @@
 //! Candidate capture, deliberately not a Core adapter or signed release format.
 use crate::{
     artifact::{self, FileIdentity},
-    coverage,
+    coverage, ownership,
     process::Runner,
     source,
     tools::{self, Tools},
@@ -197,6 +197,30 @@ fn recheck_tools(tools: &Tools) -> Result<()> {
     Ok(())
 }
 
+fn analyze_sources(request: &Request) -> Result<Value> {
+    let mut sources = BTreeMap::new();
+    let mut exclusions = Vec::new();
+    for name in request.source_files.keys().filter(|n| n.ends_with(".rs")) {
+        if name.starts_with("tests/")
+            || name.starts_with("benches/")
+            || name.starts_with("examples/")
+            || name == "build.rs"
+        {
+            exclusions.push(name);
+            continue;
+        }
+        sources.insert(
+            name,
+            source::analyze(&fs::read_to_string(request.project_root.join(name))?)
+                .with_context(|| format!("parse source {name}"))?,
+        );
+    }
+    ensure!(!sources.is_empty(), "no analyzable Rust sources");
+    Ok(
+        json!({"series":source::SERIES,"scope":"lexical source, no expansion or reachability claim","files":sources,"excluded_paths":exclusions}),
+    )
+}
+
 pub fn collect(path: &Path) -> Result<String> {
     let request_bytes = fs::read(path)?;
     let request: Request = serde_json::from_slice(&request_bytes)?;
@@ -288,37 +312,22 @@ pub fn collect(path: &Path) -> Result<String> {
     runner.run(&toolset.cargo_llvm_cov.path, &args, &extra)?;
     let coverage: Value = coverage::parse(&fs::read(&coverage_path)?)?;
     coverage::validate(&coverage)?;
-    let mut sources = BTreeMap::new();
-    let mut exclusions = Vec::new();
-    for name in request.source_files.keys().filter(|n| n.ends_with(".rs")) {
-        if name.starts_with("tests/")
-            || name.starts_with("benches/")
-            || name.starts_with("examples/")
-            || name == "build.rs"
-        {
-            exclusions.push(name);
-            continue;
-        }
-        sources.insert(
-            name,
-            source::analyze(&fs::read_to_string(request.project_root.join(name))?)
-                .with_context(|| format!("parse source {name}"))?,
-        );
+    let analysis = analyze_sources(&request)?;
+    for name in analysis["files"]
+        .as_object()
+        .context("source files")?
+        .keys()
+    {
+        ownership::file(&request.project_root, name, &coverage)?;
     }
-    ensure!(!sources.is_empty(), "no analyzable Rust sources");
-    artifact::write(
-        &runner.root.join("source-analysis.json"),
-        &json!({
-            "series": source::SERIES, "scope": "lexical source, no expansion or reachability claim", "files": sources, "excluded_paths": exclusions,
-        }),
-    )?;
+    artifact::write(&runner.root.join("source-analysis.json"), &analysis)?;
     artifact::write(
         &runner.root.join("candidate.json"),
         &json!({
             "schema":"rust-stable-candidate/v1", "state":"unsupported",
             "coverage":{"series":"rust-llvm-source-coverage/v1-candidate", "format":coverage["version"], "scope":"Cargo workspace tests; test code included; build scripts not instrumented", "artifact":"coverage.json"},
             "complexity":{"series":source::SERIES, "artifact":"source-analysis.json"},
-            "function_crap":{"state":"unsupported", "reason":"source/coverage function ownership not certified"},
+            "function_crap":{"state":"unsupported", "reason":"intra-function coverage fraction for CRAP not certified"},
             "core_acceptance":{"state":"unsupported", "reason":"candidate capture is not a signed Core protocol v2 adapter"},
         }),
     )?;
@@ -367,6 +376,18 @@ pub fn verify(root: &Path, anchor: &str, request_digest: &str) -> Result<()> {
     recheck_tools(&request.tools)?;
     let coverage: Value = coverage::parse(&fs::read(root.join("coverage.json"))?)?;
     coverage::validate(&coverage)?;
+    let analysis: Value = crate::strict_json::parse(&fs::read(root.join("source-analysis.json"))?)?;
+    ensure!(
+        analysis == analyze_sources(&request)?,
+        "source analysis differs from recomputed facts"
+    );
+    for path in analysis["files"]
+        .as_object()
+        .context("source files")?
+        .keys()
+    {
+        ownership::file(&request.project_root, path, &coverage)?;
+    }
     Ok(())
 }
 

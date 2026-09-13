@@ -1,8 +1,8 @@
 {
   "capture": {
-    "manifest_sha256": "e0060010eeb0eecea06a11b179bf6e35a1a392c00b7763312bd103e490ab0d1c",
-    "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-11/capture-plain",
-    "request_sha256": "69d47b99ae23d269339bd8574a2bcf1da160de6781e79593df892584891313ee"
+    "manifest_sha256": "3f4a81642379dc8c05a558abe8d2ae5eea2f1abb712a90793ff417a45e9b7b7c",
+    "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-14/capture-plain",
+    "request_sha256": "cc7d3dc27a3ed9c8e65037dd0aa18fa70549518dd39aa91a4a3f02ddaa5a729f"
   },
   "checks": {
     "authenticated_capture": {
@@ -81,7 +81,7 @@
       "error": "ERROR [E1000]: command failed: ADAPTER_PROTOCOL_FAILURE: adapter exited with 1\n"
     }
   },
-  "collector_sha256": "06ee8edb7b5a85813c20b6b5fa68b501dec6b4a7ef7e398e3a3285e0831bcbf3",
+  "collector_sha256": "6134e73d0069c6fd03b6d173b8a76f933bf6e30c449fd0ae8cadcd7db03fda14",
   "core_sha256": "3614dfc5dcaa1d9cdb427c2ff2fae528ec564a6672fa0a43fbd7eafd086994b0",
   "production_signature": false,
   "schema": "rust-stable-core-acceptance/v1",
@@ -90,7 +90,7 @@
       "name": "harness-gate-rust-stable-collector",
       "version": "0.1.0-candidate.1"
     },
-    "id": "measurement-series/v1:185c52443dfb3cdf55586051aafba4eb8ef09db46c0dd520e2632d85f575c4db",
+    "id": "measurement-series/v1:e230cbdc6eb93603cbdfd781695677dcb87d01ef5f7481f201c07603d29bd7da",
     "metrics": [
       {
         "name": "complexity.cyclomatic",
@@ -116,7 +116,7 @@
     "name": "rust-stable-lexical-candidate",
     "normalization": {
       "name": "stable-rust-core-candidate",
-      "version": "06ee8edb7b5a85813c20b6b5fa68b501dec6b4a7ef7e398e3a3285e0831bcbf3"
+      "version": "6134e73d0069c6fd03b6d173b8a76f933bf6e30c449fd0ae8cadcd7db03fda14"
     },
     "rule": {
       "name": "rust-source-decisions",

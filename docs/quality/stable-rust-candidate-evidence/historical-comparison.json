@@ -1,7 +1,7 @@
 {
   "schema": "rust-stable-historical-comparison/v1",
   "state": "migration-review-required",
-  "collector_sha256": "06ee8edb7b5a85813c20b6b5fa68b501dec6b4a7ef7e398e3a3285e0831bcbf3",
+  "collector_sha256": "6134e73d0069c6fd03b6d173b8a76f933bf6e30c449fd0ae8cadcd7db03fda14",
   "historical": {
     "archive": "docs/quality/gh-220/native-fixtures.tar.gz",
     "archive_sha256": "0ceb9051ec35c0047bb2c083fab25fb1ba0f72a120b147d1ad3307889ef10391",
@@ -130,8 +130,8 @@
     "anchor": {
       "capture": "complete",
       "core_acceptance": "pending",
-      "manifest_sha256": "390137155c1e627d037ec18b706ed665b6f61981ad8f3200550783d66cf5dbd0",
-      "request_sha256": "27b6981ffd86888b1d691b96ec3c225b1231ea8d98bac0cea8178821d173e97e",
+      "manifest_sha256": "d3a3c50143f1988c37d695e710c1682a51a708ad669e9c749628702c7467efe2",
+      "request_sha256": "7ee58e00728ebd6b9761c160fe4d4f870dead4fd0d73d406f67e0eddba997126",
       "state": "unsupported"
     },
     "series": {
@@ -139,7 +139,7 @@
         "name": "harness-gate-rust-stable-collector",
         "version": "0.1.0-candidate.1"
       },
-      "id": "measurement-series/v1:185c52443dfb3cdf55586051aafba4eb8ef09db46c0dd520e2632d85f575c4db",
+      "id": "measurement-series/v1:e230cbdc6eb93603cbdfd781695677dcb87d01ef5f7481f201c07603d29bd7da",
       "metrics": [
         {
           "name": "complexity.cyclomatic",
@@ -165,7 +165,7 @@
       "name": "rust-stable-lexical-candidate",
       "normalization": {
         "name": "stable-rust-core-candidate",
-        "version": "06ee8edb7b5a85813c20b6b5fa68b501dec6b4a7ef7e398e3a3285e0831bcbf3"
+        "version": "6134e73d0069c6fd03b6d173b8a76f933bf6e30c449fd0ae8cadcd7db03fda14"
       },
       "rule": {
         "name": "rust-source-decisions",
@@ -222,10 +222,13 @@
     },
     "owners": [
       {
+        "coverage_owner": null,
+        "coverage_state": "unsupported",
         "discriminator": "rust-source-span/v1:071ee8c14510d36b6125c0a18b191114a6ce559d50cf49a96579a1e50d1c07a0",
         "file_supported": false,
         "function": {
           "complexity": null,
+          "coverage_eligible": false,
           "name": "future",
           "reasons": [
             "async lowering owner not certified"
@@ -242,10 +245,13 @@
         "source_sha256": "5848ae7e66cdec35029a945b55d6f4b972c4f1b51256d1e050bba5cb45f0722d"
       },
       {
+        "coverage_owner": null,
+        "coverage_state": "unsupported",
         "discriminator": "rust-source-span/v1:e89cd0005c1095fd636853268dd102c12e58cb8646e81875f8aecdae5c8ffc4c",
         "file_supported": false,
         "function": {
           "complexity": null,
+          "coverage_eligible": false,
           "name": "closure",
           "reasons": [
             "closure owner not certified; no parent coverage inheritance"
@@ -262,10 +268,13 @@
         "source_sha256": "5848ae7e66cdec35029a945b55d6f4b972c4f1b51256d1e050bba5cb45f0722d"
       },
       {
+        "coverage_owner": null,
+        "coverage_state": "unsupported",
         "discriminator": "rust-source-span/v1:4d6fbbf27ff8a13a35fe16d3710f2bf55987191d174c6f2122829dab0ccbc994",
         "file_supported": false,
         "function": {
           "complexity": null,
+          "coverage_eligible": false,
           "name": "generic",
           "reasons": [
             "generic instantiation owner not certified"
@@ -282,10 +291,13 @@
         "source_sha256": "5848ae7e66cdec35029a945b55d6f4b972c4f1b51256d1e050bba5cb45f0722d"
       },
       {
+        "coverage_owner": null,
+        "coverage_state": "unsupported",
         "discriminator": "rust-source-span/v1:a198575379fe1a916c26dd7c06697dc4495ae5e3cda9b5a36d12fc90441fe01b",
         "file_supported": false,
         "function": {
           "complexity": null,
+          "coverage_eligible": false,
           "name": "conditional",
           "reasons": [
             "unresolved attribute: # [cfg (feature = \"extra\")]"
@@ -302,10 +314,13 @@
         "source_sha256": "5848ae7e66cdec35029a945b55d6f4b972c4f1b51256d1e050bba5cb45f0722d"
       },
       {
+        "coverage_owner": null,
+        "coverage_state": "unsupported",
         "discriminator": "rust-source-span/v1:26eca8f5b8d23c1333f20c2f5655ce250f7c32cb7d10fc9a7058f1111b89f068",
         "file_supported": false,
         "function": {
           "complexity": null,
+          "coverage_eligible": false,
           "name": "main",
           "reasons": [
             "unresolved attribute: # [cfg (feature = \"extra\")]"

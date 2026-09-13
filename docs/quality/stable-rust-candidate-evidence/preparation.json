@@ -1,6 +1,6 @@
 {
   "acceptance_records": [
-    "9ebdeb90c794789859914fd7b6eac6c8d75615f945318df56802d35483670da6"
+    "6a5f5d8869c8a064d227a526f12a8541507d8336aa652ffbea5a34fa131b769e"
   ],
   "commands": [
     {
@@ -56,7 +56,7 @@
       ],
       "exit_code": 0,
       "stderr_sha256": "765f1396d07f30f3a451cd3f9d9cad4e83c92c8e0aecf955ffc09061a6cf1e02",
-      "stdout_sha256": "543b1c97e2bcf188e37b0b0a0fa04f5d67c9ff1735e213791a880adad06c5ac0"
+      "stdout_sha256": "4a0e4ab58f502a8219248a28f2dc1afac1319cfe285a39b71206f91257e15e89"
     }
   ],
   "compiler": {
@@ -742,7 +742,7 @@
   ],
   "inventory": {
     "bytes": 563,
-    "sha256": "d5ebe1448d0d31bde1e720f8a684c3ebb061d34b777ffd2f7593439d48a3b39a"
+    "sha256": "8e5baba24a0d892e33cc0fed383c8729910b9d7837cf16ef0ceef51acf290345"
   },
   "license_scope": "conservative filtered Cargo graph including build dependencies plus Rust library notices",
   "network_download_bytes": 0,
@@ -752,12 +752,12 @@
       "sha256": "93ad0f514e2b2320ebd562dcf61094cb5e15475c9a3c8bf37f00edb10bdd51b3"
     },
     "harness-gate-rust-stable-collector": {
-      "bytes": 1727880,
-      "sha256": "06ee8edb7b5a85813c20b6b5fa68b501dec6b4a7ef7e398e3a3285e0831bcbf3"
+      "bytes": 1750872,
+      "sha256": "6134e73d0069c6fd03b6d173b8a76f933bf6e30c449fd0ae8cadcd7db03fda14"
     },
     "support.json": {
-      "bytes": 896,
-      "sha256": "83920c777b74fa24b6df006badf92365a4eb230f9e6e673f4284539909a0dad3"
+      "bytes": 924,
+      "sha256": "c6e311da105ee0296542ff941ba0c4fe8243a78554e4ff32d0ae0df8fc6fb681"
     }
   },
   "production_ready": false,
@@ -788,28 +788,32 @@
       "sha256": "161fcbf3e66635bd08d98eaf2dd621a3ae60d7f53355faf09a806d477c678f14"
     },
     "tools/quality/rust-stable-collector/prepare_release.py": {
-      "bytes": 14515,
-      "sha256": "d1129dd741f0cb81983236c69fbb99bdf17660e08accf4842dd4d41bc099b69b"
+      "bytes": 14861,
+      "sha256": "520acbf69d13a797d90c63a044967867c281fbebdde4d06cbe4b8045938b9b22"
     },
     "tools/quality/rust-stable-collector/src/adapter.rs": {
-      "bytes": 12255,
-      "sha256": "a0e2e47867ecb95c7574b516751580e37cb4654a921f2b53e6e0b6657b583d92"
+      "bytes": 13291,
+      "sha256": "67c3ad009c07793a7fc572d5dd54fb0e6ce0c7da8e19dc1433b75b3fd4556b82"
     },
     "tools/quality/rust-stable-collector/src/artifact.rs": {
       "bytes": 3177,
       "sha256": "f8e25815474b0c7ae584bc783d0e4ad59bf80e8efe38e46d25a27129d3325950"
     },
     "tools/quality/rust-stable-collector/src/collect.rs": {
-      "bytes": 14718,
-      "sha256": "5f9228759f1b37519f60156342f370ebcbcca1d76025166005f77d03cd1f298f"
+      "bytes": 15413,
+      "sha256": "9443476075e266cc208963ea106739dc96d95898e49854723dac40bff03bb66a"
     },
     "tools/quality/rust-stable-collector/src/coverage.rs": {
       "bytes": 6906,
       "sha256": "052e29b1c0fa6512c0503ad49deeb1bb690b5c09b7029065a4ac4bb17151e235"
     },
     "tools/quality/rust-stable-collector/src/main.rs": {
-      "bytes": 3031,
-      "sha256": "ecbaa713e92587f1ca6126dbd8a44e4962c95556f973912cd9c880cc0d5a5892"
+      "bytes": 3046,
+      "sha256": "46acaea812e1b5b78c0c1e0c465d5fc2166b62793739fa04e4f00f00305d24ac"
+    },
+    "tools/quality/rust-stable-collector/src/ownership.rs": {
+      "bytes": 5570,
+      "sha256": "0f0cca68024d6c450f452e3cb85ef494a7182c8effbf32165a1a05acd7597c3a"
     },
     "tools/quality/rust-stable-collector/src/process.rs": {
       "bytes": 6509,
@@ -820,16 +824,16 @@
       "sha256": "cf64e65054aecb59d0de8a444640fea0c66e0ad13f6d355dbd19df1648e2ddda"
     },
     "tools/quality/rust-stable-collector/src/source.rs": {
-      "bytes": 8690,
-      "sha256": "023355517ea4f1e4108dc3ac61b7125cf532d18179b8334248edc04debeadf7d"
+      "bytes": 9398,
+      "sha256": "a2d6c4730e8c489464a643cbf09fa293a40c9d8ce00d104bf181f9d97559ad00"
     },
     "tools/quality/rust-stable-collector/src/strict_json.rs": {
       "bytes": 4051,
       "sha256": "f391825570ec6795578be6ac83a1c85e59493358c44f48e063c67ec07538c4dc"
     },
     "tools/quality/rust-stable-collector/src/support.rs": {
-      "bytes": 3179,
-      "sha256": "e66df3ab51dd5d8ab6645b87de889e322582434928af0f24e9244030aef280d2"
+      "bytes": 3207,
+      "sha256": "a4005068ad19361347a112f10aec6fdaaf7ac1c2e18aa37dcbbe101f92f3e508"
     },
     "tools/quality/rust-stable-collector/src/tools.rs": {
       "bytes": 4692,
@@ -837,5 +841,5 @@
     }
   },
   "state": "unsigned-candidate-review-required",
-  "unsigned_package_bytes": 2781383
+  "unsigned_package_bytes": 2804403
 }
