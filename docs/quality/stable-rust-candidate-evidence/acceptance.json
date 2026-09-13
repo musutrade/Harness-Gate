@@ -258,6 +258,81 @@
       "passed": true
     },
     {
+      "name": "prepare-external-include-bytes",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "external-include-bytes",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "prepare-external-include-rust",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "external-include-rust",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "prepare-external-path-module",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "external-path-module",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "prepare-workspace-include-bytes",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "workspace-include-bytes",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "verify-workspace-include",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "empty-compiler-proof",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "omitted-compiler-input",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "malformed-dep-info",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "wrong-compiler-cwd",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "omitted-dep-info-producer",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "restored-compiler-input-proof",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
       "name": "wrong-tool-identity",
       "exit_code": 1,
       "passed": true
@@ -339,8 +414,8 @@
       "anchors": {
         "capture": "complete",
         "core_acceptance": "pending",
-        "manifest_sha256": "7afe3a1af3aa88c98a9ed64d6e942288abe4370e876732867dc3107152474b2b",
-        "request_sha256": "e66bac8f4e52886fd7240af1f685c70ad3f6d6ffb8075efb2c3f1451760f5c62",
+        "manifest_sha256": "bdf4cb93cc203e80d9e673008f9aa1f5d49131bea94ff9d368fc4a68e4ec0081",
+        "request_sha256": "5fd6c85b196b79e340529487741faf0ff774cf222798a0883a2b4b90122cc994",
         "state": "unsupported"
       },
       "llvm_totals_test_inclusive": {
@@ -411,8 +486,8 @@
       "anchors": {
         "capture": "complete",
         "core_acceptance": "pending",
-        "manifest_sha256": "625de93ee9ef1c0d63d73efbea1f8f5525d16c840082820e2333f101e8508b98",
-        "request_sha256": "fd0f378afc6033cba33f778cf745aca79d1095ead92e4ee5e7558cb57f0c3ff4",
+        "manifest_sha256": "6b8f82ad5af2db1c9d0d5b34f2f4ddb5b629a057b23386fd3fd9e39171423152",
+        "request_sha256": "1ab7afccf670e66f66a90201235f95cca1fa81e45bdb607adf4303dc97a275c5",
         "state": "unsupported"
       },
       "llvm_totals_test_inclusive": {
@@ -537,8 +612,8 @@
       "anchors": {
         "capture": "complete",
         "core_acceptance": "pending",
-        "manifest_sha256": "417ee8a73f5ff1ba182b5f176a653c57781589c02dc638c99857a5e23a1fef92",
-        "request_sha256": "a28350096b7e812cac99eaa10f4ba793087e65d108dd648afca364456d04b636",
+        "manifest_sha256": "550b0dc19391a0fe86a13d0159328b00a093196ad5eea8a0c3296fd0cd68926e",
+        "request_sha256": "fd0e3cdeeebe1a031f0e2711eb15d78a9062318f1ed414ed651610f771d28ee6",
         "state": "unsupported"
       },
       "llvm_totals_test_inclusive": {
@@ -663,8 +738,8 @@
       "anchors": {
         "capture": "complete",
         "core_acceptance": "pending",
-        "manifest_sha256": "15f25ac35b0b35651230c533f074bcc014a9d2015bb9eb9a5f3052aafc7138c7",
-        "request_sha256": "721cd787b277ad9d198e0fc018f2bcad6c5cce9009210a4dcb3c948de73beb34",
+        "manifest_sha256": "f2d789fe6cd41ca300dba3414dd5f1cc4f062a76ec9dd3ca05b962b0a91a4ca5",
+        "request_sha256": "7b2cdac277ff2a479fe699456167a3409c27d8cf64eec54ad6f910e2333b8a78",
         "state": "unsupported"
       },
       "archive_sha256": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682",
@@ -677,12 +752,18 @@
         "--locked",
         "--offline",
         "--manifest-path",
-        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-16/project-registry/Cargo.toml"
+        "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-20/project-registry/Cargo.toml"
       ],
       "setup_is_repository_automation": true,
-      "isolated_cargo_home": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-16/registry-cargo-home",
+      "isolated_cargo_home": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/acceptance-20/registry-cargo-home",
       "network_download_bytes": 0,
       "scope": "single locked crates.io dependency; local cache copied by test setup"
+    },
+    "compiler_inputs": {
+      "external_inputs": "three real captures blocked before manifest",
+      "workspace_data": "identity verified",
+      "generated_inputs": 1,
+      "scope": "observed rustc dep-info file inputs only; arbitrary build-script reads and environment are not certified"
     }
   },
   "tools": {
@@ -740,10 +821,10 @@
     "llvm": "22.1.6"
   },
   "binary": {
-    "sha256": "b00cc80c9aa89bd48e8881e628be65d44e1500b8cca693e8f22cb42f92bd7fc3",
-    "bytes": 1872168
+    "sha256": "fabd9588da2be024913375d1e284238d77e5c964cb107ddaeb844d87acc9e99e",
+    "bytes": 1993544
   },
-  "capture_bytes": 42767,
+  "capture_bytes": 48545,
   "persistent_candidate_cache_bytes": 0,
   "execve_trace": "not performed",
   "core_protocol_authentication": "not exercised by this capture suite; see separate Core acceptance",

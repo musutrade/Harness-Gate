@@ -111,9 +111,28 @@ rejects inactive lock entries, unused archive inputs, registry build scripts and
 proc macros. Git, custom registries and external path dependencies remain outside
 its support boundary. Source replacement configuration remains rejected. The real
 registry fixture exercises one `itoa` dependency, not every dependency graph.
-This proves package-directory provenance; compiler dep-info reconciliation for
-files reached through includes, path attributes or other compile-time inputs is
-not implemented, so complete build-input provenance remains unaccepted.
+The same Rust executable also serves as Cargo's public `RUSTC_WRAPPER`. It
+forwards compiler arguments unchanged and records the pinned compiler, working
+directory, arguments and exit status. Stable Makefile dep-info records must match
+those observed producers exactly; relative input paths resolve from the recorded
+working directory, including registry packages with the same source filenames.
+Every observed file must match the authenticated workspace or registry inventory.
+External `include!`, `include_bytes!` and `#[path]` inputs therefore block collection
+before a manifest exists. Files generated under the fresh build directory are
+retained by content hash; they do not acquire certified source owners.
+
+The candidate retains raw dep-info and compiler invocation records in the capture
+and rechecks their identities during verification. It accepts only the exercised
+Linux dep-info escaping and public compiler output arguments; unknown forms fail
+closed. This follows the documented [Cargo wrapper protocol](https://doc.rust-lang.org/cargo/reference/config.html#buildrustc-wrapper)
+and [rustc dep-info output](https://doc.rust-lang.org/rustc/command-line-arguments.html).
+It does not parse Cargo fingerprint internals. The internal build layout is not a
+compatibility promise; every observed `.d` must have an authenticated producer.
+
+This proves the observed compiler file-input inventory, not a complete build-input
+closure. Arbitrary build-script reads, proc-macro execution, environment closure
+and direct compiler invocations bypassing Cargo remain uncertified. Environment
+dependency comments are retained verbatim without a completeness claim.
 Pre/post checks detect observed changes; they do not provide a filesystem snapshot
 or defend against a concurrent actor changing and restoring files during a build.
 
