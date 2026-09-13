@@ -1,4 +1,4 @@
-//! Offline release verification and transactional selection. No downloader or signer.
+//! Release verification and transactional selection. No signer.
 //! The host pins trust; release files cannot choose a key, verifier or identity.
 use crate::{artifact, process::Runner, strict_json, support::Support};
 use anyhow::{ensure, Context, Result};
@@ -20,10 +20,10 @@ use std::{
     path::{Path, PathBuf},
 };
 
-const PROGRAM: &str = "harness-gate-rust-stable-collector";
+pub(crate) const PROGRAM: &str = "harness-gate-rust-stable-collector";
 const INVENTORY: &str = "release-inventory.json";
 const SIGNATURE: &str = "release-inventory.sig";
-const FILES: [&str; 5] = [PROGRAM, "LICENSE", "support.json", INVENTORY, SIGNATURE];
+pub(crate) const FILES: [&str; 5] = [PROGRAM, "LICENSE", "support.json", INVENTORY, SIGNATURE];
 const IDENTITY: &str = "https://github.com/musutrade/Harness-Gate/.github/workflows/rust-collector-release.yml@refs/heads/main";
 const ISSUER: &str = "https://token.actions.githubusercontent.com";
 const LIMIT: u64 = 64 * 1024 * 1024;
@@ -91,7 +91,7 @@ fn read(path: &Path, limit: u64) -> Result<Vec<u8>> {
 fn typed<T: DeserializeOwned>(bytes: &[u8]) -> Result<T> {
     Ok(serde_json::from_value(strict_json::parse(bytes)?)?)
 }
-fn pinned(path: &Path, digest: &str) -> Result<Vec<u8>> {
+pub(crate) fn pinned(path: &Path, digest: &str) -> Result<Vec<u8>> {
     absolute(path)?;
     let bytes = read(path, LIMIT)?;
     ensure!(
@@ -545,6 +545,41 @@ pub fn install(bundle: &Path, host: &Path, digest: &str, root: &Path, log: &Path
     )?;
     install.activate(snapshot)
 }
+pub fn download_install(
+    request: &Path,
+    request_digest: &str,
+    host: &Path,
+    digest: &str,
+    root: &Path,
+    log: &Path,
+) -> Result<Value> {
+    // Reject unpinned input/trust before any network access. Keep the lock across
+    // transport, authentication and activation so concurrent upgrades cannot race.
+    pinned(request, request_digest)?;
+    let install = LockedRoot::open(root)?;
+    let mut runner = Runner::create(log, root, 60)?;
+    let stage = tempfile::Builder::new()
+        .prefix(".download-")
+        .tempdir_in(root)?;
+    trust(host, digest, stage.path(), Some(root))?;
+    let bytes = crate::download::fetch(request, request_digest, stage.path(), root, log)?;
+    let verified = snapshot(
+        stage.path(),
+        &root.join("versions"),
+        host,
+        digest,
+        Some(root),
+        &mut runner,
+    )?;
+    pinned(request, request_digest).context("download request changed before activation")?;
+    let mut result = install.activate(verified)?;
+    result["download_bytes"] = json!(bytes);
+    result["download_request_sha256"] = json!(request_digest);
+    result["download_byte_scope"] =
+        json!("HTTP response bodies read; excludes headers, TLS and proxy overhead");
+    Ok(result)
+}
+
 pub fn rollback(
     root: &Path,
     version: &str,

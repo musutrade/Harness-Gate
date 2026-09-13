@@ -1,4 +1,4 @@
-# Stable candidate offline lifecycle
+# Stable candidate lifecycle
 
 This is partial T5 implementation, not an approved distribution or installation
 procedure for a user project. The [validation record](stable-rust-collector-validation.md)
@@ -7,8 +7,8 @@ release hold remains. No candidate package or test key authorizes production use
 
 ## Program and bundle contract
 
-The same Rust executable performs `release-verify`, `install` (also upgrade) and
-`rollback`. It does not invoke Python, OpenSSL, a shell installer or a compiler.
+The same Rust executable performs `release-verify`, `install` (also upgrade),
+`download-install` and `rollback`. It does not invoke Python, OpenSSL, a shell installer or a compiler.
 Verification invokes the host-pinned external `cosign` executable and then the
 authenticated staged program with `--version`. The latter must launch, exit zero
 within 60 seconds, and return exactly the program name and signed release version
@@ -110,12 +110,11 @@ changing selection. The previous versions are retained. A process killed during
 verification can leave unselected staging directories; automatic cleanup is not
 implemented. The test records their disk usage separately from retained versions.
 
-Reports include actual package/install bytes and selection identities. The current
-input is a local directory: network download bytes are zero for these operations,
-not a measurement of a future downloader. No compiler archives or acceptance logs
-are package assets. Protected signing/publication, production license review,
-download/cache accounting, trusted bootstrap and full independent upgrade acceptance
-remain open.
+Reports include actual package/install bytes and selection identities. Local bundle
+operations report zero download bytes. The HTTPS operation below reports received
+asset body bytes separately. No compiler archives or acceptance logs are package
+assets. Protected signing/publication, production license review, trusted bootstrap
+and full independent upgrade acceptance remain open.
 
 ## Candidate package preparation
 
@@ -161,3 +160,58 @@ verifier. Re-signed nonlaunching, wrong-version, nonzero, timed-out and stage-mu
 Rust/ELF fixtures must preserve the current version. Command records check that
 failed signatures never reach program execution. Test fixtures, build sources,
 private keys, verifiers and build caches remain outside the runtime packages.
+
+## Explicit HTTPS download and installation
+
+`download-install REQUEST REQUEST_SHA256 TRUST TRUST_SHA256 ROOT NEW_LOG` adds a
+Rust transport to the same authenticated transaction. The caller supplies the exact
+request digest and existing host trust; neither comes from a downloaded package.
+There is no `latest` discovery, unsigned fallback, automatic trust installation,
+package manager invocation or Rust/LLVM environment download. Obtain release
+identities through an independently authenticated channel. Production trust
+bootstrap and published asset URLs remain pending; test keys are not production
+trust. The old release hold remains in force.
+
+The strict `rust-stable-download-request/v1` JSON has `timeout_seconds` (1–120 per
+asset), optional `tls_root` (`path`, `sha256`), and an `assets` object containing
+exactly the five names in the bundle table. Each asset has its complete HTTPS
+`url`, exact positive `bytes`, and lowercase `sha256`. This includes the inventory
+and signature envelope, fixing the requested release rather than silently adopting
+a different signed version. Unknown/duplicate fields fail. Program size is bounded
+at 64 MiB; each other asset at 8 MiB. These are safety limits, not package sizes.
+
+TLS uses ureq 3.4.0/rustls with bundled WebPKI roots by default; it does not require
+an external OpenSSL command or library at runtime. A caller may explicitly pin one
+host-owned PEM root for private distribution. Certificate and hostname verification
+remain mandatory. The optional root must be outside the installation/download
+stage. Existing proxy environment variables are honored; TLS and signature checks
+still apply. Initial URLs and each of at most three absolute redirects require
+HTTPS and reject userinfo/fragments. Relative redirects are currently rejected.
+Only status 200 and unencoded bodies are accepted. A present Content-Length must
+match; received length and SHA-256 are independently checked. Each asset's deadline
+includes its redirects and body. Failed transfers have no automatic retries.
+
+The installation lock covers download, verification and activation. Five assets
+are streamed into a private bounded staging directory, then checked by the existing
+RSA, pinned cosign, support-contract and launch/version validators. Request and
+custom TLS-root pins are checked again after transfer; request/trust/payload checks
+precede activation. Download success alone grants no installation authority.
+Network errors, bad signatures and interrupted transfers preserve `current`.
+
+`NEW_LOG/download.json` records per-asset bytes actually read by the plugin and
+whether the transfer completed. `download_bytes` counts HTTP response-body bytes;
+it excludes headers, TLS/proxy framing and unread transport buffers, and is not a
+wire-traffic measurement. No cache is implemented (`cache_bytes: 0`). An upgrade
+downloads these five new assets only, independently of user toolchains. SIGKILL can
+prevent the final audit and leave an unselected `.download-*` directory; retries
+use fresh staging and retained bytes must be accounted for separately. No automatic
+cleanup deletes these directories or prior versions.
+
+Repository-only `validate_download.py` uses a real local HTTPS server with a
+separate test CA/server certificate and lifecycle test bundles. It exercises
+installation, a separately compiled upgrade, rollback, TLS rejection, downgrade
+and redirect limits, bad HTTP/length/encoding/hash, truncation, timeout, failed
+signature checks, request/CA changes during transfer, and interruption. RSA verification is real; Sigstore is explicitly
+mocked by the lifecycle fixture. `--trace` is mandatory in CI, but unavailable on
+the current restricted host. This does not establish public hosting, production
+signing or another supported operating system.

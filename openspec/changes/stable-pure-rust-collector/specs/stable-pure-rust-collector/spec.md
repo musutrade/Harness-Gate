@@ -183,3 +183,30 @@ accepted as compiler execution attestations or normalized Core coverage/CRAP.
 - GIVEN changed source/model identities, a wrong anchor, forged coverage zero, mixed configurations or duplicate generated owners
 - WHEN the candidate observes or verifies the result
 - THEN it fails measurement without emitting certified metrics; unvalidated nested/derive/cfg inputs yield an explicit unsupported result with no partial function observations.
+
+
+### Requirement: Authenticated bounded release transport
+
+A network installer MUST use the Rust implementation, verified HTTPS and a
+caller-pinned request fixing each of the five release assets by URL, length and
+SHA-256. It MUST require the existing separately pinned signing trust and full
+release verification before activation. It MUST NOT silently discover/adopt another
+release, accept unsigned assets, download a toolchain or install host trust.
+
+#### Scenario: Redirect or response violates the request
+
+- GIVEN a valid existing installation and an explicitly pinned download request
+- WHEN an HTTPS redirect downgrades transport, exceeds the redirect bound, or the response violates the status, encoding, size, timeout or hash contract
+- THEN installation fails, the selected program remains usable and any completed transfer audit distinguishes received body bytes from wire traffic.
+
+#### Scenario: Transport succeeds but signatures fail
+
+- GIVEN five files whose transport identities match the request
+- WHEN RSA or pinned Sigstore verification fails
+- THEN no payload becomes the selected installation and transport success cannot become release acceptance.
+
+#### Scenario: Interrupted upgrade
+
+- GIVEN a usable installed version
+- WHEN the download process is killed before verification and selection
+- THEN the old selection remains intact, retries use new staging, and any retained partial stage is accounted for separately without claiming a complete transfer audit.
