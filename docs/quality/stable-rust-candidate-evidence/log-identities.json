@@ -1,0 +1,66 @@
+{
+  "schema": "rust-stable-candidate-log-index/v1",
+  "note": "Workspace log identities only, not a signed archive or Core evidence. Empty logs have their actual empty-file digest.",
+  "logs": [
+    {
+      "path": "target/gh-259/core-nextest-no-proxy.log",
+      "bytes": 54838,
+      "sha256": "dfe2d48a312ade4863b7cad225b5e56205afccefdbbda30b4a6ae7625138a6f6"
+    },
+    {
+      "path": "target/gh-259/core-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-259/core-clippy.log",
+      "bytes": 4585,
+      "sha256": "4a13a9a442d17a6a2d84af706656c520cd282d88cbf8218a3480aeb35d2390b1"
+    },
+    {
+      "path": "target/gh-259/stable-build.log",
+      "bytes": 11455,
+      "sha256": "69bad44e5fe72f4c704613c18cf59b2340e01275ca0d17c049a643940aaf27e9"
+    },
+    {
+      "path": "target/gh-259/stable-tests.log",
+      "bytes": 987,
+      "sha256": "adc915e0027aef86df15948c8be4b6467530958e87846fccf764bc8ef42d111e"
+    },
+    {
+      "path": "target/gh-259/stable-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-259/stable-clippy.log",
+      "bytes": 217,
+      "sha256": "2a04e5bfeeb5f19d6abaab3cb74d7a92dde39f373511e1330f4d075b1517bbf4"
+    },
+    {
+      "path": "target/gh-259/release-tests.log",
+      "bytes": 13468,
+      "sha256": "118624b811f3b711508903f7407565682e426680aaf2a22dccfd997af43ef911"
+    },
+    {
+      "path": "target/gh-259/docs-consistency-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/gh-259/acceptance-04.log",
+      "bytes": 117,
+      "sha256": "01552390c2c6aab00070cb6727051732300e9be9c8bfa28f6cd0d8379b067d43"
+    },
+    {
+      "path": "target/gh-259/toolchain-download.log",
+      "bytes": 268,
+      "sha256": "3b3d53e6a9649cf00fd9b66d98a601b825f873a8a40b5abb56ec3277bd16bc78"
+    },
+    {
+      "path": "target/gh-259/quality-tests.log",
+      "bytes": 77462,
+      "sha256": "dc000cfe849be47680071b6b59684ad25e6425b22e1c6bb800d04c35ec2ae327"
+    }
+  ]
+}

@@ -1,0 +1,499 @@
+{
+  "schema": "rust-stable-candidate-acceptance/v1",
+  "state": "candidate-only",
+  "checks": [
+    {
+      "name": "doctor",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "prepare-plain",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "plain",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "verify",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "stale-output",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "wrong-request-anchor",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "wrong-manifest-anchor",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "corrupt-coverage",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "mixed-artifact",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "changed-source",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "restored-integrity",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "prepare-boundaries",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "boundaries",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "prepare-features",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "features",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "wrong-tool-identity",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "config-injection",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "missing-rust",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "injected-flags",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "missing-project-toolchain",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "symlink-source",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "prepare-failed-test",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "name": "failed-test",
+      "exit_code": 1,
+      "passed": true
+    }
+  ],
+  "observations": {
+    "plain": {
+      "anchors": {
+        "capture": "complete",
+        "core_acceptance": "pending",
+        "manifest_sha256": "7e0abd7caf0b7652001707a20a408c17d2cc4476141922155fed220d92f76aa2",
+        "request_sha256": "ab000d43c7284b29ad046fb3df8abdb6bbe0274dd029a27d20976146da8583af",
+        "state": "unsupported"
+      },
+      "llvm_totals_test_inclusive": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 3,
+          "covered": 2,
+          "percent": 66.66666666666666
+        },
+        "instantiations": {
+          "count": 3,
+          "covered": 2,
+          "percent": 66.66666666666666
+        },
+        "lines": {
+          "count": 12,
+          "covered": 9,
+          "percent": 75
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 15,
+          "covered": 12,
+          "notcovered": 3,
+          "percent": 80
+        }
+      },
+      "lexical_functions": [
+        {
+          "complexity": 3,
+          "name": "classify",
+          "reasons": [],
+          "span": [
+            1,
+            1,
+            7,
+            2
+          ],
+          "state": "supported"
+        },
+        {
+          "complexity": 1,
+          "name": "never_called",
+          "reasons": [],
+          "span": [
+            9,
+            1,
+            11,
+            2
+          ],
+          "state": "supported"
+        }
+      ]
+    },
+    "boundaries": {
+      "anchors": {
+        "capture": "complete",
+        "core_acceptance": "pending",
+        "manifest_sha256": "89dc0ab11ee0269a63e4cd43559a58cb85801ed3bf2ce147c73f7c5d3dee6dda",
+        "request_sha256": "2b341ffc23ed795a5dbfbb8b8ce5973eb20a91fbdb6385d30bc9fb979b91ca25",
+        "state": "unsupported"
+      },
+      "llvm_totals_test_inclusive": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 8,
+          "covered": 6,
+          "percent": 75
+        },
+        "instantiations": {
+          "count": 8,
+          "covered": 6,
+          "percent": 75
+        },
+        "lines": {
+          "count": 18,
+          "covered": 16,
+          "percent": 88.88888888888889
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 37,
+          "covered": 30,
+          "notcovered": 7,
+          "percent": 81.0810810810811
+        }
+      },
+      "async_constructor_count": 1,
+      "async_body_count": 0,
+      "lexical_functions": [
+        {
+          "complexity": null,
+          "name": "deferred",
+          "reasons": [
+            "async lowering owner not certified"
+          ],
+          "span": [
+            11,
+            1,
+            11,
+            36
+          ],
+          "state": "unsupported"
+        },
+        {
+          "complexity": null,
+          "name": "generic",
+          "reasons": [
+            "generic instantiation owner not certified"
+          ],
+          "span": [
+            12,
+            1,
+            12,
+            35
+          ],
+          "state": "unsupported"
+        },
+        {
+          "complexity": null,
+          "name": "closure",
+          "reasons": [
+            "closure owner not certified; no parent coverage inheritance"
+          ],
+          "span": [
+            13,
+            1,
+            16,
+            2
+          ],
+          "state": "unsupported"
+        },
+        {
+          "complexity": null,
+          "name": "feature_only",
+          "reasons": [
+            "unresolved attribute: # [cfg (feature = \"extra\")]"
+          ],
+          "span": [
+            18,
+            1,
+            19,
+            34
+          ],
+          "state": "unsupported"
+        },
+        {
+          "complexity": 1,
+          "name": "never_called",
+          "reasons": [],
+          "span": [
+            21,
+            1,
+            21,
+            34
+          ],
+          "state": "supported"
+        }
+      ],
+      "unsupported": [
+        "closure owner not certified; no parent coverage inheritance",
+        "macro expansion / generated owner not certified",
+        "unresolved attribute: # [derive (Debug , Clone)]"
+      ]
+    },
+    "features": {
+      "anchors": {
+        "capture": "complete",
+        "core_acceptance": "pending",
+        "manifest_sha256": "45c0a3371cb6c94068eb6a6b8953fca419b1a2ab9429bd04df84c5cb2536f718",
+        "request_sha256": "0f40a8fe2708b46dd1644b6cbe9af8b1ba89400998bdbc2eeb212bfac6026724",
+        "state": "unsupported"
+      },
+      "llvm_totals_test_inclusive": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 9,
+          "covered": 7,
+          "percent": 77.77777777777779
+        },
+        "instantiations": {
+          "count": 9,
+          "covered": 7,
+          "percent": 77.77777777777779
+        },
+        "lines": {
+          "count": 20,
+          "covered": 18,
+          "percent": 90
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 42,
+          "covered": 35,
+          "notcovered": 7,
+          "percent": 83.33333333333334
+        }
+      },
+      "async_constructor_count": 1,
+      "async_body_count": 0,
+      "lexical_functions": [
+        {
+          "complexity": null,
+          "name": "deferred",
+          "reasons": [
+            "async lowering owner not certified"
+          ],
+          "span": [
+            11,
+            1,
+            11,
+            36
+          ],
+          "state": "unsupported"
+        },
+        {
+          "complexity": null,
+          "name": "generic",
+          "reasons": [
+            "generic instantiation owner not certified"
+          ],
+          "span": [
+            12,
+            1,
+            12,
+            35
+          ],
+          "state": "unsupported"
+        },
+        {
+          "complexity": null,
+          "name": "closure",
+          "reasons": [
+            "closure owner not certified; no parent coverage inheritance"
+          ],
+          "span": [
+            13,
+            1,
+            16,
+            2
+          ],
+          "state": "unsupported"
+        },
+        {
+          "complexity": null,
+          "name": "feature_only",
+          "reasons": [
+            "unresolved attribute: # [cfg (feature = \"extra\")]"
+          ],
+          "span": [
+            18,
+            1,
+            19,
+            34
+          ],
+          "state": "unsupported"
+        },
+        {
+          "complexity": 1,
+          "name": "never_called",
+          "reasons": [],
+          "span": [
+            21,
+            1,
+            21,
+            34
+          ],
+          "state": "supported"
+        }
+      ],
+      "unsupported": [
+        "closure owner not certified; no parent coverage inheritance",
+        "macro expansion / generated owner not certified",
+        "unresolved attribute: # [derive (Debug , Clone)]"
+      ]
+    }
+  },
+  "tools": {
+    "rustc": {
+      "path": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+      "identity": {
+        "sha256": "d3a664c970a9fd8361b64194861bebc1ae37b9054e5ee3400dc1c9e691797eea",
+        "bytes": 645000
+      },
+      "version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6"
+    },
+    "cargo": {
+      "path": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+      "identity": {
+        "sha256": "828980723df339d62434390e9fb8ef8831036583343ae2316b7ab5646b5c1953",
+        "bytes": 42839824
+      },
+      "version": "cargo 1.97.1 (c980f4866 2026-06-30)"
+    },
+    "rustdoc": {
+      "path": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustdoc",
+      "identity": {
+        "sha256": "3b0c7aef20e0dfdfe2dd19ddb0b40d3b744f76318a44031813f501e1912934df",
+        "bytes": 13680928
+      },
+      "version": "rustdoc 1.97.1 (8bab26f4f 2026-07-14)"
+    },
+    "cargo_llvm_cov": {
+      "path": "/home/gem/.cargo/bin/cargo-llvm-cov",
+      "identity": {
+        "sha256": "61d0638359c3dd320e61b1a3467857036307235afed31fb51781a66ec5cf47a5",
+        "bytes": 4609480
+      },
+      "version": "cargo-llvm-cov 0.9.0"
+    },
+    "llvm_cov": {
+      "path": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+      "identity": {
+        "sha256": "bb415d8767d2ad73d72c01941f409ffc8f9478747ec7c18a7a69356735551ed9",
+        "bytes": 639712
+      },
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+    },
+    "llvm_profdata": {
+      "path": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+      "identity": {
+        "sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+        "bytes": 666968
+      },
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build."
+    },
+    "release": "1.97.1",
+    "commit": "8bab26f4f68e0e26f0bb7960be334d5b520ea452",
+    "host": "x86_64-unknown-linux-gnu",
+    "llvm": "22.1.6"
+  },
+  "binary": {
+    "sha256": "4baf3660d4d4bb0e1400c6f2e9a1ba2e52ac2a769607a33c90719b27bcbb645c",
+    "bytes": 1408760
+  },
+  "capture_bytes": 42063,
+  "persistent_candidate_cache_bytes": 0,
+  "execve_trace": "not performed",
+  "core_protocol_authentication": "not implemented",
+  "release_signature_lifecycle": "not implemented",
+  "second_toolchain_and_system": "not established by this invocation"
+}

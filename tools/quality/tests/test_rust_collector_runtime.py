@@ -36,6 +36,8 @@ class BuildInputTests(unittest.TestCase):
             self.assertFalse((root / 'output').exists())
 
 
+@unittest.skipUnless(os.environ.get('HARNESS_GATE_LEGACY_EXPERIMENT') == '1',
+                     'manual legacy runtime experiment excluded from required CI (ADR 0053)')
 class StandaloneNativeTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

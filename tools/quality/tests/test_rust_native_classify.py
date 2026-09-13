@@ -16,6 +16,8 @@ import rust_native_driver as native
 import rust_native_classify as classify
 
 
+@unittest.skipUnless(os.environ.get('HARNESS_GATE_LEGACY_EXPERIMENT') == '1',
+                     'manual compiler-private experiment excluded from required CI (ADR 0053)')
 class NativeFileClassificationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

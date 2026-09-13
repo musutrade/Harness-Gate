@@ -1,5 +1,9 @@
 # Rust collector installation and independent release
 
+> Migration notice (2026-09-13): this guide describes the existing legacy release.
+> New legacy collector/installer publication is suspended under [Engineering Policy section 10](../engineering-policy.md#10-stable-compiler-interfaces-and-first-party-rust-plugin-delivery).
+> The replacement must use Rust throughout and stable compiler interfaces; it is not yet released.
+
 For the **unreleased GH-255 source implementation**, see the
 [lightweight lifecycle guide](lightweight-collector-installation.md). Its component
 store, archive-free verification and maintenance commands supersede the source
@@ -166,3 +170,6 @@ Historical [GH-229 fixture validation](gh-229/validation.md),
 [GH-239 governance proposal](gh-239/operator-preparation.md) describe their dated
 scope; their old pending notes are not the current release status. Synthetic
 local rehearsals remain tests and never stand in for production signatures.
+
+The [stable Rust candidate](stable-rust-collector.md) has a separate developer
+workflow and explicit limitations. It is not yet an installable replacement.
