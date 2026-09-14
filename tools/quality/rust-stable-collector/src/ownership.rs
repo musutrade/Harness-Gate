@@ -22,8 +22,32 @@ fn contains(outer: (Position, Position), inner: (Position, Position)) -> bool {
 }
 
 pub fn file(root: &Path, path: &str, raw: &Value) -> Result<Value> {
-    let text = fs::read_to_string(root.join(path))?;
-    let inventory = serde_json::to_value(source::analyze(&text)?)?;
+    absolute(&root.join(path), raw)
+}
+
+/// Same proof for a file identified by its absolute path. Used for generated
+/// files (for example a build script's `OUT_DIR` output) that are not part of
+/// the project inventory. The caller must have authenticated the file bytes.
+pub fn absolute(path: &Path, raw: &Value) -> Result<Value> {
+    let text = fs::read_to_string(path)?;
+    analyze(path, &text, raw)
+}
+
+/// Same proof against already-read, already-authenticated source text, where the
+/// recorded LLVM filename may no longer exist on disk after capture. The caller
+/// must bind `source` to authenticated bytes. A generated file may have owner
+/// records without its own file summary, so the summary is reconciled only when
+/// one exists; owner totals are always checked against the function records.
+pub fn text(path: &Path, source: &str, raw: &Value) -> Result<Value> {
+    analyze_with(path, source, raw, true)
+}
+
+fn analyze(path: &Path, text: &str, raw: &Value) -> Result<Value> {
+    analyze_with(path, text, raw, false)
+}
+
+fn analyze_with(path: &Path, text: &str, raw: &Value, summary_optional: bool) -> Result<Value> {
+    let inventory = serde_json::to_value(source::analyze(text)?)?;
     let functions = inventory["functions"]
         .as_array()
         .context("source functions")?;
@@ -37,8 +61,7 @@ pub fn file(root: &Path, path: &str, raw: &Value) -> Result<Value> {
     {
         return Ok(unsupported());
     }
-    let filename = root.join(path);
-    let filename = filename.to_str().context("source path UTF-8")?;
+    let filename = path.to_str().context("source path UTF-8")?;
     let raw_functions = raw["data"][0]["functions"]
         .as_array()
         .context("LLVM functions")?;
@@ -134,15 +157,15 @@ pub fn file(root: &Path, path: &str, raw: &Value) -> Result<Value> {
     );
     let files = raw["data"][0]["files"].as_array().context("LLVM files")?;
     let summaries: Vec<_> = files.iter().filter(|f| f["filename"] == filename).collect();
-    ensure!(
-        summaries.len() == 1,
-        "missing or ambiguous LLVM file summary"
-    );
-    let summary = &summaries[0]["summary"]["regions"];
-    ensure!(
-        summary["count"] == file_regions && summary["covered"] == file_covered,
-        "LLVM owner regions disagree with file summary"
-    );
+    ensure!(summaries.len() <= 1, "ambiguous LLVM file summary");
+    let summary = summaries.first().map(|entry| &entry["summary"]["regions"]);
+    match summary {
+        Some(summary) => ensure!(
+            summary["count"] == file_regions && summary["covered"] == file_covered,
+            "LLVM owner regions disagree with file summary"
+        ),
+        None => ensure!(summary_optional, "missing or ambiguous LLVM file summary"),
+    }
     Ok(json!({"state":"supported","rule":RULE,"functions":mapped,"excluded":excluded}))
 }
 
