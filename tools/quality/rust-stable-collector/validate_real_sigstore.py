@@ -2,7 +2,7 @@
 """Actual pinned cosign cryptography plus candidate wrong-payload rejection.
 
 The positive is an upstream cosign release, NOT a signed collector release.
-No signing service is invoked. Candidate RSA is a local lifecycle test key.
+No signing service is invoked. The collector requires one Sigstore signature.
 """
 import argparse
 import hashlib
@@ -76,12 +76,12 @@ def main():
     signatures = json.loads((candidate / 'release-inventory.sig').read_bytes())
     signatures['sigstore_bundle'] = original
     (candidate / 'release-inventory.sig').write_text(json.dumps(signatures) + '\n')
-    # The original candidate inventory and its real test RSA signature stay exact.
+    # The original candidate inventory stays exact.
     host = lifecycle / 'test-only-host-trust'
     trust = json.loads((host / 'trust.json').read_bytes())
     trust.update(cosign=str(cosign), cosign_sha256=identity(cosign)['sha256'],
                  trusted_root=str(trusted_root), trusted_root_sha256=identity(trusted_root)['sha256'])
-    trust_path = output / 'test-rsa-real-cosign-trust.json'
+    trust_path = output / 'real-cosign-trust.json'
     write(trust_path, trust)
     run('candidate-rejects-unrelated-signed-blob', [str(binary), 'install', str(candidate), str(trust_path),
         identity(trust_path)['sha256'], str(lifecycle / 'installation'), str(output / 'candidate-log')], False)
@@ -93,7 +93,7 @@ def main():
         'binary': identity(binary), 'cosign': identity(cosign), 'trusted_root': identity(trusted_root),
         'upstream_bundle': identity(bundle), 'checks': records,
         'positive_scope': 'upstream cosign release identity only',
-        'candidate_scope': 'real test RSA plus real cosign reject a signature over another payload; current preserved',
+        'candidate_scope': 'real cosign rejects a signature over another payload; current preserved',
         'candidate_production_signature': False, 'release_ready': False})
 
 

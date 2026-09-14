@@ -86,7 +86,7 @@ def main():
                'binary': before, 'core': identity(core), 'system': platform.platform(),
                'os_release': Path('/etc/os-release').read_text(), 'inputs': inputs,
                'commands': records, 'production_signature': False,
-               'signature_scope': 'real test RSA; explicitly mocked Sigstore',
+               'signature_scope': 'SHA-256 and explicitly mocked Sigstore',
                'measurement_migration_approved': False, 'release_ready': False}
     (output / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')
     print(json.dumps({'summary': str(output / 'summary.json'), 'binary': before, 'stages': len(records)}))

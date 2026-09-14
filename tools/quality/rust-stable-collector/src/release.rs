@@ -2,10 +2,6 @@
 //! The host pins trust; release files cannot choose a key, verifier or identity.
 use crate::{artifact, process::Runner, strict_json, support::Support};
 use anyhow::{ensure, Context, Result};
-use base64::{engine::general_purpose::STANDARD, Engine};
-use rsa::{
-    pkcs1v15, pkcs8::DecodePublicKey, signature::Verifier, traits::PublicKeyParts, RsaPublicKey,
-};
 use serde::{de::DeserializeOwned, Deserialize};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
@@ -24,7 +20,7 @@ pub(crate) const PROGRAM: &str = "harness-gate-rust-stable-collector";
 const INVENTORY: &str = "release-inventory.json";
 const SIGNATURE: &str = "release-inventory.sig";
 pub(crate) const FILES: [&str; 5] = [PROGRAM, "LICENSE", "support.json", INVENTORY, SIGNATURE];
-const IDENTITY: &str = "https://github.com/musutrade/Harness-Gate/.github/workflows/rust-collector-release.yml@refs/heads/main";
+const IDENTITY_PREFIX: &str = "https://github.com/musutrade/Harness-Gate/.github/workflows/rust-collector-release.yml@refs/tags/rust-collector-v";
 const ISSUER: &str = "https://token.actions.githubusercontent.com";
 const LIMIT: u64 = 64 * 1024 * 1024;
 
@@ -38,17 +34,14 @@ struct Inventory {
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
-struct Signatures {
+struct Signature {
     schema: String,
-    rsa_signature: String,
     sigstore_bundle: Value,
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct Trust {
     schema: String,
-    public_key: PathBuf,
-    public_key_sha256: String,
     cosign: PathBuf,
     cosign_sha256: String,
     trusted_root: PathBuf,
@@ -173,17 +166,16 @@ fn exact_files(root: &Path) -> Result<()> {
 fn trust(path: &Path, digest: &str, bundle: &Path, install: Option<&Path>) -> Result<Trust> {
     let value: Trust = typed(&pinned(path, digest)?)?;
     ensure!(
-        value.schema == "rust-stable-release-trust/v1",
+        value.schema == "rust-stable-release-trust/v2",
         "unsupported host trust schema"
     );
-    for file in [path, &value.public_key, &value.cosign, &value.trusted_root] {
+    for file in [path, &value.cosign, &value.trusted_root] {
         absolute(file)?;
         ensure!(
             !file.starts_with(bundle) && !install.is_some_and(|root| file.starts_with(root)),
             "release/install cannot supply host trust"
         );
     }
-    pinned(&value.public_key, &value.public_key_sha256)?;
     tool_pin(&value.cosign, &value.cosign_sha256).context("provision the explicitly pinned cosign verifier at the host trust path; no automatic installation")?;
     pinned(&value.trusted_root, &value.trusted_root_sha256)?;
     Ok(value)
@@ -283,33 +275,22 @@ fn snapshot(
             && executable[18..20] == [62, 0],
         "release program must be an x86_64 ELF executable"
     );
-    let signatures: Signatures = typed(&read(&stage.path().join(SIGNATURE), 8 * 1024 * 1024)?)?;
+    let signature: Signature = typed(&read(&stage.path().join(SIGNATURE), 8 * 1024 * 1024)?)?;
     ensure!(
-        signatures.schema == "rust-collector-signatures/v2"
-            && signatures
+        signature.schema == "rust-stable-release-signature/v1"
+            && signature
                 .sigstore_bundle
                 .as_object()
                 .is_some_and(|v| !v.is_empty()),
-        "both RSA and Sigstore signatures are required"
+        "a Sigstore signature bundle is required"
     );
-    let pem = pinned(&host_trust.public_key, &host_trust.public_key_sha256)?;
-    let key = RsaPublicKey::from_public_key_pem(std::str::from_utf8(&pem)?)?;
-    ensure!(
-        (2048..=8192).contains(&key.n().bits()),
-        "RSA key must have 2048..8192 bits"
-    );
-    let signature = STANDARD.decode(&signatures.rsa_signature)?;
-    let signature = pkcs1v15::Signature::try_from(signature.as_slice())?;
-    pkcs1v15::VerifyingKey::<Sha256>::new(key)
-        .verify(&raw, &signature)
-        .context("RSA release signature verification failed")?;
     let verification = tempfile::Builder::new()
         .prefix(".verification-")
         .tempdir_in(parent)?;
     write(&verification.path().join(INVENTORY), &raw, 0o600)?;
     write(
         &verification.path().join("bundle.json"),
-        &serde_json::to_vec(&signatures.sigstore_bundle)?,
+        &serde_json::to_vec(&signature.sigstore_bundle)?,
         0o600,
     )?;
     write(
@@ -341,7 +322,7 @@ fn snapshot(
                     .to_string(),
                 "--offline".into(),
                 "--certificate-identity".into(),
-                IDENTITY.into(),
+                format!("{IDENTITY_PREFIX}{}", inventory.version),
                 "--certificate-oidc-issuer".into(),
                 ISSUER.into(),
                 verification.path().join(INVENTORY).display().to_string(),
@@ -356,7 +337,7 @@ fn snapshot(
     );
     ensure!(
         read(&verification.path().join("bundle.json"), LIMIT)?
-            == serde_json::to_vec(&signatures.sigstore_bundle)?,
+            == serde_json::to_vec(&signature.sigstore_bundle)?,
         "verifier changed signature bundle"
     );
     ensure!(
@@ -383,7 +364,7 @@ fn snapshot(
         Ok(())
     };
     check_stage()?;
-    // Execute only the authenticated snapshot, after both signature checks.
+    // Execute only the snapshot authenticated by SHA-256 and Sigstore.
     // This checks launch/version compatibility, not measurement certification.
     let version = runner
         .text(&stage.path().join(PROGRAM), &["--version"])
@@ -526,7 +507,7 @@ pub fn verify(bundle: &Path, host: &Path, digest: &str, log: &Path) -> Result<Va
     let verified = snapshot(bundle, &parent, host, digest, None, &mut runner)?;
     Ok(
         json!({"schema":"rust-stable-release-verification/v1", "inventory_sha256":verified.digest,
-        "version":verified.version, "package_bytes":verified.bytes, "signatures":"rsa-and-sigstore"}),
+        "version":verified.version, "package_bytes":verified.bytes, "signatures":"sigstore"}),
     )
 }
 pub fn install(bundle: &Path, host: &Path, digest: &str, root: &Path, log: &Path) -> Result<Value> {

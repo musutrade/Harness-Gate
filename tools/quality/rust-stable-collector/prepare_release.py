@@ -294,7 +294,7 @@ def prepare(output, target_dir, toolchain, observations):
             'unsigned_package_bytes': sum(p.stat().st_size for p in package.iterdir()),
             'network_download_bytes': 0, 'signed_package_bytes': None,
             'publication_blockers': ['reviewed measurement migration', 'current stable Rust and complete two-system acceptance',
-                'production license review', 'real dual-signature acceptance', 'protected release approval'],
+                'production license review', 'real Sigstore signature acceptance'],
             'acceptance_records': [o['acceptance_sha256'] for o in observed]})
         require(identity(binary) == binary_id and identity(package / PROGRAM) == binary_id,
                 'program changed while packaging')

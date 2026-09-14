@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Repository-only real loopback HTTPS transport acceptance.
 
-Uses lifecycle test RSA signatures and explicitly MOCKED Sigstore. The TLS CA is
+Uses lifecycle SHA-256 checks and explicitly MOCKED Sigstore. The TLS CA is
 an explicit host pin; this is not public hosting, production signing or a second OS.
 """
 import argparse
@@ -48,7 +48,7 @@ def main():
     bundles = {name: lifecycle / path for name, path in (
         ('good', 'package-0.1.0-candidate.1'),
         ('upgrade', 'package-0.1.0-candidate.1.upgrade-test'),
-        ('bad-rsa', 'bad-rsa'),
+        ('legacy-signature', 'legacy-signature'),
         ('missing-sigstore', 'missing-sigstore'),
     )}
     cert, key = output / 'test-ca.pem', output / 'test-key.pem'
@@ -187,7 +187,7 @@ def main():
             ('oversized-body', 'oversize', 'exceeded declared size'), ('encoded-body', 'encoding', 'encoded release asset'),
             ('timeout', 'timeout', None), ('redirect-downgrade', 'redirect-http', 'requires HTTPS'),
             ('redirect-cycle', 'redirect-loop', 'too many download redirects'), ('redirect-credentials', 'redirect-auth', 'without credentials'),
-            ('bad-rsa', 'bad-rsa', None), ('missing-sigstore', 'missing-sigstore', None),
+            ('legacy-signature', 'legacy-signature', None), ('missing-sigstore', 'missing-sigstore', None),
         ):
             run(name, request(mode), error=error)
         for name in ('untrusted-tls', 'wrong-tls-name', 'wrong-ca-pin', 'http-input', 'credential-input', 'extra-asset', 'wrong-size', 'wrong-hash', 'wrong-request-pin', 'unknown-field'):
@@ -261,7 +261,7 @@ def main():
             'abandoned_download_bytes': abandoned, 'cache_bytes': 0,
             'tls': 'real loopback HTTPS with explicitly pinned test CA; certificate and hostname failures tested',
             'process_trace': 'real execve' if args.trace else 'unavailable; command records only',
-            'signature_scope': 'real test RSA; mock Sigstore invocation only; no production signature claim',
+            'signature_scope': 'SHA-256 and mock Sigstore invocation only; no production signature claim',
             'platform_scope': 'current host only; no cross-host or public-network acceptance'})
         print(json.dumps({'checks': len(checks), 'passed': True, 'initial_download_bytes': initial_bytes, 'upgrade_download_bytes': upgrade['download_bytes']}))
     finally:
