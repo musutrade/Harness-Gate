@@ -12,7 +12,7 @@ import shutil
 import subprocess
 import tomllib
 
-from validate_stable_candidate import check_trace
+from validate_stable_candidate import check_trace, trace_command
 
 
 def identity(path):
@@ -38,8 +38,7 @@ def main():
         argv = list(map(str, ([binary] if plugin else []) + list(command)))
         traced = argv
         if args.trace:
-            traced = ['strace', '-f', '-q', '-s', '16384', '-e', 'trace=execve',
-                      '-o', str(output / (name + '.execve')), *argv]
+            traced = trace_command(output / (name + '.execve'), argv)
         env = dict(os.environ, CARGO_TARGET_DIR=str(output / 'build'))
         result = subprocess.run(traced, cwd=project, env=env, capture_output=True, timeout=300)
         (output / (name + '.stdout')).write_bytes(result.stdout)
