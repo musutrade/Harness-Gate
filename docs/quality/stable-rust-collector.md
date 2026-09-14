@@ -289,11 +289,10 @@ reconstruction and certified ownership remain pending T4 work.
 
 The Rust `release` module now verifies local flat bundles and atomically selects
 installed versions. Its [offline lifecycle contract](stable-rust-collector-lifecycle.md)
-defines the five assets, externally pinned trust and commands. Both in-process
-RSA and external Sigstore verification must succeed; no unsigned fallback exists.
+defines the five assets, externally pinned trust and commands. SHA-256 and one external Sigstore signature verification must succeed; no unsigned fallback exists.
 A per-root lock serializes transactions. Verified files are synced before the
 `current` symlink is atomically replaced; rollback re-verifies its target.
-The real fixture demonstrates RSA verification, upgrade/rollback, corruption and
+The real fixture demonstrates SHA-256 verification, upgrade/rollback, corruption and
 interruption recovery. Sigstore invocation is mocked in this fixture, explicitly
 not production signature acceptance. The downloader, trusted bootstrap,
 protected signing, production license review and real Sigstore acceptance remain

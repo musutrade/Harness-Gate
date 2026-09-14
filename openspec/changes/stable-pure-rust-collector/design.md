@@ -97,12 +97,12 @@ backend or changing historical evidence. This remains partial T4/T6 acceptance.
 
 Rust offline release verification, installation, upgrade and rollback now implement
 the [lifecycle contract](../../../docs/quality/stable-rust-collector-lifecycle.md).
-The local suite uses real RSA signatures and an explicitly mocked Sigstore command;
+The local suite uses real SHA-256 checks and an explicitly mocked Sigstore command;
 it does not establish production trust or T5 completion. No release hold is removed.
 
 Before activation, the authenticated staged executable must launch successfully
 within the process deadline and report the exact signed version through `--version`.
-This happens after both signature checks and before repeated payload/trust identity
+This happens after the SHA-256 and Sigstore checks and before repeated payload/trust identity
 validation. Repository automation builds a separate test-version executable to
 exercise upgrade by the installed old program and rollback by the installed new
 program. Its source delta is version metadata only; it is not historical release
@@ -206,14 +206,14 @@ at most three validated absolute HTTPS redirects. The host may explicitly pin a
 private PEM root; a release cannot supply trust. No archives, interpreter, toolchain,
 latest-version discovery, unsigned fallback or dependency installer is involved.
 
-The installation lock spans network transfer, existing dual signature/support/
+The installation lock spans network transfer, existing SHA-256/Sigstore/support/
 launch checks and atomic selection. Each asset has a 1–120-second overall deadline;
 program/metadata caps are 64/8 MiB. The five assets consume at most 96 MiB before
 verification. Exact request/TLS/trust identities are rechecked. Received application
 body bytes, cache absence and abandoned interrupted staging are recorded separately;
 network framing is not claimed as measured. Failures preserve the active version.
 
-Real loopback TLS and test-RSA lifecycle fixtures validate this transport. Mocked
+Real loopback TLS and SHA-256 lifecycle fixtures validate this transport. Mocked
 Sigstore cannot satisfy production signing acceptance. Trusted public bootstrap,
 protected publication, current stable Rust/full two-system and complete acceptance still block
 T5/T8; no release hold is removed by the downloader.

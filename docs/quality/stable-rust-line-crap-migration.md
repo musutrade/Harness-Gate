@@ -6,6 +6,11 @@ migration preview. The preview is not evidence, a gate result, a series approval
 or a baseline adoption. Required `risk.crap` remains blocked. GH-259 and the
 legacy publication hold remain open; PR #261 remains draft.
 
+The current release contract uses SHA-256 plus one exact-tag Sigstore signature;
+see [the lifecycle delta](stable-rust-collector-lifecycle.md#release-simplification-2026-09-14).
+RSA references in the recorded acceptance below describe the previous candidate,
+and are not current requirements or acceptance of the rebuilt executable.
+
 ## Candidate line contract
 
 `rust-llvm-exact-free-owner/v4-candidate` extends the verified root/inline-module
@@ -88,12 +93,12 @@ same-binary package. It records the OS, executable hashes, commands and original
 raw-output identities. Containers establish another runnable userspace and share
 the host kernel; they do not establish a second kernel or all Linux support.
 
-The lifecycle suites use real test RSA with explicitly mocked Sigstore. The
+The current lifecycle suites use SHA-256 with explicitly mocked Sigstore. The
 separate pinned cosign 3.1.3 upstream positive demonstrates actual Sigstore
 signature/inclusion verification under its own identity; it does not sign or
-certify this collector. Candidate production acceptance still needs both
-signatures over its exact inventory, the protected Harness-Gate workflow
-identity, independently approved trust and license/release review. This change
+certify this collector. Candidate production acceptance needs one Sigstore
+signature over its exact inventory, the Harness-Gate workflow identity bound to
+its exact version tag, authenticated trust and license/release review. This change
 cannot remove the hold or publish a production version.
 
 ## Retained 2026-09-14 acceptance

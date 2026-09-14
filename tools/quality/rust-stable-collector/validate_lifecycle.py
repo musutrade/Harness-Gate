@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-"""Repository-only lifecycle execution: real RSA, explicitly mocked Sigstore.
+"""Repository-only lifecycle execution: SHA-256 and explicitly mocked Sigstore.
 
-Never package this driver or its generated test keys/verifier. It cannot establish
+Never package this driver or its test verifier. It cannot establish
 production signing, Sigstore cryptography, cross-host compatibility or release readiness.
 """
 import argparse
-import base64
 import hashlib
 import json
 import os
@@ -19,7 +18,7 @@ from validate_stable_candidate import check_trace, trace_command
 from validate_upgrade import build_programs
 
 PROGRAM = 'harness-gate-rust-stable-collector'
-IDENTITY = 'https://github.com/musutrade/Harness-Gate/.github/workflows/rust-collector-release.yml@refs/heads/main'
+IDENTITY = 'https://github.com/musutrade/Harness-Gate/.github/workflows/rust-collector-release.yml@refs/tags/rust-collector-v'
 
 
 def sha(path):
@@ -49,8 +48,6 @@ def main():
     host.mkdir()
     root = output / 'installation'
     root.mkdir(mode=0o755)
-    private = host / 'test-only-private.pem'
-    public = host / 'test-only-public.pem'
     commands = []
     checks = []
 
@@ -65,23 +62,27 @@ def main():
     version = json.loads((prepared / 'support.json').read_text())['release_version']
     assert automation([binary, '--version']) == f'{PROGRAM} {version}\n'
 
-    automation(['openssl', 'genpkey', '-algorithm', 'RSA', '-pkeyopt', 'rsa_keygen_bits:2048', '-out', private])
-    automation(['openssl', 'pkey', '-in', private, '-pubout', '-out', public])
     verifier = host / 'test-only-mock-cosign'
-    verifier.write_text(f'''#!/bin/sh
+    verifier.write_text(fr'''#!/bin/sh
 # TEST ONLY: checks invocation, does NOT verify a Sigstore signature.
 [ "$#" = 11 ] && [ "$1" = verify-blob ] && [ "$2" = --bundle ] &&
 [ "$4" = --trusted-root ] && [ "$6" = --offline ] &&
-[ "$7" = --certificate-identity ] && [ "$8" = '{IDENTITY}' ] &&
+[ "$7" = --certificate-identity ] &&
 [ "$9" = --certificate-oidc-issuer ] && [ "${{10}}" = https://token.actions.githubusercontent.com ] || exit 31
+# Extract the fixture's version using shell builtins; require its exact tag.
+while IFS= read -r line; do
+  case "$line" in
+    *'"version": "'*) version=${{line#*\"version\": \"}}; version=${{version%%\"*}} ;;
+  esac
+done < "${{11}}"
+[ "$8" = '{IDENTITY}'"$version" ] || exit 32
 exit 0
 ''')
     verifier.chmod(0o755)
     trust_root = host / 'test-only-trusted-root.json'
     write(trust_root, {'test_only_mock': True})
     trust = host / 'trust.json'
-    trust_value = {'schema': 'rust-stable-release-trust/v1',
-                   'public_key': str(public), 'public_key_sha256': sha(public),
+    trust_value = {'schema': 'rust-stable-release-trust/v2',
                    'cosign': str(verifier), 'cosign_sha256': sha(verifier),
                    'trusted_root': str(trust_root), 'trusted_root_sha256': sha(trust_root)}
     write(trust, trust_value)
@@ -99,10 +100,7 @@ exit 0
                  for name in (PROGRAM, 'LICENSE', 'support.json')}
         write(directory / 'release-inventory.json', {'schema': 'rust-stable-release-inventory/v1',
               'version': version, 'target': 'x86_64-unknown-linux-gnu', 'files': files})
-        signature = host / f'{version}.sig'
-        automation(['openssl', 'dgst', '-sha256', '-sign', private, '-out', signature, directory / 'release-inventory.json'])
-        write(directory / 'release-inventory.sig', {'schema': 'rust-collector-signatures/v2',
-              'rsa_signature': base64.b64encode(signature.read_bytes()).decode(),
+        write(directory / 'release-inventory.sig', {'schema': 'rust-stable-release-signature/v1',
               'sigstore_bundle': {'test_only_mock': True}})
         return directory
 
@@ -151,7 +149,6 @@ exit 0
         write(output / 'summary.json', {
             'schema': 'rust-stable-install-permissions-acceptance/v1',
             'collector_sha256': sha(binary), 'checks': checks,
-            'rsa': 'real RSA-2048/SHA-256; repository-generated test key',
             'sigstore': 'MOCK invocation only; no cryptographic acceptance',
             'production_signature': False, 'traced': args.trace,
         })
@@ -167,6 +164,7 @@ exit 0
     run('unsigned-package-rejected', ['release-verify', prepared, trust, sha(trust)], False)
     verified = run('verify', ['release-verify', first, trust, sha(trust)])
     assert verified['inventory_sha256'] == first_id
+    assert verified['signatures'] == 'sigstore'
     installed = install('install', first)
     assert installed['current'] == first_id and installed['previous'] is None
     assert automation([root / 'current' / PROGRAM, '--version']) == f'{PROGRAM} {version}\n'
@@ -188,7 +186,7 @@ exit 0
         assert os.readlink(root / 'current') == f'versions/{first_id}'
         assert sha(root / 'current' / PROGRAM) == sha(binary)
 
-    def resign(directory):
+    def refresh_fixture_inventory(directory):
         support = json.loads((directory / 'support.json').read_text())
         support['program'] = {'sha256': sha(directory / PROGRAM), 'bytes': (directory / PROGRAM).stat().st_size}
         write(directory / 'support.json', support)
@@ -196,11 +194,6 @@ exit 0
         inventory['files'] = {name: {'sha256': sha(directory / name), 'bytes': (directory / name).stat().st_size}
                               for name in (PROGRAM, 'LICENSE', 'support.json')}
         write(directory / 'release-inventory.json', inventory)
-        signature = host / 'resigned.sig'
-        automation(['openssl', 'dgst', '-sha256', '-sign', private, '-out', signature, directory / 'release-inventory.json'])
-        envelope = json.loads((directory / 'release-inventory.sig').read_text())
-        envelope['rsa_signature'] = base64.b64encode(signature.read_bytes()).decode()
-        write(directory / 'release-inventory.sig', envelope)
 
     for name, executable, expected_error in (
         ('program-version-mismatch', upgrade_binary, 'version mismatch'),
@@ -218,7 +211,7 @@ exit 0
             (broken / PROGRAM).write_bytes(header)
         else:
             shutil.copyfile(executable, broken / PROGRAM)
-        resign(broken)
+        refresh_fixture_inventory(broken)
         started = time.monotonic()
         error = install(name, broken, False)
         assert expected_error in error, error
@@ -227,8 +220,10 @@ exit 0
         unchanged()
 
     for name, mutation in (
-        ('bad-rsa', lambda p: write(p / 'release-inventory.sig', {'schema': 'rust-collector-signatures/v2', 'rsa_signature': base64.b64encode(bytes(256)).decode(), 'sigstore_bundle': {'test_only_mock': True}})),
-        ('missing-sigstore', lambda p: write(p / 'release-inventory.sig', {'schema': 'rust-collector-signatures/v2', 'rsa_signature': json.loads((p / 'release-inventory.sig').read_text())['rsa_signature'], 'sigstore_bundle': {}})),
+        ('legacy-signature', lambda p: write(p / 'release-inventory.sig', {'schema': 'rust-collector-signatures/v2', 'rsa_signature': 'legacy', 'sigstore_bundle': {'test_only_mock': True}})),
+        ('missing-sigstore', lambda p: write(p / 'release-inventory.sig', {'schema': 'rust-stable-release-signature/v1', 'sigstore_bundle': {}})),
+        ('missing-signature', lambda p: (p / 'release-inventory.sig').unlink()),
+        ('unknown-signature-field', lambda p: write(p / 'release-inventory.sig', {'schema': 'rust-stable-release-signature/v1', 'sigstore_bundle': {'test_only_mock': True}, 'rsa_signature': 'unexpected'})),
         ('tampered-program', lambda p: (p / PROGRAM).write_bytes(b'forged')),
         ('mixed-inventory', lambda p: shutil.copyfile(second / 'release-inventory.json', p / 'release-inventory.json')),
         ('extra-asset', lambda p: (p / 'archive.tar').write_text('not needed')),
@@ -239,12 +234,12 @@ exit 0
         shutil.copytree(first, broken)
         mutation(broken)
         install(name, broken, False)
-        if name in ('bad-rsa', 'missing-sigstore'):
+        if name in ('legacy-signature', 'missing-sigstore', 'missing-signature', 'unknown-signature-field'):
             assert not list((output / f'log-{name}/commands').glob('*.json')), 'unauthenticated program executed'
         unchanged()
 
-    # These are re-signed with the real test RSA key, so failure proves the
-    # Rust support contract check, rather than a stale payload/signature hash.
+    # Refresh the SHA-256 inventory so failures reach the Rust support contract.
+    # The external Sigstore verifier remains a test double throughout this suite.
     for name, mutation in (
         ('support-schema', lambda v: v.update(schema='arbitrary/v1')),
         ('support-release', lambda v: v.update(release_version='different')),
@@ -265,13 +260,18 @@ exit 0
         inventory = json.loads((broken / 'release-inventory.json').read_text())
         inventory['files']['support.json'] = {'sha256': sha(broken / 'support.json'), 'bytes': (broken / 'support.json').stat().st_size}
         write(broken / 'release-inventory.json', inventory)
-        signature = host / f'{name}.sig'
-        automation(['openssl', 'dgst', '-sha256', '-sign', private, '-out', signature, broken / 'release-inventory.json'])
-        envelope = json.loads((broken / 'release-inventory.sig').read_text())
-        envelope['rsa_signature'] = base64.b64encode(signature.read_bytes()).decode()
-        write(broken / 'release-inventory.sig', envelope)
         error = install(name, broken, False)
         assert 'support' in error or 'candidate' in error or 'unknown field' in error, error
+        unchanged()
+
+    for name, mutation in (
+        ('legacy-trust', {'schema': 'rust-stable-release-trust/v1'}),
+        ('extra-release-key', {'public_key': '/removed-rsa-key.pem', 'public_key_sha256': '0' * 64}),
+    ):
+        rejected_trust = host / f'{name}.json'
+        write(rejected_trust, dict(trust_value, **mutation))
+        install(name, second, False, rejected_trust)
+        assert not list((output / f'log-{name}/commands').glob('*.json'))
         unchanged()
 
     saved = verifier.read_bytes()
@@ -349,7 +349,7 @@ exit 0
     summary = {'schema': 'rust-stable-lifecycle-acceptance/v1', 'collector_sha256': sha(binary),
                'upgrade_collector_sha256': sha(upgrade_binary), 'upgrade_version': upgrade_version,
                'upgrade_scope': 'separately compiled test version of the same implementation; no production or historical release compatibility claim',
-               'rsa': 'real RSA-2048/SHA-256 signatures; repository-generated test key',
+               'integrity': 'real SHA-256 payload and host trust pins; no RSA release key',
                'sigstore': 'MOCK invocation/exit behavior only; no cryptographic or production acceptance',
                'production_signature': False, 'checks': checks,
                'first_install': installed, 'upgrade': upgraded, 'rollback': rolled_back,
