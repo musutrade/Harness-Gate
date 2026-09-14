@@ -54,6 +54,32 @@ class SnapshotTests(unittest.TestCase):
                     self.assertFalse((snapshot / 'docs/quality').exists())
 
 
+class RiskScopeTests(unittest.TestCase):
+    def test_process_test_module_reaches_measurement_but_unknown_sources_block(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            collector = gate.Collector(Path(temporary) / 'candidate', 'base', 'head', 'scope-test')
+            for path, supported in (
+                ('tools/harness-gate/src/process/tests.rs', True),
+                ('tools/harness-gate/src/process/unknown.rs', False),
+                ('tools/harness-gate/src/process/tests/unknown.rs', False),
+                ('tools/harness-gate/src/unknown/tests.rs', False),
+            ):
+                with self.subTest(path=path), \
+                        patch.object(gate.subprocess, 'check_output', return_value=path + '\n'), \
+                        patch.object(gate, 'relocated_migration_sources', return_value=set()), \
+                        patch.object(collector, 'command',
+                                     side_effect=RuntimeError('measurement build reached')) as command:
+                    if supported:
+                        with self.assertRaisesRegex(RuntimeError, 'measurement build reached'):
+                            collector.risk()
+                        command.assert_called_once()
+                        self.assertEqual(command.call_args.args[0], 'analyzer-build')
+                    else:
+                        with self.assertRaisesRegex(ValueError, 'outside supported risk series'):
+                            collector.risk()
+                        command.assert_not_called()
+
+
 class AggregateTests(unittest.TestCase):
     def test_every_required_result_fails_closed_on_both_events(self):
         for event in ('push', 'pull_request'):

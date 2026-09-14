@@ -15,6 +15,8 @@ It handles changed paths, secret scanning, architecture auditing, environment va
 
 Core **0.4.2** is published with staged-host input and large native-report fixes. Rust-specific native measurement is an optional, independently installed plugin; Core owns orchestration and quality decisions. See the [documentation index](docs/README.md) and [release status, acceptance and remaining work](docs/release-status.md).
 
+Core **0.4.3** is prepared in source as an installer maintenance release. Its optional Rust installation selects a signed standalone binary with external tools. See the [standalone installation guide](docs/quality/standalone-installation.md) for publication status and exact version selection.
+
 ## Navigation
 
 - Quick Start: see [Installation](#installation) and [Quick Start](#installation-and-quick-start)
@@ -99,16 +101,17 @@ source installation additionally requires `git` and Rust `cargo`.
 
 Core does not download a Rust analysis toolchain by default. The
 [native standalone delivery](docs/quality/native-external-toolchain.md) retains
-the old measurement engine and publishes our binary using Core's signed release
-process, with matching Rust/LLVM and Python supplied externally. This source
-implementation is awaiting its first signed release. The stable engine remains
-an explicitly selected candidate; neither engine automatically adopts the other's
-metrics or baselines.
+the old measurement engine and publishes the compiled plugin using Core's signed
+release process. Matching Rust/LLVM and Python are external dependencies. Native
+`0.1.0-rc.4` is published for Linux x86_64; the four-platform `0.1.0-rc.5` release
+and Core `0.4.3` installer are being prepared.
 
-The existing immutable RC3 bundled release remains documented in the
-[historical installation guide](docs/quality/rust-collector-installation.md).
-Core and plugin versions are independent; a Core upgrade never selects a future
-plugin release automatically.
+The [standalone installation guide](docs/quality/standalone-installation.md)
+explains `--with-rust`, `--rust-only` and independent `--rust-version` selection.
+The stable engine remains an explicit candidate; metrics and baselines do not
+switch automatically. Existing RC3 bundled installations and offline archives
+retain their [historical installation guide](docs/quality/rust-collector-installation.md).
+Historical Core tags keep their original installer pins.
 
 Release assets include `SHA256SUMS`, a CycloneDX SBOM, and Sigstore signatures/certificates. For
 a manual integrity check, download all listed assets, `SHA256SUMS`, and the matching
@@ -119,7 +122,7 @@ sha256sum --check SHA256SUMS
 cosign verify-blob --signature harness-gate-linux-amd64.sig \
   --certificate harness-gate-linux-amd64.crt \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity-regexp '^https://github.com/musutrade/Harness-Gate/.github/workflows/release\.yml@refs/tags/v0\.4\.1$' \
+  --certificate-identity 'https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v0.4.2' \
   harness-gate-linux-amd64
 ```
 
