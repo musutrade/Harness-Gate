@@ -120,6 +120,9 @@ fn difference(a: &Value, b: &Value, path: &str) -> Option<String> {
 #[test]
 fn frozen_policy_and_reference_acceptance_match_python() {
     let reference = reference();
+    // This focused acceptance case consumes the same generated oracle. Keep
+    // it in this process under nextest instead of generating the matrix twice.
+    green_local_gates_and_breaking_contract_block_project_with_provenance(&reference);
     let mut mismatches = Vec::new();
     for case in &reference.1 {
         let actual = match run(case) {
@@ -153,9 +156,7 @@ fn frozen_policy_and_reference_acceptance_match_python() {
     );
 }
 
-#[test]
-fn green_local_gates_and_breaking_contract_block_project_with_provenance() {
-    let reference = reference();
+fn green_local_gates_and_breaking_contract_block_project_with_provenance(reference: &Reference) {
     let case = reference
         .1
         .iter()
