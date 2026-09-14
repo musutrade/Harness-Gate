@@ -218,8 +218,10 @@ class ExternalPluginTests(unittest.TestCase):
         request['expires_at_ms'] = request['issued_at_ms'] + 240000
         # Core reserves HARNESS_GATE_*; its authenticated environment uses
         # standard PATH/XDG options and its own invocation marker variables.
-        request['environment'] = {'PATH': str(Path(sys.executable).parent) + os.pathsep + os.environ['PATH'],
-                                  'XDG_CACHE_HOME': str(self.work / 'cache')}
+        # Deliberately use non-sorted insertion order on every host. Core signs
+        # its BTreeMap ordering, including SystemRoot on Windows.
+        request['environment'] = {'XDG_CACHE_HOME': str(self.work / 'cache'),
+                                  'PATH': str(Path(sys.executable).parent) + os.pathsep + os.environ['PATH']}
         if os.name == 'nt':
             request['environment']['SystemRoot'] = os.environ['SystemRoot']
         request['capabilities']['environment'] = sorted(request['environment'])

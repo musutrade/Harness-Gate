@@ -135,9 +135,11 @@ def sign(test, output, request):
     for name in ('invocation_id', 'step_id', 'timeout_ms', 'config_digest', 'artifact_root',
                  'nonce', 'issued_at_ms', 'expires_at_ms', 'args', 'environment', 'capabilities', 'input'):
         payload[name] = request[name]
+    # Match Core's BTreeMap serialization regardless of request insertion order.
+    payload['environment'] = dict(sorted(payload['environment'].items()))
     payload['input'] = json.loads(json.dumps(payload['input'], sort_keys=True))
     payload_path = output / 'signed-payload.json'
-    payload_path.write_text(json.dumps(payload, separators=(',', ':'), ensure_ascii=False))
+    payload_path.write_bytes(json.dumps(payload, separators=(',', ':'), ensure_ascii=False).encode('utf-8'))
     signature = output / 'signature.bin'
     result = test.command('configured-key-sign', [openssl, 'pkeyutl', '-sign', '-rawin',
         '-inkey', str(key), '-in', str(payload_path), '-out', str(signature)])
