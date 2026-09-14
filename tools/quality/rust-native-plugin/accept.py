@@ -30,7 +30,7 @@ class ExternalPluginTests(unittest.TestCase):
         parent.mkdir(parents=True, exist_ok=True)
         cls.work = Path(tempfile.mkdtemp(dir=parent))
         # The copied executable runs outside the source tree with isolated Python.
-        cls.binary = Path(shutil.copy2(cls.binary, cls.work / 'collector'))
+        cls.binary = Path(shutil.copy2(cls.binary, native.executable(cls.work, 'collector')))
         cls.environment = os.environ | {'XDG_CACHE_HOME': str(cls.work / 'cache'),
                                         'HARNESS_GATE_PYTHON': sys.executable}
         cls.environment.pop('HARNESS_GATE_NATIVE_CACHE', None)
@@ -75,6 +75,16 @@ class ExternalPluginTests(unittest.TestCase):
         self.assertFalse(self.report['backend_complete'])
         self.assertTrue(self.report['mapping_complete_for_declared_scope'])
 
+    def test_metadata_needs_no_python_or_cache(self):
+        cache = self.work / 'metadata-must-not-create-cache'
+        environment = self.environment | {'HARNESS_GATE_NATIVE_CACHE': str(cache),
+                                           'HARNESS_GATE_PYTHON': str(self.work / 'absent-python')}
+        for option in ('--version', '--licenses'):
+            result = self.entry('metadata-' + option[2:], option, env=environment)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue(result.stdout)
+            self.assertFalse(cache.exists())
+
     def test_real_cargo_capture_and_features(self):
         captures = []
         for features in ([], ['--feature', 'extra']):
@@ -85,6 +95,9 @@ class ExternalPluginTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             capture = json.loads(result.stdout)
             captures.append(capture)
+            if os.name == 'nt':
+                self.assertEqual(list((self.work / name).rglob('*.ilk')), [],
+                                 'Cargo measurement must not use incremental linking')
             result = self.entry(name + '-certify', 'certify', '--sysroot', self.sysroot,
                 '--evidence', capture['capture'], '--anchor', capture['anchor'])
             self.assertEqual(result.returncode, 0, result.stderr)
@@ -108,7 +121,7 @@ class ExternalPluginTests(unittest.TestCase):
 
     def test_wrong_missing_tools_and_overrides_block(self):
         cases = [('no-sysroot', ['doctor'], 'select external Rust'),
-                 ('missing-sysroot', ['doctor', '--sysroot', str(self.work / 'absent')], 'No such file'),
+                 ('missing-sysroot', ['doctor', '--sysroot', str(self.work / 'absent')], 'measurement_error'),
                  ('wrong-sysroot', ['doctor', '--sysroot', str(self.work)], 'missing external rustc')]
         for name, args, message in cases:
             env = self.environment.copy()
@@ -146,20 +159,23 @@ class ExternalPluginTests(unittest.TestCase):
     def test_modified_cache_is_never_used_or_repaired(self):
         path = self.payload / 'app/native_external.py'
         original = path.read_bytes()
-        for mode in ('bytes', 'extra', 'symlink'):
+        for mode in ('bytes', 'extra', 'symlink', 'permissions'):
             with self.subTest(mode=mode):
                 extra = self.payload / 'app/unexpected.py'
                 if mode == 'bytes':
                     path.write_bytes(original + b'\n')
                 elif mode == 'extra':
                     extra.write_text('raise RuntimeError("must never run")\n')
-                else:
+                elif mode == 'symlink':
                     extra.symlink_to(path)
+                else:
+                    path.chmod(0o444)
                 try:
                     result = self.entry('bad-cache-' + mode, 'doctor', '--sysroot', self.sysroot)
                     self.assertNotEqual(result.returncode, 0)
                     self.assertIn('native collector:', result.stderr)
                 finally:
+                    path.chmod(0o644)
                     path.write_bytes(original)
                     extra.unlink(missing_ok=True)
 
@@ -193,7 +209,9 @@ class ExternalPluginTests(unittest.TestCase):
         output.mkdir()
         artifacts = output / 'artifacts'
         artifacts.mkdir()
-        binding = binding_for(self.report, self.head, artifacts, self.version)
+        # Core canonicalizes this directory before exporting its environment.
+        # Exercise equivalent path spellings on Linux as well as Windows.
+        binding = binding_for(self.report, self.head, artifacts / '..' / 'artifacts', self.version)
         request, _ = request_for(binding, output / 'binding.json')
         request['args'] += ['--sysroot', str(self.sysroot)]
         request['adapter'].update(executable=str(self.binary), source_digest=native.file_hash(self.binary),
@@ -202,8 +220,12 @@ class ExternalPluginTests(unittest.TestCase):
         request['expires_at_ms'] = request['issued_at_ms'] + 240000
         # Core reserves HARNESS_GATE_*; its authenticated environment uses
         # standard PATH/XDG options and its own invocation marker variables.
-        request['environment'] = {'PATH': str(Path(sys.executable).parent) + ':/usr/bin:/bin',
-                                  'XDG_CACHE_HOME': str(self.work / 'cache')}
+        # Deliberately use non-sorted insertion order on every host. Core signs
+        # its BTreeMap ordering, including SystemRoot on Windows.
+        request['environment'] = {'XDG_CACHE_HOME': str(self.work / 'cache'),
+                                  'PATH': str(Path(sys.executable).parent) + os.pathsep + os.environ['PATH']}
+        if os.name == 'nt':
+            request['environment']['SystemRoot'] = os.environ['SystemRoot']
         request['capabilities']['environment'] = sorted(request['environment'])
         trusted = sign(self, output, request)
         single = output / 'trusted-key.json'
@@ -221,10 +243,54 @@ class ExternalPluginTests(unittest.TestCase):
         self.assertEqual(list(artifacts.iterdir()), [])
         path.write_text(json.dumps(request))
         result = self.command('core-collect', command + ['--request', str(path)])
+        if result.returncode:
+            # Core reports the failed exit code without forwarding adapter stderr.
+            # Retain a separate diagnostic under its documented environment;
+            # this cannot replace the failed authenticated Core acceptance.
+            canonical_root = str(artifacts.resolve(strict=True))
+            if os.name == 'nt' and not canonical_root.startswith('\\\\?\\'):
+                canonical_root = '\\\\?\\' + canonical_root
+            self.command('core-failed-adapter-diagnostic', [str(self.binary), *request['args']],
+                data=json.dumps(request), env=request['environment'] | {
+                    'HARNESS_GATE_INVOCATION_ID': request['invocation_id'],
+                    'HARNESS_GATE_STEP_ID': request['step_id'],
+                    'HARNESS_GATE_ARTIFACT_ROOT': canonical_root})
         self.assertEqual(result.returncode, 0, result.stderr)
         response = json.loads(result.stdout)
         self.assertTrue(response['collection']['evidence'])
         self.assertEqual(len(response['collection']['evidence']), len(self.report['functions']))
+        environment = request['environment'] | {
+            'HARNESS_GATE_INVOCATION_ID': request['invocation_id'],
+            'HARNESS_GATE_STEP_ID': request['step_id'],
+            'HARNESS_GATE_ARTIFACT_ROOT': str(artifacts.resolve(strict=True))}
+        other_root = output / 'artifacts-other'
+        other_root.mkdir()
+        original = {p.name: native.file_hash(p) for p in artifacts.iterdir()}
+        for name, variable, value in (
+                ('invocation', 'HARNESS_GATE_INVOCATION_ID', 'other-invocation'),
+                ('step', 'HARNESS_GATE_STEP_ID', 'other-step'),
+                ('directory', 'HARNESS_GATE_ARTIFACT_ROOT', str(other_root)),
+                ('missing-directory', 'HARNESS_GATE_ARTIFACT_ROOT', None)):
+            candidate = environment.copy()
+            if value is None:
+                candidate.pop(variable)
+            else:
+                candidate[variable] = value
+            rejected = self.command('core-environment-' + name, [str(self.binary), *request['args']],
+                                    data=json.dumps(request), env=candidate)
+            self.assertNotEqual(rejected.returncode, 0)
+            self.assertIn('Core invocation environment mismatch: ' + variable, rejected.stderr)
+            self.assertEqual({p.name: native.file_hash(p) for p in artifacts.iterdir()}, original)
+        other_executable = Path(os.environ['NATIVE_PLUGIN_BINARY']).resolve(strict=True)
+        self.assertFalse(other_executable.samefile(self.binary))
+        self.assertEqual(native.file_hash(other_executable), native.file_hash(self.binary))
+        other_request = copy.deepcopy(request)
+        other_request['adapter']['executable'] = str(other_executable)
+        rejected = self.command('core-executable-identity', [str(self.binary), *request['args']],
+                                data=json.dumps(other_request), env=environment)
+        self.assertNotEqual(rejected.returncode, 0)
+        self.assertIn('adapter executable identity mismatch', rejected.stderr)
+        self.assertEqual({p.name: native.file_hash(p) for p in artifacts.iterdir()}, original)
         result = self.command('core-replay', command + ['--request', str(path)])
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('nonce has already been used', result.stderr)
