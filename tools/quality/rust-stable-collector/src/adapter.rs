@@ -1,6 +1,6 @@
 //! Core authenticates protocol-v2 requests before spawning this adapter. Signed
 //! arguments pin a capture binding; this module never signs or adopts baselines.
-use crate::{artifact, collect, coverage, ownership, source};
+use crate::{artifact, collect, core_source, coverage, ownership, source};
 use anyhow::{ensure, Context, Result};
 use serde_json::{json, Value};
 use std::{collections::BTreeSet, env, fs, io::Read, path::Path};
@@ -45,7 +45,19 @@ fn read(path: &Path) -> Result<Value> {
 }
 
 pub fn describe(root: &Path, anchor: &str, request_digest: &str) -> Result<Value> {
+    describe_at(root, anchor, request_digest, None)
+}
+
+pub fn describe_at(
+    root: &Path,
+    anchor: &str,
+    request_digest: &str,
+    workspace: Option<&Path>,
+) -> Result<Value> {
     collect::verify(root, anchor, request_digest)?;
+    if let Some(workspace) = workspace {
+        core_source::verify(root, anchor, request_digest, workspace)?;
+    }
     let request = read(&root.join("request.json"))?;
     let binary = artifact::identity(&env::current_exe()?)?;
     let mut series = json!({
@@ -59,6 +71,10 @@ pub fn describe(root: &Path, anchor: &str, request_digest: &str) -> Result<Value
         "normalization":{"name":"stable-rust-core-candidate","version":binary.sha256},
         "metrics":METRICS.iter().map(|(name, kind)| json!({"name":name,"type":kind})).collect::<Vec<_>>()
     });
+    if workspace.is_some() {
+        series["source_identity"] =
+            json!({"name":"rust-authenticated-source-workspace", "version":"1-candidate"});
+    }
     series["id"] = json!(format!("measurement-series/v1:{}", hash(&series)?));
     let analysis = read(&root.join("source-analysis.json"))?;
     let raw = coverage::parse(&fs::read(root.join("coverage.json"))?)?;
@@ -74,14 +90,38 @@ pub fn describe(root: &Path, anchor: &str, request_digest: &str) -> Result<Value
         );
         let mapping = ownership::file(Path::new(text(&request, "project_root")?), path, &raw)?;
         for function in file["functions"].as_array().context("function inventory")? {
-            owners.push(json!({"path":path,"source_sha256":request["source_files"][path]["sha256"],
+            owners.push(json!({"path":if workspace.is_some() {format!("project/{path}")} else {path.clone()},"source_sha256":request["source_files"][path]["sha256"],
                 "discriminator":format!("rust-source-span/v1:{}", hash(&json!({"name":function["name"],"span":function["span"]}))?),
                 "coverage_owner": mapping["functions"].as_array().context("mapped owners")?.iter().find(|o| o["name"] == function["name"] && o["span"] == function["span"]),
                 "coverage_state":mapping["state"],"function":function,"file_supported":file["unsupported"].as_array().is_some_and(Vec::is_empty)}));
         }
     }
+    if workspace.is_some() {
+        let generated = read(&root.join("generated-owners.json"))?;
+        for entry in generated["owners"].as_array().context("generated owners")? {
+            let mapping = &entry["owner"];
+            for function in entry["analysis"]["functions"]
+                .as_array()
+                .context("generated source functions")?
+            {
+                let coverage_owner = mapping["functions"]
+                    .as_array()
+                    .context("generated coverage owners")?
+                    .iter()
+                    .find(|f| f["name"] == function["name"] && f["span"] == function["span"]);
+                owners.push(json!({"path":core_source::generated_path(entry)?,
+                    "source_sha256":entry["sha256"], "generated":true,
+                    "logical_path":entry["logical_path"], "compilations":entry["compilations"],
+                    "discriminator":format!("rust-generated-source-span/v1:{}", hash(&json!({
+                        "path":entry["logical_path"],"compilations":entry["compilations"],
+                        "name":function["name"],"span":function["span"]}))?),
+                    "coverage_owner":coverage_owner,"coverage_state":mapping["state"],
+                    "function":function,"file_supported":entry["analysis"]["unsupported"].as_array().is_some_and(Vec::is_empty)}));
+            }
+        }
+    }
     Ok(
-        json!({"schema":"rust-stable-core-description/v1", "series":series,"owners":owners,"workspace_root":request["project_root"]}),
+        json!({"schema":"rust-stable-core-description/v1", "series":series,"owners":owners,"workspace_root":workspace.map_or_else(|| request["project_root"].clone(), |p| json!(p))}),
     )
 }
 
@@ -168,10 +208,15 @@ fn project(request: &Value, path: &Path, digest: &str) -> Result<Value> {
         root.is_absolute() && !fs::symlink_metadata(root)?.is_symlink(),
         "unsafe capture root"
     );
-    let description = describe(
+    let captured_request = read(&root.join("request.json"))?;
+    let workspace = Path::new(text(inner, "workspace_root")?);
+    let source_workspace =
+        (workspace != Path::new(text(&captured_request, "project_root")?)).then_some(workspace);
+    let description = describe_at(
         root,
         text(capture, "manifest_sha256")?,
         text(capture, "request_sha256")?,
+        source_workspace,
     )?;
     ensure!(
         description["workspace_root"] == inner["workspace_root"],
@@ -295,6 +340,14 @@ fn project(request: &Value, path: &Path, digest: &str) -> Result<Value> {
         text(capture, "manifest_sha256")?,
         text(capture, "request_sha256")?,
     )?;
+    if let Some(workspace) = source_workspace {
+        core_source::verify(
+            root,
+            text(capture, "manifest_sha256")?,
+            text(capture, "request_sha256")?,
+            workspace,
+        )?;
+    }
     ensure!(
         artifact::identity(path)?.sha256 == digest,
         "binding changed during conversion"

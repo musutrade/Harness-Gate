@@ -20,3 +20,18 @@ mod tests {
         );
     }
 }
+
+#[cfg(feature = "duplicate")]
+pub mod duplicate {
+    include!(concat!(env!("OUT_DIR"), "/duplicate_owners.rs"));
+}
+
+#[cfg(all(test, feature = "duplicate"))]
+mod duplicate_tests {
+    #[test]
+    fn identical_source_has_independent_execution() {
+        assert_eq!(super::duplicate::plain(1), 1);
+        assert_eq!(super::duplicate::plain(2), 2);
+        // Other functions in this distinct generated file deliberately never run.
+    }
+}

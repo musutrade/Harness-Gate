@@ -10,7 +10,7 @@ use anyhow::{ensure, Context, Result};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::{
-    collections::{BTreeMap, BTreeSet},
+    collections::BTreeMap,
     env, fs,
     path::{Path, PathBuf},
 };
@@ -434,7 +434,7 @@ pub fn verify(root: &Path, anchor: &str, request_digest: &str) -> Result<()> {
 fn generated_owners(root: &Path, coverage: &Value) -> Result<Value> {
     let proof: Value = crate::strict_json::parse(&fs::read(root.join("compiler-inputs.json"))?)?;
     let mut owners = Vec::new();
-    let mut seen = BTreeSet::new();
+    let mut grouped = BTreeMap::<String, Vec<String>>::new();
     for (record, entry) in proof["records"]
         .as_object()
         .context("compiler input records")?
@@ -444,28 +444,44 @@ fn generated_owners(root: &Path, coverage: &Value) -> Result<Value> {
             if input["generated"] != true || !token.ends_with(".rs") {
                 continue;
             }
-            let sha = input["identity"]["sha256"]
-                .as_str()
-                .context("generated input digest")?;
-            if !seen.insert(sha.to_owned()) {
-                continue;
-            }
-            // Re-derive facts from the authenticated bytes, never from the scratch
-            // path that no longer exists once the capture is moved.
-            let source = root.join("compiler-generated").join(sha);
-            let identity = artifact::identity(&source)?;
-            let text = fs::read_to_string(&source)?;
-            // Bind the analyzed text back to the authenticated bytes before use.
-            ensure!(
-                artifact::digest(text.as_bytes()) == sha,
-                "generated source analysis drifted from authenticated bytes"
-            );
-            let mapping = ownership::text(&PathBuf::from(token), &text, coverage)?;
-            owners.push(json!({
-                "source":token, "sha256":sha, "bytes":identity.bytes, "producer":record,
-                "filename":token, "owner":mapping,
-            }));
+            grouped
+                .entry(token.clone())
+                .or_default()
+                .push(record.clone());
         }
+    }
+    for (token, compilations) in grouped {
+        let input = &proof["records"][&compilations[0]]["inputs"][&token];
+        ensure!(
+            compilations
+                .iter()
+                .all(
+                    |record| proof["records"][record]["inputs"][&token]["identity"]
+                        == input["identity"]
+                ),
+            "generated input identity differs between compilations"
+        );
+        let sha = input["identity"]["sha256"]
+            .as_str()
+            .context("generated input digest")?;
+        let source = root.join("compiler-generated").join(sha);
+        let identity = artifact::identity(&source)?;
+        let text = fs::read_to_string(&source)?;
+        ensure!(
+            artifact::digest(text.as_bytes()) == sha,
+            "generated source analysis drifted from authenticated bytes"
+        );
+        let logical = Path::new(&token)
+            .strip_prefix(proof["scratch"].as_str().context("compiler scratch path")?)?
+            .to_str()
+            .context("generated logical path")?;
+        let mapping = ownership::text(&PathBuf::from(&token), &text, coverage)?;
+        owners.push(json!({
+            "source":token, "sha256":sha, "bytes":identity.bytes,
+            "producer":compilations[0], "compilations":compilations,
+            "logical_path":logical, "analysis":source::analyze(&text)?,
+            "filename":token, "owner":mapping,
+        }));
     }
     Ok(json!({
         "schema":"rust-stable-generated-owners/v1-candidate",
