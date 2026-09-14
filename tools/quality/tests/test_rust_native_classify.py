@@ -14,6 +14,7 @@ ROOT = QUALITY.parents[1]
 sys.path.insert(0, str(QUALITY))
 import rust_native_driver as native
 import rust_native_classify as classify
+from test_native_artifact_paths import WindowsRelativePath
 
 
 class NativeFileClassificationTests(unittest.TestCase):
@@ -166,7 +167,8 @@ class NativeFileClassificationTests(unittest.TestCase):
         for name in self.default['capture']['binaries']:
             (raw / name).unlink()
         # Archive replay must not invoke tools or attempt the recorded external paths.
-        with patch.object(native, 'certify', side_effect=AssertionError('unexpected native recertification')):
+        with patch.object(native, 'certify', side_effect=AssertionError('unexpected native recertification')), \
+                patch.object(classify, 'Path', WindowsRelativePath):
             archived = classify.load_evidence(raw, self.anchors[0], report, digest)
         self.assertEqual(archived['mode'], 'reviewed-archive-replay')
         self.assertEqual(set(archived['missing_binaries']), set(self.default['capture']['binaries']))
