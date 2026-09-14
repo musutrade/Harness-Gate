@@ -9,14 +9,22 @@ completed its signed inventory and provenance checks. It contains our compiled
 plugin and metadata, with Rust/LLVM and Python supplied externally. This is distinct
 from installer RC4, which delivered the historical bundled RC3 product below.
 
-Core 0.4.3 is being prepared as an installer maintenance release. The new
-[installation entry point](quality/standalone-installation.md) selects a native
-binary directly and keeps Core/plugin versions independent. Its default plugin
-`0.1.0-rc.5` depends on the four-platform delivery in
-[PR #264](https://github.com/musutrade/Harness-Gate/pull/264). Publish and verify
-that native release before tagging Core 0.4.3. Neither prepared version is claimed
-published by this source update; Core 0.4.2 remains compatible with the native
-plugin. The records below retain their original date, identities and scope.
+Core [0.4.3](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.3)
+and native [0.1.0-rc.5](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-v0.1.0-rc.5)
+are published from `e5b329250cf35b57769bd6be78fa3da8159bd2a5` for Linux x86_64,
+macOS Intel, macOS Apple Silicon and Windows x86_64. The native
+[release run](https://github.com/musutrade/Harness-Gate/actions/runs/34842418510)
+and Core [release run](https://github.com/musutrade/Harness-Gate/actions/runs/34844016671)
+completed; Core 0.4.3 is also on crates.io. The public four-host inventories,
+checksums, exact-tag signatures and source provenance were verified. The actual
+installed Linux pair passed all 17 native/Core acceptance tests without skips.
+
+Source versions native `0.1.0-rc.6` and Core `0.4.4` fix
+[project CRAP policy configuration](quality/native-crap-policy.md) and update the
+installer default. They require their own exact-commit CI, four-platform native
+acceptance and immutable publication. Publish and verify the native release
+before tagging its Core installer. Existing release records below retain their
+original dates, identities and scope.
 
 ## Bundled delivery acceptance, 2026-09-13
 

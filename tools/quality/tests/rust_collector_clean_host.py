@@ -19,6 +19,7 @@ import rust_collector_contract as contract
 import rust_collector_project as project
 import rust_native_driver as native
 import rust_native_policy as policy
+from native_policy_fixture import CRAP_RULE
 import rust_collector_config_fixture as config
 from test_rust_collector_project import binding_for, request_for
 from test_rust_collector_runtime import StandaloneNativeTests
@@ -165,7 +166,7 @@ def evaluate(test):
                         expected=binding['input']['context']),
                    dict(project=collected['inputs']['project'], evidence=collected['evidence'],
                         expected=collected['inputs']['expected'])]
-    declared, mappings, _ = policy.policy_and_lineage(base, head, *projections, ['legacy_debt'])
+    declared, mappings, _ = policy.policy_and_lineage(base, head, *projections, ['legacy_debt'], CRAP_RULE)
     command = [CORE, 'quality', 'evaluate', '--output', str(output / 'installed-core-report.json')]
     for name, value in [('policy', declared), ('mappings', mappings)]:
         path = output / ('installed-' + name + '.json')

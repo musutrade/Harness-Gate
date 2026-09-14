@@ -639,6 +639,20 @@
       "authoritative_status": "Host authenticates distribution and requests; Core decides requiredness and final outcomes.",
       "final_disposition": "Retain ecosystem measurement compatibility checks; GH-230 fixture evidence is separate from native project acceptance.",
       "sha256": "c720bd954ea923a0c980df3917ee93c838dbb7c7d2bb4e0dd6989c5061aa6ae6"
+    },
+    {
+      "module": "tools/quality/rust_native_config.py",
+      "category": "B",
+      "purpose": "Resolve the explicitly selected project CRAP binding, validate configuration through Core and retain policy input provenance.",
+      "callers": [
+        "tools/quality/rust_native_policy.py",
+        "tools/quality/rust-native-plugin/accept.py"
+      ],
+      "ci_role": "Mandatory four-host packaged native/Core configuration and integrity acceptance.",
+      "release_impact": "Packaged in the standalone native plugin; cannot approve a release or accept/reset a baseline.",
+      "authoritative_status": "Policy input resolution and validation only; the released Rust Core compares limits and owns every gate/debt/non-regression decision.",
+      "final_disposition": "Retain native adapter configuration glue under the external-toolchain delivery amendment; no unconfigured compatibility fallback.",
+      "sha256": "4e1c80301839111098ffa17fb27830aabdd253f3088e0541b0884b24fb24edef"
     }
   ],
   "policy": "docs/quality/python-retention.md",

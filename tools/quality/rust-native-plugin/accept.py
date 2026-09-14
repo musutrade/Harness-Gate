@@ -4,19 +4,23 @@ import copy
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
 import tempfile
 import time
 import unittest
+from unittest.mock import patch
 
 HERE = Path(__file__).resolve().parent
 QUALITY = HERE.parent
 sys.path[:0] = [str(QUALITY), str(QUALITY / 'tests')]
 import rust_native_driver as native
+import rust_native_config as native_config
 from test_rust_collector_project import binding_for, request_for
 from rust_collector_config_fixture import sign
+from native_policy_fixture import prepare as prepare_policy, set_limit
 
 
 class ExternalPluginTests(unittest.TestCase):
@@ -142,6 +146,7 @@ class ExternalPluginTests(unittest.TestCase):
 
     def test_packaged_evaluate_retains_core_debt_rules(self):
         context = {'target': 'native', 'run': 'packaged-policy', 'commit': 'a' * 40, 'base_commit': 'b' * 40}
+        prepare_policy(self.work / 'configured-policy', native.certify(self.head, self.anchor), self.head, context)
         for name, value in (('base-context', context),
                             ('head-context', context | {'commit': 'c' * 40, 'base_commit': 'a' * 40}),
                             ('hotspots', [])):
@@ -151,10 +156,190 @@ class ExternalPluginTests(unittest.TestCase):
             '--base', self.head, '--base-anchor', self.anchor, '--head', self.head, '--head-anchor', self.anchor,
             '--output', output, '--harness-gate', self.core, '--project', 'native-fixture',
             '--base-context', self.work / 'base-context.json', '--head-context', self.work / 'head-context.json',
-            '--hotspots', self.work / 'hotspots.json')
+            '--hotspots', self.work / 'hotspots.json',
+            '--repository-root', self.work / 'configured-policy', '--policy-binding', 'crap')
         self.assertEqual(result.returncode, 1, result.stderr)
         self.assertEqual(json.loads(result.stdout)['state'], 'fail')
         self.assertNotIn('measurement_error', result.stderr)
+
+    def test_configured_crap_limit_changes_core_decision(self):
+        # One fully covered function makes the aggregate decision unambiguous.
+        source = self.work / 'one.rs'
+        # Pin identical LF bytes on every host; Windows text output adds CRLF.
+        source.write_bytes(b'fn main() { println!("measured"); }\n')
+        capture = self.work / 'one-capture'
+        result = self.entry('one-fixture', 'fixture', '--sysroot', self.sysroot, '--source', source, '--output', capture)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        anchor = json.loads(result.stdout)['anchor']
+        report = native.certify(capture, anchor)
+        self.assertEqual(report['functions'][0]['crap_exact'], [1, 1])
+        context = {'target': 'native', 'run': 'configured-ceiling', 'commit': 'a' * 40, 'base_commit': 'b' * 40}
+        root = self.work / 'one-project'
+        prepare_policy(root, report, capture, context, hotspots=['main'], component='app')
+        for name, value in [('one-base', context), ('one-head', context | {'commit': 'c' * 40, 'base_commit': 'a' * 40}),
+                            ('one-hotspots', ['main'])]:
+            (self.work / (name + '.json')).write_text(json.dumps(value), encoding='utf-8')
+        evidence = []
+        for numerator, denominator, expected in [(1, 2, 'fail'), (1, 1, 'pass'), (60, 1, 'pass')]:
+            with self.subTest(limit=(numerator, denominator)):
+                set_limit(root, numerator, denominator)
+                name = f'ceiling-{numerator}-{denominator}'
+                output = self.work / name
+                result = self.entry(name, 'evaluate', '--sysroot', self.sysroot,
+                    '--base', capture, '--base-anchor', anchor, '--head', capture, '--head-anchor', anchor,
+                    '--output', output, '--harness-gate', self.core, '--project', 'native-fixture',
+                    '--base-context', self.work / 'one-base.json', '--head-context', self.work / 'one-head.json',
+                    '--hotspots', self.work / 'one-hotspots.json', '--repository-root', root, '--policy-binding', 'crap')
+                self.assertEqual(result.returncode, int(expected != 'pass'), result.stderr)
+                evaluated = json.loads((output / 'report.json').read_text())
+                self.assertEqual(evaluated['aggregate']['state'], expected)
+                gate = next(g for g in evaluated['gates'].values() if g['record']['metric'] == 'risk.crap')
+                self.assertEqual(gate['state'], expected)
+                self.assertEqual(gate['record']['head'], {'type': 'rational', 'numerator': 1, 'denominator': 1})
+                configured = json.loads((output / 'policy-binding.json').read_text())
+                self.assertEqual(configured['rule']['limit']['numerator'], numerator)
+                self.assertEqual(configured['component'], 'app')
+                self.assertEqual(configured['config_files']['.harness-gate/policy.json'],
+                                 native.file_hash(output / 'policy-inputs/.harness-gate/policy.json'))
+                evidence.append(json.loads((output / 'evidence.json').read_text()))
+        self.assertEqual(evidence[0], evidence[1])
+        self.assertEqual(evidence[1], evidence[2])
+
+    def evaluate_policy_fixture(self, name, root, binding='crap', project_id='native-fixture', hotspots=('legacy_debt',)):
+        context = {'target': 'native', 'run': 'configured-policy', 'commit': 'a' * 40, 'base_commit': 'b' * 40}
+        for suffix, value in [('base', context), ('head', context | {'commit': 'c' * 40, 'base_commit': 'a' * 40}),
+                              ('hotspots', list(hotspots))]:
+            (root / (suffix + '.json')).write_text(json.dumps(value), encoding='utf-8')
+        output = self.work / name
+        result = self.entry(name, 'evaluate', '--sysroot', self.sysroot,
+            '--base', self.head, '--base-anchor', self.anchor, '--head', self.head, '--head-anchor', self.anchor,
+            '--output', output, '--harness-gate', self.core, '--project', project_id,
+            '--base-context', root / 'base.json', '--head-context', root / 'head.json',
+            '--hotspots', root / 'hotspots.json', '--repository-root', root, '--policy-binding', binding)
+        return result, output
+
+    def policy_fixture(self, name, hotspots=('legacy_debt',)):
+        root = self.work / name
+        context = {'target': 'native', 'run': 'configured-policy', 'commit': 'a' * 40, 'base_commit': 'b' * 40}
+        prepare_policy(root, native.certify(self.head, self.anchor), self.head, context, hotspots=hotspots)
+        return root
+
+    def test_policy_can_forbid_unchanged_legacy_debt(self):
+        root = self.policy_fixture('absolute-policy-project', hotspots=())
+        for allow, expected in [(True, 'informational'), (False, 'fail')]:
+            set_limit(root, 30, ratchet={'deny_regression': True, 'allow_legacy_debt': allow})
+            result, output = self.evaluate_policy_fixture('absolute-policy-' + str(allow), root, hotspots=())
+            self.assertNotIn('measurement_error', result.stderr)
+            gates = json.loads((output / 'report.json').read_text())['gates']
+            gate = next(g for g in gates.values() if g['record']['metric'] == 'risk.crap'
+                        and g['record']['head']['numerator'] == 56)
+            self.assertEqual(gate['state'], expected)
+            self.assertEqual(gate['record']['ratchet']['legacy_debt_allowed'], allow)
+
+    def test_configuration_changed_during_core_validation_blocks(self):
+        root = self.policy_fixture('mutating-policy-project')
+        run = subprocess.run
+        for filename in ('quality.toml', 'policy.json', 'flow.toml'):
+            with self.subTest(input=filename):
+                path = root / '.harness-gate' / filename
+                original = path.read_bytes()
+                output = self.work / ('mutating-' + filename)
+                output.mkdir()
+
+                def changed_after_validation(*args, **kwargs):
+                    checked = run(*args, **kwargs)
+                    self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
+                    path.write_bytes(original + b'\n')
+                    return checked
+
+                try:
+                    with patch.object(native_config.subprocess, 'run', side_effect=changed_after_validation):
+                        with self.assertRaisesRegex(ValueError, 'inputs changed during Core validation'):
+                            native_config.load(root, 'crap', 'native-fixture', self.core, output)
+                    self.assertFalse((output / 'policy-binding.json').exists())
+                finally:
+                    path.write_bytes(original)
+
+    def test_configured_ceiling_above_thirty_is_not_clamped(self):
+        root = self.policy_fixture('large-ceiling-project')
+        for numerator, denominator, expected in [(111, 2, 'fail'), (56, 1, 'pass'), (60, 1, 'pass')]:
+            with self.subTest(limit=(numerator, denominator)):
+                set_limit(root, numerator, denominator)
+                result, output = self.evaluate_policy_fixture(f'large-ceiling-{numerator}-{denominator}', root)
+                self.assertNotIn('measurement_error', result.stderr)
+                gates = json.loads((output / 'report.json').read_text())['gates']
+                gate = next(g for g in gates.values() if g['record']['metric'] == 'risk.crap'
+                            and g['record']['head']['numerator'] == 56)
+                self.assertEqual(gate['state'], expected)
+                self.assertFalse(gate['record']['ratchet']['legacy_debt_allowed'])
+
+    def test_invalid_policy_never_falls_back_to_thirty(self):
+        root = self.policy_fixture('bad-policy-project')
+        quality_path = root / '.harness-gate/quality.toml'
+        policy_path = root / '.harness-gate/policy.json'
+        quality_bytes, policy_bytes = quality_path.read_bytes(), policy_path.read_bytes()
+        cases = ['missing-quality', 'missing-policy', 'unknown-binding', 'wrong-project', 'duplicate-key',
+                 'duplicate-rule', 'zero-denominator', 'negative-limit', 'boolean-limit', 'extra-limit-field', 'wrong-type', 'wrong-operator',
+                 'optional-rule', 'missing-ratchet', 'disabled-ratchet', 'disabled-baseline',
+                 'wrong-series', 'outside-policy', 'outside-component']
+        for name in cases:
+            with self.subTest(case=name):
+                quality_path.write_bytes(quality_bytes)
+                policy_path.write_bytes(policy_bytes)
+                binding, project_id = 'crap', 'native-fixture'
+                document = json.loads(policy_bytes)
+                rule = document['rules'][0]
+                if name == 'missing-quality':
+                    quality_path.unlink()
+                elif name == 'missing-policy':
+                    policy_path.unlink()
+                elif name == 'unknown-binding':
+                    binding = 'absent'
+                elif name == 'wrong-project':
+                    project_id = 'unrelated'
+                elif name == 'duplicate-key':
+                    policy_path.write_text(policy_bytes.decode().replace('"numerator": 30', '"numerator": 30, "numerator": 60'))
+                elif name == 'duplicate-rule':
+                    document['rules'].append(copy.deepcopy(rule))
+                elif name == 'zero-denominator':
+                    rule['limit']['denominator'] = 0
+                elif name == 'negative-limit':
+                    rule['limit']['numerator'] = -1
+                elif name == 'boolean-limit':
+                    rule['limit']['numerator'] = True
+                elif name == 'extra-limit-field':
+                    rule['limit']['fallback'] = 30
+                elif name == 'wrong-type':
+                    rule['limit'] = {'type': 'count', 'value': 60}
+                elif name == 'wrong-operator':
+                    rule['operator'] = 'gt'
+                elif name == 'optional-rule':
+                    rule['required'] = False
+                elif name == 'missing-ratchet':
+                    rule.pop('ratchet')
+                elif name == 'disabled-ratchet':
+                    rule['ratchet']['deny_regression'] = False
+                elif name == 'disabled-baseline':
+                    quality_path.write_text(quality_bytes.decode().replace('[baseline]\nrequired = true', '[baseline]\nrequired = false'))
+                elif name == 'wrong-series':
+                    # Replace both producer and consumer, preserving valid Core configuration.
+                    quality_path.write_text(re.sub(r'measurement-series/v1:[0-9a-f]{64}',
+                        'measurement-series/v1:' + 'f' * 64, quality_bytes.decode()))
+                elif name == 'outside-policy':
+                    quality_path.write_text(quality_bytes.decode().replace(
+                        'policy_file = ".harness-gate/policy.json"', 'policy_file = "../policy.json"'))
+                elif name == 'outside-component':
+                    (root / 'src').mkdir(exist_ok=True)
+                    quality_path.write_text(quality_bytes.decode().replace('source_roots = ["."]', 'source_roots = ["src"]'))
+                if name in ('duplicate-rule', 'zero-denominator', 'negative-limit', 'boolean-limit', 'extra-limit-field', 'wrong-type',
+                            'wrong-operator', 'optional-rule', 'missing-ratchet', 'disabled-ratchet'):
+                    policy_path.write_text(json.dumps(document))
+                result, output = self.evaluate_policy_fixture('bad-policy-' + name, root, binding, project_id)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn('measurement_error', result.stderr)
+                self.assertFalse((output / 'report.json').exists(), result.stderr)
+        quality_path.write_bytes(quality_bytes)
+        policy_path.write_bytes(policy_bytes)
 
     def test_modified_cache_is_never_used_or_repaired(self):
         path = self.payload / 'app/native_external.py'
