@@ -148,6 +148,9 @@ def main():
         cmd.add_argument('--evidence', type=Path, required=True)
         cmd.add_argument('--anchor', required=True)
         cmd.add_argument('--output', type=Path)
+        if name == 'classify':
+            cmd.add_argument('--witness', type=Path)
+            cmd.add_argument('--witness-anchor')
     cmd = sub.add_parser('collect', parents=[common])
     cmd.add_argument('--binding', type=Path, required=True)
     cmd.add_argument('--binding-sha256', required=True)
@@ -157,6 +160,13 @@ def main():
     cmd.add_argument('--mappings')
     args = parser.parse_args()
     try:
+        if args.action in ('certify', 'classify') and args.output:
+            inputs = [args.evidence]
+            if args.action == 'classify' and args.witness:
+                inputs.append(args.witness)
+            native.require(not args.output.exists(), 'report output must be new')
+            native.require(all(not args.output.resolve().is_relative_to(p.resolve()) for p in inputs),
+                           'report output must be outside retained evidence')
         status = dependency_check(root, args.sysroot)
         if args.action == 'doctor':
             result = status
@@ -170,8 +180,12 @@ def main():
             if args.action == 'certify':
                 result = {'measurement': measurement(native.certify(args.evidence, args.anchor)), 'error': None}
             else:
-                result = classifier.classify(classifier.load_evidence(args.evidence, args.anchor))
-                native.require(result['classification_complete'], 'incomplete classification')
+                native.require(bool(args.witness) == bool(args.witness_anchor), 'witness and anchor required together')
+                witness = None
+                if args.witness:
+                    check_capture(args.witness, args.witness_anchor, status)
+                    witness = classifier.load_evidence(args.witness, args.witness_anchor)
+                result = classifier.classify(classifier.load_evidence(args.evidence, args.anchor), witness)
                 result.pop('measurement_passed', None)
                 result.pop('baseline_accepted', None)
         elif args.action == 'collect':
@@ -191,7 +205,7 @@ def main():
             native.require(not args.output.exists(), 'report output must be new')
             native.write_json(args.output, result)
         print(json.dumps(result))
-        return 0
+        return int(args.action == 'classify' and not result['classification_complete'])
     except (ValueError, OSError, KeyError, TypeError, subprocess.SubprocessError) as error:
         print(json.dumps({'state': 'measurement_error', 'message': str(error)}), file=sys.stderr)
         return 1
