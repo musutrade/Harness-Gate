@@ -70,7 +70,8 @@ No candidate binding is automatically substituted. Review must identify which
 required claims the new series can certify, approve source/coverage ownership and
 activation boundaries, and retain blocking for unmet claims. No transition or new
 baseline is approved by this comparison. T6 remains open for reviewed migration,
-the second stable toolchain and second runnable system.
+complete current-stable Rust 1.98.1 acceptance and the second runnable system.
+Historical 1.97.1 results above remain reference evidence, not a required version.
 
 Reproduce with `tools/quality/rust-stable-collector/compare_historical_fixture.py`
 as documented in the [candidate commands](stable-rust-collector.md). This is

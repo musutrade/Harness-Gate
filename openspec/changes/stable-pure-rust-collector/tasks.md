@@ -1,5 +1,28 @@
 # Tasks
 
+## Latest continuation (2026-09-14; T3–T8 remain open)
+
+Operator CI run 34792991105 at `9dec7e7` passes all required jobs, including
+10 exec-observer regressions, traced build, 125 capture checks, 26 macro checks,
+six Core fixtures, package preparation, 38 lifecycle checks and 29 HTTPS checks.
+The repository-only Rust observer supersedes the strace race; incomplete evidence
+still fails. Rust 1.98.1 is the sole required compiler, including upgrade builds.
+This supersedes older pending trace/rustfmt/dual-version actions in this history.
+
+T5's umask 0002 failure was reproduced with the real installer, then fixed by
+setting the creation mode of new versions directories to 0755. Nine actual
+install/reinstall/unsafe-directory checks pass across 0002/0022/0077 with the
+rebuilt 1.98.1 binary; existing unsafe directory permissions and the runnable
+selected program are preserved. RSA is real test signing; Sigstore is mocked.
+See `install-permissions.json` in the candidate evidence directory. This does not
+transfer earlier runtime acceptance to the new binary or finish T5.
+
+The critical path remains stable generated owner/counter export (including a
+supported built-in derive instrumentation path) and reviewed required CRAP/
+measurement migration. See the recovery document for exact capability requests
+and separate submission/merge/adoption states. Linux and production-signature
+acceptance remain independent; no release hold removal or completion is claimed.
+
 T4's dep-info follow-up binds complete raw compiler output to the producing
 invocation's observed digest and byte length. Added/changed/omitted environment
 comments and missing/inconsistent producer identities have real-capture regression

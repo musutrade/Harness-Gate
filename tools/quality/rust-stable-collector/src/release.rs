@@ -15,7 +15,7 @@ use std::{
     io::{Read, Write},
     os::{
         fd::AsRawFd,
-        unix::fs::{MetadataExt, OpenOptionsExt, PermissionsExt},
+        unix::fs::{DirBuilderExt, MetadataExt, OpenOptionsExt, PermissionsExt},
     },
     path::{Path, PathBuf},
 };
@@ -432,7 +432,9 @@ impl LockedRoot {
         );
         let versions = root.join("versions");
         if !versions.exists() {
-            fs::create_dir(&versions)?;
+            // Set the creation mode atomically; umask may only remove access.
+            // Existing directories still undergo validation without chmod.
+            fs::DirBuilder::new().mode(0o755).create(&versions)?;
         }
         absolute(&versions)?;
         let metadata = fs::metadata(&versions)?;
