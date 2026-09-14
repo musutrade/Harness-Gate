@@ -98,9 +98,15 @@ def adapter(root, status, args):
     request = json.load(sys.stdin, object_pairs_hook=evidence._unique_object)
     project.validate_request(request)
     for variable, field in (('HARNESS_GATE_INVOCATION_ID', 'invocation_id'),
-                            ('HARNESS_GATE_STEP_ID', 'step_id'),
-                            ('HARNESS_GATE_ARTIFACT_ROOT', 'artifact_root')):
+                            ('HARNESS_GATE_STEP_ID', 'step_id')):
         native.require(os.environ.get(variable) == request[field], 'Core invocation environment mismatch: ' + variable)
+    # Core exports fs::canonicalize's directory (including the Windows extended
+    # path prefix), while the signature retains the request's original spelling.
+    artifact_root = os.environ.get('HARNESS_GATE_ARTIFACT_ROOT')
+    native.require(artifact_root is not None and Path(artifact_root).is_absolute()
+                   and Path(artifact_root).is_dir()
+                   and Path(artifact_root).samefile(request['artifact_root']),
+                   'Core invocation environment mismatch: HARNESS_GATE_ARTIFACT_ROOT')
     native.require(all(os.environ.get(key) == value for key, value in request['environment'].items()),
                    'signed environment mismatch')
     native.require(request['args'] == sys.argv[1:], 'external dependency options differ from signed arguments')
