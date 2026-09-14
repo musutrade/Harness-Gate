@@ -165,7 +165,8 @@ class ExternalPluginTests(unittest.TestCase):
     def test_configured_crap_limit_changes_core_decision(self):
         # One fully covered function makes the aggregate decision unambiguous.
         source = self.work / 'one.rs'
-        source.write_text('fn main() { println!("measured"); }\n', encoding='utf-8')
+        # Pin identical LF bytes on every host; Windows text output adds CRLF.
+        source.write_bytes(b'fn main() { println!("measured"); }\n')
         capture = self.work / 'one-capture'
         result = self.entry('one-fixture', 'fixture', '--sysroot', self.sysroot, '--source', source, '--output', capture)
         self.assertEqual(result.returncode, 0, result.stderr)
