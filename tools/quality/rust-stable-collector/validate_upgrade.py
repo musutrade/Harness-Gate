@@ -5,13 +5,15 @@ from pathlib import Path
 import shutil
 import tomllib
 
+from prepare_release import CURRENT_RUST
+
 
 def build_programs(output, automation, sha):
     crate = Path(__file__).resolve().parent
     manifest = tomllib.loads((crate / 'Cargo.toml').read_text())['package']
     version = manifest['version']
     upgraded_version = version + '.upgrade-test'
-    toolchain = manifest['rust-version']
+    toolchain = CURRENT_RUST
     source_root = output / 'upgrade-source'
     source = source_root / 'rust-stable-collector'
     source.mkdir(parents=True)
