@@ -778,7 +778,7 @@
       "release_impact": "Packaged in the standalone native plugin; cannot approve a release or accept/reset a baseline.",
       "authoritative_status": "Policy input resolution and validation only; the released Rust Core compares limits and owns every gate/debt/non-regression decision.",
       "final_disposition": "Retain native adapter configuration glue under the external-toolchain delivery amendment; no unconfigured compatibility fallback.",
-      "sha256": "35f982f5d1ec9cdbcc89e5a66be66bd8ad7c2e62e16b86607c89ddd75bd73245"
+      "sha256": "4e1c80301839111098ffa17fb27830aabdd253f3088e0541b0884b24fb24edef"
     }
   ],
   "schema": "python-product-boundary/v1",

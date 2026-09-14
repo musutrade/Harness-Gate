@@ -86,10 +86,11 @@ This convenience command evaluates the explicitly selected native capture and
 CRAP binding. It does not certify every policy/component in a quality profile.
 Use Core's [configured verification flow](../quality-verification.md) for that.
 
-The native bridge requires a rational inclusive CRAP ceiling, `required=true`
-and `on_violation=fail`. Non-regression remains mandatory. An omitted `ratchet`
-retains the native debt rules; `allow_legacy_debt=false` makes every CRAP rule
-absolute. Otherwise, only unchanged, unselected functions may retain historical
+The native bridge requires a rational inclusive CRAP ceiling, `required=true`,
+`on_violation=fail`, and an explicit `ratchet` with `deny_regression=true`.
+Core consequently requires a configured required baseline provider.
+`allow_legacy_debt=false` makes every CRAP rule absolute. With an explicit `true`,
+only unchanged, unselected functions may retain historical
 debt. New/changed functions, hotspots and changed functions with CC > 10 retain
 their absolute checks. Coverage rules remain at 80%; this change wires the CRAP
 ceiling, without adding a separate coverage configuration interface.
