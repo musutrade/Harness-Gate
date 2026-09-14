@@ -13,6 +13,7 @@ ROOT = QUALITY.parents[1]
 sys.path.insert(0, str(QUALITY))
 import rust_native_driver as native
 import rust_native_policy as policy
+from native_policy_fixture import prepare as prepare_policy, set_limit
 
 
 class NativeDriverTests(unittest.TestCase):
@@ -199,8 +200,10 @@ class NativeDriverTests(unittest.TestCase):
         anchor = native.collect_fixture(QUALITY / 'fixtures/rust-native/driver_complete.rs', head,
                                         self.driver, self.sysroot)
         context = {'target': 'native', 'run': 'real-native-fixture', 'commit': 'a' * 40, 'base_commit': 'b' * 40}
+        configured = prepare_policy(self.work / 'configured-policy', native.certify(self.evidence, self.anchor),
+                                    self.evidence, context)
         report = policy.evaluate(self.evidence, self.anchor, head, anchor, self.work / 'policy', binary,
-                                 context, context | {'commit': 'c' * 40, 'base_commit': 'a' * 40}, 'native-fixture')
+                                 context, context | {'commit': 'c' * 40, 'base_commit': 'a' * 40}, 'native-fixture', **configured)
         self.assertEqual(report['aggregate']['state'], 'fail')
         self.assertTrue(report['gates'])
         self.assertNotIn('measurement_error', {r['state'] for r in report['gates'].values()})
@@ -218,7 +221,7 @@ class NativeDriverTests(unittest.TestCase):
         changed_anchor = native.collect_fixture(changed_source, changed, self.driver, self.sysroot)
         regression = policy.evaluate(self.evidence, self.anchor, changed, changed_anchor,
                                      self.work / 'changed-policy', binary, context,
-                                     context | {'commit': 'd' * 40, 'base_commit': 'a' * 40}, 'native-fixture')
+                                     context | {'commit': 'd' * 40, 'base_commit': 'a' * 40}, 'native-fixture', **configured)
         blocked = next(r for r in regression['gates'].values() if r['record']['metric'] == 'risk.crap'
                        and r['record']['head'].get('numerator') == 56)
         self.assertEqual(blocked['state'], 'fail')
@@ -232,11 +235,21 @@ class NativeDriverTests(unittest.TestCase):
         covered_anchor = native.collect_fixture(covered_source, covered, self.driver, self.sysroot)
         worse = policy.evaluate(covered, covered_anchor, self.evidence, self.anchor,
                                 self.work / 'worse-policy', binary, context,
-                                context | {'commit': 'e' * 40, 'base_commit': 'a' * 40}, 'native-fixture')
+                                context | {'commit': 'e' * 40, 'base_commit': 'a' * 40}, 'native-fixture', **configured)
         regressed = next(r for r in worse['gates'].values() if r['record']['metric'] == 'risk.crap'
                          and r['record']['head'].get('numerator') == 56)
         self.assertEqual(regressed['state'], 'fail')
         self.assertEqual(regressed['record']['ratchet']['debt'], 'new')
+        self.assertEqual(regressed['record']['base']['numerator'], 7)
+        # Raising the configured ceiling cannot excuse a measured regression.
+        set_limit(configured['repository_root'], 100)
+        relaxed = policy.evaluate(covered, covered_anchor, self.evidence, self.anchor,
+                                 self.work / 'configured-worse-policy', binary, context,
+                                 context | {'commit': 'f' * 40, 'base_commit': 'a' * 40},
+                                 'native-fixture', **configured)
+        regressed = next(r for r in relaxed['gates'].values() if r['record']['metric'] == 'risk.crap'
+                         and r['record']['head'].get('numerator') == 56)
+        self.assertEqual(regressed['state'], 'fail')
         self.assertEqual(regressed['record']['base']['numerator'], 7)
 
 

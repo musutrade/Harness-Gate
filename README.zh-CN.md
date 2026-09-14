@@ -15,7 +15,7 @@
 
 Core **0.4.2** 已发布，修复暂存区主机输入与大型原生报告发布问题。Rust 原生测量通过独立安装、独立版本的可选插件提供；Core 负责编排和质量决策。文档入口见[文档目录](docs/README.md)，发布凭据与剩余工作见[交付状态](docs/release-status.md)。
 
-源码正在准备 Core **0.4.3** 安装维护版：可选 Rust 安装改为下载已签名的独立二进制，工具链作为外部依赖。发布状态和固定版本用法见[独立插件安装指南](docs/quality/standalone-installation.md)。
+Core **0.4.4** 的可选安装默认选择独立插件 **0.1.0-rc.6**：原生 CRAP 门禁读取项目策略配置，Rust/LLVM 和 Python 仍作为外部依赖。发布状态和固定版本用法见[独立插件安装指南](docs/quality/standalone-installation.md)。
 
 ## 阅读导航
 
@@ -89,7 +89,7 @@ harness-gate --version
 
 ### 可选 Rust 插件
 
-默认仅安装 Core，不下载 Rust 分析工具链。原生插件沿用旧测量引擎，按 Core 的签名发布流程交付编译好的二进制；匹配的 Rust/LLVM 和 Python 由用户独立安装。原生 `0.1.0-rc.4` 已发布 Linux x86_64 版本；四平台 `0.1.0-rc.5` 与 Core `0.4.3` 安装器正在准备。
+默认仅安装 Core，不下载 Rust 分析工具链。原生插件沿用旧测量引擎，按 Core 的签名发布流程交付编译好的二进制；匹配的 Rust/LLVM 和 Python 由用户独立安装。Core `0.4.3` 与原生插件 `0.1.0-rc.5` 已完成四平台发布。源码版本 Core `0.4.4` / 插件 `0.1.0-rc.6` 修复了[原生 CRAP 配置接入](docs/quality/native-crap-policy.md)，发布状态见安装指南。
 
 [独立插件安装指南](docs/quality/standalone-installation.md)说明 `--with-rust`、`--rust-only` 和独立的 `--rust-version` 选择。stable 引擎保留为显式候选，不自动切换度量系列或基线。安装不会替项目接受可信证据或修改默认 Rust 工具链。
 

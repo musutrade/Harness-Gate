@@ -12,7 +12,7 @@ import tomllib
 
 HERE = Path(__file__).resolve().parent
 QUALITY = HERE.parent
-MODULES = ('rust_native_driver.py', 'rust_native_classify.py', 'rust_native_policy.py',
+MODULES = ('rust_native_driver.py', 'rust_native_classify.py', 'rust_native_policy.py', 'rust_native_config.py',
            'rust_collector_project.py', 'harness_evidence.py', 'project_model.py', 'quality_evidence.py')
 ASSETS = {'x86_64-unknown-linux-gnu': 'harness-gate-rust-collector-linux-amd64',
           'x86_64-apple-darwin': 'harness-gate-rust-collector-macos-amd64',

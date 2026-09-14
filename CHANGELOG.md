@@ -7,9 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Native plugin `0.1.0-rc.6` reads the project's CRAP ceiling through
+  `quality.toml` and its referenced policy JSON. Direct `evaluate` requires
+  `--repository-root` and `--policy-binding`; missing or invalid configuration
+  fails instead of falling back to 30. Exact limits, including ceilings above 30,
+  reach Core with retained configuration provenance. Existing debt and
+  non-regression decisions remain enforced by Core.
+
 ### Changed
 
-- Prepare Core 0.4.3 as an installer maintenance release, with no Core policy or
+- Core `0.4.4` updates the optional standalone plugin installer default to RC6.
+  Core's evaluator, metric formulas, protocol and repository policy defaults are
+  unchanged. All four plugin platforms run the actual configuration acceptance.
+
+## [0.4.3] - 2026-09-14
+
+### Changed
+
+- Release Core 0.4.3 as an installer maintenance release, with no Core policy or
   collector protocol change. `--with-rust` and `--rust-only` install the native
   standalone executable from its own immutable signed release; `--rust-version`
   selects the plugin independently of Core (default `0.1.0-rc.5`). Rust/LLVM and
