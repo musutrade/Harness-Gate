@@ -15,7 +15,7 @@ It handles changed paths, secret scanning, architecture auditing, environment va
 
 Core **0.4.2** is published with staged-host input and large native-report fixes. Rust-specific native measurement is an optional, independently installed plugin; Core owns orchestration and quality decisions. See the [documentation index](docs/README.md) and [release status, acceptance and remaining work](docs/release-status.md).
 
-Core **0.4.4** selects standalone Rust plugin **0.1.0-rc.6** by default. Native CRAP evaluation reads the project policy; matching Rust/LLVM and Python remain external dependencies. See the [standalone installation guide](docs/quality/standalone-installation.md) for publication status and exact version selection.
+Core **0.4.5** selects standalone Rust plugin **0.1.0-rc.6** by default. Native CRAP evaluation reads the project policy; matching Rust/LLVM and Python remain external dependencies. See the [standalone installation guide](docs/quality/standalone-installation.md) for publication status and exact version selection.
 
 ## Navigation
 
@@ -103,9 +103,10 @@ Core does not download a Rust analysis toolchain by default. The
 [native standalone delivery](docs/quality/native-external-toolchain.md) retains
 the old measurement engine and publishes the compiled plugin using Core's signed
 release process. Matching Rust/LLVM and Python are external dependencies. Native
-Core `0.4.3` and native `0.1.0-rc.5` are published for all four platforms.
-Source versions Core `0.4.4` / plugin `0.1.0-rc.6` add [configured native CRAP
-evaluation](docs/quality/native-crap-policy.md); check the release guide for publication status.
+Core `0.4.3` and native `0.1.0-rc.6` are published for all four platforms.
+Native RC6 adds [configured CRAP evaluation](docs/quality/native-crap-policy.md).
+Source Core `0.4.5` updates its TLS dependency and selects RC6 by default;
+Core `0.4.4` was blocked before publication. Check the release guide for status.
 
 The [standalone installation guide](docs/quality/standalone-installation.md)
 explains `--with-rust`, `--rust-only` and independent `--rust-version` selection.
