@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Prepare Core 0.4.3 as an installer maintenance release, with no Core policy or
+  collector protocol change. `--with-rust` and `--rust-only` install the native
+  standalone executable from its own immutable signed release; `--rust-version`
+  selects the plugin independently of Core (default `0.1.0-rc.5`). Rust/LLVM and
+  Python remain external dependencies.
+- Verify the plugin checksum and exact tag/workflow certificate before replacing
+  either executable in a combined installation. Each executable uses the existing
+  atomic replacement and private-directory checks.
+- Retain `--rust-root` as a binary destination (`DIR/bin`) and `--cache-dir` for
+  the pinned verifier cache. Legacy bundled-runtime offline archives require
+  their historical installer; existing environments and baselines stay intact.
+
+
 ## [0.4.2] - 2026-09-13
 
 ### Fixed
