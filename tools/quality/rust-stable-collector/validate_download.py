@@ -219,8 +219,17 @@ def main():
         with (output / 'interrupted.stdout').open('wb') as stdout, (output / 'interrupted.stderr').open('wb') as stderr:
             process = subprocess.Popen(traced(argv, 'interrupted'), stdout=stdout, stderr=stderr, env=env, start_new_session=True)
             assert paused.wait(5), 'download never started'
-            os.killpg(process.pid, signal.SIGKILL)
-            assert process.wait(timeout=5) == -signal.SIGKILL
+            if args.trace:
+                # Kill the downloading process, keeping the observer alive to
+                # retain a complete record of the real SIGKILL termination.
+                # The paused transfer has not launched signature subprocesses.
+                start = json.loads((output / 'interrupted.execve').read_text().splitlines()[0])
+                assert start['schema'] == 'harness-exec-events/v1'
+                os.kill(start['root_pid'], signal.SIGKILL)
+                assert process.wait(timeout=5) == 128 + signal.SIGKILL
+            else:
+                os.killpg(process.pid, signal.SIGKILL)
+                assert process.wait(timeout=5) == -signal.SIGKILL
         audit_trace('interrupted')
         commands.append({'argv': argv, 'exit_code': -signal.SIGKILL})
         unchanged()

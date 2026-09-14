@@ -4,6 +4,8 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import signal
+import time
 import sys
 import tempfile
 import unittest
@@ -59,6 +61,34 @@ class ObserverAcceptance(unittest.TestCase):
                 path.write_text(''.join(json.dumps(row)+'\n' for row in records))
                 with self.subTest(records=records), self.assertRaises(AssertionError):
                     check_trace(path)
+
+    def test_interruption_keeps_target_and_observer_failures_distinct(self):
+        for kill_observer in (False, True):
+            with tempfile.TemporaryDirectory() as directory:
+                path = Path(directory) / 'events.jsonl'
+                process = subprocess.Popen([str(HELPER), str(path), '--', '/bin/sleep', '30'])
+                try:
+                    deadline = time.monotonic() + 5
+                    while time.monotonic() < deadline:
+                        lines = path.read_text().splitlines() if path.exists() else []
+                        if len(lines) >= 2:
+                            break
+                        time.sleep(0.01)
+                    self.assertGreaterEqual(len(lines), 2)
+                    root_pid = json.loads(lines[0])['root_pid']
+                    os.kill(process.pid if kill_observer else root_pid, signal.SIGKILL)
+                    expected = -signal.SIGKILL if kill_observer else 128 + signal.SIGKILL
+                    self.assertEqual(process.wait(timeout=5), expected)
+                    if kill_observer:
+                        with self.assertRaises(AssertionError):
+                            check_trace(path)
+                    else:
+                        check_trace(path)
+                        self.assertEqual(json.loads(path.read_text().splitlines()[-1])['root_exit_code'], expected)
+                finally:
+                    if process.poll() is None:
+                        process.kill()
+                        process.wait(timeout=5)
 
     def test_existing_log_cannot_be_overwritten(self):
         with tempfile.TemporaryDirectory() as directory:
