@@ -31,6 +31,13 @@ CRAP is a normal quality gate for an ecosystem and measurement series only after
 - improvements must not silently rebound through a baseline or lineage reset;
 - changes outside a certified measurement boundary must fail for measurement review rather than receive invented CRAP or coverage results.
 
+These are this repository's gates and the reference preset defaults. Installed
+projects own their CRAP ceiling through the existing `harness-policy/v1` rule
+referenced by `quality.toml`. The independent native plugin must pass that limit
+to Core rather than replace it with a fixed value or an unconfigured fallback.
+This configuration boundary does not change this repository's threshold or allow
+measurement, lineage, requiredness or non-regression failures to become success.
+
 For ecosystems whose CRAP capability has not been certified, CRAP must remain `unsupported`; similar-looking complexity or coverage numbers must not be combined into an invented cross-tool CRAP series.
 
 Thresholds, measurement-series identity, and supported source boundaries are policy. They must not be weakened, widened, or replaced merely to make CI green. Any intentional change requires an explicit policy delta and compatible evidence.
