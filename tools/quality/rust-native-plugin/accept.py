@@ -209,7 +209,9 @@ class ExternalPluginTests(unittest.TestCase):
         output.mkdir()
         artifacts = output / 'artifacts'
         artifacts.mkdir()
-        binding = binding_for(self.report, self.head, artifacts, self.version)
+        # Core canonicalizes this directory before exporting its environment.
+        # Exercise equivalent path spellings on Linux as well as Windows.
+        binding = binding_for(self.report, self.head, artifacts / '..' / 'artifacts', self.version)
         request, _ = request_for(binding, output / 'binding.json')
         request['args'] += ['--sysroot', str(self.sysroot)]
         request['adapter'].update(executable=str(self.binary), source_digest=native.file_hash(self.binary),
@@ -241,10 +243,44 @@ class ExternalPluginTests(unittest.TestCase):
         self.assertEqual(list(artifacts.iterdir()), [])
         path.write_text(json.dumps(request))
         result = self.command('core-collect', command + ['--request', str(path)])
+        if result.returncode:
+            # Core reports the failed exit code without forwarding adapter stderr.
+            # Retain a separate diagnostic under its documented environment;
+            # this cannot replace the failed authenticated Core acceptance.
+            canonical_root = str(artifacts.resolve(strict=True))
+            if os.name == 'nt' and not canonical_root.startswith('\\\\?\\'):
+                canonical_root = '\\\\?\\' + canonical_root
+            self.command('core-failed-adapter-diagnostic', [str(self.binary), *request['args']],
+                data=json.dumps(request), env=request['environment'] | {
+                    'HARNESS_GATE_INVOCATION_ID': request['invocation_id'],
+                    'HARNESS_GATE_STEP_ID': request['step_id'],
+                    'HARNESS_GATE_ARTIFACT_ROOT': canonical_root})
         self.assertEqual(result.returncode, 0, result.stderr)
         response = json.loads(result.stdout)
         self.assertTrue(response['collection']['evidence'])
         self.assertEqual(len(response['collection']['evidence']), len(self.report['functions']))
+        environment = request['environment'] | {
+            'HARNESS_GATE_INVOCATION_ID': request['invocation_id'],
+            'HARNESS_GATE_STEP_ID': request['step_id'],
+            'HARNESS_GATE_ARTIFACT_ROOT': str(artifacts.resolve(strict=True))}
+        other_root = output / 'artifacts-other'
+        other_root.mkdir()
+        original = {p.name: native.file_hash(p) for p in artifacts.iterdir()}
+        for name, variable, value in (
+                ('invocation', 'HARNESS_GATE_INVOCATION_ID', 'other-invocation'),
+                ('step', 'HARNESS_GATE_STEP_ID', 'other-step'),
+                ('directory', 'HARNESS_GATE_ARTIFACT_ROOT', str(other_root)),
+                ('missing-directory', 'HARNESS_GATE_ARTIFACT_ROOT', None)):
+            candidate = environment.copy()
+            if value is None:
+                candidate.pop(variable)
+            else:
+                candidate[variable] = value
+            rejected = self.command('core-environment-' + name, [str(self.binary), *request['args']],
+                                    data=json.dumps(request), env=candidate)
+            self.assertNotEqual(rejected.returncode, 0)
+            self.assertIn('Core invocation environment mismatch: ' + variable, rejected.stderr)
+            self.assertEqual({p.name: native.file_hash(p) for p in artifacts.iterdir()}, original)
         result = self.command('core-replay', command + ['--request', str(path)])
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('nonce has already been used', result.stderr)
