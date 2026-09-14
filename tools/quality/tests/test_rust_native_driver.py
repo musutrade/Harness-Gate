@@ -42,6 +42,9 @@ class NativeDriverTests(unittest.TestCase):
                                  sources if sources is not None else self.capture['production_sources'], [])
 
     def test_real_generated_constructor_closure_async_and_instances(self):
+        if os.name == 'nt':
+            self.assertEqual(list(self.evidence.glob('*.ilk')), [],
+                             'incremental link padding must not enter native profiling sections')
         self.assertTrue(self.report['mapping_complete_for_declared_scope'])
         self.assertFalse(self.report['backend_complete'])
         rows = {f['name']: f for f in self.report['functions']}
@@ -164,7 +167,8 @@ class NativeDriverTests(unittest.TestCase):
         project = self.work / 'cargo-source'
         shutil.copytree(QUALITY / 'fixtures/rust-native/cargo-complete', project)
         capture = self.work / 'cargo'
-        anchor = native.collect_cargo(project / 'Cargo.toml', capture, self.driver, self.sysroot, ['contract'])
+        anchor = native.collect_cargo(project / 'Cargo.toml', capture, self.driver, self.sysroot, ['contract'],
+                                      wrapper=os.environ.get('NATIVE_PLUGIN_BINARY'))
         raw = capture / 'raw'
         report = native.certify(raw, anchor)
         native.write_json(self.work / 'cargo-report.json', report)
@@ -209,7 +213,7 @@ class NativeDriverTests(unittest.TestCase):
         # changed-function CRAP limit must reject existing debt, through Rust.
         changed_source = self.work / 'changed.rs'
         changed_source.write_text((QUALITY / 'fixtures/rust-native/driver_complete.rs').read_text()
-                                  .replace('if n == 1 { 1 }', 'if n == 1 { 9 }'))
+                                  .replace('if n == 1 { 1 }', 'if n == 1 { 9 }'), newline='\n')
         changed = self.work / 'changed'
         changed_anchor = native.collect_fixture(changed_source, changed, self.driver, self.sysroot)
         regression = policy.evaluate(self.evidence, self.anchor, changed, changed_anchor,
@@ -223,7 +227,7 @@ class NativeDriverTests(unittest.TestCase):
         # The historical ratchet must reject worsening unmodified code as well.
         covered_source = self.work / 'covered.rs'
         covered_source.write_text((QUALITY / 'fixtures/rust-native/driver_complete.rs').read_text()
-                                  .replace('fn main() {', 'fn main() {\n    for n in 0..8 { legacy_debt(n); }'))
+                                  .replace('fn main() {', 'fn main() {\n    for n in 0..8 { legacy_debt(n); }'), newline='\n')
         covered = self.work / 'covered'
         covered_anchor = native.collect_fixture(covered_source, covered, self.driver, self.sysroot)
         worse = policy.evaluate(covered, covered_anchor, self.evidence, self.anchor,
