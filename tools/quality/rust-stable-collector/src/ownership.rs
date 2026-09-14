@@ -1,11 +1,11 @@
 //! Exact source/LLVM ownership proof for ASCII, unannotated free functions.
-//! No demangling, macro expansion, line coverage or parent-count inheritance.
-use crate::source;
+//! No demangling, macro expansion or parent-count inheritance.
+use crate::{line_coverage, source};
 use anyhow::{ensure, Context, Result};
 use serde_json::{json, Value};
 use std::{collections::BTreeSet, fs, path::Path};
 
-pub const RULE: &str = "rust-llvm-exact-free-owner/v3-candidate";
+pub const RULE: &str = "rust-llvm-exact-free-owner/v4-candidate";
 
 type Position = (u64, u64);
 fn span(value: &Value) -> Result<(Position, Position)> {
@@ -71,6 +71,7 @@ fn analyze_with(path: &Path, text: &str, raw: &Value, summary_optional: bool) ->
     let mut excluded = Vec::new();
     let mut file_regions = 0_u64;
     let mut file_covered = 0_u64;
+    let mut file_lines = line_coverage::Lines::new();
     for (index, record) in raw_functions.iter().enumerate() {
         let files = record["filenames"].as_array().context("LLVM filenames")?;
         if !files.iter().any(|f| f == filename) {
@@ -122,6 +123,8 @@ fn analyze_with(path: &Path, text: &str, raw: &Value, summary_optional: bool) ->
             matches.len() + excluded_matches == 1,
             "missing or ambiguous LLVM source owner"
         );
+        let lines = line_coverage::owner(regions, text)?;
+        line_coverage::merge(&mut file_lines, &lines);
         if excluded_matches == 1 {
             excluded.push(json!({"llvm_function_index":index,"symbol":record["name"],"reason":"inside explicit test source span"}));
             continue;
@@ -148,6 +151,7 @@ fn analyze_with(path: &Path, text: &str, raw: &Value, summary_optional: bool) ->
             json!({"name":functions[owner]["name"],"span":functions[owner]["span"],
             "llvm_function_index":index,"symbol":record["name"],"execution_count":count,
             "coverage_function":{"type":"ratio","covered":u64::from(count > 0),"total":1},
+            "coverage_line":line_coverage::ratio(&lines), "line_counts":lines,
             "coverage_region":{"type":"ratio","covered":covered,"total":total}}),
         );
     }
@@ -165,6 +169,22 @@ fn analyze_with(path: &Path, text: &str, raw: &Value, summary_optional: bool) ->
             "LLVM owner regions disagree with file summary"
         ),
         None => ensure!(summary_optional, "missing or ambiguous LLVM file summary"),
+    }
+    if let Some(file) = summaries.first() {
+        let exported = line_coverage::from_segments(
+            file["segments"].as_array().context("LLVM segments")?,
+            text,
+        )?;
+        ensure!(
+            file_lines == exported,
+            "LLVM owner lines disagree with exported segments"
+        );
+        let ratio = line_coverage::ratio(&file_lines);
+        ensure!(
+            ratio["total"] == file["summary"]["lines"]["count"]
+                && ratio["covered"] == file["summary"]["lines"]["covered"],
+            "LLVM owner lines disagree with file summary"
+        );
     }
     Ok(json!({"state":"supported","rule":RULE,"functions":mapped,"excluded":excluded}))
 }

@@ -1,5 +1,15 @@
 # GH-259 same-source historical comparison
 
+## Current line and migration checkpoint (2026-09-14)
+
+The v4 candidate adds authenticated per-function line coverage, including real
+generated files. Core computes an exact `crap-line-1` migration preview from
+validated same-owner evidence. The preview has no gate or baseline authority;
+required CRAP remains blocked. Source/region reconciliation, mutation checks,
+original historical anchors and old/new series rejection remain mandatory.
+See [the line/CRAP contract](stable-rust-line-crap-migration.md).
+
+
 This is a measured migration probe, not equivalence certification or baseline
 adoption. The stable candidate actually compiled and ran the original source
 bytes with Rust 1.97.1 and matching LLVM 22.1.6. No legacy backend ran.

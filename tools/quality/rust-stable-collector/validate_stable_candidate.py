@@ -17,6 +17,7 @@ import subprocess
 from validate_registry_dependencies import validate as validate_registry
 from validate_compiler_inputs import validate as validate_compiler_inputs
 from validate_module_owners import validate as validate_module_owners
+from validate_line_coverage import validate as validate_line_coverage
 
 
 def digest(path):
@@ -110,6 +111,7 @@ def main():
     parser.add_argument('--trace', action='store_true', help='require HARNESS_EXEC_AUDIT observer; fail if unavailable')
     args = parser.parse_args()
     binary = args.binary.resolve(strict=True)
+    binary_identity = {"sha256": digest(binary), "bytes": binary.stat().st_size}
     args.output.mkdir(parents=True, exist_ok=False)
     output = args.output.resolve()
     project = output / 'plain'
@@ -122,6 +124,7 @@ def main():
     observations = {}
 
     def run(name, command, *, success=True, env=None, trace=False):
+        assert digest(binary) == binary_identity["sha256"], "candidate binary changed during acceptance"
         invocation = [str(binary), *map(str, command)]
         trace_path = output / f'{name}.execve'
         if args.trace and trace:
@@ -426,9 +429,10 @@ def main():
         assert 'tool exited' in run('failed-test', ['collect', failing], success=False)
         assert not (output / 'capture-failed-test/manifest.json').exists()
         source.write_bytes(original_source)
+        observations['line_coverage'] = validate_line_coverage(output, run, digest)
         summary = {
             'schema': 'rust-stable-candidate-acceptance/v1', 'state': 'candidate-only',
-            'checks': records, 'observations': observations, 'tools': tools, 'binary': {'sha256': digest(binary), 'bytes': binary.stat().st_size},
+            'checks': records, 'observations': observations, 'tools': tools, 'binary': binary_identity,
             'capture_bytes': sum(p.stat().st_size for p in (output / 'capture-plain').rglob('*') if p.is_file()),
             'persistent_candidate_cache_bytes': 0,
             'execve_trace': 'verified' if args.trace else 'not performed',
@@ -436,6 +440,7 @@ def main():
             'release_signature_lifecycle': 'not exercised by this capture suite; see separate lifecycle acceptance',
             'second_toolchain_and_system': 'not established by this invocation',
         }
+        assert digest(binary) == binary_identity['sha256'], 'candidate binary changed during acceptance'
         (output / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')
         print(json.dumps({'checks_passed': len(records), 'summary': str(output / 'summary.json')}))
     except BaseException:

@@ -11,6 +11,7 @@ pub mod project;
 pub mod project_report;
 pub mod ratchet;
 pub mod replay;
+pub mod risk;
 mod schema;
 
 use serde_json::Value;

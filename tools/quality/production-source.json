@@ -216,6 +216,7 @@
         "quality-core/project_report.rs",
         "quality-core/ratchet.rs",
         "quality-core/replay.rs",
+        "quality-core/risk.rs",
         "quality-core/schema.rs"
       ]
     }

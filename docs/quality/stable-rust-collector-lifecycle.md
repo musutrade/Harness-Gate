@@ -1,5 +1,15 @@
 # Stable candidate lifecycle
 
+## Current line and migration checkpoint (2026-09-14)
+
+The v4 candidate adds authenticated per-function line coverage, including real
+generated files. Core computes an exact `crap-line-1` migration preview from
+validated same-owner evidence. The preview has no gate or baseline authority;
+required CRAP remains blocked. Source/region reconciliation, mutation checks,
+original historical anchors and old/new series rejection remain mandatory.
+See [the line/CRAP contract](stable-rust-line-crap-migration.md).
+
+
 This is partial T5 implementation, not an approved distribution or installation
 procedure for a user project. The [validation record](stable-rust-collector-validation.md)
 separates real RSA/transaction checks from mocked Sigstore behavior. The legacy
@@ -35,7 +45,7 @@ duplicate keys, trailing data and unknown envelope fields are rejected. Payload
 hash/length, exact inventory, target and ELF architecture are checked before
 selection. The typed `rust-stable-support/v1` document must bind the release,
 program and license identities and declare the exact candidate series,
-`rust-llvm-exact-free-owner/v3-candidate` function execution and code-region coverage, unsupported
+`rust-llvm-exact-free-owner/v4-candidate` function execution, line and code-region coverage, unsupported
 CRAP and `candidate-review-required` status. Unknown fields,
 empty/duplicate acceptance anchors and overstated capabilities fail even when the
 inventory has a valid signature. Observations identify actual acceptance records;
