@@ -279,7 +279,8 @@ class ExternalPluginTests(unittest.TestCase):
         quality_bytes, policy_bytes = quality_path.read_bytes(), policy_path.read_bytes()
         cases = ['missing-quality', 'missing-policy', 'unknown-binding', 'wrong-project', 'duplicate-key',
                  'duplicate-rule', 'zero-denominator', 'negative-limit', 'boolean-limit', 'extra-limit-field', 'wrong-type', 'wrong-operator',
-                 'optional-rule', 'disabled-ratchet', 'wrong-series', 'outside-policy', 'outside-component']
+                 'optional-rule', 'missing-ratchet', 'disabled-ratchet', 'disabled-baseline',
+                 'wrong-series', 'outside-policy', 'outside-component']
         for name in cases:
             with self.subTest(case=name):
                 quality_path.write_bytes(quality_bytes)
@@ -313,8 +314,12 @@ class ExternalPluginTests(unittest.TestCase):
                     rule['operator'] = 'gt'
                 elif name == 'optional-rule':
                     rule['required'] = False
+                elif name == 'missing-ratchet':
+                    rule.pop('ratchet')
                 elif name == 'disabled-ratchet':
                     rule['ratchet']['deny_regression'] = False
+                elif name == 'disabled-baseline':
+                    quality_path.write_text(quality_bytes.decode().replace('[baseline]\nrequired = true', '[baseline]\nrequired = false'))
                 elif name == 'wrong-series':
                     # Replace both producer and consumer, preserving valid Core configuration.
                     quality_path.write_text(re.sub(r'measurement-series/v1:[0-9a-f]{64}',
@@ -326,7 +331,7 @@ class ExternalPluginTests(unittest.TestCase):
                     (root / 'src').mkdir(exist_ok=True)
                     quality_path.write_text(quality_bytes.decode().replace('source_roots = ["."]', 'source_roots = ["src"]'))
                 if name in ('duplicate-rule', 'zero-denominator', 'negative-limit', 'boolean-limit', 'extra-limit-field', 'wrong-type',
-                            'wrong-operator', 'optional-rule', 'disabled-ratchet'):
+                            'wrong-operator', 'optional-rule', 'missing-ratchet', 'disabled-ratchet'):
                     policy_path.write_text(json.dumps(document))
                 result, output = self.evaluate_policy_fixture('bad-policy-' + name, root, binding, project_id)
                 self.assertNotEqual(result.returncode, 0)

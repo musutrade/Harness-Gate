@@ -72,8 +72,8 @@ def load(repository_root, binding_name, project_id, binary, output):
     model.validate_shape(rule['limit'], 'policy.schema.json', 'Rational')
     native.require(rule['required'] and rule['on_violation'] == 'fail',
                    'native CRAP gate requires required=true and on_violation=fail')
-    native.require(rule.get('ratchet', {}).get('deny_regression', True),
-                   'native CRAP gate requires deny_regression=true')
+    native.require(rule.get('ratchet', {}).get('deny_regression', False),
+                   'native CRAP gate requires an explicit ratchet with deny_regression=true')
     receipt = {'schema': 'rust-native-policy-binding/v1', 'repository_root': str(root),
                'binding': binding_name, 'component': component, 'expectation': expectation,
                'source_roots': config['components'][component]['source_roots'],
