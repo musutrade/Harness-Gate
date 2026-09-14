@@ -43,7 +43,7 @@ def load_evidence(directory, anchor, reviewed_report=None, report_sha256=None):
         manifest = read_json(directory / 'manifest.json')
         native.require(manifest['schema'] == 'native-driver-artifacts/1', 'incompatible manifest')
         native.require(not any(p.is_symlink() for p in directory.rglob('*')), 'artifact symlink')
-        actual = {str(p.relative_to(directory)) for p in directory.rglob('*') if p.is_file()}
+        actual = {p.relative_to(directory).as_posix() for p in directory.rglob('*') if p.is_file()}
         native.require(actual <= set(manifest['artifacts']) | {'manifest.json'}, 'extra evidence file')
         missing = []
         for name, expected in manifest['artifacts'].items():

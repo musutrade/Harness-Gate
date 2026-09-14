@@ -88,7 +88,7 @@ def seal(directory):
     paths = sorted(p for p in directory.rglob('*') if p.is_file() and p != directory / 'manifest.json')
     require(not any(p.is_symlink() for p in directory.rglob('*')), 'symlink in evidence')
     write_json(directory / 'manifest.json', {'schema': 'native-driver-artifacts/1',
-               'artifacts': {str(p.relative_to(directory)): file_hash(p) for p in paths}})
+               'artifacts': {p.relative_to(directory).as_posix(): file_hash(p) for p in paths}})
     return file_hash(directory / 'manifest.json')
 
 
@@ -98,7 +98,7 @@ def verified_files(directory, anchor):
     require(file_hash(directory / 'manifest.json') == anchor, 'untrusted manifest')
     manifest = json.loads((directory / 'manifest.json').read_text())
     require(manifest['schema'] == 'native-driver-artifacts/1', 'incompatible artifact manifest')
-    require({str(p.relative_to(directory)) for p in directory.rglob('*') if p.is_file()}
+    require({p.relative_to(directory).as_posix() for p in directory.rglob('*') if p.is_file()}
             == set(manifest['artifacts']) | {'manifest.json'}, 'missing/extra evidence file')
     for name, expected in manifest['artifacts'].items():
         path = directory / name
