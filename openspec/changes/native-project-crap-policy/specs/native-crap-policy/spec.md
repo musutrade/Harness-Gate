@@ -27,7 +27,8 @@ or historical invocation path or claim complete profile assurance.
 ### Requirement: Preserve debt and non-regression authority
 Core SHALL retain requiredness, absolute checks for new/changed/selected functions,
 unchanged legacy-debt eligibility and non-regression. The native bridge SHALL
-reject policies that disable required failure or non-regression. A configured
+require an explicit debt ratchet and reject policies that disable required
+failure, non-regression or the required baseline provider. A configured
 prohibition on legacy debt SHALL make every function's CRAP ceiling absolute.
 
 #### Scenario: A higher ceiling still contains a regression

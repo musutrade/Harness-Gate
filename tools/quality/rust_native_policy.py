@@ -132,7 +132,7 @@ def policy_and_lineage(base, head, base_projection, head_projection, hotspots, c
                           'remediation_classes': ['review_native_production_evidence']})
             if metric == 'risk.crap':
                 rules[-1]['remediation_classes'] = crap_rule['remediation_classes']
-                rules[-1]['ratchet']['allow_legacy_debt'] &= crap_rule.get('ratchet', {}).get('allow_legacy_debt', True)
+                rules[-1]['ratchet']['allow_legacy_debt'] &= crap_rule['ratchet']['allow_legacy_debt']
     return ({'schema': 'harness-policy/v1', 'rules': rules},
             {'schema': 'subject-mappings/v1', 'project': head_projection['project']['id'], 'mappings': mappings}, identities)
 
