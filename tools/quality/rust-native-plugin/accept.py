@@ -76,6 +76,7 @@ class ExternalPluginTests(unittest.TestCase):
         self.assertTrue(self.report['mapping_complete_for_declared_scope'])
 
     def test_real_cargo_capture_and_features(self):
+        captures = []
         for features in ([], ['--feature', 'extra']):
             name = 'cargo-extra' if features else 'cargo'
             result = self.entry(name, 'capture', '--sysroot', self.sysroot,
@@ -83,6 +84,7 @@ class ExternalPluginTests(unittest.TestCase):
                 '--sample', 'contract', '--output', self.work / name, *features)
             self.assertEqual(result.returncode, 0, result.stderr)
             capture = json.loads(result.stdout)
+            captures.append(capture)
             result = self.entry(name + '-certify', 'certify', '--sysroot', self.sysroot,
                 '--evidence', capture['capture'], '--anchor', capture['anchor'])
             self.assertEqual(result.returncode, 0, result.stderr)
@@ -92,6 +94,17 @@ class ExternalPluginTests(unittest.TestCase):
             self.assertIn('production', names)
             self.assertNotIn('project_owned_contract', names)
             self.assertEqual(any(n.endswith('cfg_inactive') for n in names), bool(features))
+        common = ['classify', '--sysroot', self.sysroot, '--evidence', captures[0]['capture'],
+                  '--anchor', captures[0]['anchor']]
+        result = self.entry('classify-incomplete', *common)
+        self.assertEqual(result.returncode, 1, result.stderr)
+        report = json.loads(result.stdout)
+        self.assertFalse(report['classification_complete'])
+        self.assertTrue(any(row['reason'] == 'source_not_loaded_without_selection_proof' for row in report['files']))
+        result = self.entry('classify-witness', *common, '--witness', captures[1]['capture'],
+                            '--witness-anchor', captures[1]['anchor'])
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue(json.loads(result.stdout)['classification_complete'])
 
     def test_wrong_missing_tools_and_overrides_block(self):
         cases = [('no-sysroot', ['doctor'], 'select external Rust'),
@@ -166,6 +179,13 @@ class ExternalPluginTests(unittest.TestCase):
                 self.assertEqual(result.stdout, '')
             finally:
                 path.write_bytes(original)
+        native.verified_files(self.head, self.anchor)
+        output = self.head / 'unsealed-report.json'
+        result = self.entry('output-inside-evidence', 'certify', '--sysroot', self.sysroot,
+            '--evidence', self.head, '--anchor', self.anchor, '--output', output)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('outside retained evidence', result.stderr)
+        self.assertFalse(output.exists())
         native.verified_files(self.head, self.anchor)
 
     def test_core_authenticates_collect_and_rejects_tamper_and_replay(self):

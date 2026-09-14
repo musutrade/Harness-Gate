@@ -16,7 +16,7 @@ test_released_rust_core_receives_real_native_debt (test_rust_native_driver.Nativ
 test_source_expansion_cfg_and_compiler_tampering (test_rust_native_driver.NativeDriverTests.test_source_expansion_cfg_and_compiler_tampering) ... ok
 
 ----------------------------------------------------------------------
-Ran 16 tests in 52.690s
+Ran 16 tests in 62.634s
 
 OK
-Retained acceptance artifacts: /mnt/dev-ssd/workspaces/native-core-style-release/target/native-acceptance/tmpvbnlye7p
+Retained acceptance artifacts: /mnt/dev-ssd/workspaces/native-core-style-release/target/native-acceptance/tmp_x4vbg63

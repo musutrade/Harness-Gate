@@ -127,6 +127,12 @@ for anchored base/head captures and returns Core's decision. Raw facts have no
 legacy `passed` verdict fields. `collect` validates all selected owners before
 emitting evidence and checks Core's invocation markers; errors exit nonzero.
 
+`classify` retains the old per-file reasons and exits nonzero when classification
+is incomplete. For a source excluded by selected features, provide an independently
+anchored alternate-feature capture with `--witness` and `--witness-anchor`. The
+existing classifier checks its compatibility before using that selection proof;
+an unloaded source without such proof is never declared to have no runtime code.
+
 ## Release boundary
 
 `.github/workflows/native-collector-release.yml` builds and tests the actual
