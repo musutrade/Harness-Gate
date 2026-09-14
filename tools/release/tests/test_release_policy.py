@@ -60,6 +60,24 @@ class ReleasePolicyTests(unittest.TestCase):
     def test_prerelease_semver_is_supported(self) -> None:
         self.assertEqual(policy.version_from_tag("v1.2.3-rc.1+build.7"), "1.2.3-rc.1+build.7")
 
+    def test_collector_tag_is_explicit_and_preserves_git_checks(self) -> None:
+        tag = "rust-collector-v0.3.3"
+        self.assertEqual(policy.version_from_tag(tag, "rust-collector-v"), "0.3.3")
+        for candidate, prefix in ((tag, "v"), ("v0.3.3", "rust-collector-v"),
+                                  ("rust-collector-v01.2.3", "rust-collector-v")):
+            with self.subTest(tag=candidate), self.assertRaises(policy.PolicyError):
+                policy.version_from_tag(candidate, prefix)
+        self.git("tag", tag)
+        self.assertEqual(policy.verify_git_state(self.repo, tag, self.commit, "main"), self.commit)
+
+    def test_collector_manifest_mismatch_fails_before_network(self) -> None:
+        arguments = policy.parser().parse_args([
+            "verify", "--tag", "rust-collector-v0.3.4", "--tag-prefix", "rust-collector-v",
+            "--commit", self.commit, "--repository", "example/repository",
+            "--repo", str(self.repo), "--manifest", str(self.repo / "Cargo.toml")])
+        with self.assertRaisesRegex(policy.PolicyError, "does not match package version"):
+            policy.verify(arguments)
+
     def test_non_semver_tag_is_rejected(self) -> None:
         for tag in ("0.3.3", "v1.2", "v01.2.3", "v1.2.3-01"):
             with self.subTest(tag=tag), self.assertRaises(policy.PolicyError):
