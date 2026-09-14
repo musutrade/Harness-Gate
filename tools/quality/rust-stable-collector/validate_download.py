@@ -17,7 +17,7 @@ import subprocess
 import threading
 import time
 
-from validate_stable_candidate import check_trace
+from validate_stable_candidate import check_trace, trace_command
 
 PROGRAM = 'harness-gate-rust-stable-collector'
 FILES = (PROGRAM, 'LICENSE', 'support.json', 'release-inventory.json', 'release-inventory.sig')
@@ -142,7 +142,7 @@ def main():
 
     def traced(argv, name):
         if args.trace:
-            return ['strace', '-f', '-q', '-s', '16384', '-e', 'trace=execve', '-o', str(output / f'{name}.execve'), *argv]
+            return trace_command(output / f'{name}.execve', argv)
         return argv
 
     def audit_trace(name):
