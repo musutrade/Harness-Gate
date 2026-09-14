@@ -259,7 +259,7 @@ release, accept unsigned assets, download a toolchain or install host trust.
 #### Scenario: Transport succeeds but signatures fail
 
 - GIVEN five files whose transport identities match the request
-- WHEN RSA or pinned Sigstore verification fails
+- WHEN SHA-256 or pinned Sigstore verification fails
 - THEN no payload becomes the selected installation and transport success cannot become release acceptance.
 
 #### Scenario: Interrupted upgrade
@@ -306,3 +306,33 @@ source identity and MUST NOT adopt historical baselines or relax required metric
 - GIVEN a source workspace with substituted, missing, added or symlinked source files, an altered manifest or a different capture/configuration
 - WHEN the collector describes the workspace or converts evidence for Core
 - THEN recomputation rejects it without a successful evidence response.
+
+
+### Requirement: Core-aligned release authentication
+
+The stable collector SHALL authenticate payloads using an exact SHA-256 inventory
+and one keyless Sigstore signature over its original bytes. The certificate identity
+SHALL bind the release workflow and exact `rust-collector-v<VERSION>` tag, with the
+GitHub Actions OIDC issuer. Installation, upgrade and rollback SHALL use the same
+verifier and preserve the current version on any failure before selection.
+The candidate SHALL NOT require an RSA release key, a separate private signing
+round or a duplicate collector-specific release approval packet. Existing quality,
+CRAP, actual-measurement and required-gate decisions SHALL remain fail-closed.
+
+#### Scenario: Single signature installation
+
+- GIVEN an exact pinned release with one valid Sigstore bundle and matching SHA-256 inventory
+- WHEN the caller supplies pinned Sigstore trust without an RSA public key
+- THEN verification and launch/version checks complete before atomic activation.
+
+#### Scenario: Wrong release certificate identity
+
+- GIVEN an otherwise valid signed inventory
+- WHEN its certificate identifies another workflow, tag or issuer
+- THEN installation fails and the previously selected program remains unchanged.
+
+#### Scenario: Unpublished legacy candidate trust
+
+- GIVEN a dual-signature candidate envelope or v1 host trust
+- WHEN it is passed to the simplified stable installer
+- THEN it is rejected with no fallback or automatic trust migration.

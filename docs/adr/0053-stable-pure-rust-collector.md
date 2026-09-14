@@ -2,6 +2,14 @@
 
 Status: Accepted direction; replacement implementation and release acceptance pending.
 
+2026-09-14 user-approved delivery amendment: SHA-256 plus one exact-tag Sigstore
+signature replaces the unpublished candidate's RSA dual-signature contract.
+Remove separate private-candidate signing and duplicate collector-specific
+approval packets. Version pins, verified installation/rollback, quality gates,
+CRAP, real measurement and failure blocking remain required. See the current
+[lifecycle contract](../quality/stable-rust-collector-lifecycle.md); RSA references
+in older checkpoints below are historical. PR #261 remains draft.
+
 The shared-generator T4 checkpoint is documented in
 [`stable-rust-macro-observation.md`](../quality/stable-rust-macro-observation.md).
 The Rust collector and first-party process macro reuse one ordinary Rust library;
@@ -65,7 +73,7 @@ protected production signing, trust bootstrap, downloader, license review and
 multi-toolchain/system acceptance remain open. T5 and T8 stay unchecked.
 
 Activation now requires a bounded successful launch of the authenticated staged
-program and an exact signed-version response, after both signatures pass. Payload
+program and an exact signed-version response, after SHA-256 and the Sigstore signature pass. Payload
 and trust identities are rechecked before selection changes. A separate stable
 test-version build exercises executable upgrade and rollback; this is local
 compatibility within this implementation, not historical or production acceptance.

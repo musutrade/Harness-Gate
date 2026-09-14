@@ -12,8 +12,44 @@ See [the line/CRAP contract](stable-rust-line-crap-migration.md).
 
 This is partial T5 implementation, not an approved distribution or installation
 procedure for a user project. The [validation record](stable-rust-collector-validation.md)
-separates real RSA/transaction checks from mocked Sigstore behavior. The legacy
+separates real SHA-256/transaction checks from mocked Sigstore behavior. The legacy
 release hold remains. No candidate package or test key authorizes production use.
+
+## Release simplification (2026-09-14)
+
+The user-approved delivery delta follows Core: SHA-256 plus one Sigstore signature,
+with an exact version tag, verified installation and failure recovery. Versioned
+trust v2 and signature v1 replace the unpublished dual-signature candidate contract;
+old candidate trust/envelopes must be regenerated explicitly and are rejected by
+this installer. Existing legacy releases and their historical verifier are retained
+as legacy evidence under the publication hold.
+
+Quality thresholds, CRAP, actual measurement, required gates, baseline/debt/ratchet
+and failure blocking are unchanged. Measurement promotion still needs evidence and
+review. PR #261 stays draft; this change neither signs nor publishes a release.
+
+## Simplified-contract validation
+
+The [fresh acceptance record](stable-rust-candidate-evidence/single-sigstore.json)
+binds the rebuilt executable, inputs and original logs. Rust 1.98.1 / LLVM 22.1.8
+passes 25 Rust unit tests, Clippy/format, 135 real capture checks, 51 lifecycle
+checks, 29 HTTPS checks and the authenticated partial-coverage Core fixture.
+Required CRAP remains blocked; its preview remains non-authoritative. The quality
+script suite passes (455 run, 36 optional input-dependent skips); documentation
+consistency and strict OpenSpec validation pass.
+
+Five actual cosign checks include an upstream-release positive and collector
+rejection of an unrelated signed blob with the selected version preserved. The
+positive authenticates upstream cosign only. Lifecycle positive signatures remain
+explicit mocks; no collector production signature is claimed. The binary is
+3,475,320 bytes, the unsigned package is 5,737,434 bytes, and initial HTTPS response
+bodies total 5,737,540 bytes. No package cache or compiler environment is added.
+
+The initial default-toolchain capture used Rust 1.97.1, so packaging correctly
+rejected it. The failed preparation log and first capture are retained; the final
+package uses the fresh 1.98.1 capture. Prior two-userspace acceptance remains bound
+to the previous executable. This validates the delivery simplification on one
+system; T3–T8 and production acceptance remain open.
 
 ## Program and bundle contract
 
@@ -22,7 +58,7 @@ The same Rust executable performs `release-verify`, `install` (also upgrade),
 Verification invokes the host-pinned external `cosign` executable and then the
 authenticated staged program with `--version`. The latter must launch, exit zero
 within 60 seconds, and return exactly the program name and signed release version
-followed by a newline. Both signatures and staged identities must pass before
+followed by a newline. The Sigstore signature and staged identities must pass before
 this execution; payload and trust identities are checked again afterward. Install,
 upgrade and rollback share this check before changing `current`. This establishes
 launch/version compatibility on the installation host, not coverage certification.
@@ -37,10 +73,10 @@ extra archives:
 | `LICENSE` | Authenticated collected notices; production license review pending |
 | `support.json` | Typed `rust-stable-support/v1` candidate observations and capability limits |
 | `release-inventory.json` | `rust-stable-release-inventory/v1`: version, target, and `files` mapping the three payload names to `{sha256, bytes}` |
-| `release-inventory.sig` | `rust-collector-signatures/v2`: base64 `rsa_signature` and nonempty `sigstore_bundle` |
+| `release-inventory.sig` | `rust-stable-release-signature/v1`: nonempty `sigstore_bundle` |
 
-RSA signs the exact inventory bytes using SHA-256/PKCS#1 v1.5 with a 2048–8192-bit
-SPKI PEM public key. Sigstore independently verifies those same bytes. JSON
+One keyless Sigstore signature authenticates the exact SHA-256 inventory bytes.
+The inventory binds each payload digest and size. JSON
 duplicate keys, trailing data and unknown envelope fields are rejected. Payload
 hash/length, exact inventory, target and ELF architecture are checked before
 selection. The typed `rust-stable-support/v1` document must bind the release,
@@ -54,13 +90,11 @@ they do not authorize a measurement migration or imply untested platform support
 ## External trust and invocation
 
 Trust is supplied independently of both the bundle and installation root. The
-caller provides the trusted SHA-256 of a `rust-stable-release-trust/v1` JSON file:
+caller provides the trusted SHA-256 of a `rust-stable-release-trust/v2` JSON file:
 
 ```json
 {
-  "schema": "rust-stable-release-trust/v1",
-  "public_key": "/absolute/host-trust/release-public.pem",
-  "public_key_sha256": "<approved SHA-256>",
+  "schema": "rust-stable-release-trust/v2",
   "cosign": "/absolute/host-tools/cosign",
   "cosign_sha256": "<approved SHA-256>",
   "trusted_root": "/absolute/host-trust/trusted-root.json",
@@ -69,7 +103,7 @@ caller provides the trusted SHA-256 of a `rust-stable-release-trust/v1` JSON fil
 ```
 
 These are placeholders, not provisioned trust. Release assets cannot choose the
-key, verifier, trust root, workflow identity or OIDC issuer. All paths must be
+verifier, trust root, workflow identity or OIDC issuer. All paths must be
 absolute and canonical. The command rechecks host pins and the verified snapshot
 after external verification. A missing verifier produces an error naming its path;
 there is no automatic tool installation or unsigned fallback.
@@ -84,14 +118,14 @@ an explicit acceptance item; this document supplies no unauthenticated bootstrap
 
 The fixed invocation is `cosign verify-blob --bundle ... --trusted-root ...
 --offline --certificate-identity
-https://github.com/musutrade/Harness-Gate/.github/workflows/rust-collector-release.yml@refs/heads/main
+https://github.com/musutrade/Harness-Gate/.github/workflows/rust-collector-release.yml@refs/tags/rust-collector-v<VERSION>
 --certificate-oidc-issuer https://token.actions.githubusercontent.com ...`.
 Verification has a 60-second deadline and a fresh private HOME; nonzero exit,
 timeout, changed inputs or changed tool identity abort the transaction. Actual
 Sigstore signature/inclusion verification remains to be exercised with protected
 release evidence. A successful mock subprocess only checks argument/exit handling.
 
-Given independently approved inputs, the candidate command shapes are:
+Given authenticated pinned inputs, the candidate command shapes are:
 
 ```text
 harness-gate-rust-stable-collector release-verify BUNDLE TRUST TRUST_SHA256 NEW_LOG
@@ -163,8 +197,11 @@ The fresh output contains `unsigned-package/` with exactly the executable,
 `LICENSE`, `support.json` and `release-inventory.json`. Build logs and
 `preparation.json` stay outside this payload. The required signature envelope is
 absent, so the installed verifier rejects this package. No unsigned fallback,
-release workflow activation or production signing occurs. A reviewed protected
-signing step must eventually supply both signatures over the exact inventory bytes.
+release workflow activation or production signing occurs. The release workflow
+must supply one Sigstore signature over the exact inventory
+bytes under that version tag. Signing, installation verification and publication
+reuse the same immutable package; there is no separate private-candidate signing
+round, RSA key provisioning or second collector-specific approval packet.
 
 The lifecycle suite consumes this actual prepared program/license/support payload.
 Repository automation also makes a separate locked, offline stable release build
@@ -175,11 +212,11 @@ second executable rolls back. This tests executable replacement and lifecycle
 compatibility within this implementation, not compatibility with a historical or
 production release. No compiler is invoked by the installed lifecycle implementation.
 
-Test bundles use a repository-generated RSA key and an explicitly mocked Sigstore
-verifier. Re-signed nonlaunching, wrong-version, nonzero, timed-out and stage-mutating
+Test bundles use an explicitly mocked Sigstore verifier and real SHA-256
+inventories. Nonlaunching, wrong-version, nonzero, timed-out and stage-mutating
 Rust/ELF fixtures must preserve the current version. Command records check that
 failed signatures never reach program execution. Test fixtures, build sources,
-private keys, verifiers and build caches remain outside the runtime packages.
+verifiers and build caches remain outside the runtime packages.
 
 ## Explicit HTTPS download and installation
 
@@ -213,7 +250,7 @@ includes its redirects and body. Failed transfers have no automatic retries.
 
 The installation lock covers download, verification and activation. Five assets
 are streamed into a private bounded staging directory, then checked by the existing
-RSA, pinned cosign, support-contract and launch/version validators. Request and
+SHA-256, pinned cosign, support-contract and launch/version validators. Request and
 custom TLS-root pins are checked again after transfer; request/trust/payload checks
 precede activation. Download success alone grants no installation authority.
 Network errors, bad signatures and interrupted transfers preserve `current`.
@@ -231,7 +268,8 @@ Repository-only `validate_download.py` uses a real local HTTPS server with a
 separate test CA/server certificate and lifecycle test bundles. It exercises
 installation, a separately compiled upgrade, rollback, TLS rejection, downgrade
 and redirect limits, bad HTTP/length/encoding/hash, truncation, timeout, failed
-signature checks, request/CA changes during transfer, and interruption. RSA verification is real; Sigstore is explicitly
-mocked by the lifecycle fixture. `--trace` is mandatory in CI, but unavailable on
-the current restricted host. This does not establish public hosting, production
+signature checks, request/CA changes during transfer, and interruption. SHA-256
+verification is real; Sigstore is explicitly mocked by the lifecycle fixture.
+`--trace` requires the repository execution observer and is mandatory in CI.
+This does not establish public hosting, production
 signing or another supported operating system.

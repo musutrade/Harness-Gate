@@ -1,0 +1,305 @@
+{
+  "schema": "rust-stable-single-sigstore-acceptance/v1",
+  "source_base": "ff598222527d288da8fd46e5e4dcf4b421c65dbf",
+  "scope": "User-approved SHA-256 plus one exact-tag Sigstore signature; no RSA key or duplicate signing/approval packet. No measurement policy changes.",
+  "binary": {
+    "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/build/release/harness-gate-rust-stable-collector",
+    "sha256": "72cd567840ded09d8266cc7e73bec881b51791af30c5b8b928485bbcb35adf1b",
+    "bytes": 3475320
+  },
+  "system": "PRETTY_NAME=\"Ubuntu 26.04 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04 (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+  "rust": "1.98.1",
+  "llvm": "22.1.8",
+  "source_files": {
+    "tools/quality/rust-stable-collector/src/adapter.rs": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/tools/quality/rust-stable-collector/src/adapter.rs",
+      "sha256": "dd820395c5d0c34d366a606368f00776fcad96b3114ab7d6da08a53edb8df480",
+      "bytes": 16169
+    },
+    "tools/quality/rust-stable-collector/src/artifact.rs": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/tools/quality/rust-stable-collector/src/artifact.rs",
+      "sha256": "f8e25815474b0c7ae584bc783d0e4ad59bf80e8efe38e46d25a27129d3325950",
+      "bytes": 3177
+    },
+    "tools/quality/rust-stable-collector/src/collect.rs": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/tools/quality/rust-stable-collector/src/collect.rs",
+      "sha256": "cb7bd65623e9eaf6a670092162ffc25b1f9138d9a5fa183b4f16e8a354a9da0e",
+      "bytes": 19442
+    },
+    "tools/quality/rust-stable-collector/src/compiler_inputs.rs": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/tools/quality/rust-stable-collector/src/compiler_inputs.rs",
+      "sha256": "2dd0a224948456b7210e3baaadecabc844218da641fb451e351dc17fa6c16920",
+      "bytes": 13633
+    },
+    "tools/quality/rust-stable-collector/src/compiler_wrapper.rs": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/tools/quality/rust-stable-collector/src/compiler_wrapper.rs",
+      "sha256": "46d58943609bdd659bcf0be2967c5560eaf976fcd4fdc910ba3affae1521829f",
+      "bytes": 7093
+    },
+    "tools/quality/rust-stable-collector/src/core_source.rs": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/tools/quality/rust-stable-collector/src/core_source.rs",
+      "sha256": "173ba61bd1328333e5ef1ec7f05a69f1fd25b50d7b8d07bd786b5e402e7dab9b",
+      "bytes": 5727
+    },
+    "tools/quality/rust-stable-collector/src/coverage.rs": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/tools/quality/rust-stable-collector/src/coverage.rs",
+      "sha256": "9a6e6dd07070da44342822336de48b4a1ce6e8666ddf2570dc4047aa93d2f7bf",
+      "bytes": 8718
+    },
+    "tools/quality/rust-stable-collector/src/dependencies.rs": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/tools/quality/rust-stable-collector/src/dependencies.rs",
+      "sha256": "406fcd4ded9fbf168fa4c9ccab23ba6c320edaac9327723d60233d36b31d274b",
+      "bytes": 12561
+    },
+    "tools/quality/rust-stable-collector/src/download.rs": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/tools/quality/rust-stable-collector/src/download.rs",
+      "sha256": "e86c3d0e47eeb18f5c6b8e5ff6ff6645a96522c4dafbed0457b0990e3115e880",
+      "bytes": 8023
+    },
+    "tools/quality/rust-stable-collector/src/line_coverage.rs": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/tools/quality/rust-stable-collector/src/line_coverage.rs",
+      "sha256": "a28587a3bef740cc1999bcad1ea1f95defa92e9b3b469b45bfe1ba8d8315e9de",
+      "bytes": 6559
+    },
+    "tools/quality/rust-stable-collector/src/macro_model.rs": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/tools/quality/rust-stable-collector/src/macro_model.rs",
+      "sha256": "0843c7135aefd4433d41388eb6713dc99cc22048d0375a5b847f23a41fc0e7e1",
+      "bytes": 10662
+    },
+    "tools/quality/rust-stable-collector/src/main.rs": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/tools/quality/rust-stable-collector/src/main.rs",
+      "sha256": "ad6319abd33811481b7251484450728fd8b544186f2a03048fe159c2ed7929d8",
+      "bytes": 5324
+    },
+    "tools/quality/rust-stable-collector/src/ownership.rs": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/tools/quality/rust-stable-collector/src/ownership.rs",
+      "sha256": "4f861f41413c12b97d3fde19c21e798e8256f4c2d1cf21fce2e4d12a839ebe46",
+      "bytes": 8934
+    },
+    "tools/quality/rust-stable-collector/src/process.rs": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/tools/quality/rust-stable-collector/src/process.rs",
+      "sha256": "9775e7bb0aa2ea64ceac6720fa338502bc36dfc0a5ec80d99a05e8c217279188",
+      "bytes": 8232
+    },
+    "tools/quality/rust-stable-collector/src/release.rs": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/tools/quality/rust-stable-collector/src/release.rs",
+      "sha256": "377a7ce046d37795853d3aad88e470e79c025c1dd5f9fc46f42a09fc3b338e3c",
+      "bytes": 20751
+    },
+    "tools/quality/rust-stable-collector/src/source.rs": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/tools/quality/rust-stable-collector/src/source.rs",
+      "sha256": "4c2a16572dede48396baf34274cf74a0fcf3f7388a51fe18c28526e9e5e53853",
+      "bytes": 10979
+    },
+    "tools/quality/rust-stable-collector/src/strict_json.rs": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/tools/quality/rust-stable-collector/src/strict_json.rs",
+      "sha256": "5cdbd35515d99f1c6c210363365ba9e79faaeef145dcf08074a499094556b2ea",
+      "bytes": 4430
+    },
+    "tools/quality/rust-stable-collector/src/support.rs": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/tools/quality/rust-stable-collector/src/support.rs",
+      "sha256": "d3df1c5510c1e1ab75d282509b7d6c8403c6f149dc0736b530939fcd92c4abf6",
+      "bytes": 3192
+    },
+    "tools/quality/rust-stable-collector/src/tools.rs": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/tools/quality/rust-stable-collector/src/tools.rs",
+      "sha256": "cd0d52404cfa1bbff5d2e135f8e9eb6950af7afad403a336dac9928df80fe7f7",
+      "bytes": 4692
+    }
+  },
+  "removed_dependencies": [
+    "autocfg",
+    "base64ct",
+    "const-oid",
+    "der",
+    "lazy_static",
+    "libm",
+    "num-bigint-dig",
+    "num-integer",
+    "num-iter",
+    "num-traits",
+    "pem-rfc7468",
+    "pkcs1",
+    "pkcs8",
+    "ppv-lite86",
+    "rand",
+    "rand_chacha",
+    "rand_core",
+    "rsa",
+    "signature",
+    "smallvec",
+    "spin",
+    "spki",
+    "zerocopy",
+    "zerocopy-derive"
+  ],
+  "checks": {
+    "rust_unit_tests": 25,
+    "capture": 135,
+    "lifecycle": 51,
+    "https": 29,
+    "real_cosign": 5,
+    "quality_scripts": {
+      "run": 455,
+      "skipped": 36,
+      "skip_scope": "optional suites require external host runtime/Core/project inputs; targeted fresh candidate/Core suites are recorded separately"
+    },
+    "clippy": "passed",
+    "format": "passed",
+    "docs_consistency": "passed",
+    "strict_openspec": "passed",
+    "required_crap": "blocked as required",
+    "crap_preview": [
+      {
+        "lines": {
+          "covered": 4,
+          "total": 5,
+          "type": "ratio"
+        },
+        "value": {
+          "denominator": 125,
+          "numerator": 384,
+          "type": "rational"
+        },
+        "state": "review_required"
+      },
+      {
+        "lines": {
+          "covered": 0,
+          "total": 3,
+          "type": "ratio"
+        },
+        "value": {
+          "denominator": 1,
+          "numerator": 2,
+          "type": "rational"
+        },
+        "state": "review_required"
+      }
+    ]
+  },
+  "bytes": {
+    "binary": 3475320,
+    "unsigned_package": 5737434,
+    "lifecycle_package": 5737540,
+    "https_initial_response_body": 5737540,
+    "plugin_cache": 0
+  },
+  "raw": {
+    "runtime": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/sigstore/runtime-198/summary.json",
+      "sha256": "45820bb9ac0dfcddf25f861dc9edfab620a880d6caa2157055921e8197895392",
+      "bytes": 38072
+    },
+    "package": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/sigstore/package-198/preparation.json",
+      "sha256": "3aeeb5be5040c6d14a2cbd9115ad9259644e288c972fbcd9d5ff4d65a496102e",
+      "bytes": 37555
+    },
+    "lifecycle": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/sigstore/lifecycle/summary.json",
+      "sha256": "631a536b6863366e0c4133c9b74e6942cf65683b08b14a45d1151ad257326c60",
+      "bytes": 7745
+    },
+    "https": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/sigstore/https/summary.json",
+      "sha256": "06ece14f7025e4f63df1dcb764c8f64ff0b9da4823a28010edf6819c4db4ab78",
+      "bytes": 51928
+    },
+    "cosign": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/sigstore/real-sigstore/summary.json",
+      "sha256": "76470a2b91b50bfff65ed10c2518dea49f09cf1e11395a21062d56938a4f91b8",
+      "bytes": 5982
+    },
+    "core": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/sigstore/core-partial-198/summary.json",
+      "sha256": "96715114f45dfcbf6a3c08d4a5afa6e450f1e58f62f98a868c1724c84649a01a",
+      "bytes": 8609
+    }
+  },
+  "logs": {
+    "tests": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/sigstore-tests.log",
+      "sha256": "0701f41dfef2ae95e851790b9e73f890db057671a3d4774363bd60101f37368b",
+      "bytes": 2735
+    },
+    "clippy": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/sigstore-clippy.log",
+      "sha256": "c2f0c26f5369a67ff52890969e7aa39dc9068583f69fd8c700acc43203a71063",
+      "bytes": 228
+    },
+    "fmt": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/sigstore-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "quality-tests": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/sigstore-quality-tests.log",
+      "sha256": "4e985063cf26772d337fc634fc0d514e5cb777e25982a00d8986d6b03496e47b",
+      "bytes": 4277
+    },
+    "docs": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/sigstore-docs.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "openspec": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/sigstore-openspec.log",
+      "sha256": "93bf803f928eacc93719f0e798f2644f2e8be7803b361c216ce9bd5c3911276a",
+      "bytes": 45
+    },
+    "runtime-198": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/sigstore-runtime-198.log",
+      "sha256": "2d5072fb235453fcf1074cdbc24d595d31b808e0d523340f84163201796e01e1",
+      "bytes": 129
+    },
+    "package-198": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/sigstore-package-198.log",
+      "sha256": "c68c17a4dce87c860bde4eb8d0706fde1cbced5d9753a4ee7c105f017da4a760",
+      "bytes": 162
+    },
+    "lifecycle": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/sigstore-lifecycle.log",
+      "sha256": "c3ef12483718e1dbe74d177a34ed44b53b087b8cb71a046a5078687cf55c603f",
+      "bytes": 119
+    },
+    "https": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/sigstore-https.log",
+      "sha256": "0cfc08f342a5c611662cfc0f8137fac906c7419fa7f959c60e2c104e4b4821a6",
+      "bytes": 101
+    },
+    "real-cosign": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/sigstore-real-cosign.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "core-partial-198": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/sigstore-core-partial-198.log",
+      "sha256": "4a522d0fc2241d711046aa361dd36ad40e358854ae4ca5bf50c4235e259743eb",
+      "bytes": 102
+    }
+  },
+  "prior_attempt": {
+    "result": "First capture used default Rust 1.97.1. Package preparation rejected absence of required 1.98.1 runtime acceptance; rerun explicitly fixed RUSTUP_TOOLCHAIN=1.98.1 without weakening the check.",
+    "runtime": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/sigstore/runtime/summary.json",
+      "sha256": "5631e10a408b27ef0e08362e73becab902f4ea72c2160800ea21c99d6d815ae4",
+      "bytes": 38040
+    },
+    "rejected_preparation_log": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/sigstore-package.log",
+      "sha256": "e5f609716c966d01b3f35115f3e51c3c213006d4f692cc72b9a4f66ac049a8b6",
+      "bytes": 1150
+    }
+  },
+  "limitations": [
+    "Lifecycle Sigstore positives use an explicit command mock; no RSA signing is performed.",
+    "upstream cosign release identity only",
+    "real cosign rejects a signature over another payload; current preserved",
+    "No candidate production Sigstore signature, publication, CRAP promotion, baseline adoption or general macro/derive certification.",
+    "This rebuild has one-system acceptance. Prior two-userspace raw evidence belongs to its original binary and is not transferred."
+  ],
+  "production_signature": false,
+  "release_ready": false,
+  "pr_draft": true
+}

@@ -1,12 +1,20 @@
 # Tasks
 
+## Current release scope (2026-09-14)
+
+The user-approved lifecycle simplification supersedes RSA/dual-signature and
+duplicate signing/approval requirements in the historical checkpoints below.
+Use SHA-256 and one exact-tag Sigstore signature. Keep version pins, installation
+verification, rollback, required gates, CRAP, actual measurement and failure
+blocking. T3–T8 remain open and #261 remains draft.
+
 ## Current continuation: line coverage and explicit CRAP review
 
 The v4 candidate adds authenticated same-owner line coverage. Core owns an exact
 line-CRAP migration preview, with required CRAP still blocked and no baseline
 adoption. PR #262 CI optimizations are synchronized from main. Complete Linux
 suite orchestration and current-stable historical comparison retain raw paths and
-binary identities. Protected candidate dual signatures and broad generated-owner
+binary identities. Candidate Sigstore verification and broad generated-owner
 capability remain independent acceptance requirements; T3–T8 stay open.
 See `docs/quality/stable-rust-line-crap-migration.md`.
 
@@ -252,7 +260,7 @@ are real test fixtures; Sigstore is mocked. The same binary passes 92 capture,
 prior failed attempts and byte measurements are recorded in
 `docs/quality/stable-rust-candidate-evidence/https-download.json` and the validation
 document. Second toolchain/system, actual process tracing, public distribution,
-real dual-signature, protected trust bootstrap and release review remain pending.
+real Sigstore verification, authenticated trust bootstrap and release review remain pending.
 These results do not complete T5 or T8, authorize publication or adopt a baseline.
 
 ## Bounded execution audit checkpoint (T7 remains incomplete)
@@ -356,6 +364,6 @@ pass five actual cosign cryptographic/integration checks; the positive is the
 upstream cosign release, and the collector rejects an unrelated signed payload.
 See `docs/quality/stable-rust-candidate-evidence/line-migration-linux.json` for
 original paths, hashes, sizes, prior failures and exact limits. The userspaces
-share a kernel. Candidate production dual signatures, macro/derive capability,
+share a kernel. Candidate production Sigstore verification, macro/derive capability,
 required-CRAP migration approval and release-hold removal are still incomplete;
 T3–T8 are not closed by this bounded matrix.
