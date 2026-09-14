@@ -571,6 +571,11 @@ jobs:
           python3 tools/quality/rust-stable-collector/validate_macro_templates.py \
             --binary target/stable-candidate-build/release/harness-gate-rust-stable-collector \
             --output target/stable-candidate-checks/macros --trace
+          cargo test --manifest-path tools/quality/fixtures/rust-generated-owners/Cargo.toml --workspace --locked
+          cargo fmt --manifest-path tools/quality/fixtures/rust-generated-owners/Cargo.toml --all -- --check
+          python3 tools/quality/rust-stable-collector/validate_generated_owners.py \
+            --binary target/stable-candidate-build/release/harness-gate-rust-stable-collector \
+            --output target/stable-candidate-checks/generated-owners --trace
           diagnostic_llvm="$(rustc --print sysroot)/lib/rustlib/x86_64-unknown-linux-gnu/bin"
           python3 tools/quality/rust-stable-collector/diagnose_macro_spans.py \
             --output target/stable-candidate-checks/macro-spans --toolchain 1.98.1 \
