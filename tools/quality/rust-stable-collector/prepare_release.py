@@ -16,6 +16,8 @@ import tarfile
 import tempfile
 import tomllib
 
+# Candidate builds and lifecycle fixtures use this compiler, independently of MSRV.
+CURRENT_RUST = '1.98.1'
 PROGRAM = 'harness-gate-rust-stable-collector'
 TARGET = 'x86_64-unknown-linux-gnu'
 ROOT = Path(__file__).resolve().parents[3]
@@ -190,7 +192,7 @@ def acceptance(path, pin, binary):
 
 
 def prepare(output, target_dir, toolchain, observations):
-    require(toolchain == '1.98.1', 'current candidate build requires Rust 1.98.1')
+    require(toolchain == CURRENT_RUST, f'current candidate build requires Rust {CURRENT_RUST}')
     require(not output.exists() and not output.is_symlink(), 'output must be fresh')
     require(target_dir.is_absolute() and target_dir.is_relative_to(ROOT / 'target'),
             'build target must stay in this workspace target directory')
@@ -301,7 +303,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--target-dir', type=Path, required=True)
-    parser.add_argument('--toolchain', choices=('1.98.1',), required=True)
+    parser.add_argument('--toolchain', choices=(CURRENT_RUST,), required=True)
     parser.add_argument('--acceptance', nargs=2, action='append', required=True, metavar=('SUMMARY', 'SHA256'))
     args = parser.parse_args()
     result = prepare(args.output.absolute(), args.target_dir.resolve(), args.toolchain,
