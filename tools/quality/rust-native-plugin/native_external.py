@@ -111,7 +111,7 @@ def adapter(root, status, args):
                    'signed environment mismatch')
     native.require(request['args'] == sys.argv[1:], 'external dependency options differ from signed arguments')
     executable = Path(os.environ['HARNESS_GATE_NATIVE_EXECUTABLE']).resolve(strict=True)
-    native.require(Path(request['adapter']['executable']).resolve(strict=True) == executable
+    native.require(Path(request['adapter']['executable']).samefile(executable)
                    and native.file_hash(executable) == request['adapter']['source_digest'], 'adapter executable identity mismatch')
     native.require(request['adapter']['name'] == 'harness-gate-rust-collector'
                    and request['adapter']['version'] == os.environ['HARNESS_GATE_NATIVE_VERSION'], 'adapter version mismatch')
