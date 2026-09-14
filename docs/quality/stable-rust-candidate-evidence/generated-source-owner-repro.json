@@ -1,0 +1,81 @@
+{
+  "schema": "rust-generated-source-owner-repro/v1",
+  "kind": "actual Linux x86_64 source-coverage exports; focused re-check of the GH-259 generated-owner gap on the required compiler",
+  "date_utc": "2026-09-14",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "llvm_version": "22.1.8",
+  "cargo_llvm_cov": "cargo-llvm-cov 0.9.0",
+  "target": "x86_64-unknown-linux-gnu",
+  "runtime": "real cargo test runs under -C instrument-coverage via cargo-llvm-cov; JSON format 3.1.0",
+  "purpose": "Confirm whether the function-like proc-macro generated-owner gap persists on the required compiler, and test whether emitting the generated source into a real file yields distinct owners with a real zero record for an unexecuted function.",
+  "cases": [
+    {
+      "name": "proc-macro token stream (pinned fixture, default)",
+      "fixture": "tools/quality/fixtures/rust-macro-observation",
+      "configuration": "default",
+      "tests_executed": ["generated_functions_execute_real_code", "configuration_selects_the_actual_invocation"],
+      "owners_exported": [
+        "gate_observation_macros::observed_function",
+        "gate_observation_generator::expand",
+        "gate_observation_generator::generate",
+        "gate_observation_generator::Input::parse",
+        "gate_observation_generator::Decisions::visit_expr_if",
+        "gate_observation_consumer::tests::generated_functions_execute_real_code",
+        "gate_observation_consumer::tests::configuration_selects_the_actual_invocation"
+      ],
+      "generated_business_owners_present": false,
+      "missing": ["plain", "branch", "unexecuted", "configured"],
+      "note": "Only the macro implementation and the two consumer test functions appear. The generated business functions have no function entry. This reproduces the recorded 1.97.1 gap on 1.98.1."
+    },
+    {
+      "name": "proc-macro token stream (pinned fixture, branching)",
+      "fixture": "tools/quality/fixtures/rust-macro-observation",
+      "configuration": "branching",
+      "generated_business_owners_present": false,
+      "missing": ["plain", "branch", "unexecuted", "configured"],
+      "note": "Same omission with the branching feature; visit_expr_if count changes 2 -> 3, confirming the feature actually selected different generated tokens."
+    },
+    {
+      "name": "generated source placed in a real file and pulled in by include!",
+      "fixture": "ad hoc, same two-template generator shape",
+      "configuration": "default",
+      "tests_executed": ["tests::runs"],
+      "owners_exported": [
+        "include_probe::plain (count 1)",
+        "include_probe::branch (count 2)",
+        "include_probe::unexecuted (count 0, explicit zero record)",
+        "include_probe::tests::runs (count 1)"
+      ],
+      "generated_business_owners_present": true,
+      "note": "When the generated source text is a real file brought into the crate, each generated function gets a distinct owner with real counters, and the deliberately unexecuted function gets an explicit zero record rather than being absent."
+    },
+    {
+      "name": "generated source written by a build script into OUT_DIR and pulled in by include!",
+      "fixture": "ad hoc build.rs + include!(concat!(env!(OUT_DIR), ...))",
+      "configuration": "default",
+      "owners_exported": [
+        "genprobe::plain (count 1)",
+        "genprobe::branch (count 2)",
+        "genprobe::unexecuted (count 0, explicit zero record)",
+        "genprobe::tests::runs (count 1)"
+      ],
+      "owner_filename": "<target>/debug/build/<pkg>/out/generated_owners.rs",
+      "generated_business_owners_present": true,
+      "note": "Same result when the generated file is produced at build time and included by path, which matches how a build-time generator would share one generation path between the macro entry and the collector."
+    }
+  ],
+  "finding": "The omission is not tied to the compiler version: Rust 1.98.1 with matching LLVM reproduces the 1.97.1 result for the token-stream macro. Distinct generated owners, including a real zero record for an unexecuted function, are obtainable on this same stable compiler when the generated source is a real file brought in by include! rather than only a proc-macro TokenStream.",
+  "scope_limits": [
+    "This is a bounded two-template observation, not general macro support.",
+    "It does not certify generated-function coverage for the proc-macro path, which remains unsupported.",
+    "It does not compute CRAP; CRAP needs certified complexity and coverage identity for the same owner and an accepted migration.",
+    "Owner names above are demangled for readability; the raw exports use mangled symbols with source filenames.",
+    "Not cross-system acceptance and not a production-signature result.",
+    "Core thresholds, requiredness, baselines and historical evidence are unchanged."
+  ],
+  "next_actions": [
+    "Submit the prepared upstream capability reports through a maintainer with issue-creation permission; the current token receives HTTP 403 on rust-lang/rust.",
+    "Decide with Core review whether a real-file generator path (shared generation library that also emits a bound source file) is an acceptable supported boundary for generated owners, before any metric promotion.",
+    "Keep generated proc-macro coverage and CRAP explicitly unsupported until a real mapping exists."
+  ]
+}

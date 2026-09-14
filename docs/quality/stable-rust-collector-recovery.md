@@ -191,6 +191,25 @@ runtime trace and the earlier local diagnostic setup limitation. Neither a passi
 diagnostic nor its trace creates the missing generated owners. No global toolchain
 default was changed here.
 
+### Re-check on 1.98.1 and a real-file generated-source alternative (2026-09-14)
+
+The generated-owner gap was re-checked on the required compiler, Rust 1.98.1 with
+LLVM 22.1.8 and cargo-llvm-cov 0.9.0. Both fixture configurations still pass and
+still omit `plain`, `branch`, `unexecuted` and `configured`; only the macro
+implementation and the two consumer test functions are exported. The gap is a
+current-stable behavior, not a 1.97.1 artifact.
+
+A bounded alternative was reproduced on the same compiler. Emitting the generated
+source into a real file and bringing it in with `include!` (directly, and
+separately from a build script into `OUT_DIR`) gives each generated function a
+distinct owner with real counters, and the deliberately unexecuted function gets an
+explicit zero record instead of being absent. The generated file is a normal crate
+source, so no compiler-private interface is involved. This is not adopted: the
+proc-macro token-stream path stays unsupported for coverage and CRAP, the alternative
+is a two-template observation only, and Core review plus an accepted metric
+migration would be required before any promotion. The exact owners and limits are in
+[generated-source-owner-repro.json](stable-rust-candidate-evidence/generated-source-owner-repro.json).
+
 The smallest remaining T4 action is a compiler capability request using the pinned
 function-like and built-in Clone reproductions above: expose real, distinct
 generated-function owners and counters (including emitted unexecuted functions)
