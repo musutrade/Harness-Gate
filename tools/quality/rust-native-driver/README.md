@@ -1,5 +1,10 @@
 # Pinned native production measurement
 
+The [standalone native plugin](../rust-native-plugin/README.md) packages this
+unchanged engine with external dependencies. `rustc-dev` is needed to build the
+driver; running its binary needs the matching compiler libraries/sysroot and
+LLVM tools, without requiring the build-only development crates.
+
 This page documents source development commands. Users of the published optional
 Rust plugin should start with the [installation guide](../../../docs/quality/rust-collector-installation.md)
 and [current compatibility record](../../../docs/release-status.md#compatibility).
