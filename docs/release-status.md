@@ -19,12 +19,24 @@ completed; Core 0.4.3 is also on crates.io. The public four-host inventories,
 checksums, exact-tag signatures and source provenance were verified. The actual
 installed Linux pair passed all 17 native/Core acceptance tests without skips.
 
-Source versions native `0.1.0-rc.6` and Core `0.4.4` fix
-[project CRAP policy configuration](quality/native-crap-policy.md) and update the
-installer default. They require their own exact-commit CI, four-platform native
-acceptance and immutable publication. Publish and verify the native release
-before tagging its Core installer. Existing release records below retain their
-original dates, identities and scope.
+Native [0.1.0-rc.6](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-v0.1.0-rc.6)
+is published from `caadbeb2a37fb0dc24a84b0d80ceeaa40f185aa2`. Its
+[release run](https://github.com/musutrade/Harness-Gate/actions/runs/34865689734)
+passed all 22 native/Core acceptance tests on each of the four platforms without
+skips. All 30 public assets, checksums, signatures and exact-source provenance
+were independently verified. It fixes
+[project CRAP policy configuration](quality/native-crap-policy.md).
+
+Core `v0.4.4` was tagged at the same commit, but its
+[release audit](https://github.com/musutrade/Harness-Gate/actions/runs/34868049009)
+blocked publication on newly published
+[RUSTSEC-2026-0285](https://rustsec.org/advisories/RUSTSEC-2026-0285): the locked
+`rustls 0.23.43` requires `>=0.23.45`. No Core 0.4.4 release or crate was published.
+The tag and failed evidence remain immutable; no audit exception is added.
+
+Source Core `0.4.5` locks `rustls 0.23.45` and retains native RC6 as its installer
+default. It requires its own exact-commit CI, four-platform release and public
+verification. Existing release records below retain their original identities.
 
 ## Bundled delivery acceptance, 2026-09-13
 
