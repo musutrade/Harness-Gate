@@ -241,6 +241,15 @@ SHA-256. It MUST require the existing separately pinned signing trust and full
 release verification before activation. It MUST NOT silently discover/adopt another
 release, accept unsigned assets, download a toolchain or install host trust.
 
+#### Scenario: Installer creates directories under a permissive umask
+
+- GIVEN a safe user-owned installation root and umask 0002, 0022 or 0077
+- WHEN the installer creates its versions directory
+- THEN its mode is 0755 filtered by that umask and verified installation succeeds
+- AND repeated installation preserves the existing safe directory mode
+- AND an existing group/world-writable versions directory is rejected without
+  changing its permissions or the previously runnable selected version.
+
 #### Scenario: Redirect or response violates the request
 
 - GIVEN a valid existing installation and an explicitly pinned download request

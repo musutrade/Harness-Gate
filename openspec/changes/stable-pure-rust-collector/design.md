@@ -280,3 +280,13 @@ for the exact built binary. Two-system validation, generated-owner certification
 required CRAP/migration review and protected signatures remain independent gates.
 See `docs/quality/stable-rust-collector-recovery.md` for the operator evidence and
 remaining stable compiler capability requests.
+
+### Installation directory creation
+
+The Rust lifecycle creates its own versions directory with DirBuilder mode 0755
+at mkdir time, still filtered by the invoking process's umask. It does not change
+the process-global umask or chmod an existing directory. Existing ownership and
+group/world-write rejection remain in force. Real first/repeated installation
+and rejected unsafe-directory checks run under 0002, 0022 and 0077 in the required
+lifecycle driver. A focused permissions-only mode avoids rebuilding unrelated
+upgrade fixtures when diagnosing this boundary; it is not release acceptance.
