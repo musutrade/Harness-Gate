@@ -24,7 +24,7 @@ path = "src/process/tests.rs"
 symbol = "timeout_terminates_the_task"
 start = 11
 end = 23
-sha256 = "ecd32ead844928fb04998e51140ebbc8b82c79396c9a2c0f8b0fce552ecf4007"
+sha256 = "f457244e862fb38c8bbe65740c7e223f5ef2674fd4339d92a6ce8b9eab2c24c8"
 [[paths.probes]]
 line = 253
 column = 24
@@ -65,12 +65,12 @@ module = "process"
 test = "process::tests::timeout_terminates_process_tree_without_a_descendant_leak"
 platforms = ["linux", "macos", "windows"]
 platform_note = "Runs on all supported host platforms; no external daemon required."
-observable = "Timeout result fails and the descendant marker is absent after its deadline."
+observable = "TaskResult.timed_out=true and passed=false; the descendant was ready before cleanup and does not acknowledge a probe sent after Task::run returns."
 rule = "critical-path-source-v2"
 owner = "Harness-Gate maintainers"
-review_date = "2026-09-07"
+review_date = "2026-09-14"
 binary = "harness-gate"
-assertions = ["assert!(!result.passed);", "assert!(!marker.exists(), \"timed-out task left a descendant process\");"]
+assertions = ["assert!(result.timed_out, \"fixture must reach the timeout boundary\");", "assert!(!result.passed);", "marker.with_extension(\"ready\").exists(),", "fs::write(marker.with_extension(\"probe\"), b\"probe\").expect(\"send liveness probe\");", "assert!(!marker.exists(), \"timed-out task left a descendant process\");"]
 [paths.source]
 path = "src/process/task.rs"
 symbol = "run"
@@ -80,9 +80,9 @@ sha256 = "bbb7f1d90d741f41c6cb761f1433f4cb7c8ca168fac0082bd366a9377ae149a8"
 [paths.test_source]
 path = "src/process/tests.rs"
 symbol = "timeout_terminates_process_tree_without_a_descendant_leak"
-start = 127
-end = 161
-sha256 = "ecd32ead844928fb04998e51140ebbc8b82c79396c9a2c0f8b0fce552ecf4007"
+start = 156
+end = 197
+sha256 = "f457244e862fb38c8bbe65740c7e223f5ef2674fd4339d92a6ce8b9eab2c24c8"
 [[paths.probes]]
 line = 253
 column = 24
