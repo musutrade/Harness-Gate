@@ -11,6 +11,7 @@ import sys
 import harness_evidence as evidence
 import project_model as model
 import rust_native_driver as native
+import rust_native_config as configuration
 
 COLLECTOR = {'name': 'rust-native-production', 'version': '1'}
 
@@ -34,11 +35,11 @@ def require_history(base, head, hotspots):
         native.require(set(hotspots) <= {f['name'] for f in report['functions']}, 'missing selected hotspot')
 
 
-def project(report, root, sources, context, project_id, hotspots):
+def project(report, root, sources, context, project_id, hotspots, component='rust'):
     root.mkdir(parents=True, exist_ok=False)
     native.write_json(root / 'native.json', report)
     document = {'schema': 'harness-project/v1', 'id': project_id, 'metadata': {}, 'relationships': [],
-                'components': [{'id': 'rust', 'path': '.', 'metadata': {},
+                'components': [{'id': component, 'path': '.', 'metadata': {},
                     'targets': [{'id': context['target'], 'boundaries': ['production'], 'metadata': {}}],
                     'source_boundaries': [{'id': 'production', 'path': '.', 'role': 'production', 'metadata': {}}]}],
                 'subjects': []}
@@ -62,7 +63,7 @@ def project(report, root, sources, context, project_id, hotspots):
         'coverage.' + name: ratio(report['coverage'][plural])
         for name, plural in [('line', 'lines'), ('region', 'regions'), ('function', 'functions')]}))
     for key, path, function, values in rows:
-        subject = {'id': 'subject-identity/v1:' + '0' * 64, 'identity_version': 'subject-identity/v1', 'component': 'rust',
+        subject = {'id': 'subject-identity/v1:' + '0' * 64, 'identity_version': 'subject-identity/v1', 'component': component,
                    'target': context['target'], 'boundary': 'production',
                    'kind': 'function/v1' if function else 'boundary/v1', 'path': path,
                    'discriminator': key, 'source_sha256': inventory[path],
@@ -81,7 +82,7 @@ def project(report, root, sources, context, project_id, hotspots):
                     'sha256': native.file_hash(root / 'native.json'), 'bytes': (root / 'native.json').stat().st_size,
                     'context': context, 'source': source}
         records.append({'schema': 'harness-evidence/v1', 'id': 'native-' + key, 'project': project_id,
-                        'component': 'rust', 'collector': COLLECTOR, 'series': series, 'subject': subject,
+                        'component': component, 'collector': COLLECTOR, 'series': series, 'subject': subject,
                         'context': context, 'source': source, 'status': 'measured', 'artifacts': [artifact],
                         'metrics': [{'name': m, 'value': v, 'artifacts': ['native']} for m, v in values.items()],
                         'capabilities': [{'metric': m, 'state': 'supported', 'reason': 'Independent native counters',
@@ -95,8 +96,8 @@ def ratio(counts):
     return {'type': 'ratio', 'covered': counts['covered'], 'total': counts['count']}
 
 
-def policy_and_lineage(base, head, base_projection, head_projection, hotspots):
-    """Declare the existing 80/80/30, changed CC>10, selected and legacy scopes.
+def policy_and_lineage(base, head, base_projection, head_projection, hotspots, crap_rule):
+    """Apply the configured CRAP ceiling with native changed/selected debt scopes.
 
     The Rust core calculates absolute outcomes, debt, trend and the aggregate.
     Rename/move/split history requires a separately reviewed explicit mapping;
@@ -124,24 +125,30 @@ def policy_and_lineage(base, head, base_projection, head_projection, hotspots):
             rules.append({'id': 'native-' + key + '.' + metric,
                           'scope': {'kind': 'subject', 'subject': subject['id']}, 'metric': metric,
                           'operator': 'le' if metric == 'risk.crap' else 'ge',
-                          'limit': {'type': 'rational', 'numerator': 30, 'denominator': 1} if metric == 'risk.crap'
+                          'limit': crap_rule['limit'] if metric == 'risk.crap'
                           else {'type': 'ratio', 'covered': 4, 'total': 5},
                           'required': True, 'on_violation': 'fail',
                           'ratchet': {'deny_regression': True, 'allow_legacy_debt': not absolute},
                           'remediation_classes': ['review_native_production_evidence']})
+            if metric == 'risk.crap':
+                rules[-1]['remediation_classes'] = crap_rule['remediation_classes']
+                rules[-1]['ratchet']['allow_legacy_debt'] &= crap_rule['ratchet']['allow_legacy_debt']
     return ({'schema': 'harness-policy/v1', 'rules': rules},
             {'schema': 'subject-mappings/v1', 'project': head_projection['project']['id'], 'mappings': mappings}, identities)
 
 
 def evaluate(base_directory, base_anchor, head_directory, head_anchor, output, binary,
-             base_context, head_context, project_id, hotspots=(), explicit_mappings=()):
+             base_context, head_context, project_id, hotspots=(), explicit_mappings=(), *,
+             repository_root, policy_binding):
     """Both anchors must come from a trusted host; neither is inferred from disk."""
     import shutil
     output = Path(output).resolve()
     output.mkdir(parents=True, exist_ok=False)
+    binding = configuration.load(repository_root, policy_binding, project_id, binary, output)
     base, head = (native.certify(Path(d), a) for d, a in
                   [(base_directory, base_anchor), (head_directory, head_anchor)])
     require_history(base, head, hotspots)
+    configuration.require_scope(binding, (base, head))
     native.require(head_context['base_commit'] == base_context['commit'], 'unrelated baseline commit')
     native.require(head_context['target'] == base_context['target'], 'incompatible target')
     projections = []
@@ -153,8 +160,10 @@ def evaluate(base_directory, base_anchor, head_directory, head_anchor, output, b
         else:
             source.mkdir()
             shutil.copyfile(Path(directory) / 'fixture.rs', source / 'fixture.rs')
-        projections.append(project(report, output / label, source, context, project_id, hotspots))
-    policy, mappings, identities = policy_and_lineage(base, head, *projections, hotspots)
+        projections.append(project(report, output / label, source, context, project_id, hotspots, binding['component']))
+        native.write_json(output / (label + '-evidence.json'), projections[-1]['evidence'])
+    configuration.require_series(binding, projections)
+    policy, mappings, identities = policy_and_lineage(base, head, *projections, hotspots, binding['rule'])
     # The released core validates explicit rename/move/split cardinality and
     # collisions with automatic same-owner modifications. Never infer renames.
     mappings['mappings'].extend(explicit_mappings)
@@ -182,7 +191,7 @@ def evaluate(base_directory, base_anchor, head_directory, head_anchor, output, b
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('base', 'base-anchor', 'head', 'head-anchor', 'output', 'harness-gate',
-                 'base-context', 'head-context', 'project'):
+                 'base-context', 'head-context', 'project', 'repository-root', 'policy-binding'):
         parser.add_argument('--' + name, required=True)
     parser.add_argument('--hotspots', required=True, help='JSON array of explicitly selected compiler names (may be empty)')
     parser.add_argument('--mappings', help='JSON array of reviewed explicit subject lineage mappings')
@@ -191,7 +200,8 @@ def main():
         report = evaluate(args.base, args.base_anchor, args.head, args.head_anchor, args.output, args.harness_gate,
                           json.loads(Path(args.base_context).read_text()), json.loads(Path(args.head_context).read_text()),
                           args.project, json.loads(Path(args.hotspots).read_text()),
-                          json.loads(Path(args.mappings).read_text()) if args.mappings else ())
+                          json.loads(Path(args.mappings).read_text()) if args.mappings else (),
+                          repository_root=args.repository_root, policy_binding=args.policy_binding)
         print(json.dumps(report['aggregate']))
         return int(report['aggregate']['state'] != 'pass')
     except (ValueError, KeyError, OSError) as error:

@@ -6,6 +6,10 @@ embeds our precompiled driver, adapter sources, schemas and license notices.
 It checks those bytes before running external isolated Python (`-I -S -B -X utf8`).
 
 See the [delivery and installation contract](../../../docs/quality/native-external-toolchain.md).
+Direct `evaluate` requires `--repository-root` and `--policy-binding`; the existing
+project policy rule supplies its CRAP ceiling. See [configuration and failure
+behavior](../../../docs/quality/native-crap-policy.md). No unconfigured fallback
+is packaged.
 
 The release builds natively for Linux x86_64, macOS Intel, macOS Apple Silicon,
 and Windows x86_64 MSVC, matching Core's executable targets. Each target runs the
