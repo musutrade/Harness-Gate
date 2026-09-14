@@ -1,0 +1,18 @@
+[package]
+name = "harness-gate-exec-audit"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.98.1"
+publish = false
+autotests = false
+license = "MIT"
+
+[dependencies]
+libc = "=0.2.189"
+serde_json = "=1.0.151"
+
+[[bin]]
+name = "audit-probe"
+path = "tests/probe.rs"
+
+[workspace]

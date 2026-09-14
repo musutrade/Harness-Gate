@@ -15,7 +15,7 @@ import signal
 import subprocess
 import time
 
-from validate_stable_candidate import check_trace
+from validate_stable_candidate import check_trace, trace_command
 from validate_upgrade import build_programs
 
 PROGRAM = 'harness-gate-rust-stable-collector'
@@ -114,7 +114,7 @@ exit 0
         command = [str(binary), *map(str, argv), str(output / f'log-{name}')]
         trace = output / f'{name}.execve'
         if args.trace:
-            command = ['strace', '-f', '-q', '-s', '16384', '-e', 'trace=execve', '-o', str(trace), *command]
+            command = trace_command(trace, command)
         result = subprocess.run(command, capture_output=True, timeout=80)
         if args.trace:
             check_trace(trace)

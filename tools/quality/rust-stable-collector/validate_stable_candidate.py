@@ -23,6 +23,43 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def trace_command(path, command):
+    """Repository observer; no fallback to lossy syscall text or untraced runs."""
+    helper = os.environ.get('HARNESS_EXEC_AUDIT')
+    assert helper and Path(helper).is_file(), 'set HARNESS_EXEC_AUDIT to the built repository exec observer'
+    return [helper, str(path), '--', *map(str, command)]
+
+
+def check_exec_events(path):
+    def unique_object(pairs):
+        result = {}
+        for key, value in pairs:
+            assert key not in result, 'duplicate execution event field'
+            result[key] = value
+        return result
+    records = [json.loads(line, object_pairs_hook=unique_object) for line in path.read_text().splitlines()]
+    assert len(records) >= 3, 'incomplete execution event stream'
+    start, finish = records[0], records[-1]
+    assert set(start) == {'event', 'schema', 'root_pid', 'scope'}
+    assert start['event'] == 'start' and start['schema'] == 'harness-exec-events/v1'
+    assert start['scope'] == 'successful-exec' and type(start['root_pid']) is int and start['root_pid'] > 0
+    assert set(finish) == {'event', 'exec_count', 'root_exit_code'}
+    assert finish['event'] == 'complete' and type(finish['exec_count']) is int
+    assert finish['exec_count'] == len(records) - 2
+    assert type(finish['root_exit_code']) is int and 0 <= finish['root_exit_code'] <= 255
+    assert records[1].get('pid') == start['root_pid'], 'missing root execution'
+    for record in records[1:-1]:
+        assert set(record) == {'event', 'pid', 'executable', 'argv'}
+        assert record['event'] == 'exec' and type(record['pid']) is int and record['pid'] > 0
+        assert isinstance(record['executable'], str) and record['executable'].startswith('/')
+        assert isinstance(record['argv'], list) and record['argv'] and all(isinstance(x, str) for x in record['argv'])
+        for argument in [record['executable'], *record['argv']]:
+            assert '\0' not in argument
+            assert not re.search(r'(?:^|/)(?:python|pypy)[^/ ]*$', argument), record
+            assert not argument.startswith(('-Z', '+nightly')), record
+            assert not re.search(r'/nightly[-/]|rustc-dev|rustc_driver|RUSTC_BOOTSTRAP=', argument), record
+
+
 def check_trace(path):
     """Audit complete execve records from our untimestamped strace invocation.
 
@@ -30,6 +67,8 @@ def check_trace(path):
     syscalls must be joined by PID before inspecting their arguments. This does
     not audit the environment behind strace's default pointer/count rendering.
     """
+    if path.read_text().startswith('{'):
+        return check_exec_events(path)
     quoted = r'"(?:[^"\\\n]|\\(?:[0-7]{1,3}|x[0-9a-fA-F]{2}|[abfnrtv\\"]))*"'
     strings = rf'{quoted}(?:,\s*{quoted})*'
     array = rf'\[(?:{strings})?\]'
@@ -68,7 +107,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--binary', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--trace', action='store_true', help='require strace; fail if unavailable')
+    parser.add_argument('--trace', action='store_true', help='require HARNESS_EXEC_AUDIT observer; fail if unavailable')
     args = parser.parse_args()
     binary = args.binary.resolve(strict=True)
     args.output.mkdir(parents=True, exist_ok=False)
@@ -86,7 +125,7 @@ def main():
         invocation = [str(binary), *map(str, command)]
         trace_path = output / f'{name}.execve'
         if args.trace and trace:
-            invocation = ['strace', '-f', '-q', '-s', '16384', '-e', 'trace=execve', '-o', str(trace_path), *invocation]
+            invocation = trace_command(trace_path, invocation)
         result = subprocess.run(invocation, capture_output=True, env=env, timeout=360)
         (output / f'{name}.stdout').write_bytes(result.stdout)
         (output / f'{name}.stderr').write_bytes(result.stderr)

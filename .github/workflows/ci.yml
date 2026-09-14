@@ -532,8 +532,14 @@ jobs:
         run: |
           rustup toolchain install 1.98.1 --profile minimal --component llvm-tools-preview,rustfmt,clippy
           cargo +1.98.1 install cargo-llvm-cov --version 0.9.0 --locked
-          sudo apt-get update
-          sudo apt-get install --yes strace
+          CARGO_TARGET_DIR="$PWD/target/exec-audit" cargo +1.98.1 build \
+            --manifest-path tools/quality/exec-audit/Cargo.toml --release --locked
+          cargo +1.98.1 fmt --manifest-path tools/quality/exec-audit/Cargo.toml --all -- --check
+          CARGO_TARGET_DIR="$PWD/target/exec-audit" cargo +1.98.1 clippy \
+            --manifest-path tools/quality/exec-audit/Cargo.toml --all-targets --locked -- -D warnings
+          echo "HARNESS_EXEC_AUDIT=$PWD/target/exec-audit/release/harness-gate-exec-audit" >> "$GITHUB_ENV"
+          HARNESS_EXEC_AUDIT="$PWD/target/exec-audit/release/harness-gate-exec-audit" \
+            python3 tools/quality/exec-audit/test_acceptance.py
 
       - name: Build and run pure Rust candidate with execution traces
         env:
@@ -552,8 +558,7 @@ jobs:
             -u RUSTC_WRAPPER -u RUSTC_WORKSPACE_WRAPPER \
             cargo test --manifest-path tools/quality/rust-stable-collector/Cargo.toml --locked
           cargo clippy --manifest-path tools/quality/rust-stable-collector/Cargo.toml --all-targets --locked -- -D warnings
-          # Retain process exit records; -qq suppresses lifecycle evidence.
-          strace -f -q -s 16384 -e trace=execve -o target/stable-candidate-checks/build.execve \
+          "$HARNESS_EXEC_AUDIT" target/stable-candidate-checks/build.execve -- \
             cargo build --manifest-path tools/quality/rust-stable-collector/Cargo.toml --release --locked
           python3 -c 'from pathlib import Path; import sys; sys.path.insert(0, "tools/quality/rust-stable-collector"); from validate_stable_candidate import check_trace; check_trace(Path("target/stable-candidate-checks/build.execve"))'
           # The collector rejects inherited compiler injection, including empty flags.
@@ -579,7 +584,7 @@ jobs:
             if [ "$fixture" = registry ]; then
               candidate_env=(env "CARGO_HOME=$PWD/target/stable-candidate-checks/runtime/registry-cargo-home")
             fi
-            "${candidate_env[@]}" strace -f -q -s 16384 -e trace=execve -o "target/stable-candidate-checks/core-${fixture}.execve" \
+            "${candidate_env[@]}" "$HARNESS_EXEC_AUDIT" "target/stable-candidate-checks/core-${fixture}.execve" -- \
               target/stable-candidate-build/debug/examples/stable_collector_acceptance \
                 target/stable-candidate-build/release/harness-gate-rust-stable-collector \
                 target/stable-candidate-build/debug/harness-gate \
