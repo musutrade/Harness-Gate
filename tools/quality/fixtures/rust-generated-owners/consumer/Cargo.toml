@@ -1,0 +1,12 @@
+[package]
+name = "gate-generated-owner-consumer"
+version = "0.1.0"
+edition = "2021"
+publish = false
+build = "build.rs"
+
+[features]
+branching = []
+
+[build-dependencies]
+gate-generated-owner-generator = { path = "../generator" }

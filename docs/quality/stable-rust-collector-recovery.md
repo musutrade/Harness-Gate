@@ -210,6 +210,20 @@ is a two-template observation only, and Core review plus an accepted metric
 migration would be required before any promotion. The exact owners and limits are in
 [generated-source-owner-repro.json](stable-rust-candidate-evidence/generated-source-owner-repro.json).
 
+### A stable generated-owner alternative (2026-09-14)
+
+A real-file generator path was implemented and verified on 1.98.1:
+`tools/quality/fixtures/rust-generated-owners` has a dependency-free shared
+generator that a build script writes into `OUT_DIR`, and the consumer pulls the
+result in with `include!`. Generated functions then get distinct owners with real
+counters, and an unexecuted generated function gets an explicit zero record. The
+repository-only regression `validate_generated_owners.py` passes 7 real checks
+(tests and coverage in both configurations, then doctor/prepare/collect) and is
+wired into Quality Script Tests. The proc-macro token-stream path remains
+`unsupported`; this alternative is a boundary change that needs Core review and an
+accepted metric migration before promotion. See
+[stable-rust-generated-owners.md](stable-rust-generated-owners.md).
+
 The smallest remaining T4 action is a compiler capability request using the pinned
 function-like and built-in Clone reproductions above: expose real, distinct
 generated-function owners and counters (including emitted unexecuted functions)
