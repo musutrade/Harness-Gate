@@ -1,0 +1,284 @@
+{
+  "schema": "rust-stable-install-permissions-checkpoint/v1",
+  "issue": 259,
+  "pr": 261,
+  "date": "2026-09-14",
+  "publication_parent": "9dec7e7b10bde2f9a5b09f557d51ba755462a093",
+  "scope": "Focused T5 own-directory creation fix; T3-T8 and the protected release hold remain open.",
+  "rust": {
+    "version": "1.98.1",
+    "commit": "48a229ceaefd4985c50990b14116b6d856af0985",
+    "llvm": "22.1.8",
+    "target": "x86_64-unknown-linux-gnu",
+    "default_toolchain_changed": false
+  },
+  "before": {
+    "command": "python3 tools/quality/rust-stable-collector/validate_lifecycle.py --binary target/gh-259/package-output-02/unsigned-package/harness-gate-rust-stable-collector --package target/gh-259/package-output-02/unsigned-package --output target/gh-259/umask-before --permissions-only",
+    "collector": {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/package-output-02/unsigned-package/harness-gate-rust-stable-collector",
+      "sha256": "adeaf2d1a53e182f810097161c93ec83d8b32bcc5afefd9ec67ed20f87402ed3",
+      "bytes": 3488488
+    },
+    "result": "Real install under umask 0002 exits 1: measurement_error: unsafe versions directory; focused driver stops on this first failure."
+  },
+  "after": {
+    "command": "python3 tools/quality/rust-stable-collector/validate_lifecycle.py --binary target/gh-259/stable-target/release/harness-gate-rust-stable-collector --package target/gh-259/umask-test-only-package --output target/gh-259/umask-after --permissions-only",
+    "collector": {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/stable-target/release/harness-gate-rust-stable-collector",
+      "sha256": "b58880df8caa60d26e28cdf07931232f34d37e5532200083a8d7d710eab8aad9",
+      "bytes": 3497880
+    },
+    "summary": {
+      "schema": "rust-stable-install-permissions-acceptance/v1",
+      "collector_sha256": "b58880df8caa60d26e28cdf07931232f34d37e5532200083a8d7d710eab8aad9",
+      "checks": [
+        {
+          "name": "install-umask-0002",
+          "exit_code": 0,
+          "passed": true,
+          "umask": "0002",
+          "versions_mode": "0755"
+        },
+        {
+          "name": "install-umask-0002-existing",
+          "exit_code": 0,
+          "passed": true
+        },
+        {
+          "name": "install-umask-0002-unsafe",
+          "exit_code": 1,
+          "passed": true
+        },
+        {
+          "name": "install-umask-0022",
+          "exit_code": 0,
+          "passed": true,
+          "umask": "0022",
+          "versions_mode": "0755"
+        },
+        {
+          "name": "install-umask-0022-existing",
+          "exit_code": 0,
+          "passed": true
+        },
+        {
+          "name": "install-umask-0022-unsafe",
+          "exit_code": 1,
+          "passed": true
+        },
+        {
+          "name": "install-umask-0077",
+          "exit_code": 0,
+          "passed": true,
+          "umask": "0077",
+          "versions_mode": "0700"
+        },
+        {
+          "name": "install-umask-0077-existing",
+          "exit_code": 0,
+          "passed": true
+        },
+        {
+          "name": "install-umask-0077-unsafe",
+          "exit_code": 1,
+          "passed": true
+        }
+      ],
+      "rsa": "real RSA-2048/SHA-256; repository-generated test key",
+      "sigstore": "MOCK invocation only; no cryptographic acceptance",
+      "production_signature": false,
+      "traced": false
+    },
+    "result": "Nine real install/reinstall/unsafe-directory cases pass. New modes are 0755, 0755 and 0700 for umasks 0002, 0022 and 0077. Rejected existing 0775 directories retain their mode, current symlink, binary digest and runnable selected program."
+  },
+  "fixture_boundary": {
+    "package": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/umask-test-only-package",
+    "kind": "Synthetic four-file install test fixture, not a prepared or publishable release.",
+    "construction": [
+      "Copy LICENSE and candidate support/inventory schema from the previous unsigned package.",
+      "Replace the executable with the newly built Rust 1.98.1 binary and recompute byte counts and digests.",
+      "Replace all support observations with the SHA-256 of umask-test-only-metadata.json explicitly declaring the synthetic scope; retain no historical runtime observation.",
+      "The repository lifecycle driver generates a real RSA-2048 test key and signature; the Sigstore invocation is mocked."
+    ],
+    "new_binary_capture_or_trace_acceptance": false,
+    "production_signature_acceptance": false,
+    "user_installation_modified": false,
+    "production_publication": false
+  },
+  "validation": [
+    {
+      "command": "CARGO_TARGET_DIR=\"$PWD/target/gh-259/stable-target\" RUSTUP_TOOLCHAIN=1.98.1 cargo build --release --locked --manifest-path tools/quality/rust-stable-collector/Cargo.toml",
+      "exit_code": 0
+    },
+    {
+      "command": "RUSTUP_TOOLCHAIN=1.98.1 cargo fmt --manifest-path tools/quality/rust-stable-collector/Cargo.toml -- --check",
+      "exit_code": 0
+    },
+    {
+      "command": "RUSTUP_TOOLCHAIN=1.98.1 cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "exit_code": 0
+    },
+    {
+      "command": "CARGO_TARGET_DIR=\"$PWD/target/gh-259/stable-target\" RUSTUP_TOOLCHAIN=1.98.1 cargo clippy --manifest-path tools/quality/rust-stable-collector/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 0
+    },
+    {
+      "command": "CARGO_TARGET_DIR=\"$PWD/target/gh-259/core-target\" RUSTUP_TOOLCHAIN=1.98.1 cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 0
+    },
+    {
+      "command": "CARGO_TARGET_DIR=\"$PWD/target/gh-259/core-target\" RUSTUP_TOOLCHAIN=1.98.1 python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 0,
+      "result": "449 tests OK, 36 explicitly skipped manual legacy backend tests."
+    },
+    {
+      "command": "CARGO_TARGET_DIR=\"$PWD/target/gh-259/core-target\" RUSTUP_TOOLCHAIN=1.98.1 cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 100,
+      "result": "359/397 run: 358 passed, webhook_accepts_success_response failed with io: Connection refused; fail-fast left 38 unrun. Same isolated test also failed under the unchanged inherited proxy environment."
+    },
+    {
+      "command": "env -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u http_proxy -u https_proxy -u all_proxy CARGO_TARGET_DIR=\"$PWD/target/gh-259/core-target\" RUSTUP_TOOLCHAIN=1.98.1 cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked -E 'test(webhook_accepts_success_response)'",
+      "exit_code": 0,
+      "result": "One test passed. Proxy variables were set and NO_PROXY/no_proxy unset in the original run. No Core source or global environment was changed."
+    },
+    {
+      "command_record": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/umask-nextest-remaining.json",
+      "exit_code": 0,
+      "result": "38 previously unrun tests passed with the same process-local proxy removal. Exact selection is the checked difference between 397 listed tests and 359 initial completions. Across the initial and supplemental runs all 397 distinct tests have passing evidence; the original failed command remains failed."
+    },
+    {
+      "command": "harness-gate config check; harness-gate verify --profile ci --all",
+      "status": "not_applicable",
+      "reason": "No .harness-gate/flow.toml declaring a ci profile exists in this checkout."
+    },
+    {
+      "command": "CARGO_TARGET_DIR=\"$PWD/target/gh-259/core-target\" RUSTUP_TOOLCHAIN=1.98.1 python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "scope": "Tracked local diff; focused changes separately compared with remote 9dec7e7 blobs because the preserved local baseline predates operator commits."
+    }
+  ],
+  "reused_operator_evidence": {
+    "handoff": {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/operator-exec-audit/handoff.json",
+      "sha256": "c024538e6c463d1dc234e81d27a83a6e97853d696cbb151684737c2e23eb2e9d",
+      "bytes": 1997
+    },
+    "copied_hashes_verified": 13,
+    "ci_run": "https://github.com/musutrade/Harness-Gate/actions/runs/34792991105",
+    "ci_head": "9dec7e7b10bde2f9a5b09f557d51ba755462a093",
+    "result": "All required jobs pass: 10 observer regressions, traced candidate build, 125 capture checks, 26 macro checks, six Core fixtures, package preparation, 38 lifecycle and 29 HTTPS checks.",
+    "boundary": "Original anchors preserved; no external workspace accessed. These results do not certify the rebuilt binary. Ubuntu plain-fixture second-userspace evidence is bounded and is not complete two-system acceptance. Historical Rust 1.97.1 records remain reference only."
+  },
+  "remaining_blockers": [
+    "Stable generated-function owner/counter export bound to invocation/configuration/target, including emitted unexecuted functions; built-in derive needs a supported instrumentation path.",
+    "Function-like internal root cause remains unproven; built-in derive exclusion is source-confirmed. Shared generator metadata cannot supply missing actual coverage counters. No third-party fix is justified or adopted; capability submission/merge/adoption remain pending.",
+    "Required CRAP same-function denominator/model and explicit historical-to-AST measurement migration review; no threshold, requiredness or baseline changes are authorized.",
+    "Complete same-binary Linux acceptance and protected signature/trust/release acceptance. Cosign and public root availability is not production signing acceptance."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/umask-before.log",
+      "sha256": "fc2b6fd642b64171cf5261a6869f6b2af6c0260354ca91cc9ceab8e782054950",
+      "bytes": 817
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/umask-after/summary.json",
+      "sha256": "4733fb7a00f20dd9063a9340ca9a27c471f62867c20c84e37308f06c49c09fec",
+      "bytes": 1394
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/umask-after/automation.json",
+      "sha256": "eb2d8619b540afef7721a6dbd19a155ff1dbf7cc66ff27a89f43c1643b0dc840",
+      "bytes": 4630
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/umask-test-only-metadata.json",
+      "sha256": "89eab6252f487111cc52ea52a92e7524b9282100375e5a6cad3b59118c054899",
+      "bytes": 323
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/umask-test-only-package/support.json",
+      "sha256": "dfd14515c812fde55f58eb52ec2d2bf76b3cf9849fda4dbb565a04f219ac26b8",
+      "bytes": 924
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/umask-test-only-package/release-inventory.json",
+      "sha256": "544f29c7e27d28afb27eb2588b4b878d68589a5d9493af01ab1e1fe03501e8e2",
+      "bytes": 563
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/umask-build.log",
+      "sha256": "5044302e4428ce2a05f7be4f340dd707b23b4f82fbe6bd671c39415df3bf8447",
+      "bytes": 208
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/umask-collector-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/umask-core-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/umask-collector-clippy.log",
+      "sha256": "d5edbe88c87095579b41ccf8e6c82da77cd5b759426ccf1328c5e2034bd3275e",
+      "bytes": 2922
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/umask-core-clippy.log",
+      "sha256": "20bf0fe032d560913e4f283d8dfae05f1ea1121c55f6e406329e8e824c51598d",
+      "bytes": 4585
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/umask-quality-tests.log",
+      "sha256": "2a35fc2ccd61ed4822a0fcf811f3cce460db1b3e0f29109095cb038ba2db21b5",
+      "bytes": 78307
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/umask-core-nextest.log",
+      "sha256": "d2e49389419c579713c17d8887a665897ba2169e02453d90b568aff0bba0fe87",
+      "bytes": 55614
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/umask-webhook-repro.log",
+      "sha256": "82b7e9e120093f291d971d4a873c7c13e4fcd45ddbea1cdb51d97a5da8d847b9",
+      "bytes": 1337
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/umask-webhook-without-proxy.log",
+      "sha256": "fa76ea6e0c6f4f9f36d7030eb8ff9c05e443f8d382ed9714ac6fb811f9685625",
+      "bytes": 466
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/umask-nextest-list.json",
+      "sha256": "221c5262b484f83e6f5de034a668054387fe4995edae8154a994adadbf95fb29",
+      "bytes": 61017
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/umask-nextest-remaining.json",
+      "sha256": "42d41dc18797025c8c1a60e86286ba8d6639f581ea4fcf3b67af1157afbc4a4c",
+      "bytes": 8545
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/umask-core-nextest-remaining.log",
+      "sha256": "88a5314a61aa7a30c91cd3eabe62375e3bb9ccc603b42177f85a0a177580b65a",
+      "bytes": 5511
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/quality/docs-consistency.json",
+      "sha256": "f1dd4f9d2e417b37e5473dcc7904a842f5cf41f31f178e4bf9e5815a5fb851a9",
+      "bytes": 1488
+    },
+    {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-259/target/gh-259/umask-docs-consistency.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  ]
+}

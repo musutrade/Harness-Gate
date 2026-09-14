@@ -67,8 +67,9 @@ there is no automatic tool installation or unsigned fallback.
 The existing repository release contract selects cosign 3.1.3. Follow the upstream
 [installation instructions](https://docs.sigstore.dev/cosign/system_config/installation/)
 and the independently reviewed host trust manifest when provisioning that dependency.
-This workspace has no actual cosign binary, so no version is yet certified for the
-new Rust path. Trust bootstrap and actionable production download commands remain
+The operator provisioned cosign 3.1.3 and its public trust root under
+`target/operator-inputs/cosign-v3.1.3/`; this is not production signature acceptance.
+Trust bootstrap and actionable production download commands remain
 an explicit acceptance item; this document supplies no unauthenticated bootstrap.
 
 The fixed invocation is `cosign verify-blob --bundle ... --trusted-root ...
@@ -103,6 +104,15 @@ Only then does it atomically rename a relative symlink to `current`. A failure
 before that selection preserves the previous version. If the final directory
 sync fails after selection, the error explicitly reports that selection committed
 and requires inspection; it does not pretend the old version is still selected.
+
+New `versions` directories are created atomically with mode 0755 filtered by the
+caller's umask. Thus umask 0002 cannot make the directory group writable, and
+umask 0077 still restricts it to 0700. Existing directories are validated without
+changing their permissions. The focused real install regression covers 0002,
+0022 and 0077, repeated installation, and rejection of an existing 0775 directory
+while retaining a runnable selected program. See
+[the evidence](stable-rust-candidate-evidence/install-permissions.json). This fixes
+the operator's concrete defect, not the remaining T5 signing/release acceptance.
 
 Rollback uses an explicit inventory digest and re-verifies the stored release with
 the supplied host trust. Missing, corrupt or nonexecutable targets fail without

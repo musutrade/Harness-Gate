@@ -9,6 +9,35 @@ implementation and remote operator patches, without resetting local Git history.
 
 ## CI and operator evidence
 
+The current operator checkpoint supersedes the pending-CI actions below:
+[run 34792991105](https://github.com/musutrade/Harness-Gate/actions/runs/34792991105)
+at `9dec7e7b10bde2f9a5b09f557d51ba755462a093` passes all required jobs. Its
+successful Quality Script Tests log records 10 actual Rust exec-observer
+regressions, the traced candidate build, 125 capture checks, 26 macro checks,
+six authenticated Core fixtures, package preparation, 38 lifecycle checks and
+29 HTTPS checks. The observer follows kernel successful-exec stops; it is
+repository automation, not a payload or user dependency. The original strace
+unknown records remain rejected. Upgrade compilation now explicitly uses 1.98.1.
+
+The operator handoff is `target/operator-exec-audit/handoff.json`; its 13 copied
+file hashes were checked locally. Original anchors remain unchanged and no
+external workspace was accessed. These results belong to the operator candidate,
+not automatically to a subsequently rebuilt executable. The umask 0022 lifecycle
+pass did not fix the independently reproduced umask 0002 defect. The focused
+Rust fix and new real installation evidence are recorded in
+[install-permissions.json](stable-rust-candidate-evidence/install-permissions.json).
+
+The focused continuation passes the stable 1.98.1 release build, both projects'
+fmt/Clippy checks, quality unittest discovery (449 tests, 36 manual legacy skips)
+and docs consistency. Core's initial nextest command failed one local webhook
+test with `Connection refused` and left 38 tests unrun. The failing test passes
+with inherited proxy variables removed for that process; the 38 previously unrun
+tests also pass. All 397 distinct tests therefore have passing evidence across
+these runs, while the original command remains recorded as failed. The new binary
+has nine focused install checks, not a renewed full capture/release acceptance.
+
+The following cancelled-run details are retained as history:
+
 [Run 34787905972](https://github.com/musutrade/Harness-Gate/actions/runs/34787905972)
 at `cc1681ed085469e02b8115c87e22839b9e2dd7f1` has a **cancelled** Quality Script
 Tests job, `103806637783`. Its actual log records 125 capture checks, 26 bounded
@@ -142,12 +171,21 @@ adopted fix version: none**. This is a prepared request and reproduction, not an
 upstream submission. The separately tracked attribute-macro PR is not an adopted
 fix for these fixtures.
 
-The remaining operator/CI action is to finish the complete 1.98.1 derive diagnostic with
-rustfmt (`rustup component add --toolchain 1.98.1 rustfmt`), and obtain a permitted
-trace for the new build/runtime. CI already installs rustfmt and matching LLVM.
-No global toolchain default was changed here. Further implementation of generated
-coverage requires the stable capability above or a verified alternative that
-preserves business behavior. Full same-binary Linux acceptance, production
-signature/release review and CRAP migration remain independent blockers. This
-bounded continuation stops at those gaps rather than treating more lifecycle
-mocks as progress toward generated coverage.
+The successful current-head CI supersedes the old request for a permitted build/
+runtime trace and the earlier local diagnostic setup limitation. Neither a passing
+diagnostic nor its trace creates the missing generated owners. No global toolchain
+default was changed here.
+
+The smallest remaining T4 action is a compiler capability request using the pinned
+function-like and built-in Clone reproductions above: expose real, distinct
+generated-function owners and counters (including emitted unexecuted functions)
+through stable coverage, with a supported derive instrumentation path. The
+function-like internal cause is still unproven; the derive exclusion is
+source-confirmed. There is no justified third-party parser patch or adopted stable
+compiler fix. Submission, merge and adoption remain separate pending states.
+
+T6 separately requires explicit review of the same-owner code-region denominator
+for CRAP and the historical-to-AST measurement transition. No authority to adopt
+that model, change requiredness or reset a baseline is inferred. Full same-binary
+Linux acceptance and protected signature/release review also remain open. GH-259,
+T3–T8 and the release hold stay open; no completion/merge handoff is declared.

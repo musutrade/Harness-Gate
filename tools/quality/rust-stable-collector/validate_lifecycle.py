@@ -36,6 +36,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--package', type=Path, required=True, help='prepared four-file unsigned candidate package')
     parser.add_argument('--trace', action='store_true', help='require real execve tracing of candidate commands')
+    parser.add_argument('--permissions-only', action='store_true', help='run only real install directory-permission regressions; no upgrade build')
     args = parser.parse_args()
     binary = args.binary.resolve(strict=True)
     prepared = args.package.resolve(strict=True)
@@ -61,10 +62,8 @@ def main():
         assert result.returncode == 0, commands[-1]
         return result.stdout.decode()
 
-    version, upgrade_version, upgrade_binary, fixture_programs = build_programs(output, automation, sha)
-    assert sha(binary) != sha(upgrade_binary)
+    version = json.loads((prepared / 'support.json').read_text())['release_version']
     assert automation([binary, '--version']) == f'{PROGRAM} {version}\n'
-    assert automation([upgrade_binary, '--version']) == f'{PROGRAM} {upgrade_version}\n'
 
     automation(['openssl', 'genpkey', '-algorithm', 'RSA', '-pkeyopt', 'rsa_keygen_bits:2048', '-out', private])
     automation(['openssl', 'pkey', '-in', private, '-pubout', '-out', public])
@@ -107,15 +106,15 @@ exit 0
               'sigstore_bundle': {'test_only_mock': True}})
         return directory
 
-    first, second = bundle(version, binary), bundle(upgrade_version, upgrade_binary)
-    first_id, second_id = sha(first / 'release-inventory.json'), sha(second / 'release-inventory.json')
+    first = bundle(version, binary)
+    first_id = sha(first / 'release-inventory.json')
 
-    def run(name, argv, success=True):
+    def run(name, argv, success=True, umask=-1):
         command = [str(binary), *map(str, argv), str(output / f'log-{name}')]
         trace = output / f'{name}.execve'
         if args.trace:
             command = trace_command(trace, command)
-        result = subprocess.run(command, capture_output=True, timeout=80)
+        result = subprocess.run(command, capture_output=True, timeout=80, umask=umask)
         if args.trace:
             check_trace(trace)
         (output / f'{name}.stdout').write_bytes(result.stdout)
@@ -126,6 +125,44 @@ exit 0
 
     def install(name, directory, success=True, trust_path=trust):
         return run(name, ['install', directory, trust_path, sha(trust_path), root], success)
+
+    for mask in (0o002, 0o022, 0o077):
+        name = f'install-umask-{mask:04o}'
+        destination = output / name
+        destination.mkdir(mode=0o755)
+        result = run(name, ['install', first, trust, sha(trust), destination], umask=mask)
+        assert result['current'] == first_id and result['previous'] is None
+        mode = (destination / 'versions').stat().st_mode & 0o777
+        assert mode == (0o755 & ~mask), oct(mode)
+        assert automation([destination / 'current' / PROGRAM, '--version']) == f'{PROGRAM} {version}\n'
+        checks[-1].update({'umask': f'{mask:04o}', 'versions_mode': f'{mode:04o}'})
+        # Reopening an existing safe directory must not change its permissions.
+        run(name + '-existing', ['install', first, trust, sha(trust), destination], umask=mask)
+        assert (destination / 'versions').stat().st_mode & 0o777 == mode
+        (destination / 'versions').chmod(0o775)
+        error = run(name + '-unsafe', ['install', first, trust, sha(trust), destination], False, umask=mask)
+        assert 'unsafe versions directory' in error, error
+        assert (destination / 'versions').stat().st_mode & 0o777 == 0o775
+        assert os.readlink(destination / 'current') == f'versions/{first_id}'
+        assert sha(destination / 'current' / PROGRAM) == sha(binary)
+        assert automation([destination / 'current' / PROGRAM, '--version']) == f'{PROGRAM} {version}\n'
+
+    if args.permissions_only:
+        write(output / 'summary.json', {
+            'schema': 'rust-stable-install-permissions-acceptance/v1',
+            'collector_sha256': sha(binary), 'checks': checks,
+            'rsa': 'real RSA-2048/SHA-256; repository-generated test key',
+            'sigstore': 'MOCK invocation only; no cryptographic acceptance',
+            'production_signature': False, 'traced': args.trace,
+        })
+        print(json.dumps({'passed': len(checks), 'summary': str(output / 'summary.json')}))
+        return
+
+    built_version, upgrade_version, upgrade_binary, fixture_programs = build_programs(output, automation, sha)
+    assert built_version == version and sha(binary) != sha(upgrade_binary)
+    assert automation([upgrade_binary, '--version']) == f'{PROGRAM} {upgrade_version}\n'
+    second = bundle(upgrade_version, upgrade_binary)
+    second_id = sha(second / 'release-inventory.json')
 
     run('unsigned-package-rejected', ['release-verify', prepared, trust, sha(trust)], False)
     verified = run('verify', ['release-verify', first, trust, sha(trust)])
