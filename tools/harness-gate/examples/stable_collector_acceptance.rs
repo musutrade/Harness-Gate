@@ -3,7 +3,7 @@
 use anyhow::{ensure, Context, Result};
 use base64::{engine::general_purpose::STANDARD as BASE64, Engine};
 use ed25519_dalek::{Signer, SigningKey};
-use harness_gate::quality::{evidence, project};
+use harness_gate::quality::{evidence, project, risk};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::{
@@ -433,6 +433,52 @@ fn run() -> Result<()> {
         "required CRAP must block"
     );
     let mut checks = json!({"fixture":case,"authenticated_capture":{"accepted":true,"records":records.as_array().unwrap().len(),"counts":counts},"required_crap":required});
+    let preview = risk::preview_line_crap(records, &validation, "crap-line-1")?;
+    ensure!(
+        preview["authoritative"] == false && preview["baseline_adopted"] == false,
+        "CRAP preview acquired gate authority"
+    );
+    if matches!(case, "plain" | "partial") {
+        let rows = preview["rows"].as_array().unwrap();
+        ensure!(
+            rows[0]["lines"]
+                == json!({"type":"ratio","covered":if case == "plain" {5} else {4},"total":5}),
+            "line coverage must reflect the unexecuted branch"
+        );
+        ensure!(
+            rows[0]["value"]
+                == if case == "plain" {
+                    json!({"type":"rational","numerator":3,"denominator":1})
+                } else {
+                    json!({"type":"rational","numerator":384,"denominator":125})
+                },
+            "exact CRAP line preview"
+        );
+        ensure!(
+            rows[1]["value"] == json!({"type":"rational","numerator":2,"denominator":1}),
+            "unexecuted owner CRAP preview"
+        );
+    }
+    let mut stale = records.clone();
+    stale[0]["context"]["run"] = json!("another-run");
+    ensure!(
+        risk::preview_line_crap(&stale, &validation, "crap-line-1").is_err(),
+        "stale CRAP inputs accepted"
+    );
+    ensure!(
+        risk::preview_line_crap(records, &validation, "region-substitution").is_err(),
+        "CRAP model substitution accepted"
+    );
+    let mut previous_series = description["series"].clone();
+    previous_series["normalization"]["version"] = json!("historical-v3-binary");
+    previous_series["id"] = json!(evidence::series_id(&previous_series)?);
+    ensure!(
+        evidence::require_compatible_series(Some(&previous_series), &description["series"])
+            .is_err(),
+        "migration silently equated series"
+    );
+    checks["crap_migration_preview"] = preview;
+    checks["migration_guard"] = json!({"old_series_rejected":true,"model_substitution_rejected":true,"stale_inputs_rejected":true});
     checks["nonce_replay"] = fixture.run("replay", &fixture.request, false)?;
     let mut bad = fixture.request.clone();
     bad["input"]["context"]["run"] = json!("tampered");

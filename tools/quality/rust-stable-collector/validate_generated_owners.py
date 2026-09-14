@@ -117,6 +117,8 @@ def main():
         target = capture / 'generated-owners.json'
         for name, mutation in [
             ('forged-count', lambda v: v['owners'][0]['owner']['functions'][0].update(execution_count=99)),
+            ('forged-line-ratio', lambda v: v['owners'][0]['owner']['functions'][0]['coverage_line'].update(covered=99)),
+            ('forged-line-counts', lambda v: v['owners'][0]['owner']['functions'][0].update(line_counts={'1': 99})),
             ('swapped-producer', lambda v: v['owners'][0].update(producer='stolen/other.d')),
             ('dropped-compilation', lambda v: v['owners'][0]['compilations'].pop()),
             ('dropped-owner', lambda v: v['owners'][0]['owner']['functions'].pop()),

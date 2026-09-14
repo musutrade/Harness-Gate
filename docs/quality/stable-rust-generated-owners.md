@@ -1,5 +1,15 @@
 # Generated owners from a real source file (stable alternative)
 
+## Current line and migration checkpoint (2026-09-14)
+
+The v4 candidate adds authenticated per-function line coverage, including real
+generated files. Core computes an exact `crap-line-1` migration preview from
+validated same-owner evidence. The preview has no gate or baseline authority;
+required CRAP remains blocked. Source/region reconciliation, mutation checks,
+original historical anchors and old/new series rejection remain mandatory.
+See [the line/CRAP contract](stable-rust-line-crap-migration.md).
+
+
 This checkpoint addresses the generated-function coverage gap recorded in
 [stable-rust-macro-observation.md](stable-rust-macro-observation.md) with a
 **stable-interface alternative**, rather than waiting on an unmerged compiler
@@ -96,7 +106,7 @@ build-script input/environment closure or identify a general macro generator.
 - Proc-macro token streams and built-in derive coverage are still uncertified.
   The `include!` fixture is a bounded alternative, not automatic rewriting of
   arbitrary target projects or general macro support.
-- Line coverage and CRAP remain unsupported. Core still blocks required CRAP;
+- The v4 candidate adds authenticated line coverage. Core still blocks required CRAP;
   measurement migration, full Linux matrix and protected release acceptance remain
   incomplete. No release-hold removal or publication is authorized.
 

@@ -8,6 +8,7 @@ mod core_source;
 mod coverage;
 mod dependencies;
 mod download;
+mod line_coverage;
 mod macro_model;
 mod ownership;
 mod process;

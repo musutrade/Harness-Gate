@@ -158,6 +158,11 @@ def acceptance(path, pin, binary):
                  'total-regions-count', 'total-regions-covered',
                  'total-branches-count', 'total-branches-covered',
                  'partial', 'certified-region-owners', 'duplicate-owner-region',
+                 'certified-line-plain', 'certified-line-partial',
+                 'line-segment-count-plain', 'line-segment-count-partial',
+                 'line-segment-entry-plain', 'line-segment-entry-partial',
+                 'line-segment-position-plain', 'line-segment-position-partial',
+                 'line-summary-lines-plain', 'line-summary-lines-partial',
                  'owner-region-counter-disagreement', 'owner-region-summary-count',
                  'owner-region-summary-covered',
                  'modules', 'certified-module-owners', 'missing-module-owner',
@@ -274,7 +279,7 @@ def prepare(output, target_dir, toolchain, observations):
             'release_status': 'candidate-review-required',
             'complexity_series': 'rust-source-decisions/v1-candidate',
             'coverage_series': 'rust-llvm-source-coverage/v1-candidate',
-            'function_coverage': 'rust-llvm-exact-free-owner/v3-candidate', 'function_crap': 'unsupported',
+            'function_coverage': 'rust-llvm-exact-free-owner/v4-candidate', 'function_crap': 'unsupported',
             'build_rust': toolchain, 'observations': observed}
         write(package / 'support.json', support)
         files = {name: identity(package / name) for name in (PROGRAM, 'LICENSE', 'support.json')}

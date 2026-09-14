@@ -1,5 +1,15 @@
 # Stable Rust collector: implementation contract and candidate
 
+## Current line and migration checkpoint (2026-09-14)
+
+The v4 candidate adds authenticated per-function line coverage, including real
+generated files. Core computes an exact `crap-line-1` migration preview from
+validated same-owner evidence. The preview has no gate or baseline authority;
+required CRAP remains blocked. Source/region reconciliation, mutation checks,
+original historical anchors and old/new series rejection remain mandatory.
+See [the line/CRAP contract](stable-rust-line-crap-migration.md).
+
+
 Current generated-source integration: [`export-core-source` and `describe
 --source-workspace`](stable-rust-generated-owners.md) provide explicit verified
 source snapshots for the existing Core contract. Bounded real-file generated
@@ -188,7 +198,7 @@ requires all five metric contracts for each selected function. Verified ordinary
 lexical owners can emit `complexity.cyclomatic`. Eligible owners also emit
 `coverage.function` as executed functions / functions (1/1 or 0/1 for one owner).
 `coverage.region` counts nonzero LLVM code regions / all code regions for that same
-certified owner. Line coverage and CRAP explicitly emit `unsupported`, with no fabricated values. A file containing
+certified owner. Eligible v4 owners also emit authenticated `coverage.line`; CRAP explicitly emits `unsupported` pending migration review. A file containing
 uncertified activation/expansion also makes its complexity unavailable. Per-owner
 artifacts bind source facts, context, series and capture anchors. Input identities
 are rechecked after conversion; failure returns nonzero and no successful envelope.
@@ -210,7 +220,7 @@ does not claim compilation, reachability or expansion of every parsed source.
 
 | Construct | Current real behavior | Certification boundary |
 | --- | --- | --- |
-| Unannotated root or inline-module free function, including never-called | Lexical complexity, function execution and code-region ratios | ASCII, single-file LLVM owner; CRAP model and migration remain unaccepted |
+| Unannotated root or inline-module free function, including never-called | Lexical complexity, function execution, line and code-region ratios | ASCII, single-file LLVM owner; CRAP model and migration remain unaccepted |
 | Direct `#[test]` or `#[cfg(test)]` function/module | Explicit source spans excluded from certified function owners | Raw file totals still include tests; normalized production owners exclude their regions |
 | Macro/derive/include-generated code | Expansion/attribute recorded as unsupported | No generated owner inferred from parent/file totals |
 | Async/closure/nested function | Affected lexical function is unsupported with null complexity | Constructor, future body and closure owners are never merged |
