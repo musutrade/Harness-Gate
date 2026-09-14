@@ -66,6 +66,8 @@ We use a simplified version of the Michael Nygard ADR template:
 - [ADR-0044](0044-trusted-quality-baselines.md) - Resolve immutable baselines through ecosystem-opaque providers
 - [ADR-0045](0045-quality-verification-composition.md) - Compose execution and generic quality in verify
 
+- [ADR-0053](0053-stable-pure-rust-collector.md) - Require stable interfaces and pure-Rust collector delivery
+
 ## Creating New ADRs
 
 When making a significant architectural decision:
