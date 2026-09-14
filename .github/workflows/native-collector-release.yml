@@ -120,6 +120,13 @@ jobs:
             --output target/native-package
       - name: Build Core for protocol and policy acceptance
         run: cargo +1.97.1 build --manifest-path tools/harness-gate/Cargo.toml --locked --release
+      - name: Select OpenSSL 3 for disposable request-signing tests
+        if: runner.os == 'macOS'
+        run: |
+          openssl_prefix="$(brew --prefix openssl@3)"
+          test -x "$openssl_prefix/bin/openssl"
+          "$openssl_prefix/bin/openssl" version
+          echo "$openssl_prefix/bin" >> "$GITHUB_PATH"
       - name: Real native owner, history, external dependency and Core acceptance
         env:
           NATIVE_PLUGIN_BINARY: ${{ github.workspace }}/target/native-package/${{ matrix.asset }}

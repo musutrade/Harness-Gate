@@ -32,6 +32,11 @@ SERIES = {
 }
 FLAGS = ['-C', 'instrument-coverage', '-C', 'link-dead-code', '-C', 'opt-level=0',
          '-Z', 'mir-opt-level=0']
+if os.name == 'nt':
+    # MSVC incremental linking pads the profiling sections, including before
+    # the first name. LLVM rejects the resulting raw profile as an empty symbol.
+    # Keep dead owners/counters; disable only linker padding, in both capture paths.
+    FLAGS.extend(['-C', 'link-arg=/INCREMENTAL:NO'])
 
 
 def host_target():

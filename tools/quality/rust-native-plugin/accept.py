@@ -95,6 +95,9 @@ class ExternalPluginTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             capture = json.loads(result.stdout)
             captures.append(capture)
+            if os.name == 'nt':
+                self.assertEqual(list((self.work / name).rglob('*.ilk')), [],
+                                 'Cargo measurement must not use incremental linking')
             result = self.entry(name + '-certify', 'certify', '--sysroot', self.sysroot,
                 '--evidence', capture['capture'], '--anchor', capture['anchor'])
             self.assertEqual(result.returncode, 0, result.stderr)
