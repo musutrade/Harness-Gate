@@ -41,7 +41,7 @@ SOURCE_FILES = sorted({f"preset/{name}.rs" for name in ("catalog", "composition"
     {f"config/quality/{name}.rs" for name in ("mod", "model", "policy", "validation", "compiler", "collectors", "baseline", "baseline/git")} |
     {f"../quality-core/{name}.rs" for name in (
     "comparison", "cross_component", "evidence", "json", "mod", "model",
-    "policy", "project", "project_report", "ratchet", "replay", "schema")})
+    "policy", "project", "project_report", "ratchet", "replay", "risk", "schema")})
 
 def digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()

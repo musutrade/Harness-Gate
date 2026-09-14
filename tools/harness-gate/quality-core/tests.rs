@@ -120,6 +120,7 @@ fn frozen_evidence_and_integrity_matrix_matches_python() {
     measurement_series_compatibility_matches_python(&reference);
     capability_availability_matches_python(&reference);
     source_and_artifact_bytes_are_verified_at_the_boundary(&reference);
+    crap_preview_validates_inputs_without_changing_evidence(&reference);
     for case in reference.1.iter().filter(|c| c["kind"] == "evidence") {
         let ctx = context(case);
         let result = evidence::validate_evidence(&case["records"], &ctx).map(|typed| {
@@ -134,6 +135,40 @@ fn frozen_evidence_and_integrity_matrix_matches_python() {
         });
         assert_outcome(case, result);
     }
+}
+
+fn crap_preview_validates_inputs_without_changing_evidence(reference: &Reference) {
+    let case = reference
+        .1
+        .iter()
+        .find(|c| c["name"] == "polyglot")
+        .unwrap();
+    let original = case["records"].clone();
+    let ctx = context(case);
+    let preview = super::risk::preview_line_crap(&original, &ctx, "crap-line-1").unwrap();
+    assert_eq!(preview["authoritative"], false);
+    assert_eq!(
+        preview["rows"][0]["value"],
+        json!({"type":"rational","numerator":384,"denominator":125})
+    );
+    assert_eq!(original, case["records"]);
+    assert!(super::risk::preview_line_crap(&original, &ctx, "region").is_err());
+    let mut altered = original.clone();
+    altered[0]["context"]["run"] = json!("mixed-run");
+    assert!(super::risk::preview_line_crap(&altered, &ctx, "crap-line-1").is_err());
+    let mut unavailable = original;
+    unavailable[0]["metrics"]
+        .as_array_mut()
+        .unwrap()
+        .retain(|m| m["name"] != "coverage.line");
+    for capability in unavailable[0]["capabilities"].as_array_mut().unwrap() {
+        if capability["metric"] == "coverage.line" {
+            capability["state"] = json!("unsupported");
+        }
+    }
+    let preview = super::risk::preview_line_crap(&unavailable, &ctx, "crap-line-1").unwrap();
+    assert_eq!(preview["rows"][0]["state"], "unsupported");
+    assert!(preview["rows"][0].get("value").is_none());
 }
 
 fn project_identity_ownership_and_relationships_match_python(reference: &Reference) {

@@ -1,5 +1,15 @@
 # Tasks
 
+## Current continuation: line coverage and explicit CRAP review
+
+The v4 candidate adds authenticated same-owner line coverage. Core owns an exact
+line-CRAP migration preview, with required CRAP still blocked and no baseline
+adoption. PR #262 CI optimizations are synchronized from main. Complete Linux
+suite orchestration and current-stable historical comparison retain raw paths and
+binary identities. Protected candidate dual signatures and broad generated-owner
+capability remain independent acceptance requirements; T3–T8 stay open.
+See `docs/quality/stable-rust-line-crap-migration.md`.
+
 ## Stable generated-owner alternative (2026-09-14)
 
 The generated-function coverage gap has a stable-interface alternative that does

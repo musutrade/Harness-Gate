@@ -308,3 +308,13 @@ validation. Policy semantics are unchanged. T4 remains incomplete for broad macr
 derive ownership, line coverage and CRAP; T6 migration and remaining release/system
 acceptance are unchanged. This closes the concrete generated-file Core path gap,
 not the complete GH-259 acceptance checklist.
+
+## Candidate line coverage and Core migration preview
+
+The v4 owner contract reconstructs function-local line counters from authenticated
+nonempty code regions and reconciles them with exported file segments and totals.
+Core validates the evidence before computing a non-authoritative exact
+`crap-line-1` preview. The new preview cannot satisfy required CRAP, approve a
+series, or adopt a baseline. Existing Core evidence and policy schemas remain
+unchanged. See `docs/quality/stable-rust-line-crap-migration.md`; T4/T6 remain
+open until the explicit measurement review and unresolved owner capabilities.

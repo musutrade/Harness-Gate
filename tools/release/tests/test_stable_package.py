@@ -85,6 +85,11 @@ class PreparationTests(unittest.TestCase):
 
     def test_acceptance_requires_anchor_same_binary_and_passed_checks(self):
         value = json.loads((ROOT / 'docs/quality/stable-rust-candidate-evidence/acceptance-dep-info.json').read_text())
+        # Synthetic preparation-contract input; the frozen historical evidence is unchanged.
+        line_checks = ['certified-line-' + case for case in ('plain', 'partial')] + [
+            'line-' + name + '-' + case for name in ('segment-count', 'segment-entry', 'segment-position', 'summary-lines')
+            for case in ('plain', 'partial')]
+        value['checks'].extend({'name': name, 'passed': True} for name in line_checks)
         binary = value['binary']
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / 'summary.json'
@@ -97,7 +102,7 @@ class PreparationTests(unittest.TestCase):
                 acceptance(path, '0' * 64, binary)
             with self.assertRaisesRegex(ValueError, 'candidate binary'):
                 acceptance(path, pin, dict(binary, bytes=0))
-            for name in ('partial', 'certified-region-owners', 'duplicate-owner-region',
+            for name in (*line_checks, 'partial', 'certified-region-owners', 'duplicate-owner-region',
                          'output-isolation-doctor-direct', 'output-isolation-doctor-alias',
                          'output-isolation-doctor-parent', 'output-isolation-collect-direct',
                          'output-isolation-collect-alias', 'output-isolation-collect-parent',
