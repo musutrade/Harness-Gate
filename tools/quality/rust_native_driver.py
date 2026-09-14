@@ -14,6 +14,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import platform
 import shutil
 import subprocess
 import sys
@@ -33,16 +34,40 @@ FLAGS = ['-C', 'instrument-coverage', '-C', 'link-dead-code', '-C', 'opt-level=0
          '-Z', 'mir-opt-level=0']
 
 
+def host_target():
+    targets = {('Linux', 'x86_64'): 'x86_64-unknown-linux-gnu',
+               ('Darwin', 'x86_64'): 'x86_64-apple-darwin',
+               ('Darwin', 'arm64'): 'aarch64-apple-darwin',
+               ('Windows', 'amd64'): 'x86_64-pc-windows-msvc'}
+    target = targets.get((platform.system(), platform.machine().lower()))
+    require(target is not None, 'unsupported native host platform')
+    return target
+
+
+def executable(directory, name):
+    return Path(directory) / (name + ('.exe' if os.name == 'nt' else ''))
+
+
+def library_environment(sysroot):
+    sysroot = Path(sysroot)
+    if os.name == 'nt':
+        return {'PATH': os.pathsep.join([str(sysroot / 'bin'), str(sysroot / 'lib'), os.environ.get('PATH', '')])}
+    return {'DYLD_LIBRARY_PATH' if sys.platform == 'darwin' else 'LD_LIBRARY_PATH': str(sysroot / 'lib')}
+
+
 def tools_identity(directory, driver, sysroot):
     driver, sysroot = Path(driver).resolve(), Path(sysroot).resolve()
-    llvm = sysroot / 'lib/rustlib/x86_64-unknown-linux-gnu/bin'
-    paths = {'driver': driver, 'rustc': sysroot / 'bin/rustc',
-             'llvm-cov': llvm / 'llvm-cov', 'llvm-profdata': llvm / 'llvm-profdata'}
-    libraries = list((sysroot / 'lib').glob('librustc_driver-*.so'))
+    target = host_target()
+    llvm = sysroot / 'lib/rustlib' / target / 'bin'
+    paths = {'driver': driver, 'rustc': executable(sysroot / 'bin', 'rustc'),
+             'llvm-cov': executable(llvm, 'llvm-cov'), 'llvm-profdata': executable(llvm, 'llvm-profdata')}
+    pattern = 'rustc_driver-*.dll' if os.name == 'nt' else 'librustc_driver-*.' + ('dylib' if sys.platform == 'darwin' else 'so')
+    libraries = list((sysroot / ('bin' if os.name == 'nt' else 'lib')).glob(pattern))
     require(len(libraries) == 1, 'missing/ambiguous rustc driver library')
     paths['rustc-driver-library'] = libraries[0]
     version = run(directory, 'rustc-version', [str(paths['rustc']), '-vV']).read_text()
-    require('commit-hash: ' + RUSTC_COMMIT in version and 'LLVM version: 22.1.6' in version,
+    require('commit-hash: ' + RUSTC_COMMIT in version and 'LLVM version: 22.1.6' in version
+            and 'host: ' + target in version,
             'incompatible rustc/LLVM toolchain')
     records = {name: {'path': str(path), 'sha256': file_hash(path)} for name, path in paths.items()}
     for name in ('llvm-cov', 'llvm-profdata'):
@@ -104,11 +129,11 @@ def collect_fixture(source, directory, driver, sysroot, cfg=()):
                '--crate-name', 'native_driver_fixture', *FLAGS, '--out-dir', str(directory)]
     for value in cfg:
         command.extend(['--cfg', value])
-    env = {'RUSTC_BOOTSTRAP': '1', 'LD_LIBRARY_PATH': str(Path(sysroot) / 'lib'),
+    env = library_environment(sysroot) | {'RUSTC_BOOTSTRAP': '1',
            'NATIVE_DRIVER_OUTPUT': str(unit / 'inventory.json'), 'LLVM_PROFILE_FILE': str(unit / 'compile-%p-%m.profraw')}
     run(unit, 'effective-cfg', [tools['rustc']['path'], *command[1:], '--print=cfg'], env)
     run(unit, 'compile', command, env)
-    binary = 'native_driver_fixture'
+    binary = executable(Path('.'), 'native_driver_fixture').name
     run(directory, 'sample', [str(directory / binary)], {'LLVM_PROFILE_FILE': str(directory / 'sample.profraw')})
     export_native(directory, [binary], tools, ['sample.profraw'])
     write_json(directory / 'capture.json', {
@@ -122,9 +147,9 @@ def collect_fixture(source, directory, driver, sysroot, cfg=()):
 
 
 def cargo_selection(directory, metadata, cargo_messages, manifest_path, replay=False):
-    package = next(p for p in metadata['packages'] if p['manifest_path'] == str(manifest_path))
+    package = next(p for p in metadata['packages'] if Path(p['manifest_path']) == manifest_path)
     root = manifest_path.parent
-    targets = {t['src_path']: t for t in package['targets']}
+    targets = {str(Path(t['src_path'])): t for t in package['targets']}
     production_targets = {p for p, t in targets.items() if set(t['kind']) & {'lib', 'bin'}}
     require(bool(production_targets), 'no declared production Cargo targets')
     units, compiled = [], set()
@@ -143,7 +168,7 @@ def cargo_selection(directory, metadata, cargo_messages, manifest_path, replay=F
         production = source in production_targets
         require(production or target['kind'] == ['test'], 'unsupported Cargo target selection')
         compiled.add(source)
-        units.append({'id': path.parent.name, 'inventory': str(path.relative_to(directory)),
+        units.append({'id': path.parent.name, 'inventory': path.relative_to(directory).as_posix(),
                       'cwd': cwd, 'production': production, 'target': target})
     require(production_targets <= compiled, 'missing production Cargo target')
     production_sources = {}
@@ -152,7 +177,7 @@ def cargo_selection(directory, metadata, cargo_messages, manifest_path, replay=F
     source_root = directory / 'source' if replay else root
     for path in sorted((source_root / 'src').rglob('*.rs')):
         require(not path.is_symlink(), 'production source symlink')
-        relative = str(path.relative_to(source_root))
+        relative = path.relative_to(source_root).as_posix()
         target = directory / 'source' / relative
         if not replay:
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -242,7 +267,7 @@ def finish_cargo(directory, manifest_path, driver, sysroot, samples, cargo='carg
     require(set(tests) == set(samples) and len(samples) == len(set(samples)), 'missing/extra test selection')
     binaries = []
     for index, artifact in enumerate(artifacts):
-        path = 'binaries/' + str(index)
+        path = 'binaries/' + str(index) + ('.exe' if os.name == 'nt' else '')
         target = directory / path
         target.parent.mkdir(exist_ok=True)
         shutil.copyfile(artifact['executable'], target)
@@ -263,7 +288,7 @@ def finish_cargo(directory, manifest_path, driver, sysroot, samples, cargo='carg
     return seal(directory)
 
 
-def collect_cargo(manifest_path, directory, driver, sysroot, samples, features=(), *, runtime=None):
+def collect_cargo(manifest_path, directory, driver, sysroot, samples, features=(), *, runtime=None, wrapper=None):
     directory, manifest_path = Path(directory).resolve(), Path(manifest_path).resolve()
     directory.mkdir(parents=True, exist_ok=False)
     raw = directory / 'raw'
@@ -273,6 +298,12 @@ def collect_cargo(manifest_path, directory, driver, sysroot, samples, features=(
            'NATIVE_DRIVER': str(Path(driver).resolve()), 'NATIVE_DRIVER_LIB': str(Path(sysroot) / 'lib'),
            'LLVM_PROFILE_FILE': str(raw / 'compile-%p-%m.profraw')}
     cargo = 'cargo'
+    if wrapper is not None:
+        cargo = str(executable(Path(sysroot) / 'bin', 'cargo'))
+        env.update({'RUSTC': str(executable(Path(sysroot) / 'bin', 'rustc')),
+                    'RUSTDOC': str(executable(Path(sysroot) / 'bin', 'rustdoc')),
+                    'RUSTC_WORKSPACE_WRAPPER': str(wrapper), 'HARNESS_GATE_NATIVE_WRAPPER': '1',
+                    'HARNESS_GATE_RUST_SYSROOT': str(sysroot), 'HARNESS_GATE_PYTHON': sys.executable})
     if runtime is not None:
         cargo = str(runtime / 'rust/bin/cargo')
         env.update({'RUSTC': str(runtime / 'rust/bin/rustc'),
@@ -385,6 +416,8 @@ def wrapper(arguments):
     """Cargo workspace wrapper: target kind is certified from Cargo metadata later."""
     compiler, *args = arguments
     if '--crate-name' not in args or any(a.startswith('--print') for a in args):
+        if os.name == 'nt':
+            return subprocess.call(arguments)
         os.execv(compiler, arguments)
     root = Path(os.environ['NATIVE_CAPTURE_ROOT'])
     unit = root / 'units' / digest(json.dumps(arguments).encode())
@@ -394,8 +427,8 @@ def wrapper(arguments):
                     or k in ('OUT_DIR', 'TARGET', 'HOST', 'OPT_LEVEL', 'DEBUG', 'CARGO_ENCODED_RUSTFLAGS')}
     write_json(unit / 'invocation.json', {'compiler': compiler, 'compiler_sha256': file_hash(compiler),
                'driver_sha256': file_hash(os.environ['NATIVE_DRIVER']), 'environment': relevant_env})
-    env = {'NATIVE_DRIVER_OUTPUT': str(unit / 'inventory.json'),
-           'LD_LIBRARY_PATH': os.environ['NATIVE_DRIVER_LIB'],
+    env = library_environment(Path(os.environ['NATIVE_DRIVER_LIB']).parent) | {
+           'NATIVE_DRIVER_OUTPUT': str(unit / 'inventory.json'),
            'LLVM_PROFILE_FILE': str(unit / 'compile-%p-%m.profraw')}
     command = [os.environ['NATIVE_DRIVER'], *args]
     try:
@@ -532,7 +565,7 @@ def prepare_units(units, production_sources):
             require([b['id'] for b in owner['blocks']] == list(range(len(owner['blocks']))), 'reordered MIR blocks')
             require(bool(owner['blocks']) and len(owner['blocks']) == len(owner['mappings']), 'missing independent MIR counters')
             require(len({m['span']['file'] for m in owner['mappings']}) == 1, 'owner maps multiple counter files')
-            path = owner['mappings'][0]['span']['file']
+            path = str(Path(owner['mappings'][0]['span']['file']))
             require(path not in map_files, 'ambiguous counter map')
             for i, mapping in enumerate(owner['mappings']):
                 require(mapping['kind'] == f'Code {{ bcb: bcb{i} }}' and mapping['span']['start'] == i * 11 and mapping['span']['end'] == i * 11 + 10,
@@ -563,7 +596,7 @@ def prepare_units(units, production_sources):
 
 def exclude_region_file(path, exclusions):
     """Only declared dependency/generated/sysroot roots may exclude stock regions."""
-    matches = [e for e in exclusions if path.startswith(e['root'].rstrip('/') + '/')]
+    matches = [e for e in exclusions if Path(path) != Path(e['root']) and Path(path).is_relative_to(Path(e['root']))]
     require(bool(matches), 'unattributed LLVM source: ' + path)
     matches.sort(key=lambda e: len(e['root']), reverse=True)
     require(len(matches) == 1 or len(matches[0]['root']) != len(matches[1]['root']), 'ambiguous dependency source')
@@ -578,7 +611,7 @@ def map_native(units, llvm, production_sources, exclusions):
         name = function['name']
         require(name not in names, 'duplicate LLVM instance')
         names.add(name)
-        files = function['filenames']
+        files = [str(Path(path)) for path in function['filenames']]
         require(bool(files) and bool(function['regions']), 'empty LLVM source/region inventory')
         for region in function['regions']:
             require(len(region) == 8 and all(type(v) is int for v in region), 'invalid LLVM region')

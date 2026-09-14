@@ -3,9 +3,16 @@
 Retains `rust-native-production-mir-block/1` and the existing native driver,
 normalizer, re-export verification and Core policy bridge. The Rust launcher
 embeds our precompiled driver, adapter sources, schemas and license notices.
-It checks those bytes before running external isolated Python (`-I -S -B`).
+It checks those bytes before running external isolated Python (`-I -S -B -X utf8`).
 
 See the [delivery and installation contract](../../../docs/quality/native-external-toolchain.md).
+
+The release builds natively for Linux x86_64, macOS Intel, macOS Apple Silicon,
+and Windows x86_64 MSVC, matching Core's executable targets. Each target runs the
+real measurement and Core acceptance suite before its asset can be published.
+The commands below use Linux filenames; on Windows the driver and Core have
+`.exe` suffixes. `build.py --target TARGET` requires a matching host rustc and
+emits the target-specific executable and SBOM listed in the delivery contract.
 No compiler, interpreter, linker or LLVM distribution is included.
 
 Build with external prerequisites already installed:

@@ -30,7 +30,7 @@ class ExternalPluginTests(unittest.TestCase):
         parent.mkdir(parents=True, exist_ok=True)
         cls.work = Path(tempfile.mkdtemp(dir=parent))
         # The copied executable runs outside the source tree with isolated Python.
-        cls.binary = Path(shutil.copy2(cls.binary, cls.work / 'collector'))
+        cls.binary = Path(shutil.copy2(cls.binary, native.executable(cls.work, 'collector')))
         cls.environment = os.environ | {'XDG_CACHE_HOME': str(cls.work / 'cache'),
                                         'HARNESS_GATE_PYTHON': sys.executable}
         cls.environment.pop('HARNESS_GATE_NATIVE_CACHE', None)
@@ -75,6 +75,16 @@ class ExternalPluginTests(unittest.TestCase):
         self.assertFalse(self.report['backend_complete'])
         self.assertTrue(self.report['mapping_complete_for_declared_scope'])
 
+    def test_metadata_needs_no_python_or_cache(self):
+        cache = self.work / 'metadata-must-not-create-cache'
+        environment = self.environment | {'HARNESS_GATE_NATIVE_CACHE': str(cache),
+                                           'HARNESS_GATE_PYTHON': str(self.work / 'absent-python')}
+        for option in ('--version', '--licenses'):
+            result = self.entry('metadata-' + option[2:], option, env=environment)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue(result.stdout)
+            self.assertFalse(cache.exists())
+
     def test_real_cargo_capture_and_features(self):
         captures = []
         for features in ([], ['--feature', 'extra']):
@@ -108,7 +118,7 @@ class ExternalPluginTests(unittest.TestCase):
 
     def test_wrong_missing_tools_and_overrides_block(self):
         cases = [('no-sysroot', ['doctor'], 'select external Rust'),
-                 ('missing-sysroot', ['doctor', '--sysroot', str(self.work / 'absent')], 'No such file'),
+                 ('missing-sysroot', ['doctor', '--sysroot', str(self.work / 'absent')], 'measurement_error'),
                  ('wrong-sysroot', ['doctor', '--sysroot', str(self.work)], 'missing external rustc')]
         for name, args, message in cases:
             env = self.environment.copy()
@@ -146,20 +156,23 @@ class ExternalPluginTests(unittest.TestCase):
     def test_modified_cache_is_never_used_or_repaired(self):
         path = self.payload / 'app/native_external.py'
         original = path.read_bytes()
-        for mode in ('bytes', 'extra', 'symlink'):
+        for mode in ('bytes', 'extra', 'symlink', 'permissions'):
             with self.subTest(mode=mode):
                 extra = self.payload / 'app/unexpected.py'
                 if mode == 'bytes':
                     path.write_bytes(original + b'\n')
                 elif mode == 'extra':
                     extra.write_text('raise RuntimeError("must never run")\n')
-                else:
+                elif mode == 'symlink':
                     extra.symlink_to(path)
+                else:
+                    path.chmod(0o444)
                 try:
                     result = self.entry('bad-cache-' + mode, 'doctor', '--sysroot', self.sysroot)
                     self.assertNotEqual(result.returncode, 0)
                     self.assertIn('native collector:', result.stderr)
                 finally:
+                    path.chmod(0o644)
                     path.write_bytes(original)
                     extra.unlink(missing_ok=True)
 
@@ -202,8 +215,10 @@ class ExternalPluginTests(unittest.TestCase):
         request['expires_at_ms'] = request['issued_at_ms'] + 240000
         # Core reserves HARNESS_GATE_*; its authenticated environment uses
         # standard PATH/XDG options and its own invocation marker variables.
-        request['environment'] = {'PATH': str(Path(sys.executable).parent) + ':/usr/bin:/bin',
+        request['environment'] = {'PATH': str(Path(sys.executable).parent) + os.pathsep + os.environ['PATH'],
                                   'XDG_CACHE_HOME': str(self.work / 'cache')}
+        if os.name == 'nt':
+            request['environment']['SystemRoot'] = os.environ['SystemRoot']
         request['capabilities']['environment'] = sorted(request['environment'])
         trusted = sign(self, output, request)
         single = output / 'trusted-key.json'
