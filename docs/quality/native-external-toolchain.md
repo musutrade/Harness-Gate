@@ -1,9 +1,10 @@
 # Native collector with external dependencies
 
-The selected delivery route retains the old native engine and uses Core's release
-process. [Version `0.1.0-rc.4`](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-v0.1.0-rc.4)
-is the signed Linux release. Source version `0.1.0-rc.5` adds Core's four-platform
-publication matrix; each target must pass its hosted acceptance before publication.
+The selected delivery route retains the native engine and uses Core's release
+process. [Version `0.1.0-rc.5`](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-v0.1.0-rc.5)
+is published for Core's four-platform matrix. Source version `0.1.0-rc.6` wires
+the project-owned CRAP policy into direct evaluation; every target must pass its
+real packaged acceptance before publication.
 Stable remains an archived candidate. This supersedes
 stable rewriting as a delivery prerequisite, under the
 [policy amendment](../engineering-policy.md#native-delivery-amendment-2026-09-14).
@@ -115,7 +116,8 @@ defines the precise limits. This delivery does not certify arbitrary macros or
 projects beyond that contract.
 
 Regions remain MIR blocks, complexity remains the typed normal CFG rule, and
-CRAP uses the same exact rational formula. Core keeps CRAP 30, required coverage,
+CRAP uses the same exact rational formula. Core evaluates the project-configured
+CRAP ceiling (the reference preset remains 30), required coverage,
 changed-function rules and historical debt/non-regression decisions. No macro
 exemption policy is enabled. Missing counters, uninstantiated generics, ambiguous
 owners, incompatible inputs and evidence damage remain blocking errors. Reports
@@ -138,8 +140,10 @@ rejected by this product. The host still owns trusted capture anchors and series
 acceptance; an invocation signature does not independently attest the producer.
 
 `certify` emits measurement facts and exits zero for valid evidence, even when the
-numbers would fail policy. `evaluate` calls the existing Rust Core policy bridge
-for anchored base/head captures and returns Core's decision. Raw facts have no
+numbers would fail policy. `evaluate` requires `--repository-root` and
+`--policy-binding`, resolves the existing project policy file, and calls Core for
+anchored base/head captures. See [the exact configuration fields and command](native-crap-policy.md).
+Raw facts have no
 legacy `passed` verdict fields. `collect` validates all selected owners before
 emitting evidence and checks Core's invocation markers; errors exit nonzero.
 
