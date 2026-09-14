@@ -15,6 +15,8 @@
 
 Core **0.4.2** 已发布，修复暂存区主机输入与大型原生报告发布问题。Rust 原生测量通过独立安装、独立版本的可选插件提供；Core 负责编排和质量决策。文档入口见[文档目录](docs/README.md)，发布凭据与剩余工作见[交付状态](docs/release-status.md)。
 
+源码正在准备 Core **0.4.3** 安装维护版：可选 Rust 安装改为下载已签名的独立二进制，工具链作为外部依赖。发布状态和固定版本用法见[独立插件安装指南](docs/quality/standalone-installation.md)。
+
 ## 阅读导航
 
 - 快速开始：看[安装](#安装)和[快速开始](#安装与快速开始)；
@@ -87,11 +89,11 @@ harness-gate --version
 
 ### 可选 Rust 插件
 
-默认仅安装 Core，不下载 Rust 分析工具链。请按[当前插件安装指南](docs/quality/rust-collector-installation.md)选择已签名安装器、兼容的 Core/插件组合或离线包。安装器与插件独立版本；历史 Core tag 中的脚本不会自动选择未来插件版本。
+默认仅安装 Core，不下载 Rust 分析工具链。原生插件沿用旧测量引擎，按 Core 的签名发布流程交付编译好的二进制；匹配的 Rust/LLVM 和 Python 由用户独立安装。原生 `0.1.0-rc.4` 已发布 Linux x86_64 版本；四平台 `0.1.0-rc.5` 与 Core `0.4.3` 安装器正在准备。
 
-插件采用约 270 MB 的工具链层与 13 MB 的插件层；首次连同 bootstrap、验证工具及元数据约 **444 MB**。未改变的工具层按摘要缓存，运行时和原始签名归档保留用于验证及回滚。默认插件目录为 `~/.local/share/harness-gate/rust-collector`，缓存目录为 `~/.cache/harness-gate/collector`。
+[独立插件安装指南](docs/quality/standalone-installation.md)说明 `--with-rust`、`--rust-only` 和独立的 `--rust-version` 选择。stable 引擎保留为显式候选，不自动切换度量系列或基线。安装不会替项目接受可信证据或修改默认 Rust 工具链。
 
-Rust 原生采集只认证明确记录的 Linux x86_64 ABI，兼容版本和实际回执见[交付状态](docs/release-status.md#compatibility)。安装不会替项目生成可信采集请求、接受基线或修改默认 Rust 工具链。
+原有 RC3 整包安装及离线归档保留[历史安装指南](docs/quality/rust-collector-installation.md)。新的安装器不搬迁或删除旧环境；历史 Core tag 中的安装器继续保留各自的版本绑定。
 
 ### 从源码安装
 
@@ -133,12 +135,12 @@ sha256sum --check SHA256SUMS
 cosign verify-blob --signature harness-gate-linux-amd64.sig \
   --certificate harness-gate-linux-amd64.crt \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity-regexp '^https://github.com/musutrade/Harness-Gate/.github/workflows/release\.yml@refs/tags/v0\.4\.1$' \
+  --certificate-identity 'https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v0.4.2' \
   harness-gate-linux-amd64
 cosign verify-blob --signature harness-gate.sbom.cdx.json.sig \
   --certificate harness-gate.sbom.cdx.json.crt \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity-regexp '^https://github.com/musutrade/Harness-Gate/.github/workflows/release\.yml@refs/tags/v0\.4\.1$' \
+  --certificate-identity 'https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v0.4.2' \
   harness-gate.sbom.cdx.json
 ```
 

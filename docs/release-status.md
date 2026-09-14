@@ -1,5 +1,25 @@
 # Published releases and acceptance
 
+## Standalone delivery update, 2026-09-14
+
+The native old-engine standalone [0.1.0-rc.4 release](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-v0.1.0-rc.4)
+is published for Linux x86_64 from `52532a7ed133dacf1f665e48e8580c37cdaa7cee`;
+[release workflow 34823683270](https://github.com/musutrade/Harness-Gate/actions/runs/34823683270)
+completed its signed inventory and provenance checks. It contains our compiled
+plugin and metadata, with Rust/LLVM and Python supplied externally. This is distinct
+from installer RC4, which delivered the historical bundled RC3 product below.
+
+Core 0.4.3 is being prepared as an installer maintenance release. The new
+[installation entry point](quality/standalone-installation.md) selects a native
+binary directly and keeps Core/plugin versions independent. Its default plugin
+`0.1.0-rc.5` depends on the four-platform delivery in
+[PR #264](https://github.com/musutrade/Harness-Gate/pull/264). Publish and verify
+that native release before tagging Core 0.4.3. Neither prepared version is claimed
+published by this source update; Core 0.4.2 remains compatible with the native
+plugin. The records below retain their original date, identities and scope.
+
+## Bundled delivery acceptance, 2026-09-13
+
 Verified on **2026-09-13**. Core 0.4.2 and its compatible optional Rust delivery are published and installed on the acceptance host. Engineering Policy semantics are unchanged.
 
 | Component | Published version | Source / verification |
