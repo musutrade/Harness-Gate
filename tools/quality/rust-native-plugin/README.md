@@ -34,6 +34,15 @@ sources/notices against Cargo.lock and writes a CycloneDX SBOM using Core's tool
 
 Run mandatory acceptance (missing inputs or skipped tests fail):
 
+The disposable protocol-v2 request signer needs OpenSSL with Ed25519 `pkeyutl
+-rawin` support. On macOS, put the existing Homebrew OpenSSL 3 `bin` directory
+on PATH (`export PATH="$(brew --prefix openssl@3)/bin:$PATH"`); the system
+LibreSSL command does not implement that signing interface. OpenSSL is an
+acceptance-test dependency, not embedded in the plugin. Windows measurement
+passes `/INCREMENTAL:NO` to the MSVC linker so its padding cannot corrupt LLVM
+profiling sections. The complete fixture and Cargo acceptance checks require
+valid raw profiles and no incremental `.ilk` artifacts.
+
 ```sh
 NATIVE_PLUGIN_BINARY="$PWD/target/native-package/harness-gate-rust-collector-linux-amd64" \
 NATIVE_DRIVER="$PWD/target/native-driver/release/harness-gate-rust-native-driver" \

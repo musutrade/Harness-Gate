@@ -42,6 +42,9 @@ class NativeDriverTests(unittest.TestCase):
                                  sources if sources is not None else self.capture['production_sources'], [])
 
     def test_real_generated_constructor_closure_async_and_instances(self):
+        if os.name == 'nt':
+            self.assertEqual(list(self.evidence.glob('*.ilk')), [],
+                             'incremental link padding must not enter native profiling sections')
         self.assertTrue(self.report['mapping_complete_for_declared_scope'])
         self.assertFalse(self.report['backend_complete'])
         rows = {f['name']: f for f in self.report['functions']}
