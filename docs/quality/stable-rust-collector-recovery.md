@@ -167,9 +167,24 @@ A candidate compiler fix must first recover real owners/counters for different
 invocations/features and execution outcomes, then test unexecuted/nested/duplicate
 owners and reject wrong mappings before collector adoption. General macro support
 is not implied. For these two capability requests, **submitted: no; merged: no;
-adopted fix version: none**. This is a prepared request and reproduction, not an
-upstream submission. The separately tracked attribute-macro PR is not an adopted
-fix for these fixtures.
+adopted fix version: none**. On 2026-09-14 the exact function-like request was
+sent to GitHub's issue-creation API, which returned HTTP 403, `Resource not
+accessible by personal access token`. No upstream issue was created. The derive
+submission was not attempted after that repository permission failure. The
+complete [function-like report](stable-rust-candidate-evidence/upstream-macro-request.md)
+and [derive capability request](stable-rust-candidate-evidence/upstream-derive-request.md)
+are ready for a maintainer with issue-creation permission to submit. All 13 pinned
+public fixture source/lockfile blobs were verified against the existing capture
+inputs; no compiler or runtime acceptance was rerun for this documentation step.
+The separately tracked attribute-macro PR is still open and is not an adopted fix.
+
+The upstream duplicate/source review also found
+[rust-lang/rust#147434](https://github.com/rust-lang/rust/issues/147434), which
+discusses the intentional derive exclusion and possible opt-in, and
+[#134749](https://github.com/rust-lang/rust/issues/134749), which tracks coverage
+attribute stabilization and directs specific requests to dedicated issues. The
+derive report requests a supported opt-in capability; it does not assert a
+default-policy regression or use the unstable coverage attribute as a workaround.
 
 The successful current-head CI supersedes the old request for a permitted build/
 runtime trace and the earlier local diagnostic setup limitation. Neither a passing
@@ -182,7 +197,11 @@ generated-function owners and counters (including emitted unexecuted functions)
 through stable coverage, with a supported derive instrumentation path. The
 function-like internal cause is still unproven; the derive exclusion is
 source-confirmed. There is no justified third-party parser patch or adopted stable
-compiler fix. Submission, merge and adoption remain separate pending states.
+compiler fix. The immediate external action is to submit the two prepared reports
+with an authorized upstream account; then establish a stable capability or
+verifiable alternative and validate it before adoption. Submission, merge and
+adoption remain separate pending states. The HTTP 403 blocks submission from this
+session, independently of the missing compiler capability.
 
 T6 separately requires explicit review of the same-owner code-region denominator
 for CRAP and the historical-to-AST measurement transition. No authority to adopt

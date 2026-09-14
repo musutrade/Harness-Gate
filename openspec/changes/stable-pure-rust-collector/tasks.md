@@ -23,6 +23,16 @@ measurement migration. See the recovery document for exact capability requests
 and separate submission/merge/adoption states. Linux and production-signature
 acceptance remain independent; no release hold removal or completion is claimed.
 
+The 2026-09-14 upstream submission attempt for the exact function-like fixture
+received HTTP 403 (`Resource not accessible by personal access token`); no issue
+was created, and the derive submission was not attempted after that failure.
+Complete reports are preserved as `upstream-macro-request.md` and
+`upstream-derive-request.md` in the candidate evidence directory for an authorized
+maintainer to submit. Thirteen public pinned fixture blobs match the existing
+inputs. The related derive/default-policy and coverage-attribute discussions do
+not provide an adopted stable fix. No runtime suite was repeated for this
+documentation step; T4 and T6 remain unchecked.
+
 T4's dep-info follow-up binds complete raw compiler output to the producing
 invocation's observed digest and byte length. Added/changed/omitted environment
 comments and missing/inconsistent producer identities have real-capture regression

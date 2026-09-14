@@ -37,7 +37,7 @@
   "exact_fixture_capability_request": {
     "submitted": false,
     "needed": "Stable generated owner and real counter export for executed and unexecuted functions with invocation/configuration identity.",
-    "next_step": "Establish upstream applicability or track the exact function-like reproduction separately; do not claim this related PR fixes it."
+    "next_step": "An upstream maintainer with issue-creation permission must submit the prepared function-like and derive reports; this session received HTTP 403. Validate any eventual stable fix before adoption."
   },
   "adoption_requirements": [
     "Merged change available in supported released stable Rust",
@@ -64,6 +64,73 @@
     "whitespace": {
       "command": "git diff --check",
       "exit_code": 0
+    }
+  },
+  "submission_checkpoint": {
+    "checked_on_utc": "2026-09-14",
+    "kind": "Upstream duplicate/status review and denied issue-creation attempt; no new runtime acceptance",
+    "public_fixture_commit": "f553fa412df9e7ac119197af98c13cb169ee070c",
+    "public_fixture_blobs_verified": 13,
+    "macro_request": {
+      "draft": "docs/quality/stable-rust-candidate-evidence/upstream-macro-request.md",
+      "attempted": true,
+      "method": "POST",
+      "path": "/repos/rust-lang/rust/issues",
+      "http_status": 403,
+      "error": "Resource not accessible by personal access token",
+      "submitted": false,
+      "issue_url": null,
+      "fix_pr": null,
+      "merged": false,
+      "adopted_fixed_version": null
+    },
+    "derive_request": {
+      "draft": "docs/quality/stable-rust-candidate-evidence/upstream-derive-request.md",
+      "attempted": false,
+      "reason": "Same repository permission failure; no redundant denied write",
+      "submitted": false,
+      "issue_url": null,
+      "fix_pr": null,
+      "merged": false,
+      "adopted_fixed_version": null
+    },
+    "related_reviews": [
+      {
+        "url": "https://github.com/rust-lang/rust/pull/158276",
+        "state": "open",
+        "merged": false,
+        "head_sha": "401941acaed24c6477203c87533d08f3c548d953",
+        "applicability": "Not established for the function-like fixture"
+      },
+      {
+        "url": "https://github.com/rust-lang/rust/issues/147434",
+        "state": "open",
+        "relevance": "Intentional default derive exclusion; opt-in discussed, not an implemented stable solution"
+      },
+      {
+        "url": "https://github.com/rust-lang/rust/issues/134749",
+        "state": "open",
+        "relevance": "Coverage attribute stabilization tracking; specific requests belong in dedicated issues"
+      },
+      {
+        "url": "https://github.com/rust-lang/rust/issues/84561",
+        "state": "closed",
+        "relevance": "Historical function-like macro region behavior, not established as the missing whole-function case"
+      }
+    ],
+    "fixture_rerun": false,
+    "compiler_built": false,
+    "required_crap_supported": false,
+    "release_hold_removed": false,
+    "next_action": "Maintainer with upstream issue-creation permission submits both reports; capability resolution and stable-version adoption require separate real validation.",
+    "validation": {
+      "docs_consistency": {
+        "command": "CARGO_TARGET_DIR=\"$PWD/target/gh-259/core-target\" RUSTUP_TOOLCHAIN=1.98.1 python3 tools/quality/docs_consistency.py --output target/gh-259/upstream-submission/docs-consistency.json",
+        "exit_code": 0
+      },
+      "changed_file_whitespace_and_tracking_json": "passed",
+      "unchanged_runtime_suites": "not repeated; prior checkpoint evidence retained",
+      "project_config_check_and_verify": "not applicable: .harness-gate/flow.toml absent"
     }
   }
 }
