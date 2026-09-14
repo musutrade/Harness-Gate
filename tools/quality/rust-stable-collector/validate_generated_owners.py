@@ -82,64 +82,107 @@ def main():
         exports[configuration] = {'coverage': identity(coverage), 'owners': counts,
                                   'zero_is_recorded_not_missing': True}
 
-    # The collector must not reject the fixture: this is an in-workspace build
-    # script, so no registry build script/proc-macro rule applies.
     run('doctor', ['doctor', project, output / 'doctor'])
-    request = run('prepare', ['prepare', project, output / 'capture', output / 'doctor/doctor.json'])
-    request_file = output / 'request.json'
-    request_file.write_bytes(request)
-    run('collect', ['collect', request_file])
-    capture = output / 'capture'
-
-    # The collector must certify the generated file itself, with each function
-    # bound to a real owner and the unexecuted one to a real zero.
-    certified = json.loads((capture / 'generated-owners.json').read_bytes())
-    assert certified['schema'] == 'rust-stable-generated-owners/v1-candidate'
-    assert len(certified['owners']) == 1, certified['owners']
-    entry = certified['owners'][0]
-    assert entry['filename'].endswith('generated_owners.rs')
-    assert entry['producer'].endswith('.d')
-    certified_counts = {f['name']: f['execution_count'] for f in entry['owner']['functions']}
-    assert certified_counts == {'plain': 1, 'branch': 2, 'unexecuted': 0, 'configured': 1}, certified_counts
-    assert entry['owner']['state'] == 'supported'
-    zero = next(f for f in entry['owner']['functions'] if f['name'] == 'unexecuted')
-    assert zero['coverage_region']['covered'] == 0 and zero['coverage_region']['total'] > 0
-
-    # The recomputed verify path must accept the capture. The anchor is the
-    # manifest's own digest, so a tampered capture fails.
-    manifest = json.loads((capture / 'manifest.json').read_bytes())
-    anchor = identity(capture / 'manifest.json')['sha256']
-    run('verify', ['verify', capture, anchor, manifest['request_sha256']])
-
-    # Negative cases: forged coverage numbers, a swapped producer and a dropped
-    # owner must fail the recompute, not succeed silently. The manifest is also
-    # updated so the tamper reaches the fact check rather than failing the hash.
-    target = capture / 'generated-owners.json'
-    for name, mutation in [
-        ('forged-generated-count', lambda value: value['owners'][0]['owner']['functions'][2].update(execution_count=99)),
-        ('swapped-generated-producer', lambda value: value['owners'][0].update(producer='stolen/other.d')),
-        ('dropped-generated-owner', lambda value: value['owners'][0]['owner']['functions'].pop()),
-    ]:
-        saved_bytes = target.read_bytes()
-        saved_manifest = (capture / 'manifest.json').read_bytes()
-        value = json.loads(saved_bytes)
-        mutation(value)
-        target.write_text(json.dumps(value))
-        manifest['files']['generated-owners.json'] = identity(target)
-        updated_manifest = json.dumps(manifest).encode()
-        (capture / 'manifest.json').write_bytes(updated_manifest)
-        run(name, ['verify', capture, identity(capture / 'manifest.json')['sha256'],
-                   manifest['request_sha256']], success=False,
-            contains='generated owner facts differ from recomputed facts')
-        target.write_bytes(saved_bytes)
-        (capture / 'manifest.json').write_bytes(saved_manifest)
-        manifest = json.loads(saved_manifest)
+    certified_results = {}
+    for configuration in ('default', 'branching', 'duplicate'):
+        case = 'generated-' + configuration
+        capture = output / ('capture-' + case)
+        request = json.loads(run('prepare-' + case, ['prepare', project, capture,
+                            output / 'doctor/doctor.json']))
+        request['features'] = [] if configuration == 'default' else [configuration]
+        request_file = output / (case + '.request.json')
+        request_file.write_text(json.dumps(request))
+        run(case, ['collect', request_file])
+        certified = json.loads((capture / 'generated-owners.json').read_bytes())
+        assert len(certified['owners']) == (2 if configuration == 'duplicate' else 1)
+        result = {}
+        for entry in certified['owners']:
+            counts = {f['name']: f['execution_count'] for f in entry['owner']['functions']}
+            duplicate = entry['filename'].endswith('duplicate_owners.rs')
+            expected = ({'plain': 2, 'branch': 0, 'unexecuted': 0, 'configured': 0} if duplicate else
+                        {'plain': 1, 'branch': 2, 'unexecuted': 0, 'configured': 1})
+            assert counts == expected, counts
+            assert entry['owner']['state'] == 'supported'
+            assert entry['compilations'] and len(set(entry['compilations'])) == len(entry['compilations'])
+            complexity = {f['name']: f['complexity'] for f in entry['analysis']['functions']}
+            assert complexity['configured'] == (2 if configuration == 'branching' else 1)
+            result[entry['logical_path']] = counts
+        if configuration == 'duplicate':
+            assert certified['owners'][0]['sha256'] == certified['owners'][1]['sha256']
+        certified_results[configuration] = result
+        manifest_path = capture / 'manifest.json'
+        manifest = json.loads(manifest_path.read_bytes())
+        anchor = identity(manifest_path)['sha256']
+        run('verify-' + case, ['verify', capture, anchor, manifest['request_sha256']])
+        target = capture / 'generated-owners.json'
+        for name, mutation in [
+            ('forged-count', lambda v: v['owners'][0]['owner']['functions'][0].update(execution_count=99)),
+            ('swapped-producer', lambda v: v['owners'][0].update(producer='stolen/other.d')),
+            ('dropped-compilation', lambda v: v['owners'][0]['compilations'].pop()),
+            ('dropped-owner', lambda v: v['owners'][0]['owner']['functions'].pop()),
+            ('dropped-file', lambda v: v['owners'].pop()),
+        ]:
+            saved = target.read_bytes()
+            saved_manifest = manifest_path.read_bytes()
+            value = json.loads(saved)
+            mutation(value)
+            target.write_text(json.dumps(value))
+            manifest['files']['generated-owners.json'] = identity(target)
+            manifest_path.write_text(json.dumps(manifest))
+            run(name + '-' + case, ['verify', capture, identity(manifest_path)['sha256'],
+                manifest['request_sha256']], success=False,
+                contains='generated owner facts differ from recomputed facts')
+            target.write_bytes(saved)
+            manifest_path.write_bytes(saved_manifest)
+            manifest = json.loads(saved_manifest)
+        workspace = output / ('source-' + case)
+        args_export = ['export-core-source', capture, anchor, manifest['request_sha256']]
+        run('export-' + case, [*args_export, workspace])
+        run('export-existing-' + case, [*args_export, workspace], success=False,
+            contains='source workspace must be a new directory')
+        rejected = project / ('rejected-' + case)
+        run('export-in-project-' + case, [*args_export, rejected], success=False)
+        assert not rejected.exists()
+        describe = ['describe', capture, anchor, manifest['request_sha256'], '--source-workspace', workspace]
+        description = json.loads(run('describe-' + case, describe))
+        generated = [o for o in description['owners'] if o.get('generated')]
+        assert len(generated) == (8 if configuration == 'duplicate' else 4)
+        assert len({(o['path'], o['discriminator']) for o in generated}) == len(generated)
+        for owner in description['owners']:
+            assert identity(workspace / owner['path'])['sha256'] == owner['source_sha256']
+        # A modified snapshot cannot re-authorize itself, even if its own manifest
+        # is rewritten. Both the collector and Core must still use captured bytes.
+        source = workspace / generated[0]['path']
+        saved = source.read_bytes()
+        source.write_bytes(saved + b'// forged\n')
+        run('tampered-source-' + case, describe, success=False)
+        snapshot_manifest = workspace / 'source-workspace.json'
+        snapshot_saved = snapshot_manifest.read_bytes()
+        forged = json.loads(snapshot_saved)
+        forged['files'][generated[0]['path']] = identity(source)
+        snapshot_manifest.write_text(json.dumps(forged, indent=2))
+        run('self-reanchored-snapshot-' + case, describe, success=False)
+        snapshot_manifest.write_bytes(snapshot_saved)
+        source.write_bytes(saved)
+        source.unlink()
+        run('missing-source-' + case, describe, success=False)
+        source.symlink_to(capture / 'compiler-generated' / generated[0]['source_sha256'])
+        run('symlink-source-' + case, describe, success=False)
+        source.unlink()
+        source.write_bytes(saved)
+        extra = workspace / 'unexpected.rs'
+        extra.write_text('fn omitted() {}')
+        run('extra-source-' + case, describe, success=False)
+        extra.unlink()
+        if configuration != 'default':
+            wrong_workspace = output / 'source-generated-default'
+            run('mixed-configuration-' + case, [*describe[:-1], wrong_workspace], success=False)
 
     summary = {'schema': 'rust-generated-owner-regression/v1', 'binary': identity(binary),
                'fixture': identity(fixture / 'Cargo.lock'), 'checks': records, 'exports': exports,
-               'certified_owners': certified_counts,
+               'certified_owners': certified_results,
                'proc_macro_token_stream_coverage': 'unsupported (unchanged)',
-               'core_acceptance': 'unsupported', 'T4': 'incomplete'}
+               'core_acceptance': 'separate authenticated Core fixture required', 'T4': 'incomplete'}
     (output / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')
     print(json.dumps({'checks': len(records), 'state': 'generated-owner regression passed'}))
 

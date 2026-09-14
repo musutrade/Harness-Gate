@@ -285,3 +285,24 @@ names SHALL distinguish same-named functions in separate modules.
   metric definitions, thresholds, requiredness, CRAP support or existing baselines
 - **AND** the new binary-bound Core series identity is preserved without assuming
   compatibility with an existing baseline
+
+### Requirement: Authenticated generated-source workspace for Core
+
+An explicit candidate source export MUST bind actual copied project/generated
+source bytes to the verified capture, original request, generated input paths and
+consuming compiler records. Distinct generated paths MUST NOT collapse solely
+because their content digests match. Core MUST retain its existing relative-path
+and source-digest validation. The exported view MUST use a distinct candidate
+source identity and MUST NOT adopt historical baselines or relax required metrics.
+
+#### Scenario: Generated owners reach Core
+
+- GIVEN certified generated Rust files with executed and unexecuted functions
+- WHEN the operator exports a new verified source workspace and binds it in the signed Core request
+- THEN Core receives independent function records with actual source complexity and function/code-region coverage, while uncertified CRAP remains blocking.
+
+#### Scenario: Modified or incomplete exported source
+
+- GIVEN a source workspace with substituted, missing, added or symlinked source files, an altered manifest or a different capture/configuration
+- WHEN the collector describes the workspace or converts evidence for Core
+- THEN recomputation rejects it without a successful evidence response.

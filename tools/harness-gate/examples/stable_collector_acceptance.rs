@@ -152,7 +152,7 @@ fn run() -> Result<()> {
     let args: Vec<_> = env::args_os().skip(1).collect();
     ensure!(
         args.len() == 5,
-        "usage: stable_collector_acceptance COLLECTOR CORE CAPTURE_ACCEPTANCE NEW_OUTPUT plain|partial|modules|boundaries|features|registry"
+        "usage: stable_collector_acceptance COLLECTOR CORE CAPTURE_ACCEPTANCE NEW_OUTPUT plain|partial|modules|boundaries|features|registry|generated-default|generated-branching|generated-duplicate"
     );
     let binary = Path::new(&args[0]).canonicalize()?;
     let core = Path::new(&args[1]).canonicalize()?;
@@ -167,19 +167,29 @@ fn run() -> Result<()> {
             "modules",
             "boundaries",
             "features",
-            "registry"
+            "registry",
+            "generated-default",
+            "generated-branching",
+            "generated-duplicate"
         ]
         .contains(&case),
         "unknown fixture"
     );
     let anchor = read(&capture_root.join(format!("{case}.stdout")))?;
     let capture = capture_root.join(format!("capture-{case}"));
-    let described = Command::new(&binary)
+    let mut describe_command = Command::new(&binary);
+    describe_command
         .arg("describe")
         .arg(&capture)
         .arg(anchor["manifest_sha256"].as_str().unwrap())
-        .arg(anchor["request_sha256"].as_str().unwrap())
-        .output()?;
+        .arg(anchor["request_sha256"].as_str().unwrap());
+    let generated_case = case.starts_with("generated-");
+    if generated_case {
+        describe_command
+            .arg("--source-workspace")
+            .arg(capture_root.join(format!("source-{case}")));
+    }
+    let described = describe_command.output()?;
     ensure!(
         described.status.success(),
         "describe: {}",
@@ -251,7 +261,65 @@ fn run() -> Result<()> {
         .filter(|m| m["name"] == "complexity.cyclomatic")
         .map(|m| m["value"]["value"].clone())
         .collect();
-    if matches!(case, "plain" | "partial") {
+    if generated_case {
+        let generated: Vec<_> = description["owners"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|owner| owner["generated"] == true)
+            .collect();
+        ensure!(
+            generated.len() == if case == "generated-duplicate" { 8 } else { 4 },
+            "generated owners must enter Core, including never-executed owners"
+        );
+        for owner in generated {
+            let record = records
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|record| {
+                    record["subject"]["path"] == owner["path"]
+                        && record["subject"]["discriminator"] == owner["discriminator"]
+                })
+                .context("Core generated record missing")?;
+            ensure!(
+                record["status"] == "measured",
+                "generated owner unavailable in Core"
+            );
+            for (metric, expected) in [
+                (
+                    "complexity.cyclomatic",
+                    json!({"type":"count", "value":owner["function"]["complexity"]}),
+                ),
+                (
+                    "coverage.function",
+                    owner["coverage_owner"]["coverage_function"].clone(),
+                ),
+                (
+                    "coverage.region",
+                    owner["coverage_owner"]["coverage_region"].clone(),
+                ),
+            ] {
+                let value = &record["metrics"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .find(|value| value["name"] == metric)
+                    .context("generated metric missing")?["value"];
+                ensure!(
+                    *value == expected && !value.is_null(),
+                    "generated Core metric mismatch: {metric}"
+                );
+            }
+            if owner["function"]["name"] == "unexecuted" {
+                ensure!(
+                    owner["coverage_owner"]["coverage_function"]["covered"] == 0
+                        && owner["coverage_owner"]["coverage_region"]["covered"] == 0,
+                    "never-executed generated owner lost its real zero"
+                );
+            }
+        }
+    } else if matches!(case, "plain" | "partial") {
         ensure!(
             counts == vec![json!(3), json!(1)],
             "real lexical counts: {counts:?}"
@@ -410,6 +478,38 @@ fn run() -> Result<()> {
         "Core stale context"
     );
     checks["core-stale-context"] = json!({"blocked":true});
+    if generated_case {
+        let generated = description["owners"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|owner| owner["generated"] == true)
+            .context("generated owner")?;
+        let path = source_root.join(generated["path"].as_str().unwrap());
+        let bytes = fs::read(&path)?;
+        fs::write(&path, b"forged generated source")?;
+        let rejected = evidence::validate_evidence(records, &validation).is_err();
+        fs::write(&path, &bytes)?;
+        ensure!(rejected, "Core accepted substituted generated source");
+        checks["core-generated-source-substitution"] = json!({"blocked":true});
+        let path_value = generated["path"].clone();
+        checks["generated-owner-swap"] = fixture.altered_binding("generated-owner-swap", |b| {
+            let subject = b["project"]["subjects"]
+                .as_array_mut()
+                .unwrap()
+                .iter_mut()
+                .find(|subject| subject["path"] == path_value)
+                .unwrap();
+            subject["discriminator"] = json!("unrelated-generated-owner");
+        })?;
+        if case != "generated-default" {
+            checks["mixed-generated-configuration"] =
+                fixture.altered_binding("mixed-generated-configuration", |b| {
+                    b["input"]["workspace_root"] =
+                        json!(capture_root.join("source-generated-default"));
+                })?;
+        }
+    }
     let artifact = output.join(records[0]["artifacts"][0]["path"].as_str().unwrap());
     let original = fs::read(&artifact)?;
     fs::write(&artifact, b"corrupt")?;

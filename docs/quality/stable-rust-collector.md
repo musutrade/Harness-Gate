@@ -1,5 +1,12 @@
 # Stable Rust collector: implementation contract and candidate
 
+Current generated-source integration: [`export-core-source` and `describe
+--source-workspace`](stable-rust-generated-owners.md) provide explicit verified
+source snapshots for the existing Core contract. Bounded real-file generated
+owners can enter Core with complexity and function/code-region coverage; the
+proc-macro/derive, line-coverage, CRAP and release/migration limits remain below.
+This supersedes earlier statements that *all* generated owners lack Core access.
+
 GH-259 is **not complete**. The executable in
 [`tools/quality/rust-stable-collector`](../../tools/quality/rust-stable-collector)
 performs real stable coverage capture and Rust syntax analysis. It is a developer

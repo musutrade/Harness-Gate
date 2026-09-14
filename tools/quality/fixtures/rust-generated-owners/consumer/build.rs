@@ -21,5 +21,12 @@ fn main() {
     ];
     let out = PathBuf::from(env::var_os("OUT_DIR").unwrap()).join("generated_owners.rs");
     fs::write(&out, functions.join("\n") + "\n").unwrap();
+    if env::var_os("CARGO_FEATURE_DUPLICATE").is_some() {
+        fs::write(
+            out.with_file_name("duplicate_owners.rs"),
+            functions.join("\n") + "\n",
+        )
+        .unwrap();
+    }
     println!("cargo:rerun-if-changed=build.rs");
 }

@@ -597,6 +597,15 @@ jobs:
                 "target/stable-candidate-checks/core-${fixture}" "$fixture"
             python3 -c 'from pathlib import Path; import sys; sys.path.insert(0, "tools/quality/rust-stable-collector"); from validate_stable_candidate import check_trace; check_trace(Path(sys.argv[1]))' "target/stable-candidate-checks/core-${fixture}.execve"
           done
+          for fixture in generated-default generated-branching generated-duplicate; do
+            "$HARNESS_EXEC_AUDIT" "target/stable-candidate-checks/core-${fixture}.execve" -- \
+              target/stable-candidate-build/debug/examples/stable_collector_acceptance \
+                target/stable-candidate-build/release/harness-gate-rust-stable-collector \
+                target/stable-candidate-build/debug/harness-gate \
+                target/stable-candidate-checks/generated-owners \
+                "target/stable-candidate-checks/core-${fixture}" "$fixture"
+            python3 -c 'from pathlib import Path; import sys; sys.path.insert(0, "tools/quality/rust-stable-collector"); from validate_stable_candidate import check_trace; check_trace(Path(sys.argv[1]))' "target/stable-candidate-checks/core-${fixture}.execve"
+          done
           python3 tools/quality/rust-stable-collector/compare_historical_fixture.py \
             --binary target/stable-candidate-build/release/harness-gate-rust-stable-collector \
             --output target/stable-candidate-checks/historical
