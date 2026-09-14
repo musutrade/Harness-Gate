@@ -1,21 +1,31 @@
 # Native collector with external dependencies
 
 The selected delivery route retains the old native engine and uses Core's release
-process. The source version is `0.1.0-rc.4`; no signed release of this standalone
-product is claimed yet. Stable remains an explicit candidate. This supersedes
+process. [Version `0.1.0-rc.4`](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-v0.1.0-rc.4)
+is the signed Linux release. Source version `0.1.0-rc.5` adds Core's four-platform
+publication matrix; each target must pass its hosted acceptance before publication.
+Stable remains an archived candidate. This supersedes
 stable rewriting as a delivery prerequisite, under the
 [policy amendment](../engineering-policy.md#native-delivery-amendment-2026-09-14).
 
 ## Product and dependencies
 
-The release contains `harness-gate-rust-collector-linux-amd64`, its CycloneDX SBOM,
-Core-format `release-inventory.json`, `SHA256SUMS` and Sigstore signatures and
+The release contains the platform executables below, a separate CycloneDX SBOM
+for each executable, Core-format `release-inventory.json`, `SHA256SUMS` and Sigstore signatures and
 certificates. The binary embeds our driver, Python adapter sources, schemas and
 license notices. It does not contain Rust, LLVM, Python or a system environment.
 `--version` and `--licenses` need no external interpreter and write no cache.
 
-The runtime requires Linux x86_64 GNU, Python 3.12 or newer, and an explicit
-external Rust **1.97.1**, commit
+| Platform | Target | Executable |
+| --- | --- | --- |
+| Linux x86_64 GNU | `x86_64-unknown-linux-gnu` | `harness-gate-rust-collector-linux-amd64` |
+| macOS Intel | `x86_64-apple-darwin` | `harness-gate-rust-collector-macos-amd64` |
+| macOS Apple Silicon | `aarch64-apple-darwin` | `harness-gate-rust-collector-macos-arm64` |
+| Windows x86_64 MSVC | `x86_64-pc-windows-msvc` | `harness-gate-rust-collector-windows-amd64.exe` |
+
+Each SBOM is named after its executable, removing `.exe`, then appending
+`.sbom.cdx.json`. The runtime requires Python 3.12 or newer and an explicit
+external Rust **1.97.1** for the same host target, commit
 `8bab26f4f68e0e26f0bb7960be334d5b520ea452`, with matching `librustc_driver`,
 LLVM **22.1.6**, sysroot and `llvm-tools-preview`. Target projects also need
 their normal linker, native libraries and test services. `rustc-dev` is a
@@ -23,14 +33,17 @@ publisher build dependency; the consumer does not need its development crates.
 
 Select the sysroot using `--sysroot` or `HARNESS_GATE_RUST_SYSROOT`.
 `HARNESS_GATE_PYTHON` can select an interpreter for direct use; otherwise the
-launcher calls `python3` from PATH. No command installs dependencies or changes
+launcher calls `python3` from PATH (`python.exe` on Windows). Python runs isolated
+with UTF-8 enabled. No command installs dependencies or changes
 the default Rust toolchain. An incompatible/missing tool or a loading failure
 blocks collection and produces `measurement_error`.
 
-Only Linux x86_64 is implemented here. Local validation uses Ubuntu 26.04,
-Python 3.14.4 and Core 0.4.2; hosted acceptance is configured for Ubuntu 24.04 and
-Python 3.12. A local run does not establish the hosted result or portability to
-every GNU/Linux ABI. The dependency probe loads the actual driver on the host.
+The release matrix uses Ubuntu 24.04, macOS 15 Intel, macOS 15 Apple Silicon and
+Windows Server 2025, with Python 3.12 and matching native Rust hosts. The dependency
+probe loads the actual driver and authenticates the matching compiler/LLVM files.
+Only a successful target job establishes its hosted result; Linux acceptance
+does not stand in for another platform. Platform and tool identities remain part
+of the measurement evidence and cannot silently replace an existing baseline.
 
 ## Install and collect
 
@@ -82,7 +95,8 @@ data from retained binaries. It does not rerun archived programs.
 
 The cache defaults to `$XDG_CACHE_HOME/harness-gate/native` or
 `$HOME/.cache/harness-gate/native`; `HARNESS_GATE_NATIVE_CACHE` can override it for
-direct use. Each payload has a separate content-addressed directory. Extra,
+direct use. Windows defaults to `%LOCALAPPDATA%/harness-gate/native` when no explicit
+cache is selected. Each payload has a separate content-addressed directory. Extra,
 modified or symlinked payload files block execution rather than being repaired
 silently. Preserve the original executable, cache and external dependencies for
 historical re-export. Upgrades add another payload; rollback selects the previous
@@ -90,8 +104,10 @@ verified binary and its matching evidence. Neither operation rewrites a baseline
 
 ## Measurement and Core contract
 
-The algorithms in `rust_native_driver.py`, `rust_native_classify.py`,
-`rust_native_policy.py` and `rust_collector_project.py` are reused unchanged.
+The native MIR instrumentation, counter aggregation, complexity, CRAP and Core
+policy rules remain the existing algorithms. Host-specific tool discovery,
+library loading, executable suffixes and path separators are handled by the
+adapter; these changes do not introduce a new measurement formula.
 Independent typed-MIR basic-block counters cover the old validated compiler-owner
 scope, including derived methods, macro expansions, constructors, closures and
 async bodies. The [native engine contract](../../tools/quality/rust-native-driver/README.md)
