@@ -1,8 +1,15 @@
 """The native tag route must retain Core's publication trust boundary."""
+import importlib.util
 from pathlib import Path
+import re
+import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[3]
+SPEC = importlib.util.spec_from_file_location('release_inventory', ROOT / 'tools/release/release_inventory.py')
+assert SPEC and SPEC.loader
+inventory = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(inventory)
 
 
 class NativeReleaseWorkflowTests(unittest.TestCase):
@@ -47,6 +54,37 @@ class NativeReleaseWorkflowTests(unittest.TestCase):
         self.assertIn('fail-fast: false', build)
         self.assertIn('--target ${{ matrix.target }}', build)
         self.assertIn('native-acceptance-${{ github.run_id }}-${{ matrix.target }}', build)
+
+    def test_native_publish_inventory_seals_all_four_platform_sboms(self):
+        source = (ROOT / '.github/workflows/native-collector-release.yml').read_text()
+        publish = source.split('  publish:\n')[1]
+        subjects = re.findall(r'--(binary|sbom) ([\w.-]+)', publish)
+        binaries = {name for kind, name in subjects if kind == 'binary'}
+        sboms = {name for kind, name in subjects if kind == 'sbom'}
+        self.assertEqual(len(binaries), 4)
+        self.assertEqual(len(sboms), 4)
+        with tempfile.TemporaryDirectory(prefix='native-release-inventory-') as temporary:
+            dist = Path(temporary)
+            path = dist / 'release-inventory.json'
+            args = ['generate', '--dist', str(dist), '--output', str(path)]
+            for kind, name in subjects:
+                (dist / name).write_bytes(name.encode())
+                args.extend(['--' + kind, name])
+            self.assertEqual(inventory.main(args), 0)
+            data = inventory.load(path)
+            self.assertEqual({a['name'] for a in data['assets']}, binaries | sboms)
+            inventory.write_checksums(dist, data)
+            integrity = inventory.list_operation(data, 'sign')
+            self.assertTrue((binaries | sboms).issubset(integrity))
+            for name in integrity:
+                # These placeholders exercise inventory completeness only;
+                # the release workflow separately verifies real signatures.
+                (dist / (name + '.sig')).write_text('fixture signature')
+                (dist / (name + '.crt')).write_text('fixture certificate')
+            inventory.verify(dist, path, integrity)
+            (dist / sorted(sboms)[0]).write_bytes(b'tampered platform SBOM')
+            with self.assertRaisesRegex(inventory.InventoryError, 'modified asset'):
+                inventory.verify(dist, path, integrity)
 
 
 if __name__ == '__main__':
