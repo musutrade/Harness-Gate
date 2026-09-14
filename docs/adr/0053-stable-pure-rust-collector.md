@@ -1,6 +1,16 @@
 # ADR 0053: Stable interfaces and a pure-Rust collector
 
-Status: Accepted direction; replacement implementation and release acceptance pending.
+Status: Stable candidate direction; native delivery takes precedence as of 2026-09-14.
+
+2026-09-14 native delivery amendment: retain the existing compiler-private engine
+and publish a standalone binary using Core's release process. Rust/LLVM/Python
+remain external dependencies. The user explicitly selected this route; replacing
+the engine is no longer a prerequisite for independent delivery. The stable-only
+and pure-Rust requirements below now apply to the candidate. See the normative
+[policy amendment](../engineering-policy.md#native-delivery-amendment-2026-09-14)
+and [native delivery guide](../quality/native-external-toolchain.md).
+Historical metrics, debt and fail-closed boundaries are retained. The old bundled
+workflow remains suspended; the new native workflow uses Core's release boundary.
 
 ## Context
 

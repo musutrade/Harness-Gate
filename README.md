@@ -97,18 +97,18 @@ source installation additionally requires `git` and Rust `cargo`.
 
 ### Optional Rust collection
 
-Core does not download a Rust analysis toolchain by default. Use the current
-[plugin installation guide](docs/quality/rust-collector-installation.md) for the
-signed installer, compatible Core/plugin pair and offline kit. Installer and
-plugin versions are independent; a historical Core tag does not select future
-plugin releases automatically.
+Core does not download a Rust analysis toolchain by default. The
+[native standalone delivery](docs/quality/native-external-toolchain.md) retains
+the old measurement engine and publishes our binary using Core's signed release
+process, with matching Rust/LLVM and Python supplied externally. This source
+implementation is awaiting its first signed release. The stable engine remains
+an explicitly selected candidate; neither engine automatically adopts the other's
+metrics or baselines.
 
-Compressed delivery uses about 270 MB of reusable tools and 13 MB of plugin
-contents. First installation is about 444 MB including bootstrap and verifier;
-unchanged layers are cached under `~/.cache/harness-gate/collector`. The installed
-runtime and original signed archive are retained for verification and rollback.
-Only the exact reviewed Linux x86_64 ABI is certified for native Rust collection.
-See [compatibility and receipts](docs/release-status.md#compatibility).
+The existing immutable RC3 bundled release remains documented in the
+[historical installation guide](docs/quality/rust-collector-installation.md).
+Core and plugin versions are independent; a Core upgrade never selects a future
+plugin release automatically.
 
 Release assets include `SHA256SUMS`, a CycloneDX SBOM, and Sigstore signatures/certificates. For
 a manual integrity check, download all listed assets, `SHA256SUMS`, and the matching

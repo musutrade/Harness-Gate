@@ -99,6 +99,39 @@ Documentation and machine enforcement must not knowingly drift. Where a normativ
 
 ## 10. Stable compiler interfaces and first-party Rust plugin delivery
 
+### Native delivery amendment (2026-09-14)
+
+The user has explicitly selected the existing native measurement engine for
+independent delivery, with the matching toolchain supplied externally. This
+amendment takes precedence over the stable-only and pure-Rust-runtime restrictions
+below for the **native collector product**. It does not make the stable candidate
+a prerequisite for native delivery.
+
+- Preserve the native MIR instrumentation, owner mapping, coverage, complexity and
+  CRAP definitions and all existing fail-closed and historical debt rules. No
+  temporary macro exemption or stable measurement substitution is introduced.
+- Publish our precompiled program and necessary adapter resources using Core's
+  release eligibility, checksum, Sigstore, provenance and immutable-release flow.
+  Do not bundle Rust, LLVM, Python, a linker or their system environments.
+- The native product may use its existing compiler-private driver and Python
+  adapters. Its exact supported rustc commit, compiler libraries, LLVM tools,
+  Python and linker requirements are explicit external dependencies. Check them
+  before collection; call the selected compiler directly without changing the
+  user's default toolchain or automatically installing dependencies.
+- The stable implementation remains an explicitly selected candidate. Do not
+  automatically switch engines, reinterpret metrics, adopt historical baselines
+  or reset lineage. Packaging/tool-path changes must retain their actual identity;
+  any continuity claim requires comparison evidence and explicit migration.
+- The new native release must pass real native collection, re-export, Core policy
+  and installation tests. Existing immutable releases remain untouched. The old
+  bundled-runtime publication workflow remains suspended; it is not re-enabled.
+- Core's ordinary required CI continues to use stable public interfaces. The
+  native product's explicitly selected build/acceptance workflow may use its
+  pinned compiler-private implementation.
+
+The remaining stable-only requirements describe the stable candidate and its
+future promotion, not a prohibition on the authorized native delivery above.
+
 - Officially released plugins and required CI gates MUST NOT depend on unstable compiler APIs, `rustc_private`, `RUSTC_BOOTSTRAP`, nightly-only features or `-Z` flags. Using a stable compiler executable with an instability escape hatch does not satisfy this rule.
 - The first-party Rust quality collector MUST be implemented entirely in Rust, including its command entry, orchestration, measurement, normalization, validation and user-facing lifecycle logic. Its installed runtime MUST NOT require Python or ship a private Python interpreter. This is specific to our Rust collector; it does not prohibit third-party adapters in other languages or repository-only test/release automation.
 - Publish our own precompiled plugin artifacts and necessary resources by supported target, following Harness-Gate's release verification model. Users install the documented external Rust/Cargo/coverage and project-native dependencies. Do not bundle entire Rust/LLVM/C/Python environments by default or silently install/change users' toolchains and system packages. User approval of an optional dependency-install action must be explicit.

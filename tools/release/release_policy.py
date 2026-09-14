@@ -40,10 +40,12 @@ class PolicyError(RuntimeError):
     """A release eligibility invariant was not satisfied."""
 
 
-def version_from_tag(tag: str) -> str:
-    match = SEMVER_PATTERN.fullmatch(tag)
+def version_from_tag(tag: str, prefix: str = "v") -> str:
+    if prefix not in ("v", "rust-collector-v") or not tag.startswith(prefix):
+        raise PolicyError(f"release tag must use the selected prefix {prefix!r}: {tag!r}")
+    match = SEMVER_PATTERN.fullmatch("v" + tag[len(prefix):])
     if match is None:
-        raise PolicyError(f"release tag must be exact SemVer with a v prefix: {tag!r}")
+        raise PolicyError(f"release tag must be exact SemVer with a {prefix} prefix: {tag!r}")
     return match.group("version")
 
 
@@ -263,7 +265,7 @@ def _atomic_write_json(path: Path, value: Mapping[str, Any]) -> None:
 
 
 def verify(args: argparse.Namespace) -> dict[str, Any]:
-    version = version_from_tag(args.tag)
+    version = version_from_tag(args.tag, args.tag_prefix)
     package_version = manifest_version(args.manifest)
     if version != package_version:
         raise PolicyError(
@@ -296,6 +298,7 @@ def parser() -> argparse.ArgumentParser:
     subcommands = root.add_subparsers(dest="command", required=True)
     command = subcommands.add_parser("verify", help="verify a tag is eligible to publish")
     command.add_argument("--tag", required=True)
+    command.add_argument("--tag-prefix", choices=("v", "rust-collector-v"), default="v")
     command.add_argument("--commit", required=True)
     command.add_argument("--repository", required=True)
     command.add_argument("--repo", type=Path, default=Path("."))
