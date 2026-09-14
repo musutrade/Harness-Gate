@@ -61,7 +61,6 @@ pub fn describe(root: &Path, anchor: &str, request_digest: &str) -> Result<Value
     });
     series["id"] = json!(format!("measurement-series/v1:{}", hash(&series)?));
     let analysis = read(&root.join("source-analysis.json"))?;
-    let generated = read(&root.join("generated-owners.json"))?;
     let raw = coverage::parse(&fs::read(root.join("coverage.json"))?)?;
     let mut owners = Vec::new();
     for (path, file) in analysis["files"].as_object().context("source inventory")? {
@@ -79,22 +78,6 @@ pub fn describe(root: &Path, anchor: &str, request_digest: &str) -> Result<Value
                 "discriminator":format!("rust-source-span/v1:{}", hash(&json!({"name":function["name"],"span":function["span"]}))?),
                 "coverage_owner": mapping["functions"].as_array().context("mapped owners")?.iter().find(|o| o["name"] == function["name"] && o["span"] == function["span"]),
                 "coverage_state":mapping["state"],"function":function,"file_supported":file["unsupported"].as_array().is_some_and(Vec::is_empty)}));
-        }
-    }
-    // Generated owners come from real source files authenticated as compiler
-    // inputs; each is bound to the file digest and the producing invocation.
-    for entry in generated["owners"].as_array().context("generated owners")? {
-        let mapping = &entry["owner"];
-        for function in mapping["functions"]
-            .as_array()
-            .context("generated function owners")?
-        {
-            owners.push(json!({
-                "path":entry["source"], "source_sha256":entry["sha256"],
-                "generated":true, "producer":entry["producer"],
-                "discriminator":format!("rust-generated-source-span/v1:{}", hash(&json!({"name":function["name"],"span":function["span"]}))?),
-                "coverage_owner":function, "coverage_state":mapping["state"],
-                "function":function, "file_supported":true}));
         }
     }
     Ok(
