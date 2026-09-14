@@ -169,7 +169,7 @@ def generate(
     dist: Path,
     output: Path,
     binaries: Iterable[str],
-    sbom: str,
+    sbom: str | Iterable[str],
     tag: str,
     commit: str,
     repository: str,
@@ -177,8 +177,11 @@ def generate(
     binary_names = sorted({_safe_name(name) for name in binaries})
     if not binary_names:
         raise InventoryError("at least one platform binary is required")
+    sbom_names = sorted({_safe_name(name) for name in ([sbom] if isinstance(sbom, str) else sbom)})
+    if not sbom_names:
+        raise InventoryError("at least one SBOM is required")
     assets = [_asset(dist, name, "binary") for name in binary_names]
-    assets.append(_asset(dist, sbom, "sbom"))
+    assets.extend(_asset(dist, name, "sbom") for name in sbom_names)
     inventory_name = _safe_name(output.name)
     if output.parent.resolve() != dist.resolve():
         raise InventoryError("inventory output must be directly inside dist")
@@ -332,7 +335,7 @@ def main(argv: list[str]) -> int:
     generate_parser.add_argument("--dist", type=Path, required=True)
     generate_parser.add_argument("--output", type=Path, required=True)
     generate_parser.add_argument("--binary", action="append", required=True)
-    generate_parser.add_argument("--sbom", required=True)
+    generate_parser.add_argument("--sbom", action="append", required=True)
     generate_parser.add_argument("--tag", default="")
     generate_parser.add_argument("--commit", default="")
     generate_parser.add_argument("--repository", default="")
