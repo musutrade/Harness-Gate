@@ -1,5 +1,19 @@
 # Tasks
 
+## Generated-owner re-check on 1.98.1 (2026-09-14)
+
+The pinned token-stream fixture reproduces the generated-owner gap on the required
+compiler, Rust 1.98.1 / LLVM 22.1.8: both configurations pass and still omit
+`plain`, `branch`, `unexecuted` and `configured`. Emitting generated source into a
+real file and pulling it in with `include!` (directly and from a build script's
+`OUT_DIR`) yields distinct owners with real counters, including an explicit zero
+record for the unexecuted function. This is a bounded two-template observation, not
+adopted support: proc-macro generated coverage and CRAP stay unsupported, and Core
+review plus an accepted metric migration are still required. Evidence is
+`generated-source-owner-repro.json` in the candidate evidence directory. Required CI
+run 34796325281 at `e68a0da` passes all required jobs. No baseline, threshold or
+release hold changes.
+
 ## Latest continuation (2026-09-14; T3–T8 remain open)
 
 Operator CI run 34792991105 at `9dec7e7` passes all required jobs, including

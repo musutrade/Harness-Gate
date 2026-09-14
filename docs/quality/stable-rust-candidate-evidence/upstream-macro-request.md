@@ -53,6 +53,12 @@ A separate diagnostic repeats both configurations with stable proc_macro span lo
 
 Is there a supported way for this macro to obtain real, distinct generated-function coverage owners/counters using stable instrumentation, without rewriting the consumer behavior or substituting calling-function coverage? If not, please track the instrumentation/mapping capability needed, including whether emitted but unexecuted owners can have explicit zero-count records. An explicit unsupported case is preferable to an invented mapping. This does not request identical coverage numbers across compiler releases.
 
+### Re-check on the required compiler and a bounded alternative
+
+The same fixture was re-run on Rust 1.98.1 with LLVM 22.1.8 and cargo-llvm-cov 0.9.0. Both configurations still pass their tests and still export only the two consumer test functions plus the macro/generator implementation owners; `plain`, `branch`, `unexecuted` and `configured` remain absent. The gap is therefore present on the current required stable compiler, not only on 1.97.1. Exact owners are recorded in [generated-source-owner-repro.json](generated-source-owner-repro.json).
+
+One bounded alternative works today on the same stable compiler: when the generated source is a real file brought into the crate with `include!` (written directly, or produced at build time into `OUT_DIR`), each generated function receives a distinct owner with real counters, and a deliberately unexecuted generated function receives an explicit zero record instead of being absent. This does not change the request below. It shows the missing information is a token-stream-to-source-owner mapping, which a real generated source file sidesteps using only stable interfaces.
+
 Related: #131119 and PR #158276 concern an attribute macro around existing bodies. That PR is still unmerged at the time of this report; I have not built it or established applicability to whole functions emitted by this function-like macro. Historical #84561 concerns regions within invoked macros, rather than this missing whole-function record. This report is separate from the intentional built-in derive exclusion.
 
 ### Environment and limits
