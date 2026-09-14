@@ -5,13 +5,23 @@ The positive is an upstream cosign release, NOT a signed collector release.
 No signing service is invoked. Candidate RSA is a local lifecycle test key.
 """
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import shutil
 import subprocess
 
-from prepare_release import identity, write
+from prepare_release import write
 from validate_stable_candidate import check_trace, trace_command
+
+
+def identity(path):
+    # The external verifier is larger than the plugin payload limit. It is
+    # independently pinned and is never copied into the collector package.
+    assert path.is_file() and not path.is_symlink()
+    with path.open('rb') as stream:
+        digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+    return {'sha256': digest, 'bytes': path.stat().st_size}
 
 
 def main():
