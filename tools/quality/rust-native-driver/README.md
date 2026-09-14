@@ -98,9 +98,11 @@ hashes, Cargo manifests/lockfile, collector and projection rules partition histo
 ## Policy and tests
 
 `../rust_native_policy.py --help` accepts two separately anchored captures,
-reviewed base/head contexts, explicit hotspot selections and a released
+reviewed base/head contexts, explicit hotspot selections, `--repository-root`,
+`--policy-binding` and a released
 `harness-gate` binary. It emits generic typed evidence and calls `quality evaluate`.
-Line/region thresholds remain 80%, CRAP 30. Aggregate coverage is required;
+The [project policy](../../../docs/quality/native-crap-policy.md) supplies the exact
+CRAP ceiling; line/region thresholds remain 80%. Aggregate coverage is required;
 changed CC>10 functions and selected hotspots require all thresholds, other
 changed functions require CRAP, and all historical rows require non-regression.
 Unchanged debt is reported, not erased. Missing or incompatible history rejects.

@@ -16,6 +16,7 @@ ROOT = QUALITY.parents[1]
 sys.path.insert(0, str(QUALITY))
 import build_rust_collector as builder
 import rust_native_policy as policy
+from native_policy_fixture import CRAP_RULE
 
 
 class BuildInputTests(unittest.TestCase):
@@ -205,7 +206,7 @@ class StandaloneNativeTests(unittest.TestCase):
             sources.mkdir()
             shutil.copyfile(self.work / name / 'fixture.rs', sources / 'fixture.rs')
             projections.append(policy.project(report, output / name, sources, context, 'private-runtime', []))
-        declared, mappings, _ = policy.policy_and_lineage(base, head, *projections, [])
+        declared, mappings, _ = policy.policy_and_lineage(base, head, *projections, [], CRAP_RULE)
         command = [str(Path(binary).resolve()), 'quality', 'evaluate', '--output', str(output / 'report.json')]
         for name, value in [('policy', declared), ('mappings', mappings)]:
             path = output / (name + '.json')
@@ -277,7 +278,7 @@ class StandaloneNativeTests(unittest.TestCase):
             projections.append({'project': binding['project'], 'evidence': response['collection']['evidence'],
                                 'expected': binding['input']['context'],
                                 'source-root': str(self.work / name), 'artifact-root': str(artifacts)})
-        declared, mappings, _ = policy.policy_and_lineage(*reports, *projections, ['legacy_debt'])
+        declared, mappings, _ = policy.policy_and_lineage(*reports, *projections, ['legacy_debt'], CRAP_RULE)
         command = [str(Path(binary).resolve()), 'quality', 'evaluate', '--output', str(output / 'report.json')]
         for name, value in [('policy', declared), ('mappings', mappings)]:
             path = output / (name + '.json')

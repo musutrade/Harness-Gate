@@ -162,7 +162,7 @@ def main():
     cmd.add_argument('--binding', type=Path, required=True)
     cmd.add_argument('--binding-sha256', required=True)
     cmd = sub.add_parser('evaluate', parents=[common])
-    for name in ('base', 'base-anchor', 'head', 'head-anchor', 'output', 'harness-gate', 'base-context', 'head-context', 'project', 'hotspots'):
+    for name in ('base', 'base-anchor', 'head', 'head-anchor', 'output', 'harness-gate', 'base-context', 'head-context', 'project', 'hotspots', 'repository-root', 'policy-binding'):
         cmd.add_argument('--' + name, required=True)
     cmd.add_argument('--mappings')
     args = parser.parse_args()
@@ -203,7 +203,8 @@ def main():
             result = policy.evaluate(args.base, args.base_anchor, args.head, args.head_anchor, args.output, args.harness_gate,
                 json.loads(Path(args.base_context).read_text()), json.loads(Path(args.head_context).read_text()),
                 args.project, json.loads(Path(args.hotspots).read_text()),
-                json.loads(Path(args.mappings).read_text()) if args.mappings else ())
+                json.loads(Path(args.mappings).read_text()) if args.mappings else (),
+                repository_root=args.repository_root, policy_binding=args.policy_binding)
             native.require(status == dependency_check(root, args.sysroot), 'external dependencies changed during operation')
             print(json.dumps(result['aggregate']))
             return int(result['aggregate']['state'] != 'pass')
