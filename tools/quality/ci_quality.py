@@ -23,6 +23,10 @@ COMMON = ('test', 'test-cross-platform', 'security-audit', 'fmt', 'clippy', 'bui
 PUSH_ONLY = ('build-cross-platform', 'coverage',
              'quality-contracts-cross-platform', 'quality-baseline')
 STAGES = ('legacy', 'production', 'risk', 'matrix')
+# Rust integration tests and their Python oracles read these repository trees.
+# Historical reports under docs/quality are not test inputs: archiving that
+# directory duplicated hundreds of MB of compressed evidence for each side.
+SNAPSHOT_PATHS = ('tools/harness-gate', 'tools/quality', 'schema', 'docs/dogfood')
 REPLAY_RELOCATION = ('tools/harness-gate/quality-core/examples/differential_replay.rs',
                      'tools/harness-gate/quality-replay/examples/differential_replay.rs')
 REQUIRED_ARTIFACTS = {'coverage.json', 'coverage.raw.json', 'coverage.lcov',
@@ -87,12 +91,14 @@ class Collector:
 
     def command(self, name: str, command: list[str], allowed=(0,)):
         started = time.monotonic()
+        print(f'{name}: started (log: {name}.log)', flush=True)
         with (self.directory / f'{name}.log').open('w') as log:
             code = subprocess.run(command, cwd=ROOT, env=self.environment,
                                   stdout=log, stderr=subprocess.STDOUT).returncode
         self.report['commands'].append({'name': name, 'argv': command, 'exit_code': code,
                                         'seconds': time.monotonic() - started})
         self.save()
+        print(f'{name}: exited {code} in {self.report["commands"][-1]["seconds"]:.2f}s', flush=True)
         require(code in allowed, f'{name} exited {code}; see {name}.log')
 
     def python(self, name: str, script: str, *args: str, allowed=(0,)):
@@ -112,7 +118,7 @@ class Collector:
         # Integration tests embed documentation fixtures. Archive them from the
         # measured commit too, preserving their repository-relative paths.
         self.command(f'{label}-archive', ['git', 'archive', '--format=tar', f'--output={archive}',
-                                          commit, 'tools/harness-gate', 'tools/quality', 'schema', 'docs'])
+                                          commit, *SNAPSHOT_PATHS])
         with tarfile.open(archive) as source:
             source.extractall(snapshot, filter='data')
         return snapshot
