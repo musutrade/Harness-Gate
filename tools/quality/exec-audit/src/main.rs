@@ -133,6 +133,7 @@ fn run() -> io::Result<i32> {
             Err(err) => return Err(err),
         };
         if libc::WIFEXITED(status) || libc::WIFSIGNALED(status) {
+            seen.remove(&pid);
             if pid == root {
                 exit = Some(if libc::WIFEXITED(status) {
                     libc::WEXITSTATUS(status)
@@ -149,6 +150,17 @@ fn run() -> io::Result<i32> {
         let kind = status >> 16;
         let first_stop = seen.insert(pid);
         if kind == libc::PTRACE_EVENT_EXEC {
+            // A nonleader exec replaces its TID with the group leader's PID.
+            // Retire the former TID so a later reused PID gets its initial stop.
+            let mut former_tid: libc::c_ulong = 0;
+            ptrace(
+                libc::PTRACE_GETEVENTMSG,
+                pid,
+                (&mut former_tid as *mut libc::c_ulong) as usize,
+            )?;
+            if former_tid != pid as libc::c_ulong {
+                seen.remove(&(former_tid as libc::pid_t));
+            }
             event(&mut out, capture(pid)?)?;
             count += 1;
         } else if kind != 0
