@@ -40,7 +40,10 @@ A complete stream has a versioned start record, one record per successful exec,
 and a completion record after all traced children terminate. Read failures,
 non-UTF8/oversized arguments, unexpected events and missing completion fail. Logs
 are created exclusively; existing evidence is never overwritten. EXITKILL kills
-tracees if the observer exits unexpectedly. Target exit status is preserved.
+tracees if the observer exits unexpectedly. Normal target exit status is preserved; signal termination is reported as
+128 plus the signal number. Interruption tests kill the downloading target while
+keeping the observer alive. Killing the observer itself leaves an incomplete
+stream which is rejected, and EXITKILL terminates its tracees.
 
 This is not an adversarial sandbox or an environment/library-load attestation.
 It needs permitted ptrace and procfs access. It does not certify code inside an
