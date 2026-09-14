@@ -113,6 +113,13 @@ fn assert_outcome(case: &Value, result: Result<Value>) {
 #[test]
 fn frozen_evidence_and_integrity_matrix_matches_python() {
     let reference = reference();
+    // nextest runs each #[test] in a separate process. Keep all consumers of
+    // this full oracle matrix together so it is generated once, with the
+    // TempDir owned until every assertion (including byte tampering) finishes.
+    project_identity_ownership_and_relationships_match_python(&reference);
+    measurement_series_compatibility_matches_python(&reference);
+    capability_availability_matches_python(&reference);
+    source_and_artifact_bytes_are_verified_at_the_boundary(&reference);
     for case in reference.1.iter().filter(|c| c["kind"] == "evidence") {
         let ctx = context(case);
         let result = evidence::validate_evidence(&case["records"], &ctx).map(|typed| {
@@ -129,9 +136,7 @@ fn frozen_evidence_and_integrity_matrix_matches_python() {
     }
 }
 
-#[test]
-fn project_identity_ownership_and_relationships_match_python() {
-    let reference = reference();
+fn project_identity_ownership_and_relationships_match_python(reference: &Reference) {
     for case in reference.1.iter().filter(|c| c["kind"] == "project") {
         assert_outcome(
             case,
@@ -140,9 +145,7 @@ fn project_identity_ownership_and_relationships_match_python() {
     }
 }
 
-#[test]
-fn measurement_series_compatibility_matches_python() {
-    let reference = reference();
+fn measurement_series_compatibility_matches_python(reference: &Reference) {
     for case in reference.1.iter().filter(|c| c["kind"] == "series") {
         assert_outcome(
             case,
@@ -155,9 +158,7 @@ fn measurement_series_compatibility_matches_python() {
     }
 }
 
-#[test]
-fn capability_availability_matches_python() {
-    let reference = reference();
+fn capability_availability_matches_python(reference: &Reference) {
     for case in reference.1.iter().filter(|c| c["kind"] == "requirements") {
         assert_outcome(
             case,
@@ -221,9 +222,7 @@ fn json_boundary_rejects_duplicate_keys_and_malformed_values() {
     );
 }
 
-#[test]
-fn source_and_artifact_bytes_are_verified_at_the_boundary() {
-    let reference = reference();
+fn source_and_artifact_bytes_are_verified_at_the_boundary(reference: &Reference) {
     let case = reference
         .1
         .iter()
