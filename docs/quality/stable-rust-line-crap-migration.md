@@ -95,3 +95,30 @@ certify this collector. Candidate production acceptance still needs both
 signatures over its exact inventory, the protected Harness-Gate workflow
 identity, independently approved trust and license/release review. This change
 cannot remove the hold or publish a production version.
+
+## Retained 2026-09-14 acceptance
+
+The [compact acceptance record](stable-rust-candidate-evidence/line-migration-linux.json)
+binds the original raw paths and hashes for both complete userspace runs. The
+same 3,587,880-byte executable has SHA-256
+`9b70b49135da5febfafb2100c78a7dadb7dfefa89b7bf097d2fb9d5f28097ad2`.
+Each system passes 135 capture checks, 64 generated-source checks, 26 macro
+checks, nine authenticated Core cases, the current-stable historical comparison,
+47 lifecycle checks and 29 HTTPS checks. Both systems also pass five actual
+cosign checks, including the upstream positive, wrong identity, corrupted
+signature, missing transparency evidence and the candidate's rejection of a
+valid signature for another payload. The installed candidate remains selected.
+
+The unsigned review package is 6,134,708 bytes: a 3,587,880-byte program,
+2,545,341-byte conservative license notices, support metadata and inventory.
+The test-signed initial download is 6,135,177 response-body bytes; plugin cache is
+zero. Independently built test-version upgrade downloads are 6,135,203 bytes on
+Ubuntu 26.04 and 6,134,507 on Ubuntu 24.04. Those upgrade programs were built
+separately on their respective systems; the main candidate is identical. The
+record includes retained interrupted staging and installation bytes. External
+Rust/LLVM/cosign and repository automation are outside the package.
+
+The record retains the earlier failed test expectation, rejected mismatched
+package binary, missing Python standard library in the test container and the
+external-verifier size check correction. None of those earlier attempts is
+relabeled as final-binary acceptance. Protected candidate signing remains open.

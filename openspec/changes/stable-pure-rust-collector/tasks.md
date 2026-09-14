@@ -346,3 +346,16 @@ validation. Policy semantics are unchanged. T4 remains incomplete for broad macr
 derive ownership, line coverage and CRAP; T6 migration and remaining release/system
 acceptance are unchanged. This closes the concrete generated-file Core path gap,
 not the complete GH-259 acceptance checklist.
+
+## Same-binary Linux acceptance and actual verifier checkpoint (2026-09-14)
+
+Ubuntu 26.04 and 24.04 now run the same Rust 1.98.1 candidate through 135 capture,
+64 generated-source, 26 macro, nine authenticated Core, 47 lifecycle and 29 HTTPS
+checks per userspace, plus the current-stable historical comparison. Both also
+pass five actual cosign cryptographic/integration checks; the positive is the
+upstream cosign release, and the collector rejects an unrelated signed payload.
+See `docs/quality/stable-rust-candidate-evidence/line-migration-linux.json` for
+original paths, hashes, sizes, prior failures and exact limits. The userspaces
+share a kernel. Candidate production dual signatures, macro/derive capability,
+required-CRAP migration approval and release-hold removal are still incomplete;
+T3–T8 are not closed by this bounded matrix.

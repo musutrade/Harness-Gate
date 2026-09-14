@@ -1,0 +1,462 @@
+{
+  "schema": "gh259-line-migration-linux-acceptance/v1",
+  "implementation_commit": "168dfb93c44c76ff7d6a4f89f5f780515f03d9ec",
+  "ci_sync": {
+    "pr": 262,
+    "merge_commit": "04344d6f49e945ce32819891ff0e76213278ae10",
+    "included_merge_commit": "d609b723fb6df955be270264f71f281f8e19c21e"
+  },
+  "collector": {
+    "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/candidate/harness-gate-rust-stable-collector",
+    "sha256": "9b70b49135da5febfafb2100c78a7dadb7dfefa89b7bf097d2fb9d5f28097ad2",
+    "bytes": 3587880
+  },
+  "required_rust": "1.98.1",
+  "systems": {
+    "ubuntu26": {
+      "os_release": "PRETTY_NAME=\"Ubuntu 26.04 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04 (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+      "kernel": "Linux-7.0.0-31-generic-x86_64-with-glibc2.43",
+      "suite": {
+        "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/final-host/suite/summary.json",
+        "sha256": "1a99991dc91026575dab73b7fe1b68fdcb5a27254ca87b99339dadf307d21596",
+        "bytes": 16651
+      },
+      "capture": {
+        "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/final-host/runtime/summary.json",
+        "sha256": "7071ee7245b12c7ed2a8ee69c83d15eb4b877738c3a795c90e2a414e3a85d21a",
+        "bytes": 38144
+      },
+      "capture_checks": 135,
+      "core_cases": {
+        "core-boundaries": {
+          "summary": {
+            "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/final-host/suite/core-boundaries/summary.json",
+            "sha256": "7a80dd8df4a2f0a89e0107eb6fa07adbc980eb4052c89bb3d43e7e3b4cf1b034",
+            "bytes": 6730
+          },
+          "core_sha256": "2772ebafca3edb89f5054e7f45ca22fda0f5648e79a07411ac00f67a6d7a1258",
+          "required_crap_blocked": true,
+          "preview_states": [
+            "unsupported"
+          ]
+        },
+        "core-features": {
+          "summary": {
+            "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/final-host/suite/core-features/summary.json",
+            "sha256": "4310bb7b67efc3268bcf63700355e5ae2c2f8ca21c737eb9cdce4683e31261d0",
+            "bytes": 6726
+          },
+          "core_sha256": "2772ebafca3edb89f5054e7f45ca22fda0f5648e79a07411ac00f67a6d7a1258",
+          "required_crap_blocked": true,
+          "preview_states": [
+            "unsupported"
+          ]
+        },
+        "core-generated-branching": {
+          "summary": {
+            "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/final-host/suite/core-generated-branching/summary.json",
+            "sha256": "c59b8d384c6fdfd14e47fcd08c844ef7afcb4c99a73d4203bf792dd6ea2ffc15",
+            "bytes": 16271
+          },
+          "core_sha256": "2772ebafca3edb89f5054e7f45ca22fda0f5648e79a07411ac00f67a6d7a1258",
+          "required_crap_blocked": true,
+          "preview_states": [
+            "review_required",
+            "unsupported"
+          ]
+        },
+        "core-generated-default": {
+          "summary": {
+            "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/final-host/suite/core-generated-default/summary.json",
+            "sha256": "261055fbcc0500a117fb35d99924e4d32448a5afb617dabc5d3da9233c6d03dc",
+            "bytes": 16100
+          },
+          "core_sha256": "2772ebafca3edb89f5054e7f45ca22fda0f5648e79a07411ac00f67a6d7a1258",
+          "required_crap_blocked": true,
+          "preview_states": [
+            "review_required",
+            "unsupported"
+          ]
+        },
+        "core-generated-duplicate": {
+          "summary": {
+            "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/final-host/suite/core-generated-duplicate/summary.json",
+            "sha256": "9a071b22f38e2cdb0fb8d46c48abb36b2352718cedfc542a2bf6c42a9310488f",
+            "bytes": 25836
+          },
+          "core_sha256": "2772ebafca3edb89f5054e7f45ca22fda0f5648e79a07411ac00f67a6d7a1258",
+          "required_crap_blocked": true,
+          "preview_states": [
+            "review_required",
+            "unsupported"
+          ]
+        },
+        "core-modules": {
+          "summary": {
+            "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/final-host/suite/core-modules/summary.json",
+            "sha256": "6faf26fcf8b2372469f581e2a385b5b4ed018b2071c9b8e3f73282081899d8db",
+            "bytes": 10745
+          },
+          "core_sha256": "2772ebafca3edb89f5054e7f45ca22fda0f5648e79a07411ac00f67a6d7a1258",
+          "required_crap_blocked": true,
+          "preview_states": [
+            "review_required"
+          ]
+        },
+        "core-partial": {
+          "summary": {
+            "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/final-host/suite/core-partial/summary.json",
+            "sha256": "bbe76305a12e4731ab01ecf8e2ecd418bc1b7ddd0f9154ea0eec563f7dcfad19",
+            "bytes": 8618
+          },
+          "core_sha256": "2772ebafca3edb89f5054e7f45ca22fda0f5648e79a07411ac00f67a6d7a1258",
+          "required_crap_blocked": true,
+          "preview_states": [
+            "review_required"
+          ]
+        },
+        "core-plain": {
+          "summary": {
+            "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/final-host/suite/core-plain/summary.json",
+            "sha256": "c5c825f72a7365d42675a21a09c8a63aa6dd6ffbe8364cbaf8ef1ffaa01f3cc4",
+            "bytes": 8610
+          },
+          "core_sha256": "2772ebafca3edb89f5054e7f45ca22fda0f5648e79a07411ac00f67a6d7a1258",
+          "required_crap_blocked": true,
+          "preview_states": [
+            "review_required"
+          ]
+        },
+        "core-registry": {
+          "summary": {
+            "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/final-host/suite/core-registry/summary.json",
+            "sha256": "0bb4059dc102ef001857bd7f56966e6114a84dacead20975525ccb4443defecf",
+            "bytes": 6489
+          },
+          "core_sha256": "2772ebafca3edb89f5054e7f45ca22fda0f5648e79a07411ac00f67a6d7a1258",
+          "required_crap_blocked": true,
+          "preview_states": [
+            "review_required"
+          ]
+        }
+      },
+      "generated": {
+        "summary": {
+          "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/final-host/suite/generated/summary.json",
+          "sha256": "c4e9dcb9692137cd5b2a49660010260912513ea6a63780748d7124ca0e763baf",
+          "bytes": 57013
+        },
+        "checks": 64
+      },
+      "macros": {
+        "summary": {
+          "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/final-host/suite/macros/summary.json",
+          "sha256": "3717c04d8a9bca7a48d5d8bace0b1c4275d9007a21bd39cdc3da9170a0c2aeba",
+          "bytes": 31782
+        },
+        "checks": 26
+      },
+      "lifecycle": {
+        "summary": {
+          "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/final-host/suite/lifecycle/summary.json",
+          "sha256": "c6b385daed4054ed4804a9cebbf29ce8dae26372674b57aa4855403e646b9dee",
+          "bytes": 7425
+        },
+        "checks": 47,
+        "bytes": {
+          "package_bytes": 6135177,
+          "upgrade_package_bytes": 6135203,
+          "two_versions_bytes": 12270380,
+          "interrupted_staging_bytes": 6135203,
+          "installation_bytes_including_interrupted_staging": 18406211,
+          "network_download_bytes": 0
+        }
+      },
+      "https": {
+        "summary": {
+          "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/final-host/suite/https/summary.json",
+          "sha256": "c8f2d90a7e082e2c558207ec7f50a7dc82ddd2053292bbb6a3824b5e148d9f68",
+          "bytes": 54830
+        },
+        "checks": 29,
+        "bytes": {
+          "initial_download_bytes": 6135177,
+          "upgrade_download_bytes": 6135203,
+          "total_received_body_bytes": 50582263,
+          "abandoned_download_bytes": 0,
+          "cache_bytes": 0
+        }
+      },
+      "historical": {
+        "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/final-host/suite/historical/comparison.json",
+        "sha256": "07032292a8d1c006e02476e829995daeaa8b37fc8c3ffc619d0c3bba84948e62",
+        "bytes": 9650
+      },
+      "historical_source_sha256": "5848ae7e66cdec35029a945b55d6f4b972c4f1b51256d1e050bba5cb45f0722d",
+      "real_sigstore": {
+        "summary": {
+          "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/final-host/real-sigstore2/summary.json",
+          "sha256": "181e73e61d292fd26d4995ac0362e0a1eb4aaf1810f79a11a7ece26adf5c7be2",
+          "bytes": 6094
+        },
+        "checks": 5,
+        "positive_scope": "upstream cosign release identity only",
+        "candidate_production_signature": false
+      }
+    },
+    "ubuntu24": {
+      "os_release": "PRETTY_NAME=\"Ubuntu 24.04.4 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.4 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+      "kernel": "Linux-7.0.0-31-generic-x86_64-with-glibc2.39",
+      "suite": {
+        "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/ubuntu24/suite/summary.json",
+        "sha256": "e0868e153cfe1dbb38fc98a099e0d0345ec9cead259e031051bc67a9ccaac739",
+        "bytes": 16621
+      },
+      "capture": {
+        "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/ubuntu24/final-runtime/summary.json",
+        "sha256": "393fa0e02506e871ff51ee15bdab3929633ff4133a8604b6c1e305eae92fd227",
+        "bytes": 38176
+      },
+      "capture_checks": 135,
+      "core_cases": {
+        "core-boundaries": {
+          "summary": {
+            "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/ubuntu24/suite/core-boundaries/summary.json",
+            "sha256": "d4d729f7166076ce42fc9e1692da5b7aec89e5c1536f76cba56d134c5693b548",
+            "bytes": 6734
+          },
+          "core_sha256": "2772ebafca3edb89f5054e7f45ca22fda0f5648e79a07411ac00f67a6d7a1258",
+          "required_crap_blocked": true,
+          "preview_states": [
+            "unsupported"
+          ]
+        },
+        "core-features": {
+          "summary": {
+            "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/ubuntu24/suite/core-features/summary.json",
+            "sha256": "2c44bebd34aed0218f1f9b016589211653c21d987fef597acdd6f17c6e4a5db9",
+            "bytes": 6730
+          },
+          "core_sha256": "2772ebafca3edb89f5054e7f45ca22fda0f5648e79a07411ac00f67a6d7a1258",
+          "required_crap_blocked": true,
+          "preview_states": [
+            "unsupported"
+          ]
+        },
+        "core-generated-branching": {
+          "summary": {
+            "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/ubuntu24/suite/core-generated-branching/summary.json",
+            "sha256": "513dddd0c883d3faa6aedcbeb2e39c4c4510bc2e49bf9ad7d46973da86266ee0",
+            "bytes": 16269
+          },
+          "core_sha256": "2772ebafca3edb89f5054e7f45ca22fda0f5648e79a07411ac00f67a6d7a1258",
+          "required_crap_blocked": true,
+          "preview_states": [
+            "review_required",
+            "unsupported"
+          ]
+        },
+        "core-generated-default": {
+          "summary": {
+            "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/ubuntu24/suite/core-generated-default/summary.json",
+            "sha256": "a9ade91fbdb19947aa9deaa6e1ef0f9b5dd25753715584994e6ac3f3d6643435",
+            "bytes": 16098
+          },
+          "core_sha256": "2772ebafca3edb89f5054e7f45ca22fda0f5648e79a07411ac00f67a6d7a1258",
+          "required_crap_blocked": true,
+          "preview_states": [
+            "review_required",
+            "unsupported"
+          ]
+        },
+        "core-generated-duplicate": {
+          "summary": {
+            "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/ubuntu24/suite/core-generated-duplicate/summary.json",
+            "sha256": "1c6a2bcf098121dcb3246b2e684304f6b85805b1358e4ccd2a991135c19f54e3",
+            "bytes": 25834
+          },
+          "core_sha256": "2772ebafca3edb89f5054e7f45ca22fda0f5648e79a07411ac00f67a6d7a1258",
+          "required_crap_blocked": true,
+          "preview_states": [
+            "review_required",
+            "unsupported"
+          ]
+        },
+        "core-modules": {
+          "summary": {
+            "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/ubuntu24/suite/core-modules/summary.json",
+            "sha256": "63268530cf4e85472776ea806689d277fafd310247692a24d740b3d392c6fccf",
+            "bytes": 10749
+          },
+          "core_sha256": "2772ebafca3edb89f5054e7f45ca22fda0f5648e79a07411ac00f67a6d7a1258",
+          "required_crap_blocked": true,
+          "preview_states": [
+            "review_required"
+          ]
+        },
+        "core-partial": {
+          "summary": {
+            "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/ubuntu24/suite/core-partial/summary.json",
+            "sha256": "5afd2431dc55d9193fc7b14a0ef099ee47edbd0365880b32553ed971a95e1e9f",
+            "bytes": 8622
+          },
+          "core_sha256": "2772ebafca3edb89f5054e7f45ca22fda0f5648e79a07411ac00f67a6d7a1258",
+          "required_crap_blocked": true,
+          "preview_states": [
+            "review_required"
+          ]
+        },
+        "core-plain": {
+          "summary": {
+            "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/ubuntu24/suite/core-plain/summary.json",
+            "sha256": "26a813d4f553833a7149f3d91f871fa3d18e0a0bee1ab57be05067dc198fb206",
+            "bytes": 8614
+          },
+          "core_sha256": "2772ebafca3edb89f5054e7f45ca22fda0f5648e79a07411ac00f67a6d7a1258",
+          "required_crap_blocked": true,
+          "preview_states": [
+            "review_required"
+          ]
+        },
+        "core-registry": {
+          "summary": {
+            "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/ubuntu24/suite/core-registry/summary.json",
+            "sha256": "abe115be179e7c7e5a9d6e18ced1b81fdc4b2a7531d7c0c6fdae43ae605a1de4",
+            "bytes": 6493
+          },
+          "core_sha256": "2772ebafca3edb89f5054e7f45ca22fda0f5648e79a07411ac00f67a6d7a1258",
+          "required_crap_blocked": true,
+          "preview_states": [
+            "review_required"
+          ]
+        }
+      },
+      "generated": {
+        "summary": {
+          "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/ubuntu24/suite/generated/summary.json",
+          "sha256": "f457e0cb17d4eb35e81163bc5acc82d31081f0b1e89bb20bdc39232c280ced76",
+          "bytes": 56809
+        },
+        "checks": 64
+      },
+      "macros": {
+        "summary": {
+          "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/ubuntu24/suite/macros/summary.json",
+          "sha256": "adac19c3019c25b2011c2f6ca8f5a68a792b51866ff188d784a5e49f9b99f460",
+          "bytes": 31672
+        },
+        "checks": 26
+      },
+      "lifecycle": {
+        "summary": {
+          "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/ubuntu24/suite/lifecycle/summary.json",
+          "sha256": "061dc59abdb2d6b5dba9faf982c9118862fd4ffe8bcb0dcb62f98ce8360b6ed9",
+          "bytes": 7419
+        },
+        "checks": 47,
+        "bytes": {
+          "package_bytes": 6135177,
+          "upgrade_package_bytes": 6134507,
+          "two_versions_bytes": 12269684,
+          "interrupted_staging_bytes": 6134507,
+          "installation_bytes_including_interrupted_staging": 18404819,
+          "network_download_bytes": 0
+        }
+      },
+      "https": {
+        "summary": {
+          "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/ubuntu24/suite/https/summary.json",
+          "sha256": "651c397461a940874cb77cf25e067fae85c5c2baa9e38892bd75365e60eab245",
+          "bytes": 53552
+        },
+        "checks": 29,
+        "bytes": {
+          "initial_download_bytes": 6135177,
+          "upgrade_download_bytes": 6134507,
+          "total_received_body_bytes": 50581567,
+          "abandoned_download_bytes": 0,
+          "cache_bytes": 0
+        }
+      },
+      "historical": {
+        "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/ubuntu24/suite/historical/comparison.json",
+        "sha256": "dac88eca751631c7e5f7abd3f0ea5edfabcf41f9917eaab13a6741fdb7adae41",
+        "bytes": 9650
+      },
+      "historical_source_sha256": "5848ae7e66cdec35029a945b55d6f4b972c4f1b51256d1e050bba5cb45f0722d",
+      "real_sigstore": {
+        "summary": {
+          "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/ubuntu24/real-sigstore2/summary.json",
+          "sha256": "96138cda1028c945cc2ddad02c6859cc7744cb51976f925766646e5223d8ba97",
+          "bytes": 6082
+        },
+        "checks": 5,
+        "positive_scope": "upstream cosign release identity only",
+        "candidate_production_signature": false
+      }
+    }
+  },
+  "limitations": [
+    "Two runnable Ubuntu userspaces share one host kernel; no claim of all Linux or a second kernel.",
+    "CRAP values are Core migration previews, not supported required evidence or baseline/series approval.",
+    "Proc-macro token-stream and built-in derive owners remain uncertified on the exercised stable path.",
+    "The stable same-source historical comparison preserves diagnostic-only totals and incomplete legacy provenance.",
+    "Installer positives use real test RSA and mocked Sigstore. Actual Sigstore positive is upstream cosign only; candidate rejects an unrelated signed blob.",
+    "Candidate production dual signatures, independently approved trust, license/release review and hold removal remain incomplete."
+  ],
+  "prior_attempts": [
+    {
+      "scope": "new line tests",
+      "result": "initial expectation counted brace-only lines; real LLVM has 5 executable lines, 4 covered in partial. Expected tests corrected; original failed output retained.",
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/host-final/runtime/partial-checks.json"
+    },
+    {
+      "scope": "package identity",
+      "result": "preparation rejected a differently built local binary. The preparation-environment binary was frozen and both full suites recaptured. No acceptance transferred from the earlier binary.",
+      "previous_binary": "0595dd23ceb15d8c8a6eb20eefd8f976adee8d5817858a2931a332491bed5bb3"
+    },
+    {
+      "scope": "Ubuntu automation",
+      "result": "python3-minimal lacked json; full Python was installed only in the isolated test image. No plugin payload or host toolchain was changed."
+    },
+    {
+      "scope": "real verifier automation",
+      "result": "first driver reused the 64 MiB package identity limit for the larger external cosign; replaced with streaming hashing. Plugin payload size policy unchanged."
+    }
+  ],
+  "state": "candidate-review-required",
+  "issue_closed": false,
+  "pr_draft": true,
+  "production_release": false,
+  "ubuntu24_image": "sha256:aeb9aa2a960b5511608c45e8192b905d78871f1b058403e0722eda83b66c1f81",
+  "package": {
+    "preparation": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/package/preparation.json",
+      "sha256": "4fd3e4dd6dcb8a2f4ebbb3a42fd41a7bcd0970c1f4c11541a961c798c1a1cce6",
+      "bytes": 47770
+    },
+    "inventory": {
+      "path": "/mnt/dev-ssd/workspaces/gh259-remaining-acceptance/target/acceptance/package/unsigned-package/release-inventory.json",
+      "sha256": "e944d5227539cc96856e9c6eaa78b8c955e86b76138a219921a709b5a5df82f6",
+      "bytes": 563
+    },
+    "unsigned_bytes": 6134708,
+    "payload": {
+      "LICENSE": {
+        "bytes": 2545341,
+        "sha256": "c5c62c170a6c4f67b3814d0f324e678741fc35cdef33d13a82c0ca2af8a92a16"
+      },
+      "harness-gate-rust-stable-collector": {
+        "bytes": 3587880,
+        "sha256": "9b70b49135da5febfafb2100c78a7dadb7dfefa89b7bf097d2fb9d5f28097ad2"
+      },
+      "support.json": {
+        "bytes": 924,
+        "sha256": "e29e51bdaf992a0114734805561f4a8032ba30ac9f9f37c1aa3ea489056dac43"
+      }
+    },
+    "cache_bytes": 0,
+    "state": "unsigned-candidate-review-required"
+  },
+  "support_scope": "same x86_64-unknown-linux-gnu candidate; Rust 1.98.1 / LLVM 22.1.8 / cargo-llvm-cov 0.9.0; documented bounded owners"
+}
