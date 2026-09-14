@@ -318,3 +318,21 @@ owners, nested expansions, and a deliberately faulty mapping regression. Focused
 upstream patches require a reproduced library defect; submission and deployed fixes
 remain separate. The shared-generation prototype alone does not complete T4 or
 authorize changing the accepted measurement series.
+
+## Generated source to Core integration (2026-09-14)
+
+An explicit `export-core-source` command creates a verified source workspace outside
+the original project and capture. `describe --source-workspace` and authenticated
+adapter conversion preserve the original capture binding while presenting actual
+relative source paths to unchanged Core validation. The workspace uses a distinct
+candidate source identity; it does not adopt a baseline or migrate required metrics.
+Generated inputs at distinct paths keep distinct owners even when bytes match, and
+all consuming compiler records are retained. Three actual configurations (default,
+branching, duplicate source) must reach Core with real complexity/function/region
+values; mutated sources and cross-configuration snapshots must fail.
+
+See `docs/quality/stable-rust-generated-owners.md` for the source-view contract and
+validation. Policy semantics are unchanged. T4 remains incomplete for broad macro/
+derive ownership, line coverage and CRAP; T6 migration and remaining release/system
+acceptance are unchanged. This closes the concrete generated-file Core path gap,
+not the complete GH-259 acceptance checklist.

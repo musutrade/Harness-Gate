@@ -1,0 +1,384 @@
+{
+  "schema": "rust-stable-core-source-integration-acceptance/v1",
+  "base_commit": "4727acaf4aa9fdddd1cfaa72a7b4d7159f097320",
+  "toolchain": "1.98.1",
+  "collector": {
+    "sha256": "47b7c06434d74a8c9abc1932845c373d68f3f6e8e4d4b7a650ea872ca9b666e2",
+    "bytes": 3557256
+  },
+  "generated": {
+    "path": "/mnt/dev-ssd/dev-tmp/harness-gh259-tests/generated-final/summary.json",
+    "identity": {
+      "sha256": "d4624d40d098b33d47b15217dcfcf13b8f595e0abb92896b4fe0dcab3c5f67c7",
+      "bytes": 47458
+    },
+    "checks": 58,
+    "configurations": [
+      "default",
+      "branching",
+      "duplicate"
+    ]
+  },
+  "core_cases": {
+    "boundaries": {
+      "path": "/mnt/dev-ssd/dev-tmp/harness-gh259-tests/final-core-boundaries/summary.json",
+      "identity": {
+        "sha256": "e50a3850c569a93720f5f0078bee258407a8fa8b1007c963cd7cf970eae36c80",
+        "bytes": 5111
+      },
+      "collector_sha256": "47b7c06434d74a8c9abc1932845c373d68f3f6e8e4d4b7a650ea872ca9b666e2",
+      "checks": [
+        "authenticated_capture",
+        "changed-project",
+        "changed-series",
+        "core-corrupt-artifact",
+        "core-stale-context",
+        "expired_request",
+        "fixture",
+        "invalid_signature",
+        "missing-claim",
+        "nonce_replay",
+        "required_crap",
+        "stale-config-binding",
+        "unknown-owner",
+        "wrong-capture-anchor",
+        "wrong-source",
+        "wrong-target"
+      ]
+    },
+    "features": {
+      "path": "/mnt/dev-ssd/dev-tmp/harness-gh259-tests/final-core-features/summary.json",
+      "identity": {
+        "sha256": "9a009c4f5ffa4c6ee5acbe3e21532d759b4039666a7db54ff23f21bd1000df65",
+        "bytes": 5107
+      },
+      "collector_sha256": "47b7c06434d74a8c9abc1932845c373d68f3f6e8e4d4b7a650ea872ca9b666e2",
+      "checks": [
+        "authenticated_capture",
+        "changed-project",
+        "changed-series",
+        "core-corrupt-artifact",
+        "core-stale-context",
+        "expired_request",
+        "fixture",
+        "invalid_signature",
+        "missing-claim",
+        "nonce_replay",
+        "required_crap",
+        "stale-config-binding",
+        "unknown-owner",
+        "wrong-capture-anchor",
+        "wrong-source",
+        "wrong-target"
+      ]
+    },
+    "generated-branching": {
+      "path": "/mnt/dev-ssd/dev-tmp/harness-gh259-tests/final-core-generated-branching/summary.json",
+      "identity": {
+        "sha256": "295c70a34dbabd97b1c1d9ded546503924bfed84f4a0763de9ed758ad09f3fa8",
+        "bytes": 6311
+      },
+      "collector_sha256": "47b7c06434d74a8c9abc1932845c373d68f3f6e8e4d4b7a650ea872ca9b666e2",
+      "checks": [
+        "authenticated_capture",
+        "changed-project",
+        "changed-series",
+        "core-corrupt-artifact",
+        "core-generated-source-substitution",
+        "core-stale-context",
+        "expired_request",
+        "fixture",
+        "generated-owner-swap",
+        "invalid_signature",
+        "missing-claim",
+        "mixed-generated-configuration",
+        "nonce_replay",
+        "required_crap",
+        "stale-config-binding",
+        "unknown-owner",
+        "wrong-capture-anchor",
+        "wrong-source",
+        "wrong-target"
+      ]
+    },
+    "generated-default": {
+      "path": "/mnt/dev-ssd/dev-tmp/harness-gh259-tests/final-core-generated-default/summary.json",
+      "identity": {
+        "sha256": "c5b004ca32861cbbb490c275960a79bd3e38c40ba516d03a4c62a9998d9b130e",
+        "bytes": 6140
+      },
+      "collector_sha256": "47b7c06434d74a8c9abc1932845c373d68f3f6e8e4d4b7a650ea872ca9b666e2",
+      "checks": [
+        "authenticated_capture",
+        "changed-project",
+        "changed-series",
+        "core-corrupt-artifact",
+        "core-generated-source-substitution",
+        "core-stale-context",
+        "expired_request",
+        "fixture",
+        "generated-owner-swap",
+        "invalid_signature",
+        "missing-claim",
+        "nonce_replay",
+        "required_crap",
+        "stale-config-binding",
+        "unknown-owner",
+        "wrong-capture-anchor",
+        "wrong-source",
+        "wrong-target"
+      ]
+    },
+    "generated-duplicate": {
+      "path": "/mnt/dev-ssd/dev-tmp/harness-gh259-tests/final-core-generated-duplicate/summary.json",
+      "identity": {
+        "sha256": "777ced1e6a7d6f725b5eb985f96762104a520865ab632549487f41f251fc25ea",
+        "bytes": 7296
+      },
+      "collector_sha256": "47b7c06434d74a8c9abc1932845c373d68f3f6e8e4d4b7a650ea872ca9b666e2",
+      "checks": [
+        "authenticated_capture",
+        "changed-project",
+        "changed-series",
+        "core-corrupt-artifact",
+        "core-generated-source-substitution",
+        "core-stale-context",
+        "expired_request",
+        "fixture",
+        "generated-owner-swap",
+        "invalid_signature",
+        "missing-claim",
+        "mixed-generated-configuration",
+        "nonce_replay",
+        "required_crap",
+        "stale-config-binding",
+        "unknown-owner",
+        "wrong-capture-anchor",
+        "wrong-source",
+        "wrong-target"
+      ]
+    },
+    "modules": {
+      "path": "/mnt/dev-ssd/dev-tmp/harness-gh259-tests/final-core-modules/summary.json",
+      "identity": {
+        "sha256": "7bd68e52d8b625ba66d21187151dc571ef221dc5be83d3dddba424481433c2ba",
+        "bytes": 4674
+      },
+      "collector_sha256": "47b7c06434d74a8c9abc1932845c373d68f3f6e8e4d4b7a650ea872ca9b666e2",
+      "checks": [
+        "authenticated_capture",
+        "changed-project",
+        "changed-series",
+        "core-corrupt-artifact",
+        "core-stale-context",
+        "expired_request",
+        "fixture",
+        "invalid_signature",
+        "missing-claim",
+        "nonce_replay",
+        "required_crap",
+        "stale-config-binding",
+        "unknown-owner",
+        "wrong-capture-anchor",
+        "wrong-source",
+        "wrong-target"
+      ]
+    },
+    "partial": {
+      "path": "/mnt/dev-ssd/dev-tmp/harness-gh259-tests/final-core-partial/summary.json",
+      "identity": {
+        "sha256": "d5ea29a1564bfb71acc774c14784cf4bcb0e30bd65a60d774ceca01ed04c066f",
+        "bytes": 4428
+      },
+      "collector_sha256": "47b7c06434d74a8c9abc1932845c373d68f3f6e8e4d4b7a650ea872ca9b666e2",
+      "checks": [
+        "authenticated_capture",
+        "changed-project",
+        "changed-series",
+        "core-corrupt-artifact",
+        "core-stale-context",
+        "expired_request",
+        "fixture",
+        "invalid_signature",
+        "missing-claim",
+        "nonce_replay",
+        "required_crap",
+        "stale-config-binding",
+        "unknown-owner",
+        "wrong-capture-anchor",
+        "wrong-source",
+        "wrong-target"
+      ]
+    },
+    "plain": {
+      "path": "/mnt/dev-ssd/dev-tmp/harness-gh259-tests/final-core-plain/summary.json",
+      "identity": {
+        "sha256": "414563a2533616fdd7f6fa7284d67abc3560d554d9657f91e8b0d74ff3abe4d7",
+        "bytes": 4424
+      },
+      "collector_sha256": "47b7c06434d74a8c9abc1932845c373d68f3f6e8e4d4b7a650ea872ca9b666e2",
+      "checks": [
+        "authenticated_capture",
+        "changed-project",
+        "changed-series",
+        "core-corrupt-artifact",
+        "core-stale-context",
+        "expired_request",
+        "fixture",
+        "invalid_signature",
+        "missing-claim",
+        "nonce_replay",
+        "required_crap",
+        "stale-config-binding",
+        "unknown-owner",
+        "wrong-capture-anchor",
+        "wrong-source",
+        "wrong-target"
+      ]
+    },
+    "registry": {
+      "path": "/mnt/dev-ssd/dev-tmp/harness-gh259-tests/final-core-registry/summary.json",
+      "identity": {
+        "sha256": "663f15a62b06e656dc72cf81bc7d98f8ad8fc62b9df3e52e37580b4d31066320",
+        "bytes": 4184
+      },
+      "collector_sha256": "47b7c06434d74a8c9abc1932845c373d68f3f6e8e4d4b7a650ea872ca9b666e2",
+      "checks": [
+        "authenticated_capture",
+        "changed-project",
+        "changed-series",
+        "core-corrupt-artifact",
+        "core-stale-context",
+        "expired_request",
+        "fixture",
+        "invalid_signature",
+        "missing-claim",
+        "nonce_replay",
+        "required_crap",
+        "stale-config-binding",
+        "unknown-owner",
+        "wrong-capture-anchor",
+        "wrong-source",
+        "wrong-target"
+      ]
+    }
+  },
+  "local_execution_traced": false,
+  "hosted_trace_acceptance": "required CI, pending at submission",
+  "pre_final_guard_capture_regression": {
+    "path": "/mnt/dev-ssd/dev-tmp/harness-gh259-tests/runtime/summary.json",
+    "identity": {
+      "sha256": "f01b138f80fdc5ede0539018b3296a755998072b0a278b55f1832b22b617e8ca",
+      "bytes": 32007
+    },
+    "checks": 125,
+    "scope": "Earlier implementation executable; not rebound to the final binary. Final binary re-verifies these captures in the six original Core cases; required CI recollects at final head."
+  },
+  "checks": {
+    "rust_unit": 22,
+    "quality_scripts": 455,
+    "quality_manual_legacy_skips": 36,
+    "release_contracts": 92,
+    "clippy": "passed for collector all targets and Core acceptance example",
+    "format": "passed",
+    "documentation": "passed",
+    "openspec_strict": "passed"
+  },
+  "original_failures": [
+    "Initial /tmp release/Core builds and Clippy failed with disk quota exceeded. Only task-owned build directories were moved to SSD; subsequent builds and Clippy passed."
+  ],
+  "remaining": [
+    "general proc-macro and derive coverage",
+    "line coverage and CRAP certification",
+    "reviewed metric migration",
+    "full same-binary Linux acceptance",
+    "protected trust/signature/license/release acceptance"
+  ],
+  "policy_semantics": "unchanged; required CRAP blocks and release hold remains",
+  "source_files": {
+    "tools/quality/rust-stable-collector/src/adapter.rs": {
+      "sha256": "9df57b870cc74d927d736fc24ffd6778f37470d9280d843b0ba5d4d4a670ad1b",
+      "bytes": 15998
+    },
+    "tools/quality/rust-stable-collector/src/artifact.rs": {
+      "sha256": "f8e25815474b0c7ae584bc783d0e4ad59bf80e8efe38e46d25a27129d3325950",
+      "bytes": 3177
+    },
+    "tools/quality/rust-stable-collector/src/collect.rs": {
+      "sha256": "cb7bd65623e9eaf6a670092162ffc25b1f9138d9a5fa183b4f16e8a354a9da0e",
+      "bytes": 19442
+    },
+    "tools/quality/rust-stable-collector/src/compiler_inputs.rs": {
+      "sha256": "2dd0a224948456b7210e3baaadecabc844218da641fb451e351dc17fa6c16920",
+      "bytes": 13633
+    },
+    "tools/quality/rust-stable-collector/src/compiler_wrapper.rs": {
+      "sha256": "46d58943609bdd659bcf0be2967c5560eaf976fcd4fdc910ba3affae1521829f",
+      "bytes": 7093
+    },
+    "tools/quality/rust-stable-collector/src/core_source.rs": {
+      "sha256": "173ba61bd1328333e5ef1ec7f05a69f1fd25b50d7b8d07bd786b5e402e7dab9b",
+      "bytes": 5727
+    },
+    "tools/quality/rust-stable-collector/src/coverage.rs": {
+      "sha256": "9a6e6dd07070da44342822336de48b4a1ce6e8666ddf2570dc4047aa93d2f7bf",
+      "bytes": 8718
+    },
+    "tools/quality/rust-stable-collector/src/dependencies.rs": {
+      "sha256": "406fcd4ded9fbf168fa4c9ccab23ba6c320edaac9327723d60233d36b31d274b",
+      "bytes": 12561
+    },
+    "tools/quality/rust-stable-collector/src/download.rs": {
+      "sha256": "e86c3d0e47eeb18f5c6b8e5ff6ff6645a96522c4dafbed0457b0990e3115e880",
+      "bytes": 8023
+    },
+    "tools/quality/rust-stable-collector/src/macro_model.rs": {
+      "sha256": "0843c7135aefd4433d41388eb6713dc99cc22048d0375a5b847f23a41fc0e7e1",
+      "bytes": 10662
+    },
+    "tools/quality/rust-stable-collector/src/main.rs": {
+      "sha256": "7cd287af2ea0999059c7c07e0d7bd68e9df68f30665e8d0b1ba53125e8caae5b",
+      "bytes": 5305
+    },
+    "tools/quality/rust-stable-collector/src/ownership.rs": {
+      "sha256": "22b54dbc1445809527d75cf9a8eaae974343688cc2997e9a3930c15ec0dd576e",
+      "bytes": 8078
+    },
+    "tools/quality/rust-stable-collector/src/process.rs": {
+      "sha256": "9775e7bb0aa2ea64ceac6720fa338502bc36dfc0a5ec80d99a05e8c217279188",
+      "bytes": 8232
+    },
+    "tools/quality/rust-stable-collector/src/release.rs": {
+      "sha256": "6201919d52bb1796c1ab4aff732281cdf37f060468f13a770ed46b6374b6a56d",
+      "bytes": 21602
+    },
+    "tools/quality/rust-stable-collector/src/source.rs": {
+      "sha256": "4c2a16572dede48396baf34274cf74a0fcf3f7388a51fe18c28526e9e5e53853",
+      "bytes": 10979
+    },
+    "tools/quality/rust-stable-collector/src/strict_json.rs": {
+      "sha256": "5cdbd35515d99f1c6c210363365ba9e79faaeef145dcf08074a499094556b2ea",
+      "bytes": 4430
+    },
+    "tools/quality/rust-stable-collector/src/support.rs": {
+      "sha256": "d3df1c5510c1e1ab75d282509b7d6c8403c6f149dc0736b530939fcd92c4abf6",
+      "bytes": 3192
+    },
+    "tools/quality/rust-stable-collector/src/tools.rs": {
+      "sha256": "cd0d52404cfa1bbff5d2e135f8e9eb6950af7afad403a336dac9928df80fe7f7",
+      "bytes": 4692
+    },
+    "tools/quality/fixtures/rust-generated-owners/consumer/Cargo.toml": {
+      "sha256": "ee708362725698c2be0e14aafbb42bd6416628f6771beb3cc0be436ded3d3720",
+      "bytes": 242
+    },
+    "tools/quality/fixtures/rust-generated-owners/consumer/build.rs": {
+      "sha256": "58c99b934dc5675664460b43357b7228a34b4a1de0c9aa4be16acb8d7fa2d7fd",
+      "bytes": 1164
+    },
+    "tools/quality/fixtures/rust-generated-owners/consumer/src/lib.rs": {
+      "sha256": "e6285286d091ac8c54150510a3f241fd2810c7dec4c2d58f4e9d331b51e26a21",
+      "bytes": 1153
+    }
+  }
+}
