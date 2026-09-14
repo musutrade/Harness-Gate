@@ -9,6 +9,7 @@ trap 'rm -rf "$TEMP_ROOT"' EXIT
 FIXTURE="$TEMP_ROOT/fixture"
 FAKE_BIN="$TEMP_ROOT/fake-bin"
 mkdir -p "$FIXTURE" "$FAKE_BIN"
+export HARNESS_GATE_TEST_DOWNLOAD_LOG="$TEMP_ROOT/download.log"
 
 binary_name="harness-gate-linux-amd64"
 printf 'verified fixture binary\n' >"$FIXTURE/$binary_name"
@@ -34,6 +35,22 @@ printf 'identity=https://github.com/musutrade/Harness-Gate/.github/workflows/rel
 printf 'signed-subject=%s\n' "$windows_binary_name" >"$FIXTURE/$windows_binary_name.sig"
 printf 'identity=https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v0.3.3\n' >"$FIXTURE/$windows_binary_name.crt"
 
+# Native fixture tags are intentionally independent of the Core fixture tag.
+for rust_version in 0.1.0-rc.4 0.1.0-rc.5; do
+    native_fixture="$FIXTURE/rust-collector-v$rust_version"
+    mkdir -p "$native_fixture"
+    : >"$native_fixture/SHA256SUMS"
+    for platform in linux-amd64 macos-amd64 macos-arm64 windows-amd64.exe; do
+        native_asset="harness-gate-rust-collector-$platform"
+        printf 'native %s %s fixture\n' "$rust_version" "$platform" >"$native_fixture/$native_asset"
+        printf '%s  %s\n' "$(hash_file "$native_fixture/$native_asset")" "$native_asset" >>"$native_fixture/SHA256SUMS"
+    done
+    for asset in "$native_fixture/SHA256SUMS" "$native_fixture"/harness-gate-rust-collector-*; do
+        printf 'signed-subject=%s\n' "${asset##*/}" >"$asset.sig"
+        printf 'identity=https://github.com/musutrade/Harness-Gate/.github/workflows/native-collector-release.yml@refs/tags/rust-collector-v%s\n' "$rust_version" >"$asset.crt"
+    done
+done
+
 cat >"$FAKE_BIN/curl" <<'EOF'
 #!/usr/bin/env bash
 set -Eeuo pipefail
@@ -45,11 +62,18 @@ for argument in "${expected[@]}"; do
 done
 output="$1"
 url="$2"
-expected_prefix="https://github.com/musutrade/Harness-Gate/releases/download/v0.3.3/"
+expected_prefix="https://github.com/musutrade/Harness-Gate/releases/download/"
 [[ "$url" == "$expected_prefix"* && "$url" != *'?'* && "$url" != *'#'* ]] || exit 22
 filename="${url##*/}"
 [[ -n "$filename" && "$filename" != */* ]] || exit 22
-source_file="$HARNESS_GATE_TEST_FIXTURE/$filename"
+relative="${url#"$expected_prefix"}"
+case "$relative" in
+    v0.3.3/*) source_file="$HARNESS_GATE_TEST_FIXTURE/$filename" ;;
+    rust-collector-v0.1.0-rc.4/*|rust-collector-v0.1.0-rc.5/*)
+        source_file="$HARNESS_GATE_TEST_FIXTURE/$relative" ;;
+    *) exit 22 ;;
+esac
+printf '%s\n' "$url" >>"$HARNESS_GATE_TEST_DOWNLOAD_LOG"
 [[ -f "$source_file" ]] || exit 22
 /bin/cp "$source_file" "$output"
 EOF
@@ -71,18 +95,21 @@ while (($# > 0)); do
         --signature) signature="${2:-}"; shift 2 ;;
         --certificate) certificate="${2:-}"; shift 2 ;;
         --certificate-oidc-issuer) issuer="${2:-}"; shift 2 ;;
-        --certificate-identity-regexp) identity="${2:-}"; shift 2 ;;
+        --certificate-identity) identity="${2:-}"; shift 2 ;;
         --*) exit 2 ;;
         *) [[ -z "$subject" ]] || exit 2; subject="$1"; shift ;;
     esac
 done
-expected_identity='^https://github.com/musutrade/Harness-Gate/.github/workflows/release\.yml@refs/tags/v0\.3\.3$'
+case "$subject" in
+    */rust/*) expected_identity="https://github.com/musutrade/Harness-Gate/.github/workflows/native-collector-release.yml@refs/tags/rust-collector-v${HARNESS_GATE_TEST_EXPECTED_RUST_VERSION:-0.1.0-rc.5}" ;;
+    *) expected_identity='https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v0.3.3' ;;
+esac
 [[ "$issuer" == 'https://token.actions.githubusercontent.com' ]] || exit 1
 [[ "$identity" == "$expected_identity" ]] || exit 1
 [[ -n "$signature" && -n "$certificate" && -n "$subject" ]] || exit 1
 [[ "$(basename "$signature")" == "$(basename "$subject").sig" ]] || exit 1
 [[ "$(basename "$certificate")" == "$(basename "$subject").crt" ]] || exit 1
-grep -Fxq 'identity=https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v0.3.3' "$certificate" || exit 1
+grep -Fxq "identity=$expected_identity" "$certificate" || exit 1
 grep -Fxq "signed-subject=$(basename "$subject")" "$signature" || exit 1
 printf '%s\n' "$original_args" >>"$HARNESS_GATE_TEST_COSIGN_LOG"
 if [[ "${HARNESS_GATE_TEST_COSIGN_FAIL:-0}" == 1 ]]; then exit 1; fi
@@ -149,19 +176,20 @@ chmod 755 "$FAKE_BIN/cargo"
 cat >"$FAKE_BIN/uname" <<'EOF'
 #!/usr/bin/env bash
 set -Eeuo pipefail
-if [[ "${HARNESS_GATE_TEST_PLATFORM:-linux}" == windows ]]; then
-    case "${1:-}" in
-        -s) printf 'MINGW64_NT\n' ;;
-        -m) printf 'x86_64\n' ;;
-        *) exit 2 ;;
-    esac
-else
-    case "${1:-}" in
-        -s) printf 'Linux\n' ;;
-        -m) printf 'x86_64\n' ;;
-        *) exit 2 ;;
-    esac
-fi
+case "${1:-}" in
+    -s)
+        case "${HARNESS_GATE_TEST_PLATFORM:-linux}" in
+            windows) printf 'MINGW64_NT\n' ;;
+            macos-*) printf 'Darwin\n' ;;
+            *) printf 'Linux\n' ;;
+        esac ;;
+    -m)
+        case "${HARNESS_GATE_TEST_PLATFORM:-linux}" in
+            *-arm64) printf 'arm64\n' ;;
+            *) printf 'x86_64\n' ;;
+        esac ;;
+    *) exit 2 ;;
+esac
 EOF
 chmod 755 "$FAKE_BIN/uname"
 
@@ -363,5 +391,97 @@ for invalid_version in v1.2 v01.2.3 v1.2.3-01; do
     set -e
     ((invalid_status != 0)) || exit 1
 done
+
+# Platform dispatch is simulated here; actual host acceptance belongs to the
+# native release matrix. Only immutable signed binary assets may be requested.
+for platform in linux macos-amd64 macos-arm64 windows; do
+    destination="$TEMP_ROOT/native-$platform"
+    HARNESS_GATE_TEST_PLATFORM="$platform" run_installer "$destination" --rust-only >/dev/null
+    case "$platform" in
+        linux) asset=linux-amd64; executable=harness-gate-rust-collector ;;
+        windows) asset=windows-amd64.exe; executable=harness-gate-rust-collector.exe ;;
+        *) asset="$platform"; executable=harness-gate-rust-collector ;;
+    esac
+    cmp "$FIXTURE/rust-collector-v0.1.0-rc.5/harness-gate-rust-collector-$asset" "$destination/$executable"
+    [[ "$(mode_of "$destination/$executable")" == 755 ]]
+    [[ ! -e "$destination/harness-gate" && ! -e "$destination/harness-gate.exe" ]]
+done
+
+# --rust-only needs no Core version. Selecting an older native version verifies
+# against that exact tag, without downloading Core or using the bundled installer.
+: >"$TEMP_ROOT/download.log"
+env PATH="$FAKE_BIN:$PATH" HARNESS_GATE_VERSION='' \
+    HARNESS_GATE_TEST_FIXTURE="$FIXTURE" \
+    HARNESS_GATE_TEST_COSIGN_LOG="$TEMP_ROOT/cosign.log" \
+    HARNESS_GATE_TEST_EXPECTED_RUST_VERSION=0.1.0-rc.4 \
+    bash "$ROOT/install.sh" --rust-only --rust-version 0.1.0-rc.4 \
+    --install-dir "$TEMP_ROOT/native-older" >/dev/null
+cmp "$FIXTURE/rust-collector-v0.1.0-rc.4/harness-gate-rust-collector-linux-amd64" \
+    "$TEMP_ROOT/native-older/harness-gate-rust-collector"
+[[ "$(wc -l <"$TEMP_ROOT/download.log")" -eq 6 ]]
+[[ "$(grep -c '/rust-collector-v0.1.0-rc.4/' "$TEMP_ROOT/download.log")" -eq 6 ]]
+
+combined="$TEMP_ROOT/combined"
+: >"$TEMP_ROOT/cosign.log"
+run_installer "$combined" --with-rust >/dev/null
+assert_file_content "$combined/harness-gate"
+native_fixture="$FIXTURE/rust-collector-v0.1.0-rc.5"
+native_asset=harness-gate-rust-collector-linux-amd64
+cmp "$native_fixture/$native_asset" "$combined/harness-gate-rust-collector"
+[[ "$(wc -l <"$TEMP_ROOT/cosign.log")" -eq 4 ]]
+
+run_installer "$TEMP_ROOT/source-native" --from-source --with-rust >/dev/null
+grep -Fxq 'source fixture binary' "$TEMP_ROOT/source-native/harness-gate"
+cmp "$native_fixture/$native_asset" "$TEMP_ROOT/source-native/harness-gate-rust-collector"
+# Core source installs can still target an architecture without a release asset.
+HARNESS_GATE_TEST_PLATFORM=linux-arm64 run_installer "$TEMP_ROOT/source-arm" --from-source >/dev/null
+
+custom_root="$TEMP_ROOT/custom-native"
+run_installer "$TEMP_ROOT/custom-core" --with-rust --rust-root "$custom_root" >/dev/null
+assert_file_content "$TEMP_ROOT/custom-core/harness-gate"
+cmp "$native_fixture/$native_asset" "$custom_root/bin/harness-gate-rust-collector"
+[[ ! -e "$TEMP_ROOT/custom-core/harness-gate-rust-collector" ]]
+
+# A missing/tampered native asset or a certificate from the wrong workflow/tag
+# must fail before replacing either previously installed executable.
+for failure in tampered missing-signature wrong-workflow wrong-tag; do
+    rejected="$TEMP_ROOT/native-$failure"
+    mkdir -m 700 "$rejected"
+    printf 'previous core\n' >"$rejected/harness-gate"
+    printf 'previous plugin\n' >"$rejected/harness-gate-rust-collector"
+    cp "$native_fixture/$native_asset" "$TEMP_ROOT/saved-native"
+    cp "$native_fixture/$native_asset.sig" "$TEMP_ROOT/saved-signature"
+    cp "$native_fixture/$native_asset.crt" "$TEMP_ROOT/saved-certificate"
+    case "$failure" in
+        tampered) printf 'corrupted\n' >"$native_fixture/$native_asset" ;;
+        missing-signature) mv "$native_fixture/$native_asset.sig" "$TEMP_ROOT/missing-native-signature" ;;
+        wrong-workflow) printf 'identity=https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/rust-collector-v0.1.0-rc.5\n' >"$native_fixture/$native_asset.crt" ;;
+        wrong-tag) printf 'identity=https://github.com/musutrade/Harness-Gate/.github/workflows/native-collector-release.yml@refs/tags/rust-collector-v0.1.0-rc.4\n' >"$native_fixture/$native_asset.crt" ;;
+    esac
+    if run_installer "$rejected" --with-rust >/dev/null 2>&1; then
+        printf 'unexpected native success: %s\n' "$failure" >&2
+        exit 1
+    fi
+    grep -Fxq 'previous core' "$rejected/harness-gate"
+    grep -Fxq 'previous plugin' "$rejected/harness-gate-rust-collector"
+    cp "$TEMP_ROOT/saved-native" "$native_fixture/$native_asset"
+    cp "$TEMP_ROOT/saved-signature" "$native_fixture/$native_asset.sig"
+    cp "$TEMP_ROOT/saved-certificate" "$native_fixture/$native_asset.crt"
+done
+
+for invalid_version in latest v0.1.0-rc.5 0.1 00.1.0 0.1.0-01 '../escape'; do
+    if run_installer "$TEMP_ROOT/native-invalid" --rust-only --rust-version "$invalid_version" >/dev/null 2>&1; then
+        exit 1
+    fi
+done
+[[ ! -e "$TEMP_ROOT/native-invalid" ]]
+if run_installer "$TEMP_ROOT/native-offline" --rust-only --offline old-runtime.tar.gz >"$TEMP_ROOT/offline.log" 2>&1; then
+    exit 1
+fi
+grep -q 'historical installer' "$TEMP_ROOT/offline.log"
+[[ ! -e "$TEMP_ROOT/native-offline" ]]
+if run_installer "$TEMP_ROOT/native-source-invalid" --rust-only --from-source >/dev/null 2>&1; then
+    exit 1
+fi
 
 printf 'installer integrity tests: pass\n'
