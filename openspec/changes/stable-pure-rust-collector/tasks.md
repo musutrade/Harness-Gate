@@ -1,5 +1,19 @@
 # Tasks
 
+## Stable generated-owner alternative (2026-09-14)
+
+The generated-function coverage gap has a stable-interface alternative that does
+not wait on the unmerged upstream changes. When the generated source is a real
+file pulled in with `include!` (directly, or written by a build script into
+`OUT_DIR`), each generated function gets a distinct owner with real counters, and
+an unexecuted generated function gets an explicit zero record. Fixture
+`tools/quality/fixtures/rust-generated-owners` and regression
+`validate_generated_owners.py` (7 real checks, both configurations, plus
+doctor/prepare/collect) fix this on Rust 1.98.1; CI wires it into Quality Script
+Tests. The proc-macro token-stream path stays `unsupported`, and promoting this
+to a supported metric needs Core review plus an accepted measurement migration.
+See `docs/quality/stable-rust-generated-owners.md`.
+
 ## Generated-owner re-check on 1.98.1 (2026-09-14)
 
 The pinned token-stream fixture reproduces the generated-owner gap on the required
