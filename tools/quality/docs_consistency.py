@@ -145,6 +145,10 @@ def engineering_policy_failures() -> list[str]:
         "Officially released plugins and required CI gates MUST NOT depend on unstable compiler APIs",
         "first-party Rust quality collector MUST be implemented entirely in Rust",
         "installed runtime MUST NOT require Python",
+        "Source availability alone MUST NOT be treated as proof of measurement accuracy",
+        "A macro or derive invocation alone MUST NOT justify blanket unsupported classification",
+        "prefer an upstream PR",
+
         "Users install the documented external Rust/Cargo/coverage and project-native dependencies",
         "New signing/publication of the legacy Python/compiler-private Rust collector and its installer is suspended",
 
