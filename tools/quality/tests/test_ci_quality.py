@@ -32,6 +32,9 @@ class SnapshotTests(unittest.TestCase):
                 target = root / path
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_text('base fixture\n')
+            historical = root / 'docs/quality/old-run/evidence.tar.gz'
+            historical.parent.mkdir(parents=True)
+            historical.write_bytes(b'historical evidence, not a test input')
             git('add', '.')
             git('commit', '-m', 'base fixtures')
             base = git('rev-parse', 'HEAD')
@@ -48,6 +51,7 @@ class SnapshotTests(unittest.TestCase):
                     for path in paths:
                         with self.subTest(label=label, path=path):
                             self.assertEqual((snapshot / path).read_text(), f'{label} fixture\n')
+                    self.assertFalse((snapshot / 'docs/quality').exists())
 
 
 class AggregateTests(unittest.TestCase):
