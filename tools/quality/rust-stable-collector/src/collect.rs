@@ -10,7 +10,7 @@ use anyhow::{ensure, Context, Result};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, BTreeSet},
     env, fs,
     path::{Path, PathBuf},
 };
@@ -314,7 +314,9 @@ pub fn collect(path: &Path) -> Result<String> {
     {
         ownership::file(&request.project_root, name, &coverage)?;
     }
+    let generated = generated_owners(&runner.root, &coverage)?;
     artifact::write(&runner.root.join("source-analysis.json"), &analysis)?;
+    artifact::write(&runner.root.join("generated-owners.json"), &generated)?;
     artifact::write(
         &runner.root.join("candidate.json"),
         &json!({
@@ -416,7 +418,61 @@ pub fn verify(root: &Path, anchor: &str, request_digest: &str) -> Result<()> {
     {
         ownership::file(&request.project_root, path, &coverage)?;
     }
+    let generated: Value =
+        crate::strict_json::parse(&fs::read(root.join("generated-owners.json"))?)?;
+    ensure!(
+        generated == generated_owners(root, &coverage)?,
+        "generated owner facts differ from recomputed facts"
+    );
     Ok(())
+}
+
+/// Certified owners for generated source files. Only files already authenticated
+/// as compiler inputs (`compiler-generated/<sha256>` plus a recorded producer)
+/// are analyzed, and each is linked to the producer that emitted it. This is a
+/// real-file path; the proc-macro token stream is still not certified.
+fn generated_owners(root: &Path, coverage: &Value) -> Result<Value> {
+    let proof: Value = crate::strict_json::parse(&fs::read(root.join("compiler-inputs.json"))?)?;
+    let mut owners = Vec::new();
+    let mut seen = BTreeSet::new();
+    for (record, entry) in proof["records"]
+        .as_object()
+        .context("compiler input records")?
+        .iter()
+    {
+        for (token, input) in entry["inputs"].as_object().context("compiler inputs")? {
+            if input["generated"] != true || !token.ends_with(".rs") {
+                continue;
+            }
+            let sha = input["identity"]["sha256"]
+                .as_str()
+                .context("generated input digest")?;
+            if !seen.insert(sha.to_owned()) {
+                continue;
+            }
+            // Re-derive facts from the authenticated bytes, never from the scratch
+            // path that no longer exists once the capture is moved.
+            let source = root.join("compiler-generated").join(sha);
+            let identity = artifact::identity(&source)?;
+            let text = fs::read_to_string(&source)?;
+            // Bind the analyzed text back to the authenticated bytes before use.
+            ensure!(
+                artifact::digest(text.as_bytes()) == sha,
+                "generated source analysis drifted from authenticated bytes"
+            );
+            let mapping = ownership::text(&PathBuf::from(token), &text, coverage)?;
+            owners.push(json!({
+                "source":token, "sha256":sha, "bytes":identity.bytes, "producer":record,
+                "filename":token, "owner":mapping,
+            }));
+        }
+    }
+    Ok(json!({
+        "schema":"rust-stable-generated-owners/v1-candidate",
+        "rule":"rust-llvm-exact-free-owner-generated/v1-candidate",
+        "scope":"build-script generated source files authenticated as compiler inputs; proc-macro token streams not certified",
+        "owners":owners,
+    }))
 }
 
 #[cfg(test)]

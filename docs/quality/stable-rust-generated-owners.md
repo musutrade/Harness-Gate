@@ -47,16 +47,24 @@ single-`if`), so the feature genuinely selects different generated source.
 
 ## What is certified and what is not
 
-- Certified: real, distinct generated owners and counters through stable
-  interfaces, with an explicit zero for an unexecuted generated function, and a
-  collector capture that accepts the fixture.
+- Certified by the collector: generated source files that are authenticated
+  compiler inputs are analyzed by `rust-llvm-exact-free-owner-generated/v1-candidate`
+  and exported to `generated-owners.json`. Each function carries a real owner,
+  execution count and code-region ratio, and each owner is bound to the file
+  digest and the producing invocation. `describe` exposes them as owners with
+  `"generated": true`, and `verify` recomputes them so forged counts, a swapped
+  producer or a dropped owner fail with `generated owner facts differ from
+  recomputed facts`.
 - Not certified: the proc-macro **token-stream** path stays `unsupported` for
   coverage and CRAP. Nothing here inherits a calling function's count, fills a
-  zero by default, or promotes generated coverage/CRAP to required.
-- The alternative changes the required boundary. Promoting it to a supported
-  metric is a reviewed change requiring Core's agreement and an accepted
-  measurement migration, not something this checkpoint adopts.
+  zero by default, or promotes generated coverage/CRAP to the required gate.
+- The alternative changes the required boundary. Adopting it as a required
+  metric (thresholds, requiredness, CRAP, baselines) is a reviewed change
+  requiring Core's agreement and an accepted measurement migration. This
+  candidate exposes certified owners; it does not set the gate.
 
 `tools/quality/rust-stable-collector/validate_generated_owners.py` is the
-repository-only regression (7 checks: tests/coverage in both configurations,
-then doctor/prepare/collect). It is not shipped in the plugin payload.
+repository-only regression (11 checks): tests and raw coverage in both
+configurations, doctor/prepare/collect, the certified-owner export, the recompute
+`verify` path, and three tamper cases. It is not shipped in the plugin payload.
+
