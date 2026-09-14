@@ -15,6 +15,13 @@ on:
 permissions:
   contents: read
 
+env:
+  PYTHONUTF8: '1'
+
+defaults:
+  run:
+    shell: bash
+
 concurrency:
   group: native-collector-${{ github.ref }}
   cancel-in-progress: false
@@ -62,10 +69,30 @@ jobs:
           retention-days: 90
 
   build:
-    name: Build and accept native Linux x86_64
+    name: Build and accept native (${{ matrix.target }})
     needs: policy
     if: always() && (needs.policy.result == 'success' || (!startsWith(github.ref, 'refs/tags/') && needs.policy.result == 'skipped'))
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+            asset: harness-gate-rust-collector-linux-amd64
+            suffix: ''
+          - os: macos-15-intel
+            target: x86_64-apple-darwin
+            asset: harness-gate-rust-collector-macos-amd64
+            suffix: ''
+          - os: macos-15
+            target: aarch64-apple-darwin
+            asset: harness-gate-rust-collector-macos-arm64
+            suffix: ''
+          - os: windows-2025
+            target: x86_64-pc-windows-msvc
+            asset: harness-gate-rust-collector-windows-amd64.exe
+            suffix: '.exe'
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
@@ -87,21 +114,30 @@ jobs:
       - name: Build standalone plugin, embedded notices and SBOM
         run: |
           python tools/quality/rust-native-plugin/build.py \
-            --driver target/native-driver/release/harness-gate-rust-native-driver \
+            --driver target/native-driver/release/harness-gate-rust-native-driver${{ matrix.suffix }} \
             --rustc "$(rustup which --toolchain 1.97.1 rustc)" \
+            --target ${{ matrix.target }} \
             --output target/native-package
       - name: Build Core for protocol and policy acceptance
         run: cargo +1.97.1 build --manifest-path tools/harness-gate/Cargo.toml --locked --release
+      - name: Select OpenSSL 3 for disposable request-signing tests
+        if: runner.os == 'macOS'
+        run: |
+          openssl_prefix="$(brew --prefix openssl@3)"
+          test -x "$openssl_prefix/bin/openssl"
+          "$openssl_prefix/bin/openssl" version
+          echo "$openssl_prefix/bin" >> "$GITHUB_PATH"
       - name: Real native owner, history, external dependency and Core acceptance
         env:
-          NATIVE_PLUGIN_BINARY: ${{ github.workspace }}/target/native-package/harness-gate-rust-collector-linux-amd64
-          NATIVE_DRIVER: ${{ github.workspace }}/target/native-driver/release/harness-gate-rust-native-driver
-          HARNESS_GATE_NATIVE_POLICY_BINARY: ${{ github.workspace }}/tools/harness-gate/target/release/harness-gate
+          NATIVE_PLUGIN_BINARY: ${{ github.workspace }}/target/native-package/${{ matrix.asset }}
+          NATIVE_DRIVER: ${{ github.workspace }}/target/native-driver/release/harness-gate-rust-native-driver${{ matrix.suffix }}
+          HARNESS_GATE_NATIVE_POLICY_BINARY: ${{ github.workspace }}/tools/harness-gate/target/release/harness-gate${{ matrix.suffix }}
           CARGO_NET_OFFLINE: 'true'
         run: |
           export NATIVE_DRIVER_SYSROOT="$(rustc +1.97.1 --print sysroot)"
           python tools/quality/rust-native-plugin/accept.py
       - name: Verify shared release rules and documentation
+        if: matrix.target == 'x86_64-unknown-linux-gnu'
         run: |
           rustfmt +1.97.1 --edition 2021 --check tools/quality/rust-native-plugin/launcher.rs
           python -m unittest discover -s tools/release/tests -v
@@ -110,7 +146,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
-          name: native-acceptance-${{ github.run_id }}
+          name: native-acceptance-${{ github.run_id }}-${{ matrix.target }}
           path: |
             target/native-package/build.json
             target/native-acceptance
@@ -121,11 +157,11 @@ jobs:
       - name: Stage only the tested release assets
         run: |
           mkdir dist
-          cp target/native-package/harness-gate-rust-collector-linux-amd64 dist/
-          cp target/native-package/harness-gate-rust-collector.sbom.cdx.json dist/
+          cp target/native-package/${{ matrix.asset }} dist/
+          cp target/native-package/*.sbom.cdx.json dist/
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
-          name: native-release-assets-${{ github.run_id }}
+          name: native-release-assets-${{ github.run_id }}-${{ matrix.target }}
           path: dist/*
           if-no-files-found: error
           retention-days: 30
@@ -146,9 +182,10 @@ jobs:
       - name: Download release assets
         uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
         with:
-          # Download only the tested binary and its SBOM from this run.
-          name: native-release-assets-${{ github.run_id }}
+          # Download only the four tested binaries and their SBOMs from this run.
+          pattern: native-release-assets-${{ github.run_id }}-*
           path: dist
+          merge-multiple: true
 
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
@@ -167,7 +204,13 @@ jobs:
             --dist dist \
             --output dist/release-inventory.json \
             --binary harness-gate-rust-collector-linux-amd64 \
-            --sbom harness-gate-rust-collector.sbom.cdx.json \
+            --binary harness-gate-rust-collector-macos-amd64 \
+            --binary harness-gate-rust-collector-macos-arm64 \
+            --binary harness-gate-rust-collector-windows-amd64.exe \
+            --sbom harness-gate-rust-collector-linux-amd64.sbom.cdx.json \
+            --sbom harness-gate-rust-collector-macos-amd64.sbom.cdx.json \
+            --sbom harness-gate-rust-collector-macos-arm64.sbom.cdx.json \
+            --sbom harness-gate-rust-collector-windows-amd64.sbom.cdx.json \
             --tag "$TAG" \
             --commit "$COMMIT" \
             --repository "$REPOSITORY"

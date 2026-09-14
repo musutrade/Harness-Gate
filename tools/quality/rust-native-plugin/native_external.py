@@ -20,24 +20,25 @@ import harness_evidence as evidence
 
 def dependency_check(root, sysroot):
     native.require(sys.version_info >= (3, 12), 'external Python 3.12 or newer is required')
-    native.require(platform.system() == 'Linux' and platform.machine() == 'x86_64',
-                   'supported native target is Linux x86_64 GNU')
+    target = native.host_target()
     native.require(sysroot is not None, 'select external Rust 1.97.1 with --sysroot or HARNESS_GATE_RUST_SYSROOT; no toolchain was installed')
     sysroot = Path(sysroot).resolve(strict=True)
-    driver = root / 'bin/harness-gate-rust-native-driver'
+    driver = native.executable(root / 'bin', 'harness-gate-rust-native-driver')
     for name in ('rustc', 'cargo', 'rustdoc'):
-        native.require((sysroot / 'bin' / name).is_file(), 'missing external ' + name)
+        native.require(native.executable(sysroot / 'bin', name).is_file(), 'missing external ' + name)
     with tempfile.TemporaryDirectory(prefix='native-doctor-') as temporary:
         tools = native.tools_identity(Path(temporary), driver, sysroot)
-    env = os.environ | {'LD_LIBRARY_PATH': str(sysroot / 'lib'), 'RUSTUP_AUTO_INSTALL': '0'}
+    env = os.environ | native.library_environment(sysroot) | {'RUSTUP_AUTO_INSTALL': '0'}
     result = subprocess.run([str(driver), '--version'], env=env, capture_output=True, text=True, timeout=30)
     native.require(result.returncode == 0 and result.stdout.startswith('rustc 1.97.1 '),
                    'native driver cannot load the selected compiler libraries: ' + result.stderr[-1000:])
-    return {'schema': 'native-external-dependencies/v1', 'state': 'supported', 'sysroot': str(sysroot),
+    runtime_libraries = sorted(p for base in ('bin', 'lib') for p in (sysroot / base).glob('*LLVM*')
+                               if p.is_file() and ('.so' in p.name or p.suffix in ('.dylib', '.dll')))
+    return {'schema': 'native-external-dependencies/v1', 'state': 'supported', 'sysroot': str(sysroot), 'target': target,
             'python': {'path': sys.executable, 'version': platform.python_version(),
                        'sha256': native.file_hash(Path(sys.executable))},
             'external_runtime': {str(path): native.file_hash(path) for path in
-                [sysroot / 'bin/cargo', sysroot / 'bin/rustdoc', *sorted((sysroot / 'lib').glob('libLLVM*.so*'))]},
+                [native.executable(sysroot / 'bin', name) for name in ('cargo', 'rustdoc')] + runtime_libraries},
             'tools': tools, 'measurement_series': native.SERIES, 'bundled_toolchains': False,
             'scope': 'existing native compiler-owner/MIR-block contract; no stable fallback'}
 
@@ -53,12 +54,12 @@ def external_capture(manifest, output, samples, features, root, status):
     output.mkdir(parents=True, exist_ok=False)
     raw = output / 'raw'
     raw.mkdir()
-    cargo = str(sysroot / 'bin/cargo')
+    cargo = str(native.executable(sysroot / 'bin', 'cargo'))
     env = {'CARGO_TARGET_DIR': str(output / 'build'), 'CARGO_INCREMENTAL': '0',
            'RUSTC_BOOTSTRAP': '1', 'RUSTFLAGS': ' '.join(native.FLAGS),
-           'RUSTC': str(sysroot / 'bin/rustc'), 'RUSTDOC': str(sysroot / 'bin/rustdoc'),
+           'RUSTC': str(native.executable(sysroot / 'bin', 'rustc')), 'RUSTDOC': str(native.executable(sysroot / 'bin', 'rustdoc')),
            'RUSTC_WORKSPACE_WRAPPER': os.environ['HARNESS_GATE_NATIVE_EXECUTABLE'],
-           'NATIVE_CAPTURE_ROOT': str(raw), 'NATIVE_DRIVER': str(root / 'bin/harness-gate-rust-native-driver'),
+           'NATIVE_CAPTURE_ROOT': str(raw), 'NATIVE_DRIVER': str(native.executable(root / 'bin', 'harness-gate-rust-native-driver')),
            'NATIVE_DRIVER_LIB': str(sysroot / 'lib'), 'HARNESS_GATE_NATIVE_WRAPPER': '1',
            'HARNESS_GATE_RUST_SYSROOT': str(sysroot), 'HARNESS_GATE_PYTHON': sys.executable,
            'RUSTUP_AUTO_INSTALL': '0', 'LLVM_PROFILE_FILE': str(raw / 'compile-%p-%m.profraw')}
@@ -70,9 +71,9 @@ def external_capture(manifest, output, samples, features, root, status):
     native.run(raw, 'cargo', command, env)
     # Cargo metadata must use the same explicit compiler, including when the
     # target repository pins a different default toolchain.
-    os.environ['RUSTC'] = str(sysroot / 'bin/rustc')
+    os.environ['RUSTC'] = str(native.executable(sysroot / 'bin', 'rustc'))
     try:
-        anchor = native.finish_cargo(raw, manifest, root / 'bin/harness-gate-rust-native-driver',
+        anchor = native.finish_cargo(raw, manifest, native.executable(root / 'bin', 'harness-gate-rust-native-driver'),
                                      sysroot, samples, cargo)
     finally:
         os.environ.pop('RUSTC', None)
@@ -97,14 +98,20 @@ def adapter(root, status, args):
     request = json.load(sys.stdin, object_pairs_hook=evidence._unique_object)
     project.validate_request(request)
     for variable, field in (('HARNESS_GATE_INVOCATION_ID', 'invocation_id'),
-                            ('HARNESS_GATE_STEP_ID', 'step_id'),
-                            ('HARNESS_GATE_ARTIFACT_ROOT', 'artifact_root')):
+                            ('HARNESS_GATE_STEP_ID', 'step_id')):
         native.require(os.environ.get(variable) == request[field], 'Core invocation environment mismatch: ' + variable)
+    # Core exports fs::canonicalize's directory (including the Windows extended
+    # path prefix), while the signature retains the request's original spelling.
+    artifact_root = os.environ.get('HARNESS_GATE_ARTIFACT_ROOT')
+    native.require(artifact_root is not None and Path(artifact_root).is_absolute()
+                   and Path(artifact_root).is_dir()
+                   and Path(artifact_root).samefile(request['artifact_root']),
+                   'Core invocation environment mismatch: HARNESS_GATE_ARTIFACT_ROOT')
     native.require(all(os.environ.get(key) == value for key, value in request['environment'].items()),
                    'signed environment mismatch')
     native.require(request['args'] == sys.argv[1:], 'external dependency options differ from signed arguments')
     executable = Path(os.environ['HARNESS_GATE_NATIVE_EXECUTABLE']).resolve(strict=True)
-    native.require(Path(request['adapter']['executable']).resolve(strict=True) == executable
+    native.require(Path(request['adapter']['executable']).samefile(executable)
                    and native.file_hash(executable) == request['adapter']['source_digest'], 'adapter executable identity mismatch')
     native.require(request['adapter']['name'] == 'harness-gate-rust-collector'
                    and request['adapter']['version'] == os.environ['HARNESS_GATE_NATIVE_VERSION'], 'adapter version mismatch')
@@ -124,9 +131,9 @@ def main():
     root = Path(os.environ['HARNESS_GATE_NATIVE_ROOT'])
     # The same precompiled launcher is Cargo's wrapper, using the selected host
     # Python. No shebang/PATH selection of another interpreter is involved.
-    if len(sys.argv) > 1 and Path(sys.argv[1]).name == 'rustc' and os.environ.get('HARNESS_GATE_NATIVE_WRAPPER') == '1':
+    if len(sys.argv) > 1 and Path(sys.argv[1]).name in ('rustc', 'rustc.exe') and os.environ.get('HARNESS_GATE_NATIVE_WRAPPER') == '1':
         sysroot = Path(os.environ['HARNESS_GATE_RUST_SYSROOT']).resolve(strict=True)
-        native.require(Path(sys.argv[1]).resolve(strict=True) == (sysroot / 'bin/rustc').resolve(strict=True), 'unexpected wrapper compiler')
+        native.require(Path(sys.argv[1]).resolve(strict=True) == native.executable(sysroot / 'bin', 'rustc').resolve(strict=True), 'unexpected wrapper compiler')
         native.require(not any(a == '--sysroot' or a.startswith('--sysroot=') for a in sys.argv[2:]), 'unexpected compiler sysroot override')
         return native.wrapper([sys.argv[1], *sys.argv[2:], '--sysroot', str(sysroot)])
     parser = argparse.ArgumentParser(description=__doc__)
@@ -173,7 +180,7 @@ def main():
         elif args.action == 'capture':
             result = external_capture(args.source, args.output, args.sample, args.feature, root, status)
         elif args.action == 'fixture':
-            anchor = native.collect_fixture(args.source, args.output, root / 'bin/harness-gate-rust-native-driver', Path(status['sysroot']), args.cfg)
+            anchor = native.collect_fixture(args.source, args.output, native.executable(root / 'bin', 'harness-gate-rust-native-driver'), Path(status['sysroot']), args.cfg)
             result = {'capture': str(args.output.resolve()), 'anchor': anchor}
         elif args.action in ('certify', 'classify'):
             check_capture(args.evidence, args.anchor, status)

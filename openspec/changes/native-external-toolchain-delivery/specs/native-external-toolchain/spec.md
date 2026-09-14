@@ -1,5 +1,22 @@
 ## ADDED Requirements
 
+### Requirement: Publish Core's native platform matrix
+The product SHALL publish its own precompiled executables for Linux x86_64 GNU,
+macOS x86_64, macOS aarch64 and Windows x86_64 MSVC. Each executable SHALL use
+matching externally installed Rust and LLVM tools, and SHALL retain the existing
+native measurement and Core policy rules.
+
+#### Scenario: Each platform passes real acceptance before publication
+- **WHEN** a native release tag is submitted
+- **THEN** all four native host jobs build and exercise the actual packaged executable
+- **AND** each target retains measurement, dependency and authenticated Core evidence
+- **AND** publication signs and inventories all four executables and their distinct SBOMs
+- **AND** a failed or missing platform job blocks the release
+
+#### Scenario: A host selects a different compiler architecture
+- **WHEN** the compiler host differs from the installed executable's supported host
+- **THEN** dependency discovery rejects collection without switching tools or baselines
+
 ### Requirement: Preserve the native measurement engine
 The independent product SHALL retain the existing native MIR owner/counter,
 complexity and exact CRAP rules. Core SHALL retain thresholds, requiredness,

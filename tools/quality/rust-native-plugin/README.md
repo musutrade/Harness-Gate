@@ -3,9 +3,16 @@
 Retains `rust-native-production-mir-block/1` and the existing native driver,
 normalizer, re-export verification and Core policy bridge. The Rust launcher
 embeds our precompiled driver, adapter sources, schemas and license notices.
-It checks those bytes before running external isolated Python (`-I -S -B`).
+It checks those bytes before running external isolated Python (`-I -S -B -X utf8`).
 
 See the [delivery and installation contract](../../../docs/quality/native-external-toolchain.md).
+
+The release builds natively for Linux x86_64, macOS Intel, macOS Apple Silicon,
+and Windows x86_64 MSVC, matching Core's executable targets. Each target runs the
+real measurement and Core acceptance suite before its asset can be published.
+The commands below use Linux filenames; on Windows the driver and Core have
+`.exe` suffixes. `build.py --target TARGET` requires a matching host rustc and
+emits the target-specific executable and SBOM listed in the delivery contract.
 No compiler, interpreter, linker or LLVM distribution is included.
 
 Build with external prerequisites already installed:
@@ -26,6 +33,15 @@ and the project's native build dependencies. The builder authenticates crate
 sources/notices against Cargo.lock and writes a CycloneDX SBOM using Core's tool.
 
 Run mandatory acceptance (missing inputs or skipped tests fail):
+
+The disposable protocol-v2 request signer needs OpenSSL with Ed25519 `pkeyutl
+-rawin` support. On macOS, put the existing Homebrew OpenSSL 3 `bin` directory
+on PATH (`export PATH="$(brew --prefix openssl@3)/bin:$PATH"`); the system
+LibreSSL command does not implement that signing interface. OpenSSL is an
+acceptance-test dependency, not embedded in the plugin. Windows measurement
+passes `/INCREMENTAL:NO` to the MSVC linker so its padding cannot corrupt LLVM
+profiling sections. The complete fixture and Cargo acceptance checks require
+valid raw profiles and no incremental `.ilk` artifacts.
 
 ```sh
 NATIVE_PLUGIN_BINARY="$PWD/target/native-package/harness-gate-rust-collector-linux-amd64" \

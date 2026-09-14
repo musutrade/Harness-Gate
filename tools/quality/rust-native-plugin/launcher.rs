@@ -1,21 +1,45 @@
 //! Standalone distribution of our code. Rust/LLVM/Python stay external.
+#[cfg(unix)]
+use std::os::unix::{fs::PermissionsExt, process::CommandExt};
 use std::{
     env,
     ffi::OsString,
     fs,
     io::Write,
-    os::unix::{fs::PermissionsExt, process::CommandExt},
     path::{Path, PathBuf},
     process::{Command, ExitCode},
 };
 include!(env!("HARNESS_GATE_NATIVE_PAYLOAD"));
+
+fn mode_matches(metadata: &fs::Metadata, mode: u32) -> bool {
+    #[cfg(unix)]
+    {
+        metadata.permissions().mode() & 0o777 == mode
+    }
+    #[cfg(windows)]
+    {
+        metadata.permissions().readonly() == (mode & 0o200 == 0)
+    }
+}
+
+fn set_mode(file: &fs::File, mode: u32) -> Result<(), String> {
+    #[cfg(unix)]
+    let permissions = fs::Permissions::from_mode(mode);
+    #[cfg(windows)]
+    let permissions = {
+        let mut permissions = file.metadata().map_err(|e| e.to_string())?.permissions();
+        permissions.set_readonly(mode & 0o200 == 0);
+        permissions
+    };
+    file.set_permissions(permissions).map_err(|e| e.to_string())
+}
 
 fn verify(root: &Path) -> Result<(), String> {
     for (name, bytes, mode) in PAYLOAD {
         let path = root.join(name);
         let metadata = fs::symlink_metadata(&path).map_err(|e| format!("payload {name}: {e}"))?;
         if !metadata.is_file()
-            || metadata.permissions().mode() & 0o777 != *mode
+            || !mode_matches(&metadata, *mode)
             || fs::read(&path).map_err(|e| e.to_string())? != *bytes
         {
             return Err(format!("missing or modified plugin payload: {name}"));
@@ -48,7 +72,7 @@ fn verify(root: &Path) -> Result<(), String> {
                         .strip_prefix(root)
                         .unwrap()
                         .to_string_lossy()
-                        .into(),
+                        .replace('\\', "/"),
                 );
             } else {
                 return Err("nonregular plugin cache member".into());
@@ -72,9 +96,15 @@ fn payload() -> Result<PathBuf, String> {
         PathBuf::from(path)
     } else if let Some(path) = env::var_os("XDG_CACHE_HOME") {
         PathBuf::from(path).join("harness-gate/native")
+    } else if cfg!(windows) && env::var_os("LOCALAPPDATA").is_some() {
+        PathBuf::from(env::var_os("LOCALAPPDATA").unwrap()).join("harness-gate/native")
     } else {
-        PathBuf::from(env::var_os("HOME").ok_or("HOME or HARNESS_GATE_NATIVE_CACHE required")?)
-            .join(".cache/harness-gate/native")
+        PathBuf::from(
+            env::var_os("HOME")
+                .or_else(|| env::var_os("USERPROFILE"))
+                .ok_or("HOME, LOCALAPPDATA or HARNESS_GATE_NATIVE_CACHE required")?,
+        )
+        .join(".cache/harness-gate/native")
     };
     if !cache.is_absolute() {
         return Err("plugin cache must be absolute".into());
@@ -93,8 +123,7 @@ fn payload() -> Result<PathBuf, String> {
                 .open(&path)
                 .map_err(|e| e.to_string())?;
             file.write_all(bytes).map_err(|e| e.to_string())?;
-            file.set_permissions(fs::Permissions::from_mode(*mode))
-                .map_err(|e| e.to_string())?;
+            set_mode(&file, *mode)?;
             file.sync_all().map_err(|e| e.to_string())?;
         }
         verify(&staging)?;
@@ -110,11 +139,11 @@ fn payload() -> Result<PathBuf, String> {
     root.canonicalize().map_err(|e| e.to_string())
 }
 
-fn run() -> Result<(), String> {
+fn run() -> Result<ExitCode, String> {
     let args: Vec<OsString> = env::args_os().skip(1).collect();
     if args == [OsString::from("--version")] {
         println!("harness-gate-rust-collector {VERSION}");
-        return Ok(());
+        return Ok(ExitCode::SUCCESS);
     }
     if args == [OsString::from("--licenses")] {
         let (_, bytes, _) = PAYLOAD
@@ -124,28 +153,42 @@ fn run() -> Result<(), String> {
         std::io::stdout()
             .write_all(bytes)
             .map_err(|e| e.to_string())?;
-        return Ok(());
+        return Ok(ExitCode::SUCCESS);
     }
     let root = payload()?;
-    let python = env::var_os("HARNESS_GATE_PYTHON").unwrap_or_else(|| "python3".into());
+    let python = env::var_os("HARNESS_GATE_PYTHON").unwrap_or_else(|| {
+        if cfg!(windows) {
+            "python.exe".into()
+        } else {
+            "python3".into()
+        }
+    });
     let executable = env::current_exe().map_err(|e| e.to_string())?;
     let mut command = Command::new(python);
     command
-        .args(["-I", "-S", "-B"])
+        .args(["-I", "-S", "-B", "-X", "utf8"])
         .arg(root.join("app/native_external.py"))
         .args(&args)
         .env("HARNESS_GATE_NATIVE_ROOT", &root)
         .env("HARNESS_GATE_NATIVE_EXECUTABLE", executable)
         .env("HARNESS_GATE_NATIVE_VERSION", VERSION);
-    Err(format!(
+    #[cfg(unix)]
+    return Err(format!(
         "cannot run external Python 3.12+ (set HARNESS_GATE_PYTHON): {}",
         command.exec()
-    ))
+    ));
+    #[cfg(windows)]
+    {
+        let status = command.status().map_err(|error| {
+            format!("cannot run external Python 3.12+ (set HARNESS_GATE_PYTHON): {error}")
+        })?;
+        Ok(ExitCode::from(if status.success() { 0 } else { 1 }))
+    }
 }
 
 fn main() -> ExitCode {
     match run() {
-        Ok(()) => ExitCode::SUCCESS,
+        Ok(code) => code,
         Err(error) => {
             eprintln!("native collector: {error}");
             ExitCode::FAILURE
