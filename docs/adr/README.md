@@ -89,6 +89,8 @@ When an ADR is superseded:
 
 - [ADR-0047: Composable quality preset packs and explicit adoption](0047-composable-quality-preset-packs.md)
 
+- [ADR-0048: Configured CI workflow acceptance](0048-configured-ci-workflow-acceptance.md)
+- [ADR-0049: Keep project-owned validation outside Harness-Gate Core](0049-project-owned-validation-extension-boundary.md)
 - [ADR-0050: Guaranteed serial dispatch and shared-service ordering](0050-serial-shared-service-ordering.md)
 
 - [ADR-0051: Lightweight collector storage and independent upgrades](0051-lightweight-collector-storage.md)

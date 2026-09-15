@@ -19,9 +19,25 @@ from critical_paths import (INVENTORY, POLICY, RULE, platform_for, require_commi
 from production_coverage import require
 from quality_common import CRATE, ROOT, git_sha, metadata, sha256, write_json
 
+# Failed collections retain their build tree for diagnosis. A build tree is large
+# (instrumented deps + test binaries), so keep only the newest few and reclaim the
+# rest before the next collection starts.
+RETAIN_FAILED_BUILDS = 3
+
+
+def prune_old_builds() -> None:
+    root = ROOT / 'target/critical-path-build'
+    if not root.is_dir():
+        return
+    kept = sorted((entry for entry in root.iterdir() if entry.is_dir()),
+                  key=lambda entry: entry.stat().st_mtime, reverse=True)
+    for entry in kept[RETAIN_FAILED_BUILDS:]:
+        shutil.rmtree(entry, ignore_errors=True)
+
 
 def collect(evidence: Path, jobs: int = 2) -> None:
     require(1 <= jobs <= 8, "critical-path jobs must be between 1 and 8")
+    prune_old_builds()
     lock = ROOT / 'target/critical-path-collection.lock'
     lock.parent.mkdir(parents=True, exist_ok=True)
     try:
@@ -69,8 +85,14 @@ def collect_locked(evidence: Path, jobs: int = 2) -> None:
     setup.mkdir()
     tick = time.monotonic()
     command(['cargo', 'llvm-cov', 'show-env', *manifest], environment, setup, 'environment')
-    # Parse assignments as data; never execute shell output.
-    for assignment in shlex.split((setup / 'environment.stdout').read_text()):
+    # Parse assignments as data; never execute shell output. show-env's default
+    # form is one bare `KEY=VALUE` per line (no `export` prefix or `;` terminator);
+    # reject the shell-export variant explicitly instead of misparsing it.
+    raw = (setup / 'environment.stdout').read_text()
+    require(not any(';' in line or line.startswith(('export', 'set ', 'setenv'))
+                    for line in raw.splitlines()),
+            'unexpected shell-form coverage environment; expected bare KEY=VALUE lines')
+    for assignment in shlex.split(raw):
         key, separator, value = assignment.partition('=')
         require(bool(separator) and key.isidentifier(), 'invalid coverage environment assignment')
         environment[key] = value
@@ -103,6 +125,7 @@ def collect_locked(evidence: Path, jobs: int = 2) -> None:
     require(before == source_identity(CRATE) and identity['commit'] == git_sha(), 'source/commit changed during collection')
     require_committed_sources(identity['commit'])
     # Successful evidence is self-contained; do not accumulate a full build per run.
+    # Failed collections keep their build tree for diagnosis (bounded by prune_old_builds).
     shutil.rmtree(build)
     bundle['collection_seconds'] = time.monotonic() - started
     write_json(evidence, bundle)

@@ -36,7 +36,8 @@ writes the bundle declaration. `clean_exit` now describes profile-only report
 preparation, not a rebuild. Build, test and total collection timings are included
 in the bundle; individual commands also record elapsed seconds. The fresh build
 directory is removed after successful collection; failed builds remain available for
-diagnosis. Build binaries are not included in the evidence bundle.
+diagnosis, and the next collection reclaims the oldest failed build trees, keeping
+the newest three. Build binaries are not included in the evidence bundle.
 
 The bundle binds inventory, all crate source/test/build inputs, host target,
 commit, rule, tool versions and artifact hashes. Local source bytes must match the
@@ -71,3 +72,7 @@ This implements OpenSpec `strict-json-results-and-risk-based-quality-gates` task
 [ADR 0034](../adr/0034-fail-closed-trust-boundaries.md) and
 [ADR 0038](../adr/0038-post-remediation-hardening.md). Broader quality aggregation
 and baseline adoption remain tasks 8.x.
+
+Local before/after timing, tool versions and the review of the parallel
+collection change are in the
+[collection benchmark](../benchmarks/critical-path-collection/README.md).

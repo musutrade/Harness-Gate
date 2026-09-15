@@ -1,6 +1,8 @@
 """Exercise scheduling and profile isolation without compiling Rust in unit tests."""
 import json
+import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
@@ -64,7 +66,13 @@ class ParallelCollectionTests(unittest.TestCase):
                 self.peak = max(self.peak, self.active)
             if self.barrier:
                 self.barrier.wait(timeout=5)
-            profile = Path(env['LLVM_PROFILE_FILE'].replace('%p', '1').replace('%m', '2'))
+            # Real show-env emits e.g. 'harness-gate-%p-%8m.profraw'; LLVM replaces
+            # '%p'/'%m' (with an optional width) per process. Expand both forms to a
+            # unique token so the two concurrent runs never collide in the shared root.
+            pattern = env['LLVM_PROFILE_FILE']
+            pattern = re.sub(r'%p', '1', pattern)
+            pattern = re.sub(r'%(?:\d+)?m', '2', pattern)
+            profile = Path(pattern)
             if self.failure != 'profiles':
                 profile.write_text(name)
             stdout.write(name)
@@ -136,6 +144,19 @@ class ParallelCollectionTests(unittest.TestCase):
             collector.collect(self.evidence)
         self.assertEqual(self.commands, [])
         self.assertTrue(lock.is_dir())
+
+    def test_prune_old_builds_keeps_newest_failed_trees(self):
+        build_root = self.root / 'target/critical-path-build'
+        for index, name in enumerate(['oldest', 'older', 'mid', 'newest']):
+            path = build_root / name
+            path.mkdir(parents=True)
+            os.utime(path, (index, index))
+        lock = self.root / 'target/critical-path-collection.lock'
+        lock.mkdir(parents=True)
+        with self.assertRaisesRegex(ValueError, 'collection already active'):
+            collector.collect(self.evidence)
+        self.assertEqual(sorted(p.name for p in build_root.iterdir()),
+                         ['mid', 'newest', 'older'])
 
     def test_source_change_rejects_completed_tests(self):
         with patch.object(collector, 'source_identity', side_effect=[{'a': 'before'}, {'a': 'after'}]):
