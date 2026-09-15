@@ -16,7 +16,11 @@ if (process.argv[2] === "--version") {
       new TextDecoder("utf-8", { fatal: true }).decode(input),
     );
     const result =
-      process.argv[2] === "inventory" ? discover(request) : collect(request);
+      process.argv[2] === "project"
+        ? require("./project.cjs")(request, process.argv.slice(2))
+        : process.argv[2] === "inventory"
+          ? discover(request)
+          : collect(request);
     if (process.argv[2] === "inventory")
       result.sources = result.sources.map(({ path, sha256 }) => ({
         path,
@@ -24,6 +28,11 @@ if (process.argv[2] === "--version") {
       }));
     process.stdout.write(JSON.stringify(result) + "\n");
   } catch (error) {
+    if (process.argv[2] === "project") {
+      process.stderr.write(error.message + "\n");
+      process.exitCode = 1;
+      return;
+    }
     process.stdout.write(
       JSON.stringify({
         schema: "harness-collector-response/v1",

@@ -85,7 +85,14 @@ function inventory(name, text) {
     ts.forEachChild(node, visit);
   }
   visit(source);
-  return { sha256: sha(text), functions };
+  const declarationOnly = source.statements.every(
+    (node) =>
+      ts.isInterfaceDeclaration(node) ||
+      ts.isTypeAliasDeclaration(node) ||
+      (ts.isImportDeclaration(node) && node.importClause?.isTypeOnly) ||
+      (ts.isExportDeclaration(node) && node.isTypeOnly),
+  );
+  return { sha256: sha(text), functions, declarationOnly };
 }
 
 function counter(value) {
@@ -185,6 +192,8 @@ function measure(name, text, native) {
   );
   const statements = Object.entries(native.statementMap).map(([key, span]) => {
     checkPoint(span.start, text);
+    checkPoint(span.end, text);
+    assert(compare(span.start, span.end) <= 0, "reversed statement span");
     const owners = info.functions.filter(
       (fn) =>
         compare(fn.body, span.start) <= 0 && compare(span.start, fn.end) < 0,
@@ -192,8 +201,27 @@ function measure(name, text, native) {
     owners.sort((a, b) => compare(b.start, a.start));
     return { key, line: span.start.line, owner: owners[0] };
   });
+  const fileLines = new Map();
+  for (const item of statements)
+    fileLines.set(
+      item.line,
+      Math.max(fileLines.get(item.line) || 0, native.s[item.key]),
+    );
+  const fileTotal = fileLines.size;
   return {
     source: { path: name, sha256: info.sha256 },
+    file: {
+      values: fileTotal
+        ? {
+            "coverage.line": {
+              type: "ratio",
+              covered: [...fileLines.values()].filter((v) => v > 0).length,
+              total: fileTotal,
+            },
+          }
+        : {},
+      unavailable: fileTotal ? [] : ["coverage.line"],
+    },
     functions: info.functions.map((fn) => {
       const lines = new Map();
       for (const item of statements.filter((s) => s.owner === fn)) {

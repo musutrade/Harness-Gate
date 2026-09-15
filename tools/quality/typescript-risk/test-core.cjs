@@ -14,6 +14,8 @@ const {
   discover,
   binding,
   collect,
+  series,
+  TYPES,
 } = require("./protocol.cjs");
 const { sha } = require("./measure.cjs");
 const binary = process.env.HARNESS_GATE_BINARY || "harness-gate";
@@ -81,7 +83,13 @@ function fixture(cc, invoke, action) {
       },
     };
     const response = process.env.HARNESS_GATE_TYPESCRIPT_CLI
-      ? JSON.parse(spawnSync(process.execPath, [process.env.HARNESS_GATE_TYPESCRIPT_CLI], {input:canonical(request),encoding:'utf8'}).stdout)
+      ? JSON.parse(
+          spawnSync(
+            process.execPath,
+            [process.env.HARNESS_GATE_TYPESCRIPT_CLI],
+            { input: canonical(request), encoding: "utf8" },
+          ).stdout,
+        )
       : collect(request);
     const project = {
       schema: "harness-project/v1",
@@ -125,9 +133,12 @@ function fixture(cc, invoke, action) {
       fs.writeFileSync(path.join(root, name + ".json"), canonical(data));
     action({ root, request, response });
     if (process.env.HARNESS_GATE_TYPESCRIPT_ACCEPTANCE) {
-      const destination=path.join(process.env.HARNESS_GATE_TYPESCRIPT_ACCEPTANCE, `case-${++retainedCase}`);
-      assert(!fs.existsSync(destination),'refusing stale acceptance output');
-      fs.cpSync(root,destination,{recursive:true});
+      const destination = path.join(
+        process.env.HARNESS_GATE_TYPESCRIPT_ACCEPTANCE,
+        `case-${++retainedCase}`,
+      );
+      assert(!fs.existsSync(destination), "refusing stale acceptance output");
+      fs.cpSync(root, destination, { recursive: true });
     }
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
@@ -198,11 +209,109 @@ test("generic collector transport validates independent executable and artifact 
         path.resolve(__dirname, ".."),
         root,
         process.execPath,
-        process.env.HARNESS_GATE_TYPESCRIPT_CLI || path.join(__dirname, "cli.cjs"),
+        process.env.HARNESS_GATE_TYPESCRIPT_CLI ||
+          path.join(__dirname, "cli.cjs"),
       ],
       { encoding: "utf8" },
     );
     assert.equal(result.status, 0, result.stderr);
     assert.match(result.stdout, /validated/);
+  });
+});
+
+test("project envelope binds the complete request and fails before publishing on binding tamper", () => {
+  fixture(1, "subject(0);", ({ root, request }) => {
+    const output = path.join(root, "project-output");
+    fs.mkdirSync(output);
+    request.output_root = output;
+    request.requested_capabilities = Object.keys(TYPES).sort();
+    request.parameters.receipt.request = binding(request);
+    const identity = series(request, request.parameters.receipt);
+    const input = {
+      schema: "harness-project-collector-request/v1",
+      ...Object.fromEntries(
+        [
+          "project",
+          "collector",
+          "context",
+          "workspace_root",
+          "output_root",
+        ].map((k) => [k, request[k]]),
+      ),
+      selection: null,
+      bindings: request.parameters.subjects
+        .flatMap((s) =>
+          request.requested_capabilities.map((capability) => ({
+            subject: s.id,
+            capability,
+            series: identity.id,
+          })),
+        )
+        .sort(
+          (a, b) =>
+            a.subject.localeCompare(b.subject) ||
+            a.capability.localeCompare(b.capability),
+        ),
+    };
+    const file = path.join(root, "binding.json");
+    fs.writeFileSync(
+      file,
+      canonical({
+        schema: "typescript-project-collector-binding/v1",
+        input,
+        request,
+        config_digest: "c".repeat(64),
+      }),
+    );
+    const args = [
+      "project",
+      "--binding",
+      file,
+      "--binding-sha256",
+      sha(fs.readFileSync(file)),
+    ];
+    const outer = {
+      protocol_version: 2,
+      result_schema_version: "1",
+      input,
+      adapter: COLLECTOR,
+      config_digest: "c".repeat(64),
+      args,
+      artifact_root: output,
+      invocation_id: request.context.run,
+      step_id: "frontend",
+    };
+    const env = {
+      ...process.env,
+      HARNESS_GATE_INVOCATION_ID: outer.invocation_id,
+      HARNESS_GATE_STEP_ID: outer.step_id,
+      HARNESS_GATE_ARTIFACT_ROOT: output,
+    };
+    const cli =
+      process.env.HARNESS_GATE_TYPESCRIPT_CLI ||
+      path.join(__dirname, "cli.cjs");
+    fs.appendFileSync(file, " ");
+    const rejected = spawnSync(process.execPath, [cli, ...args], {
+      input: canonical(outer),
+      encoding: "utf8",
+      env,
+    });
+    assert.equal(rejected.status, 1);
+    assert.match(rejected.stderr, /binding digest mismatch/);
+    assert.deepEqual(fs.readdirSync(output), []);
+    fs.writeFileSync(file, fs.readFileSync(file).subarray(0, -1));
+    const result = spawnSync(process.execPath, [cli, ...args], {
+      input: canonical(outer),
+      encoding: "utf8",
+      env,
+    });
+    assert.equal(result.status, 0, result.stderr);
+    const response = JSON.parse(result.stdout);
+    assert.equal(
+      response.collection.schema,
+      "harness-project-collector-response/v1",
+    );
+    assert.equal(response.collection.evidence.length, 1);
+    assert.equal(response.status, "PASS"); // Transport completion; Core still decides quality.
   });
 });
