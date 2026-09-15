@@ -142,7 +142,14 @@ def project_report(report, binding):
         key = fingerprint(function['owner'])
         evidence.require(key not in functions, 'duplicate native owner')
         functions[key] = function
-    sources = {p['relative']: p['sha256'] for p in report['source_inventory']}
+    prefix = binding.get('source_prefix', '')
+    evidence.require(isinstance(prefix, str) and
+                     (not prefix or all(part not in ('', '.', '..') for part in prefix.split('/'))) and
+                     not any(char in prefix for char in ('\\', ':')) and
+                     not any(ord(char) < 32 for char in prefix), 'invalid package source prefix')
+    def project_path(relative):
+        return prefix + '/' + relative if prefix else relative
+    sources = {project_path(p['relative']): p['sha256'] for p in report['source_inventory']}
     # Resolve every owner/source before creating any output. No partial success.
     rows = []
     for subject in binding['project']['subjects']:
@@ -150,7 +157,7 @@ def project_report(report, binding):
             continue
         function = functions.get(subject['discriminator'])
         evidence.require(function is not None, 'missing selected native owner')
-        evidence.require(subject['path'] == function['source_lines'][0][0]
+        evidence.require(subject['path'] == project_path(function['source_lines'][0][0])
                          and sources.get(subject['path']) == subject['source_sha256'],
                          'native owner/source mismatch')
         evidence._file(Path(inner['workspace_root']), subject['path'], subject['source_sha256'])
@@ -180,6 +187,7 @@ def project_report(report, binding):
         function.pop('passed', None)
         paths = {row[0] for row in function['source_lines']}
         facts = {'schema': 'rust-native-owner-artifact/v1',
+                 'source_prefix': prefix,
                  'native_report_sha256': report_digest, 'native_identity': identity,
                  'artifact_anchor': report['artifact_anchor'], 'series': report['series'],
                  'scope': report['scope'], 'tools': report['tools'],
