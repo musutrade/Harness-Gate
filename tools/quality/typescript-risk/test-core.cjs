@@ -63,6 +63,7 @@ function fixture(cc, invoke, action) {
       output_root: path.join(root, "artifacts"),
       parameters: {
         source_root: "src",
+        artifact_subdir: "frontend",
         boundary: "production",
         coverage: "coverage.json",
       },
