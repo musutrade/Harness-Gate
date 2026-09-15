@@ -86,3 +86,6 @@ When an ADR is superseded:
 - [ADR-0046: Capability-driven quality profiles and retained head evidence](0046-capability-driven-quality-profiles.md)
 
 - [ADR-0047: Composable quality preset packs and explicit adoption](0047-composable-quality-preset-packs.md)
+
+- [ADR-0048: Configured CI workflow acceptance](0048-configured-ci-workflow-acceptance.md)
+- [ADR-0049: Keep project-owned validation outside Harness-Gate Core](0049-project-owned-validation-extension-boundary.md)

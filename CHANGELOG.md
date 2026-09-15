@@ -14,6 +14,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Process output and adapter artifacts are bounded with truncation/deadline
   failures, and audit/log/report/SBOM error paths share credential redaction.
 
+### Changed
+
+- The critical-path collector now builds instrumented binaries once per
+  collection in a fresh owned build directory and runs up to two isolated
+  tests concurrently; `--jobs` selects 1 to 8 workers and profile exports stay
+  serialized. Engineering-policy semantics are unchanged.
+
+### Added
+
+- Added the project-owned validation extension boundary (ADR-0049): command
+  hooks, structured result adapters, and quality collector plugins keep
+  application-specific validation out of the generic core.
+
 ## [0.3.7] - 2026-09-03
 
 ### Added
