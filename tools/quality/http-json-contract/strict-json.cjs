@@ -69,7 +69,7 @@ module.exports = function parse(text) {
     offset += match[0].length;
     const result = JSON.parse(match[0]);
     if (typeof result === "number")
-      assert(Number.isSafeInteger(result), "non-integer or unsafe JSON number");
+      assert(Number.isFinite(result) && (!Number.isInteger(result) || Number.isSafeInteger(result)), "non-finite or unsafe JSON number");
     return result;
   }
   const result = value(0);
