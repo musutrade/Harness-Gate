@@ -66,6 +66,72 @@ impl Inventory<'_> {
             .push(format!("{kind} at {:?}", self.point(span.start())));
     }
 }
+// Parse JSON containers while retaining the spans of every Rust expression.
+// Macro expansion control flow is outside this source-only metric.
+struct JsonExpressions(Vec<syn::Expr>);
+impl syn::parse::Parse for JsonExpressions {
+    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+        let mut expressions = Vec::new();
+        if input.peek(syn::token::Brace) {
+            let content;
+            syn::braced!(content in input);
+            while !content.is_empty() {
+                expressions.push(content.parse()?);
+                content.parse::<syn::Token![:]>()?;
+                expressions.extend(content.parse::<Self>()?.0);
+                if content.is_empty() {
+                    break;
+                }
+                content.parse::<syn::Token![,]>()?;
+            }
+        } else if input.peek(syn::token::Bracket) {
+            let content;
+            syn::bracketed!(content in input);
+            while !content.is_empty() {
+                expressions.extend(content.parse::<Self>()?.0);
+                if content.is_empty() {
+                    break;
+                }
+                content.parse::<syn::Token![,]>()?;
+            }
+        } else {
+            expressions.push(input.parse()?);
+        }
+        Ok(Self(expressions))
+    }
+}
+fn serde_metadata(attribute: &syn::Attribute) -> syn::Result<()> {
+    attribute.parse_nested_meta(|meta| {
+        if [
+            "deny_unknown_fields",
+            "untagged",
+            "transparent",
+            "skip",
+            "skip_serializing",
+            "skip_deserializing",
+        ]
+        .iter()
+        .any(|name| meta.path.is_ident(name))
+        {
+            return Ok(());
+        }
+        if [
+            "tag",
+            "content",
+            "rename",
+            "rename_all",
+            "rename_all_fields",
+            "alias",
+        ]
+        .iter()
+        .any(|name| meta.path.is_ident(name))
+        {
+            meta.value()?.parse::<syn::LitStr>()?;
+            return Ok(());
+        }
+        Err(meta.error("unsupported Serde metadata"))
+    })
+}
 impl<'ast> Visit<'ast> for Inventory<'_> {
     fn visit_attribute(&mut self, n: &'ast syn::Attribute) {
         let path = n
@@ -75,6 +141,12 @@ impl<'ast> Visit<'ast> for Inventory<'_> {
             .map(|s| s.ident.to_string())
             .collect::<Vec<_>>()
             .join("::");
+        if path == "serde" {
+            if serde_metadata(n).is_err() {
+                self.unsupported("unsupported Serde metadata", n.span());
+            }
+            return;
+        }
         if ![
             "doc",
             "derive",
@@ -167,11 +239,27 @@ impl<'ast> Visit<'ast> for Inventory<'_> {
         for attr in &n.attrs {
             self.visit_attribute(attr);
         }
+        let mut anchors = vec![n.span(), n.body.span()];
+        let mut body = n.body.as_ref();
+        while let syn::Expr::Call(call) = body {
+            let syn::Expr::Path(path) = call.func.as_ref() else {
+                break;
+            };
+            if call.args.len() != 1
+                || !["Ok", "Err", "Some"]
+                    .iter()
+                    .any(|name| path.path.is_ident(name))
+            {
+                break;
+            }
+            body = &call.args[0];
+            anchors.push(body.span());
+        }
         self.begin(
             "<closure>".into(),
             "closure",
             n.span(),
-            &[n.span(), n.body.span()],
+            &anchors,
             n.body.span(),
             n.asyncness.is_some(),
         );
@@ -239,7 +327,16 @@ impl<'ast> Visit<'ast> for Inventory<'_> {
             .map(|s| s.ident.to_string())
             .collect::<Vec<_>>()
             .join("::");
-        if path == "matches" {
+        if ["json", "serde_json::json"].contains(&path.as_str()) {
+            match syn::parse2::<JsonExpressions>(n.tokens.clone()) {
+                Ok(expressions) => {
+                    for expression in expressions.0 {
+                        self.visit_expr(&expression);
+                    }
+                }
+                Err(_) => self.unsupported("unsupported json! arguments", n.span()),
+            }
+        } else if path == "matches" {
             let parser =
                 |input: syn::parse::ParseStream| -> syn::Result<(syn::Expr, Option<syn::Expr>)> {
                     let expression = input.parse()?;
@@ -267,6 +364,8 @@ impl<'ast> Visit<'ast> for Inventory<'_> {
                 Err(_) => self.unsupported("unparsed matches!", n.span()),
             }
         } else if [
+            "format",
+            "std::format",
             "tracing::info",
             "tracing::warn",
             "tracing::error",
@@ -348,6 +447,40 @@ mod tests {
         assert!(inventory("fn f() { custom!(); }").is_err());
         assert!(inventory("macro_rules! x { () => {} }").is_err());
         assert!(inventory("#[cfg(feature = \"x\")] fn f() {}").is_err());
+    }
+    #[test]
+    fn business_macros_visit_nested_expressions_and_owners() {
+        let f = inventory(r#"fn f() { json!({"n": if true { 1 } else { 2 }, "a": [null, call()?, {"v": (|| if true { 1 } else { 0 })()}]}); format!("{}", if true { 1 } else { 0 }); }"#).unwrap();
+        assert_eq!(
+            f.iter().map(|f| f.complexity).collect::<Vec<_>>(),
+            vec![4, 2]
+        );
+        let f = inventory(r#"fn f() { serde_json::json!({(if true { "a" } else { "b" }): [1, 2,],}); std::format!("{n}", n = call()?); }"#).unwrap();
+        assert_eq!(f[0].complexity, 3);
+        assert!(inventory(r#"fn f() { json!({"a": }); }"#).is_err());
+        assert!(inventory(r#"fn f() { json!({"a": custom!()}); }"#).is_err());
+    }
+    #[test]
+    fn serde_metadata_is_declarative_and_fail_closed() {
+        assert!(inventory(r#"#[derive(Serialize)] #[serde(deny_unknown_fields)] struct A { #[serde(rename = "value")] v: i32 } #[serde(tag = "operation", content = "data")] enum B { A(A) }"#).is_ok());
+        for source in [
+            r#"#[serde(unknown)] struct A {}"#,
+            r#"#[serde(tag = call())] enum A {}"#,
+            r#"#[serde(serialize_with = "hidden")] struct A {}"#,
+        ] {
+            assert!(inventory(source).is_err());
+        }
+    }
+    #[test]
+    fn result_wrapped_closure_has_exact_lowered_entry_anchor() {
+        let source = "fn f() { let g = |s| Ok(parse(s)?); }";
+        let rows = inventory(source).unwrap();
+        assert!(
+            rows[1]
+                .anchors
+                .contains(&[1, source.find("parse").unwrap() + 1])
+        );
+        assert_eq!(rows[1].complexity, 2);
     }
     #[test]
     fn unicode_columns_are_bytes() {

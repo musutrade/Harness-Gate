@@ -1,4 +1,4 @@
-# Rust source-risk collector (candidate 0.1.0-rc.1)
+# Rust source-risk collector (candidate 0.1.0-rc.2)
 
 This is an independent Harness-Gate collector plugin. It does not modify Core,
 change a policy threshold, sign its own requests, or replace the MIR measurement
@@ -94,3 +94,14 @@ and a new identity before adoption.
 
 References: [LLVM coverage mapping](https://llvm.org/docs/CoverageMappingFormat.html)
 and [Rust instrument-coverage](https://doc.rust-lang.org/rustc/instrument-coverage.html).
+
+## rc.2 business-source support
+
+Declarative Serde deny-unknown-fields, tag/content, rename and skip metadata are
+accepted; callback/custom metadata remains unsupported. json!/serde_json::json!
+containers recursively visit every Rust expression, including object keys, nested
+arrays, branches and closures. format!/std::format! visits expression arguments.
+Unknown macros and malformed grammar still fail closed. Generated macro/derive
+control flow remains outside this source-only metric. Exact LLVM entry anchors
+include the argument of single-argument Ok/Err/Some closure bodies, where Rust
+lowering omits the constructor wrapper. No nearest-position/name fallback is used.
