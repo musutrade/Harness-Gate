@@ -11,11 +11,11 @@ test('matching provider variants, consumer AST and baseline produce facts',()=>{
 test('existing operation changes are conservatively incompatible',()=>{const f=fixture(),base=structuredClone(f.spec);base.paths['/api/health'].get.operationId='previous';assert.equal(run(f,base)['contract.breaking_changes'].value,1);});
 test('consumer field and route changes are drift',()=>{const f=fixture();f.type=f.type.replace('database:','db:');assert.equal(run(f)['contract.client_drift'].value,true);f.client=f.client.replace('/api/health','/wrong');assert.equal(run(f)['contract.compatible'].value,false);});
 test('provider field/value drift and missing variants fail closed',()=>{for(const change of [f=>f.observations.pop(),f=>delete f.observations[0].body.database,f=>f.observations[0].body.status='secret']) {const f=fixture();change(f);assert.throws(()=>run(f));}});
-test('unknown schema features cannot silently disappear',()=>{const f=fixture();f.spec.paths['/api/health'].get.parameters=[];assert.throws(()=>run(f));});
+test('unknown schema features cannot silently disappear',()=>{const f=fixture();f.spec.paths['/api/health'].get.callbacks={};assert.throws(()=>run(f));});
 test('dynamic or aliased clients cannot silently disappear',()=>{const f=fixture();assert.throws(()=>consumer(f.type,f.client.replace("()=>'/api/health'",'()=>url'),'HealthResponse'));assert.throws(()=>consumer(f.type,f.client.replace('{httpResource}','{httpResource as call}'),'HealthResponse'));});
 test('duplicate observations cannot replace an uncovered status',()=>{const f=fixture();f.observations[1]=f.observations[0];assert.throws(()=>run(f),/duplicate/);});
 
-test('extra production HTTP consumers and unsupported imports are rejected',()=>{const {consumerInventory}=require('./measure.cjs'),f=fixture();consumerInventory({'client.ts':f.client},'client.ts');assert.throws(()=>consumerInventory({'client.ts':f.client,'extra.ts':f.client},'client.ts'));assert.throws(()=>consumerInventory({'client.ts':f.client,'extra.ts':"import { HttpClient } from '@angular/common/http';"},'client.ts'));});
+test('extra production HTTP consumers and unsupported imports are rejected',()=>{const {consumerInventory}=require('./measure.cjs'),f=fixture();consumerInventory({'client.ts':f.client},'client.ts');assert.throws(()=>consumerInventory({'client.ts':f.client,'extra.ts':f.client},'client.ts'));assert.throws(()=>consumerInventory({'client.ts':f.client,'extra.ts':"import { HttpClient as Hidden } from '@angular/common/http';"},'client.ts'));});
 
 test('strict CLI collection retains actual generated-client provenance',()=>{
  const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),{spawnSync}=require('node:child_process');
