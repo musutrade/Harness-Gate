@@ -1,7 +1,7 @@
 {
   "schema": "typescript-collector-plugin/v1",
   "name": "typescript-risk",
-  "version": "0.1.0-rc.2",
+  "version": "0.1.0-rc.4",
   "executable": "harness-gate-typescript-collector",
   "request": "harness-collector-request/v1",
   "response": "harness-collector-response/v1",

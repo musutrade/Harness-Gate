@@ -4,7 +4,7 @@ const path = require("node:path");
 const assert = require("node:assert/strict");
 const { inventory, measure, sha } = require("./measure.cjs");
 const parse = require("./strict-json.cjs");
-const COLLECTOR = { name: "typescript-risk", version: "0.1.0-rc.2" };
+const COLLECTOR = { name: "typescript-risk", version: "0.1.0-rc.4" };
 const TYPES = {
   "complexity.cyclomatic": "count",
   "coverage.function": "ratio",
@@ -246,6 +246,7 @@ function collect(request) {
     "receipt",
     "exclude",
     "include_files",
+    "artifact_subdir",
   ];
   assert(
     Object.keys(request.parameters).every((k) => allowedParameters.includes(k)),
@@ -291,7 +292,12 @@ function collect(request) {
     ),
     "output overlaps sources",
   );
-  assert.equal(fs.readdirSync(output).length, 0, "output must be fresh");
+  const prefix = request.parameters.artifact_subdir || "";
+  if (prefix) {
+    relative(prefix);
+    assert(!prefix.includes("/"), "artifact subdirectory must be one component");
+    assert(!fs.existsSync(path.join(output, prefix)), "artifact subdirectory must be fresh");
+  } else assert.equal(fs.readdirSync(output).length, 0, "output must be fresh");
   const { sources: files, subjects } = discover(request),
     receipt = request.parameters.receipt;
   equal(
@@ -376,6 +382,7 @@ function collect(request) {
   const allArtifacts = [],
     records = [],
     identity = series(request, receipt);
+  if (prefix) fs.mkdirSync(path.join(output, prefix), { mode: 0o700 });
   for (const { source, measurement } of rows.filter(
     (row) =>
       request.parameters.include_files || row.measurement.functions.length > 0,
@@ -385,13 +392,13 @@ function collect(request) {
       ["coverage.json", coverageBytes],
       ["receipt.json", Buffer.from(canonical(receipt))],
     ]) {
-      const name = sha(source.path) + "-" + suffix;
+      const name = (prefix ? prefix + "/" : "") + sha(source.path) + "-" + suffix;
       fs.writeFileSync(path.join(output, name), bytes, {
         flag: "wx",
         mode: 0o600,
       });
       refs.push({
-        id: "raw-" + name,
+        id: "raw-" + name.replaceAll("/", "-"),
         kind: "raw",
         media_type: "application/json",
         path: name,
