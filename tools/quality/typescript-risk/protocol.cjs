@@ -4,7 +4,7 @@ const path = require("node:path");
 const assert = require("node:assert/strict");
 const { inventory, measure, sha } = require("./measure.cjs");
 const parse = require("./strict-json.cjs");
-const COLLECTOR = { name: "typescript-risk", version: "0.1.0-rc.1" };
+const COLLECTOR = { name: "typescript-risk", version: "0.1.0-rc.2" };
 const TYPES = {
   "complexity.cyclomatic": "count",
   "coverage.function": "ratio",
@@ -129,17 +129,37 @@ function subject(request, source, fn) {
     metadata: {},
   };
 }
+function fileSubject(request, source) {
+  const result = {
+    identity_version: "subject-identity/v1",
+    component: request.component,
+    target: request.context.target,
+    boundary: request.parameters.boundary,
+    kind: "file/v1",
+    path: source.path,
+    discriminator: "typescript-original-file/v1",
+    source_sha256: source.sha256,
+  };
+  return {
+    id:
+      "subject-identity/v1:" +
+      sha(canonical({ project: request.project, ...result })),
+    ...result,
+    metadata: {},
+  };
+}
 function discover(request) {
   const files = sources(
     rootDirectory(request.workspace_root),
     request.parameters.source_root,
     request.parameters.exclude,
   );
-  const subjects = files.flatMap((source) =>
-    inventory(source.path, source.text).functions.map((fn) =>
+  const subjects = files.flatMap((source) => [
+    ...(request.parameters.include_files ? [fileSubject(request, source)] : []),
+    ...inventory(source.path, source.text).functions.map((fn) =>
       subject(request, source, fn),
     ),
-  );
+  ]);
   assert(subjects.length > 0, "no production function subjects");
   return { sources: files, subjects };
 }
@@ -158,6 +178,7 @@ function binding(request) {
       source_root: request.parameters.source_root,
       boundary: request.parameters.boundary,
       exclude: request.parameters.exclude || [],
+      include_files: request.parameters.include_files || false,
     },
   };
 }
@@ -168,6 +189,7 @@ function series(request, receipt) {
       "protocol.cjs",
       "strict-json.cjs",
       "cli.cjs",
+      "project.cjs",
       "npm-shrinkwrap.json",
     ].map((name) => [name, sha(fs.readFileSync(path.join(__dirname, name)))]),
   );
@@ -176,7 +198,12 @@ function series(request, receipt) {
     collector: COLLECTOR,
     tool: {
       name: "typescript-original-instrumentation",
-      version: sha(canonical(receipt.toolchain)),
+      version: sha(
+        canonical({
+          toolchain: receipt.toolchain,
+          pipeline: receipt.pipeline || null,
+        }),
+      ),
     },
     rule: {
       name: "typescript-decision-count-innermost-lines",
@@ -218,6 +245,7 @@ function collect(request) {
     "subjects",
     "receipt",
     "exclude",
+    "include_files",
   ];
   assert(
     Object.keys(request.parameters).every((k) => allowedParameters.includes(k)),
@@ -288,6 +316,41 @@ function collect(request) {
     },
     "unsupported instrumentation series",
   );
+  if (receipt.pipeline) {
+    const pipeline = receipt.pipeline;
+    equal(
+      Object.keys(pipeline).sort(),
+      ["files", "schema", "tools"],
+      "invalid capture pipeline fields",
+    );
+    assert.equal(pipeline.schema, "typescript-capture-pipeline/v1");
+    assert(
+      Object.keys(pipeline.files).length > 0 &&
+        Object.keys(pipeline.tools).length > 0,
+      "empty capture pipeline",
+    );
+    for (const [name, digest] of Object.entries(pipeline.files))
+      assert.equal(
+        sha(file(root, name)),
+        digest,
+        "capture configuration changed: " + name,
+      );
+    assert(
+      Object.values(pipeline.tools).every(
+        (v) => typeof v === "string" && v.length > 0,
+      ),
+      "invalid capture tool identity",
+    );
+  }
+  if (receipt.inputs) {
+    assert(Object.keys(receipt.inputs).length > 0, "empty capture inputs");
+    for (const [name, digest] of Object.entries(receipt.inputs))
+      assert.equal(
+        sha(file(root, name)),
+        digest,
+        "capture input changed: " + name,
+      );
+  }
   const coverageBytes = file(root, request.parameters.coverage);
   assert.equal(
     sha(coverageBytes),
@@ -314,7 +377,8 @@ function collect(request) {
     records = [],
     identity = series(request, receipt);
   for (const { source, measurement } of rows.filter(
-    (row) => row.measurement.functions.length > 0,
+    (row) =>
+      request.parameters.include_files || row.measurement.functions.length > 0,
   )) {
     const refs = [];
     for (const [suffix, bytes] of [
@@ -339,8 +403,30 @@ function collect(request) {
     }
     allArtifacts.push(...refs);
     const links = refs.map((r) => r.id);
-    for (const fn of measurement.functions) {
-      const owner = subject(request, source, fn);
+    const measuredSubjects = [
+      ...(request.parameters.include_files
+        ? [
+            {
+              ...measurement.file,
+              owner: fileSubject(request, source),
+              types: Object.keys(TYPES),
+              unavailable: [
+                ...measurement.file.unavailable,
+                "coverage.function",
+                "complexity.cyclomatic",
+                "risk.crap",
+              ],
+            },
+          ]
+        : []),
+      ...measurement.functions.map((fn) => ({
+        ...fn,
+        owner: subject(request, source, fn),
+        types: Object.keys(TYPES),
+      })),
+    ];
+    for (const fn of measuredSubjects) {
+      const owner = fn.owner;
       records.push({
         schema: "harness-evidence/v1",
         id: "typescript-" + owner.id.split(":")[1],
@@ -354,20 +440,20 @@ function collect(request) {
         metrics: Object.entries(fn.values)
           .sort()
           .map(([name, value]) => ({ name, value, artifacts: links })),
-        capabilities: Object.keys(TYPES)
-          .sort()
-          .map((metric) => ({
-            metric,
-            state: fn.unavailable.includes(metric)
-              ? "not_applicable"
-              : "supported",
-            reason: fn.unavailable.includes(metric)
-              ? "no original function line denominator"
-              : "pinned original TypeScript instrumentation",
-            artifacts: links,
-          })),
+        capabilities: fn.types.sort().map((metric) => ({
+          metric,
+          state: fn.unavailable.includes(metric)
+            ? "not_applicable"
+            : "supported",
+          reason: fn.unavailable.includes(metric)
+            ? owner.kind === "file/v1" && metric !== "coverage.line"
+              ? "metric is defined for function subjects only"
+              : "no original line denominator"
+            : "pinned original TypeScript instrumentation",
+          artifacts: links,
+        })),
         artifacts: refs,
-        status: "measured",
+        status: Object.keys(fn.values).length ? "measured" : "unavailable",
       });
     }
   }
@@ -378,4 +464,12 @@ function collect(request) {
     error: null,
   };
 }
-module.exports = { COLLECTOR, TYPES, canonical, discover, binding, collect };
+module.exports = {
+  COLLECTOR,
+  TYPES,
+  canonical,
+  discover,
+  binding,
+  collect,
+  series,
+};
