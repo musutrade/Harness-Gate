@@ -29,3 +29,30 @@ type and the current expected generated type. It rejects forged stamps or types
 edited without regeneration; a recognized older baseline stamp is reported as
 client drift. This satisfies Core's generated-client provenance contract without
 changing Core. Formatting differences are normalized through the TypeScript AST.
+
+## Business JSON contracts (candidate rc.4)
+
+The bounded OpenAPI 3.0.3 adapter supports GET/POST/PUT/PATCH/DELETE, declared
+path/query/header parameters, JSON request bodies, closed nested objects, arrays,
+string/boolean/number/integer fields, enums, nullable fields and local acyclic
+component schema references. Unsupported schema features fail closed. Every
+response status for every declared operation requires a real observation.
+No-content responses are represented by an absent OpenAPI content member and
+an observation with a null body and empty content type.
+
+`generate` now emits all operation response types in one generated type file;
+`getHealth` retains `HealthResponse`, other operations use PascalCase operationId
+plus `Response` (and `Request` for JSON request bodies). The complete source digest
+stamp is retained. The checker rejects edited/widened types, `any`, TypeScript
+suppression comments, missing consumers and undeclared operations.
+
+Supported Angular forms are canonical `httpResource<T>(() => '/literal')` and
+`HttpClient` held in an explicitly typed/injected variable or class property,
+using typed get/post/put/patch/delete calls with literal or template paths.
+Dynamic/aliased HTTP APIs require an additional certified adapter; they are not
+silently ignored. Parameter templates must resolve to one declared route shape.
+Request examples are checked against request schemas for successful responses;
+response types are checked structurally against generated operation types.
+
+This is a new measurement series. Installation requires a freshly validated host
+approval; it must not replace rc.3 in place or reuse an old series identity.
