@@ -24,7 +24,7 @@ path = "src/process/tests.rs"
 symbol = "timeout_terminates_the_task"
 start = 11
 end = 23
-sha256 = "ecd32ead844928fb04998e51140ebbc8b82c79396c9a2c0f8b0fce552ecf4007"
+sha256 = "f457244e862fb38c8bbe65740c7e223f5ef2674fd4339d92a6ce8b9eab2c24c8"
 [[paths.probes]]
 line = 253
 column = 24
@@ -51,9 +51,9 @@ sha256 = "bbb7f1d90d741f41c6cb761f1433f4cb7c8ca168fac0082bd366a9377ae149a8"
 [paths.test_source]
 path = "tests/failure_paths_test.rs"
 symbol = "verification_cleanup_cancel_and_report_precedence_retains_resource_evidence"
-start = 493
-end = 640
-sha256 = "72492cf2d8bb7a27f8ed58682c588acbfdbfafea903b73dcb031ef4dd6c8b44d"
+start = 575
+end = 724
+sha256 = "97df519be3c31a60fd8266e24478d6ff500484115604e80e71203681978f8704"
 [[paths.probes]]
 line = 250
 column = 24
@@ -65,12 +65,12 @@ module = "process"
 test = "process::tests::timeout_terminates_process_tree_without_a_descendant_leak"
 platforms = ["linux", "macos", "windows"]
 platform_note = "Runs on all supported host platforms; no external daemon required."
-observable = "Timeout result fails and the descendant marker is absent after its deadline."
+observable = "TaskResult.timed_out=true and passed=false; the descendant was ready before cleanup and does not acknowledge a probe sent after Task::run returns."
 rule = "critical-path-source-v2"
 owner = "Harness-Gate maintainers"
-review_date = "2026-09-07"
+review_date = "2026-09-14"
 binary = "harness-gate"
-assertions = ["assert!(!result.passed);", "assert!(!marker.exists(), \"timed-out task left a descendant process\");"]
+assertions = ["assert!(result.timed_out, \"fixture must reach the timeout boundary\");", "assert!(!result.passed);", "marker.with_extension(\"ready\").exists(),", "fs::write(marker.with_extension(\"probe\"), b\"probe\").expect(\"send liveness probe\");", "assert!(!marker.exists(), \"timed-out task left a descendant process\");"]
 [paths.source]
 path = "src/process/task.rs"
 symbol = "run"
@@ -80,9 +80,9 @@ sha256 = "bbb7f1d90d741f41c6cb761f1433f4cb7c8ca168fac0082bd366a9377ae149a8"
 [paths.test_source]
 path = "src/process/tests.rs"
 symbol = "timeout_terminates_process_tree_without_a_descendant_leak"
-start = 127
-end = 161
-sha256 = "ecd32ead844928fb04998e51140ebbc8b82c79396c9a2c0f8b0fce552ecf4007"
+start = 156
+end = 197
+sha256 = "f457244e862fb38c8bbe65740c7e223f5ef2674fd4339d92a6ce8b9eab2c24c8"
 [[paths.probes]]
 line = 253
 column = 24
@@ -111,7 +111,7 @@ path = "src/verify/tests.rs"
 symbol = "non_zero_step_retains_exit_detail_and_log"
 start = 301
 end = 318
-sha256 = "edeed13483430222bd9b95eca498d38e739c96896f15c8f14a87c040e9382f29"
+sha256 = "7814fc130149d5d7f4b0f834262a9d96c73d1f1913e42616e9127e46bbcf4667"
 [[paths.probes]]
 line = 456
 column = 5
@@ -140,7 +140,7 @@ path = "src/verify/tests.rs"
 symbol = "service_failure_does_not_skip_unrelated_steps"
 start = 45
 end = 88
-sha256 = "edeed13483430222bd9b95eca498d38e739c96896f15c8f14a87c040e9382f29"
+sha256 = "7814fc130149d5d7f4b0f834262a9d96c73d1f1913e42616e9127e46bbcf4667"
 [[paths.probes]]
 line = 70
 column = 21
@@ -163,13 +163,13 @@ path = "src/verify/mod.rs"
 symbol = "run_selected"
 start = 182
 end = 340
-sha256 = "3a99f94f4966cd1efe8ae0e48c0c2abd528e40088ac2fa399e48e728453a2594"
+sha256 = "12d7fdce72abbd6d7692f8483dcb3bf990856be732d70920afb9dc964f136447"
 [paths.test_source]
 path = "src/verify/tests.rs"
 symbol = "gate_failure_writes_compatible_report"
 start = 552
 end = 574
-sha256 = "edeed13483430222bd9b95eca498d38e739c96896f15c8f14a87c040e9382f29"
+sha256 = "7814fc130149d5d7f4b0f834262a9d96c73d1f1913e42616e9127e46bbcf4667"
 [[paths.probes]]
 line = 322
 column = 5
@@ -227,7 +227,7 @@ path = "src/verify/tests.rs"
 symbol = "parser_failure_marks_step_failed"
 start = 347
 end = 380
-sha256 = "edeed13483430222bd9b95eca498d38e739c96896f15c8f14a87c040e9382f29"
+sha256 = "7814fc130149d5d7f4b0f834262a9d96c73d1f1913e42616e9127e46bbcf4667"
 [[paths.probes]]
 line = 439
 column = 21
@@ -248,18 +248,18 @@ assertions = ["assert!(matches!(error, VerifyError::Report { .. }));"]
 [paths.source]
 path = "src/verify/report.rs"
 symbol = "write_report_file"
-start = 1165
-end = 1175
-sha256 = "e7d42d13b07c42a30f5bc8848091934a0fce3abdce61d4937d5b9b228a47be37"
+start = 1243
+end = 1253
+sha256 = "732fbabc404861e6f24c582fe45009f03153659f462c25f50476ef6b9de742b9"
 
 [paths.test_source]
 path = "src/verify/tests.rs"
 symbol = "report_write_failure_returns_error"
 start = 604
 end = 613
-sha256 = "edeed13483430222bd9b95eca498d38e739c96896f15c8f14a87c040e9382f29"
+sha256 = "7814fc130149d5d7f4b0f834262a9d96c73d1f1913e42616e9127e46bbcf4667"
 [[paths.probes]]
-line = 1166
+line = 1244
 column = 5
 text = "report_target(project, relative)?;"
 
@@ -278,19 +278,19 @@ assertions = ["assert!(verify_manifest(&invocation_project).is_err());"]
 [paths.source]
 path = "src/verify/report.rs"
 symbol = "verify_manifest_without_result"
-start = 1738
-end = 1825
-sha256 = "e7d42d13b07c42a30f5bc8848091934a0fce3abdce61d4937d5b9b228a47be37"
+start = 1822
+end = 1909
+sha256 = "732fbabc404861e6f24c582fe45009f03153659f462c25f50476ef6b9de742b9"
 
 [paths.test_source]
 path = "src/verify/report.rs"
 symbol = "manifest_records_digests_and_detects_tampering"
-start = 2694
-end = 2747
-sha256 = "e7d42d13b07c42a30f5bc8848091934a0fce3abdce61d4937d5b9b228a47be37"
+start = 2800
+end = 2853
+sha256 = "732fbabc404861e6f24c582fe45009f03153659f462c25f50476ef6b9de742b9"
 
 [[paths.probes]]
-line = 1821
+line = 1905
 column = 13
 text = "bail!(\"artifact digest or size changed: {}\", artifact.path);"
 

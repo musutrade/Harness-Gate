@@ -12,6 +12,74 @@ import ci_quality as gate
 from quality_common import ROOT, sha256
 
 
+class SnapshotTests(unittest.TestCase):
+    def test_documentation_fixtures_follow_measured_commit(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+
+            def git(*args):
+                return subprocess.check_output(['git', *args], cwd=root, stderr=subprocess.PIPE,
+                                               text=True).strip()
+
+            git('init')
+            git('config', 'user.name', 'Snapshot Test')
+            git('config', 'user.email', 'snapshot@example.invalid')
+            paths = ('tools/harness-gate/tests/import_test.rs', 'tools/quality/fixture.json',
+                     'schema/fixture.json', 'docs/dogfood/arc-admin/sources/.arc-flow/flow.toml.txt',
+                     'docs/dogfood/arc-admin/import/flow.toml',
+                     'docs/dogfood/arc-admin/import/flow.import.json')
+            for path in paths:
+                target = root / path
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text('base fixture\n')
+            historical = root / 'docs/quality/old-run/evidence.tar.gz'
+            historical.parent.mkdir(parents=True)
+            historical.write_bytes(b'historical evidence, not a test input')
+            git('add', '.')
+            git('commit', '-m', 'base fixtures')
+            base = git('rev-parse', 'HEAD')
+            for path in paths:
+                (root / path).write_text('head fixture\n')
+            git('commit', '-am', 'head fixtures')
+            head = git('rev-parse', 'HEAD')
+            for path in paths:
+                (root / path).unlink()
+            with patch.object(gate, 'ROOT', root):
+                collector = gate.Collector(root / 'candidate', base, head, 'snapshot-test')
+                for label, commit in (('base', base), ('head', head)):
+                    snapshot = collector.snapshot(label, commit)
+                    for path in paths:
+                        with self.subTest(label=label, path=path):
+                            self.assertEqual((snapshot / path).read_text(), f'{label} fixture\n')
+                    self.assertFalse((snapshot / 'docs/quality').exists())
+
+
+class RiskScopeTests(unittest.TestCase):
+    def test_process_test_module_reaches_measurement_but_unknown_sources_block(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            collector = gate.Collector(Path(temporary) / 'candidate', 'base', 'head', 'scope-test')
+            for path, supported in (
+                ('tools/harness-gate/src/process/tests.rs', True),
+                ('tools/harness-gate/src/process/unknown.rs', False),
+                ('tools/harness-gate/src/process/tests/unknown.rs', False),
+                ('tools/harness-gate/src/unknown/tests.rs', False),
+            ):
+                with self.subTest(path=path), \
+                        patch.object(gate.subprocess, 'check_output', return_value=path + '\n'), \
+                        patch.object(gate, 'relocated_migration_sources', return_value=set()), \
+                        patch.object(collector, 'command',
+                                     side_effect=RuntimeError('measurement build reached')) as command:
+                    if supported:
+                        with self.assertRaisesRegex(RuntimeError, 'measurement build reached'):
+                            collector.risk()
+                        command.assert_called_once()
+                        self.assertEqual(command.call_args.args[0], 'analyzer-build')
+                    else:
+                        with self.assertRaisesRegex(ValueError, 'outside supported risk series'):
+                            collector.risk()
+                        command.assert_not_called()
+
+
 class AggregateTests(unittest.TestCase):
     def test_every_required_result_fails_closed_on_both_events(self):
         for event in ('push', 'pull_request'):

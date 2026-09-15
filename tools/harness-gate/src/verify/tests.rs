@@ -659,3 +659,40 @@ fn webhook_connection_failure_maps_to_e1404() {
         .join(".harness-gate/reports/test_result.json")
         .is_file());
 }
+
+#[cfg(unix)]
+#[test]
+fn serial_shared_service_steps_execute_once_in_declaration_order() {
+    for (parallel, max_parallel) in [(false, None), (true, Some(1))] {
+        let (_workspace, mut project) = generic_project("verify-serial-shared-service");
+        project.config.execution.parallel = parallel;
+        project.config.execution.max_parallel = max_parallel;
+        project.config.services.insert(
+            "shared".into(),
+            ServiceConfig::Environment {
+                source_env: "PATH".into(),
+                inject_env: "SHARED_TEST_PATH".into(),
+            },
+        );
+        for step in &mut project.config.steps {
+            step.services = vec!["shared".into()];
+            step.profiles.insert("full".into());
+            step.program = "sh".into();
+        }
+        fs::write(project.root.join("first.sh"),
+            "test -n \"$SHARED_TEST_PATH\" && mkdir exclusive && sleep 0.05 && echo first > order && rmdir exclusive").expect("first script");
+        fs::write(project.root.join("second.sh"),
+            "test -n \"$SHARED_TEST_PATH\" && mkdir exclusive && test \"$(cat order)\" = first && echo second >> order && rmdir exclusive").expect("second script");
+        project.config.steps[0].args = vec!["first.sh".into()];
+        project.config.steps[1].args = vec!["second.sh".into()];
+        let source = toml::to_string_pretty(&project.config).expect("serialize");
+        project.config =
+            FlowConfig::from_source(&source).expect("production loader accepts serial sharing");
+        let report = run(&project, ScopeResult::all(&project), "full", false).expect("verify");
+        assert!(report.passed);
+        assert_eq!(
+            fs::read_to_string(project.root.join("order")).expect("execution order"),
+            "first\nsecond\n"
+        );
+    }
+}

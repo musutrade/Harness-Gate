@@ -7,6 +7,30 @@ use std::path::Path;
 use std::process::{Command, Output};
 use tempfile::TempDir;
 
+#[test]
+#[cfg(target_os = "linux")]
+fn arc_admin_required_commands_fail_through_generic_hooks() {
+    let output = TempDir::new().unwrap();
+    success(
+        Command::new("python3")
+            .arg(
+                Path::new(env!("CARGO_MANIFEST_DIR"))
+                    .join("../../docs/dogfood/arc-admin/negative/run.py"),
+            )
+            .args([
+                "--harness-gate",
+                env!("CARGO_BIN_EXE_harness-gate"),
+                "--output",
+            ])
+            .arg(output.path())
+            .output()
+            .unwrap(),
+    );
+    let cases: Value =
+        serde_json::from_slice(&fs::read(output.path().join("commands.json")).unwrap()).unwrap();
+    assert_eq!(cases["cases"].as_array().unwrap().len(), 6);
+}
+
 const FLOW: &str = r#"
 version = 2
 [project]
@@ -99,6 +123,64 @@ fn assert_sealed_evidence(json: &Value) {
             format!("{:x}", Sha256::digest(&bytes)),
             "{path}"
         );
+    }
+}
+
+/// ADR-0049: an unknown application runner participates without a core registry,
+/// framework parser, or quality collector. Renaming it must preserve blocking.
+#[test]
+fn project_owned_runner_replacement_preserves_generic_command_gate() {
+    for runner in ["nebula-e2e", "quasar-api"] {
+        for exit_code in [0, 7] {
+            let root = fixture();
+            let flow = FLOW
+                .replace("id = \"probe\"", &format!("id = \"{runner}\""))
+                .replace("program = \"sh\"", &format!("program = \"{runner}\""))
+                .replace(
+                    "args = [\"probe.sh\", \"original\"]",
+                    "args = [\"project-assertion\"]",
+                );
+            fs::write(root.path().join(".harness-gate/flow.toml"), flow).unwrap();
+            let executable = root.path().join(runner);
+            fs::write(
+                &executable,
+                format!("#!/bin/sh\n[ \"$1\" = project-assertion ] || exit 9\necho project-owned-result\nexit {exit_code}\n"),
+            )
+            .unwrap();
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(&executable, fs::Permissions::from_mode(0o755)).unwrap();
+            success(
+                command(root.path())
+                    .args(["config", "check"])
+                    .output()
+                    .unwrap(),
+            );
+            let output = command(root.path())
+                .env(
+                    "PATH",
+                    std::env::join_paths(std::iter::once(root.path().to_path_buf()).chain(
+                        std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()),
+                    ))
+                    .unwrap(),
+                )
+                .args(["verify", "--profile", "full", "--all"])
+                .output()
+                .unwrap();
+            assert_eq!(output.status.success(), exit_code == 0, "{runner}");
+            let json = report(root.path());
+            assert_eq!(json["passed"], exit_code == 0);
+            let step = json["steps"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|step| step["step_id"] == runner)
+                .expect("unknown project runner must execute and retain its identity");
+            assert_eq!(step["passed"], exit_code == 0);
+            assert!(fs::read_to_string(step["log"].as_str().unwrap())
+                .unwrap()
+                .contains("project-owned-result"));
+            assert_sealed_evidence(&json);
+        }
     }
 }
 
@@ -517,7 +599,9 @@ connection = 'fixture:{host_port}'
         fs::write(
             root.path().join("probe.sh"),
             if cancel {
-                "echo $$ > started\nexec sleep 30\n"
+                // Publish readiness only after the PID is fully written. Shell
+                // redirection creates an empty file before echo writes to it.
+                "echo $$ > started.tmp\nmv started.tmp started\nexec sleep 30\n"
             } else {
                 "echo completed\n"
             },

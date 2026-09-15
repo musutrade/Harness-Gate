@@ -1,4 +1,5 @@
 mod diagnostic;
+pub(crate) mod import;
 mod loader;
 mod migration;
 mod model;

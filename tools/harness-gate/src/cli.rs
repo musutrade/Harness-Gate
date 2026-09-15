@@ -210,6 +210,16 @@ pub(crate) enum SchemaAction {
 
 #[derive(Debug, Subcommand)]
 pub(crate) enum ConfigAction {
+    /// Import compatible Arc-Flow v2 execution configuration and a parity report.
+    Import {
+        #[arg(long, default_value = ".arc-flow/flow.toml", value_name = "PATH")]
+        input: PathBuf,
+        #[arg(long, default_value = ".harness-gate/flow.toml", value_name = "PATH")]
+        output: PathBuf,
+        /// Limit import to declared execution config; runtime authority remains blocked.
+        #[arg(long)]
+        execution_only: bool,
+    },
     /// Validate configuration, environment overrides, and protected steps.
     Check {
         /// Render diagnostics as a machine-readable JSON envelope.

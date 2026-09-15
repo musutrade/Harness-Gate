@@ -24,7 +24,6 @@ from quality_common import CRATE, ROOT, git_sha, metadata, sha256, write_json
 # rest before the next collection starts.
 RETAIN_FAILED_BUILDS = 3
 
-
 def prune_old_builds() -> None:
     root = ROOT / 'target/critical-path-build'
     if not root.is_dir():
