@@ -86,7 +86,12 @@ python3 tools/quality/benchmarks.py --output target/quality/benchmarks.json --sa
 ```
 
 The matrix rejects aggregate nextest JSONL/module coverage as a replacement for
-isolated evidence. The collector continues other stages after an ordinary gate
+isolated evidence. The critical-path collector builds instrumented binaries once
+per collection and runs up to two isolated tests concurrently by default; pass
+`--jobs 1` for serial execution or `--jobs N` for 1 to 8 workers. Local timing
+observations are in the
+[collection benchmark](../../docs/benchmarks/critical-path-collection/README.md).
+The collector continues other stages after an ordinary gate
 failure, retains the failure and exits nonzero. Candidate timings describe this
 collection environment; hosted CI overhead comes from the uploaded CI candidate.
 This repository has no project-local `.harness-gate/flow.toml` declaring `ci`:

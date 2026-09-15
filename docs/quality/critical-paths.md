@@ -16,14 +16,27 @@ python3 tools/quality/critical_paths.py --collect \
 ```
 
 The collector requires cargo-nextest, cargo-llvm-cov (CI pins 0.9.0), and Rust's
-llvm-tools-preview component. It reserves `target/build/llvm-cov-target` for serial
-instrumented runs; do not run another coverage command there during collection.
+llvm-tools-preview component. The collector builds instrumented test binaries once
+in a fresh `target/critical-path-build/<collection-id>` directory, then uses nextest
+build metadata to reuse those binaries. Two exact tests run concurrently by default;
+`--jobs 1` selects serial execution and `--jobs N` accepts 1–8 workers. Each test and
+its child CLI processes write profiles to a unique run directory. No test cleans or
+rebuilds the shared binaries. Retries are disabled for exact single-test evidence.
+
+After tests finish, report exports run serially. Each export cleans only the shared
+report directory's raw profiles, stages one test's profiles, and exports LLVM JSON.
+The originals remain in that test's run directory. Build/list-time counters and
+other tests' counters are excluded. This preserves the existing source-v2 rule,
+mandatory rows, thresholds and fail-closed engineering-policy semantics.
+
 An atomic collection lock rejects overlapping collectors. A crash leaves the lock
-for inspection before manual removal. Each row cleans prior instrumentation,
-executes exactly one test with nextest JSON-plus 0.1, and exports raw LLVM JSON.
-Child CLI processes inherit instrumentation. Every command, exit status, test event
-stream and coverage export is retained under a unique run directory, including
-failed runs. Only a completed collection writes the bundle declaration.
+for inspection before manual removal. Every command, exit status, test event stream
+and coverage export is retained, including failed runs. Only a completed collection
+writes the bundle declaration. `clean_exit` now describes profile-only report
+preparation, not a rebuild. Build, test and total collection timings are included
+in the bundle; individual commands also record elapsed seconds. The fresh build
+directory is removed after successful collection; failed builds remain available for
+diagnosis. Build binaries are not included in the evidence bundle.
 
 The bundle binds inventory, all crate source/test/build inputs, host target,
 commit, rule, tool versions and artifact hashes. Local source bytes must match the
@@ -58,3 +71,7 @@ This implements OpenSpec `strict-json-results-and-risk-based-quality-gates` task
 [ADR 0034](../adr/0034-fail-closed-trust-boundaries.md) and
 [ADR 0038](../adr/0038-post-remediation-hardening.md). Broader quality aggregation
 and baseline adoption remain tasks 8.x.
+
+Local before/after timing, tool versions and the review of the parallel
+collection change are in the
+[collection benchmark](../benchmarks/critical-path-collection/README.md).

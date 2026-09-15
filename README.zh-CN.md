@@ -17,7 +17,7 @@
 - 接入新项目：看[安装与快速开始](#安装与快速开始)和[内置预设](#内置预设)；
 - 增加命令、组件或 CI profile：看[选择模型](#选择模型)、[schema v2 配置参考（中文）](https://github.com/musutrade/Harness-Gate/blob/main/docs/configuration.zh-CN.md)和 [JSON Schema 目录（英文）](https://github.com/musutrade/Harness-Gate/blob/main/schema/README.md)；
 - 处理失败：看[验证与报告](#验证与报告)和[故障排查](#故障排查)；
-- 扩展 Rust 引擎：看[无需改代码的范围](#无需改代码的范围)和[需要改-rust-的边界](#需要改-rust-的边界)。
+- 扩展 Rust 引擎：看[无需改代码的范围](#无需改代码的范围)、[需要改-rust-的边界](#需要改-rust-的边界)和[项目自有验证边界](#项目自有验证边界)。
 
 ## 工作模型
 
@@ -667,6 +667,16 @@ component 来自 `[[steps]].component`，profile 来自 `[[steps]].profiles`。�
 
 这类改动应同时增加单元测试、内置预设验证和配置兼容性说明，并提升版本号。
 
+## 项目自有验证边界
+
+应用与仓库特有的验证逻辑属于被验证项目本身。Harness-Gate 在通用边界上编排、接入和裁决，不会成为每个 API、E2E、集成、冒烟、迁移、负载或框架测试系统的实现归属。项目自有验证由三层扩展覆盖：
+
+- **命令 hook / 执行门禁**运行项目自有命令。Harness-Gate 负责 scope/profile 选择、依赖、服务、环境、超时、重试、必需性与阻断组合；项目负责测试代码、fixture、领域断言和工具语义。
+- **结构化结果适配器**接入 JUnit、SARIF 或声明式 JSON 契约等可复用机器格式，改善诊断与报告。解析结果不会把必需性、阈值、ratchet 或发布权限转移给工具或解析器。
+- **质量采集器插件**度量供通用策略评估的规范化事实。采集器始终只做度量；发布版 Rust 核心保留必需性、阈值、基线、聚合和最终裁决。
+
+一个新的应用验证工具只要能用命令 hook 契约表达，就不应强制修改通用核心代码。原生产品支持只在可复用协议、结果格式、服务原语、生态/能力 pack、认证边界或通用策略语义上成立。迁移成熟项目时，其现有必需验证在达到对等且具备 fail-closed 替代行为之前，始终是保证基线。详见 [ADR-0049](docs/adr/0049-project-owned-validation-extension-boundary.md)。
+
 ## 当前审计规则
 
 `.harness-gate/audit.toml` 保存项目自己的 SQL、分层和模板约束。audit 配置当前 schema 为 v2，必须显式声明 `version = 2` 和 `[engine]`；规则扩展名没有对应 `comment_syntax` 时会 fail closed。旧版字符串 allowlist、缺失 engine 和版本升级方法见[配置迁移参考](https://github.com/musutrade/Harness-Gate/blob/main/docs/configuration.zh-CN.md#audit-v2-migration)。`arch_rules.allowed_patterns` 可声明逐行例外，不存在写死的 model trait 放行逻辑。
@@ -684,3 +694,7 @@ harness-gate verify --components workflow
 ```
 
 修改配置模型时还应验证全部内置预设和 v1 migration 测试；修改 service provider 时必须执行 `harness-gate verify --all`，确认一次性容器会在成功和失败路径上清理。
+
+### 质量门禁开发
+
+本地质量脚本测试和 CI 使用的精确采集命令见 [tools/quality/README.md](tools/quality/README.md)。覆盖率、函数风险和隔离的关键路径证据共同构成 PR 和 push 上的 `Required Quality Aggregate`。关键路径采集器现在每次采集只构建一次插桩二进制，默认最多并发运行两个隔离测试；`--jobs 1` 选择串行执行，`--jobs N` 接受 1 到 8 个 worker。基准数据见[采集基准](docs/benchmarks/critical-path-collection/README.md)。生成的 baseline 仍只是待审候选；采纳策略见 [ADR-0039](docs/adr/0039-required-risk-and-traceability-gates.md)。
