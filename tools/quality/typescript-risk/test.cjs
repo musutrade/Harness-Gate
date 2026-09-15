@@ -362,7 +362,7 @@ test("subprocess supports version/inventory and strict one-response error semant
       { encoding: "utf8" },
     );
     assert.equal(version.status, 0);
-    assert.match(version.stdout, /0.1.0-rc.2/);
+    assert.match(version.stdout, /0.1.0-rc.4/);
     const result = spawnSync(
       process.execPath,
       [path.join(__dirname, "cli.cjs")],
@@ -427,3 +427,17 @@ test("production files with test-looking names are inventoried unless host expli
     assert.equal(discover(request).subjects.length, 1);
     assert.throws(() => collect(request)); // Existing receipt did not authorize this scope change.
   }));
+
+
+test("collectors share a root but exclusively own their artifact subdirectory", () => {
+  scenario(({ root, request }) => {
+    fs.writeFileSync(path.join(request.output_root, "other-collector.json"), "retained");
+    request.parameters.artifact_subdir = "frontend";
+    const response = collect(request);
+    assert(response.artifacts.every(a => a.path.startsWith("frontend/")));
+    assert.equal(fs.readFileSync(path.join(request.output_root, "other-collector.json"), "utf8"), "retained");
+    assert.throws(() => collect(request), /fresh/);
+    request.parameters.artifact_subdir = "../escape";
+    assert.throws(() => collect(request), /relative/);
+  });
+});
