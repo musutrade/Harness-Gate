@@ -1,6 +1,6 @@
 {
   "name": "@harness-gate/typescript-collector",
-  "version": "0.1.0-rc.1",
+  "version": "0.1.0-rc.2",
   "private": true,
   "scripts": {
     "test": "node --test test.cjs",
@@ -28,6 +28,7 @@
     "npm-shrinkwrap.json",
     "README.md",
     "LICENSE",
-    "plugin.json"
+    "plugin.json",
+    "project.cjs"
   ]
 }

@@ -238,6 +238,64 @@ function scenario(run) {
   }
 }
 
+test("file coverage includes top-level statements without borrowing function coverage", () => {
+  const source = "const unused = 42;\nfunction f() { return 1; }\n";
+  const raw = native(source, "f();");
+  const top = Object.keys(raw.statementMap).find(
+    (k) => raw.statementMap[k].start.line === 1,
+  );
+  raw.s[top] = 0;
+  const result = measure("src/sample.ts", source, raw);
+  assert.deepEqual(result.file.values["coverage.line"], {
+    type: "ratio",
+    covered: 1,
+    total: 2,
+  });
+  assert.equal(result.functions[0].values["coverage.line"].covered, 1);
+  const empty = measure(
+    "src/type.ts",
+    "interface Value { x: number }",
+    native("interface Value { x: number }", ""),
+  );
+  assert.deepEqual(empty.file.values, {});
+  assert.deepEqual(empty.file.unavailable, ["coverage.line"]);
+});
+
+test("declaration classification never treats unexecuted runtime code as erased types", () => {
+  assert(
+    inventory("types.ts", "export interface X { n: number }\ntype Y = X;")
+      .declarationOnly,
+  );
+  assert(!inventory("runtime.ts", "const n = 42;").declarationOnly);
+  assert(!inventory("side-effect.ts", "import './setup';").declarationOnly);
+  assert(!inventory("class.ts", "export class X {};").declarationOnly);
+});
+
+test("file subject inventory and capture pipeline pins are part of the measured series", () => {
+  scenario(({ root, request }) => {
+    request.parameters.include_files = true;
+    request.parameters.subjects = discover(request).subjects;
+    request.parameters.receipt.request = binding(request);
+    fs.writeFileSync(path.join(root, "angular.json"), "{}");
+    request.parameters.receipt.pipeline = {
+      schema: "typescript-capture-pipeline/v1",
+      files: { "angular.json": sha("{}") },
+      tools: { builder: "angular-test-fixture" },
+    };
+    const result = collect(request);
+    assert.deepEqual(
+      result.evidence.map((e) => e.subject.kind),
+      ["file/v1", "function/v1"],
+    );
+    fs.writeFileSync(path.join(root, "angular.json"), "{ }");
+    const output = path.join(root, "fresh");
+    fs.mkdirSync(output);
+    request.output_root = output;
+    assert.throws(() => collect(request), /capture configuration changed/);
+    assert.deepEqual(fs.readdirSync(output), []);
+  });
+});
+
 test("standard protocol returns facts and source/context-bound raw artifacts", () =>
   scenario(({ root, request }) => {
     const response = collect(request);
@@ -304,7 +362,7 @@ test("subprocess supports version/inventory and strict one-response error semant
       { encoding: "utf8" },
     );
     assert.equal(version.status, 0);
-    assert.match(version.stdout, /0.1.0-rc.1/);
+    assert.match(version.stdout, /0.1.0-rc.2/);
     const result = spawnSync(
       process.execPath,
       [path.join(__dirname, "cli.cjs")],
