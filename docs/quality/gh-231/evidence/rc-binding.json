@@ -1,0 +1,660 @@
+{
+  "schema": "rust-project-collector-binding/v1",
+  "input": {
+    "schema": "harness-project-collector-request/v1",
+    "project": "native-test",
+    "collector": {
+      "name": "harness-gate-rust-collector",
+      "version": "0.1.0-rc.1"
+    },
+    "context": {
+      "target": "native",
+      "run": "project-test",
+      "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "base_commit": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    "workspace_root": "/mnt/dev-ssd/workspaces/symphony/GH-231/target/gh-231/runtime-tests/tmp_k4g84ws/base",
+    "output_root": "/mnt/dev-ssd/workspaces/symphony/GH-231/target/gh-231/rc-binding-output",
+    "selection": {},
+    "bindings": [
+      {
+        "subject": "subject-identity/v1:9fe76a240822d2ba336111212f4046a21d9ebc6e328a7fbf86f7435ef80ac761",
+        "capability": "complexity.cyclomatic",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:9fe76a240822d2ba336111212f4046a21d9ebc6e328a7fbf86f7435ef80ac761",
+        "capability": "coverage.function",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:9fe76a240822d2ba336111212f4046a21d9ebc6e328a7fbf86f7435ef80ac761",
+        "capability": "coverage.line",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:9fe76a240822d2ba336111212f4046a21d9ebc6e328a7fbf86f7435ef80ac761",
+        "capability": "coverage.region",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:9fe76a240822d2ba336111212f4046a21d9ebc6e328a7fbf86f7435ef80ac761",
+        "capability": "risk.crap",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:10f96f90558fd282e3227ad544bcd882e3e0786ba46343198e387da0d35546a4",
+        "capability": "complexity.cyclomatic",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:10f96f90558fd282e3227ad544bcd882e3e0786ba46343198e387da0d35546a4",
+        "capability": "coverage.function",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:10f96f90558fd282e3227ad544bcd882e3e0786ba46343198e387da0d35546a4",
+        "capability": "coverage.line",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:10f96f90558fd282e3227ad544bcd882e3e0786ba46343198e387da0d35546a4",
+        "capability": "coverage.region",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:10f96f90558fd282e3227ad544bcd882e3e0786ba46343198e387da0d35546a4",
+        "capability": "risk.crap",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:62d4c7b533d6f4a466c79028f2f249368e6647e87bceb585aa48c833ae06b376",
+        "capability": "complexity.cyclomatic",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:62d4c7b533d6f4a466c79028f2f249368e6647e87bceb585aa48c833ae06b376",
+        "capability": "coverage.function",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:62d4c7b533d6f4a466c79028f2f249368e6647e87bceb585aa48c833ae06b376",
+        "capability": "coverage.line",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:62d4c7b533d6f4a466c79028f2f249368e6647e87bceb585aa48c833ae06b376",
+        "capability": "coverage.region",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:62d4c7b533d6f4a466c79028f2f249368e6647e87bceb585aa48c833ae06b376",
+        "capability": "risk.crap",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:adb497673c471140eb073b4d134bc603db33aa8844fa4bd0ae6a3ff4686d8a7b",
+        "capability": "complexity.cyclomatic",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:adb497673c471140eb073b4d134bc603db33aa8844fa4bd0ae6a3ff4686d8a7b",
+        "capability": "coverage.function",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:adb497673c471140eb073b4d134bc603db33aa8844fa4bd0ae6a3ff4686d8a7b",
+        "capability": "coverage.line",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:adb497673c471140eb073b4d134bc603db33aa8844fa4bd0ae6a3ff4686d8a7b",
+        "capability": "coverage.region",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:adb497673c471140eb073b4d134bc603db33aa8844fa4bd0ae6a3ff4686d8a7b",
+        "capability": "risk.crap",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:988cdb96bc8b4acbca2b1a9da4e1d74677de9970a4b67e67a665440a3876e7f5",
+        "capability": "complexity.cyclomatic",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:988cdb96bc8b4acbca2b1a9da4e1d74677de9970a4b67e67a665440a3876e7f5",
+        "capability": "coverage.function",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:988cdb96bc8b4acbca2b1a9da4e1d74677de9970a4b67e67a665440a3876e7f5",
+        "capability": "coverage.line",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:988cdb96bc8b4acbca2b1a9da4e1d74677de9970a4b67e67a665440a3876e7f5",
+        "capability": "coverage.region",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:988cdb96bc8b4acbca2b1a9da4e1d74677de9970a4b67e67a665440a3876e7f5",
+        "capability": "risk.crap",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:090f4af9de12691e84e1ef8026738224282fde0a3a0b2afdc5cd8dbb9a3f0c07",
+        "capability": "complexity.cyclomatic",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:090f4af9de12691e84e1ef8026738224282fde0a3a0b2afdc5cd8dbb9a3f0c07",
+        "capability": "coverage.function",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:090f4af9de12691e84e1ef8026738224282fde0a3a0b2afdc5cd8dbb9a3f0c07",
+        "capability": "coverage.line",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:090f4af9de12691e84e1ef8026738224282fde0a3a0b2afdc5cd8dbb9a3f0c07",
+        "capability": "coverage.region",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:090f4af9de12691e84e1ef8026738224282fde0a3a0b2afdc5cd8dbb9a3f0c07",
+        "capability": "risk.crap",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:36230ed472ba900358bdad9e66722d8d6436ff98c987c0c16901e5c02446029a",
+        "capability": "complexity.cyclomatic",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:36230ed472ba900358bdad9e66722d8d6436ff98c987c0c16901e5c02446029a",
+        "capability": "coverage.function",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:36230ed472ba900358bdad9e66722d8d6436ff98c987c0c16901e5c02446029a",
+        "capability": "coverage.line",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:36230ed472ba900358bdad9e66722d8d6436ff98c987c0c16901e5c02446029a",
+        "capability": "coverage.region",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:36230ed472ba900358bdad9e66722d8d6436ff98c987c0c16901e5c02446029a",
+        "capability": "risk.crap",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:7ab5985a8f73465691071119f05230eb6a8d9e856898808e954880811d31ecb5",
+        "capability": "complexity.cyclomatic",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:7ab5985a8f73465691071119f05230eb6a8d9e856898808e954880811d31ecb5",
+        "capability": "coverage.function",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:7ab5985a8f73465691071119f05230eb6a8d9e856898808e954880811d31ecb5",
+        "capability": "coverage.line",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:7ab5985a8f73465691071119f05230eb6a8d9e856898808e954880811d31ecb5",
+        "capability": "coverage.region",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:7ab5985a8f73465691071119f05230eb6a8d9e856898808e954880811d31ecb5",
+        "capability": "risk.crap",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:fe2899ba2c571107043b982f8a6aadf2587d2da527e735e159e9cff90fc4a5a0",
+        "capability": "complexity.cyclomatic",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:fe2899ba2c571107043b982f8a6aadf2587d2da527e735e159e9cff90fc4a5a0",
+        "capability": "coverage.function",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:fe2899ba2c571107043b982f8a6aadf2587d2da527e735e159e9cff90fc4a5a0",
+        "capability": "coverage.line",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:fe2899ba2c571107043b982f8a6aadf2587d2da527e735e159e9cff90fc4a5a0",
+        "capability": "coverage.region",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:fe2899ba2c571107043b982f8a6aadf2587d2da527e735e159e9cff90fc4a5a0",
+        "capability": "risk.crap",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:ac7a3191c9aaa50331951b7c48f369872a768674b2113edcdec5ad456c023915",
+        "capability": "complexity.cyclomatic",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:ac7a3191c9aaa50331951b7c48f369872a768674b2113edcdec5ad456c023915",
+        "capability": "coverage.function",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:ac7a3191c9aaa50331951b7c48f369872a768674b2113edcdec5ad456c023915",
+        "capability": "coverage.line",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:ac7a3191c9aaa50331951b7c48f369872a768674b2113edcdec5ad456c023915",
+        "capability": "coverage.region",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:ac7a3191c9aaa50331951b7c48f369872a768674b2113edcdec5ad456c023915",
+        "capability": "risk.crap",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:1b22532c28c64fbbe4605befecb90a818e6819224f5b001b6463af2872296f3a",
+        "capability": "complexity.cyclomatic",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:1b22532c28c64fbbe4605befecb90a818e6819224f5b001b6463af2872296f3a",
+        "capability": "coverage.function",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:1b22532c28c64fbbe4605befecb90a818e6819224f5b001b6463af2872296f3a",
+        "capability": "coverage.line",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:1b22532c28c64fbbe4605befecb90a818e6819224f5b001b6463af2872296f3a",
+        "capability": "coverage.region",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:1b22532c28c64fbbe4605befecb90a818e6819224f5b001b6463af2872296f3a",
+        "capability": "risk.crap",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:6eb778a894b0502890cb7dbd501f7393ace2e3138659f4119beca495e7bd612c",
+        "capability": "complexity.cyclomatic",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:6eb778a894b0502890cb7dbd501f7393ace2e3138659f4119beca495e7bd612c",
+        "capability": "coverage.function",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:6eb778a894b0502890cb7dbd501f7393ace2e3138659f4119beca495e7bd612c",
+        "capability": "coverage.line",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:6eb778a894b0502890cb7dbd501f7393ace2e3138659f4119beca495e7bd612c",
+        "capability": "coverage.region",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:6eb778a894b0502890cb7dbd501f7393ace2e3138659f4119beca495e7bd612c",
+        "capability": "risk.crap",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:7a97224f76271a22a4def4b44a78fded3d4e7a55f3403c407af9d047994da774",
+        "capability": "complexity.cyclomatic",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:7a97224f76271a22a4def4b44a78fded3d4e7a55f3403c407af9d047994da774",
+        "capability": "coverage.function",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:7a97224f76271a22a4def4b44a78fded3d4e7a55f3403c407af9d047994da774",
+        "capability": "coverage.line",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:7a97224f76271a22a4def4b44a78fded3d4e7a55f3403c407af9d047994da774",
+        "capability": "coverage.region",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:7a97224f76271a22a4def4b44a78fded3d4e7a55f3403c407af9d047994da774",
+        "capability": "risk.crap",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:a08331900c1f80a1eaf9f02cfa088abb7299037245bf41adb4de191e5864f2c9",
+        "capability": "complexity.cyclomatic",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:a08331900c1f80a1eaf9f02cfa088abb7299037245bf41adb4de191e5864f2c9",
+        "capability": "coverage.function",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:a08331900c1f80a1eaf9f02cfa088abb7299037245bf41adb4de191e5864f2c9",
+        "capability": "coverage.line",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:a08331900c1f80a1eaf9f02cfa088abb7299037245bf41adb4de191e5864f2c9",
+        "capability": "coverage.region",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      },
+      {
+        "subject": "subject-identity/v1:a08331900c1f80a1eaf9f02cfa088abb7299037245bf41adb4de191e5864f2c9",
+        "capability": "risk.crap",
+        "series": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+      }
+    ]
+  },
+  "invocation_id": "project-test",
+  "config_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "capture": {
+    "path": "/mnt/dev-ssd/workspaces/symphony/GH-231/target/gh-231/runtime-tests/tmp_k4g84ws/base",
+    "anchor": "738128d8517cfc8f20de85b76ac804c07c11a87f7be9e79210129f3688f136cb"
+  },
+  "project": {
+    "schema": "harness-project/v1",
+    "id": "native-test",
+    "metadata": {},
+    "relationships": [],
+    "components": [
+      {
+        "id": "rust",
+        "path": ".",
+        "metadata": {},
+        "targets": [
+          {
+            "id": "native",
+            "boundaries": [
+              "production"
+            ],
+            "metadata": {}
+          }
+        ],
+        "source_boundaries": [
+          {
+            "id": "production",
+            "path": ".",
+            "role": "production",
+            "metadata": {}
+          }
+        ]
+      }
+    ],
+    "subjects": [
+      {
+        "id": "subject-identity/v1:9fe76a240822d2ba336111212f4046a21d9ebc6e328a7fbf86f7435ef80ac761",
+        "identity_version": "subject-identity/v1",
+        "component": "rust",
+        "target": "native",
+        "boundary": "production",
+        "kind": "function/v1",
+        "path": "fixture.rs",
+        "discriminator": "2d157724d95969f939a5e3a86eb4fc74d4023c345dd95a8a50541f146e54a7e6",
+        "metadata": {},
+        "source_sha256": "a8be4cef00ed15911adb43f65662509eb9ace34a0fd98f5af2fd012b092d2aa3"
+      },
+      {
+        "id": "subject-identity/v1:10f96f90558fd282e3227ad544bcd882e3e0786ba46343198e387da0d35546a4",
+        "identity_version": "subject-identity/v1",
+        "component": "rust",
+        "target": "native",
+        "boundary": "production",
+        "kind": "function/v1",
+        "path": "fixture.rs",
+        "discriminator": "a0b998e564f422490cc4e0c15ce890aefe6ca5d6a59dc3b6c96959d36b356973",
+        "metadata": {},
+        "source_sha256": "a8be4cef00ed15911adb43f65662509eb9ace34a0fd98f5af2fd012b092d2aa3"
+      },
+      {
+        "id": "subject-identity/v1:62d4c7b533d6f4a466c79028f2f249368e6647e87bceb585aa48c833ae06b376",
+        "identity_version": "subject-identity/v1",
+        "component": "rust",
+        "target": "native",
+        "boundary": "production",
+        "kind": "function/v1",
+        "path": "fixture.rs",
+        "discriminator": "77e0f391b28cca1dd17ae8c54bc1b0ea990fed5e5b036af55d91293e698dd08c",
+        "metadata": {},
+        "source_sha256": "a8be4cef00ed15911adb43f65662509eb9ace34a0fd98f5af2fd012b092d2aa3"
+      },
+      {
+        "id": "subject-identity/v1:adb497673c471140eb073b4d134bc603db33aa8844fa4bd0ae6a3ff4686d8a7b",
+        "identity_version": "subject-identity/v1",
+        "component": "rust",
+        "target": "native",
+        "boundary": "production",
+        "kind": "function/v1",
+        "path": "fixture.rs",
+        "discriminator": "399765cd9436067f7561001354258e2de504aa8326da92b18018ffcac1cb91e3",
+        "metadata": {},
+        "source_sha256": "a8be4cef00ed15911adb43f65662509eb9ace34a0fd98f5af2fd012b092d2aa3"
+      },
+      {
+        "id": "subject-identity/v1:988cdb96bc8b4acbca2b1a9da4e1d74677de9970a4b67e67a665440a3876e7f5",
+        "identity_version": "subject-identity/v1",
+        "component": "rust",
+        "target": "native",
+        "boundary": "production",
+        "kind": "function/v1",
+        "path": "fixture.rs",
+        "discriminator": "dca2939f4ef3c2b6564aae7c05cdb153fcf0f55f757b6ea1e1d9278b93a3f892",
+        "metadata": {},
+        "source_sha256": "a8be4cef00ed15911adb43f65662509eb9ace34a0fd98f5af2fd012b092d2aa3"
+      },
+      {
+        "id": "subject-identity/v1:090f4af9de12691e84e1ef8026738224282fde0a3a0b2afdc5cd8dbb9a3f0c07",
+        "identity_version": "subject-identity/v1",
+        "component": "rust",
+        "target": "native",
+        "boundary": "production",
+        "kind": "function/v1",
+        "path": "fixture.rs",
+        "discriminator": "f732148495ce0e3a31db5e49d59b57fd0d5cdd3010b62cd470a61cf68e184ad3",
+        "metadata": {},
+        "source_sha256": "a8be4cef00ed15911adb43f65662509eb9ace34a0fd98f5af2fd012b092d2aa3"
+      },
+      {
+        "id": "subject-identity/v1:36230ed472ba900358bdad9e66722d8d6436ff98c987c0c16901e5c02446029a",
+        "identity_version": "subject-identity/v1",
+        "component": "rust",
+        "target": "native",
+        "boundary": "production",
+        "kind": "function/v1",
+        "path": "fixture.rs",
+        "discriminator": "1edecd1fc7f2f33053fd46a05bdb5746733e2d9c2f031c14275a3b43bb980116",
+        "metadata": {},
+        "source_sha256": "a8be4cef00ed15911adb43f65662509eb9ace34a0fd98f5af2fd012b092d2aa3"
+      },
+      {
+        "id": "subject-identity/v1:7ab5985a8f73465691071119f05230eb6a8d9e856898808e954880811d31ecb5",
+        "identity_version": "subject-identity/v1",
+        "component": "rust",
+        "target": "native",
+        "boundary": "production",
+        "kind": "function/v1",
+        "path": "fixture.rs",
+        "discriminator": "dbf619c55f66bceb19c50cac77eff5a72d6370b48301679cb7d2eb051ad65b9a",
+        "metadata": {},
+        "source_sha256": "a8be4cef00ed15911adb43f65662509eb9ace34a0fd98f5af2fd012b092d2aa3"
+      },
+      {
+        "id": "subject-identity/v1:fe2899ba2c571107043b982f8a6aadf2587d2da527e735e159e9cff90fc4a5a0",
+        "identity_version": "subject-identity/v1",
+        "component": "rust",
+        "target": "native",
+        "boundary": "production",
+        "kind": "function/v1",
+        "path": "fixture.rs",
+        "discriminator": "1f651dc0e2f6a2bfd0aa6bb9afd88cc5759cec240948804148b3c86ecc572f2f",
+        "metadata": {},
+        "source_sha256": "a8be4cef00ed15911adb43f65662509eb9ace34a0fd98f5af2fd012b092d2aa3"
+      },
+      {
+        "id": "subject-identity/v1:ac7a3191c9aaa50331951b7c48f369872a768674b2113edcdec5ad456c023915",
+        "identity_version": "subject-identity/v1",
+        "component": "rust",
+        "target": "native",
+        "boundary": "production",
+        "kind": "function/v1",
+        "path": "fixture.rs",
+        "discriminator": "7d456783c0951654ed595506b497fb6bc075766a60d1b2485992df442cdfe0c4",
+        "metadata": {},
+        "source_sha256": "a8be4cef00ed15911adb43f65662509eb9ace34a0fd98f5af2fd012b092d2aa3"
+      },
+      {
+        "id": "subject-identity/v1:1b22532c28c64fbbe4605befecb90a818e6819224f5b001b6463af2872296f3a",
+        "identity_version": "subject-identity/v1",
+        "component": "rust",
+        "target": "native",
+        "boundary": "production",
+        "kind": "function/v1",
+        "path": "fixture.rs",
+        "discriminator": "babaaf71f1032977bfe4c37630a615674b16ff3b8baba0aa550bbd83df41319b",
+        "metadata": {},
+        "source_sha256": "a8be4cef00ed15911adb43f65662509eb9ace34a0fd98f5af2fd012b092d2aa3"
+      },
+      {
+        "id": "subject-identity/v1:6eb778a894b0502890cb7dbd501f7393ace2e3138659f4119beca495e7bd612c",
+        "identity_version": "subject-identity/v1",
+        "component": "rust",
+        "target": "native",
+        "boundary": "production",
+        "kind": "function/v1",
+        "path": "fixture.rs",
+        "discriminator": "6d1b5d978bf53f6506d3a445fcd3c2874fcc79390d20394ee2d4d91cc04e8aae",
+        "metadata": {},
+        "source_sha256": "a8be4cef00ed15911adb43f65662509eb9ace34a0fd98f5af2fd012b092d2aa3"
+      },
+      {
+        "id": "subject-identity/v1:7a97224f76271a22a4def4b44a78fded3d4e7a55f3403c407af9d047994da774",
+        "identity_version": "subject-identity/v1",
+        "component": "rust",
+        "target": "native",
+        "boundary": "production",
+        "kind": "function/v1",
+        "path": "fixture.rs",
+        "discriminator": "73fc98e5e68d0a80a1926a212b4697e17635ce5622b4bfb916aa89a2495a75d6",
+        "metadata": {},
+        "source_sha256": "a8be4cef00ed15911adb43f65662509eb9ace34a0fd98f5af2fd012b092d2aa3"
+      },
+      {
+        "id": "subject-identity/v1:a08331900c1f80a1eaf9f02cfa088abb7299037245bf41adb4de191e5864f2c9",
+        "identity_version": "subject-identity/v1",
+        "component": "rust",
+        "target": "native",
+        "boundary": "production",
+        "kind": "function/v1",
+        "path": "fixture.rs",
+        "discriminator": "55fefbe427386d1420cf7eb2460e36a7358a358857180a86487504750a389925",
+        "metadata": {},
+        "source_sha256": "a8be4cef00ed15911adb43f65662509eb9ace34a0fd98f5af2fd012b092d2aa3"
+      }
+    ]
+  },
+  "series": {
+    "name": "native-project-test",
+    "collector": {
+      "name": "harness-gate-rust-collector",
+      "version": "0.1.0-rc.1"
+    },
+    "tool": {
+      "name": "native-toolchain",
+      "version": "7838a5c6cbc869c75a30aa211713d3b8113dc2c01d9ef03f33d8722483296f2f"
+    },
+    "rule": {
+      "name": "native-project",
+      "version": "3da55d17a01aed677a58331ef872f2a14e5ef32669b869cd948e3b1d6fc3fc77"
+    },
+    "runtime": {
+      "name": "rustc",
+      "version": "8bab26f4f68e0e26f0bb7960be334d5b520ea452"
+    },
+    "source_identity": {
+      "name": "rustc-def-path-hash-expansion",
+      "version": "1"
+    },
+    "normalization": {
+      "name": "native-project",
+      "version": "de72ceb4d9a6d18a93198eab0ff6b45e03866b0e4c2f8c899bf035c539f1e1e0"
+    },
+    "target": "native",
+    "metrics": [
+      {
+        "name": "complexity.cyclomatic",
+        "type": "count"
+      },
+      {
+        "name": "coverage.function",
+        "type": "ratio"
+      },
+      {
+        "name": "coverage.line",
+        "type": "ratio"
+      },
+      {
+        "name": "coverage.region",
+        "type": "ratio"
+      },
+      {
+        "name": "risk.crap",
+        "type": "rational"
+      }
+    ],
+    "id": "measurement-series/v1:b4e74adeca90a1d3f2f0eb0d69985fa69ef33dfad5dd0a13c7ec6f3f3dd1a0ce"
+  },
+  "native_identity": {
+    "native_sha256": "f3102082073bc536f09369fde9978138023c74d7e27c8ac81f7ddb4a4500395e",
+    "projection_sha256": "de72ceb4d9a6d18a93198eab0ff6b45e03866b0e4c2f8c899bf035c539f1e1e0"
+  },
+  "capabilities": [
+    {
+      "metric": "complexity.cyclomatic",
+      "state": "supported",
+      "reason": "native counters"
+    },
+    {
+      "metric": "coverage.function",
+      "state": "supported",
+      "reason": "native counters"
+    },
+    {
+      "metric": "coverage.line",
+      "state": "supported",
+      "reason": "native counters"
+    },
+    {
+      "metric": "coverage.region",
+      "state": "supported",
+      "reason": "native counters"
+    },
+    {
+      "metric": "risk.crap",
+      "state": "supported",
+      "reason": "native counters"
+    }
+  ]
+}

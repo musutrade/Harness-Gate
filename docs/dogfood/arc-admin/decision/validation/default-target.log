@@ -1,0 +1,4 @@
+error: failed to open: /home/gem/cargo-target/debug/.cargo-build-lock
+
+Caused by:
+  Read-only file system (os error 30)

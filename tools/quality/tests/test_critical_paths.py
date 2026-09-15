@@ -7,11 +7,18 @@ from pathlib import Path
 import sys
 import subprocess
 import tempfile
+import tomllib
 import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import critical_paths as gate
+
+
+class RepositoryCriticalPathInventoryTests(unittest.TestCase):
+    def test_checked_in_inventory_matches_current_sources_and_assertions(self):
+        gate.validate_inventory(tomllib.loads(gate.INVENTORY.read_text()),
+                                json.loads(gate.POLICY.read_text()))
 
 
 class CriticalPathEvidenceTests(unittest.TestCase):

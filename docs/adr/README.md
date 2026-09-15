@@ -66,6 +66,8 @@ We use a simplified version of the Michael Nygard ADR template:
 - [ADR-0044](0044-trusted-quality-baselines.md) - Resolve immutable baselines through ecosystem-opaque providers
 - [ADR-0045](0045-quality-verification-composition.md) - Compose execution and generic quality in verify
 
+- [ADR-0053](0053-stable-pure-rust-collector.md) - Require stable interfaces and pure-Rust collector delivery
+
 ## Creating New ADRs
 
 When making a significant architectural decision:
@@ -89,3 +91,6 @@ When an ADR is superseded:
 
 - [ADR-0048: Configured CI workflow acceptance](0048-configured-ci-workflow-acceptance.md)
 - [ADR-0049: Keep project-owned validation outside Harness-Gate Core](0049-project-owned-validation-extension-boundary.md)
+- [ADR-0050: Guaranteed serial dispatch and shared-service ordering](0050-serial-shared-service-ordering.md)
+
+- [ADR-0051: Lightweight collector storage and independent upgrades](0051-lightweight-collector-storage.md)

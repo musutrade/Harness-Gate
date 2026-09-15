@@ -1,0 +1,107 @@
+
+running 23 tests
+test access::tests::data_scope_database_codes_are_explicit ... ok
+test access::tests::data_scope_grants_cannot_exceed_actor_scope ... ok
+test auth::tests::untrusted_peer_cannot_spoof_forwarded_address ... ok
+test auth::tests::malformed_forwarded_chain_falls_back_to_peer ... ok
+test auth::tests::trusted_proxy_chain_uses_nearest_untrusted_address ... ok
+test config::tests::development_has_safe_local_defaults ... ok
+test config::tests::idle_timeout_cannot_exceed_absolute_session_ttl ... ok
+test auth::tests::session_tokens_are_random_and_hashed_before_storage ... ok
+test auth::tests::production_cookies_enforce_host_security_attributes ... ok
+test config::tests::production_requires_explicit_cors_origins ... ok
+test config::tests::empty_mfa_encryption_key_uses_non_production_default ... ok
+test db::tests::pool_configuration_validates_bounds ... ok
+test config::tests::production_uses_json_logs_by_default ... ok
+test config::tests::trusted_proxy_cidrs_are_validated ... ok
+test telemetry::tests::extracts_w3c_trace_parent ... ok
+test mfa::tests::totp_secrets_are_bound_to_the_user ... ok
+test error::tests::internal_error_response_does_not_expose_root_cause ... ok
+test telemetry::tests::validates_bounded_safe_request_ids ... ok
+test telemetry::tests::invalid_request_id_is_replaced ... ok
+test telemetry::tests::json_formatter_emits_one_json_object_per_line ... ok
+test telemetry::tests::cors_preflight_response_has_a_request_id ... ok
+test telemetry::tests::error_response_propagates_the_request_id ... ok
+test telemetry::tests::panic_returns_the_standard_error_contract ... ok
+
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 1 test
+test login_and_user_crud_flow has been running for over 60 seconds
+test login_and_user_crud_flow ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 147.08s
+
+
+running 2 tests
+test openapi_operations_match_backend_contract ... ok
+test checked_in_openapi_artifact_matches_rust_types ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+running 5 tests
+test business_templates_share_the_same_permission_codes ... ok
+test migration_template_grants_only_the_super_admin_by_default ... ok
+test platform_permission_markers_keep_their_codes ... ok
+test handler_template_requires_typed_read_and_write_permissions ... ok
+test template_placeholder_contract_is_explicit ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+   Compiling ring v0.17.14
+   Compiling rustls-webpki v0.103.13
+   Compiling rustls v0.23.43
+   Compiling sqlx-core v0.9.0
+   Compiling sqlx-postgres v0.9.0
+   Compiling sqlx-macros-core v0.9.0
+   Compiling sqlx-macros v0.9.0
+   Compiling sqlx v0.9.0
+   Compiling arc-admin-backend v0.1.0 (/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/backend)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 21.70s
+     Running unittests src/lib.rs (/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/cargo-target/debug/deps/arc_admin_backend-98f926fc9a263a1d)
+
+thread 'telemetry::tests::panic_returns_the_standard_error_contract' (2931969) panicked at src/telemetry.rs:507:9:
+simulated handler panic
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+     Running unittests src/main.rs (/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/cargo-target/debug/deps/arc_admin_backend-db4908fa64846777)
+     Running unittests src/bin/archive_audit_logs.rs (/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/cargo-target/debug/deps/archive_audit_logs-63a291f44dee2c15)
+     Running unittests src/bin/bootstrap_admin.rs (/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/cargo-target/debug/deps/bootstrap_admin-08c25434de561202)
+     Running unittests src/bin/export_openapi.rs (/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/cargo-target/debug/deps/export_openapi-fa69a7506a6963c2)
+     Running unittests src/bin/migrate.rs (/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/cargo-target/debug/deps/migrate-2ff79a7cbd4c36d0)
+     Running tests/api_flow.rs (/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/cargo-target/debug/deps/api_flow-14b2725a12c17db9)
+     Running tests/openapi_contract.rs (/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/cargo-target/debug/deps/openapi_contract-5125688c57ec328e)
+     Running tests/permission_template_contract.rs (/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/cargo-target/debug/deps/permission_template_contract-21bb700dce589370)
+   Doc-tests arc_admin_backend

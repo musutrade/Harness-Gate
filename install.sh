@@ -14,15 +14,30 @@ ARCH=""
 PLATFORM=""
 INSTALL_NAME="$BINARY_NAME"
 ATOMIC_TEMPORARY=""
+RELEASE_WORKFLOW="release.yml"
+RUST_VERSION="${HARNESS_GATE_RUST_VERSION:-0.1.0-rc.6}"
+RUST_INSTALL_DIR=""
+VERIFIER_CACHE_DIR="${HOME}/.cache/harness-gate/collector"
+STAGED_BINARY=""
+RUST_STAGED_BINARY=""
 
 usage() {
     cat <<'EOF'
 Usage: install.sh --version vX.Y.Z [--install-dir DIR]
        install.sh --version vX.Y.Z --from-source [--install-dir DIR]
+       install.sh --version vX.Y.Z --with-rust [--rust-version X.Y.Z] [--install-dir DIR]
+       install.sh --rust-only [--rust-version X.Y.Z] [--install-dir DIR]
 
-The version is required so the download is bound to an immutable release tag.
+The Core version is required unless --rust-only is selected. Every download is
+bound to an immutable release tag.
 The installer verifies SHA256 and the Sigstore keyless certificate before it
 changes the destination directory.
+The optional Rust collector is a standalone binary, versioned independently of
+Core. It defaults to 0.1.0-rc.6; --rust-version selects another exact version.
+Rust 1.97.1, matching LLVM tools and Python 3.12+ remain external dependencies.
+--rust-root DIR installs only the collector executable in DIR/bin.
+--cache-dir DIR selects an existing checksum-pinned verifier cache.
+Legacy bundled-runtime --offline archives require their historical installer.
 EOF
 }
 
@@ -45,10 +60,11 @@ abort_on_signal() {
 }
 
 validate_version() {
-    [[ "$VERSION" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$ ]] \
+    local version="${1:-$VERSION}"
+    [[ "$version" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$ ]] \
         || die "version must be an exact v-prefixed SemVer (for example v0.3.3)"
-    if [[ "$VERSION" == *-* ]]; then
-        local prerelease="${VERSION#*-}"
+    if [[ "$version" == *-* ]]; then
+        local prerelease="${version#*-}"
         prerelease="${prerelease%%+*}"
         local identifier
         IFS='.' read -r -a identifiers <<<"$prerelease"
@@ -78,9 +94,6 @@ detect_platform() {
         *) die "unsupported architecture: $arch" ;;
     esac
 
-    if [[ "$OS" == windows && "$ARCH" == arm64 ]]; then
-        die "no Windows arm64 release asset is published"
-    fi
     PLATFORM="${OS}-${ARCH}"
     INSTALL_NAME="$BINARY_NAME"
     if [[ "$OS" == windows ]]; then
@@ -131,16 +144,57 @@ verify_signature() {
         || die "cosign is required for Sigstore verification (see https://docs.sigstore.dev/cosign/system_config/installation/)"
 
     # The release workflow's OIDC identity is bound to this exact immutable tag.
-    local escaped_version
-    escaped_version="${VERSION//./\\.}"
-    escaped_version="${escaped_version//+/\\+}"
     cosign verify-blob \
         --signature "$dist/${filename}.sig" \
         --certificate "$dist/${filename}.crt" \
         --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
-        --certificate-identity-regexp "^https://github.com/${REPO}/.github/workflows/release\\.yml@refs/tags/${escaped_version}$" \
+        --certificate-identity "https://github.com/${REPO}/.github/workflows/${RELEASE_WORKFLOW}@refs/tags/${VERSION}" \
         "$dist/$filename" \
         || die "Sigstore verification failed for $filename"
+}
+
+ensure_cosign() {
+    command -v cosign >/dev/null 2>&1 && return 0
+    local name digest path
+    case "$PLATFORM" in
+        linux-amd64) name=cosign-linux-amd64; digest=4629c757b7618056f8ddd7e2625ae9fdd94c0372a65049520bc7d9df9efc7f71 ;;
+        macos-amd64) name=cosign-darwin-amd64; digest=2347488e5d5b25336644024dfeca5601b190e91197a71a917bda44744aff106c ;;
+        macos-arm64) name=cosign-darwin-arm64; digest=5cf948c2f4dfe59687bdd0b8523709067383e03982cc543475c8a7dc70e92a76 ;;
+        windows-amd64) name=cosign-windows-amd64.exe; digest=9fe59be0eca1271873ce019061335eb1ac419b7059202e797828467ddabe33be ;;
+        *) die "no pinned signature verifier for $PLATFORM" ;;
+    esac
+    mkdir -p "$1/verifier"
+    path="$1/verifier/cosign"
+    [[ "$OS" != windows ]] || path="${path}.exe"
+    local cached="$VERIFIER_CACHE_DIR/${digest}-${name}"
+    if [[ -f "$cached" && ! -L "$cached" ]]; then
+        cp -- "$cached" "$path"
+    else
+        download "https://github.com/sigstore/cosign/releases/download/v3.1.3/$name" "$path"
+    fi
+    local actual
+    if command -v sha256sum >/dev/null 2>&1; then actual=$(sha256sum "$path"); else actual=$(shasum -a 256 "$path"); fi
+    [[ "${actual%% *}" == "$digest" ]] || die "signature verifier checksum mismatch"
+    chmod 755 "$path"
+    export PATH="$1/verifier:$PATH"
+}
+
+prepare_rust() {
+    local temporary="$1"
+    local VERSION="rust-collector-v${RUST_VERSION}"
+    local RELEASE_WORKFLOW="native-collector-release.yml"
+    local BINARY_NAME="harness-gate-rust-collector"
+    prepare_binary "$temporary"
+    RUST_STAGED_BINARY="$STAGED_BINARY"
+}
+
+install_rust() {
+    local VERSION="rust-collector-v${RUST_VERSION}"
+    local BINARY_NAME="harness-gate-rust-collector"
+    local INSTALL_NAME="$BINARY_NAME"
+    local INSTALL_DIR="${RUST_INSTALL_DIR:-$INSTALL_DIR}"
+    [[ "$OS" != windows ]] || INSTALL_NAME="${INSTALL_NAME}.exe"
+    atomic_install "$RUST_STAGED_BINARY"
 }
 
 validate_install_dir() {
@@ -219,9 +273,13 @@ file_sha256() {
     fi
 }
 
-install_binary() {
+prepare_binary() {
     local temporary_root="$1"
-    detect_platform
+    case "$PLATFORM" in
+        linux-amd64|macos-amd64|macos-arm64|windows-amd64) ;;
+        *) die "no release asset is published for $PLATFORM" ;;
+    esac
+    mkdir -p "$temporary_root"
     local extension=""
     [[ "$OS" == windows ]] && extension=".exe"
     local filename="${BINARY_NAME}-${PLATFORM}${extension}"
@@ -237,7 +295,7 @@ install_binary() {
     verify_signature "$temporary_root" "SHA256SUMS"
     verify_checksum "$temporary_root" "$filename"
     verify_signature "$temporary_root" "$filename"
-    atomic_install "$temporary_root/$filename"
+    STAGED_BINARY="$temporary_root/$filename"
 }
 
 install_from_source() {
@@ -273,8 +331,22 @@ install_from_source() {
 
 main() {
     local from_source=0
+    local with_rust=0 rust_only=0 rust_options=0
     while (($# > 0)); do
         case "$1" in
+            --with-rust) with_rust=1; shift ;;
+            --rust-only) rust_only=1; with_rust=1; shift ;;
+            --rust-root|--cache-dir|--rust-version)
+                (($# >= 2)) && [[ -n "$2" ]] || die "$1 requires a value"
+                rust_options=1
+                case "$1" in
+                    --rust-root) RUST_INSTALL_DIR="${2%/}/bin" ;;
+                    --cache-dir) VERIFIER_CACHE_DIR="$2" ;;
+                    --rust-version) RUST_VERSION="$2" ;;
+                esac
+                shift 2 ;;
+            --offline)
+                die "legacy bundled-runtime offline archives require their historical installer; this installer only installs standalone release binaries" ;;
             --version)
                 (($# >= 2)) || die "--version requires a value"
                 VERSION="$2"
@@ -300,8 +372,13 @@ main() {
         esac
     done
 
-    [[ -n "$VERSION" ]] || { usage >&2; die "--version is required"; }
-    validate_version
+    if (( !rust_only )); then
+        [[ -n "$VERSION" ]] || { usage >&2; die "--version is required"; }
+        validate_version
+    fi
+    ((with_rust || !rust_options)) || die "Rust options require --with-rust or --rust-only"
+    ((!rust_only || !from_source)) || die "--from-source applies to Core, not --rust-only"
+    if ((with_rust)); then validate_version "v$RUST_VERSION"; fi
     local temporary_root
     temporary_root="$(mktemp -d "${TMPDIR:-/tmp}/harness-gate-install.XXXXXXXX")" \
         || die "cannot create temporary installation directory"
@@ -309,11 +386,19 @@ main() {
     trap 'abort_on_signal 129' HUP
     trap 'abort_on_signal 130' INT
     trap 'abort_on_signal 143' TERM
-    if ((from_source)); then
-        install_from_source "$temporary_root"
-    else
-        install_binary "$temporary_root"
+    detect_platform
+    if ((with_rust || !from_source)); then ensure_cosign "$temporary_root"; fi
+    # Verify the optional plugin before replacing either installed program.
+    if ((with_rust)); then prepare_rust "$temporary_root/rust"; fi
+    if ((!rust_only)); then
+        if ((from_source)); then
+            install_from_source "$temporary_root"
+        else
+            prepare_binary "$temporary_root/core"
+            atomic_install "$STAGED_BINARY"
+        fi
     fi
+    if ((with_rust)); then install_rust; fi
 }
 
 main "$@"

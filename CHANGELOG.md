@@ -7,6 +7,86 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Native plugin `0.1.0-rc.6` reads the project's CRAP ceiling through
+  `quality.toml` and its referenced policy JSON. Direct `evaluate` requires
+  `--repository-root` and `--policy-binding`; missing or invalid configuration
+  fails instead of falling back to 30. Exact limits, including ceilings above 30,
+  reach Core with retained configuration provenance. Existing debt and
+  non-regression decisions remain enforced by Core.
+
+### Changed
+
+- Core `0.4.4` updates the optional standalone plugin installer default to RC6.
+  Core's evaluator, metric formulas, protocol and repository policy defaults are
+  unchanged. All four plugin platforms run the actual configuration acceptance.
+
+## [0.4.3] - 2026-09-14
+
+### Changed
+
+- Release Core 0.4.3 as an installer maintenance release, with no Core policy or
+  collector protocol change. `--with-rust` and `--rust-only` install the native
+  standalone executable from its own immutable signed release; `--rust-version`
+  selects the plugin independently of Core (default `0.1.0-rc.5`). Rust/LLVM and
+  Python remain external dependencies.
+- Verify the plugin checksum and exact tag/workflow certificate before replacing
+  either executable in a combined installation. Each executable uses the existing
+  atomic replacement and private-directory checks.
+- Retain `--rust-root` as a binary destination (`DIR/bin`) and `--cache-dir` for
+  the pinned verifier cache. Legacy bundled-runtime offline archives require
+  their historical installer; existing environments and baselines stay intact.
+
+
+## [0.4.2] - 2026-09-13
+
+### Fixed
+
+- Finalize large Core-owned native quality JSON with bounded field redaction and exact output digest checks; retain external evidence limits and the invocation byte budget. Preserve all quality records and valid JSON instead of failing report publication solely because a generated report exceeds the per-text-file limit.
+
+- Let staged partial quality profiles read host-owned state and keys while checking
+  source/configuration pins against the Git index; create contained empty evidence
+  directories in the private snapshot without importing working-tree artifacts.
+
+## [0.4.1] - 2026-09-12
+
+### Improved
+
+- Keep Core installation small by default; add `install.sh --with-rust` and
+  `--rust-only` for the optional Rust collector with automatic verifier provisioning.
+- Compress and deduplicate collector transport into reusable toolchain and plugin
+  layers while preserving every original signed archive byte and dual verification.
+- Cache downloads by digest; support offline installation and bounded HTTP/1.1
+  range retries for large downloads, including publication read-back verification.
+- Publish reviewed installer deliveries through the existing protected collector
+  workflow. Core continues to use the existing GitHub/crates.io release workflow.
+
+
+## [0.4.0] - 2026-09-11
+
+### Added
+
+- Publish the accepted generic Rust quality Core, including `quality evaluate`,
+  collector invocation, capability states, baseline/lineage and debt decisions.
+- Include accepted generic project configuration and evidence contracts, native
+  Rust measurement tooling, and independent collector installation/release tooling.
+
+### Fixed
+
+- Scope crates.io publication to the public `harness-gate` package; the workspace
+  replay tool remains non-publishable.
+
+### Compatibility and scope
+
+- Adapter producers must use the accepted protocol v2 signed-request contract;
+  review existing integrations before upgrading from 0.3.x.
+- The Core release enables follow-up testing against an identifiable published
+  executable. It does not certify GH-230 clean-host acceptance, publish an
+  independent collector package, enable GH-215, or transfer Arc-Admin authority.
+- Relevant Engineering Policy semantics remain unchanged. No threshold,
+  capability, baseline, measurement-series or release gate is weakened.
+
 ### Security
 
 - Versioned adapter requests now use protocol v2 complete-request signatures,

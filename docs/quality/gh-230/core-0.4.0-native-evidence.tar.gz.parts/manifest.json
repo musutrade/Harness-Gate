@@ -1,0 +1,169 @@
+{
+  "original_archive": "core-0.4.0-native-evidence.tar.gz",
+  "bytes": 90491981,
+  "sha256": "485bbc1a9719c4cd5198f3e86a2a3b3db8d9b30300a4817da8334927ca8ce020",
+  "parts": [
+    {
+      "file": "part-0000",
+      "bytes": 2880000,
+      "sha256": "0315eba93d5f14dd2149f116e719c9de8f827cfcf44e335be52df12c54ab54f1"
+    },
+    {
+      "file": "part-0001",
+      "bytes": 2880000,
+      "sha256": "d1ee88bb01e9d5254e40bc9e0c2dc5f6b757f5e6f8e90e1a5c3780d7ebc2b62d"
+    },
+    {
+      "file": "part-0002",
+      "bytes": 2880000,
+      "sha256": "0fd4d93012470588b42cedff7f2ddab29246fcb775ac4ab1a1ef959e27a7624d"
+    },
+    {
+      "file": "part-0003",
+      "bytes": 2880000,
+      "sha256": "a337d3bc1dbc7961fe51379788cfe57c16aacfbc8df2561fac618c4891ed51bf"
+    },
+    {
+      "file": "part-0004",
+      "bytes": 2880000,
+      "sha256": "1cef46c9ac513d62eebd3410b321826288b8e52f30c52b02636d6dd6154d7d3e"
+    },
+    {
+      "file": "part-0005",
+      "bytes": 2880000,
+      "sha256": "fb99bf221d7edd39c2852158000ed3a91d847c363b7f285c4a9566339ab6fc25"
+    },
+    {
+      "file": "part-0006",
+      "bytes": 2880000,
+      "sha256": "6a4fd3b6b61ffb3c27ed1b31017b9a7aaf9c4aaa09662e04cc57f827fcb9e51a"
+    },
+    {
+      "file": "part-0007",
+      "bytes": 2880000,
+      "sha256": "6ba31fb41e5f04456e864f9fe9633443055203c803a119140bd102e38fa695e1"
+    },
+    {
+      "file": "part-0008",
+      "bytes": 2880000,
+      "sha256": "f8a1a5b6886ad620f89b83cefe19d2997cd26d79a1b451cbb91810e4e08698c4"
+    },
+    {
+      "file": "part-0009",
+      "bytes": 2880000,
+      "sha256": "a97c7c1119cee3e22b338b4760ad24957f10af56010e787a2da05ce1cf8a18e3"
+    },
+    {
+      "file": "part-0010",
+      "bytes": 2880000,
+      "sha256": "948082bcee41e843eed08ab2dd07baacf7407c07cd8bae44e775d53c06b10345"
+    },
+    {
+      "file": "part-0011",
+      "bytes": 2880000,
+      "sha256": "e9fdbe650891743f9caa3efdc3dee1ac267b16c38a39b79fffc9805816ccd1a4"
+    },
+    {
+      "file": "part-0012",
+      "bytes": 2880000,
+      "sha256": "f9581106ffd247d6c1580b2b8efb30ad17b9ec6ac8d72434c72bc28ea284ceee"
+    },
+    {
+      "file": "part-0013",
+      "bytes": 2880000,
+      "sha256": "0a436bd10c548189cb4e11dfe74c01e672d252fdca51f4faf9e7bd2a82f508ff"
+    },
+    {
+      "file": "part-0014",
+      "bytes": 2880000,
+      "sha256": "869509a22a484fe96dbd09e6c2cb33b18323f61a75ac26e988f72862a3c079b2"
+    },
+    {
+      "file": "part-0015",
+      "bytes": 2880000,
+      "sha256": "212b722207a398218026969c3e7fde008e1df72493ecaad3e777a316902eeb76"
+    },
+    {
+      "file": "part-0016",
+      "bytes": 2880000,
+      "sha256": "b75f5023cacac9234fbe312134eadaf1232af6a5abe6afceb2b84c925f4d80b3"
+    },
+    {
+      "file": "part-0017",
+      "bytes": 2880000,
+      "sha256": "b25e9223ac4d8ed8ae07b81d28354228bf3b2db7b75a4e708ce48c606f4643ce"
+    },
+    {
+      "file": "part-0018",
+      "bytes": 2880000,
+      "sha256": "19ccacef71c8a9c47a10a44fc191a89991c497d122880a7670fbca7800273dcd"
+    },
+    {
+      "file": "part-0019",
+      "bytes": 2880000,
+      "sha256": "219545b8683e05cdcf8ae7da78cb6199ec7ae3bee75ff01a2856762b9fafd82b"
+    },
+    {
+      "file": "part-0020",
+      "bytes": 2880000,
+      "sha256": "790a78dfe8ea62ea6461ffb196b5c3c7883a4b33b5f659bc1cb5ca64677a33e9"
+    },
+    {
+      "file": "part-0021",
+      "bytes": 2880000,
+      "sha256": "78679170c7fca425306dbea52faed4f1a7c88239dc5b8a58f2dfed5b9c58fb31"
+    },
+    {
+      "file": "part-0022",
+      "bytes": 2880000,
+      "sha256": "59a8c702559068799837a740195d73ba2daf6eb3a46f1be96a358dc5c429ca84"
+    },
+    {
+      "file": "part-0023",
+      "bytes": 2880000,
+      "sha256": "a30073a96cf2d173ffcbbf5b8a7c397fa7e0e433ee650c84f955ff8a09b40e47"
+    },
+    {
+      "file": "part-0024",
+      "bytes": 2880000,
+      "sha256": "b9d3bc62623eadf25d6924aa0cbd5f629ea7d234cc72bd52b9df5b2f00bd2bfd"
+    },
+    {
+      "file": "part-0025",
+      "bytes": 2880000,
+      "sha256": "5638003d7a10b166c66deedc8057f62f315d987dd539e6635b6a96d1ecb7980d"
+    },
+    {
+      "file": "part-0026",
+      "bytes": 2880000,
+      "sha256": "b8b800b92cc3e3f019650d87590d07ae17fc25c8906ff2f83ab6cc589c16efb8"
+    },
+    {
+      "file": "part-0027",
+      "bytes": 2880000,
+      "sha256": "b3a205008233beb4a7d6465ab7c5e555e4299fe894431bee2b07f383aff87b53"
+    },
+    {
+      "file": "part-0028",
+      "bytes": 2880000,
+      "sha256": "cb74f287c2b7000cab4c7f133e7ffcec5335738fd06ef0a5bdabbebeb0dab248"
+    },
+    {
+      "file": "part-0029",
+      "bytes": 2880000,
+      "sha256": "197bb3d395b6d5a99c90627755c6beecd8f8e07c81ba88076b5a698b61e94ba5"
+    },
+    {
+      "file": "part-0030",
+      "bytes": 2880000,
+      "sha256": "a49c1386d37fffc97ee43317991c35436e11aeb96e626613782cfc8f05eb3d4f"
+    },
+    {
+      "file": "part-0031",
+      "bytes": 1211981,
+      "sha256": "fc2958c0004006b6cdcbb18282c6e12322cb8e71a717c65d392d62a2285b11b6"
+    }
+  ],
+  "reconstruct_from_parts_directory": "cat part-* > ../core-0.4.0-native-evidence.tar.gz",
+  "verify": "Verify original archive SHA-256 before extraction; original per-file inventory remains unchanged."
+}

@@ -11,6 +11,12 @@
 
 It handles changed paths, secret scanning, architecture auditing, environment validation, external command orchestration, test result counting, timeout and interrupt handling, and temporary service lifecycle. Git hooks only keep launchers, and flow decisions do not depend on Shell scripts.
 
+## Current releases
+
+Core **0.4.2** is published with staged-host input and large native-report fixes. Rust-specific native measurement is an optional, independently installed plugin; Core owns orchestration and quality decisions. See the [documentation index](docs/README.md) and [release status, acceptance and remaining work](docs/release-status.md).
+
+Core **0.4.5** selects standalone Rust plugin **0.1.0-rc.6** by default. Native CRAP evaluation reads the project policy; matching Rust/LLVM and Python remain external dependencies. See the [standalone installation guide](docs/quality/standalone-installation.md) for publication status and exact version selection.
+
 ## Navigation
 
 - Quick Start: see [Installation](#installation) and [Quick Start](#installation-and-quick-start)
@@ -60,13 +66,13 @@ actual collector/series. New metric semantics require separate contract review.
 ### Install from Crates.io (Recommended)
 
 ```bash
-cargo install harness-gate
+cargo install harness-gate --version 0.4.2 --locked
 ```
 
 ### Install from GitHub Release (Pre-built Binaries)
 
 Download the binary for your platform from an immutable [GitHub Release
-tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.7):
+tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.2):
 
 - **Linux (x86_64)**: `harness-gate-linux-amd64`
 - **macOS (Intel)**: `harness-gate-macos-amd64`
@@ -74,26 +80,43 @@ tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.3.7):
 - **Windows (x86_64)**: `harness-gate-windows-amd64.exe`
 
 The checked installer verifies the checksum manifest and Sigstore certificate
-before changing the installation directory. Download the script from the same
-immutable tag, then pass that tag explicitly:
+before changing the installation directory. Download the current installer from
+the pinned source revision, then select the immutable Core release explicitly:
 
 ```bash
 curl --fail --show-error --location --proto '=https' --tlsv1.2 \
   -o /tmp/harness-gate-install.sh \
-  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.3.7/install.sh
-bash /tmp/harness-gate-install.sh --version v0.3.7
+  https://raw.githubusercontent.com/musutrade/Harness-Gate/9ffa2b829ec25ca54fcb00a9bc720284c3913924/install.sh
+bash /tmp/harness-gate-install.sh --version v0.4.2
 harness-gate --version
 ```
 
 The script installs to `~/.local/bin` by default. Set `--install-dir` to an
 existing private directory when a different location is required. It never
 uses the mutable `releases/latest` API or a `raw/main` installation command.
-Binary installation requires the `cosign` CLI so the keyless Sigstore
-certificate can be checked locally; source installation additionally requires
-`git` and Rust `cargo`.
+The installer provisions a pinned `cosign` verifier when it is missing;
+source installation additionally requires `git` and Rust `cargo`.
 
-Release assets include `SHA256SUMS`, a CycloneDX SBOM, and Sigstore bundles. For
-an offline integrity check, download the binary, `SHA256SUMS`, and the matching
+### Optional Rust collection
+
+Core does not download a Rust analysis toolchain by default. The
+[native standalone delivery](docs/quality/native-external-toolchain.md) retains
+the old measurement engine and publishes the compiled plugin using Core's signed
+release process. Matching Rust/LLVM and Python are external dependencies. Native
+Core `0.4.3` and native `0.1.0-rc.6` are published for all four platforms.
+Native RC6 adds [configured CRAP evaluation](docs/quality/native-crap-policy.md).
+Source Core `0.4.5` updates its TLS dependency and selects RC6 by default;
+Core `0.4.4` was blocked before publication. Check the release guide for status.
+
+The [standalone installation guide](docs/quality/standalone-installation.md)
+explains `--with-rust`, `--rust-only` and independent `--rust-version` selection.
+The stable engine remains an explicit candidate; metrics and baselines do not
+switch automatically. Existing RC3 bundled installations and offline archives
+retain their [historical installation guide](docs/quality/rust-collector-installation.md).
+Historical Core tags keep their original installer pins.
+
+Release assets include `SHA256SUMS`, a CycloneDX SBOM, and Sigstore signatures/certificates. For
+a manual integrity check, download all listed assets, `SHA256SUMS`, and the matching
 `.sig`/`.crt` files, then run:
 
 ```bash
@@ -101,7 +124,7 @@ sha256sum --check SHA256SUMS
 cosign verify-blob --signature harness-gate-linux-amd64.sig \
   --certificate harness-gate-linux-amd64.crt \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity-regexp '^https://github.com/musutrade/Harness-Gate/.github/workflows/release\.yml@refs/tags/v0\.3\.7$' \
+  --certificate-identity 'https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v0.4.2' \
   harness-gate-linux-amd64
 ```
 
@@ -219,6 +242,7 @@ Presets are starting points, not runtime branches. After initialization is compl
 | `harness-gate hook`                                          | Execute hook profile on a private staged snapshot |
 | `harness-gate step <id>`                                     | Run a single step after passing secrets/audit |
 | `harness-gate config check`                                  | Validate schema, references, paths, environment overrides, and resource safety |
+| `harness-gate config import --execution-only`                | Import compatible Arc-Flow v2 declarations with a parity/UX report; [runtime limits](docs/dogfood/arc-admin/import/README.md) remain explicit |
 | `harness-gate config check --format json`                    | Emit stable field-path diagnostics for editors and CI          |
 | `harness-gate config print --resolved`                       | Output final effective configuration      |
 | `harness-gate config migrate`                                | Convert schema v1 to v2                   |
@@ -268,7 +292,7 @@ harness-gate hook
 git commit -m "..."
 ```
 
-The repository's pre-commit automatically executes `harness-gate hook`. The command materializes the complete Git index into a private staged snapshot before loading configuration, selecting scope, running built-in gates, or executing ordinary steps. It therefore does not mix staged and unstaged file contents. The hook profile only retains fast deterministic checks, not a replacement for complete testing.
+A project can configure pre-commit to execute `harness-gate hook`. The command materializes the complete Git index into a private staged snapshot before loading configuration, selecting scope, running built-in gates, or executing ordinary steps. It therefore does not mix staged and unstaged file contents. Choose suitable pre-commit checks in the project hook profile; it does not replace complete testing.
 
 Configured steps use `input = "snapshot"` by default, so `{root}`, path aliases, and arguments resolve against the invocation input root. A step that genuinely needs the original checkout or direct Git metadata may opt into `input = "repository"`; this is an explicit compatibility capability and does not change scope, secret-scan, or architecture-audit input. Invocation reports record the input mode, source identity, execution root, and configuration digest.
 
@@ -390,15 +414,10 @@ synthetic unknown-ecosystem end-to-end fixture.
 
 ## Git Hook Integration
 
-Set up Git hooks:
-
-```bash
-git config core.hooksPath hooks
-```
-
-The `pre-commit` hook executes `harness-gate hook`. The hook profile does not run database integration tests or production builds; use `harness-gate verify --all` before delivery.
-
-For standalone installation in new projects, you can create a similar thin hook:
+In a configured consumer project, save the following as executable
+`.githooks/pre-commit`, then run `git config core.hooksPath .githooks`.
+The project defines which steps its hook profile runs; Harness-Gate does not
+exclude database tests or builds globally:
 
 ```sh
 #!/bin/sh

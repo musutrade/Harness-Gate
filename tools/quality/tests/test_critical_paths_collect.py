@@ -158,7 +158,6 @@ class ParallelCollectionTests(unittest.TestCase):
         self.assertEqual(sorted(p.name for p in build_root.iterdir()),
                          ['mid', 'newest', 'older'])
 
-
     def test_source_change_rejects_completed_tests(self):
         with patch.object(collector, 'source_identity', side_effect=[{'a': 'before'}, {'a': 'after'}]):
             with self.assertRaisesRegex(ValueError, 'source/commit changed'):

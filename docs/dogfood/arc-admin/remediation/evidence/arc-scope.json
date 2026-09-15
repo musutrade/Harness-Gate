@@ -1,0 +1,13 @@
+{
+  "name": "arc-scope",
+  "argv": [
+    "cargo",
+    "flow",
+    "scope",
+    "--all"
+  ],
+  "started_at": "2026-09-10T09:45:47.054573+00:00",
+  "completed_at": "2026-09-10T09:45:47.190966+00:00",
+  "elapsed_seconds": 0.136385742,
+  "exit_code": 0
+}

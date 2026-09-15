@@ -1,0 +1,62 @@
+{
+  "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-228",
+  "environment": {
+    "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-228/target/gh-228/cargo",
+    "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-228/target/gh-228/tmp",
+    "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-228/target/gh-228/tmp",
+    "OPENSPEC_TELEMETRY": "0",
+    "NATIVE_DRIVER": "/mnt/dev-ssd/workspaces/symphony/GH-228/target/gh-228/operator-native-runtime/build/debug/harness-gate-rust-native-driver",
+    "NATIVE_DRIVER_SYSROOT": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu",
+    "HARNESS_GATE_NATIVE_POLICY_BINARY": "/mnt/dev-ssd/workspaces/symphony/GH-228/target/gh-228/cargo/debug/harness-gate",
+    "RUST_COLLECTOR_RUNTIME": "/mnt/dev-ssd/workspaces/symphony/GH-228/target/gh-228/bundle-v6-one",
+    "RUST_COLLECTOR_TEST_VENDOR": "/mnt/dev-ssd/workspaces/symphony/GH-228/target/gh-228/project-inputs/vendor"
+  },
+  "removed_environment": [
+    "HTTP_PROXY",
+    "http_proxy",
+    "HTTPS_PROXY",
+    "https_proxy",
+    "ALL_PROXY",
+    "all_proxy"
+  ],
+  "results": [
+    {
+      "name": "docs",
+      "command": [
+        "python3",
+        "tools/quality/docs_consistency.py",
+        "--output",
+        "target/quality/docs-consistency.json"
+      ],
+      "exit_code": 0,
+      "seconds": 3.361
+    },
+    {
+      "name": "openspec",
+      "command": [
+        "openspec",
+        "validate",
+        "package-official-rust-collector-for-independent-delivery",
+        "--strict",
+        "--no-interactive"
+      ],
+      "exit_code": 0,
+      "seconds": 0.621
+    },
+    {
+      "name": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.011
+    }
+  ],
+  "not_applicable": [
+    "harness-gate config check",
+    "harness-gate verify --profile ci --all"
+  ],
+  "reason": "No .harness-gate/flow.toml declaring ci exists."
+}

@@ -1,0 +1,345 @@
+[
+  {
+    "run_id": 32701649122,
+    "url": "https://github.com/musutrade/arc-admin/actions/runs/32701649122",
+    "name": "CI",
+    "head_sha": "9982ed556eaf997910824d7b682946147c81a16a",
+    "conclusion": "success",
+    "created_to_updated_seconds": 1152,
+    "first_job_wait_seconds": 352,
+    "execution_span_seconds": 799,
+    "runner_seconds": 1077,
+    "jobs": [
+      {
+        "name": "Detect change scope",
+        "conclusion": "success",
+        "labels": [
+          "self-hosted"
+        ],
+        "runner_seconds": 41,
+        "step_seconds": {
+          "project_commands": 0,
+          "scope": 31,
+          "artifacts": 2,
+          "setup_and_teardown": 4
+        },
+        "job_overhead_seconds": 4
+      },
+      {
+        "name": "Dependency review",
+        "conclusion": "skipped",
+        "labels": [
+          "self-hosted"
+        ],
+        "runner_seconds": 0,
+        "step_seconds": {
+          "project_commands": 0,
+          "scope": 0,
+          "artifacts": 0,
+          "setup_and_teardown": 0
+        },
+        "job_overhead_seconds": 0
+      },
+      {
+        "name": "Frontend verification",
+        "conclusion": "success",
+        "labels": [
+          "self-hosted"
+        ],
+        "runner_seconds": 311,
+        "step_seconds": {
+          "project_commands": 227,
+          "scope": 0,
+          "artifacts": 3,
+          "setup_and_teardown": 73
+        },
+        "job_overhead_seconds": 8
+      },
+      {
+        "name": "Quality gate",
+        "conclusion": "success",
+        "labels": [
+          "self-hosted"
+        ],
+        "runner_seconds": 285,
+        "step_seconds": {
+          "project_commands": 228,
+          "scope": 0,
+          "artifacts": 2,
+          "setup_and_teardown": 51
+        },
+        "job_overhead_seconds": 4
+      },
+      {
+        "name": "Backend verification",
+        "conclusion": "success",
+        "labels": [
+          "self-hosted"
+        ],
+        "runner_seconds": 440,
+        "step_seconds": {
+          "project_commands": 423,
+          "scope": 0,
+          "artifacts": 1,
+          "setup_and_teardown": 13
+        },
+        "job_overhead_seconds": 3
+      }
+    ],
+    "artifacts": [
+      {
+        "id": 9511228753,
+        "name": "backend-report",
+        "size_in_bytes": 10045,
+        "expired": true,
+        "created_at": "2026-08-24T07:47:35Z",
+        "expires_at": "2026-09-07T07:47:34Z",
+        "digest": "sha256:0d83b159bc14070bf30ead56520f76134c84a9ae1f6a35871ce61d052996db2b"
+      },
+      {
+        "id": 9511195071,
+        "name": "quality-reports",
+        "size_in_bytes": 10083,
+        "expired": true,
+        "created_at": "2026-08-24T07:46:22Z",
+        "expires_at": "2026-09-07T07:46:21Z",
+        "digest": "sha256:51667c29b282b2d09aa58abd9d982dda53c302a8d25042a80a96e9cac5ec8aeb"
+      },
+      {
+        "id": 9511147874,
+        "name": "frontend-report",
+        "size_in_bytes": 9742,
+        "expired": true,
+        "created_at": "2026-08-24T07:44:38Z",
+        "expires_at": "2026-09-07T07:44:35Z",
+        "digest": "sha256:0108e07a6245e9aa021435f3ec29faf6125d06b81f97376e7b2adff53bd69e49"
+      },
+      {
+        "id": 9510889111,
+        "name": "scope-report",
+        "size_in_bytes": 282,
+        "expired": true,
+        "created_at": "2026-08-24T07:34:56Z",
+        "expires_at": "2026-09-07T07:34:55Z",
+        "digest": "sha256:32d4122496e20888c3f8f3f9e2524ba3fa3352619219af44cd41ab03604937e3"
+      }
+    ],
+    "monetary_cost": null,
+    "measurement_and_parsing_seconds": null
+  },
+  {
+    "run_id": 32692754787,
+    "url": "https://github.com/musutrade/arc-admin/actions/runs/32692754787",
+    "name": "CI",
+    "head_sha": "6563f34991a1b85cbd5590fd0ebf6a2e64532946",
+    "conclusion": "success",
+    "created_to_updated_seconds": 435,
+    "first_job_wait_seconds": 2,
+    "execution_span_seconds": 432,
+    "runner_seconds": 1048,
+    "jobs": [
+      {
+        "name": "Backend verification",
+        "conclusion": "success",
+        "labels": [
+          "self-hosted"
+        ],
+        "runner_seconds": 387,
+        "step_seconds": {
+          "project_commands": 351,
+          "scope": 0,
+          "artifacts": 4,
+          "setup_and_teardown": 25
+        },
+        "job_overhead_seconds": 7
+      },
+      {
+        "name": "Frontend verification",
+        "conclusion": "success",
+        "labels": [
+          "self-hosted"
+        ],
+        "runner_seconds": 432,
+        "step_seconds": {
+          "project_commands": 341,
+          "scope": 0,
+          "artifacts": 3,
+          "setup_and_teardown": 84
+        },
+        "job_overhead_seconds": 4
+      },
+      {
+        "name": "Quality gate",
+        "conclusion": "success",
+        "labels": [
+          "self-hosted"
+        ],
+        "runner_seconds": 229,
+        "step_seconds": {
+          "project_commands": 202,
+          "scope": 0,
+          "artifacts": 2,
+          "setup_and_teardown": 20
+        },
+        "job_overhead_seconds": 5
+      },
+      {
+        "name": "Dependency review",
+        "conclusion": "skipped",
+        "labels": [
+          "self-hosted"
+        ],
+        "runner_seconds": 0,
+        "step_seconds": {
+          "project_commands": 0,
+          "scope": 0,
+          "artifacts": 0,
+          "setup_and_teardown": 0
+        },
+        "job_overhead_seconds": 0
+      }
+    ],
+    "artifacts": [
+      {
+        "id": 9507929452,
+        "name": "frontend-report",
+        "size_in_bytes": 9785,
+        "expired": true,
+        "created_at": "2026-08-24T05:20:44Z",
+        "expires_at": "2026-09-07T05:20:42Z",
+        "digest": "sha256:a284e7094e20e346f873724ee0269ef82b63660fbe096b4dac54e652022b6067"
+      },
+      {
+        "id": 9507913491,
+        "name": "backend-report",
+        "size_in_bytes": 9998,
+        "expired": true,
+        "created_at": "2026-08-24T05:19:58Z",
+        "expires_at": "2026-09-07T05:19:55Z",
+        "digest": "sha256:9241dfa6e9c25d82fd3ffa817deabca494624e15743be382615cdd847dc40802"
+      },
+      {
+        "id": 9507860854,
+        "name": "quality-reports",
+        "size_in_bytes": 10055,
+        "expired": true,
+        "created_at": "2026-08-24T05:17:21Z",
+        "expires_at": "2026-09-07T05:17:20Z",
+        "digest": "sha256:4284d4038a52a73c05d5a70ac8c233ef45cc906573ec0d85f9193530ec91b2a5"
+      }
+    ],
+    "monetary_cost": null,
+    "measurement_and_parsing_seconds": null
+  },
+  {
+    "run_id": 32701649194,
+    "url": "https://github.com/musutrade/arc-admin/actions/runs/32701649194",
+    "name": "CodeQL",
+    "head_sha": "9982ed556eaf997910824d7b682946147c81a16a",
+    "conclusion": "skipped",
+    "created_to_updated_seconds": 2,
+    "first_job_wait_seconds": null,
+    "execution_span_seconds": 0,
+    "runner_seconds": 0,
+    "jobs": [
+      {
+        "name": "Analyze ${{ matrix.language }}",
+        "conclusion": "skipped",
+        "labels": [
+          "self-hosted"
+        ],
+        "runner_seconds": 0,
+        "step_seconds": {
+          "project_commands": 0,
+          "scope": 0,
+          "artifacts": 0,
+          "setup_and_teardown": 0
+        },
+        "job_overhead_seconds": 0
+      }
+    ],
+    "artifacts": [],
+    "monetary_cost": null,
+    "measurement_and_parsing_seconds": null
+  },
+  {
+    "run_id": 32701649091,
+    "url": "https://github.com/musutrade/arc-admin/actions/runs/32701649091",
+    "name": "Supply chain security",
+    "head_sha": "9982ed556eaf997910824d7b682946147c81a16a",
+    "conclusion": "success",
+    "created_to_updated_seconds": 365,
+    "first_job_wait_seconds": 207,
+    "execution_span_seconds": 157,
+    "runner_seconds": 140,
+    "jobs": [
+      {
+        "name": "Container scan and SBOM (arc-admin-backend:ci, backend/Dockerfile, arc-admin-backend.spdx.json)",
+        "conclusion": "success",
+        "labels": [
+          "self-hosted"
+        ],
+        "runner_seconds": 39,
+        "step_seconds": {
+          "project_commands": 27,
+          "scope": 0,
+          "artifacts": 2,
+          "setup_and_teardown": 6
+        },
+        "job_overhead_seconds": 4
+      },
+      {
+        "name": "Rust dependency policy",
+        "conclusion": "success",
+        "labels": [
+          "self-hosted"
+        ],
+        "runner_seconds": 21,
+        "step_seconds": {
+          "project_commands": 12,
+          "scope": 0,
+          "artifacts": 0,
+          "setup_and_teardown": 5
+        },
+        "job_overhead_seconds": 4
+      },
+      {
+        "name": "Container scan and SBOM (arc-admin-frontend:ci, frontend/Dockerfile, arc-admin-frontend.spdx.json)",
+        "conclusion": "success",
+        "labels": [
+          "self-hosted"
+        ],
+        "runner_seconds": 80,
+        "step_seconds": {
+          "project_commands": 63,
+          "scope": 0,
+          "artifacts": 2,
+          "setup_and_teardown": 12
+        },
+        "job_overhead_seconds": 3
+      }
+    ],
+    "artifacts": [
+      {
+        "id": 9510876143,
+        "name": "arc-admin-frontend.spdx.json",
+        "size_in_bytes": 118664,
+        "expired": false,
+        "created_at": "2026-08-24T07:34:28Z",
+        "expires_at": "2026-09-23T07:34:26Z",
+        "digest": "sha256:00a0cdf50e967eb26b47c3c0a8c90903ab516f996d172992179a2fb56521a2e5"
+      },
+      {
+        "id": 9510824320,
+        "name": "arc-admin-backend.spdx.json",
+        "size_in_bytes": 372248,
+        "expired": false,
+        "created_at": "2026-08-24T07:32:30Z",
+        "expires_at": "2026-09-23T07:32:29Z",
+        "digest": "sha256:78fbf63e0a7dc9e9a424e3be8699d8930bf5c3f00f255a7e47ecc98acd070e98"
+      }
+    ],
+    "monetary_cost": null,
+    "measurement_and_parsing_seconds": null
+  }
+]

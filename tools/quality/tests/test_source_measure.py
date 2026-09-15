@@ -29,6 +29,22 @@ class SourceMeasureTests(unittest.TestCase):
             file.write_text(source)
             return ast(file, self.binary)
 
+    def test_native_inventory_has_separate_identity_and_contracts(self):
+        subprocess.run(["cargo", "test", "--locked", "--manifest-path",
+                        str(ROOT / "tools/quality/rust-measure/Cargo.toml")],
+                       env={**os.environ, "CARGO_TARGET_DIR": str(ROOT / "target/gh-94-measure")},
+                       check=True, capture_output=True)
+        with tempfile.TemporaryDirectory() as temp:
+            file = Path(temp) / "input.rs"
+            file.write_text('fn f() { tracing::error!(value = %value); }')
+            run = subprocess.run([str(self.binary), "--native-inventory", str(file)],
+                                 text=True, capture_output=True, check=True)
+            result = json.loads(run.stdout)
+            self.assertEqual(result["analyzer"], "harness-gate-rust-native-inventory")
+            self.assertFalse(result["certified_llvm_mapping"])
+            with self.assertRaises(subprocess.CalledProcessError):
+                ast(file, self.binary)
+
     def test_quality_configuration_source_certification(self):
         crate = ROOT / 'tools/harness-gate'
         for name in ('mod', 'model', 'policy', 'validation', 'compiler', 'collectors', 'baseline', 'baseline/git'):
@@ -52,7 +68,7 @@ class SourceMeasureTests(unittest.TestCase):
         inventory = json.loads((ROOT / 'tools/quality/production-source.json').read_text())
         declared = {path.removeprefix('src/') for path in inventory['boundaries']['preset']['files']}
         self.assertEqual(declared, {path for path in SOURCE_FILES if path.startswith('preset/')})
-        for name in ('catalog', 'composition', 'filesystem', 'initialize', 'migration', 'mod'):
+        for name in ('catalog', 'composition', 'filesystem', 'import', 'initialize', 'migration', 'mod'):
             path = f'preset/{name}.rs'
             with self.subTest(path=path):
                 self.assertIn(path, SOURCE_FILES)
@@ -64,9 +80,20 @@ class SourceMeasureTests(unittest.TestCase):
                 self.assertEqual(len(self.inventory(transformed)['symbols']), len(symbols))
         self.assertIn('#[cfg(test)]\nmod tests;', (crate / 'src/preset/mod.rs').read_text())
 
+    def test_resource_validation_source_certification(self):
+        path = 'config/validation/mod.rs'
+        self.assertIn(path, SOURCE_FILES)
+        symbols = ast(ROOT / 'tools/harness-gate/src' / path, self.binary)['symbols']
+        names = {symbol['name'] for symbol in symbols if not symbol['test']}
+        self.assertTrue({'validate_resource_conflicts', 'validate_shared_services',
+                         'validate_log_conflicts', 'validate_service_injections'} <= names)
+        for module in ('config', 'verify'):
+            source = (ROOT / f'tools/harness-gate/src/{module}/mod.rs').read_text()
+            self.assertIn('#[cfg(test)]\nmod tests;', source)
+
     def test_verify_reporting_source_certification(self):
         crate = ROOT / 'tools/harness-gate'
-        for path in ('verify/mod.rs', 'verify/quality.rs', 'verify/report.rs', 'failure.rs'):
+        for path in ('verify/mod.rs', 'verify/quality.rs', 'verify/report.rs', 'failure.rs', 'config/import.rs'):
             with self.subTest(path=path):
                 self.assertIn(path, SOURCE_FILES)
                 source = crate / 'src' / path

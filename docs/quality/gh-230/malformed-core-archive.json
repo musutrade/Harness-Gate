@@ -1,0 +1,10 @@
+{
+  "scope": "local native diagnostics and synthetic malformed output; not clean-host acceptance",
+  "directories": [
+    "target/gh-230/runtime-tests/tmpnidtap89"
+  ],
+  "files": 674,
+  "bytes": 18647677,
+  "sha256": "0a8949691bea1c272a1560ac253d0acc268a101fffc0722e334d3dc0cad8b982",
+  "archive_member_sha256_verified": true
+}
