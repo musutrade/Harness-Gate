@@ -612,6 +612,7 @@ def map_native(units, llvm, production_sources, exclusions):
     require(llvm.get('type') == 'llvm.coverage.json.export' and llvm.get('version') == '3.1.0' and len(llvm['data']) == 1, 'incompatible LLVM export')
     owners, map_files, symbols, source_seen, definitions = prepare_units(units, production_sources)
     names, excluded = set(), []
+    dependency_owners = {}
     for function in llvm['data'][0]['functions']:
         name = function['name']
         require(name not in names, 'duplicate LLVM instance')
@@ -626,7 +627,12 @@ def map_native(units, llvm, production_sources, exclusions):
         if not mapped:
             require(not any(p.endswith('.mir-map') for p in files), 'unowned compiler counter map')
             require(not (symbols.get(name, set()) & owners.keys()), 'local compiler symbol lacks direct counters')
-            reasons = sorted({exclude_region_file(p, exclusions) for p in files})
+            # The declared roots are immutable for this export. Cache only a
+            # successful attribution, and keep validating every instance/region.
+            for path in files:
+                if path not in dependency_owners:
+                    dependency_owners[path] = exclude_region_file(path, exclusions)
+            reasons = sorted({dependency_owners[p] for p in files})
             excluded.append({'symbol': name, 'reason': 'dependency', 'owners': reasons, 'regions': len(function['regions'])})
             continue
         require(len(mapped) == 1 and len(files) == 1, 'ambiguous LLVM owner')

@@ -7,6 +7,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 QUALITY = Path(__file__).resolve().parents[1]
 ROOT = QUALITY.parents[1]
@@ -41,6 +42,23 @@ class NativeDriverTests(unittest.TestCase):
         return native.map_native(units if units is not None else self.units,
                                  llvm if llvm is not None else self.llvm,
                                  sources if sources is not None else self.capture['production_sources'], [])
+
+    def test_dependency_cache_is_per_export_and_preserves_instance_inventory(self):
+        llvm = copy.deepcopy(self.llvm)
+        for name in ('dependency-one', 'dependency-two'):
+            llvm['data'][0]['functions'].append({
+                'name': name, 'filenames': ['/declared-dependency/lib.rs'],
+                'regions': [[1, 1, 1, 2, 0, 0, 0, 0]], 'count': 0, 'branches': []})
+        for owner in ('dependency-a', 'dependency-b'):
+            with patch.object(native, 'exclude_region_file', wraps=native.exclude_region_file) as classify:
+                report = native.map_native(self.units, llvm, self.capture['production_sources'],
+                                           [{'id': owner, 'root': '/declared-dependency'}])
+            self.assertEqual(classify.call_count, 1)
+            entries = [row for row in report['exclusions'] if row.get('symbol', '').startswith('dependency-')]
+            self.assertEqual(len(entries), 2)
+            self.assertTrue(all(row['owners'] == [owner] for row in entries))
+        with self.assertRaisesRegex(ValueError, 'unattributed LLVM source'):
+            native.map_native(self.units, llvm, self.capture['production_sources'], [])
 
     def test_real_generated_constructor_closure_async_and_instances(self):
         if os.name == 'nt':
