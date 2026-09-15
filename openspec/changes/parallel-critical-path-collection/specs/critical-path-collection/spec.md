@@ -18,6 +18,7 @@ and probe validation SHALL remain unchanged.
 #### Scenario: Collection fails or inputs change
 - **WHEN** building, testing, profile preparation or export fails, profiles are missing, or source identity changes
 - **THEN** the collector retains diagnostic evidence and publishes no completed bundle
+- **AND** the failed build tree is retained for diagnosis up to a bounded number of recent failures
 - **AND** no retry or missing result can become a passing mandatory path
 
 #### Scenario: Successful collection releases temporary build storage
