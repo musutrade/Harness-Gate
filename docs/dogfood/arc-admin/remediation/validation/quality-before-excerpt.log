@@ -1,0 +1,35 @@
+Excerpt: missing-profile regression before the product fix.
+        FAIL [   0.346s] (2/2) harness-gate::bin/harness-gate config::quality::collectors::tests::dogfood_acceptance::quality_preparation_failure_retains_requested_profile_and_blocks
+  stdout ───
+
+    running 1 test
+    harness-gate verify
+    Scope: all
+    Components: app
+
+    [PASS] secret scan (90 ms)
+    [PASS] architecture audit (6 ms)
+    [RUN ] Configured execution check ... PASS (20 ms)
+    Quality profile null: blocked (configuration); full quality: blocked
+    quality workflow input is missing: /mnt/dev-ssd/dev-tmp/.tmpDSrvx9/.harness-gate/workflow-state.json
+
+
+    Verification report: /mnt/dev-ssd/dev-tmp/.tmpDSrvx9/.harness-gate/reports/test_result.md
+    TEST_SUMMARY: FAIL
+    test config::quality::collectors::tests::dogfood_acceptance::quality_preparation_failure_retains_requested_profile_and_blocks ... FAILED
+
+    failures:
+
+    failures:
+        config::quality::collectors::tests::dogfood_acceptance::quality_preparation_failure_retains_requested_profile_and_blocks
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 323 filtered out; finished in 0.34s
+
+  stderr ───
+
+    thread 'config::quality::collectors::tests::dogfood_acceptance::quality_preparation_failure_retains_requested_profile_and_blocks' (1593) panicked at src/config/quality/collectors/tests/dogfood_acceptance.rs:209:9:
+    assertion `left == right` failed
+      left: Null
+     right: "full"
+    note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+

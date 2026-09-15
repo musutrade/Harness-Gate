@@ -1,0 +1,39 @@
+{
+  "scope": "preparation only; no production acceptance",
+  "historical_payload_hashes_verified": 1102,
+  "worklist_reproduced_byte_for_byte": true,
+  "audit_checks": [
+    {
+      "case": "valid",
+      "exit_code": 0,
+      "expected_result": true
+    },
+    {
+      "case": "tampered",
+      "exit_code": 1,
+      "expected_result": true
+    },
+    {
+      "case": "missing",
+      "exit_code": 1,
+      "expected_result": true
+    },
+    {
+      "case": "duplicate-archive",
+      "exit_code": 1,
+      "expected_result": true
+    },
+    {
+      "case": "duplicate-manifest",
+      "exit_code": 1,
+      "expected_result": true
+    },
+    {
+      "case": "symlink",
+      "exit_code": 1,
+      "expected_result": true
+    }
+  ],
+  "docs_consistency": "passed",
+  "git_diff_check": "passed"
+}

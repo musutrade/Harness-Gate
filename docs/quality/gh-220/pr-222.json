@@ -1,0 +1,114 @@
+{
+  "pr": 222,
+  "merged": true,
+  "merged_at": "2026-09-10T13:32:58Z",
+  "merge_commit_sha": "bfceab076ad3a1760c75ab412337ddc93959ec4d",
+  "url": "https://github.com/musutrade/Harness-Gate/pull/222",
+  "checks": [
+    {
+      "name": "differential",
+      "conclusion": "skipped",
+      "details_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34483332704/job/102891297063"
+    },
+    {
+      "name": "Release Governance Contracts",
+      "conclusion": "success",
+      "details_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34483332503/job/102891294981"
+    },
+    {
+      "name": "Quality CLI Contracts (macos-latest)",
+      "conclusion": "success",
+      "details_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34483332503/job/102891294973"
+    },
+    {
+      "name": "Format",
+      "conclusion": "success",
+      "details_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34483332503/job/102891294960"
+    },
+    {
+      "name": "Quality Coverage and Critical Paths",
+      "conclusion": null,
+      "details_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34483332503/job/102891294956"
+    },
+    {
+      "name": "Quality CLI Contracts (windows-latest)",
+      "conclusion": "success",
+      "details_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34483332503/job/102891294934"
+    },
+    {
+      "name": "Build (macos-latest)",
+      "conclusion": "success",
+      "details_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34483332503/job/102891294922"
+    },
+    {
+      "name": "Documentation Consistency",
+      "conclusion": "success",
+      "details_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34483332503/job/102891294899"
+    },
+    {
+      "name": "Quality Performance Baseline (macos-latest)",
+      "conclusion": null,
+      "details_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34483332503/job/102891294893"
+    },
+    {
+      "name": "Quality Script Tests",
+      "conclusion": "success",
+      "details_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34483332503/job/102891294836"
+    },
+    {
+      "name": "Build (windows-latest)",
+      "conclusion": "success",
+      "details_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34483332503/job/102891294830"
+    },
+    {
+      "name": "Test (macos-latest)",
+      "conclusion": "success",
+      "details_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34483332503/job/102891294819"
+    },
+    {
+      "name": "Quality Performance Baseline (ubuntu-latest)",
+      "conclusion": null,
+      "details_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34483332503/job/102891294802"
+    },
+    {
+      "name": "Test",
+      "conclusion": "success",
+      "details_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34483332503/job/102891294754"
+    },
+    {
+      "name": "Quality Performance Baseline (windows-latest)",
+      "conclusion": null,
+      "details_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34483332503/job/102891294737"
+    },
+    {
+      "name": "Test (windows-latest)",
+      "conclusion": null,
+      "details_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34483332503/job/102891294734"
+    },
+    {
+      "name": "Security Audit",
+      "conclusion": "success",
+      "details_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34483332503/job/102891294698"
+    },
+    {
+      "name": "Code Coverage",
+      "conclusion": null,
+      "details_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34483332503/job/102891294697"
+    },
+    {
+      "name": "Quality CLI Contracts",
+      "conclusion": "success",
+      "details_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34483332503/job/102891294640"
+    },
+    {
+      "name": "Clippy",
+      "conclusion": "success",
+      "details_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34483332503/job/102891294591"
+    },
+    {
+      "name": "Build",
+      "conclusion": "success",
+      "details_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34483332503/job/102891294341"
+    }
+  ]
+}

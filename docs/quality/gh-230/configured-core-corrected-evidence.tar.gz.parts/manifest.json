@@ -1,0 +1,134 @@
+{
+  "original_archive": "configured-core-corrected-evidence.tar.gz",
+  "bytes": 71702622,
+  "sha256": "63b9366a47164977a6b4cff3d639c7def1b70bb32739fb49f90f50034c9bffe1",
+  "parts": [
+    {
+      "file": "part-0000",
+      "bytes": 2880000,
+      "sha256": "fa4d90c6e0b197b1419241d0433be295c316ba3c8c351350c7067adacb34eb47"
+    },
+    {
+      "file": "part-0001",
+      "bytes": 2880000,
+      "sha256": "a7e749acd3ebe289b2f5aa061b4cb24e31d2dbddb8d8d6755d230fc5a6d8ec40"
+    },
+    {
+      "file": "part-0002",
+      "bytes": 2880000,
+      "sha256": "d42ba14d3c81062e4cc64522f04d6ba1c807f130270dcdd714d4cedd90063f65"
+    },
+    {
+      "file": "part-0003",
+      "bytes": 2880000,
+      "sha256": "f91ee4cb2ac02732767164010a637477d59a1fb8f280a5282390beaf7180fb71"
+    },
+    {
+      "file": "part-0004",
+      "bytes": 2880000,
+      "sha256": "9a9fd43ca048fb0c571a4d2ab650fff2276b9ae341c8af1e418399fba60e6d5e"
+    },
+    {
+      "file": "part-0005",
+      "bytes": 2880000,
+      "sha256": "bbf2bfc894357a419d39e2c9935e52316bdd351d09b831f2705037fb61a40923"
+    },
+    {
+      "file": "part-0006",
+      "bytes": 2880000,
+      "sha256": "87c996bf40dca70a499fa3b000f3ed7e668a85cfbf62733e7f00fed987b5b899"
+    },
+    {
+      "file": "part-0007",
+      "bytes": 2880000,
+      "sha256": "74d19b5b085562bbd8e5a6088fb7bf7e1495951670e3ca7a148ffe1c0e32bea6"
+    },
+    {
+      "file": "part-0008",
+      "bytes": 2880000,
+      "sha256": "1cfd985b7e464f5cf36e52a4dbcfaf2c74d6a25a29939dac95e6c445d95cb02b"
+    },
+    {
+      "file": "part-0009",
+      "bytes": 2880000,
+      "sha256": "88e13bc5aadf29e3b011ab22e1fd1683e52d6724109b61f74fcae784f8030549"
+    },
+    {
+      "file": "part-0010",
+      "bytes": 2880000,
+      "sha256": "ea8b996f9302eb9bc99c5914edc994192f757937ea9964ac7ed3f1821d08ebf2"
+    },
+    {
+      "file": "part-0011",
+      "bytes": 2880000,
+      "sha256": "860877a1b0450eddba80e2dfa56208763f7594ead2109211d8dc1cf68437e923"
+    },
+    {
+      "file": "part-0012",
+      "bytes": 2880000,
+      "sha256": "c0df6c1f2b65d80eff9e736d2791f7ae18c5542b9561543e65abef5d1eee1d26"
+    },
+    {
+      "file": "part-0013",
+      "bytes": 2880000,
+      "sha256": "75c7a7199285180b23b3b96601d2b81f47475431fdb6ba5085dae9d520d43606"
+    },
+    {
+      "file": "part-0014",
+      "bytes": 2880000,
+      "sha256": "6c808cda4bf7a25e0eb1d66acb4bb66163f2d7e11b5648590887d6e11aae469c"
+    },
+    {
+      "file": "part-0015",
+      "bytes": 2880000,
+      "sha256": "51615de437cba040d266515df67cc5e3c80e84a7e0b6063618b683d3c01eece0"
+    },
+    {
+      "file": "part-0016",
+      "bytes": 2880000,
+      "sha256": "2a7f9703ff6975ce053f459825ac3b9b14ebb1cab11a5808c0d833dbf6457751"
+    },
+    {
+      "file": "part-0017",
+      "bytes": 2880000,
+      "sha256": "129250bd31a045ae4f89843475e22e068e91b853b09fe929b6b3c198264e9bc4"
+    },
+    {
+      "file": "part-0018",
+      "bytes": 2880000,
+      "sha256": "2819b29e4f294cd3034492552900a70a42f4a73e9b1e2941a0fe79420a21b38d"
+    },
+    {
+      "file": "part-0019",
+      "bytes": 2880000,
+      "sha256": "183be9a9f5d48dd7fa8dcb7e4bf32b0b9282982cc0dbcbbffb4fb35929584c96"
+    },
+    {
+      "file": "part-0020",
+      "bytes": 2880000,
+      "sha256": "7a21a2a11ce45e8b9593a18fd776fd49fa757af3388e283e12eaa99de8d7b45e"
+    },
+    {
+      "file": "part-0021",
+      "bytes": 2880000,
+      "sha256": "0fd33f939918e6e8222ff689e48b1487c7ee4cf97c63644e77fa7a78678e4b6f"
+    },
+    {
+      "file": "part-0022",
+      "bytes": 2880000,
+      "sha256": "c63d1b20829b97e71c47a04d0de396574943fd1da8bd404c4a82e15ec45621aa"
+    },
+    {
+      "file": "part-0023",
+      "bytes": 2880000,
+      "sha256": "f2a30c9254d68f5d193eb9802862a71f49e9a543bdffd60ea810957d58eb5d1d"
+    },
+    {
+      "file": "part-0024",
+      "bytes": 2582622,
+      "sha256": "bd08117da97d005369395e15e41f2bc2f3ec9f893761e7e01b17a1bcb71c7f65"
+    }
+  ],
+  "reconstruct_from_parts_directory": "cat part-* > ../configured-core-corrected-evidence.tar.gz",
+  "verify": "Verify original archive SHA-256 before extraction; original per-file inventory remains unchanged."
+}

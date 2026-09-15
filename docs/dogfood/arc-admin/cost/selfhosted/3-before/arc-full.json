@@ -1,0 +1,15 @@
+{
+  "name": "arc-full",
+  "argv": [
+    "cargo",
+    "flow",
+    "verify",
+    "--profile",
+    "full",
+    "--all"
+  ],
+  "started_at": "2026-09-10T08:56:15.395679+00:00",
+  "completed_at": "2026-09-10T09:01:09.025347+00:00",
+  "elapsed_seconds": 293.62965879,
+  "exit_code": 0
+}

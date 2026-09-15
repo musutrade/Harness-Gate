@@ -117,3 +117,7 @@ uses the existing CI jobs and adds no collection owner or aggregate evaluator.
 See [ADR-0041](adr/0041-quality-configuration-v1.md) for this bounded decision.
 
 See [profile assurance and retained evidence](quality-profiles.md) for hook/full/ci participation.
+
+For direct standalone native evaluation, see [native CRAP policy configuration](quality/native-crap-policy.md).
+The command selects `policies.<binding>.policy_file` and `.rule` explicitly; the
+referenced rule's rational `limit` is the ceiling Core actually evaluates.

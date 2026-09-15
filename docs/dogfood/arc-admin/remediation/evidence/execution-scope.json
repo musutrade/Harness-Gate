@@ -1,0 +1,16 @@
+{
+  "name": "execution-scope",
+  "argv": [
+    "/mnt/dev-ssd/workspaces/symphony/GH-207/target/debug/harness-gate",
+    "--project-root",
+    "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source",
+    "--config",
+    ".shadow-execution/flow.toml",
+    "scope",
+    "--all"
+  ],
+  "started_at": "2026-09-10T09:53:26.815900+00:00",
+  "completed_at": "2026-09-10T09:53:26.905160+00:00",
+  "elapsed_seconds": 0.089281132,
+  "exit_code": 0
+}

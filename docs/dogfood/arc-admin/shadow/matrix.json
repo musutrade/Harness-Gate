@@ -1,0 +1,386 @@
+{
+  "source_commit": "9982ed556eaf997910824d7b682946147c81a16a",
+  "mode": "shadow",
+  "parity": "blocked; runtime equivalence not established",
+  "validation_is_workflow_state": false,
+  "components": {
+    "arc_admin": [
+      "backend",
+      "frontend",
+      "workflow"
+    ],
+    "harness_gate": "NOT_COMPUTED: configuration rejected"
+  },
+  "prelude": [
+    {
+      "gate": "secret scan",
+      "arc_admin": "PASS",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "gate": "architecture audit",
+      "arc_admin": "PASS",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "step": "backend.format",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": null,
+      "arc_log": "evidence/arc/logs/backend_fmt.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "backend.clippy",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": null,
+      "arc_log": "evidence/arc/logs/backend_clippy.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "backend.compile",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": null,
+      "arc_log": "evidence/arc/logs/backend_check.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "backend.tests",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": "31 result(s)",
+      "arc_log": "evidence/arc/logs/backend_tests.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "frontend.lint",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": null,
+      "arc_log": "evidence/arc/logs/frontend_lint.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "frontend.format",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": null,
+      "arc_log": "evidence/arc/logs/frontend_format.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "frontend.tests",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": "85 result(s)",
+      "arc_log": "evidence/arc/logs/frontend_tests.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "frontend.e2e",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": null,
+      "arc_log": "evidence/arc/logs/frontend_e2e.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "frontend.fullstack-smoke",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": null,
+      "arc_log": "evidence/arc/logs/frontend_fullstack_smoke.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "frontend.build",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": null,
+      "arc_log": "evidence/arc/logs/frontend_build.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "workflow.hook-syntax",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": null,
+      "arc_log": "evidence/arc/logs/git_hook_syntax.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "workflow.project-init-tests",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": null,
+      "arc_log": "evidence/arc/logs/project_init_tests.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "workflow.framework-release-config",
+      "policy_required": false,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": null,
+      "arc_log": "evidence/arc/logs/framework_release_config.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "workflow.framework-upgrade-tests",
+      "policy_required": false,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": null,
+      "arc_log": "evidence/arc/logs/framework_upgrade_tests.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "workflow.template-quality",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": null,
+      "arc_log": "evidence/arc/logs/template_quality.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "workflow.template-quality-tests",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": null,
+      "arc_log": "evidence/arc/logs/template_quality_tests.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "workflow.observability-config",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": null,
+      "arc_log": "evidence/arc/logs/observability_config.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "workflow.tracing-config",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": null,
+      "arc_log": "evidence/arc/logs/tracing_config.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "workflow.production-deployment-config",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": null,
+      "arc_log": "evidence/arc/logs/production_deployment_config.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "workflow.audit-retention-config",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": null,
+      "arc_log": "evidence/arc/logs/audit_retention_config.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "workflow.api-generation",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": null,
+      "arc_log": "evidence/arc/logs/api_generation.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "workflow.supply-chain-config",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": null,
+      "arc_log": "evidence/arc/logs/supply_chain_config.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "workflow.format",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": null,
+      "arc_log": "evidence/arc/logs/arc_flow_fmt.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "workflow.clippy",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": null,
+      "arc_log": "evidence/arc/logs/arc_flow_clippy.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "step": "workflow.tests",
+      "policy_required": true,
+      "blocks_when_selected": true,
+      "arc_admin": "PASS",
+      "arc_detail": "58 result(s)",
+      "arc_log": "evidence/arc/logs/arc_flow_tests.log",
+      "harness_gate": "NOT_RUN: configuration rejected",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    }
+  ],
+  "dimensions": [
+    {
+      "dimension": "component selection",
+      "arc_admin": "Observed scope --all and full report select backend, frontend, workflow.",
+      "harness_gate": "NOT_COMPUTED: production config rejection precedes scope; declaration parity is not observed selection.",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "dimension": "PostgreSQL service",
+      "arc_admin": "Observed postgres:16-alpine, loopback 127.0.0.1:32768, successful pg_isready and TCP connection; backend tests and real full-stack smoke PASS. The specific owned container is absent after verify. Source service manager caches the shared service during sequential execution.",
+      "harness_gate": "NOT_RUN: no service dispatch or cleanup observed. No runtime equivalence claim.",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "dimension": "environment isolation",
+      "arc_admin": "DATABASE_URL and TEST_DATABASE_URL unset at invocation. Original service injects TEST_DATABASE_URL; both database-consuming steps declare DATABASE_URL removal. Native task_can_remove_an_inherited_environment_variable and task_runs_in_an_isolated_session tests PASS; backend API and smoke PASS. Ambient database rejection unit tests PASS. No adversarial environment run was added (task 6).",
+      "harness_gate": "NOT_RUN: preserved declarations are not runtime evidence.",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "dimension": "diagnostics and validation readiness",
+      "arc_admin": "Per-gate PASS, parsed result counts and overall TEST_SUMMARY: PASS; intentional panic/failure output belongs to passing negative unit tests, not a failed gate.",
+      "harness_gate": "E1000 wraps HGCFG-SHARED-SERVICE with source locations, shared resource, conflicting step and dependency/separate-resource help. No gate result. Structural/binding validation success did not establish production readiness.",
+      "discrepancies": [
+        "HG-CAP-001",
+        "HG-UX-001"
+      ]
+    },
+    {
+      "dimension": "reports and artifacts",
+      "arc_admin": "Retained scope.json, secret_scan.json, review_context JSON/Markdown, test_result JSON/Markdown and all 25 native command logs. Generated Playwright/build file hashes and sizes are inventoried separately; reproducible outputs are not all bundled.",
+      "harness_gate": "No reports emitted. Post-Arc scope/verify in both variants left all Arc report hashes unchanged; existing reports must not be attributed to Harness-Gate.",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "dimension": "generic quality",
+      "arc_admin": "Traditional gate PASS is not generic coverage/CRAP/contract evidence.",
+      "harness_gate": "NOT_RUN before quality collection. No stricter-quality discrepancy observed. GH-203 authenticated baseline/collector prerequisites remain unprovisioned; not reached and not claimed passed.",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    }
+  ],
+  "unexplained_discrepancies": 0
+}

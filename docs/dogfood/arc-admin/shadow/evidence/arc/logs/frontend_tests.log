@@ -1,0 +1,17 @@
+
+> arc-admin@0.0.0 test
+> ng test --watch=false --runner=vitest
+
+❯ Building...
+✔ Building...
+Application bundle generation complete. [6.245 seconds] - 2026-09-10T05:40:27.826Z
+
+
+ RUN  v4.1.10 ${ARC_SOURCE}/frontend
+
+
+ Test Files  24 passed (24)
+      Tests  85 passed (85)
+   Start at  05:40:28
+   Duration  6.18s (transform 2.77s, setup 6.08s, import 9.15s, tests 8.22s, environment 43.17s)
+

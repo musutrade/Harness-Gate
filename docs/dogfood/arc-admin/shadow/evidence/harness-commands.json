@@ -1,0 +1,66 @@
+[
+  {
+    "name": "execution",
+    "phase": "scope",
+    "command": [
+      "${WORKSPACE}/target/debug/harness-gate",
+      "--project-root",
+      "${ARC_SOURCE}",
+      "--config",
+      ".shadow-execution/flow.toml",
+      "scope",
+      "--all"
+    ],
+    "exit_code": 1,
+    "reports_unchanged": true
+  },
+  {
+    "name": "execution",
+    "phase": "full",
+    "command": [
+      "${WORKSPACE}/target/debug/harness-gate",
+      "--project-root",
+      "${ARC_SOURCE}",
+      "--config",
+      ".shadow-execution/flow.toml",
+      "verify",
+      "--profile",
+      "full",
+      "--all"
+    ],
+    "exit_code": 1,
+    "reports_unchanged": true
+  },
+  {
+    "name": "quality",
+    "phase": "scope",
+    "command": [
+      "${WORKSPACE}/target/debug/harness-gate",
+      "--project-root",
+      "${ARC_SOURCE}",
+      "--config",
+      ".harness-gate/flow.toml",
+      "scope",
+      "--all"
+    ],
+    "exit_code": 1,
+    "reports_unchanged": true
+  },
+  {
+    "name": "quality",
+    "phase": "full",
+    "command": [
+      "${WORKSPACE}/target/debug/harness-gate",
+      "--project-root",
+      "${ARC_SOURCE}",
+      "--config",
+      ".harness-gate/flow.toml",
+      "verify",
+      "--profile",
+      "full",
+      "--all"
+    ],
+    "exit_code": 1,
+    "reports_unchanged": true
+  }
+]

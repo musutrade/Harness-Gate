@@ -1,0 +1,25 @@
+[
+  {
+    "command": [
+      "python3",
+      "tools/quality/docs_consistency.py",
+      "--output",
+      "target/gh-230/resume-probe/docs-consistency.json"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "openspec",
+      "validate",
+      "package-official-rust-collector-for-independent-delivery",
+      "--strict",
+      "--no-interactive"
+    ],
+    "exit_code": 0,
+    "stdout": "Change 'package-official-rust-collector-for-independent-delivery' is valid\n",
+    "stderr": ""
+  }
+]

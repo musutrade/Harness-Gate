@@ -1,0 +1,17 @@
+
+> arc-admin@0.0.0 test
+> ng test --watch=false --runner=vitest
+
+❯ Building...
+✔ Building...
+Application bundle generation complete. [6.544 seconds] - 2026-09-10T09:57:38.460Z
+
+
+ RUN  v4.1.10 /mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/frontend
+
+
+ Test Files  24 passed (24)
+      Tests  85 passed (85)
+   Start at  09:57:38
+   Duration  6.66s (transform 2.47s, setup 7.21s, import 8.50s, tests 8.64s, environment 50.38s)
+

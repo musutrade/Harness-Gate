@@ -1,0 +1,7 @@
+{
+  "schema": "arc-admin-negative-corpus/v1",
+  "artifacts": {
+    "evidence/commands.json": "a4d4fc6788693a314aeab5b4fe3a606b19c60d2f8aa10e3367c12a01a04755b6",
+    "evidence/quality.json": "736dafb65ae6d4c97a5ae866c383049a07f88a4cb23e0d08e7765f6311274b2b"
+  }
+}

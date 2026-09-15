@@ -1,0 +1,15 @@
+{
+  "archive": "clean-host-evidence.tar.gz",
+  "sha256": "3f4641babce2adfde0a1a39252f8a9ac44dde61aee2940e2f2dce7842c84d45a",
+  "bytes": 12160242,
+  "files": 812,
+  "uncompressed_file_bytes": 127134946,
+  "all_file_hashes_verified_after_archive": true,
+  "exclusions": [
+    "duplicated relocated runtime (inventory retained)",
+    "disposable signer private PEM keys",
+    "Python bytecode",
+    "runtime distribution tar (package hash and inventory retained)"
+  ],
+  "scope": "Fresh original fixture captures, retained executables/profiles/exports/seals, complete reexports, configured Core decisions, raw strace, commands, costs, genuine failures, source snapshots; no operator runner secret."
+}

@@ -1,0 +1,6 @@
+Imported execution configuration: /mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/import/flow.toml
+Parity inventory and UX metrics: /mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/import/flow.import.json
+Authority transfer BLOCKED; runtime incompatibilities:
+Global ARC_FLOW_REPORTS, AUDITOR_CONFIG, ARC_FLOW_AUDIT_CONFIG and ARC_FLOW_SECRETS_CONFIG overrides are not migrated; Harness-Gate protects audit policy and uses its own environment interface. REPORT_DIR is only a deprecated compatibility alias.
+Hook/prelude staged-versus-working-tree behavior, service lifecycle and runtime outcomes require shadow parity; existing secret/audit policy files and CI/hook commands remain project-owned prerequisites.
+Route the destination config through project scope and integrate CI separately. No ci profile, quality policy or authority transfer is invented by import.

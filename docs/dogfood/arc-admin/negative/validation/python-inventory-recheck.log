@@ -1,0 +1,19 @@
+test_boundary_failure_cannot_be_diluted_by_other_boundaries (test_production_coverage.ProductionCoverageTests.test_boundary_failure_cannot_be_diluted_by_other_boundaries) ... ok
+test_boundary_with_only_test_mappings_fails (test_production_coverage.ProductionCoverageTests.test_boundary_with_only_test_mappings_fails) ... ok
+test_checked_in_inventory_covers_every_source_once (test_production_coverage.ProductionCoverageTests.test_checked_in_inventory_covers_every_source_once) ... ok
+test_exact_threshold_passes_and_keeps_separate_raw_metrics (test_production_coverage.ProductionCoverageTests.test_exact_threshold_passes_and_keeps_separate_raw_metrics) ... ok
+test_excluded_files_cannot_inflate_production_metrics (test_production_coverage.ProductionCoverageTests.test_excluded_files_cannot_inflate_production_metrics) ... ok
+test_exclusions_have_reasons_and_never_overlap (test_production_coverage.ProductionCoverageTests.test_exclusions_have_reasons_and_never_overlap) ... ok
+test_instances_are_merged_by_source_location (test_production_coverage.ProductionCoverageTests.test_instances_are_merged_by_source_location) ... ok
+test_missing_raw_reports_fail_without_collecting (test_production_coverage.ProductionCoverageTests.test_missing_raw_reports_fail_without_collecting) ... ok
+test_negative_inventory_and_raw_reports (test_production_coverage.ProductionCoverageTests.test_negative_inventory_and_raw_reports) ... ok
+test_outside_src_production_is_blocking_and_uninventoried_sources_fail (test_production_coverage.ProductionCoverageTests.test_outside_src_production_is_blocking_and_uninventoried_sources_fail) ... ok
+test_test_only_additions_do_not_change_production_counts (test_production_coverage.ProductionCoverageTests.test_test_only_additions_do_not_change_production_counts) ... ok
+test_test_ranges_handle_literals_helpers_and_production_after_tests (test_production_coverage.ProductionCoverageTests.test_test_ranges_handle_literals_helpers_and_production_after_tests) ... ok
+test_threshold_never_rounds_up_or_accepts_invalid_values (test_production_coverage.ProductionCoverageTests.test_threshold_never_rounds_up_or_accepts_invalid_values) ... ok
+test_unhit_production_functions_remain_in_denominator (test_production_coverage.ProductionCoverageTests.test_unhit_production_functions_remain_in_denominator) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.397s
+
+OK

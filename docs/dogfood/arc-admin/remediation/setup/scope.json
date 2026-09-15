@@ -1,0 +1,13 @@
+{
+  "name": "scope",
+  "argv": [
+    "cargo",
+    "flow",
+    "scope",
+    "--all"
+  ],
+  "started_at": "2026-09-10T09:39:29.359886+00:00",
+  "completed_at": "2026-09-10T09:39:49.091249+00:00",
+  "elapsed_seconds": 19.731377182,
+  "exit_code": 0
+}

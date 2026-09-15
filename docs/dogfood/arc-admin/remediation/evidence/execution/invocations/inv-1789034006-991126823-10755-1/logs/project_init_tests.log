@@ -1,0 +1,15 @@
+✔ initializes a clean template without tracking the local environment (48.237775ms)
+✔ rejects repeated initialization before checking worktree changes (35.385361ms)
+✔ rejects unsafe API base URLs and protects the production environment (0.746386ms)
+✔ rejects a dirty worktree and invalid identifiers (29.854895ms)
+✔ rejects project initialization from an unreleased framework version (39.295527ms)
+✔ refuses to initialize the canonical framework repository (30.189082ms)
+✔ shell entrypoint has valid syntax and exposes Chinese help (70.31187ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 346.423063

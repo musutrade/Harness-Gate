@@ -1,0 +1,225 @@
+{
+  "schema": "gh-220-production-evidence/1",
+  "acceptance": "submitted for controller review; CI pending",
+  "raw_root": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/compiler-driver-probe/backend-trial-5",
+  "anchor": "e4481cad305bd0be28bcdfc37f20f018b3927d5a40d36d0f5c80d49594f1d133",
+  "fixture_root": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/driver-tests/tmpughy36p7",
+  "backend_binaries": [
+    {
+      "path": "target/gh-220/compiler-driver-probe/backend-trial-5/binaries/0",
+      "bytes": 414519832,
+      "sha256": "52b5907490abf5457e4cd644b684a9fd73bc7e99724451b04e3691a834a17dc6"
+    },
+    {
+      "path": "target/gh-220/compiler-driver-probe/backend-trial-5/binaries/1",
+      "bytes": 412118184,
+      "sha256": "cc4bb68bcc900b69f612b4c4d2e14848334eb39c4f0ef83f5cf0b7f81a9cb22d"
+    },
+    {
+      "path": "target/gh-220/compiler-driver-probe/backend-trial-5/binaries/2",
+      "bytes": 412597160,
+      "sha256": "a9fb6db130d107b57b99d87527cc15933c154fdd56551b8f5527697b169baeb9"
+    },
+    {
+      "path": "target/gh-220/compiler-driver-probe/backend-trial-5/binaries/3",
+      "bytes": 412701888,
+      "sha256": "b7524d23174437e26e07305e876f75023f8ab3c8d9d2af45c584ee5c02f18389"
+    },
+    {
+      "path": "target/gh-220/compiler-driver-probe/backend-trial-5/binaries/4",
+      "bytes": 416593408,
+      "sha256": "79bacf57b1f92bb4c59358f181f4ce4409370721af38d7cf85923e04481ef1f4"
+    },
+    {
+      "path": "target/gh-220/compiler-driver-probe/backend-trial-5/binaries/5",
+      "bytes": 413539408,
+      "sha256": "a20c45e3f124b0c14084245cd823516c2916b4fb29b76273c503598a2e31ed08"
+    },
+    {
+      "path": "target/gh-220/compiler-driver-probe/backend-trial-5/binaries/6",
+      "bytes": 417898656,
+      "sha256": "d7f0088d4ae6ecac82dea7e5a4b39f025b180ece4828c309d3d3e8ed8fc39ee9"
+    }
+  ],
+  "tools": {
+    "driver": {
+      "path": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/compiler-driver-probe/build/debug/harness-gate-rust-native-driver",
+      "sha256": "1723deb9be7597f11410c33971d668a1cc25d8ac65f8a59162afa9152f76f458"
+    },
+    "llvm-cov": {
+      "path": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+      "sha256": "bb415d8767d2ad73d72c01941f409ffc8f9478747ec7c18a7a69356735551ed9",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build.\n"
+    },
+    "llvm-profdata": {
+      "path": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-profdata",
+      "sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 22.1.6-rust-1.97.1-stable\n  Optimized build.\n"
+    },
+    "rustc": {
+      "path": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+      "sha256": "d3a664c970a9fd8361b64194861bebc1ae37b9054e5ee3400dc1c9e691797eea",
+      "version": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+    },
+    "rustc-driver-library": {
+      "path": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/librustc_driver-832cf6cfb1386559.so",
+      "sha256": "b0726217c199be52842c1318a340f0fc68a2c2ca0e3fa4886191dbf6ee192a58"
+    }
+  },
+  "rustc_dev_archive": {
+    "path": "target/gh-220/compiler-driver-probe/rustc-dev.tar.xz",
+    "bytes": 122286540,
+    "sha256": "0109304e1995cce9e3362208f5d4ec0944e52a2ddfbc0a85d4ce5bea5d3081ab"
+  },
+  "limitations": [
+    "Backend raw archive omits indexed 2.8GB binaries; they remain in this workspace. Re-export requires those exact binaries and hash-matched tools.",
+    "Fixture archive includes binaries and profiles; absolute compiler paths and tool identities are retained, so relocation must preserve verified identities.",
+    "Earlier failed captures and prototype evidence are historical; no baseline is reset.",
+    "Declared default Linux Cargo configuration and existing two integration-test samples only; no GH-215 frontend/API/database/full-workflow acceptance."
+  ],
+  "committed_files": [
+    {
+      "path": "docs/quality/gh-220/production-expansions.json",
+      "bytes": 202648,
+      "sha256": "e9011346c272a60b21a193f22823625fb1b907a657443b000f492a252442432b"
+    },
+    {
+      "path": "docs/quality/gh-220/production-fixtures.tar.xz",
+      "bytes": 23163336,
+      "sha256": "82f42a353001476f2ed4ea6c8afb9ff67fbbe34ffff638f1389025c65eb2b200"
+    },
+    {
+      "path": "docs/quality/gh-220/production-history.json",
+      "bytes": 4359884,
+      "sha256": "65d1fbfba08db21c2d9b3ea7612a9a1a0f8885ec1a38c220e1a22fd0b03ce98d"
+    },
+    {
+      "path": "docs/quality/gh-220/production-raw.tar.xz",
+      "bytes": 48553348,
+      "sha256": "96e5ad870e4606de809bd4508611e0f70746e4f6802fc821123f6601151f4acb"
+    },
+    {
+      "path": "docs/quality/gh-220/production-report.json.gz",
+      "bytes": 2421013,
+      "sha256": "8464f732540ac476ee20cada1afa4cd36c8a16fa80fb741991c7239a12612a2b"
+    },
+    {
+      "path": "docs/quality/gh-220/production-summary.json",
+      "bytes": 14422,
+      "sha256": "3cd477ad37ecfab038891e0ad77d24b9ac0c974410c212dddf7f91aa4f6a2d43"
+    },
+    {
+      "path": "docs/quality/gh-220/production-validation.json",
+      "bytes": 18116,
+      "sha256": "74a562f1c06160de9fb9b0de9a72e9f1dcc12180303a083f0bb243e6ed984b2a"
+    },
+    {
+      "path": "docs/quality/gh-220/production-validation.tar.xz",
+      "bytes": 63316,
+      "sha256": "077994a2b520417e512677ccf56fdb10be2db370b72d97f259c329db2c17209a"
+    },
+    {
+      "path": "docs/quality/gh-220/production.md",
+      "bytes": 5291,
+      "sha256": "d29eea977c84bf56f6163dc3c488c910cf268422f370d6a3ccab637b7d32ffd5"
+    }
+  ],
+  "implementation_files": [
+    {
+      "path": "openspec/changes/rust-native-production-mapping/design.md",
+      "bytes": 7164,
+      "sha256": "afbb3aec018f20b45b230a47e330019a7d04f0772418185789b3ecfd8b2d3115"
+    },
+    {
+      "path": "openspec/changes/rust-native-production-mapping/proposal.md",
+      "bytes": 2734,
+      "sha256": "298159bbe2b89c7a1ec11ad7b2a5e68fccbd01629d676c2bc45fca71a21ea249"
+    },
+    {
+      "path": "openspec/changes/rust-native-production-mapping/specs/rust-native-production-mapping/spec.md",
+      "bytes": 4204,
+      "sha256": "09daa580d3c01a8c401ea4735e6d2ef2f171ff2a5b74d1470f0b78e48cf7a765"
+    },
+    {
+      "path": "openspec/changes/rust-native-production-mapping/tasks.md",
+      "bytes": 4248,
+      "sha256": "48e810453c75361f306e6640d94e948f85a2e5bae41ab10bfe7f6adee132eb0d"
+    },
+    {
+      "path": "tools/quality/fixtures/rust-native/cargo-complete/Cargo.lock",
+      "bytes": 164,
+      "sha256": "40bb4824db9814094513a24216188e8127d6514cece5e593d922fc8ebc28ec74"
+    },
+    {
+      "path": "tools/quality/fixtures/rust-native/cargo-complete/Cargo.toml",
+      "bytes": 111,
+      "sha256": "cd28b127d7a5f47d8a9155a7c84769b5c83833b853c9454424cf9674f7ac065c"
+    },
+    {
+      "path": "tools/quality/fixtures/rust-native/cargo-complete/src/inactive.rs",
+      "bytes": 34,
+      "sha256": "375b1683cae6addf570f9082be9e45d3e1b0cc41669508a9d6dd06ef688ababb"
+    },
+    {
+      "path": "tools/quality/fixtures/rust-native/cargo-complete/src/lib.rs",
+      "bytes": 305,
+      "sha256": "2609d23104a017a5ed65fc1d7463fb81c7b6b26d052f20014a087cf1d5a4981a"
+    },
+    {
+      "path": "tools/quality/fixtures/rust-native/cargo-complete/src/main.rs",
+      "bytes": 55,
+      "sha256": "cc78ca59ff9b603f4dc02bb664c4c63b54db4f834c08b152e67bccc7e75de8ec"
+    },
+    {
+      "path": "tools/quality/fixtures/rust-native/cargo-complete/tests/contract.rs",
+      "bytes": 164,
+      "sha256": "92711f9d094b6db6941b149560dc0dba69dad9ffb208aeca546da07e85642dd2"
+    },
+    {
+      "path": "tools/quality/fixtures/rust-native/driver_complete.rs",
+      "bytes": 1146,
+      "sha256": "a8be4cef00ed15911adb43f65662509eb9ace34a0fd98f5af2fd012b092d2aa3"
+    },
+    {
+      "path": "tools/quality/rust-native-driver/Cargo.lock",
+      "bytes": 4881,
+      "sha256": "73e6a295bc1c4a4709e4efa684f1e00b5a5f0bcd04c51c7cebe66b04e8894666"
+    },
+    {
+      "path": "tools/quality/rust-native-driver/Cargo.toml",
+      "bytes": 163,
+      "sha256": "3ccaa624ace4290a69b70b91bc0df99bd2462c86d8e620c2258e8709845a037d"
+    },
+    {
+      "path": "tools/quality/rust-native-driver/README.md",
+      "bytes": 6836,
+      "sha256": "54ee9ef8142c30c08a7bb729a58d9f7c5f311dfbbc11633471a8641e9ff75229"
+    },
+    {
+      "path": "tools/quality/rust-native-driver/bootstrap.py",
+      "bytes": 3277,
+      "sha256": "65104b19e33132eefcfad05c38385a03c9d04ea8961008b5798a6019f68916dd"
+    },
+    {
+      "path": "tools/quality/rust-native-driver/src/main.rs",
+      "bytes": 13681,
+      "sha256": "09240d9beaa8adaddf8782870a0a433d5293f314e46e7b6bbfb788d3efa6be8a"
+    },
+    {
+      "path": "tools/quality/rust_native_driver.py",
+      "bytes": 39340,
+      "sha256": "634ac8195f6dfd57f2e489828bdbfe1b761629f7ec326bf32c4bb660d7290b7a"
+    },
+    {
+      "path": "tools/quality/rust_native_policy.py",
+      "bytes": 12668,
+      "sha256": "72872de33986555d44c2ae99beecbf71a7e851352da37db60815ac9eab4b192b"
+    },
+    {
+      "path": "tools/quality/tests/test_rust_native_driver.py",
+      "bytes": 13890,
+      "sha256": "8a52e0c62c15995285cf8775f7f084dd7bbce0d6baa9653aaa97a27ff1b53f99"
+    }
+  ],
+  "historical_evidence": "production-history.json retains hashes for all earlier raw attempts; only separately recorded Cargo build caches were removed."
+}

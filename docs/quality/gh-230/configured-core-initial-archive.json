@@ -1,0 +1,14 @@
+{
+  "scope": "fresh local diagnostics; not clean-host acceptance",
+  "directories": [
+    "target/gh-220/driver-tests/tmpzo13tdt4",
+    "target/gh-221/file-tests/tmp5dudmeb6",
+    "target/gh-230/runtime-tests/tmp1as18x59",
+    "target/gh-230/runtime-tests/tmpb4tpiq06",
+    "target/gh-230/runtime-tests/tmpi6rcsf1c"
+  ],
+  "files": 1557,
+  "bytes": 69907309,
+  "sha256": "b344dcd07db7d6ba2050607365c581b87ddc650ff441968901dea490e6ebea2d",
+  "archive_member_sha256_verified": true
+}

@@ -1,0 +1,6 @@
+Configuration valid: /mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/.shadow-execution/flow.toml
+Schema version: 2
+Components: backend, frontend, workflow
+Profiles: full, hook
+Verification steps: 25
+Quality configuration valid: .harness-gate/quality.toml (v1)

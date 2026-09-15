@@ -1,0 +1,154 @@
+{
+  "source": "GitHub REST /repos/musutrade/Harness-Gate/releases/latest",
+  "tag": "v0.3.7",
+  "published_at": "2026-09-03T12:19:51Z",
+  "assets": [
+    {
+      "id": 542733258,
+      "name": "harness-gate-linux-amd64",
+      "digest": "sha256:7b148bd293acaff6a58fb15ac5e44929b5a2fe9232a5acc658d02883c3a79ff3",
+      "size": 8716944,
+      "browser_download_url": "https://github.com/musutrade/Harness-Gate/releases/download/v0.3.7/harness-gate-linux-amd64"
+    },
+    {
+      "id": 542733263,
+      "name": "harness-gate-linux-amd64.crt",
+      "digest": "sha256:6d7bdec52da2c79653a96b2dec0b7e3d8dbbd1f8c85550b947123ffab8c91efc",
+      "size": 3428,
+      "browser_download_url": "https://github.com/musutrade/Harness-Gate/releases/download/v0.3.7/harness-gate-linux-amd64.crt"
+    },
+    {
+      "id": 542733273,
+      "name": "harness-gate-linux-amd64.sig",
+      "digest": "sha256:4deabccdec2672a829ce06266404d64e5c8e2dbd7749d08e9f3e3c15990c3c72",
+      "size": 96,
+      "browser_download_url": "https://github.com/musutrade/Harness-Gate/releases/download/v0.3.7/harness-gate-linux-amd64.sig"
+    },
+    {
+      "id": 542733270,
+      "name": "harness-gate-macos-amd64",
+      "digest": "sha256:5bbdb8382ce244d9be71fcf58ae08f85740df70536ed8d53507f551f090d3894",
+      "size": 6809104,
+      "browser_download_url": "https://github.com/musutrade/Harness-Gate/releases/download/v0.3.7/harness-gate-macos-amd64"
+    },
+    {
+      "id": 542733271,
+      "name": "harness-gate-macos-amd64.crt",
+      "digest": "sha256:adc0903db451064aa8ec7b27639b220855ef5c155591b6e1039213d54014cdfe",
+      "size": 3420,
+      "browser_download_url": "https://github.com/musutrade/Harness-Gate/releases/download/v0.3.7/harness-gate-macos-amd64.crt"
+    },
+    {
+      "id": 542733274,
+      "name": "harness-gate-macos-amd64.sig",
+      "digest": "sha256:90a0fa24a9756f3c2d9dd32b3d5a9d4f03045674d9b5768172919af76f973a93",
+      "size": 96,
+      "browser_download_url": "https://github.com/musutrade/Harness-Gate/releases/download/v0.3.7/harness-gate-macos-amd64.sig"
+    },
+    {
+      "id": 542733281,
+      "name": "harness-gate-macos-arm64",
+      "digest": "sha256:875506b7948ea14e831bb1119a116bae141e3ecf6f0e9b51cba09c54ffcebb4c",
+      "size": 5768000,
+      "browser_download_url": "https://github.com/musutrade/Harness-Gate/releases/download/v0.3.7/harness-gate-macos-arm64"
+    },
+    {
+      "id": 542733282,
+      "name": "harness-gate-macos-arm64.crt",
+      "digest": "sha256:562049f2faa08b1c51e38e49f361cd72681e7fb777b49fee2a9f1e4141fec8ee",
+      "size": 3420,
+      "browser_download_url": "https://github.com/musutrade/Harness-Gate/releases/download/v0.3.7/harness-gate-macos-arm64.crt"
+    },
+    {
+      "id": 542733284,
+      "name": "harness-gate-macos-arm64.sig",
+      "digest": "sha256:9c313a8cba0568a48851f194c2ccdfa4753ba15e02c563533d31d8f590b1fea6",
+      "size": 96,
+      "browser_download_url": "https://github.com/musutrade/Harness-Gate/releases/download/v0.3.7/harness-gate-macos-arm64.sig"
+    },
+    {
+      "id": 542733289,
+      "name": "harness-gate-windows-amd64.exe",
+      "digest": "sha256:b06573e3cdb1141fa0f58fcb58da8c321a350289c2790e50a4c7c12b6da51f39",
+      "size": 6947840,
+      "browser_download_url": "https://github.com/musutrade/Harness-Gate/releases/download/v0.3.7/harness-gate-windows-amd64.exe"
+    },
+    {
+      "id": 542733286,
+      "name": "harness-gate-windows-amd64.exe.crt",
+      "digest": "sha256:58120d18502670c85ae9a567d45d5c8fc70d74eb636290e1d9cd806ebb109527",
+      "size": 3420,
+      "browser_download_url": "https://github.com/musutrade/Harness-Gate/releases/download/v0.3.7/harness-gate-windows-amd64.exe.crt"
+    },
+    {
+      "id": 542733291,
+      "name": "harness-gate-windows-amd64.exe.sig",
+      "digest": "sha256:55a67009bdd7551f4279ec1adc5334e14fa7b95793ed46cd3c0011a5421ed960",
+      "size": 96,
+      "browser_download_url": "https://github.com/musutrade/Harness-Gate/releases/download/v0.3.7/harness-gate-windows-amd64.exe.sig"
+    },
+    {
+      "id": 542733295,
+      "name": "harness-gate.sbom.cdx.json",
+      "digest": "sha256:95d68fa22c5923372967da3998ca39125d476321ac5a3b81530407a0d27e6a28",
+      "size": 71983,
+      "browser_download_url": "https://github.com/musutrade/Harness-Gate/releases/download/v0.3.7/harness-gate.sbom.cdx.json"
+    },
+    {
+      "id": 542733297,
+      "name": "harness-gate.sbom.cdx.json.crt",
+      "digest": "sha256:1ad5c44b00dd3fbdba185732e0fdb82d222cfbbca673fbdde2161e796363512a",
+      "size": 3416,
+      "browser_download_url": "https://github.com/musutrade/Harness-Gate/releases/download/v0.3.7/harness-gate.sbom.cdx.json.crt"
+    },
+    {
+      "id": 542733299,
+      "name": "harness-gate.sbom.cdx.json.sig",
+      "digest": "sha256:3361a2fab17ce37084acc56c6e95b7ee203b673a18ae0d9c2847eae495e8844f",
+      "size": 96,
+      "browser_download_url": "https://github.com/musutrade/Harness-Gate/releases/download/v0.3.7/harness-gate.sbom.cdx.json.sig"
+    },
+    {
+      "id": 542733298,
+      "name": "release-inventory.json",
+      "digest": "sha256:f3a60b7ec833411e83407e494d6afc1e0101bffa7da5d8f93f56105eb25283a1",
+      "size": 2957,
+      "browser_download_url": "https://github.com/musutrade/Harness-Gate/releases/download/v0.3.7/release-inventory.json"
+    },
+    {
+      "id": 542733302,
+      "name": "release-inventory.json.crt",
+      "digest": "sha256:d83431b78f9d017fc0fdd1b147cf4f5232f252bc8ff2775f22dc9af7d1f8d6e6",
+      "size": 3420,
+      "browser_download_url": "https://github.com/musutrade/Harness-Gate/releases/download/v0.3.7/release-inventory.json.crt"
+    },
+    {
+      "id": 542733304,
+      "name": "release-inventory.json.sig",
+      "digest": "sha256:98e7a7aac8a80b3d9e169e716f9244adce1290724b1b90d6fdc5f9def68fb807",
+      "size": 96,
+      "browser_download_url": "https://github.com/musutrade/Harness-Gate/releases/download/v0.3.7/release-inventory.json.sig"
+    },
+    {
+      "id": 542733261,
+      "name": "SHA256SUMS",
+      "digest": "sha256:ff8991910d4dc5fb97018863bc668a5db54ad19a7f04ea4939e07220cf5cb2b2",
+      "size": 552,
+      "browser_download_url": "https://github.com/musutrade/Harness-Gate/releases/download/v0.3.7/SHA256SUMS"
+    },
+    {
+      "id": 542733265,
+      "name": "SHA256SUMS.crt",
+      "digest": "sha256:b1e7ee4a2e4c968393664f7c7e4649eaf9e525566902d40f35dad1db4f036eef",
+      "size": 3420,
+      "browser_download_url": "https://github.com/musutrade/Harness-Gate/releases/download/v0.3.7/SHA256SUMS.crt"
+    },
+    {
+      "id": 542733259,
+      "name": "SHA256SUMS.sig",
+      "digest": "sha256:e79d9704fb314bef0653bb46c27920574e01d34b5a1614049df4f886a7d8dcab",
+      "size": 96,
+      "browser_download_url": "https://github.com/musutrade/Harness-Gate/releases/download/v0.3.7/SHA256SUMS.sig"
+    }
+  ]
+}

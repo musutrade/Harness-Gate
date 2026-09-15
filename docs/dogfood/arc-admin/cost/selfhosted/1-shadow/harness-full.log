@@ -1,0 +1,37 @@
+harness-gate verify
+Scope: all
+Components: backend, frontend, workflow
+
+[PASS] secret scan (13444 ms)
+[PASS] architecture audit (392 ms)
+[RUN ] backend format ... PASS (239 ms)
+[RUN ] backend Clippy ... PASS (21229 ms)
+[RUN ] backend compile ... PASS (2084 ms)
+[RUN ] backend tests ... PASS (175986 ms)
+[RUN ] frontend lint ... PASS (3123 ms)
+[RUN ] frontend format ... PASS (3363 ms)
+[RUN ] frontend tests ... PASS (12183 ms)
+[RUN ] frontend end-to-end tests ... PASS (24299 ms)
+[RUN ] frontend real full-stack smoke test ... PASS (22435 ms)
+[RUN ] frontend production build ... PASS (9534 ms)
+[RUN ] Git hook syntax ... PASS (9 ms)
+[RUN ] project initializer tests ... PASS (480 ms)
+[RUN ] framework release configuration gate ... PASS (80 ms)
+[RUN ] framework upgrade tests ... PASS (1042 ms)
+[RUN ] template quality gate ... PASS (480 ms)
+[RUN ] template quality gate tests ... PASS (640 ms)
+[RUN ] observability configuration gate ... PASS (79 ms)
+[RUN ] optional tracing and compliance configuration gate ... PASS (79 ms)
+[RUN ] production deployment configuration gate ... PASS (78 ms)
+[RUN ] audit retention and archive configuration gate ... PASS (78 ms)
+[RUN ] Rust OpenAPI and Angular client generation gate ... PASS (720 ms)
+[RUN ] supply chain security configuration gate ... PASS (79 ms)
+[RUN ] arc-flow format ... PASS (239 ms)
+[RUN ] arc-flow Clippy ... PASS (320 ms)
+[RUN ] arc-flow tests ... PASS (560 ms)
+Quality profile null: blocked (configuration); full quality: blocked
+quality workflow input is missing: /mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/.harness-gate/runtime/full-state.json
+
+
+Verification report: /mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/codex-audit-pipeline/.codex/reports/test_result.md
+TEST_SUMMARY: FAIL

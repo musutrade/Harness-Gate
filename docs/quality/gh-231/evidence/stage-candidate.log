@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/mnt/dev-ssd/workspaces/symphony/GH-231/tools/release/stage_collector_candidate.py", line 60, in <module>
+    receipt, observed = stage(args.runtime.resolve(), args.core.resolve(), assets.read(args.core_identity),
+                                                                           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/dev-ssd/workspaces/symphony/GH-231/tools/release/collector_assets.py", line 49, in read
+    return json.loads(Path(path).read_bytes(), object_pairs_hook=unique,
+                      ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 778, in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'target/gh-231/evidence/core-identity.json'

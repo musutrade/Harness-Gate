@@ -105,3 +105,29 @@ The end-to-end fixture uses `nebula-unregistered-2049`, an arbitrary configured
 collector/tool/runtime and the supported generic `bundle.size` contract, including
 a retained baseline and direct-evaluator equivalence. An architecture regression
 guard rejects closed ecosystem dispatch in generic verification and reporting.
+
+
+## Staged partial profiles
+
+For a staged profile declared `assurance = "partial"` with no selected collectors
+or policies, workflow state and trusted keys are read from the host checkout.
+They do not need to be added to the Git index. The Core still validates every
+configuration/source pin and the selected subjects against the immutable staged
+snapshot, so a working-tree edit cannot replace staged source evidence.
+
+Git cannot preserve empty directories. For this uncollected profile only, the
+Core creates the configured artifact directories inside its private snapshot;
+it does not import working-tree artifacts. State containing artifacts or retained
+responses is rejected. Missing host state/keys, stale pins and unsafe paths stay
+blocked, and successful hook execution reports full quality as `not_collected`.
+Profiles selecting collectors or policies retain their existing authenticated
+request and baseline requirements. This transport fix changes no engineering
+policy, threshold, requiredness, measurement series, debt or release authority.
+
+## Large native verification reports
+
+Core-generated quality and machine-result JSON can exceed the 16 MiB limit for untrusted text files. The writer redacts the structured model before serialization, preserving JSON structure, numerical evidence and complete arrays. Each string/key remains bounded to 16 MiB, nesting to 128 levels, and the invocation evidence byte budget remains 256 MiB. Credential-bearing values are replaced without producing malformed JSON.
+
+Only the exact SHA-256 of JSON produced and redacted by the current writer may pass the file-size boundary. Existing files, matching filenames or JSON extensions grant no exemption; modified generated output fails closed. External logs and evidence retain their existing 16 MiB limit. No quality policy, required capability, subject/series identity or baseline rule changes.
+
+Structured serialization orders JSON object members deterministically. The reviewed CLI snapshot changes only member ordering in five machine reports; parsed fields, values, arrays and exit statuses are unchanged.

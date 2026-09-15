@@ -1,0 +1,18 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 696B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/sha256:41459feb2f9970a7a22fa2b3789dccc286b1749a300300d97c3210ec56513db3
+#2 ERROR: pull access denied, repository does not exist or may require authorization: server message: insufficient_scope: authorization failed
+------
+ > [internal] load metadata for docker.io/library/sha256:41459feb2f9970a7a22fa2b3789dccc286b1749a300300d97c3210ec56513db3:
+------
+Dockerfile:1
+--------------------
+   1 | >>> FROM sha256:41459feb2f9970a7a22fa2b3789dccc286b1749a300300d97c3210ec56513db3
+   2 |     RUN apt-get update && apt-get install -y --no-install-recommends git curl ca-certificates python3 openssl libicu78 gh && dpkg-query -W > /runner-packages.txt
+   3 |     COPY rootfs/ /
+--------------------
+ERROR: failed to build: failed to solve: sha256:41459feb2f9970a7a22fa2b3789dccc286b1749a300300d97c3210ec56513db3: failed to resolve source metadata for docker.io/library/sha256:41459feb2f9970a7a22fa2b3789dccc286b1749a300300d97c3210ec56513db3: pull access denied, repository does not exist or may require authorization: server message: insufficient_scope: authorization failed

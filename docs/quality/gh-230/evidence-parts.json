@@ -1,0 +1,12 @@
+{
+  "trusted-invocation-evidence.tar.gz": "trusted-invocation-evidence.tar.gz.parts/manifest.json",
+  "clean-host-evidence.tar.gz": "clean-host-evidence.tar.gz.parts/manifest.json",
+  "core-0.4.0-python-final-evidence.tar.gz": "core-0.4.0-python-final-evidence.tar.gz.parts/manifest.json",
+  "recovery-evidence.tar.gz": "recovery-evidence.tar.gz.parts/manifest.json",
+  "core-0.4.0-native-evidence.tar.gz": "core-0.4.0-native-evidence.tar.gz.parts/manifest.json",
+  "configured-core-corrected-evidence.tar.gz": "configured-core-corrected-evidence.tar.gz.parts/manifest.json",
+  "capability-evidence.tar.gz": "capability-evidence.tar.gz.parts/manifest.json",
+  "configured-core-initial-evidence.tar.gz": "configured-core-initial-evidence.tar.gz.parts/manifest.json",
+  "project-evidence.tar.gz": "project-evidence.tar.gz.parts/manifest.json",
+  "malformed-core-evidence.tar.gz": "malformed-core-evidence.tar.gz.parts/manifest.json"
+}

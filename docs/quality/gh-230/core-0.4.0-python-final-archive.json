@@ -1,0 +1,34 @@
+{
+  "files": 1379,
+  "bytes": 71696594,
+  "sha256": "98c3fb568f520a5573c6ba5c1269f35a4faa43659c674c836988ab9f0def2013",
+  "archive_member_sha256_verified": true,
+  "scope": "corrected full-suite local diagnostics; not clean-host acceptance",
+  "check": {
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tools/quality/tests",
+      "-v"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+      "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "OPENSPEC_TELEMETRY": "0",
+      "RUST_COLLECTOR_RUNTIME": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/continued/runtime",
+      "RUST_COLLECTOR_TEST_VENDOR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/continued/vendor",
+      "HARNESS_GATE_NATIVE_POLICY_BINARY": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/symphony-inputs/core-v0.4.0/harness-gate-linux-amd64",
+      "NATIVE_DRIVER": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/operator-native-runtime/build/debug/harness-gate-rust-native-driver",
+      "NATIVE_DRIVER_SYSROOT": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu",
+      "PYTHONPATH": "/mnt/dev-ssd/workspaces/symphony/GH-230/tools/quality/tests"
+    },
+    "proxy_environment_removed": true,
+    "exit_code": 0,
+    "wall_seconds": 278.8243089970201
+  }
+}

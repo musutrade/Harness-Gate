@@ -1,0 +1,57 @@
+
+> arc-admin@0.0.0 e2e:fullstack
+> playwright test --config playwright.fullstack.config.ts
+
+[WebServer] 数据库迁移完成：已应用 18，内置 18
+[WebServer] 管理员账号已就绪：fullstack_admin（id=11）
+[WebServer] 
+[WebServer] > arc-admin@0.0.0 start
+[WebServer] > ng serve --proxy-config proxy.conf.json --host 127.0.0.1 --port 4300 --proxy-config proxy.fullstack.conf.json
+[WebServer] 
+[WebServer] (node:9416) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] Option 'proxy-config' has been specified multiple times. The value 'proxy.fullstack.conf.json' will be used.
+[WebServer] ❯ Building...
+[WebServer] (node:9416) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] ✔ Building...
+[WebServer] Initial chunk files | Names            |  Raw size
+[WebServer] main.js             | main             | 163.31 kB | 
+[WebServer] chunk-737J5G7W.js   | -                |  31.60 kB | 
+[WebServer] styles.css          | styles           |  27.44 kB | 
+[WebServer] chunk-NIVRNT7B.js   | -                |  11.97 kB | 
+[WebServer] chunk-NAVJ3AGU.js   | -                |   1.00 kB | 
+[WebServer] chunk-VUJOFXKG.js   | -                | 987 bytes | 
+[WebServer] chunk-Z2BY6HYM.js   | -                | 392 bytes | 
+[WebServer] 
+[WebServer]                     | Initial total    | 236.70 kB
+[WebServer] 
+[WebServer] Lazy chunk files    | Names            |  Raw size
+[WebServer] chunk-QF2XSHFB.js   | users            | 142.53 kB | 
+[WebServer] chunk-VLOOTGNU.js   | departments      |  66.31 kB | 
+[WebServer] chunk-F2G4R3F6.js   | roles            |  62.97 kB | 
+[WebServer] chunk-RZYHTSDN.js   | -                |  56.96 kB | 
+[WebServer] chunk-Y5XYRK4Q.js   | security         |  45.72 kB | 
+[WebServer] chunk-FQHMT7F5.js   | audit-logs       |  44.20 kB | 
+[WebServer] chunk-FB7E6H6E.js   | permissions      |  29.79 kB | 
+[WebServer] chunk-CYRI5BBJ.js   | error-page       |  25.49 kB | 
+[WebServer] chunk-X23Y5BUO.js   | role-permissions |  23.58 kB | 
+[WebServer] chunk-YRAMXN24.js   | -                |  21.30 kB | 
+[WebServer] chunk-B6QCQALK.js   | -                |  12.32 kB | 
+[WebServer] chunk-IS62S5MJ.js   | -                |   9.65 kB | 
+[WebServer] chunk-IIYU4VNM.js   | -                |   4.51 kB | 
+[WebServer] chunk-SUKW2XOL.js   | -                |   2.06 kB | 
+[WebServer] 
+[WebServer] Application bundle generation complete. [4.997 seconds] - 2026-09-10T05:41:11.634Z
+[WebServer] 
+[WebServer] Watch mode enabled. Watching for file changes...
+[WebServer] NOTE: Raw file sizes do not reflect development server per-request transformations.
+[WebServer]   ➜  Local:   http://127.0.0.1:4300/
+
+Running 1 test using 1 worker
+
+(node:9450) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [fullstack-chromium] › e2e/fullstack-smoke.spec.ts:5:5 › 通过真实 Angular、Axum 和 PostgreSQL 完成登录与用户创建 (7.4s)
+
+  1 passed (18.9s)

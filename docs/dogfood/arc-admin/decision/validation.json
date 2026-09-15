@@ -1,0 +1,116 @@
+{
+  "issue": 208,
+  "scope": "OpenSpec 9.1\u20139.4: no transfer; conditional removal inapplicable; proposal closure withheld",
+  "checkout_base": "19894adbdc32f131370dbb8d55994de758d1185f",
+  "environment": {
+    "CARGO_TARGET_DIR": "$PWD/target",
+    "reason": "Use workspace-local build output; default Cargo target is read-only. Successful nextest, clippy, Python suite and docs checks use this setting."
+  },
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 0,
+      "result": "392 passed; 0 skipped",
+      "log": "validation/nextest.log"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "exit_code": 0,
+      "result": "PASS",
+      "log": "validation/fmt.log"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 0,
+      "result": "PASS",
+      "log": "validation/clippy.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 0,
+      "result": "380 passed",
+      "log": "validation/python-final.log"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 0,
+      "result": "PASS; schemas, presets, links and policy consistent",
+      "log": "validation/docs-final.log"
+    },
+    {
+      "command": "openspec validate dogfood-harness-gate-on-arc-admin --strict",
+      "exit_code": 0,
+      "result": "PASS",
+      "log": "validation/openspec.log"
+    },
+    {
+      "command": "python3 docs/dogfood/arc-admin/remediation/reproduce.py",
+      "exit_code": 0,
+      "result": "PASS: 27 traditional results per engine; 6 command and 17 synthetic quality cases; native quality blocked; transfer false",
+      "log": "validation/remediation.log"
+    },
+    {
+      "command": "python3 docs/dogfood/arc-admin/cost/ci_reproduce.py",
+      "exit_code": 0,
+      "result": "PASS: retained bounded self-hosted receipt integrity/semantics; transfer remains blocked",
+      "log": "validation/selfhosted.log"
+    }
+  ],
+  "not_applicable": [
+    {
+      "command": "harness-gate config check",
+      "reason": "This source checkout has no .harness-gate/flow.toml or declared ci profile. Fixture/preset checks are separately identified; no generic project config was invented."
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "reason": "This source checkout has no .harness-gate/flow.toml or declared ci profile."
+    }
+  ],
+  "initial_failures": [
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 1,
+      "result": "380 tests; one error: DocsExecutionTests.test_all_presets_migration_and_schema_use_locked_cargo raised SystemExit(1) while validation.json was not yet present. Full rerun passed after completing the linked record.",
+      "log": "validation/python.log"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 1,
+      "result": "documentation, examples, or schema synchronization failed; initial missing validation.json link plus Cargo-backed checks failed with default target. Corrected rerun passed.",
+      "log": "validation/docs.log"
+    },
+    {
+      "command": "cargo run --quiet --locked --manifest-path tools/harness-gate/Cargo.toml -- --version",
+      "exit_code": 101,
+      "result": "error: failed to open: /home/gem/cargo-target/debug/.cargo-build-lock; Read-only file system (os error 30)",
+      "impact": "Resolved by CARGO_TARGET_DIR=$PWD/target; no source/assurance change needed.",
+      "log": "validation/default-target.log"
+    }
+  ],
+  "limitations": [
+    "This issue replays retained Arc-Admin evidence; it does not rerun native application/quality integration.",
+    "Native quality, host/hook/CI parity, rollback rehearsal and complete-quality/original-topology cost acceptance remain blocked as recorded in README.md.",
+    "Required Quality Aggregate is CI pending at submission. Local checks do not establish hosted success. The controller must verify green before acceptance.",
+    "The whole OpenSpec and ADR-0049 remain unaccepted; tasks 9.3 and closure portion of 9.4 remain conditional/withheld."
+  ],
+  "artifacts_sha256": {
+    "validation/clippy.log": "2bc238947517e514d6a479d0fd35bf263b55954ce79a9568f4804c4bdc01d86f",
+    "validation/default-target.log": "1518f5efe4e6f2ab73a01b43187054665d70adad18be3c687269a0d7028ada40",
+    "validation/docs-consistency.json": "3e6a663b46aacda01be60584f56baf7d69515485df0e804837355e4e70929a88",
+    "validation/docs-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "validation/docs.log": "6fdde67acd13145abd556580c3ab8d9ea34bad99a09db00ccf28a3fbeabecb76",
+    "validation/fmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "validation/nextest.log": "f803b072053e5a8be3cbbbbcd4c381ae28ae09b35ab9dd0b6ca35cfe0209bf25",
+    "validation/openspec.log": "86efd3d17a58c3f38812fedc1c24b83296301901d87f908d1098925d766b65da",
+    "validation/python-final.log": "93194dc256087e88693a63261e515e0c6a24799bf78a0c0b5e7e7c9be194c8ec",
+    "validation/python.log": "d33ebaff2bb7a200dce9502e9c8626cf93add1f775d2c17261982a1dc029aed3",
+    "validation/remediation.log": "1f952e8a56f9f8bdec043e488b26ccefe6031b4c28e25aec9390ec824376a1e5",
+    "validation/selfhosted.log": "3ca1326e094e44e41954533d4c2fe18f366dad4b7a0c222feb16783c82c58486"
+  },
+  "delivery_environment": {
+    "initial_command": "git add <issue files> && git commit -m \"docs(dogfood): retain Arc-Admin authority pending native evidence\"",
+    "exit_code": 128,
+    "error": "fatal: Unable to create '/mnt/dev-ssd/workspaces/symphony/GH-208/.git/index.lock': Read-only file system",
+    "resolution": "Use a copy of this checkout Git metadata in target/gh208-delivery.git with GIT_DIR and GIT_WORK_TREE pointing inside this workspace. Push the same symphony/GH-208 branch. Original read-only .git remains at checkout base; handoff identifies the actual pushed commit."
+  }
+}

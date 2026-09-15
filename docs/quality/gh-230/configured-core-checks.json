@@ -1,0 +1,387 @@
+{
+  "diff-final": {
+    "command": [
+      "git",
+      "--git-dir=target/gh-230/continued/git-metadata",
+      "--work-tree=.",
+      "diff",
+      "--check"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+      "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "OPENSPEC_TELEMETRY": "0"
+    },
+    "proxy_environment_removed": true,
+    "exit_code": 0,
+    "wall_seconds": 0.00953519600443542
+  },
+  "diff": {
+    "command": [
+      "git",
+      "--git-dir=target/gh-230/continued/git-metadata",
+      "--work-tree=.",
+      "diff",
+      "--check"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "OPENSPEC_TELEMETRY": "0"
+    },
+    "exit_code": 0,
+    "wall_seconds": 0.011126096011139452
+  },
+  "docs-corrected-report": {
+    "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+    "commit": "e24aeb351168610c00c14032a473fad61659ec2b",
+    "engineering_policy": {
+      "failures": [],
+      "status": "pass"
+    },
+    "examples": [
+      {
+        "path": "tools/harness-gate/presets/angular-only.flow.toml",
+        "quality_generated": true,
+        "status": "pass"
+      },
+      {
+        "path": "tools/harness-gate/presets/angular-rust-postgres.flow.toml",
+        "quality_generated": true,
+        "status": "pass"
+      },
+      {
+        "path": "tools/harness-gate/presets/generic.flow.toml",
+        "quality_generated": false,
+        "status": "pass"
+      },
+      {
+        "path": "tools/harness-gate/presets/rust-api.flow.toml",
+        "quality_generated": true,
+        "status": "pass"
+      }
+    ],
+    "language_docs_valid": true,
+    "link_failures": [],
+    "logical_cpus": 8,
+    "machine": "x86_64",
+    "machine_schema_valid": true,
+    "manifest_schema_valid": true,
+    "migration": {
+      "path": "tools/quality/fixtures/v1-flow.toml",
+      "status": "pass"
+    },
+    "os": "Linux-7.0.0-31-generic-x86_64-with-glibc2.43",
+    "processor": "",
+    "python": "3.14.4",
+    "quality_example_valid": true,
+    "quality_schema_synced": true,
+    "registry_schema_valid": true,
+    "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+    "sandbox_wording": {
+      "failures": [],
+      "status": "pass"
+    },
+    "schema_synced": true,
+    "status": "pass",
+    "target": "x86_64-unknown-linux-gnu",
+    "timestamp_utc": "2026-09-11T10:55:03.905358+00:00",
+    "tool": "docs-consistency"
+  },
+  "docs-corrected": {
+    "command": [
+      "python3",
+      "tools/quality/docs_consistency.py",
+      "--output",
+      "target/quality/docs-consistency.json"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+      "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "OPENSPEC_TELEMETRY": "0"
+    },
+    "proxy_environment_removed": true,
+    "exit_code": 0,
+    "wall_seconds": 3.3130448029842228
+  },
+  "docs-final-report": {
+    "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+    "commit": "e24aeb351168610c00c14032a473fad61659ec2b",
+    "engineering_policy": {
+      "failures": [],
+      "status": "pass"
+    },
+    "examples": [
+      {
+        "path": "tools/harness-gate/presets/angular-only.flow.toml",
+        "quality_generated": true,
+        "status": "pass"
+      },
+      {
+        "path": "tools/harness-gate/presets/angular-rust-postgres.flow.toml",
+        "quality_generated": true,
+        "status": "pass"
+      },
+      {
+        "path": "tools/harness-gate/presets/generic.flow.toml",
+        "quality_generated": false,
+        "status": "pass"
+      },
+      {
+        "path": "tools/harness-gate/presets/rust-api.flow.toml",
+        "quality_generated": true,
+        "status": "pass"
+      }
+    ],
+    "language_docs_valid": true,
+    "link_failures": [],
+    "logical_cpus": 8,
+    "machine": "x86_64",
+    "machine_schema_valid": true,
+    "manifest_schema_valid": true,
+    "migration": {
+      "path": "tools/quality/fixtures/v1-flow.toml",
+      "status": "pass"
+    },
+    "os": "Linux-7.0.0-31-generic-x86_64-with-glibc2.43",
+    "processor": "",
+    "python": "3.14.4",
+    "quality_example_valid": true,
+    "quality_schema_synced": true,
+    "registry_schema_valid": true,
+    "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+    "sandbox_wording": {
+      "failures": [],
+      "status": "pass"
+    },
+    "schema_synced": true,
+    "status": "pass",
+    "target": "x86_64-unknown-linux-gnu",
+    "timestamp_utc": "2026-09-11T10:59:17.189933+00:00",
+    "tool": "docs-consistency"
+  },
+  "docs-final": {
+    "command": [
+      "python3",
+      "tools/quality/docs_consistency.py",
+      "--output",
+      "target/quality/docs-consistency.json"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+      "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "OPENSPEC_TELEMETRY": "0"
+    },
+    "proxy_environment_removed": true,
+    "exit_code": 0,
+    "wall_seconds": 3.3763630539760925
+  },
+  "docs-initial-report": {
+    "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+    "commit": "e24aeb351168610c00c14032a473fad61659ec2b",
+    "engineering_policy": {
+      "failures": [],
+      "status": "pass"
+    },
+    "examples": [
+      {
+        "path": "tools/harness-gate/presets/angular-only.flow.toml",
+        "quality_generated": false,
+        "status": "fail"
+      },
+      {
+        "path": "tools/harness-gate/presets/angular-rust-postgres.flow.toml",
+        "quality_generated": false,
+        "status": "fail"
+      },
+      {
+        "path": "tools/harness-gate/presets/generic.flow.toml",
+        "quality_generated": false,
+        "status": "fail"
+      },
+      {
+        "path": "tools/harness-gate/presets/rust-api.flow.toml",
+        "quality_generated": false,
+        "status": "fail"
+      }
+    ],
+    "language_docs_valid": true,
+    "link_failures": [],
+    "logical_cpus": 8,
+    "machine": "x86_64",
+    "machine_schema_valid": true,
+    "manifest_schema_valid": true,
+    "migration": {
+      "path": "tools/quality/fixtures/v1-flow.toml",
+      "status": "fail"
+    },
+    "os": "Linux-7.0.0-31-generic-x86_64-with-glibc2.43",
+    "processor": "",
+    "python": "3.14.4",
+    "quality_example_valid": false,
+    "quality_schema_synced": false,
+    "registry_schema_valid": true,
+    "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+    "sandbox_wording": {
+      "failures": [],
+      "status": "pass"
+    },
+    "schema_synced": false,
+    "status": "fail",
+    "target": "x86_64-unknown-linux-gnu",
+    "timestamp_utc": "2026-09-11T10:54:20.241630+00:00",
+    "tool": "docs-consistency"
+  },
+  "docs": {
+    "command": [
+      "python3",
+      "tools/quality/docs_consistency.py",
+      "--output",
+      "target/quality/docs-consistency.json"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "OPENSPEC_TELEMETRY": "0"
+    },
+    "exit_code": 1,
+    "wall_seconds": 1.730766060994938
+  },
+  "focused-1": {
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "test_rust_collector_runtime.StandaloneNativeTests.test_actual_core_configures_installed_collector_without_retry_or_fallback",
+      "-v"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "RUST_COLLECTOR_RUNTIME": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/continued/runtime",
+      "HARNESS_GATE_NATIVE_POLICY_BINARY": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/symphony-inputs/core-v0.4.0/harness-gate-linux-amd64",
+      "PYTHONPATH": "/mnt/dev-ssd/workspaces/symphony/GH-230/tools/quality/tests",
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+      "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp"
+    },
+    "exit_code": 1,
+    "wall_seconds": 7.354649164015427
+  },
+  "focused-2": {
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "test_rust_collector_runtime.StandaloneNativeTests.test_actual_core_configures_installed_collector_without_retry_or_fallback",
+      "-v"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "RUST_COLLECTOR_RUNTIME": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/continued/runtime",
+      "HARNESS_GATE_NATIVE_POLICY_BINARY": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/symphony-inputs/core-v0.4.0/harness-gate-linux-amd64",
+      "PYTHONPATH": "/mnt/dev-ssd/workspaces/symphony/GH-230/tools/quality/tests",
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+      "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp"
+    },
+    "exit_code": 0,
+    "wall_seconds": 14.538274944992736
+  },
+  "openspec-final": {
+    "command": [
+      "openspec",
+      "validate",
+      "package-official-rust-collector-for-independent-delivery",
+      "--strict",
+      "--no-interactive"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+      "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "OPENSPEC_TELEMETRY": "0"
+    },
+    "proxy_environment_removed": true,
+    "exit_code": 0,
+    "wall_seconds": 0.6148566139745526
+  },
+  "openspec": {
+    "command": [
+      "openspec",
+      "validate",
+      "package-official-rust-collector-for-independent-delivery",
+      "--strict",
+      "--no-interactive"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "OPENSPEC_TELEMETRY": "0"
+    },
+    "exit_code": 0,
+    "wall_seconds": 0.6055498660425656
+  },
+  "python-corrected": {
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tools/quality/tests",
+      "-v"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "RUST_COLLECTOR_RUNTIME": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/continued/runtime",
+      "HARNESS_GATE_NATIVE_POLICY_BINARY": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/symphony-inputs/core-v0.4.0/harness-gate-linux-amd64",
+      "PYTHONPATH": "/mnt/dev-ssd/workspaces/symphony/GH-230/tools/quality/tests",
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+      "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "NATIVE_DRIVER": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/operator-native-runtime/build/debug/harness-gate-rust-native-driver",
+      "NATIVE_DRIVER_SYSROOT": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu",
+      "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "RUST_COLLECTOR_TEST_VENDOR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/continued/vendor"
+    },
+    "proxy_environment_removed": true,
+    "exit_code": 0,
+    "wall_seconds": 287.4525621290086
+  },
+  "python-full": {
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tools/quality/tests",
+      "-v"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "RUST_COLLECTOR_RUNTIME": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/continued/runtime",
+      "HARNESS_GATE_NATIVE_POLICY_BINARY": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/symphony-inputs/core-v0.4.0/harness-gate-linux-amd64",
+      "PYTHONPATH": "/mnt/dev-ssd/workspaces/symphony/GH-230/tools/quality/tests",
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+      "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "NATIVE_DRIVER": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/operator-native-runtime/build/debug/harness-gate-rust-native-driver",
+      "NATIVE_DRIVER_SYSROOT": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu",
+      "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp"
+    },
+    "proxy_environment_removed": true,
+    "exit_code": 1,
+    "wall_seconds": 279.9180602490087
+  },
+  "tested-sources": [
+    {
+      "path": "tools/quality/tests/rust_collector_config_fixture.py",
+      "sha256": "b01ec772de2791749b687dc027b8004ee009b28464d8a0c5d3751d69358f1356"
+    },
+    {
+      "path": "tools/quality/tests/test_rust_collector_runtime.py",
+      "sha256": "a1365fc4e0eec802591636dbfb5dde7a62ef3dfc627a785fb1e7aef74e1ee70d"
+    }
+  ]
+}

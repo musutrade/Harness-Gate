@@ -1,0 +1,3 @@
+Flag --offline has been deprecated, To verify in an airgapped environment, provide a --bundle with the signature and verification material, and a --trusted-root file with the service keys and certificates
+Error: failed to verify certificate identity: no matching CertificateIdentity found, last error: expected SAN value "unapproved@example.invalid", got "keyless@projectsigstore.iam.gserviceaccount.com"
+error during command execution: failed to verify certificate identity: no matching CertificateIdentity found, last error: expected SAN value "unapproved@example.invalid", got "keyless@projectsigstore.iam.gserviceaccount.com"

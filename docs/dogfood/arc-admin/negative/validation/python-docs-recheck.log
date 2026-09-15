@@ -1,0 +1,29 @@
+test_accepts_current_bounded_wording (test_docs_consistency.DocsConsistencySandboxWordingTests.test_accepts_current_bounded_wording) ... ok
+test_rejects_complete_descendant_claim (test_docs_consistency.DocsConsistencySandboxWordingTests.test_rejects_complete_descendant_claim) ... ok
+test_rejects_positive_os_sandbox_claim (test_docs_consistency.DocsConsistencySandboxWordingTests.test_rejects_positive_os_sandbox_claim) ... ok
+test_all_presets_migration_and_schema_use_locked_cargo (test_docs_consistency.DocsExecutionTests.test_all_presets_migration_and_schema_use_locked_cargo) ... ok
+test_each_cli_failure_and_migration_schema_drift_still_blocks (test_docs_consistency.DocsExecutionTests.test_each_cli_failure_and_migration_schema_drift_still_blocks) ... quality gate failed: documentation, examples, or schema synchronization failed
+quality gate failed: documentation, examples, or schema synchronization failed
+quality gate failed: documentation, examples, or schema synchronization failed
+quality gate failed: documentation, examples, or schema synchronization failed
+quality gate failed: documentation, examples, or schema synchronization failed
+quality gate failed: documentation, examples, or schema synchronization failed
+quality gate failed: documentation, examples, or schema synchronization failed
+quality gate failed: documentation, examples, or schema synchronization failed
+quality gate failed: documentation, examples, or schema synchronization failed
+quality gate failed: documentation, examples, or schema synchronization failed
+quality gate failed: documentation, examples, or schema synchronization failed
+quality gate failed: documentation, examples, or schema synchronization failed
+quality gate failed: documentation, examples, or schema synchronization failed
+quality gate failed: documentation, examples, or schema synchronization failed
+quality gate failed: documentation, examples, or schema synchronization failed
+quality gate failed: documentation, examples, or schema synchronization failed
+quality gate failed: documentation, examples, or schema synchronization failed
+quality gate failed: documentation, examples, or schema synchronization failed
+quality gate failed: documentation, examples, or schema synchronization failed
+ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 9.414s
+
+OK

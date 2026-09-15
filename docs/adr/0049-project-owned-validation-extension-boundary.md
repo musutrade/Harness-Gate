@@ -54,4 +54,15 @@ Rejected because implementation agents can otherwise interpret dogfood failures 
 
 ## Validation
 
-The Arc-Admin dogfood change will validate the decision against real Playwright E2E/full-stack smoke, Rust integration tests, OpenAPI generation consistency, PostgreSQL services and project-specific workflow gates. Future regression checks should demonstrate that an unknown executable test runner can participate through generic configuration without schema or Generic Core redesign.
+GH-208's [authority-transfer recommendation](../dogfood/arc-admin/decision/README.md)
+retains `cargo flow` authority and bounded shadow mode. Native quality, complete
+host/routing parity and complete cost evidence remain blocked despite bounded
+traditional command parity. Result remains validation evidence, not lifecycle
+state. Existing infrastructure and assurance remain intact; this recommendation
+does not change this ADR's proposed status or accept the whole dogfood proposal.
+
+The [frozen Arc-Admin before state](../dogfood/arc-admin/README.md) records real Playwright E2E/full-stack smoke, Rust integration tests, OpenAPI generation consistency, PostgreSQL services and project-specific workflow gates. Its source hashes, inventory and historical CI timing calculations are checked offline by `docs/dogfood/arc-admin/reproduce.py` and the quality-script tests.
+
+`project_owned_runner_replacement_preserves_generic_command_gate` in `tools/harness-gate/tests/failure_paths_test.rs` exercises two unknown executable runners through the same generic configuration contract, including blocking failures, logs and sealed evidence. Documentation consistency requires the extension-layer and project-ownership policy anchors. No Generic Core or schema special case is added.
+
+GH-202 adds [execution import fixtures, loss detection and UX measurements](../dogfood/arc-admin/import/README.md) for all 25 baseline blockers. E2E/API/smoke/generation/deployment commands remain unchanged project declarations. Import requires an explicit execution-only scope and reports runtime incompatibilities; neither these fixtures nor the baseline establish shadow parity or authority transfer. The complete OpenSpec change and this ADR remain proposed.

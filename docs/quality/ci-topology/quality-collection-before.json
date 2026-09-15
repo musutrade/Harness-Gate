@@ -1,0 +1,55 @@
+{
+  "run_id": 34806146019,
+  "job_id": 103858306352,
+  "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34806146019/job/103858306352",
+  "candidate_sha256": "022952dd781b78c1cbcd435e65f92286c67841576f5ab3de647d3fc4ea7221f0",
+  "head": "4fb1409b2ed9af01fbfafef2880e17e833838a84",
+  "base": "4fcc781cb6fb2afda5f13c2efaf6e443e857626d",
+  "job_seconds": 844,
+  "stages": {
+    "legacy": {
+      "seconds": 247.05197866400002,
+      "status": "success"
+    },
+    "matrix": {
+      "seconds": 76.69577317400001,
+      "status": "success"
+    },
+    "production": {
+      "seconds": 2.173115964000033,
+      "status": "success"
+    },
+    "risk": {
+      "seconds": 439.416284838,
+      "status": "success"
+    }
+  },
+  "command_seconds": {
+    "legacy": 247.05138292200002,
+    "production": 2.1721896840000454,
+    "analyzer-build": 4.283413328999984,
+    "base-archive": 1.6604304570000181,
+    "base-prepare": 0.9073103500000457,
+    "base-coverage": 204.91216885,
+    "base-lcov": 0.7452833170000304,
+    "base-cobertura.xml": 0.7804402430000437,
+    "base-measure": 8.05487360199993,
+    "head-archive": 1.6501438479999706,
+    "head-prepare": 0.8997934530000293,
+    "head-coverage": 203.6066985199999,
+    "head-lcov": 0.7469888200000696,
+    "head-cobertura.xml": 0.7845883710000408,
+    "head-measure": 7.92778801299994,
+    "risk-compare": 0.15651966299992637,
+    "matrix": 76.69492997000009
+  },
+  "artifact_zip_bytes": 1358880700,
+  "source_archives": {
+    "base-source.tar": 704481280,
+    "head-source.tar": 706078720
+  },
+  "base_tests_seconds": 183.371,
+  "head_tests_seconds": 182.185,
+  "base_test_build_seconds": 20.19,
+  "head_test_build_seconds": 20.04
+}

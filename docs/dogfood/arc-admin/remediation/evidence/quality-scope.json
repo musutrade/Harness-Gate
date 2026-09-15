@@ -1,0 +1,16 @@
+{
+  "name": "quality-scope",
+  "argv": [
+    "/mnt/dev-ssd/workspaces/symphony/GH-207/target/debug/harness-gate",
+    "--project-root",
+    "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source",
+    "--config",
+    ".harness-gate/flow.toml",
+    "scope",
+    "--all"
+  ],
+  "started_at": "2026-09-10T09:58:46.746170+00:00",
+  "completed_at": "2026-09-10T09:58:46.840426+00:00",
+  "elapsed_seconds": 0.094300574,
+  "exit_code": 0
+}

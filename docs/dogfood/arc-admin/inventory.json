@@ -1,0 +1,1354 @@
+{
+  "repository": "musutrade/arc-admin",
+  "commit": "9982ed556eaf997910824d7b682946147c81a16a",
+  "flow": {
+    "version": 2,
+    "project": {
+      "name": "arc-admin",
+      "default_profile": "full",
+      "hook_profile": "hook"
+    },
+    "paths": {
+      "reports": "codex-audit-pipeline/.codex/reports",
+      "audit_config": "codex-audit-pipeline/.codex/audit.toml",
+      "secrets_config": "codex-audit-pipeline/.codex/secrets.toml",
+      "aliases": {
+        "backend": {
+          "path": "backend",
+          "env": "ARC_FLOW_BACKEND"
+        },
+        "frontend": {
+          "path": "frontend",
+          "env": "ARC_FLOW_FRONTEND"
+        },
+        "tool_manifest": {
+          "path": "codex-audit-pipeline/tools/arc-flow/Cargo.toml",
+          "env": "ARC_FLOW_TOOL_MANIFEST"
+        }
+      }
+    },
+    "policy": {
+      "required_steps": [
+        "backend.format",
+        "backend.clippy",
+        "backend.compile",
+        "backend.tests",
+        "frontend.lint",
+        "frontend.format",
+        "frontend.tests",
+        "frontend.e2e",
+        "frontend.fullstack-smoke",
+        "frontend.build",
+        "workflow.hook-syntax",
+        "workflow.project-init-tests",
+        "workflow.template-quality",
+        "workflow.template-quality-tests",
+        "workflow.observability-config",
+        "workflow.tracing-config",
+        "workflow.production-deployment-config",
+        "workflow.audit-retention-config",
+        "workflow.api-generation",
+        "workflow.supply-chain-config",
+        "workflow.format",
+        "workflow.clippy",
+        "workflow.tests"
+      ]
+    },
+    "doctor": {
+      "checks": [
+        {
+          "id": "tool.git",
+          "label": "git",
+          "kind": "command",
+          "program": "git",
+          "args": [
+            "--version"
+          ]
+        },
+        {
+          "id": "tool.cargo",
+          "label": "cargo",
+          "kind": "command",
+          "program": "cargo",
+          "args": [
+            "--version"
+          ]
+        },
+        {
+          "id": "tool.rustc",
+          "label": "rustc",
+          "kind": "command",
+          "program": "rustc",
+          "args": [
+            "--version"
+          ]
+        },
+        {
+          "id": "tool.node",
+          "label": "node",
+          "kind": "command",
+          "program": "node",
+          "args": [
+            "--version"
+          ]
+        },
+        {
+          "id": "tool.npm",
+          "label": "npm",
+          "kind": "command",
+          "program": "npm",
+          "args": [
+            "--version"
+          ]
+        },
+        {
+          "id": "frontend.dependencies",
+          "label": "frontend dependencies",
+          "kind": "path",
+          "path": "{frontend}/node_modules",
+          "path_type": "directory",
+          "help": "run `cd frontend && npm ci`"
+        },
+        {
+          "id": "runtime.database",
+          "label": "runtime database",
+          "kind": "env-or-file",
+          "env": "DATABASE_URL",
+          "path": "{backend}/.env",
+          "contains": "DATABASE_URL=",
+          "help": "create backend/.env from backend/.env.example"
+        },
+        {
+          "id": "backend.migrations",
+          "label": "migrations",
+          "kind": "glob",
+          "pattern": "{backend}/migrations/*.sql",
+          "help": "add at least one SQL migration"
+        },
+        {
+          "id": "git.hooks",
+          "label": "Git hooks",
+          "required": false,
+          "kind": "git-config",
+          "key": "core.hooksPath",
+          "expected": "codex-audit-pipeline/hooks",
+          "help": "run `git config core.hooksPath codex-audit-pipeline/hooks`"
+        },
+        {
+          "id": "node.version",
+          "label": "Node version",
+          "kind": "version",
+          "program": "node",
+          "args": [
+            "--version"
+          ],
+          "path": "{root}/.node-version",
+          "trim_prefix": "v"
+        },
+        {
+          "id": "git.remotes",
+          "label": "Git remotes",
+          "kind": "git-remotes"
+        },
+        {
+          "id": "test.database",
+          "label": "test database",
+          "required": false,
+          "kind": "service",
+          "service": "test-postgres",
+          "help": "configure TEST_DATABASE_URL or Docker"
+        }
+      ]
+    },
+    "services": {
+      "test-postgres": {
+        "kind": "docker",
+        "image": "postgres:16-alpine",
+        "image_env": "ARC_FLOW_POSTGRES_IMAGE",
+        "external_env": "TEST_DATABASE_URL",
+        "inject_env": "TEST_DATABASE_URL",
+        "external_value_policy": "isolated-postgres",
+        "startup_timeout_secs": 30,
+        "timeout_env": "ARC_FLOW_DATABASE_TIMEOUT_SECS",
+        "container_port": 5432,
+        "environment": {
+          "POSTGRES_USER": "arc_admin_test",
+          "POSTGRES_PASSWORD": "arc_admin_test",
+          "POSTGRES_DB": "arc_admin_test"
+        },
+        "healthcheck": [
+          "pg_isready",
+          "-h",
+          "127.0.0.1",
+          "-U",
+          "arc_admin_test",
+          "-d",
+          "arc_admin_test"
+        ],
+        "connection": "postgres://arc_admin_test:arc_admin_test@127.0.0.1:{host_port}/arc_admin_test"
+      }
+    },
+    "parsers": {
+      "rust": {
+        "kind": "regex",
+        "patterns": [
+          "(?m)^running ([0-9]+) tests?$"
+        ],
+        "capture": 1,
+        "minimum": 1
+      },
+      "angular": {
+        "kind": "regex",
+        "patterns": [
+          "Tests\\s+([0-9]+) passed"
+        ],
+        "capture": 1,
+        "minimum": 1
+      }
+    },
+    "scope": {
+      "unmatched": "fail",
+      "rules": [
+        {
+          "patterns": [
+            "README.md",
+            "CHANGELOG.md",
+            ".gitignore",
+            ".gitattributes",
+            ".dockerignore",
+            "AGENTS.md",
+            "start.sh",
+            "deny.toml",
+            "scripts/**",
+            "observability/**",
+            "deployment/**",
+            "compose.production.yaml",
+            "FRAMEWORK_VERSION",
+            ".arc-framework/**",
+            ".arc-project.json",
+            "docs/**",
+            "extracted/**",
+            "codex-audit-pipeline/README.md",
+            "codex-audit-pipeline/docs/**",
+            ".github/**"
+          ],
+          "components": [
+            "workflow"
+          ]
+        },
+        {
+          "patterns": [
+            "backend/**"
+          ],
+          "components": [
+            "backend"
+          ]
+        },
+        {
+          "patterns": [
+            "frontend/**",
+            ".node-version"
+          ],
+          "components": [
+            "frontend"
+          ]
+        },
+        {
+          "patterns": [
+            "rust-toolchain.toml"
+          ],
+          "components": [
+            "backend",
+            "workflow"
+          ]
+        },
+        {
+          "patterns": [
+            ".arc-flow/**",
+            "codex-audit-pipeline/tools/arc-flow/**",
+            "codex-audit-pipeline/hooks/**",
+            ".cargo/config.toml"
+          ],
+          "components": [
+            "backend",
+            "frontend",
+            "workflow"
+          ]
+        },
+        {
+          "patterns": [
+            "backend/src/openapi.rs",
+            "backend/src/bin/export_openapi.rs",
+            "docs/openapi.json",
+            "frontend/ng-openapi-gen.json",
+            "frontend/src/app/generated/api/**",
+            ".github/workflows/**"
+          ],
+          "components": [
+            "backend",
+            "frontend",
+            "workflow"
+          ]
+        },
+        {
+          "patterns": [
+            "codex-audit-pipeline/.codex/audit.toml",
+            "codex-audit-pipeline/.codex/secrets.toml",
+            "codex-audit-pipeline/.codex/templates/**"
+          ],
+          "components": [
+            "workflow"
+          ]
+        }
+      ]
+    },
+    "steps": [
+      {
+        "id": "backend.format",
+        "label": "backend format",
+        "component": "backend",
+        "profiles": [
+          "full",
+          "hook"
+        ],
+        "program": "cargo",
+        "args": [
+          "fmt",
+          "--manifest-path",
+          "{backend}/Cargo.toml",
+          "--",
+          "--check"
+        ],
+        "cwd": "{root}",
+        "log": "backend_fmt.log",
+        "timeout_secs": 180
+      },
+      {
+        "id": "backend.clippy",
+        "label": "backend Clippy",
+        "component": "backend",
+        "profiles": [
+          "full",
+          "hook"
+        ],
+        "program": "cargo",
+        "args": [
+          "clippy",
+          "--manifest-path",
+          "{backend}/Cargo.toml",
+          "--locked",
+          "--all-targets",
+          "--all-features",
+          "--",
+          "-D",
+          "warnings",
+          "-D",
+          "clippy::allow_attributes_without_reason"
+        ],
+        "cwd": "{root}",
+        "log": "backend_clippy.log",
+        "timeout_secs": 180
+      },
+      {
+        "id": "backend.compile",
+        "label": "backend compile",
+        "component": "backend",
+        "profiles": [
+          "full"
+        ],
+        "program": "cargo",
+        "args": [
+          "check",
+          "--manifest-path",
+          "{backend}/Cargo.toml",
+          "--locked",
+          "--all-targets"
+        ],
+        "cwd": "{root}",
+        "log": "backend_check.log",
+        "timeout_secs": 180
+      },
+      {
+        "id": "backend.tests",
+        "label": "backend tests",
+        "component": "backend",
+        "profiles": [
+          "full"
+        ],
+        "program": "cargo",
+        "args": [
+          "test",
+          "--manifest-path",
+          "{backend}/Cargo.toml",
+          "--locked",
+          "--",
+          "--nocapture"
+        ],
+        "cwd": "{root}",
+        "log": "backend_tests.log",
+        "timeout_secs": 600,
+        "timeout_env": "RUST_TEST_TIMEOUT",
+        "parser": "rust",
+        "services": [
+          "test-postgres"
+        ],
+        "remove_env": [
+          "DATABASE_URL"
+        ]
+      },
+      {
+        "id": "frontend.lint",
+        "label": "frontend lint",
+        "component": "frontend",
+        "profiles": [
+          "full",
+          "hook"
+        ],
+        "program": "npm",
+        "args": [
+          "exec",
+          "--offline",
+          "eslint",
+          "--",
+          "src",
+          "--max-warnings=0"
+        ],
+        "cwd": "{frontend}",
+        "log": "frontend_lint.log",
+        "timeout_secs": 180
+      },
+      {
+        "id": "frontend.format",
+        "label": "frontend format",
+        "component": "frontend",
+        "profiles": [
+          "full",
+          "hook"
+        ],
+        "program": "npm",
+        "args": [
+          "run",
+          "format:check"
+        ],
+        "cwd": "{frontend}",
+        "log": "frontend_format.log",
+        "timeout_secs": 180
+      },
+      {
+        "id": "frontend.tests",
+        "label": "frontend tests",
+        "component": "frontend",
+        "profiles": [
+          "full"
+        ],
+        "program": "npm",
+        "args": [
+          "test",
+          "--",
+          "--watch=false",
+          "--runner=vitest"
+        ],
+        "cwd": "{frontend}",
+        "log": "frontend_tests.log",
+        "timeout_secs": 180,
+        "timeout_env": "ANGULAR_TEST_TIMEOUT",
+        "parser": "angular"
+      },
+      {
+        "id": "frontend.e2e",
+        "label": "frontend end-to-end tests",
+        "component": "frontend",
+        "profiles": [
+          "full"
+        ],
+        "program": "npm",
+        "args": [
+          "run",
+          "e2e"
+        ],
+        "cwd": "{frontend}",
+        "log": "frontend_e2e.log",
+        "timeout_secs": 240
+      },
+      {
+        "id": "frontend.fullstack-smoke",
+        "label": "frontend real full-stack smoke test",
+        "component": "frontend",
+        "profiles": [
+          "full"
+        ],
+        "program": "npm",
+        "args": [
+          "run",
+          "e2e:fullstack"
+        ],
+        "cwd": "{frontend}",
+        "log": "frontend_fullstack_smoke.log",
+        "timeout_secs": 420,
+        "services": [
+          "test-postgres"
+        ],
+        "remove_env": [
+          "DATABASE_URL"
+        ]
+      },
+      {
+        "id": "frontend.build",
+        "label": "frontend production build",
+        "component": "frontend",
+        "profiles": [
+          "full"
+        ],
+        "program": "npm",
+        "args": [
+          "run",
+          "build"
+        ],
+        "cwd": "{frontend}",
+        "log": "frontend_build.log",
+        "timeout_secs": 180,
+        "timeout_env": "ANGULAR_BUILD_TIMEOUT"
+      },
+      {
+        "id": "workflow.hook-syntax",
+        "label": "Git hook syntax",
+        "component": "workflow",
+        "profiles": [
+          "full",
+          "hook"
+        ],
+        "program": "sh",
+        "args": [
+          "-n",
+          "{root}/codex-audit-pipeline/hooks/pre-commit"
+        ],
+        "cwd": "{root}",
+        "log": "git_hook_syntax.log",
+        "timeout_secs": 180
+      },
+      {
+        "id": "workflow.project-init-tests",
+        "label": "project initializer tests",
+        "component": "workflow",
+        "profiles": [
+          "full",
+          "hook"
+        ],
+        "program": "node",
+        "args": [
+          "--test",
+          "{root}/scripts/init-project.test.mjs"
+        ],
+        "cwd": "{root}",
+        "log": "project_init_tests.log",
+        "timeout_secs": 60
+      },
+      {
+        "id": "workflow.framework-release-config",
+        "label": "framework release configuration gate",
+        "component": "workflow",
+        "profiles": [
+          "full",
+          "hook"
+        ],
+        "program": "node",
+        "args": [
+          "{root}/scripts/check-framework-release.mjs"
+        ],
+        "cwd": "{root}",
+        "log": "framework_release_config.log",
+        "timeout_secs": 60
+      },
+      {
+        "id": "workflow.framework-upgrade-tests",
+        "label": "framework upgrade tests",
+        "component": "workflow",
+        "profiles": [
+          "full",
+          "hook"
+        ],
+        "program": "node",
+        "args": [
+          "--test",
+          "{root}/scripts/upgrade-framework.test.mjs"
+        ],
+        "cwd": "{root}",
+        "log": "framework_upgrade_tests.log",
+        "timeout_secs": 60
+      },
+      {
+        "id": "workflow.template-quality",
+        "label": "template quality gate",
+        "component": "workflow",
+        "profiles": [
+          "full",
+          "hook"
+        ],
+        "program": "node",
+        "args": [
+          "{root}/scripts/check-templates.mjs"
+        ],
+        "cwd": "{root}",
+        "log": "template_quality.log",
+        "timeout_secs": 60
+      },
+      {
+        "id": "workflow.template-quality-tests",
+        "label": "template quality gate tests",
+        "component": "workflow",
+        "profiles": [
+          "full",
+          "hook"
+        ],
+        "program": "node",
+        "args": [
+          "--test",
+          "{root}/scripts/check-templates.test.mjs"
+        ],
+        "cwd": "{root}",
+        "log": "template_quality_tests.log",
+        "timeout_secs": 60
+      },
+      {
+        "id": "workflow.observability-config",
+        "label": "observability configuration gate",
+        "component": "workflow",
+        "profiles": [
+          "full",
+          "hook"
+        ],
+        "program": "node",
+        "args": [
+          "{root}/scripts/check-observability.mjs"
+        ],
+        "cwd": "{root}",
+        "log": "observability_config.log",
+        "timeout_secs": 60
+      },
+      {
+        "id": "workflow.tracing-config",
+        "label": "optional tracing and compliance configuration gate",
+        "component": "workflow",
+        "profiles": [
+          "full",
+          "hook"
+        ],
+        "program": "node",
+        "args": [
+          "{root}/scripts/check-tracing.mjs"
+        ],
+        "cwd": "{root}",
+        "log": "tracing_config.log",
+        "timeout_secs": 60
+      },
+      {
+        "id": "workflow.production-deployment-config",
+        "label": "production deployment configuration gate",
+        "component": "workflow",
+        "profiles": [
+          "full",
+          "hook"
+        ],
+        "program": "node",
+        "args": [
+          "{root}/scripts/check-production-deployment.mjs"
+        ],
+        "cwd": "{root}",
+        "log": "production_deployment_config.log",
+        "timeout_secs": 60
+      },
+      {
+        "id": "workflow.audit-retention-config",
+        "label": "audit retention and archive configuration gate",
+        "component": "workflow",
+        "profiles": [
+          "full",
+          "hook"
+        ],
+        "program": "node",
+        "args": [
+          "{root}/scripts/check-audit-retention.mjs"
+        ],
+        "cwd": "{root}",
+        "log": "audit_retention_config.log",
+        "timeout_secs": 60
+      },
+      {
+        "id": "workflow.api-generation",
+        "label": "Rust OpenAPI and Angular client generation gate",
+        "component": "workflow",
+        "profiles": [
+          "full"
+        ],
+        "program": "node",
+        "args": [
+          "{root}/scripts/check-api-generation.mjs"
+        ],
+        "cwd": "{root}",
+        "log": "api_generation.log",
+        "timeout_secs": 180
+      },
+      {
+        "id": "workflow.supply-chain-config",
+        "label": "supply chain security configuration gate",
+        "component": "workflow",
+        "profiles": [
+          "full",
+          "hook"
+        ],
+        "program": "node",
+        "args": [
+          "{root}/scripts/check-supply-chain.mjs"
+        ],
+        "cwd": "{root}",
+        "log": "supply_chain_config.log",
+        "timeout_secs": 60
+      },
+      {
+        "id": "workflow.format",
+        "label": "arc-flow format",
+        "component": "workflow",
+        "profiles": [
+          "full",
+          "hook"
+        ],
+        "program": "cargo",
+        "args": [
+          "fmt",
+          "--manifest-path",
+          "{tool_manifest}",
+          "--",
+          "--check"
+        ],
+        "cwd": "{root}",
+        "log": "arc_flow_fmt.log",
+        "timeout_secs": 180
+      },
+      {
+        "id": "workflow.clippy",
+        "label": "arc-flow Clippy",
+        "component": "workflow",
+        "profiles": [
+          "full"
+        ],
+        "program": "cargo",
+        "args": [
+          "clippy",
+          "--manifest-path",
+          "{tool_manifest}",
+          "--locked",
+          "--all-targets",
+          "--all-features",
+          "--",
+          "-D",
+          "warnings",
+          "-D",
+          "clippy::allow_attributes_without_reason"
+        ],
+        "cwd": "{root}",
+        "log": "arc_flow_clippy.log",
+        "timeout_secs": 180
+      },
+      {
+        "id": "workflow.tests",
+        "label": "arc-flow tests",
+        "component": "workflow",
+        "profiles": [
+          "full",
+          "hook"
+        ],
+        "program": "cargo",
+        "args": [
+          "test",
+          "--manifest-path",
+          "{tool_manifest}",
+          "--locked",
+          "--",
+          "--nocapture"
+        ],
+        "cwd": "{root}",
+        "log": "arc_flow_tests.log",
+        "timeout_secs": 120,
+        "timeout_env": "RUST_TEST_TIMEOUT",
+        "parser": "rust"
+      }
+    ]
+  },
+  "audit": {
+    "version": 2,
+    "engine": {
+      "ignore_filename": ".auditignore",
+      "json_report_filename": "review_context.json",
+      "markdown_report_filename": "review_context.md",
+      "markdown_max_bytes": 4096,
+      "markdown_occurrences_per_rule": 3,
+      "comment_syntax": {
+        "rs": {
+          "line": [
+            "//"
+          ],
+          "block": [
+            {
+              "start": "/*",
+              "end": "*/",
+              "nested": true
+            }
+          ],
+          "strings": [
+            {
+              "start": "r###\"",
+              "end": "\"###"
+            },
+            {
+              "start": "r##\"",
+              "end": "\"##"
+            },
+            {
+              "start": "r#\"",
+              "end": "\"#"
+            },
+            {
+              "start": "r\"",
+              "end": "\""
+            },
+            {
+              "start": "\"",
+              "end": "\"",
+              "escape": "\\"
+            }
+          ]
+        },
+        "sql": {
+          "line": [
+            "--"
+          ],
+          "block": [
+            {
+              "start": "/*",
+              "end": "*/"
+            }
+          ],
+          "strings": [
+            {
+              "start": "'",
+              "end": "'"
+            },
+            {
+              "start": "\"",
+              "end": "\""
+            }
+          ]
+        },
+        "ts": {
+          "line": [
+            "//"
+          ],
+          "block": [
+            {
+              "start": "/*",
+              "end": "*/"
+            }
+          ],
+          "strings": [
+            {
+              "start": "'",
+              "end": "'",
+              "escape": "\\"
+            },
+            {
+              "start": "\"",
+              "end": "\"",
+              "escape": "\\"
+            },
+            {
+              "start": "`",
+              "end": "`",
+              "escape": "\\"
+            }
+          ]
+        },
+        "tmpl": {
+          "line": [
+            "//"
+          ],
+          "block": [
+            {
+              "start": "/*",
+              "end": "*/",
+              "nested": true
+            }
+          ],
+          "strings": [
+            {
+              "start": "r#\"",
+              "end": "\"#"
+            },
+            {
+              "start": "\"",
+              "end": "\"",
+              "escape": "\\"
+            }
+          ]
+        }
+      }
+    },
+    "paths": {
+      "backend": "backend",
+      "frontend": "frontend",
+      "exclude": [
+        "target",
+        "node_modules",
+        "dist",
+        ".git",
+        "tools"
+      ]
+    },
+    "hard_rules": [
+      {
+        "name": "SQL \u5199\u64cd\u4f5c\u4ec5\u5141\u8bb8\u51fa\u73b0\u5728 Repository/\u8fc1\u79fb/\u6d4b\u8bd5\u5c42",
+        "severity": "blocker",
+        "paths": [
+          "backend"
+        ],
+        "extensions": [
+          "rs",
+          "sql"
+        ],
+        "patterns": [
+          "(?i)INSERT\\s+INTO",
+          "(?i)UPDATE\\s+(?:\"[^\"]+\"|[A-Za-z_][A-Za-z0-9_.]*)\\s+SET",
+          "(?i)DELETE\\s+FROM",
+          "(?i)DROP\\s+TABLE",
+          "(?i)ALTER\\s+TABLE",
+          "(?i)TRUNCATE",
+          "(?:sqlx\\s*::\\s*)?raw_sql\\s*\\(",
+          "(?:sqlx\\s*::\\s*)?QueryBuilder(?:\\s*::<[^>]+>)?\\s*::\\s*new\\s*\\(",
+          "\\.execute\\s*\\(",
+          "\\.exec\\s*\\("
+        ],
+        "allowlist": [
+          {
+            "kind": "path-prefix",
+            "path": "backend/src/repositories"
+          },
+          {
+            "kind": "path-prefix",
+            "path": "backend/src/db.rs"
+          },
+          {
+            "kind": "path-prefix",
+            "path": "backend/migrations"
+          },
+          {
+            "kind": "path-prefix",
+            "path": "backend/tests"
+          },
+          {
+            "kind": "path-prefix",
+            "path": "backend/src/seed"
+          }
+        ],
+        "exclude_patterns": []
+      },
+      {
+        "name": "\u4ee3\u7801\u6a21\u677f\u4e0d\u5f97\u5f15\u7528\u8fc7\u65f6\u6846\u67b6",
+        "severity": "error",
+        "paths": [
+          "codex-audit-pipeline/.codex/templates"
+        ],
+        "extensions": [
+          "tmpl"
+        ],
+        "patterns": [
+          "actix_web",
+          "actix-web",
+          "HttpResponse"
+        ],
+        "allowlist": [],
+        "exclude_patterns": []
+      },
+      {
+        "name": "\u65e5\u5fd7\u4e0d\u5f97\u8bb0\u5f55\u5b8c\u6574\u8bf7\u6c42\u5934\u6216\u663e\u5f0f\u654f\u611f\u5b57\u6bb5",
+        "severity": "blocker",
+        "paths": [
+          "backend/src"
+        ],
+        "extensions": [
+          "rs"
+        ],
+        "patterns": [
+          "include_headers\\s*\\(\\s*true\\s*\\)",
+          "(?is)(?:tracing\\s*::\\s*)?(?:trace|debug|info|warn|error)!\\s*\\([^;]*?\\b(?:authorization|cookie|password|(?:access_|refresh_)?token|database_url)\\s*=",
+          "(?is)(?:tracing\\s*::\\s*)?(?:trace|debug|info|warn|error)!\\s*\\([^;]*?[?%]\\s*(?:authorization|cookie|password|(?:access_|refresh_)?token|database_url)\\b"
+        ],
+        "allowlist": [],
+        "exclude_patterns": []
+      }
+    ],
+    "arch_rules": [
+      {
+        "name": "Service \u5c42\u4e0d\u5e94\u5305\u542b SQL \u67e5\u8be2",
+        "layer": "service",
+        "paths": [
+          "backend/src/services"
+        ],
+        "extensions": [
+          "rs"
+        ],
+        "forbidden_patterns": [
+          "sqlx\\s*::\\s*(?:query|query_as|query_scalar|query_file|query_file_as|raw_sql)!?\\s*\\(",
+          "(?:sqlx\\s*::\\s*)?QueryBuilder(?:\\s*::<[^>]+>)?\\s*::\\s*new\\s*\\("
+        ],
+        "allowed_patterns": [],
+        "suggestion": "\u8bf7\u5c06 SQL \u903b\u8f91\u79fb\u81f3 Repository \u5c42",
+        "allowlist": [],
+        "exclude_patterns": []
+      },
+      {
+        "name": "Handler \u5c42\u4e0d\u5e94\u5305\u542b SQL \u67e5\u8be2",
+        "layer": "handler",
+        "paths": [
+          "backend/src/handlers"
+        ],
+        "extensions": [
+          "rs"
+        ],
+        "forbidden_patterns": [
+          "sqlx\\s*::\\s*(?:query|query_as|query_scalar|query_file|query_file_as|raw_sql)!?\\s*\\(",
+          "(?:sqlx\\s*::\\s*)?QueryBuilder(?:\\s*::<[^>]+>)?\\s*::\\s*new\\s*\\("
+        ],
+        "allowed_patterns": [],
+        "suggestion": "\u8bf7\u5c06 SQL \u903b\u8f91\u79fb\u81f3 Repository \u5c42",
+        "allowlist": [],
+        "exclude_patterns": []
+      },
+      {
+        "name": "Model \u5c42\u4e0d\u5e94\u5305\u542b\u4e1a\u52a1\u903b\u8f91\uff08\u5141\u8bb8\u5e38\u89c1 trait impl\uff09",
+        "layer": "model",
+        "paths": [
+          "backend/src/models.rs"
+        ],
+        "extensions": [
+          "rs"
+        ],
+        "forbidden_patterns": [
+          "^impl\\s+"
+        ],
+        "allowed_patterns": [
+          "^impl(?:<[^>]+>)?\\s+(?:std::fmt::)?(?:Display|Debug|Clone|Copy|Default|PartialEq|Eq|PartialOrd|Ord|Hash|Serialize|Deserialize|From|Into|TryFrom|TryInto|Error|Deref|AsRef|AsMut|Drop|Send|Sync)\\b"
+        ],
+        "suggestion": "Model \u5e94\u4ec5\u4e3a\u7eaf\u6570\u636e\u7ed3\u6784\uff0c\u4e1a\u52a1\u903b\u8f91\u5e94\u653e\u5728 Service \u5c42",
+        "allowlist": [],
+        "exclude_patterns": []
+      },
+      {
+        "name": "Component \u4e0d\u5e94\u76f4\u63a5\u6ce8\u5165 HttpClient",
+        "layer": "component",
+        "paths": [
+          "frontend/src/app/pages",
+          "frontend/src/app/layout"
+        ],
+        "extensions": [
+          "ts"
+        ],
+        "forbidden_patterns": [
+          "HttpClient"
+        ],
+        "allowed_patterns": [],
+        "suggestion": "\u8bf7\u901a\u8fc7 Service \u5c42\u8c03\u7528 API",
+        "allowlist": [],
+        "exclude_patterns": []
+      },
+      {
+        "name": "Service \u5c42\u4e0d\u5e94\u64cd\u4f5c DOM",
+        "layer": "service",
+        "paths": [
+          "frontend/src/app/core"
+        ],
+        "extensions": [
+          "ts"
+        ],
+        "forbidden_patterns": [
+          "@ViewChild",
+          "@ViewChildren",
+          "ElementRef"
+        ],
+        "allowed_patterns": [],
+        "suggestion": "\u8bf7\u5c06 DOM \u64cd\u4f5c\u903b\u8f91\u79fb\u5230 Component \u5c42",
+        "allowlist": [],
+        "exclude_patterns": []
+      },
+      {
+        "name": "\u524d\u7aef Core \u4e0d\u5e94\u4f9d\u8d56\u4e1a\u52a1 Feature",
+        "layer": "frontend-core",
+        "paths": [
+          "frontend/src/app/core"
+        ],
+        "extensions": [
+          "ts"
+        ],
+        "forbidden_patterns": [
+          "from\\s+['\"][^'\"]*features(?:/|['\"])",
+          "import\\s*\\(\\s*['\"][^'\"]*features(?:/|['\"])"
+        ],
+        "allowed_patterns": [],
+        "suggestion": "\u8bf7\u5c06\u4e1a\u52a1\u7ec4\u5408\u653e\u5728 app.routes.ts\u3001app.navigation.ts \u6216\u5bf9\u5e94 features/<domain> \u5185\uff0cCore \u53ea\u80fd\u63d0\u4f9b\u57fa\u7840\u80fd\u529b",
+        "allowlist": [],
+        "exclude_patterns": []
+      },
+      {
+        "name": "Handler \u5c42\u4e0d\u5e94\u76f4\u63a5\u4f9d\u8d56 Repository",
+        "layer": "handler",
+        "paths": [
+          "backend/src/handlers"
+        ],
+        "extensions": [
+          "rs"
+        ],
+        "forbidden_patterns": [
+          "crate::repositories(?:\\b|::)"
+        ],
+        "allowed_patterns": [],
+        "suggestion": "\u8bf7\u7531 Handler \u8c03\u7528 Service\uff0c\u518d\u7531 Service \u8c03\u7528 Repository",
+        "allowlist": [],
+        "exclude_patterns": []
+      },
+      {
+        "name": "Repository \u5c42\u4e0d\u5e94\u4f9d\u8d56\u4e0a\u5c42",
+        "layer": "repository",
+        "paths": [
+          "backend/src/repositories"
+        ],
+        "extensions": [
+          "rs"
+        ],
+        "forbidden_patterns": [
+          "crate::(?:handlers|services)(?:\\b|::)"
+        ],
+        "allowed_patterns": [],
+        "suggestion": "Repository \u53ea\u8d1f\u8d23\u6301\u4e45\u5316\uff0c\u4e0d\u5f97\u4f9d\u8d56 Handler \u6216 Service",
+        "allowlist": [],
+        "exclude_patterns": []
+      }
+    ]
+  },
+  "secrets": {
+    "version": 2,
+    "placeholders": {
+      "minimum_unique_characters": 4,
+      "maximum_nonalphanumeric_characters": 2,
+      "prefixes": [
+        "${",
+        "{{",
+        "<"
+      ],
+      "markers": [
+        "change-me",
+        "changeme",
+        "replace-me",
+        "replace_me",
+        "placeholder",
+        "example",
+        "your-",
+        "your_",
+        "dummy",
+        "not-a-secret",
+        "not_a_secret",
+        "secret-here",
+        "secret_here",
+        "for-testing",
+        "for_testing"
+      ],
+      "exact": [
+        "postgres",
+        "password",
+        "secret",
+        "admin",
+        "test-password",
+        "local-password"
+      ]
+    },
+    "rules": [
+      {
+        "id": "provider-token",
+        "kind": "direct",
+        "pattern": "github_pat_[A-Za-z0-9_]{20,}|gh[pousr]_[A-Za-z0-9]{20,}|glpat-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|npm_[A-Za-z0-9]{36}|eyJ[A-Za-z0-9_-]{8,}\\.[A-Za-z0-9_-]{8,}\\.[A-Za-z0-9_-]{8,}|https?://[^/@\\s]+:[^@\\s]+@[^\\s]+|https://hooks\\.slack\\.com/services/[A-Za-z0-9_-]{8,}/[A-Za-z0-9_-]{8,}/[A-Za-z0-9_-]{20,}|-----BEGIN ([A-Z0-9 ]+ )?PRIVATE KEY-----"
+      },
+      {
+        "id": "named-secret",
+        "kind": "value",
+        "pattern": "(?ix)\n  \\b(?:\n    jwt_(?:secret|signing_(?:key|secret)|encryption_key) |\n    (?:access_|refresh_)?token_secret |\n    session_secret |\n    cookie_secret |\n    auth_secret |\n    (?:wecom|wechat_work|weixin|dingtalk|ding_talk)[a-z0-9_]*(?:secret|token|key) |\n    [a-z0-9_]*webhook_(?:secret|token|key)\n  )\\b\n  (?:\n    [\"']?\\s*[:=]\\s*[\"']? |\n    \\s*:\\s*[^=\\r\\n]{1,40}=\\s*[\"']?\n  )\n  ([A-Za-z0-9][A-Za-z0-9._~+/=-]{7,})\n",
+        "capture": 1,
+        "minimum_length": 12
+      },
+      {
+        "id": "postgres-credentials",
+        "kind": "postgres-url",
+        "pattern": "(?ix)\n  \\bpostgres(?:ql)?://\n  ([^:/@\\s\"'<>]+):\n  ([^@/\\s\"'<>]+)@\n  (\\[[^\\]]+\\]|[^:/\\s\"'<>]+)\n  (?::[^/\\s\"'<>]+)?\n  /([A-Za-z0-9_.-]+)\n",
+        "username_capture": 1,
+        "password_capture": 2,
+        "host_capture": 3,
+        "database_capture": 4,
+        "minimum_length": 8,
+        "local_test_policy": {
+          "hosts": [
+            "localhost",
+            "127.0.0.1",
+            "::1",
+            "[::1]"
+          ],
+          "database_suffixes": [
+            "_test",
+            "-test"
+          ],
+          "require_username_equals_password": true
+        }
+      },
+      {
+        "id": "secret-bearing-webhook-url",
+        "kind": "webhook-url",
+        "pattern": "(?ix)\n  \\b[a-z0-9_]*(?:webhook|callback)(?:_url)?\\b\n  [\"']?\\s*[:=]\\s*[\"']?\n  (https?://[^\\s\"'<>]+)\n",
+        "capture": 1,
+        "query_parameters": [
+          "key",
+          "token",
+          "access_token",
+          "secret",
+          "signature",
+          "sig"
+        ],
+        "query_minimum_length": 12,
+        "path_minimum_length": 20
+      },
+      {
+        "id": "wecom-webhook",
+        "kind": "value",
+        "pattern": "(?i)https://qyapi\\.weixin\\.qq\\.com/cgi-bin/webhook/send\\?key=([A-Za-z0-9_-]{16,})",
+        "capture": 1,
+        "minimum_length": 16
+      },
+      {
+        "id": "dingtalk-webhook",
+        "kind": "value",
+        "pattern": "(?i)https://(?:oapi|api)\\.dingtalk\\.com/[^\\s\"'<>]*[?&]access_token=([A-Za-z0-9_-]{16,})",
+        "capture": 1,
+        "minimum_length": 16
+      }
+    ]
+  },
+  "components": [
+    "backend",
+    "frontend",
+    "workflow"
+  ],
+  "always_blocking_prelude": [
+    "secret scan",
+    "architecture audit"
+  ],
+  "blocking_when_selected": [
+    "backend.format",
+    "backend.clippy",
+    "backend.compile",
+    "backend.tests",
+    "frontend.lint",
+    "frontend.format",
+    "frontend.tests",
+    "frontend.e2e",
+    "frontend.fullstack-smoke",
+    "frontend.build",
+    "workflow.hook-syntax",
+    "workflow.project-init-tests",
+    "workflow.framework-release-config",
+    "workflow.framework-upgrade-tests",
+    "workflow.template-quality",
+    "workflow.template-quality-tests",
+    "workflow.observability-config",
+    "workflow.tracing-config",
+    "workflow.production-deployment-config",
+    "workflow.audit-retention-config",
+    "workflow.api-generation",
+    "workflow.supply-chain-config",
+    "workflow.format",
+    "workflow.clippy",
+    "workflow.tests"
+  ],
+  "blocking_beyond_policy_list": [
+    "workflow.framework-release-config",
+    "workflow.framework-upgrade-tests"
+  ],
+  "profile_steps": {
+    "full": [
+      "backend.format",
+      "backend.clippy",
+      "backend.compile",
+      "backend.tests",
+      "frontend.lint",
+      "frontend.format",
+      "frontend.tests",
+      "frontend.e2e",
+      "frontend.fullstack-smoke",
+      "frontend.build",
+      "workflow.hook-syntax",
+      "workflow.project-init-tests",
+      "workflow.framework-release-config",
+      "workflow.framework-upgrade-tests",
+      "workflow.template-quality",
+      "workflow.template-quality-tests",
+      "workflow.observability-config",
+      "workflow.tracing-config",
+      "workflow.production-deployment-config",
+      "workflow.audit-retention-config",
+      "workflow.api-generation",
+      "workflow.supply-chain-config",
+      "workflow.format",
+      "workflow.clippy",
+      "workflow.tests"
+    ],
+    "hook": [
+      "backend.format",
+      "backend.clippy",
+      "frontend.lint",
+      "frontend.format",
+      "workflow.hook-syntax",
+      "workflow.project-init-tests",
+      "workflow.framework-release-config",
+      "workflow.framework-upgrade-tests",
+      "workflow.template-quality",
+      "workflow.template-quality-tests",
+      "workflow.observability-config",
+      "workflow.tracing-config",
+      "workflow.production-deployment-config",
+      "workflow.audit-retention-config",
+      "workflow.supply-chain-config",
+      "workflow.format",
+      "workflow.tests"
+    ]
+  },
+  "ownership": {
+    "backend.format": "project-owned validation; generic command hook",
+    "backend.clippy": "project-owned validation; generic command hook",
+    "backend.compile": "project-owned validation; generic command hook",
+    "backend.tests": "project-owned validation; generic command hook",
+    "frontend.lint": "project-owned validation; generic command hook",
+    "frontend.format": "project-owned validation; generic command hook",
+    "frontend.tests": "project-owned validation; generic command hook",
+    "frontend.e2e": "project-owned validation; generic command hook",
+    "frontend.fullstack-smoke": "project-owned validation; generic command hook",
+    "frontend.build": "project-owned validation; generic command hook",
+    "workflow.hook-syntax": "project-owned validation; generic command hook",
+    "workflow.project-init-tests": "project-owned validation; generic command hook",
+    "workflow.framework-release-config": "project-owned validation; generic command hook",
+    "workflow.framework-upgrade-tests": "project-owned validation; generic command hook",
+    "workflow.template-quality": "project-owned validation; generic command hook",
+    "workflow.template-quality-tests": "project-owned validation; generic command hook",
+    "workflow.observability-config": "project-owned validation; generic command hook",
+    "workflow.tracing-config": "project-owned validation; generic command hook",
+    "workflow.production-deployment-config": "project-owned validation; generic command hook",
+    "workflow.audit-retention-config": "project-owned validation; generic command hook",
+    "workflow.api-generation": "project-owned validation; generic command hook",
+    "workflow.supply-chain-config": "project-owned validation; generic command hook",
+    "workflow.format": "project-owned validation; generic command hook",
+    "workflow.clippy": "project-owned validation; generic command hook",
+    "workflow.tests": "project-owned validation; generic command hook"
+  }
+}

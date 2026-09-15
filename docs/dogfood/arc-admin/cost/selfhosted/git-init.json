@@ -1,0 +1,12 @@
+{
+  "name": "git-init",
+  "argv": [
+    "git",
+    "init",
+    "-q"
+  ],
+  "started_at": "2026-09-10T08:25:26.561920+00:00",
+  "completed_at": "2026-09-10T08:25:26.565820+00:00",
+  "elapsed_seconds": 0.00387266,
+  "exit_code": 0
+}

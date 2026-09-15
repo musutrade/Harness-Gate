@@ -1,0 +1,1 @@
+ERROR [E1000]: command failed: read /mnt/dev-ssd/workspaces/gh215-arc-input/.harness-gate/runtime/trusted-keys.json: No such file or directory (os error 2)

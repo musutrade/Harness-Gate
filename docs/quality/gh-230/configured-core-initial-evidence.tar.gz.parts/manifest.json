@@ -1,0 +1,134 @@
+{
+  "original_archive": "configured-core-initial-evidence.tar.gz",
+  "bytes": 69907309,
+  "sha256": "b344dcd07db7d6ba2050607365c581b87ddc650ff441968901dea490e6ebea2d",
+  "parts": [
+    {
+      "file": "part-0000",
+      "bytes": 2880000,
+      "sha256": "1c1f6dbaf1e9758f77f8500c26d02b88a7ce617325a38be6fe1b92af4a84e8b1"
+    },
+    {
+      "file": "part-0001",
+      "bytes": 2880000,
+      "sha256": "5b3390ec1aed98ed6d1df507eabdc884fd087e9305dc9899fdebe6745f5d6080"
+    },
+    {
+      "file": "part-0002",
+      "bytes": 2880000,
+      "sha256": "1d18986ad5b669d1b2fe48e88602db41b1b9ec0e8ba6a001379fc3b7e78f8d7e"
+    },
+    {
+      "file": "part-0003",
+      "bytes": 2880000,
+      "sha256": "7db0ce59c7e38b44541536d7dedd4526e84faf507e2c20af5756dfa1b0f54566"
+    },
+    {
+      "file": "part-0004",
+      "bytes": 2880000,
+      "sha256": "4773e3eaf057be21089aa3f222a58a633dc61d74cb182ef7f1d0883bf0a6a069"
+    },
+    {
+      "file": "part-0005",
+      "bytes": 2880000,
+      "sha256": "5bc0c24e32aefaddba889f2cf887e70638399ab301ab9564f6682f17325a4ca7"
+    },
+    {
+      "file": "part-0006",
+      "bytes": 2880000,
+      "sha256": "ef0385322d21e8885e82bbbfba4a6f201f9c524eaeb4023b0fb132cf38dd4b9a"
+    },
+    {
+      "file": "part-0007",
+      "bytes": 2880000,
+      "sha256": "e3a8745d1802bd67acf3178289b99c6009cae3c9d2e1883d717ca20d48c5f146"
+    },
+    {
+      "file": "part-0008",
+      "bytes": 2880000,
+      "sha256": "9dd211f561297495252c985bc0ad73992e11113f306e81582c6d2e3a77358377"
+    },
+    {
+      "file": "part-0009",
+      "bytes": 2880000,
+      "sha256": "32edfabbf03c2afb42a0770205d913b5cc9b2a7bbda47da6e65855eccda6cd67"
+    },
+    {
+      "file": "part-0010",
+      "bytes": 2880000,
+      "sha256": "a0c5910a63e1eb8721b4abdd30a80e946f7769e85356f68e8220ea2d8f1cdc15"
+    },
+    {
+      "file": "part-0011",
+      "bytes": 2880000,
+      "sha256": "44c621c0ae7321021bdf1220aaef3f514e1b480a9488a89a6207fd82d4b70920"
+    },
+    {
+      "file": "part-0012",
+      "bytes": 2880000,
+      "sha256": "ef437e33e9998dca89b38886fe15129e1956ed6420655603c76fa145df47d8ad"
+    },
+    {
+      "file": "part-0013",
+      "bytes": 2880000,
+      "sha256": "868e4d128e3cc060c21d5772569b51d64d699e00d8da47ef6ba824ef067770f1"
+    },
+    {
+      "file": "part-0014",
+      "bytes": 2880000,
+      "sha256": "6633546931092994735f1754b759926ca273994406e22666d4622c266e8b05dd"
+    },
+    {
+      "file": "part-0015",
+      "bytes": 2880000,
+      "sha256": "3c7f0cb02245e1b94685411e6311f248042624cd8dbd3893379080afa87d111a"
+    },
+    {
+      "file": "part-0016",
+      "bytes": 2880000,
+      "sha256": "81bb930b7c3672791ab18d1f823e014a64599401192ee770e9b503df2bb1e3ba"
+    },
+    {
+      "file": "part-0017",
+      "bytes": 2880000,
+      "sha256": "925f9084269f2e6383cf4f52fb24ad9860d4a626a23a5df12534d80fd26c31ab"
+    },
+    {
+      "file": "part-0018",
+      "bytes": 2880000,
+      "sha256": "45f402f44b7e42249614f7842078863950bcd1b99a5494698132b33eee2e7e3d"
+    },
+    {
+      "file": "part-0019",
+      "bytes": 2880000,
+      "sha256": "a12a44edf8c752ab2c948811f788b5891805933b6c59c5db300539299b94b81f"
+    },
+    {
+      "file": "part-0020",
+      "bytes": 2880000,
+      "sha256": "90c1801e75c8edbabf5d0506b799a6a41eb4df0d04952eb978286340a4b713c5"
+    },
+    {
+      "file": "part-0021",
+      "bytes": 2880000,
+      "sha256": "c49d1db8b01da629c4fad2b811df497f9fb537ac2d67b8de8c4a8138348da6cf"
+    },
+    {
+      "file": "part-0022",
+      "bytes": 2880000,
+      "sha256": "b731af9b26c7b3d5acaf395f9845a558ba8e97eb9e772e67e1fafc323472a407"
+    },
+    {
+      "file": "part-0023",
+      "bytes": 2880000,
+      "sha256": "fe5b139996787dd50ae641fe77613a95b527f6025a64a46dc69681f8cc3c6b61"
+    },
+    {
+      "file": "part-0024",
+      "bytes": 787309,
+      "sha256": "e242d89d8ddb85f16cabd21b78a81c9390bd31601cf77a7f3e367ef976fdeca7"
+    }
+  ],
+  "reconstruct_from_parts_directory": "cat part-* > ../configured-core-initial-evidence.tar.gz",
+  "verify": "Verify original archive SHA-256 before extraction; original per-file inventory remains unchanged."
+}

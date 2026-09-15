@@ -2,9 +2,9 @@ use super::capture::{capture, capture_with_limits, CaptureLimits};
 use super::Task;
 use std::env;
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Command;
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 #[cfg(unix)]
 #[test]
@@ -96,9 +96,38 @@ fn process_tree_child_fixture() {
     if env::var_os("HARNESS_GATE_PROCESS_TREE_MARKER").is_none() {
         return;
     }
-    std::thread::sleep(Duration::from_secs(2));
-    let marker = env::var_os("HARNESS_GATE_PROCESS_TREE_MARKER").expect("marker path");
-    fs::write(marker, b"descendant survived").expect("write process-tree marker");
+    let marker =
+        PathBuf::from(env::var_os("HARNESS_GATE_PROCESS_TREE_MARKER").expect("marker path"));
+    fs::write(marker.with_extension("ready"), b"ready").expect("write child readiness");
+    // Respond only to a probe sent after cleanup returns. A fixed sleep could
+    // write before Windows taskkill finishes and falsely report a leaked child.
+    let deadline = Instant::now() + Duration::from_secs(30);
+    while Instant::now() < deadline {
+        if marker.with_extension("probe").exists() {
+            fs::write(marker, b"descendant survived").expect("write process-tree marker");
+            return;
+        }
+        std::thread::sleep(Duration::from_millis(10));
+    }
+}
+
+#[test]
+fn process_tree_probe_detects_a_live_child() {
+    let root = tempfile::tempdir().expect("process probe directory");
+    let marker = root.path().join("child.marker");
+    fs::write(marker.with_extension("probe"), b"probe").expect("send liveness probe");
+    let status = Command::new(env::current_exe().expect("test executable"))
+        .args([
+            "--exact",
+            "process::tests::process_tree_child_fixture",
+            "--nocapture",
+        ])
+        .env("HARNESS_GATE_PROCESS_TREE_MARKER", &marker)
+        .status()
+        .expect("start live child fixture");
+    assert!(status.success());
+    assert!(marker.with_extension("ready").exists());
+    assert!(marker.exists(), "probe must detect a live child");
 }
 
 #[test]
@@ -152,11 +181,18 @@ fn timeout_terminates_process_tree_without_a_descendant_leak() {
 
     assert!(result.timed_out, "fixture must reach the timeout boundary");
     assert!(!result.passed);
-    // The child fixture writes after two seconds. Waiting beyond that deadline
-    // makes a surviving descendant observable on every supported platform.
+    assert!(
+        marker.with_extension("ready").exists(),
+        "the descendant must have started before cleanup"
+    );
+    // A surviving child can acknowledge this probe only after Task::run has
+    // returned. Time spent inside platform cleanup cannot produce a false leak.
+    fs::write(marker.with_extension("probe"), b"probe").expect("send liveness probe");
     std::thread::sleep(Duration::from_secs(3));
     assert!(!marker.exists(), "timed-out task left a descendant process");
     let _ = fs::remove_file(log);
+    let _ = fs::remove_file(marker.with_extension("ready"));
+    let _ = fs::remove_file(marker.with_extension("probe"));
     let _ = fs::remove_file(marker);
 }
 
@@ -182,6 +218,8 @@ fn abnormal_or_cancelled_worker_removes_isolation_state() {
         "terminal worker state must not be reusable"
     );
     assert!(state.with_extension("terminal.json").is_file());
+    fs::write(marker.with_extension("probe"), b"probe").expect("send liveness probe");
+    std::thread::sleep(Duration::from_secs(3));
     assert!(
         !marker.exists(),
         "abnormal worker fixture outlived its task"

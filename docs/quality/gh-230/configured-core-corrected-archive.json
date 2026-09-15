@@ -1,0 +1,12 @@
+{
+  "scope": "fresh local diagnostics; not clean-host acceptance",
+  "directories": [
+    "target/gh-220/driver-tests/tmp7outrnrq",
+    "target/gh-221/file-tests/tmpehruo9e5",
+    "target/gh-230/runtime-tests/tmpone1wc4e"
+  ],
+  "files": 1431,
+  "bytes": 71702622,
+  "sha256": "63b9366a47164977a6b4cff3d639c7def1b70bb32739fb49f90f50034c9bffe1",
+  "archive_member_sha256_verified": true
+}

@@ -1,0 +1,170 @@
+{
+  "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-228",
+  "environment": {
+    "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-228/target/gh-228/cargo",
+    "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-228/target/gh-228/tmp",
+    "OPENSPEC_TELEMETRY": "0"
+  },
+  "removed_environment": [
+    "HTTP_PROXY",
+    "http_proxy",
+    "HTTPS_PROXY",
+    "https_proxy",
+    "ALL_PROXY",
+    "all_proxy"
+  ],
+  "results": [
+    {
+      "name": "nextest",
+      "command": [
+        "cargo",
+        "nextest",
+        "run",
+        "--manifest-path",
+        "tools/harness-gate/Cargo.toml",
+        "--locked"
+      ],
+      "exit_code": 100,
+      "seconds": 157.71
+    },
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--manifest-path",
+        "tools/harness-gate/Cargo.toml",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.692
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--manifest-path",
+        "tools/harness-gate/Cargo.toml",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 0.289
+    },
+    {
+      "name": "python",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/quality/tests",
+        "-v"
+      ],
+      "exit_code": 0,
+      "seconds": 218.869
+    },
+    {
+      "name": "docs",
+      "command": [
+        "python3",
+        "tools/quality/docs_consistency.py",
+        "--output",
+        "target/quality/docs-consistency.json"
+      ],
+      "exit_code": 0,
+      "seconds": 3.251
+    },
+    {
+      "name": "openspec",
+      "command": [
+        "openspec",
+        "validate",
+        "package-official-rust-collector-for-independent-delivery",
+        "--strict",
+        "--no-interactive"
+      ],
+      "exit_code": 0,
+      "seconds": 0.528
+    },
+    {
+      "name": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.008
+    }
+  ],
+  "not_applicable": [
+    "harness-gate config check",
+    "harness-gate verify --profile ci --all"
+  ],
+  "reason": "No .harness-gate/flow.toml declaring ci exists.",
+  "additional_results": [
+    {
+      "name": "nextest-scope-retry",
+      "command": [
+        "cargo",
+        "nextest",
+        "run",
+        "--manifest-path",
+        "tools/harness-gate/Cargo.toml",
+        "--locked",
+        "-E",
+        "test(test_scope_without_git)"
+      ],
+      "environment_addition": {
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-228/target/gh-228/tmp"
+      },
+      "exit_code": 0,
+      "passed": 1,
+      "skipped": 391
+    },
+    {
+      "name": "nextest-final",
+      "command": [
+        "cargo",
+        "nextest",
+        "run",
+        "--manifest-path",
+        "tools/harness-gate/Cargo.toml",
+        "--locked",
+        "--no-fail-fast"
+      ],
+      "environment_addition": {
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-228/target/gh-228/tmp"
+      },
+      "exit_code": 0,
+      "passed": 392,
+      "skipped": 0,
+      "nextest_seconds": 191.09
+    }
+  ],
+  "native_build": {
+    "command": [
+      "cargo",
+      "build",
+      "--locked",
+      "--manifest-path",
+      "tools/quality/rust-native-driver/Cargo.toml"
+    ],
+    "environment": {
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-228/target/gh-228/driver-build",
+      "RUSTC_BOOTSTRAP": "1"
+    },
+    "exit_code": 101,
+    "errors": "7 E0463 missing compiler-private crates"
+  },
+  "final_documentation_validation": {
+    "command": "TMPDIR=\"$PWD/target/gh-228/tmp\" CARGO_TARGET_DIR=\"$PWD/target/gh-228/cargo\" python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json > target/gh-228/logs/docs-final.log 2>&1 && OPENSPEC_TELEMETRY=0 openspec validate package-official-rust-collector-for-independent-delivery --strict --no-interactive > target/gh-228/logs/openspec-final.log 2>&1 && git diff --check",
+    "exit_code": 0
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "schema": "rust-collector-compatibility/v1",
+  "tested": [
+    {
+      "manifest_sha256": "70721226226363b7247419fb22490a0cb4dee52e57eab267780cdb856d8718bc",
+      "environment": {
+        "core": {
+          "version": "0.4.0",
+          "commit": "ee544690662645806cda7dd4cd2c9192566f7929",
+          "sha256": "8e3df8303ca8f650d4ef768b29cfefb60ca115122a47b116245cc19e4649bbdd"
+        },
+        "protocol": {
+          "request": "harness-collector-request/v1",
+          "response": "harness-collector-response/v1",
+          "evidence": "harness-evidence/v1",
+          "project_request": "harness-project-collector-request/v1",
+          "project_response": "harness-project-collector-response/v1",
+          "adapter_result_schema_version": "1"
+        },
+        "host_abi": {
+          "target": "x86_64-unknown-linux-gnu",
+          "glibc": "glibc 2.43",
+          "kernel": "7.0.0-31-generic",
+          "runtime_dependencies_sha256": "f9b213877a2ea9aa44e6119e6fe2e1361f84f9a8084abd410ab8ef34b74e2872"
+        },
+        "tools": [
+          {
+            "name": "driver",
+            "sha256": "5a51fee77e3f6453e41ad7146b14d7b31f9155302ff6982a4d0480938e638784",
+            "version": "sha256:5a51fee77e3f6453e41ad7146b14d7b31f9155302ff6982a4d0480938e638784"
+          },
+          {
+            "name": "rustc",
+            "sha256": "d3a664c970a9fd8361b64194861bebc1ae37b9054e5ee3400dc1c9e691797eea",
+            "version": "rustc 1.97.1 (8bab26f4f 2026-07-14) | binary: rustc | commit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452 | commit-date: 2026-07-14 | host: x86_64-unknown-linux-gnu | release: 1.97.1 | LLVM version: 22.1.6"
+          },
+          {
+            "name": "rustc-driver-library",
+            "sha256": "b0726217c199be52842c1318a340f0fc68a2c2ca0e3fa4886191dbf6ee192a58",
+            "version": "sha256:b0726217c199be52842c1318a340f0fc68a2c2ca0e3fa4886191dbf6ee192a58"
+          },
+          {
+            "name": "llvm-cov",
+            "sha256": "bb415d8767d2ad73d72c01941f409ffc8f9478747ec7c18a7a69356735551ed9",
+            "version": "LLVM (http://llvm.org/): |   LLVM version 22.1.6-rust-1.97.1-stable |   Optimized build."
+          },
+          {
+            "name": "llvm-profdata",
+            "sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+            "version": "LLVM (http://llvm.org/): |   LLVM version 22.1.6-rust-1.97.1-stable |   Optimized build."
+          },
+          {
+            "name": "python",
+            "sha256": "52e0a13e60a981d8c4b6478be2ba5176f69da07948a056bf49cf6f077e30cb41",
+            "version": "Python 3.14.4"
+          }
+        ]
+      },
+      "receipt": {
+        "path": "/work/seed-receipt.json",
+        "sha256": "011cd77a6784549f56ab43adf426d3c634b4992395befdcf70ec61fdaaf2fd24",
+        "kind": "reviewed-native-capture-and-core-evaluation"
+      }
+    }
+  ]
+}

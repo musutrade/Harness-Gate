@@ -1,0 +1,1965 @@
+{
+  "cases": [
+    {
+      "absent_ci": {
+        "command": [
+          "<workspace>/target/debug/harness-gate",
+          "--project-root",
+          "<fixture>",
+          "verify",
+          "--profile",
+          "ci",
+          "--all"
+        ],
+        "exit_code": 1,
+        "stderr": "ERROR [E1401]: unknown or empty verification profile \"ci\"\n",
+        "stdout": ""
+      },
+      "config_check": {
+        "command": [
+          "<workspace>/target/debug/harness-gate",
+          "--project-root",
+          "<fixture>",
+          "config",
+          "check"
+        ],
+        "exit_code": 0,
+        "stderr": "",
+        "stdout": "Configuration valid: <fixture>/.harness-gate/flow.toml\nSchema version: 2\nComponents: frontend\nProfiles: full\nVerification steps: 1\n"
+      },
+      "expected_exit_code": 0,
+      "flow": "version = 2\n[project]\nname = \"arc-admin-negative-boundary\"\ndefault_profile = \"full\"\nhook_profile = \"full\"\n[paths]\nreports = \".harness-gate/reports\"\naudit_config = \".harness-gate/audit.toml\"\nsecrets_config = \".harness-gate/secrets.toml\"\n[scope]\nunmatched = \"all\"\n[[scope.rules]]\npatterns = [\"**\"]\ncomponents = [\"frontend\"]\n[policy]\nrequired_steps = [\"frontend.e2e\"]\n[[steps]]\nid = \"frontend.e2e\"\nlabel = \"controlled command boundary\"\ncomponent = \"frontend\"\nprofiles = [\"full\"]\nprogram = \"sh\"\nargs = [\"boundary.sh\"]\ncwd = \"{root}\"\nlog = \"boundary.log\"\ntimeout_secs = 20\n",
+      "id": "frontend.e2e-0",
+      "injected_exit_code": 0,
+      "log": "controlled-project-command\n",
+      "manifest": {
+        "artifacts": [
+          {
+            "kind": "artifact",
+            "path": "changed_files.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "size_bytes": 0
+          },
+          {
+            "kind": "invocation-metadata",
+            "path": "invocation.json",
+            "sha256": "5876844788e7483976641c043794fdc058fabcdcd2a3ff3c385921d279dc9110",
+            "size_bytes": 684
+          },
+          {
+            "kind": "step-log",
+            "path": "logs/boundary.log",
+            "sha256": "76a547780a68c99014cca0349f652a2975bdc1dc9fb602019aeef4b819bfa94d",
+            "size_bytes": 27
+          },
+          {
+            "kind": "step-log",
+            "path": "review_context.json",
+            "sha256": "f3776146a1bb5b7359419d1558da76dc1d48c5d96570ea72b0cbfb3a7fd39850",
+            "size_bytes": 222
+          },
+          {
+            "kind": "report",
+            "path": "review_context.md",
+            "sha256": "6a8ca76cb14869277398928b274f97a73fa1aaa6def2917ad903e76bf1acedcb",
+            "size_bytes": 92
+          },
+          {
+            "kind": "report",
+            "path": "scope.json",
+            "sha256": "453c93570f4ab27fe2f7011eec8bb212f7942f6ea6e5b935118e45d3ee6f6926",
+            "size_bytes": 105
+          },
+          {
+            "kind": "step-log",
+            "path": "secret_scan.json",
+            "sha256": "f44b56097b730a9cd7fd734aa7feea9dc85ee0729934f47cd88d43903ec7ad27",
+            "size_bytes": 100
+          },
+          {
+            "kind": "report",
+            "path": "test_result.md",
+            "sha256": "647129284504b72c2c50d6afad21a455457f130af397515a0a6b5c35affd195d",
+            "size_bytes": 293
+          }
+        ],
+        "generated_at": "2026-09-10T09:45:48.455815967+00:00",
+        "invocation_id": "inv-1789033548-308061364-10-1",
+        "schema_version": "1"
+      },
+      "original_step": {
+        "args": [
+          "run",
+          "e2e"
+        ],
+        "component": "frontend",
+        "cwd": "{frontend}",
+        "id": "frontend.e2e",
+        "input": "repository",
+        "label": "frontend end-to-end tests",
+        "log": "frontend_e2e.log",
+        "profiles": [
+          "full"
+        ],
+        "program": "npm",
+        "timeout_secs": 240
+      },
+      "receipt": {
+        "command": [
+          "<workspace>/target/debug/harness-gate",
+          "--project-root",
+          "<fixture>",
+          "verify",
+          "--profile",
+          "full",
+          "--all"
+        ],
+        "exit_code": 0,
+        "stderr": "",
+        "stdout": "harness-gate verify\nScope: all\nComponents: frontend\n\n[PASS] secret scan (82 ms)\n[PASS] architecture audit (4 ms)\n[RUN ] controlled command boundary ... PASS (7 ms)\n\nVerification report: <fixture>/.harness-gate/reports/test_result.md\nTEST_SUMMARY: PASS\n"
+      },
+      "report": {
+        "artifacts": [
+          {
+            "invocation_id": "inv-1789033548-308061364-10-1",
+            "kind": "artifact",
+            "path": "changed_files.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "size_bytes": 0
+          },
+          {
+            "invocation_id": "inv-1789033548-308061364-10-1",
+            "kind": "invocation-metadata",
+            "path": "invocation.json",
+            "sha256": "5876844788e7483976641c043794fdc058fabcdcd2a3ff3c385921d279dc9110",
+            "size_bytes": 684
+          },
+          {
+            "invocation_id": "inv-1789033548-308061364-10-1",
+            "kind": "step-log",
+            "path": "logs/boundary.log",
+            "sha256": "76a547780a68c99014cca0349f652a2975bdc1dc9fb602019aeef4b819bfa94d",
+            "size_bytes": 27,
+            "step_id": "frontend.e2e"
+          },
+          {
+            "invocation_id": "inv-1789033548-308061364-10-1",
+            "kind": "step-log",
+            "path": "review_context.json",
+            "sha256": "f3776146a1bb5b7359419d1558da76dc1d48c5d96570ea72b0cbfb3a7fd39850",
+            "size_bytes": 222,
+            "step_id": "builtin.architecture-audit"
+          },
+          {
+            "invocation_id": "inv-1789033548-308061364-10-1",
+            "kind": "report",
+            "path": "review_context.md",
+            "sha256": "6a8ca76cb14869277398928b274f97a73fa1aaa6def2917ad903e76bf1acedcb",
+            "size_bytes": 92
+          },
+          {
+            "invocation_id": "inv-1789033548-308061364-10-1",
+            "kind": "report",
+            "path": "scope.json",
+            "sha256": "453c93570f4ab27fe2f7011eec8bb212f7942f6ea6e5b935118e45d3ee6f6926",
+            "size_bytes": 105
+          },
+          {
+            "invocation_id": "inv-1789033548-308061364-10-1",
+            "kind": "step-log",
+            "path": "secret_scan.json",
+            "sha256": "f44b56097b730a9cd7fd734aa7feea9dc85ee0729934f47cd88d43903ec7ad27",
+            "size_bytes": 100,
+            "step_id": "builtin.secret-scan"
+          },
+          {
+            "invocation_id": "inv-1789033548-308061364-10-1",
+            "kind": "report",
+            "path": "test_result.md",
+            "sha256": "647129284504b72c2c50d6afad21a455457f130af397515a0a6b5c35affd195d",
+            "size_bytes": 293
+          }
+        ],
+        "configuration_digest": "sha256:fbc479523c7073e5e4aa05e3949110748221dfc6bed9c8c90189abeb633417dd",
+        "evidence_complete": true,
+        "execution_root": "<fixture>",
+        "executor_version": "0.3.7",
+        "failures": [],
+        "input_mode": "all",
+        "invocation_id": "inv-1789033548-308061364-10-1",
+        "passed": true,
+        "profile": "full",
+        "project_identity": "<fixture>",
+        "report_directory": "<fixture>/.harness-gate/reports/invocations/inv-1789033548-308061364-10-1",
+        "schema_version": "1",
+        "scope": {
+          "changed_files": [],
+          "components": [
+            "frontend"
+          ],
+          "mode": "all",
+          "unmatched_files": []
+        },
+        "services": [],
+        "skipped_steps": [],
+        "source_identity": "working-tree:unknown",
+        "status": "PASS",
+        "steps": [
+          {
+            "attempts": [
+              {
+                "attempt": 1,
+                "cancelled": false,
+                "detail": null,
+                "duration_ms": 82,
+                "finished_at": null,
+                "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033548-308061364-10-1/secret_scan.json",
+                "started_at": null,
+                "status": "PASS",
+                "timed_out": false
+              }
+            ],
+            "cancelled": false,
+            "detail": null,
+            "duration_ms": 82,
+            "failure_code": null,
+            "flaky": false,
+            "invocation_id": "inv-1789033548-308061364-10-1",
+            "label": "secret scan",
+            "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033548-308061364-10-1/secret_scan.json",
+            "parser": null,
+            "passed": true,
+            "retry_class": null,
+            "retry_count": 0,
+            "runner": null,
+            "status": "PASS",
+            "step_id": "builtin.secret-scan",
+            "timed_out": false,
+            "waived": false,
+            "waiver": null
+          },
+          {
+            "attempts": [
+              {
+                "attempt": 1,
+                "cancelled": false,
+                "detail": "0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)",
+                "duration_ms": 4,
+                "finished_at": null,
+                "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033548-308061364-10-1/review_context.json",
+                "started_at": null,
+                "status": "PASS",
+                "timed_out": false
+              }
+            ],
+            "cancelled": false,
+            "detail": "0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)",
+            "duration_ms": 4,
+            "failure_code": null,
+            "flaky": false,
+            "invocation_id": "inv-1789033548-308061364-10-1",
+            "label": "architecture audit",
+            "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033548-308061364-10-1/review_context.json",
+            "parser": null,
+            "passed": true,
+            "retry_class": null,
+            "retry_count": 0,
+            "runner": null,
+            "status": "PASS",
+            "step_id": "builtin.architecture-audit",
+            "timed_out": false,
+            "waived": false,
+            "waiver": null
+          },
+          {
+            "attempts": [
+              {
+                "attempt": 1,
+                "cancelled": false,
+                "detail": null,
+                "duration_ms": 7,
+                "finished_at": "2026-09-10T09:45:48.428082899+00:00",
+                "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033548-308061364-10-1/logs/boundary.log",
+                "started_at": "2026-09-10T09:45:48.420247274+00:00",
+                "status": "PASS",
+                "timed_out": false
+              }
+            ],
+            "cancelled": false,
+            "detail": null,
+            "duration_ms": 7,
+            "failure_code": null,
+            "flaky": false,
+            "invocation_id": "inv-1789033548-308061364-10-1",
+            "label": "controlled command boundary",
+            "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033548-308061364-10-1/logs/boundary.log",
+            "parser": null,
+            "passed": true,
+            "retry_class": null,
+            "retry_count": 0,
+            "runner": null,
+            "status": "PASS",
+            "step_id": "frontend.e2e",
+            "timed_out": false,
+            "waived": false,
+            "waiver": null
+          }
+        ],
+        "timestamp": "2026-09-10T09:45:48.428251843+00:00",
+        "warnings": []
+      },
+      "script": "echo controlled-project-command\nexit 0\n",
+      "source_unchanged": true
+    },
+    {
+      "absent_ci": {
+        "command": [
+          "<workspace>/target/debug/harness-gate",
+          "--project-root",
+          "<fixture>",
+          "verify",
+          "--profile",
+          "ci",
+          "--all"
+        ],
+        "exit_code": 1,
+        "stderr": "ERROR [E1401]: unknown or empty verification profile \"ci\"\n",
+        "stdout": ""
+      },
+      "config_check": {
+        "command": [
+          "<workspace>/target/debug/harness-gate",
+          "--project-root",
+          "<fixture>",
+          "config",
+          "check"
+        ],
+        "exit_code": 0,
+        "stderr": "",
+        "stdout": "Configuration valid: <fixture>/.harness-gate/flow.toml\nSchema version: 2\nComponents: frontend\nProfiles: full\nVerification steps: 1\n"
+      },
+      "expected_exit_code": 1,
+      "flow": "version = 2\n[project]\nname = \"arc-admin-negative-boundary\"\ndefault_profile = \"full\"\nhook_profile = \"full\"\n[paths]\nreports = \".harness-gate/reports\"\naudit_config = \".harness-gate/audit.toml\"\nsecrets_config = \".harness-gate/secrets.toml\"\n[scope]\nunmatched = \"all\"\n[[scope.rules]]\npatterns = [\"**\"]\ncomponents = [\"frontend\"]\n[policy]\nrequired_steps = [\"frontend.e2e\"]\n[[steps]]\nid = \"frontend.e2e\"\nlabel = \"controlled command boundary\"\ncomponent = \"frontend\"\nprofiles = [\"full\"]\nprogram = \"sh\"\nargs = [\"boundary.sh\"]\ncwd = \"{root}\"\nlog = \"boundary.log\"\ntimeout_secs = 20\n",
+      "id": "frontend.e2e-7",
+      "injected_exit_code": 7,
+      "log": "controlled-project-command\n",
+      "manifest": {
+        "artifacts": [
+          {
+            "kind": "artifact",
+            "path": "changed_files.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "size_bytes": 0
+          },
+          {
+            "kind": "invocation-metadata",
+            "path": "invocation.json",
+            "sha256": "efabd0a3a4e4d37dab7cf85993a4902ff9a05a7bc9869800ba02045408401d29",
+            "size_bytes": 684
+          },
+          {
+            "kind": "step-log",
+            "path": "logs/boundary.log",
+            "sha256": "76a547780a68c99014cca0349f652a2975bdc1dc9fb602019aeef4b819bfa94d",
+            "size_bytes": 27
+          },
+          {
+            "kind": "step-log",
+            "path": "review_context.json",
+            "sha256": "a5f68ba3089fbe091a145fa439b7da2caf8dd677a6fde4c7d9e0aec5b14cf14f",
+            "size_bytes": 222
+          },
+          {
+            "kind": "report",
+            "path": "review_context.md",
+            "sha256": "6a8ca76cb14869277398928b274f97a73fa1aaa6def2917ad903e76bf1acedcb",
+            "size_bytes": 92
+          },
+          {
+            "kind": "report",
+            "path": "scope.json",
+            "sha256": "453c93570f4ab27fe2f7011eec8bb212f7942f6ea6e5b935118e45d3ee6f6926",
+            "size_bytes": 105
+          },
+          {
+            "kind": "step-log",
+            "path": "secret_scan.json",
+            "sha256": "5c25f4a59a36f246a328088eebe3e41ddb877c3d33e9b8a8c1ac8574b6d97695",
+            "size_bytes": 100
+          },
+          {
+            "kind": "report",
+            "path": "test_result.md",
+            "sha256": "1d7bce8a470a21e2f41f7c47127bf927d4cf686073c4c58e9a5bc87a1f5de38f",
+            "size_bytes": 474
+          }
+        ],
+        "generated_at": "2026-09-10T09:45:48.836699840+00:00",
+        "invocation_id": "inv-1789033548-688706243-45-1",
+        "schema_version": "1"
+      },
+      "original_step": {
+        "args": [
+          "run",
+          "e2e"
+        ],
+        "component": "frontend",
+        "cwd": "{frontend}",
+        "id": "frontend.e2e",
+        "input": "repository",
+        "label": "frontend end-to-end tests",
+        "log": "frontend_e2e.log",
+        "profiles": [
+          "full"
+        ],
+        "program": "npm",
+        "timeout_secs": 240
+      },
+      "receipt": {
+        "command": [
+          "<workspace>/target/debug/harness-gate",
+          "--project-root",
+          "<fixture>",
+          "verify",
+          "--profile",
+          "full",
+          "--all"
+        ],
+        "exit_code": 1,
+        "stderr": "",
+        "stdout": "harness-gate verify\nScope: all\nComponents: frontend\n\n[PASS] secret scan (82 ms)\n[PASS] architecture audit (5 ms)\n[RUN ] controlled command boundary ... FAIL (7 ms)\n       log: <fixture>/.harness-gate/reports/invocations/inv-1789033548-688706243-45-1/logs/boundary.log\n\nVerification report: <fixture>/.harness-gate/reports/test_result.md\nTEST_SUMMARY: FAIL\n"
+      },
+      "report": {
+        "artifacts": [
+          {
+            "invocation_id": "inv-1789033548-688706243-45-1",
+            "kind": "artifact",
+            "path": "changed_files.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "size_bytes": 0
+          },
+          {
+            "invocation_id": "inv-1789033548-688706243-45-1",
+            "kind": "invocation-metadata",
+            "path": "invocation.json",
+            "sha256": "efabd0a3a4e4d37dab7cf85993a4902ff9a05a7bc9869800ba02045408401d29",
+            "size_bytes": 684
+          },
+          {
+            "invocation_id": "inv-1789033548-688706243-45-1",
+            "kind": "step-log",
+            "path": "logs/boundary.log",
+            "sha256": "76a547780a68c99014cca0349f652a2975bdc1dc9fb602019aeef4b819bfa94d",
+            "size_bytes": 27,
+            "step_id": "frontend.e2e"
+          },
+          {
+            "invocation_id": "inv-1789033548-688706243-45-1",
+            "kind": "step-log",
+            "path": "review_context.json",
+            "sha256": "a5f68ba3089fbe091a145fa439b7da2caf8dd677a6fde4c7d9e0aec5b14cf14f",
+            "size_bytes": 222,
+            "step_id": "builtin.architecture-audit"
+          },
+          {
+            "invocation_id": "inv-1789033548-688706243-45-1",
+            "kind": "report",
+            "path": "review_context.md",
+            "sha256": "6a8ca76cb14869277398928b274f97a73fa1aaa6def2917ad903e76bf1acedcb",
+            "size_bytes": 92
+          },
+          {
+            "invocation_id": "inv-1789033548-688706243-45-1",
+            "kind": "report",
+            "path": "scope.json",
+            "sha256": "453c93570f4ab27fe2f7011eec8bb212f7942f6ea6e5b935118e45d3ee6f6926",
+            "size_bytes": 105
+          },
+          {
+            "invocation_id": "inv-1789033548-688706243-45-1",
+            "kind": "step-log",
+            "path": "secret_scan.json",
+            "sha256": "5c25f4a59a36f246a328088eebe3e41ddb877c3d33e9b8a8c1ac8574b6d97695",
+            "size_bytes": 100,
+            "step_id": "builtin.secret-scan"
+          },
+          {
+            "invocation_id": "inv-1789033548-688706243-45-1",
+            "kind": "report",
+            "path": "test_result.md",
+            "sha256": "1d7bce8a470a21e2f41f7c47127bf927d4cf686073c4c58e9a5bc87a1f5de38f",
+            "size_bytes": 474
+          }
+        ],
+        "configuration_digest": "sha256:fbc479523c7073e5e4aa05e3949110748221dfc6bed9c8c90189abeb633417dd",
+        "evidence_complete": true,
+        "execution_root": "<fixture>",
+        "executor_version": "0.3.7",
+        "failures": [
+          {
+            "code": "STEP_FAILED",
+            "message": "exit code 7",
+            "step_id": "frontend.e2e"
+          }
+        ],
+        "input_mode": "all",
+        "invocation_id": "inv-1789033548-688706243-45-1",
+        "passed": false,
+        "profile": "full",
+        "project_identity": "<fixture>",
+        "report_directory": "<fixture>/.harness-gate/reports/invocations/inv-1789033548-688706243-45-1",
+        "schema_version": "1",
+        "scope": {
+          "changed_files": [],
+          "components": [
+            "frontend"
+          ],
+          "mode": "all",
+          "unmatched_files": []
+        },
+        "services": [],
+        "skipped_steps": [],
+        "source_identity": "working-tree:unknown",
+        "status": "FAIL",
+        "steps": [
+          {
+            "attempts": [
+              {
+                "attempt": 1,
+                "cancelled": false,
+                "detail": null,
+                "duration_ms": 82,
+                "finished_at": null,
+                "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033548-688706243-45-1/secret_scan.json",
+                "started_at": null,
+                "status": "PASS",
+                "timed_out": false
+              }
+            ],
+            "cancelled": false,
+            "detail": null,
+            "duration_ms": 82,
+            "failure_code": null,
+            "flaky": false,
+            "invocation_id": "inv-1789033548-688706243-45-1",
+            "label": "secret scan",
+            "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033548-688706243-45-1/secret_scan.json",
+            "parser": null,
+            "passed": true,
+            "retry_class": null,
+            "retry_count": 0,
+            "runner": null,
+            "status": "PASS",
+            "step_id": "builtin.secret-scan",
+            "timed_out": false,
+            "waived": false,
+            "waiver": null
+          },
+          {
+            "attempts": [
+              {
+                "attempt": 1,
+                "cancelled": false,
+                "detail": "0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)",
+                "duration_ms": 5,
+                "finished_at": null,
+                "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033548-688706243-45-1/review_context.json",
+                "started_at": null,
+                "status": "PASS",
+                "timed_out": false
+              }
+            ],
+            "cancelled": false,
+            "detail": "0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)",
+            "duration_ms": 5,
+            "failure_code": null,
+            "flaky": false,
+            "invocation_id": "inv-1789033548-688706243-45-1",
+            "label": "architecture audit",
+            "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033548-688706243-45-1/review_context.json",
+            "parser": null,
+            "passed": true,
+            "retry_class": null,
+            "retry_count": 0,
+            "runner": null,
+            "status": "PASS",
+            "step_id": "builtin.architecture-audit",
+            "timed_out": false,
+            "waived": false,
+            "waiver": null
+          },
+          {
+            "attempts": [
+              {
+                "attempt": 1,
+                "cancelled": false,
+                "detail": "exit code 7",
+                "duration_ms": 7,
+                "finished_at": "2026-09-10T09:45:48.809057635+00:00",
+                "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033548-688706243-45-1/logs/boundary.log",
+                "started_at": "2026-09-10T09:45:48.801612279+00:00",
+                "status": "FAIL",
+                "timed_out": false
+              }
+            ],
+            "cancelled": false,
+            "detail": "exit code 7",
+            "duration_ms": 7,
+            "failure_code": "STEP_FAILED",
+            "flaky": false,
+            "invocation_id": "inv-1789033548-688706243-45-1",
+            "label": "controlled command boundary",
+            "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033548-688706243-45-1/logs/boundary.log",
+            "parser": null,
+            "passed": false,
+            "retry_class": "exit",
+            "retry_count": 0,
+            "runner": null,
+            "status": "FAIL",
+            "step_id": "frontend.e2e",
+            "timed_out": false,
+            "waived": false,
+            "waiver": null
+          }
+        ],
+        "timestamp": "2026-09-10T09:45:48.809224763+00:00",
+        "warnings": []
+      },
+      "script": "echo controlled-project-command\nexit 7\n",
+      "source_unchanged": true
+    },
+    {
+      "absent_ci": {
+        "command": [
+          "<workspace>/target/debug/harness-gate",
+          "--project-root",
+          "<fixture>",
+          "verify",
+          "--profile",
+          "ci",
+          "--all"
+        ],
+        "exit_code": 1,
+        "stderr": "ERROR [E1401]: unknown or empty verification profile \"ci\"\n",
+        "stdout": ""
+      },
+      "config_check": {
+        "command": [
+          "<workspace>/target/debug/harness-gate",
+          "--project-root",
+          "<fixture>",
+          "config",
+          "check"
+        ],
+        "exit_code": 0,
+        "stderr": "",
+        "stdout": "Configuration valid: <fixture>/.harness-gate/flow.toml\nSchema version: 2\nComponents: backend\nProfiles: full\nVerification steps: 1\n"
+      },
+      "expected_exit_code": 0,
+      "flow": "version = 2\n[project]\nname = \"arc-admin-negative-boundary\"\ndefault_profile = \"full\"\nhook_profile = \"full\"\n[paths]\nreports = \".harness-gate/reports\"\naudit_config = \".harness-gate/audit.toml\"\nsecrets_config = \".harness-gate/secrets.toml\"\n[scope]\nunmatched = \"all\"\n[[scope.rules]]\npatterns = [\"**\"]\ncomponents = [\"backend\"]\n[policy]\nrequired_steps = [\"backend.tests\"]\n[[steps]]\nid = \"backend.tests\"\nlabel = \"controlled command boundary\"\ncomponent = \"backend\"\nprofiles = [\"full\"]\nprogram = \"sh\"\nargs = [\"boundary.sh\"]\ncwd = \"{root}\"\nlog = \"boundary.log\"\ntimeout_secs = 20\n",
+      "id": "backend.tests-0",
+      "injected_exit_code": 0,
+      "log": "controlled-project-command\n",
+      "manifest": {
+        "artifacts": [
+          {
+            "kind": "artifact",
+            "path": "changed_files.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "size_bytes": 0
+          },
+          {
+            "kind": "invocation-metadata",
+            "path": "invocation.json",
+            "sha256": "72c100f58ad1b6d29278affbf4c788e680bac01b80ab2cc77aa7514a5020e904",
+            "size_bytes": 684
+          },
+          {
+            "kind": "step-log",
+            "path": "logs/boundary.log",
+            "sha256": "76a547780a68c99014cca0349f652a2975bdc1dc9fb602019aeef4b819bfa94d",
+            "size_bytes": 27
+          },
+          {
+            "kind": "step-log",
+            "path": "review_context.json",
+            "sha256": "eeffcf6b6b596193713b6eaa7ace70fcc4e3312b1b100c194147cac66381c0d4",
+            "size_bytes": 222
+          },
+          {
+            "kind": "report",
+            "path": "review_context.md",
+            "sha256": "6a8ca76cb14869277398928b274f97a73fa1aaa6def2917ad903e76bf1acedcb",
+            "size_bytes": 92
+          },
+          {
+            "kind": "report",
+            "path": "scope.json",
+            "sha256": "7795a63f393350b83624641d03c7b632c876d1f6109b9a4002cbb98c02ecfdff",
+            "size_bytes": 104
+          },
+          {
+            "kind": "step-log",
+            "path": "secret_scan.json",
+            "sha256": "74562afc70cb7e56a27cdc0bdb34e29a7693c5a3e94712e0a43452d7b5cb629b",
+            "size_bytes": 100
+          },
+          {
+            "kind": "report",
+            "path": "test_result.md",
+            "sha256": "5734ffbe2428757f8ae977433e303df3dcf899184d6c20124616404de662a290",
+            "size_bytes": 292
+          }
+        ],
+        "generated_at": "2026-09-10T09:45:49.192458144+00:00",
+        "invocation_id": "inv-1789033549-040855395-80-1",
+        "schema_version": "1"
+      },
+      "original_step": {
+        "args": [
+          "test",
+          "--manifest-path",
+          "{backend}/Cargo.toml",
+          "--locked",
+          "--",
+          "--nocapture"
+        ],
+        "component": "backend",
+        "cwd": "{root}",
+        "id": "backend.tests",
+        "input": "repository",
+        "label": "backend tests",
+        "log": "backend_tests.log",
+        "parser": "rust",
+        "profiles": [
+          "full"
+        ],
+        "program": "cargo",
+        "remove_env": [
+          "DATABASE_URL"
+        ],
+        "services": [
+          "test-postgres"
+        ],
+        "timeout_env": "RUST_TEST_TIMEOUT",
+        "timeout_secs": 600
+      },
+      "receipt": {
+        "command": [
+          "<workspace>/target/debug/harness-gate",
+          "--project-root",
+          "<fixture>",
+          "verify",
+          "--profile",
+          "full",
+          "--all"
+        ],
+        "exit_code": 0,
+        "stderr": "",
+        "stdout": "harness-gate verify\nScope: all\nComponents: backend\n\n[PASS] secret scan (82 ms)\n[PASS] architecture audit (5 ms)\n[RUN ] controlled command boundary ... PASS (7 ms)\n\nVerification report: <fixture>/.harness-gate/reports/test_result.md\nTEST_SUMMARY: PASS\n"
+      },
+      "report": {
+        "artifacts": [
+          {
+            "invocation_id": "inv-1789033549-040855395-80-1",
+            "kind": "artifact",
+            "path": "changed_files.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "size_bytes": 0
+          },
+          {
+            "invocation_id": "inv-1789033549-040855395-80-1",
+            "kind": "invocation-metadata",
+            "path": "invocation.json",
+            "sha256": "72c100f58ad1b6d29278affbf4c788e680bac01b80ab2cc77aa7514a5020e904",
+            "size_bytes": 684
+          },
+          {
+            "invocation_id": "inv-1789033549-040855395-80-1",
+            "kind": "step-log",
+            "path": "logs/boundary.log",
+            "sha256": "76a547780a68c99014cca0349f652a2975bdc1dc9fb602019aeef4b819bfa94d",
+            "size_bytes": 27,
+            "step_id": "backend.tests"
+          },
+          {
+            "invocation_id": "inv-1789033549-040855395-80-1",
+            "kind": "step-log",
+            "path": "review_context.json",
+            "sha256": "eeffcf6b6b596193713b6eaa7ace70fcc4e3312b1b100c194147cac66381c0d4",
+            "size_bytes": 222,
+            "step_id": "builtin.architecture-audit"
+          },
+          {
+            "invocation_id": "inv-1789033549-040855395-80-1",
+            "kind": "report",
+            "path": "review_context.md",
+            "sha256": "6a8ca76cb14869277398928b274f97a73fa1aaa6def2917ad903e76bf1acedcb",
+            "size_bytes": 92
+          },
+          {
+            "invocation_id": "inv-1789033549-040855395-80-1",
+            "kind": "report",
+            "path": "scope.json",
+            "sha256": "7795a63f393350b83624641d03c7b632c876d1f6109b9a4002cbb98c02ecfdff",
+            "size_bytes": 104
+          },
+          {
+            "invocation_id": "inv-1789033549-040855395-80-1",
+            "kind": "step-log",
+            "path": "secret_scan.json",
+            "sha256": "74562afc70cb7e56a27cdc0bdb34e29a7693c5a3e94712e0a43452d7b5cb629b",
+            "size_bytes": 100,
+            "step_id": "builtin.secret-scan"
+          },
+          {
+            "invocation_id": "inv-1789033549-040855395-80-1",
+            "kind": "report",
+            "path": "test_result.md",
+            "sha256": "5734ffbe2428757f8ae977433e303df3dcf899184d6c20124616404de662a290",
+            "size_bytes": 292
+          }
+        ],
+        "configuration_digest": "sha256:dbde55025e7a4369e47fcf89675111bdd53a09d21064b7436d64e91aacf4d86c",
+        "evidence_complete": true,
+        "execution_root": "<fixture>",
+        "executor_version": "0.3.7",
+        "failures": [],
+        "input_mode": "all",
+        "invocation_id": "inv-1789033549-040855395-80-1",
+        "passed": true,
+        "profile": "full",
+        "project_identity": "<fixture>",
+        "report_directory": "<fixture>/.harness-gate/reports/invocations/inv-1789033549-040855395-80-1",
+        "schema_version": "1",
+        "scope": {
+          "changed_files": [],
+          "components": [
+            "backend"
+          ],
+          "mode": "all",
+          "unmatched_files": []
+        },
+        "services": [],
+        "skipped_steps": [],
+        "source_identity": "working-tree:unknown",
+        "status": "PASS",
+        "steps": [
+          {
+            "attempts": [
+              {
+                "attempt": 1,
+                "cancelled": false,
+                "detail": null,
+                "duration_ms": 82,
+                "finished_at": null,
+                "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033549-040855395-80-1/secret_scan.json",
+                "started_at": null,
+                "status": "PASS",
+                "timed_out": false
+              }
+            ],
+            "cancelled": false,
+            "detail": null,
+            "duration_ms": 82,
+            "failure_code": null,
+            "flaky": false,
+            "invocation_id": "inv-1789033549-040855395-80-1",
+            "label": "secret scan",
+            "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033549-040855395-80-1/secret_scan.json",
+            "parser": null,
+            "passed": true,
+            "retry_class": null,
+            "retry_count": 0,
+            "runner": null,
+            "status": "PASS",
+            "step_id": "builtin.secret-scan",
+            "timed_out": false,
+            "waived": false,
+            "waiver": null
+          },
+          {
+            "attempts": [
+              {
+                "attempt": 1,
+                "cancelled": false,
+                "detail": "0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)",
+                "duration_ms": 5,
+                "finished_at": null,
+                "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033549-040855395-80-1/review_context.json",
+                "started_at": null,
+                "status": "PASS",
+                "timed_out": false
+              }
+            ],
+            "cancelled": false,
+            "detail": "0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)",
+            "duration_ms": 5,
+            "failure_code": null,
+            "flaky": false,
+            "invocation_id": "inv-1789033549-040855395-80-1",
+            "label": "architecture audit",
+            "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033549-040855395-80-1/review_context.json",
+            "parser": null,
+            "passed": true,
+            "retry_class": null,
+            "retry_count": 0,
+            "runner": null,
+            "status": "PASS",
+            "step_id": "builtin.architecture-audit",
+            "timed_out": false,
+            "waived": false,
+            "waiver": null
+          },
+          {
+            "attempts": [
+              {
+                "attempt": 1,
+                "cancelled": false,
+                "detail": null,
+                "duration_ms": 7,
+                "finished_at": "2026-09-10T09:45:49.163995312+00:00",
+                "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033549-040855395-80-1/logs/boundary.log",
+                "started_at": "2026-09-10T09:45:49.156452249+00:00",
+                "status": "PASS",
+                "timed_out": false
+              }
+            ],
+            "cancelled": false,
+            "detail": null,
+            "duration_ms": 7,
+            "failure_code": null,
+            "flaky": false,
+            "invocation_id": "inv-1789033549-040855395-80-1",
+            "label": "controlled command boundary",
+            "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033549-040855395-80-1/logs/boundary.log",
+            "parser": null,
+            "passed": true,
+            "retry_class": null,
+            "retry_count": 0,
+            "runner": null,
+            "status": "PASS",
+            "step_id": "backend.tests",
+            "timed_out": false,
+            "waived": false,
+            "waiver": null
+          }
+        ],
+        "timestamp": "2026-09-10T09:45:49.164154897+00:00",
+        "warnings": []
+      },
+      "script": "echo controlled-project-command\nexit 0\n",
+      "source_unchanged": true
+    },
+    {
+      "absent_ci": {
+        "command": [
+          "<workspace>/target/debug/harness-gate",
+          "--project-root",
+          "<fixture>",
+          "verify",
+          "--profile",
+          "ci",
+          "--all"
+        ],
+        "exit_code": 1,
+        "stderr": "ERROR [E1401]: unknown or empty verification profile \"ci\"\n",
+        "stdout": ""
+      },
+      "config_check": {
+        "command": [
+          "<workspace>/target/debug/harness-gate",
+          "--project-root",
+          "<fixture>",
+          "config",
+          "check"
+        ],
+        "exit_code": 0,
+        "stderr": "",
+        "stdout": "Configuration valid: <fixture>/.harness-gate/flow.toml\nSchema version: 2\nComponents: backend\nProfiles: full\nVerification steps: 1\n"
+      },
+      "expected_exit_code": 1,
+      "flow": "version = 2\n[project]\nname = \"arc-admin-negative-boundary\"\ndefault_profile = \"full\"\nhook_profile = \"full\"\n[paths]\nreports = \".harness-gate/reports\"\naudit_config = \".harness-gate/audit.toml\"\nsecrets_config = \".harness-gate/secrets.toml\"\n[scope]\nunmatched = \"all\"\n[[scope.rules]]\npatterns = [\"**\"]\ncomponents = [\"backend\"]\n[policy]\nrequired_steps = [\"backend.tests\"]\n[[steps]]\nid = \"backend.tests\"\nlabel = \"controlled command boundary\"\ncomponent = \"backend\"\nprofiles = [\"full\"]\nprogram = \"sh\"\nargs = [\"boundary.sh\"]\ncwd = \"{root}\"\nlog = \"boundary.log\"\ntimeout_secs = 20\n",
+      "id": "backend.tests-7",
+      "injected_exit_code": 7,
+      "log": "controlled-project-command\n",
+      "manifest": {
+        "artifacts": [
+          {
+            "kind": "artifact",
+            "path": "changed_files.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "size_bytes": 0
+          },
+          {
+            "kind": "invocation-metadata",
+            "path": "invocation.json",
+            "sha256": "6fef7e75df3e05940e41d68cf88ffe1b8e7f8dbb35b8e971e64be2c57fd63072",
+            "size_bytes": 685
+          },
+          {
+            "kind": "step-log",
+            "path": "logs/boundary.log",
+            "sha256": "76a547780a68c99014cca0349f652a2975bdc1dc9fb602019aeef4b819bfa94d",
+            "size_bytes": 27
+          },
+          {
+            "kind": "step-log",
+            "path": "review_context.json",
+            "sha256": "71b7944c76c6dceee0a515d2d26aaa98f3610126b010677e02a163cf745fa4f9",
+            "size_bytes": 222
+          },
+          {
+            "kind": "report",
+            "path": "review_context.md",
+            "sha256": "6a8ca76cb14869277398928b274f97a73fa1aaa6def2917ad903e76bf1acedcb",
+            "size_bytes": 92
+          },
+          {
+            "kind": "report",
+            "path": "scope.json",
+            "sha256": "7795a63f393350b83624641d03c7b632c876d1f6109b9a4002cbb98c02ecfdff",
+            "size_bytes": 104
+          },
+          {
+            "kind": "step-log",
+            "path": "secret_scan.json",
+            "sha256": "f914ad422660864fd895430355ae9fd92c21e623371253ba2f0f7fe087aaf7d7",
+            "size_bytes": 100
+          },
+          {
+            "kind": "report",
+            "path": "test_result.md",
+            "sha256": "df18f963476f68ec3a7845ae61a53a07ab54f198c2450f0cfc7cbea620875111",
+            "size_bytes": 474
+          }
+        ],
+        "generated_at": "2026-09-10T09:45:49.555168798+00:00",
+        "invocation_id": "inv-1789033549-401784556-115-1",
+        "schema_version": "1"
+      },
+      "original_step": {
+        "args": [
+          "test",
+          "--manifest-path",
+          "{backend}/Cargo.toml",
+          "--locked",
+          "--",
+          "--nocapture"
+        ],
+        "component": "backend",
+        "cwd": "{root}",
+        "id": "backend.tests",
+        "input": "repository",
+        "label": "backend tests",
+        "log": "backend_tests.log",
+        "parser": "rust",
+        "profiles": [
+          "full"
+        ],
+        "program": "cargo",
+        "remove_env": [
+          "DATABASE_URL"
+        ],
+        "services": [
+          "test-postgres"
+        ],
+        "timeout_env": "RUST_TEST_TIMEOUT",
+        "timeout_secs": 600
+      },
+      "receipt": {
+        "command": [
+          "<workspace>/target/debug/harness-gate",
+          "--project-root",
+          "<fixture>",
+          "verify",
+          "--profile",
+          "full",
+          "--all"
+        ],
+        "exit_code": 1,
+        "stderr": "",
+        "stdout": "harness-gate verify\nScope: all\nComponents: backend\n\n[PASS] secret scan (84 ms)\n[PASS] architecture audit (5 ms)\n[RUN ] controlled command boundary ... FAIL (7 ms)\n       log: <fixture>/.harness-gate/reports/invocations/inv-1789033549-401784556-115-1/logs/boundary.log\n\nVerification report: <fixture>/.harness-gate/reports/test_result.md\nTEST_SUMMARY: FAIL\n"
+      },
+      "report": {
+        "artifacts": [
+          {
+            "invocation_id": "inv-1789033549-401784556-115-1",
+            "kind": "artifact",
+            "path": "changed_files.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "size_bytes": 0
+          },
+          {
+            "invocation_id": "inv-1789033549-401784556-115-1",
+            "kind": "invocation-metadata",
+            "path": "invocation.json",
+            "sha256": "6fef7e75df3e05940e41d68cf88ffe1b8e7f8dbb35b8e971e64be2c57fd63072",
+            "size_bytes": 685
+          },
+          {
+            "invocation_id": "inv-1789033549-401784556-115-1",
+            "kind": "step-log",
+            "path": "logs/boundary.log",
+            "sha256": "76a547780a68c99014cca0349f652a2975bdc1dc9fb602019aeef4b819bfa94d",
+            "size_bytes": 27,
+            "step_id": "backend.tests"
+          },
+          {
+            "invocation_id": "inv-1789033549-401784556-115-1",
+            "kind": "step-log",
+            "path": "review_context.json",
+            "sha256": "71b7944c76c6dceee0a515d2d26aaa98f3610126b010677e02a163cf745fa4f9",
+            "size_bytes": 222,
+            "step_id": "builtin.architecture-audit"
+          },
+          {
+            "invocation_id": "inv-1789033549-401784556-115-1",
+            "kind": "report",
+            "path": "review_context.md",
+            "sha256": "6a8ca76cb14869277398928b274f97a73fa1aaa6def2917ad903e76bf1acedcb",
+            "size_bytes": 92
+          },
+          {
+            "invocation_id": "inv-1789033549-401784556-115-1",
+            "kind": "report",
+            "path": "scope.json",
+            "sha256": "7795a63f393350b83624641d03c7b632c876d1f6109b9a4002cbb98c02ecfdff",
+            "size_bytes": 104
+          },
+          {
+            "invocation_id": "inv-1789033549-401784556-115-1",
+            "kind": "step-log",
+            "path": "secret_scan.json",
+            "sha256": "f914ad422660864fd895430355ae9fd92c21e623371253ba2f0f7fe087aaf7d7",
+            "size_bytes": 100,
+            "step_id": "builtin.secret-scan"
+          },
+          {
+            "invocation_id": "inv-1789033549-401784556-115-1",
+            "kind": "report",
+            "path": "test_result.md",
+            "sha256": "df18f963476f68ec3a7845ae61a53a07ab54f198c2450f0cfc7cbea620875111",
+            "size_bytes": 474
+          }
+        ],
+        "configuration_digest": "sha256:dbde55025e7a4369e47fcf89675111bdd53a09d21064b7436d64e91aacf4d86c",
+        "evidence_complete": true,
+        "execution_root": "<fixture>",
+        "executor_version": "0.3.7",
+        "failures": [
+          {
+            "code": "STEP_FAILED",
+            "message": "exit code 7",
+            "step_id": "backend.tests"
+          }
+        ],
+        "input_mode": "all",
+        "invocation_id": "inv-1789033549-401784556-115-1",
+        "passed": false,
+        "profile": "full",
+        "project_identity": "<fixture>",
+        "report_directory": "<fixture>/.harness-gate/reports/invocations/inv-1789033549-401784556-115-1",
+        "schema_version": "1",
+        "scope": {
+          "changed_files": [],
+          "components": [
+            "backend"
+          ],
+          "mode": "all",
+          "unmatched_files": []
+        },
+        "services": [],
+        "skipped_steps": [],
+        "source_identity": "working-tree:unknown",
+        "status": "FAIL",
+        "steps": [
+          {
+            "attempts": [
+              {
+                "attempt": 1,
+                "cancelled": false,
+                "detail": null,
+                "duration_ms": 84,
+                "finished_at": null,
+                "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033549-401784556-115-1/secret_scan.json",
+                "started_at": null,
+                "status": "PASS",
+                "timed_out": false
+              }
+            ],
+            "cancelled": false,
+            "detail": null,
+            "duration_ms": 84,
+            "failure_code": null,
+            "flaky": false,
+            "invocation_id": "inv-1789033549-401784556-115-1",
+            "label": "secret scan",
+            "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033549-401784556-115-1/secret_scan.json",
+            "parser": null,
+            "passed": true,
+            "retry_class": null,
+            "retry_count": 0,
+            "runner": null,
+            "status": "PASS",
+            "step_id": "builtin.secret-scan",
+            "timed_out": false,
+            "waived": false,
+            "waiver": null
+          },
+          {
+            "attempts": [
+              {
+                "attempt": 1,
+                "cancelled": false,
+                "detail": "0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)",
+                "duration_ms": 5,
+                "finished_at": null,
+                "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033549-401784556-115-1/review_context.json",
+                "started_at": null,
+                "status": "PASS",
+                "timed_out": false
+              }
+            ],
+            "cancelled": false,
+            "detail": "0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)",
+            "duration_ms": 5,
+            "failure_code": null,
+            "flaky": false,
+            "invocation_id": "inv-1789033549-401784556-115-1",
+            "label": "architecture audit",
+            "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033549-401784556-115-1/review_context.json",
+            "parser": null,
+            "passed": true,
+            "retry_class": null,
+            "retry_count": 0,
+            "runner": null,
+            "status": "PASS",
+            "step_id": "builtin.architecture-audit",
+            "timed_out": false,
+            "waived": false,
+            "waiver": null
+          },
+          {
+            "attempts": [
+              {
+                "attempt": 1,
+                "cancelled": false,
+                "detail": "exit code 7",
+                "duration_ms": 7,
+                "finished_at": "2026-09-10T09:45:49.525941631+00:00",
+                "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033549-401784556-115-1/logs/boundary.log",
+                "started_at": "2026-09-10T09:45:49.517986230+00:00",
+                "status": "FAIL",
+                "timed_out": false
+              }
+            ],
+            "cancelled": false,
+            "detail": "exit code 7",
+            "duration_ms": 7,
+            "failure_code": "STEP_FAILED",
+            "flaky": false,
+            "invocation_id": "inv-1789033549-401784556-115-1",
+            "label": "controlled command boundary",
+            "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033549-401784556-115-1/logs/boundary.log",
+            "parser": null,
+            "passed": false,
+            "retry_class": "exit",
+            "retry_count": 0,
+            "runner": null,
+            "status": "FAIL",
+            "step_id": "backend.tests",
+            "timed_out": false,
+            "waived": false,
+            "waiver": null
+          }
+        ],
+        "timestamp": "2026-09-10T09:45:49.526128524+00:00",
+        "warnings": []
+      },
+      "script": "echo controlled-project-command\nexit 7\n",
+      "source_unchanged": true
+    },
+    {
+      "absent_ci": {
+        "command": [
+          "<workspace>/target/debug/harness-gate",
+          "--project-root",
+          "<fixture>",
+          "verify",
+          "--profile",
+          "ci",
+          "--all"
+        ],
+        "exit_code": 1,
+        "stderr": "ERROR [E1401]: unknown or empty verification profile \"ci\"\n",
+        "stdout": ""
+      },
+      "config_check": {
+        "command": [
+          "<workspace>/target/debug/harness-gate",
+          "--project-root",
+          "<fixture>",
+          "config",
+          "check"
+        ],
+        "exit_code": 0,
+        "stderr": "",
+        "stdout": "Configuration valid: <fixture>/.harness-gate/flow.toml\nSchema version: 2\nComponents: frontend\nProfiles: full\nVerification steps: 1\n"
+      },
+      "expected_exit_code": 0,
+      "flow": "version = 2\n[project]\nname = \"arc-admin-negative-boundary\"\ndefault_profile = \"full\"\nhook_profile = \"full\"\n[paths]\nreports = \".harness-gate/reports\"\naudit_config = \".harness-gate/audit.toml\"\nsecrets_config = \".harness-gate/secrets.toml\"\n[scope]\nunmatched = \"all\"\n[[scope.rules]]\npatterns = [\"**\"]\ncomponents = [\"frontend\"]\n[policy]\nrequired_steps = [\"frontend.fullstack-smoke\"]\n[[steps]]\nid = \"frontend.fullstack-smoke\"\nlabel = \"controlled command boundary\"\ncomponent = \"frontend\"\nprofiles = [\"full\"]\nprogram = \"sh\"\nargs = [\"boundary.sh\"]\ncwd = \"{root}\"\nlog = \"boundary.log\"\ntimeout_secs = 20\n",
+      "id": "frontend.fullstack-smoke-0",
+      "injected_exit_code": 0,
+      "log": "controlled-project-command\n",
+      "manifest": {
+        "artifacts": [
+          {
+            "kind": "artifact",
+            "path": "changed_files.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "size_bytes": 0
+          },
+          {
+            "kind": "invocation-metadata",
+            "path": "invocation.json",
+            "sha256": "c5d183685651bbf2f83371e8c93a7825f0a73a4fe0e333cea72c314f33ce24a0",
+            "size_bytes": 685
+          },
+          {
+            "kind": "step-log",
+            "path": "logs/boundary.log",
+            "sha256": "76a547780a68c99014cca0349f652a2975bdc1dc9fb602019aeef4b819bfa94d",
+            "size_bytes": 27
+          },
+          {
+            "kind": "step-log",
+            "path": "review_context.json",
+            "sha256": "ba37d93e14e59e1373b444a82c82a75e2c06dbbc67127ab2859e18271f648cf0",
+            "size_bytes": 222
+          },
+          {
+            "kind": "report",
+            "path": "review_context.md",
+            "sha256": "6a8ca76cb14869277398928b274f97a73fa1aaa6def2917ad903e76bf1acedcb",
+            "size_bytes": 92
+          },
+          {
+            "kind": "report",
+            "path": "scope.json",
+            "sha256": "453c93570f4ab27fe2f7011eec8bb212f7942f6ea6e5b935118e45d3ee6f6926",
+            "size_bytes": 105
+          },
+          {
+            "kind": "step-log",
+            "path": "secret_scan.json",
+            "sha256": "a679dd78c845701a29397e5eb5018aba0b2cf6a1f44e63047c8ad2ffffa06b30",
+            "size_bytes": 100
+          },
+          {
+            "kind": "report",
+            "path": "test_result.md",
+            "sha256": "aace043e19c6912599efb081c08a7e1f2b2a07dced9eaabfa0774289421e1682",
+            "size_bytes": 293
+          }
+        ],
+        "generated_at": "2026-09-10T09:45:49.942715743+00:00",
+        "invocation_id": "inv-1789033549-775418278-150-1",
+        "schema_version": "1"
+      },
+      "original_step": {
+        "args": [
+          "run",
+          "e2e:fullstack"
+        ],
+        "component": "frontend",
+        "cwd": "{frontend}",
+        "id": "frontend.fullstack-smoke",
+        "input": "repository",
+        "label": "frontend real full-stack smoke test",
+        "log": "frontend_fullstack_smoke.log",
+        "profiles": [
+          "full"
+        ],
+        "program": "npm",
+        "remove_env": [
+          "DATABASE_URL"
+        ],
+        "services": [
+          "test-postgres"
+        ],
+        "timeout_secs": 420
+      },
+      "receipt": {
+        "command": [
+          "<workspace>/target/debug/harness-gate",
+          "--project-root",
+          "<fixture>",
+          "verify",
+          "--profile",
+          "full",
+          "--all"
+        ],
+        "exit_code": 0,
+        "stderr": "",
+        "stdout": "harness-gate verify\nScope: all\nComponents: frontend\n\n[PASS] secret scan (83 ms)\n[PASS] architecture audit (9 ms)\n[RUN ] controlled command boundary ... PASS (7 ms)\n\nVerification report: <fixture>/.harness-gate/reports/test_result.md\nTEST_SUMMARY: PASS\n"
+      },
+      "report": {
+        "artifacts": [
+          {
+            "invocation_id": "inv-1789033549-775418278-150-1",
+            "kind": "artifact",
+            "path": "changed_files.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "size_bytes": 0
+          },
+          {
+            "invocation_id": "inv-1789033549-775418278-150-1",
+            "kind": "invocation-metadata",
+            "path": "invocation.json",
+            "sha256": "c5d183685651bbf2f83371e8c93a7825f0a73a4fe0e333cea72c314f33ce24a0",
+            "size_bytes": 685
+          },
+          {
+            "invocation_id": "inv-1789033549-775418278-150-1",
+            "kind": "step-log",
+            "path": "logs/boundary.log",
+            "sha256": "76a547780a68c99014cca0349f652a2975bdc1dc9fb602019aeef4b819bfa94d",
+            "size_bytes": 27,
+            "step_id": "frontend.fullstack-smoke"
+          },
+          {
+            "invocation_id": "inv-1789033549-775418278-150-1",
+            "kind": "step-log",
+            "path": "review_context.json",
+            "sha256": "ba37d93e14e59e1373b444a82c82a75e2c06dbbc67127ab2859e18271f648cf0",
+            "size_bytes": 222,
+            "step_id": "builtin.architecture-audit"
+          },
+          {
+            "invocation_id": "inv-1789033549-775418278-150-1",
+            "kind": "report",
+            "path": "review_context.md",
+            "sha256": "6a8ca76cb14869277398928b274f97a73fa1aaa6def2917ad903e76bf1acedcb",
+            "size_bytes": 92
+          },
+          {
+            "invocation_id": "inv-1789033549-775418278-150-1",
+            "kind": "report",
+            "path": "scope.json",
+            "sha256": "453c93570f4ab27fe2f7011eec8bb212f7942f6ea6e5b935118e45d3ee6f6926",
+            "size_bytes": 105
+          },
+          {
+            "invocation_id": "inv-1789033549-775418278-150-1",
+            "kind": "step-log",
+            "path": "secret_scan.json",
+            "sha256": "a679dd78c845701a29397e5eb5018aba0b2cf6a1f44e63047c8ad2ffffa06b30",
+            "size_bytes": 100,
+            "step_id": "builtin.secret-scan"
+          },
+          {
+            "invocation_id": "inv-1789033549-775418278-150-1",
+            "kind": "report",
+            "path": "test_result.md",
+            "sha256": "aace043e19c6912599efb081c08a7e1f2b2a07dced9eaabfa0774289421e1682",
+            "size_bytes": 293
+          }
+        ],
+        "configuration_digest": "sha256:ff3bbd24bf6c578eac1d9cd5849412893145367e9621d1af37a0a29f4df09a12",
+        "evidence_complete": true,
+        "execution_root": "<fixture>",
+        "executor_version": "0.3.7",
+        "failures": [],
+        "input_mode": "all",
+        "invocation_id": "inv-1789033549-775418278-150-1",
+        "passed": true,
+        "profile": "full",
+        "project_identity": "<fixture>",
+        "report_directory": "<fixture>/.harness-gate/reports/invocations/inv-1789033549-775418278-150-1",
+        "schema_version": "1",
+        "scope": {
+          "changed_files": [],
+          "components": [
+            "frontend"
+          ],
+          "mode": "all",
+          "unmatched_files": []
+        },
+        "services": [],
+        "skipped_steps": [],
+        "source_identity": "working-tree:unknown",
+        "status": "PASS",
+        "steps": [
+          {
+            "attempts": [
+              {
+                "attempt": 1,
+                "cancelled": false,
+                "detail": null,
+                "duration_ms": 83,
+                "finished_at": null,
+                "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033549-775418278-150-1/secret_scan.json",
+                "started_at": null,
+                "status": "PASS",
+                "timed_out": false
+              }
+            ],
+            "cancelled": false,
+            "detail": null,
+            "duration_ms": 83,
+            "failure_code": null,
+            "flaky": false,
+            "invocation_id": "inv-1789033549-775418278-150-1",
+            "label": "secret scan",
+            "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033549-775418278-150-1/secret_scan.json",
+            "parser": null,
+            "passed": true,
+            "retry_class": null,
+            "retry_count": 0,
+            "runner": null,
+            "status": "PASS",
+            "step_id": "builtin.secret-scan",
+            "timed_out": false,
+            "waived": false,
+            "waiver": null
+          },
+          {
+            "attempts": [
+              {
+                "attempt": 1,
+                "cancelled": false,
+                "detail": "0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)",
+                "duration_ms": 9,
+                "finished_at": null,
+                "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033549-775418278-150-1/review_context.json",
+                "started_at": null,
+                "status": "PASS",
+                "timed_out": false
+              }
+            ],
+            "cancelled": false,
+            "detail": "0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)",
+            "duration_ms": 9,
+            "failure_code": null,
+            "flaky": false,
+            "invocation_id": "inv-1789033549-775418278-150-1",
+            "label": "architecture audit",
+            "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033549-775418278-150-1/review_context.json",
+            "parser": null,
+            "passed": true,
+            "retry_class": null,
+            "retry_count": 0,
+            "runner": null,
+            "status": "PASS",
+            "step_id": "builtin.architecture-audit",
+            "timed_out": false,
+            "waived": false,
+            "waiver": null
+          },
+          {
+            "attempts": [
+              {
+                "attempt": 1,
+                "cancelled": false,
+                "detail": null,
+                "duration_ms": 7,
+                "finished_at": "2026-09-10T09:45:49.903424966+00:00",
+                "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033549-775418278-150-1/logs/boundary.log",
+                "started_at": "2026-09-10T09:45:49.895731607+00:00",
+                "status": "PASS",
+                "timed_out": false
+              }
+            ],
+            "cancelled": false,
+            "detail": null,
+            "duration_ms": 7,
+            "failure_code": null,
+            "flaky": false,
+            "invocation_id": "inv-1789033549-775418278-150-1",
+            "label": "controlled command boundary",
+            "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033549-775418278-150-1/logs/boundary.log",
+            "parser": null,
+            "passed": true,
+            "retry_class": null,
+            "retry_count": 0,
+            "runner": null,
+            "status": "PASS",
+            "step_id": "frontend.fullstack-smoke",
+            "timed_out": false,
+            "waived": false,
+            "waiver": null
+          }
+        ],
+        "timestamp": "2026-09-10T09:45:49.903620799+00:00",
+        "warnings": []
+      },
+      "script": "echo controlled-project-command\nexit 0\n",
+      "source_unchanged": true
+    },
+    {
+      "absent_ci": {
+        "command": [
+          "<workspace>/target/debug/harness-gate",
+          "--project-root",
+          "<fixture>",
+          "verify",
+          "--profile",
+          "ci",
+          "--all"
+        ],
+        "exit_code": 1,
+        "stderr": "ERROR [E1401]: unknown or empty verification profile \"ci\"\n",
+        "stdout": ""
+      },
+      "config_check": {
+        "command": [
+          "<workspace>/target/debug/harness-gate",
+          "--project-root",
+          "<fixture>",
+          "config",
+          "check"
+        ],
+        "exit_code": 0,
+        "stderr": "",
+        "stdout": "Configuration valid: <fixture>/.harness-gate/flow.toml\nSchema version: 2\nComponents: frontend\nProfiles: full\nVerification steps: 1\n"
+      },
+      "expected_exit_code": 1,
+      "flow": "version = 2\n[project]\nname = \"arc-admin-negative-boundary\"\ndefault_profile = \"full\"\nhook_profile = \"full\"\n[paths]\nreports = \".harness-gate/reports\"\naudit_config = \".harness-gate/audit.toml\"\nsecrets_config = \".harness-gate/secrets.toml\"\n[scope]\nunmatched = \"all\"\n[[scope.rules]]\npatterns = [\"**\"]\ncomponents = [\"frontend\"]\n[policy]\nrequired_steps = [\"frontend.fullstack-smoke\"]\n[[steps]]\nid = \"frontend.fullstack-smoke\"\nlabel = \"controlled command boundary\"\ncomponent = \"frontend\"\nprofiles = [\"full\"]\nprogram = \"sh\"\nargs = [\"boundary.sh\"]\ncwd = \"{root}\"\nlog = \"boundary.log\"\ntimeout_secs = 20\n",
+      "id": "frontend.fullstack-smoke-7",
+      "injected_exit_code": 7,
+      "log": "controlled-project-command\n",
+      "manifest": {
+        "artifacts": [
+          {
+            "kind": "artifact",
+            "path": "changed_files.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "size_bytes": 0
+          },
+          {
+            "kind": "invocation-metadata",
+            "path": "invocation.json",
+            "sha256": "866802973e6e325ef005d0db81b07c36c88d1ddd3d0fe9d7d8d44b4b47ac7fe5",
+            "size_bytes": 685
+          },
+          {
+            "kind": "step-log",
+            "path": "logs/boundary.log",
+            "sha256": "76a547780a68c99014cca0349f652a2975bdc1dc9fb602019aeef4b819bfa94d",
+            "size_bytes": 27
+          },
+          {
+            "kind": "step-log",
+            "path": "review_context.json",
+            "sha256": "1e1bc2e550f0a0b5bfe3ad9afe0f0a719dca004635e98506cffbc041b8702dab",
+            "size_bytes": 222
+          },
+          {
+            "kind": "report",
+            "path": "review_context.md",
+            "sha256": "6a8ca76cb14869277398928b274f97a73fa1aaa6def2917ad903e76bf1acedcb",
+            "size_bytes": 92
+          },
+          {
+            "kind": "report",
+            "path": "scope.json",
+            "sha256": "453c93570f4ab27fe2f7011eec8bb212f7942f6ea6e5b935118e45d3ee6f6926",
+            "size_bytes": 105
+          },
+          {
+            "kind": "step-log",
+            "path": "secret_scan.json",
+            "sha256": "caee636f197ecc6692167a9639b5f60bfabf3884f5710c24dd2f5b1b8efa0a01",
+            "size_bytes": 100
+          },
+          {
+            "kind": "report",
+            "path": "test_result.md",
+            "sha256": "f308377ce45a43e9c56832007de01fb85cfb24782b8d051a092439c066db39d5",
+            "size_bytes": 475
+          }
+        ],
+        "generated_at": "2026-09-10T09:45:50.319711032+00:00",
+        "invocation_id": "inv-1789033550-167949466-185-1",
+        "schema_version": "1"
+      },
+      "original_step": {
+        "args": [
+          "run",
+          "e2e:fullstack"
+        ],
+        "component": "frontend",
+        "cwd": "{frontend}",
+        "id": "frontend.fullstack-smoke",
+        "input": "repository",
+        "label": "frontend real full-stack smoke test",
+        "log": "frontend_fullstack_smoke.log",
+        "profiles": [
+          "full"
+        ],
+        "program": "npm",
+        "remove_env": [
+          "DATABASE_URL"
+        ],
+        "services": [
+          "test-postgres"
+        ],
+        "timeout_secs": 420
+      },
+      "receipt": {
+        "command": [
+          "<workspace>/target/debug/harness-gate",
+          "--project-root",
+          "<fixture>",
+          "verify",
+          "--profile",
+          "full",
+          "--all"
+        ],
+        "exit_code": 1,
+        "stderr": "",
+        "stdout": "harness-gate verify\nScope: all\nComponents: frontend\n\n[PASS] secret scan (83 ms)\n[PASS] architecture audit (5 ms)\n[RUN ] controlled command boundary ... FAIL (7 ms)\n       log: <fixture>/.harness-gate/reports/invocations/inv-1789033550-167949466-185-1/logs/boundary.log\n\nVerification report: <fixture>/.harness-gate/reports/test_result.md\nTEST_SUMMARY: FAIL\n"
+      },
+      "report": {
+        "artifacts": [
+          {
+            "invocation_id": "inv-1789033550-167949466-185-1",
+            "kind": "artifact",
+            "path": "changed_files.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "size_bytes": 0
+          },
+          {
+            "invocation_id": "inv-1789033550-167949466-185-1",
+            "kind": "invocation-metadata",
+            "path": "invocation.json",
+            "sha256": "866802973e6e325ef005d0db81b07c36c88d1ddd3d0fe9d7d8d44b4b47ac7fe5",
+            "size_bytes": 685
+          },
+          {
+            "invocation_id": "inv-1789033550-167949466-185-1",
+            "kind": "step-log",
+            "path": "logs/boundary.log",
+            "sha256": "76a547780a68c99014cca0349f652a2975bdc1dc9fb602019aeef4b819bfa94d",
+            "size_bytes": 27,
+            "step_id": "frontend.fullstack-smoke"
+          },
+          {
+            "invocation_id": "inv-1789033550-167949466-185-1",
+            "kind": "step-log",
+            "path": "review_context.json",
+            "sha256": "1e1bc2e550f0a0b5bfe3ad9afe0f0a719dca004635e98506cffbc041b8702dab",
+            "size_bytes": 222,
+            "step_id": "builtin.architecture-audit"
+          },
+          {
+            "invocation_id": "inv-1789033550-167949466-185-1",
+            "kind": "report",
+            "path": "review_context.md",
+            "sha256": "6a8ca76cb14869277398928b274f97a73fa1aaa6def2917ad903e76bf1acedcb",
+            "size_bytes": 92
+          },
+          {
+            "invocation_id": "inv-1789033550-167949466-185-1",
+            "kind": "report",
+            "path": "scope.json",
+            "sha256": "453c93570f4ab27fe2f7011eec8bb212f7942f6ea6e5b935118e45d3ee6f6926",
+            "size_bytes": 105
+          },
+          {
+            "invocation_id": "inv-1789033550-167949466-185-1",
+            "kind": "step-log",
+            "path": "secret_scan.json",
+            "sha256": "caee636f197ecc6692167a9639b5f60bfabf3884f5710c24dd2f5b1b8efa0a01",
+            "size_bytes": 100,
+            "step_id": "builtin.secret-scan"
+          },
+          {
+            "invocation_id": "inv-1789033550-167949466-185-1",
+            "kind": "report",
+            "path": "test_result.md",
+            "sha256": "f308377ce45a43e9c56832007de01fb85cfb24782b8d051a092439c066db39d5",
+            "size_bytes": 475
+          }
+        ],
+        "configuration_digest": "sha256:ff3bbd24bf6c578eac1d9cd5849412893145367e9621d1af37a0a29f4df09a12",
+        "evidence_complete": true,
+        "execution_root": "<fixture>",
+        "executor_version": "0.3.7",
+        "failures": [
+          {
+            "code": "STEP_FAILED",
+            "message": "exit code 7",
+            "step_id": "frontend.fullstack-smoke"
+          }
+        ],
+        "input_mode": "all",
+        "invocation_id": "inv-1789033550-167949466-185-1",
+        "passed": false,
+        "profile": "full",
+        "project_identity": "<fixture>",
+        "report_directory": "<fixture>/.harness-gate/reports/invocations/inv-1789033550-167949466-185-1",
+        "schema_version": "1",
+        "scope": {
+          "changed_files": [],
+          "components": [
+            "frontend"
+          ],
+          "mode": "all",
+          "unmatched_files": []
+        },
+        "services": [],
+        "skipped_steps": [],
+        "source_identity": "working-tree:unknown",
+        "status": "FAIL",
+        "steps": [
+          {
+            "attempts": [
+              {
+                "attempt": 1,
+                "cancelled": false,
+                "detail": null,
+                "duration_ms": 83,
+                "finished_at": null,
+                "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033550-167949466-185-1/secret_scan.json",
+                "started_at": null,
+                "status": "PASS",
+                "timed_out": false
+              }
+            ],
+            "cancelled": false,
+            "detail": null,
+            "duration_ms": 83,
+            "failure_code": null,
+            "flaky": false,
+            "invocation_id": "inv-1789033550-167949466-185-1",
+            "label": "secret scan",
+            "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033550-167949466-185-1/secret_scan.json",
+            "parser": null,
+            "passed": true,
+            "retry_class": null,
+            "retry_count": 0,
+            "runner": null,
+            "status": "PASS",
+            "step_id": "builtin.secret-scan",
+            "timed_out": false,
+            "waived": false,
+            "waiver": null
+          },
+          {
+            "attempts": [
+              {
+                "attempt": 1,
+                "cancelled": false,
+                "detail": "0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)",
+                "duration_ms": 5,
+                "finished_at": null,
+                "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033550-167949466-185-1/review_context.json",
+                "started_at": null,
+                "status": "PASS",
+                "timed_out": false
+              }
+            ],
+            "cancelled": false,
+            "detail": "0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)",
+            "duration_ms": 5,
+            "failure_code": null,
+            "flaky": false,
+            "invocation_id": "inv-1789033550-167949466-185-1",
+            "label": "architecture audit",
+            "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033550-167949466-185-1/review_context.json",
+            "parser": null,
+            "passed": true,
+            "retry_class": null,
+            "retry_count": 0,
+            "runner": null,
+            "status": "PASS",
+            "step_id": "builtin.architecture-audit",
+            "timed_out": false,
+            "waived": false,
+            "waiver": null
+          },
+          {
+            "attempts": [
+              {
+                "attempt": 1,
+                "cancelled": false,
+                "detail": "exit code 7",
+                "duration_ms": 7,
+                "finished_at": "2026-09-10T09:45:50.290013558+00:00",
+                "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033550-167949466-185-1/logs/boundary.log",
+                "started_at": "2026-09-10T09:45:50.282312027+00:00",
+                "status": "FAIL",
+                "timed_out": false
+              }
+            ],
+            "cancelled": false,
+            "detail": "exit code 7",
+            "duration_ms": 7,
+            "failure_code": "STEP_FAILED",
+            "flaky": false,
+            "invocation_id": "inv-1789033550-167949466-185-1",
+            "label": "controlled command boundary",
+            "log": "<fixture>/.harness-gate/reports/invocations/inv-1789033550-167949466-185-1/logs/boundary.log",
+            "parser": null,
+            "passed": false,
+            "retry_class": "exit",
+            "retry_count": 0,
+            "runner": null,
+            "status": "FAIL",
+            "step_id": "frontend.fullstack-smoke",
+            "timed_out": false,
+            "waived": false,
+            "waiver": null
+          }
+        ],
+        "timestamp": "2026-09-10T09:45:50.290201080+00:00",
+        "warnings": []
+      },
+      "script": "echo controlled-project-command\nexit 7\n",
+      "source_unchanged": true
+    }
+  ],
+  "disposable_fixtures_removed": true,
+  "frozen_source_hashes": {
+    "import/README.md": "b155e475e62e1019159c1f2af23e9257aede27286b8c9e3fa7a35d2a517de1cc",
+    "import/flow.import.json": "c1140cc1cda9099e729aefd6c42de09167c8e2c499864d818043b3084a0284f3",
+    "import/flow.toml": "5096719c1c5ecea970411f0df823eb81af92dd39add56c1764f8059cb602ea5e",
+    "import/validation.json": "aaba901e428604c7f3261bac95ae62eb684e2512709741f4f51967f8684c7066",
+    "quality/README.md": "26f7c94e9474e052338b7c36da9dd33c26d4824b2aad740b924bb6d1f1cd079e",
+    "quality/packs/backend/capabilities.json": "17e5f0a3412c7b2283ad28d3520ef57b9fad9c59147a558ff3b7248fc6eed951",
+    "quality/packs/backend/policy.json": "6bbdcc6332eadf0da8755923178f8c165a529106a583894db5c63152676d9b16",
+    "quality/packs/frontend-api/capabilities.json": "111356bb09c01006edcc412599ed88cd08416901f7182451e9872c2d34d867e8",
+    "quality/packs/frontend-api/policy.json": "d78747bcd7a4c86aa3c7de056d2fb6fb77750bca27ab2d48ab86e8ef3ff99d7e",
+    "quality/packs/frontend/capabilities.json": "3a7b49321e2352fa7cc097ff9b61f7fc9346de85d0c9f3478e8f9d3261fcb84c",
+    "quality/packs/frontend/policy.json": "08ddce545c9a809d1a335c3c21f15ee05929d055998fc8a83a8b19abde3c0958",
+    "quality/quality.toml": "e6c69e54df8bcd64ebf0514462a98cd69664fb0f09c37de47a20cd949b6fbc47",
+    "quality/validation.json": "2570f80bc4aea0c54fc12d74f3f445baa48a70384eb72031ffc7b2acddb7437c",
+    "sources/.arc-flow/flow.toml.txt": "6e254663c4a47b94ac8e85c263d34d24eb58f3afe5a14b02c7ef257b08f3ed5d",
+    "sources/.cargo/config.toml.txt": "acc10e419afbd1dd327c5ce7f84ba71bb8d18777fd58500b09682c71e5fe2818",
+    "sources/.github/workflows/ci.yml.txt": "6d4e1878f5e5945b4ced2c63b96f1dc9f32b60b146d7507d1812422a3c94d1d4",
+    "sources/.github/workflows/codeql.yml.txt": "901f7bab55a6bc161e6f9af0f8cd71dab963e2014fa717e9164f60089d76bf92",
+    "sources/.github/workflows/security.yml.txt": "bafa768da072f4d4894eeca93c953b4749aa26a6bafe35ed51b1384adddd2c5a",
+    "sources/AGENTS.md.txt": "e58ce1db076ec0d75f061f6a50b348fc4a5d57a3f127514560bf828555609bb7",
+    "sources/backend/tests/api_flow.rs.txt": "b10ba0564623b8a0d62ab383720eb14df0048de65d3268eab808b3043059c6ba",
+    "sources/codex-audit-pipeline/.codex/audit.toml.txt": "cef9985234a9e333fd89813496d2a452d3a10a63c1c4fb10501a61cea4cf28d2",
+    "sources/codex-audit-pipeline/.codex/secrets.toml.txt": "f50ee579024104cc20818cd628d1cad42404a6d3c53e11cdb85d464afefe3345",
+    "sources/codex-audit-pipeline/hooks/pre-commit.txt": "2b3b3763cd1859d9dd82d39006f8cfb6cc35ff66bd73887798ead3481975a5aa",
+    "sources/codex-audit-pipeline/tools/arc-flow/src/config.rs.txt": "1746aa00b87a39a49bdd24223cdd59c71b5a2c7ea58cb6a2c23775298376a09d",
+    "sources/codex-audit-pipeline/tools/arc-flow/src/main.rs.txt": "3075e7528d5dbe2e7ec15a49cbaa44af8b4307096e135631dd4408a8e5898111",
+    "sources/codex-audit-pipeline/tools/arc-flow/src/process.rs.txt": "70cb7cbab8cdcb9de646279b42e886662f9de15d9d7904b41466f580e14db6a9",
+    "sources/codex-audit-pipeline/tools/arc-flow/src/project.rs.txt": "8f9b3c892cde51d7d0d9b89677ddc51a7437f201d8000b9ae04da10f3446605a",
+    "sources/codex-audit-pipeline/tools/arc-flow/src/scope.rs.txt": "32d5141d3b87f0e39133d282ed53112ba4b4e3943bdf2f37fec6d9f94fbcfcf7",
+    "sources/codex-audit-pipeline/tools/arc-flow/src/service.rs.txt": "1fba030b1d5a8662de0b64013a903c3d93a623cf921b59970dec97a46005c7d8",
+    "sources/codex-audit-pipeline/tools/arc-flow/src/verify.rs.txt": "4d3a56ef08925681df4471998fee6d58854f35e6e4c542484fbe9727d1effce7",
+    "sources/frontend/package.json.txt": "9423b35bc194a309a96e20773d9efda329903d31ad8687bfe9238ea77eddf6e5",
+    "sources/frontend/playwright.config.ts.txt": "53bb93ff2d36e5d175406b83364dee44a470a5455e0db0cb7dd198300551a349",
+    "sources/frontend/playwright.fullstack.config.ts.txt": "7495e0a8f666ea70dec7a3897ee4cfc5f0926d6a17a51a036a442316465e8e14",
+    "sources/scripts/check-api-generation.mjs.txt": "91401aa15379da404a1ea18cb312acd84225074e91e86873f4ede2fc3906825d",
+    "sources/scripts/start-fullstack-smoke.sh.txt": "6286909ed04a92fad1d0df8a7b7b2e8d561c054038400d5104a9017d53a117fb"
+  },
+  "frozen_sources_unchanged": true,
+  "imported_flow_sha256": "5096719c1c5ecea970411f0df823eb81af92dd39add56c1764f8059cb602ea5e",
+  "schema": "arc-admin-negative-commands/v1"
+}

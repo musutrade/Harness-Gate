@@ -1,0 +1,34 @@
+{
+  "original_archive": "clean-host-evidence.tar.gz",
+  "bytes": 12160242,
+  "sha256": "3f4641babce2adfde0a1a39252f8a9ac44dde61aee2940e2f2dce7842c84d45a",
+  "parts": [
+    {
+      "file": "part-0000",
+      "bytes": 2880000,
+      "sha256": "8744902552e4c8c968f652d6083bc37739b10e27142be25774dad1977a0a08d1"
+    },
+    {
+      "file": "part-0001",
+      "bytes": 2880000,
+      "sha256": "a693de256f204c5876f48e8e5cffa53fd3b86a8a4587ccf28fe56580ab026ac1"
+    },
+    {
+      "file": "part-0002",
+      "bytes": 2880000,
+      "sha256": "a313b5e6dc5f76bff54859ed632ec3ebb04650a32b885f10e6bede14395d38ee"
+    },
+    {
+      "file": "part-0003",
+      "bytes": 2880000,
+      "sha256": "44f18875644c3146f43e3fe6e17939c8443e92aa35be66144f8ec7cf71a91ea0"
+    },
+    {
+      "file": "part-0004",
+      "bytes": 640242,
+      "sha256": "a0332128612c4775842e97b5ccba46e0c3fb0958102c27475ca7395ffdf3bfff"
+    }
+  ],
+  "reconstruct_from_parts_directory": "cat part-* > ../clean-host-evidence.tar.gz",
+  "verify": "Verify original archive SHA-256 before extraction; original per-file inventory remains unchanged."
+}

@@ -1,0 +1,34 @@
+{
+  "original_archive": "recovery-evidence.tar.gz",
+  "bytes": 13830853,
+  "sha256": "415d6dde27f065d9283025d1c32483d31661a587b477e0eed036863812b644ff",
+  "parts": [
+    {
+      "file": "part-0000",
+      "bytes": 2880000,
+      "sha256": "6ad7f878bbb2bbcefffc407ea3167ec3252e73696ade2077f3eb1e90ab544dfc"
+    },
+    {
+      "file": "part-0001",
+      "bytes": 2880000,
+      "sha256": "4ff04d64209461a9134e49ff9f131cfc9d28dc394e2ea1ad19231fa9b130cc10"
+    },
+    {
+      "file": "part-0002",
+      "bytes": 2880000,
+      "sha256": "da29337ffb421b34bb8e6d21262f599b8236f0f034e7d3b029c2f51c703fc217"
+    },
+    {
+      "file": "part-0003",
+      "bytes": 2880000,
+      "sha256": "df8d71f502ace683dfd7f88c1bdf7aeab5664856ccd211773b23b6074f4b0c6b"
+    },
+    {
+      "file": "part-0004",
+      "bytes": 2310853,
+      "sha256": "70c0c95fb6eba507b3990ea6ddd33e24682a35ff4fd75fc02947736c25b72bce"
+    }
+  ],
+  "reconstruct_from_parts_directory": "cat part-* > ../recovery-evidence.tar.gz",
+  "verify": "Verify original archive SHA-256 before extraction; original per-file inventory remains unchanged."
+}

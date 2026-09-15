@@ -1,0 +1,28 @@
+   Vendoring block-buffer v0.10.4 (/home/gem/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/block-buffer-0.10.4) to target/gh-231/vendor/block-buffer
+   Vendoring cfg-if v1.0.4 (/home/gem/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cfg-if-1.0.4) to target/gh-231/vendor/cfg-if
+   Vendoring cpufeatures v0.2.17 (/home/gem/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cpufeatures-0.2.17) to target/gh-231/vendor/cpufeatures
+   Vendoring crypto-common v0.1.7 (/home/gem/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/crypto-common-0.1.7) to target/gh-231/vendor/crypto-common
+   Vendoring digest v0.10.7 (/home/gem/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/digest-0.10.7) to target/gh-231/vendor/digest
+   Vendoring generic-array v0.14.7 (/home/gem/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/generic-array-0.14.7) to target/gh-231/vendor/generic-array
+   Vendoring itoa v1.0.18 (/home/gem/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/itoa-1.0.18) to target/gh-231/vendor/itoa
+   Vendoring libc v0.2.189 (/home/gem/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libc-0.2.189) to target/gh-231/vendor/libc
+   Vendoring memchr v2.8.3 (/home/gem/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/memchr-2.8.3) to target/gh-231/vendor/memchr
+   Vendoring proc-macro2 v1.0.107 (/home/gem/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro2-1.0.107) to target/gh-231/vendor/proc-macro2
+   Vendoring quote v1.0.47 (/home/gem/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.47) to target/gh-231/vendor/quote
+   Vendoring serde v1.0.229 (/home/gem/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229) to target/gh-231/vendor/serde
+   Vendoring serde_core v1.0.229 (/home/gem/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_core-1.0.229) to target/gh-231/vendor/serde_core
+   Vendoring serde_derive v1.0.229 (/home/gem/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_derive-1.0.229) to target/gh-231/vendor/serde_derive
+   Vendoring serde_json v1.0.151 (/home/gem/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_json-1.0.151) to target/gh-231/vendor/serde_json
+   Vendoring sha2 v0.10.9 (/home/gem/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sha2-0.10.9) to target/gh-231/vendor/sha2
+   Vendoring syn v3.0.5 (/home/gem/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/syn-3.0.5) to target/gh-231/vendor/syn
+   Vendoring typenum v1.20.1 (/home/gem/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.20.1) to target/gh-231/vendor/typenum
+   Vendoring unicode-ident v1.0.24 (/home/gem/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/unicode-ident-1.0.24) to target/gh-231/vendor/unicode-ident
+   Vendoring version_check v0.9.5 (/home/gem/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/version_check-0.9.5) to target/gh-231/vendor/version_check
+   Vendoring zmij v1.0.23 (/home/gem/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zmij-1.0.23) to target/gh-231/vendor/zmij
+To use vendored sources, add this to your .cargo/config.toml for this project:
+
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "target/gh-231/vendor"

@@ -1,0 +1,34 @@
+[
+  {
+    "module": "tools/quality/collector_runner.py",
+    "category": "C",
+    "expected_sha256": "f79a21dadc950d2cf54a97c0bb7a73d2990f7329e084037d505946db51e057e9",
+    "actual_sha256": "f79a21dadc950d2cf54a97c0bb7a73d2990f7329e084037d505946db51e057e9",
+    "matches": true,
+    "final_disposition": "Frozen non-authoritative reference; no generic release-approval path. See python-retention.md for mixed-module exceptions."
+  },
+  {
+    "module": "tools/quality/harness_evidence.py",
+    "category": "C",
+    "expected_sha256": "f08736199f6e192b8e3ab3c9269ce2743f5624940561663919f99790545281e2",
+    "actual_sha256": "f08736199f6e192b8e3ab3c9269ce2743f5624940561663919f99790545281e2",
+    "matches": true,
+    "final_disposition": "Frozen non-authoritative reference; no generic release-approval path. See python-retention.md for mixed-module exceptions."
+  },
+  {
+    "module": "tools/quality/project_model.py",
+    "category": "C",
+    "expected_sha256": "d1d493bbd4566b8aaf469d0f28fdee89a3c3a3e3ebfe3e1068b9d93e90d1b196",
+    "actual_sha256": "d1d493bbd4566b8aaf469d0f28fdee89a3c3a3e3ebfe3e1068b9d93e90d1b196",
+    "matches": true,
+    "final_disposition": "Frozen non-authoritative reference; no generic release-approval path. See python-retention.md for mixed-module exceptions."
+  },
+  {
+    "module": "tools/quality/quality_evidence.py",
+    "category": "C",
+    "expected_sha256": "8938ce2fc2d49caf2e3f3dac284fe3d07a13a3da9cbd8e1e729f011e2d5d145e",
+    "actual_sha256": "8938ce2fc2d49caf2e3f3dac284fe3d07a13a3da9cbd8e1e729f011e2d5d145e",
+    "matches": true,
+    "final_disposition": "Frozen non-authoritative reference; no generic release-approval path. See python-retention.md for mixed-module exceptions."
+  }
+]
