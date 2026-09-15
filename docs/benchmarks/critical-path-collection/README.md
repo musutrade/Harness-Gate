@@ -27,7 +27,8 @@ ends at completed collection. macOS/Windows and hosted CI have not been exercise
 Validation: all 352 quality-script tests passed; the final focused collector and
 evidence run passed 23 tests; documentation consistency and `git diff --check`
 passed. Unit failure controls include shared-profile contamination, missing profiles,
-failed builds/tests/cleanup/exports, source changes, and overlapping collection locks.
+failed builds/tests/cleanup/exports, source changes, overlapping collection locks,
+and bounded retention of failed build trees.
 
 See [machine-readable results](validation.json) for tool versions, exact counters,
 source hash, timings and local raw evidence locations. Reproduce after committing

@@ -23,7 +23,7 @@ Core **0.4.5** selects standalone Rust plugin **0.1.0-rc.6** by default. Native 
 - New Project Integration: see [Installation and Quick Start](#installation-and-quick-start) and [Built-in Presets](#built-in-presets)
 - Add Commands, Components or CI Profiles: see [Command Overview](#command-overview), the [English schema v2 configuration reference](https://github.com/musutrade/Harness-Gate/blob/main/docs/configuration.md), and the [JSON Schema catalog](https://github.com/musutrade/Harness-Gate/blob/main/schema/README.md)
 - Handle Failures: see [Reports and Notifications](#reports-and-notifications) and [Common Repair Paths](#common-repair-paths)
-- Extend Rust Engine: see [No Code Change Scope](#no-code-change-scope) and [Rust Change Boundary](#rust-change-boundary)
+- Extend Rust Engine: see [No Code Change Scope](#no-code-change-scope), [Rust Change Boundary](#rust-change-boundary) and [Project-owned Validation Boundary](#project-owned-validation-boundary)
 
 ## Working Model
 
@@ -577,6 +577,34 @@ new Doctor protocol, a new credential algorithm, or a different process
 cancellation policy. These changes require tests, preset validation, and a
 versioned compatibility review.
 
+## Project-owned validation boundary
+
+Application- and repository-specific validation belongs to the project being
+verified. Harness-Gate orchestrates, ingests and decides at generic boundaries;
+it does not become the implementation home for every API, E2E, integration,
+smoke, migration, load or framework-specific test system. Three extension layers
+cover project-owned validation:
+
+- **Command hooks / execution gates** run project-owned commands. Harness-Gate
+  owns scope/profile selection, dependencies, services, environment, timeout,
+  retry, requiredness and blocking composition; the project owns test code,
+  fixtures, domain assertions and tool semantics.
+- **Structured result adapters** ingest reusable machine formats such as JUnit,
+  SARIF or declared JSON contracts to improve diagnostics and reporting.
+  Parsing a result never transfers requiredness, threshold, ratchet or release
+  authority to the tool or parser.
+- **Quality collector plugins** measure normalized facts for generic policy
+  evaluation. Collectors remain measurement-only; the released Rust core retains
+  requiredness, thresholds, baselines, aggregation and final decisions.
+
+A new application validation tool must not force a generic-core code change when
+it can run through the command-hook contract. Native support is justified only
+for a reusable protocol, result format, service primitive, ecosystem/capability
+pack, certification boundary or generic policy semantic. When migrating a mature
+project, its existing required validation is the assurance baseline until parity
+and fail-closed replacement behavior are evidenced. See
+[ADR-0049](docs/adr/0049-project-owned-validation-extension-boundary.md).
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/musutrade/Harness-Gate/blob/main/LICENSE) file for details.
@@ -600,5 +628,9 @@ Thanks to all contributors of the arc-admin project, Harness-Gate evolved from t
 Local quality-tool tests and the exact CI collection command are documented in
 [tools/quality/README.md](tools/quality/README.md). Coverage, function risk and
 isolated critical-path evidence feed `Required Quality Aggregate` on PRs and
-pushes. Generated baselines remain review-only candidates; adoption policy is
+pushes. The critical-path collector now builds the instrumented binaries once
+per collection and runs up to two isolated tests concurrently by default;
+`--jobs 1` selects serial execution and `--jobs N` accepts 1 to 8 workers. See
+the [collection benchmark](docs/benchmarks/critical-path-collection/README.md).
+Generated baselines remain review-only candidates; adoption policy is
 [ADR-0039](docs/adr/0039-required-risk-and-traceability-gates.md).

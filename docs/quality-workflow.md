@@ -83,6 +83,15 @@ remain reference data. Registry discovery, installation, version resolution and
 execution-pack composition are future work, not current CLI features. See
 [pack composition](quality-presets.md) and [ADR-0047](adr/0047-composable-quality-preset-packs.md).
 
+Application-specific validation (API, E2E, integration, smoke, migration, load,
+generation or framework tooling) stays project-owned. Harness-Gate contributes
+command hooks for orchestration, structured result adapters for diagnostics, and
+measurement-only collector plugins; the released Rust core keeps authority over
+requiredness, thresholds, baselines and final decisions. A new framework must
+not force a generic-core change to run through a command hook. See
+[ADR-0049](adr/0049-project-owned-validation-extension-boundary.md) and
+[Engineering Policy section 7](engineering-policy.md).
+
 ## Configuration and authority
 
 `flow.toml` v2 owns commands, services, paths, scope, execution profiles and
