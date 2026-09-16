@@ -1,6 +1,6 @@
 {
   "name": "rust-source-risk",
-  "version": "0.1.0-rc.2",
+  "version": "0.1.0-rc.3",
   "kind": "harness-gate-collector",
   "request_schema": "harness-collector-request/v1",
   "adapter_protocol": 2,
