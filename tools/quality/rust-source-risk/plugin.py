@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Independent Harness-Gate Rust source-risk collector, adapter protocol v2."""
 import argparse
+import gzip
 import hashlib
 import json
 import os
@@ -12,7 +13,7 @@ import tempfile
 from measure import measure, strict_json
 
 HERE = Path(__file__).resolve().parent
-COLLECTOR = {'name': 'rust-source-risk', 'version': '0.1.0-rc.2'}
+COLLECTOR = {'name': 'rust-source-risk', 'version': '0.1.0-rc.3'}
 TYPES = {'complexity.cyclomatic': 'count', 'coverage.function': 'ratio',
          'coverage.line': 'ratio', 'coverage.region': 'ratio', 'risk.crap': 'rational'}
 
@@ -143,14 +144,18 @@ def collect(request):
         require(subjects == request['parameters']['subjects'], 'incomplete host subject inventory')
         identity = series(request)
         target.mkdir(mode=0o700)
+        coverage = gzip.compress(llvm.read_bytes(), mtime=0)
+        measured_sources = {row['source'] for row in result['functions']}
         refs_by_source = {}
         all_refs = []
         for path, digest in inventory(request).items():
+            if path not in measured_sources:
+                continue
             refs = []
-            for name, data in [('coverage.json', llvm.read_bytes()), ('receipt.json', canonical(request['parameters']['receipt']).encode())]:
+            for name, data in [('coverage.json.gz', coverage), ('receipt.json', canonical(request['parameters']['receipt']).encode())]:
                 artifact_name = sha(path.encode()) + '-' + name
                 (target / artifact_name).write_bytes(data)
-                refs.append({'id': 'rust-source-' + sha((path + name).encode()), 'kind': 'raw', 'media_type': 'application/json',
+                refs.append({'id': 'rust-source-' + sha((path + name).encode()), 'kind': 'raw', 'media_type': 'application/gzip' if name.endswith('.gz') else 'application/json',
                              'path': str(prefix / artifact_name), 'sha256': sha(data), 'bytes': len(data), 'context': request['context'],
                              'source': {'path': path, 'sha256': digest}})
             refs_by_source[path] = refs
