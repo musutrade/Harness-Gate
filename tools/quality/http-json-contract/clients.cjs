@@ -16,7 +16,7 @@ function inventory(files){
    assert(!/^(axios|node:https?|https?)$/.test(imported),'unsupported HTTP client import');
    if(imported==='@angular/common/http'){
     const bindings=node.importClause?.namedBindings;assert(bindings&&ts.isNamedImports(bindings),'unsupported HTTP namespace import');
-    for(const item of bindings.elements){assert(!item.propertyName&&['httpResource','HttpClient','provideHttpClient','HttpHeaders','HttpErrorResponse'].includes(item.name.text),'unsupported HTTP client import');resource||=item.name.text==='httpResource';http||=item.name.text==='HttpClient';}
+    for(const item of bindings.elements){assert(!item.propertyName&&['httpResource','HttpClient','provideHttpClient','HttpHeaders','HttpErrorResponse','HttpInterceptorFn','withInterceptors'].includes(item.name.text),'unsupported HTTP client import');resource||=item.name.text==='httpResource';http||=item.name.text==='HttpClient';}
    }
   }
   function binding(node){
