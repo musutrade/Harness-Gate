@@ -42,3 +42,26 @@ test('business collection binds every production client and rejects changed capt
   assert.throws(()=>P.collect(request),/hash|digest|changed|mismatch/i);
  } finally {fs.rmSync(root,{recursive:true,force:true});}
 });
+
+// Functional interceptor types/providers are not HTTP calls. Their bodies still
+// undergo the same recursive inventory and unsupported-client checks.
+test('canonical functional interceptors retain the complete HTTP call inventory',()=>{
+ const f=fixture();
+ const config="import {provideHttpClient,withInterceptors} from '@angular/common/http'; const providers=[provideHttpClient(withInterceptors([authInterceptor]))];";
+ const interceptor="import {HttpInterceptorFn,HttpClient,HttpErrorResponse} from '@angular/common/http'; const authInterceptor:HttpInterceptorFn=(request,next)=>{const http=inject(HttpClient);http.post<CreateRequirementResponse>('/api/requirements',{});return next(request.clone({setHeaders:{'x-csrf':'proof'}}));};";
+ const sources={'client.ts':f.client,'auth.ts':interceptor,'config.ts':config};
+ const calls=C.inventory(sources);assert.equal(calls.length,3);
+ assert.deepEqual(calls.filter(c=>c.file==='auth.ts'),[{file:'auth.ts',method:'POST',path:'/api/requirements',typeName:'CreateRequirementResponse'}]);
+ assert(M.measure(f.spec,f.spec,f.type,f.client,'HealthResponse',f.observations,sources)['contract.compatible'].value);
+ const bad={...sources,'auth.ts':interceptor.replace('/api/requirements','/api/undeclared')};
+ assert.throws(()=>M.consumerInventory(bad,'client.ts',f.spec),/undeclared/);
+ assert(M.measure(f.spec,f.spec,f.type,f.client,'HealthResponse',f.observations,bad)['contract.client_drift'].value);
+ for(const changed of [interceptor.replace('return next(',"fetch('/api/hidden');return next("),interceptor.replace('http.post', 'http["post"]')])
+  assert.throws(()=>C.inventory({...sources,'auth.ts':changed}));
+});
+test('interceptor support does not permit aliased or unknown HTTP imports',()=>{
+ for(const imports of ['HttpInterceptorFn as Interceptor','withInterceptors as middleware','HttpBackend','HttpInterceptorFn,JsonpClientBackend'])
+  assert.throws(()=>C.inventory({'auth.ts':"import {"+imports+"} from '@angular/common/http';"}),/unsupported HTTP client import/);
+ const source="import type {HttpInterceptorFn} from '@angular/common/http'; const interceptor:HttpInterceptorFn=(request,next)=>next(request);";
+ assert.deepEqual(C.inventory({'auth.ts':source}),[]);
+});
