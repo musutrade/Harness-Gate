@@ -1,4 +1,4 @@
-# HTTP JSON contract collector — 0.1.0-rc.3 candidate
+# HTTP JSON contract collector — 0.1.0-rc.5 candidate
 
 Independent Harness-Gate adapter-v2 plugin. Core owns policy and signature checks.
 It measures `contract.breaking_changes`, `contract.client_drift`, and
@@ -6,9 +6,8 @@ It measures `contract.breaking_changes`, `contract.client_drift`, and
 contract, actual Angular TypeScript AST, and host-recorded live HTTP responses.
 All source/capture inputs and baseline bytes are pinned in the signed binding.
 
-Supported scope is deliberately explicit: OpenAPI 3.0.3, parameter-free GET paths,
-closed required string-enum JSON object responses and one canonical Angular
-`httpResource<ResponseType>(() => '/literal/path')` consumer. Every declared HTTP
+Supported scope is deliberately explicit: the bounded OpenAPI 3.0.3 business
+contracts and canonical Angular consumers described below. Every declared HTTP
 status must have a live response observation. Unknown schema/client features,
 missing variants or invalid provider responses fail collection, never become zero.
 The host must independently inventory approved consumer source files and protect
@@ -56,3 +55,19 @@ response types are checked structurally against generated operation types.
 
 This is a new measurement series. Installation requires a freshly validated host
 approval; it must not replace rc.3 in place or reuse an old series identity.
+
+## Functional interceptor imports (candidate rc.5)
+
+Canonical `HttpInterceptorFn` (including type-only imports) and `withInterceptors`
+imports from `@angular/common/http` are accepted. Interceptor type declarations
+and provider registration are not counted as HTTP calls. The inventory still
+traverses interceptor bodies and counts their typed `HttpClient` calls; undeclared
+routes, aliases, indirect client use, `fetch`, and unsupported HTTP imports retain
+their existing rejection or drift behavior.
+
+Only the import allowlist and collector version change. Request/response schemas,
+complete provider status coverage, generated-type checks and baseline comparison
+retain the rc.4 implementation. Install rc.5 separately and approve its new
+measurement-series identity; do not overwrite an existing rc.4 installation or
+reuse the old series pin. Rollback selects the preserved rc.4 installation and
+its matching approved series, but restores the functional-import rejection.
