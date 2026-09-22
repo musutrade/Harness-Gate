@@ -71,3 +71,5 @@ retain the rc.4 implementation. Install rc.5 separately and approve its new
 measurement-series identity; do not overwrite an existing rc.4 installation or
 reuse the old series pin. Rollback selects the preserved rc.4 installation and
 its matching approved series, but restores the functional-import rejection.
+
+Signed candidate packages and installation: [release guide](../../../docs/releases/0.4.6.zh-CN.md).

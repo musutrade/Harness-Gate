@@ -7,20 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.6] - 2026-09-22
+
+### Added
+
+- Configure the shared collector artifact byte budget with
+  `[limits] max_artifact_bytes` in quality.toml. Both `verify` and
+  `quality collect` retain the 64 MiB default and reject invalid limits.
+- Deliver independently versioned Rust source-risk RC5, TypeScript risk RC4
+  and HTTP JSON contract RC5 candidate packages with signed checksums, SBOMs
+  and provenance in the Core release. Node packages use pinned shrinkwraps;
+  Rust source-risk includes a Linux x86-64 inventory executable.
+- Document project-owned validation extensions (ADR-0049), source measurement
+  boundaries, installation and explicit measurement-series migration.
+
 ### Fixed
 
-- Native plugin `0.1.0-rc.6` reads the project's CRAP ceiling through
-  `quality.toml` and its referenced policy JSON. Direct `evaluate` requires
-  `--repository-root` and `--policy-binding`; missing or invalid configuration
-  fails instead of falling back to 30. Exact limits, including ceilings above 30,
-  reach Core with retained configuration provenance. Existing debt and
-  non-regression decisions remain enforced by Core.
+- Rust source collection supports declarative business Serde metadata,
+  JSON/format and tokio::select! source expressions, exact closure entry
+  counters and async ownership. Retain compressed evidence without duplicating
+  raw capture files; missing native mappings still fail.
+- HTTP JSON contracts support closed business APIs, Angular write clients and
+  functional interceptor imports. TypeScript risk supports signed project
+  binding, file coverage and isolated shared-root artifacts.
 
 ### Changed
 
-- Core `0.4.4` updates the optional standalone plugin installer default to RC6.
-  Core's evaluator, metric formulas, protocol and repository policy defaults are
-  unchanged. All four plugin platforms run the actual configuration acceptance.
+- Reuse one instrumented build per critical-path collection and overlap up to
+  two isolated tests by default (`--jobs` accepts 1–8).
+- Existing native Rust/MIR RC6 remains the installer default. New plugins remain
+  independent RC candidates; Core alone owns policy decisions and baselines.
+
+## [0.4.5] - 2026-09-14
+
+### Security
+
+- Update locked rustls to 0.23.45 for RUSTSEC-2026-0285. Core 0.4.4 was blocked
+  by the release audit and was never published; its tag remains immutable.
+
+### Fixed
+
+- Native plugin RC6 reads project CRAP policy and retains provenance. Core
+  0.4.5 selects RC6 by default; Core metric and policy semantics are unchanged.
 
 ## [0.4.3] - 2026-09-14
 
@@ -93,19 +121,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   nonce/expiry replay checks, and pre-spawn environment validation.
 - Process output and adapter artifacts are bounded with truncation/deadline
   failures, and audit/log/report/SBOM error paths share credential redaction.
-
-### Changed
-
-- The critical-path collector now builds instrumented binaries once per
-  collection in a fresh owned build directory and runs up to two isolated
-  tests concurrently; `--jobs` selects 1 to 8 workers and profile exports stay
-  serialized. Engineering-policy semantics are unchanged.
-
-### Added
-
-- Added the project-owned validation extension boundary (ADR-0049): command
-  hooks, structured result adapters, and quality collector plugins keep
-  application-specific validation out of the generic core.
 
 ## [0.3.7] - 2026-09-03
 
