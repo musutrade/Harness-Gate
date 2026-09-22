@@ -1,3 +1,5 @@
+mod select;
+
 use proc_macro2::Span;
 use serde::Serialize;
 use syn::{
@@ -66,6 +68,57 @@ impl Inventory<'_> {
             .push(format!("{kind} at {:?}", self.point(span.start())));
     }
 }
+// LLVM can start a closure counter at its first evaluated source expression,
+// omitting constructors and punctuation. Follow only the leading AST spine;
+// never accept arbitrary positions inside a callable or cross into a nested owner.
+fn closure_entry_anchors<'a>(expression: &'a syn::Expr, anchors: &mut Vec<Span>) {
+    use syn::Expr;
+    if let Expr::Async(n) = expression {
+        // Returning an async block constructs a future. Its closing brace is
+        // the factory region; the opening brace belongs to the separate poll body.
+        anchors.push(n.block.brace_token.span.close());
+        return;
+    }
+    if matches!(expression, Expr::Closure(_)) {
+        return;
+    }
+    anchors.push(expression.span());
+    let next: Option<&'a Expr> = match expression {
+        Expr::Paren(n) => Some(&n.expr),
+        Expr::Group(n) => Some(&n.expr),
+        Expr::Unary(n) => Some(&n.expr),
+        Expr::Reference(n) => Some(&n.expr),
+        Expr::Cast(n) => Some(&n.expr),
+        Expr::Try(n) => Some(&n.expr),
+        Expr::Await(n) => Some(&n.base),
+        Expr::Binary(n) => Some(&n.left),
+        Expr::If(n) => Some(&n.cond),
+        Expr::Match(n) => Some(&n.expr),
+        Expr::Tuple(n) => n.elems.first(),
+        Expr::Array(n) => n.elems.first(),
+        Expr::Repeat(n) => Some(&n.expr),
+        Expr::Struct(n) => n.fields.first().map(|f| &f.expr).or(n.rest.as_deref()),
+        Expr::Return(n) => n.expr.as_deref(),
+        Expr::Break(n) => n.expr.as_deref(),
+        Expr::Call(n) if n.args.len() == 1 => match n.func.as_ref() {
+            Expr::Path(path)
+                if path.qself.is_none()
+                    && path.path.segments.len() == 1
+                    && ["Ok", "Err", "Some"]
+                        .iter()
+                        .any(|name| path.path.segments[0].ident == name) =>
+            {
+                n.args.first()
+            }
+            _ => None,
+        },
+        _ => None,
+    };
+    if let Some(next) = next {
+        closure_entry_anchors(next, anchors);
+    }
+}
+
 // Parse JSON containers while retaining the spans of every Rust expression.
 // Macro expansion control flow is outside this source-only metric.
 struct JsonExpressions(Vec<syn::Expr>);
@@ -133,6 +186,20 @@ fn serde_metadata(attribute: &syn::Attribute) -> syn::Result<()> {
     })
 }
 impl<'ast> Visit<'ast> for Inventory<'_> {
+    fn visit_item_mod(&mut self, n: &'ast syn::ItemMod) {
+        // Exact cfg(test) modules cannot contribute production callables.
+        // All other configuration remains unsupported rather than guessed.
+        if n.attrs.iter().any(|attr| {
+            attr.path().is_ident("cfg")
+                && attr
+                    .parse_args::<syn::Path>()
+                    .is_ok_and(|path| path.is_ident("test"))
+        }) {
+            return;
+        }
+        visit::visit_item_mod(self, n);
+    }
+
     fn visit_attribute(&mut self, n: &'ast syn::Attribute) {
         let path = n
             .path()
@@ -239,22 +306,8 @@ impl<'ast> Visit<'ast> for Inventory<'_> {
         for attr in &n.attrs {
             self.visit_attribute(attr);
         }
-        let mut anchors = vec![n.span(), n.body.span()];
-        let mut body = n.body.as_ref();
-        while let syn::Expr::Call(call) = body {
-            let syn::Expr::Path(path) = call.func.as_ref() else {
-                break;
-            };
-            if call.args.len() != 1
-                || !["Ok", "Err", "Some"]
-                    .iter()
-                    .any(|name| path.path.is_ident(name))
-            {
-                break;
-            }
-            body = &call.args[0];
-            anchors.push(body.span());
-        }
+        let mut anchors = vec![n.span()];
+        closure_entry_anchors(&n.body, &mut anchors);
         self.begin(
             "<closure>".into(),
             "closure",
@@ -335,6 +388,16 @@ impl<'ast> Visit<'ast> for Inventory<'_> {
                     }
                 }
                 Err(_) => self.unsupported("unsupported json! arguments", n.span()),
+            }
+        } else if path == "tokio::select" {
+            match select::parse.parse2(n.tokens.clone()) {
+                Ok(parsed) => {
+                    self.decision(parsed.decisions + parsed.guards);
+                    for expression in parsed.expressions {
+                        self.visit_expr(&expression);
+                    }
+                }
+                Err(_) => self.unsupported("unsupported tokio::select! arguments", n.span()),
             }
         } else if path == "matches" {
             let parser =
@@ -422,6 +485,14 @@ fn main() {
 mod tests {
     use super::*;
     #[test]
+    fn test_modules_are_outside_the_production_boundary() {
+        let rows = inventory("fn production() {} #[cfg(test)] mod tests { #[test] fn only_test() { arbitrary!(); } } #[cfg(test)] #[path=\"../tests/external.rs\"] mod external;").unwrap();
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0].name, "production");
+        assert!(inventory("#[cfg(not(test))] mod production { fn f() {} }").is_err());
+        assert!(inventory("#[cfg(feature=\"test\")] mod feature { fn f() {} }").is_err());
+    }
+    #[test]
     fn explicit_decisions() {
         let f = inventory("fn f(x: Option<i32>) -> Option<i32> { let Some(y) = x else { return None }; if y > 0 && y < 4 { for _ in 0..y {} } while false {} match y { 0 => {}, 1 if true => {}, _ => {} } Some(x?) }").unwrap();
         assert_eq!(f[0].complexity, 10);
@@ -497,5 +568,45 @@ mod tests {
         assert_eq!(f.len(), 2);
         assert!(f[0].asynchronous);
         assert_eq!(f[0].complexity, 2);
+    }
+}
+
+#[cfg(test)]
+mod select_tests {
+    use super::inventory;
+
+    #[test]
+    fn select_decisions_and_nested_owners() {
+        let rows = inventory("async fn f() { tokio::select! { biased; Some(x) = a(), if enabled && ready => { if x {} } _ = async { if test {} }, if enabled => (|| if test { 1 } else { 2 })(), else => fallback()? } }").unwrap();
+        // Base + two alternatives + refutable pattern + two guards + && + if + ?.
+        assert_eq!(
+            rows.iter().map(|r| r.complexity).collect::<Vec<_>>(),
+            vec![9, 2, 2]
+        );
+        assert!(rows[1].asynchronous);
+    }
+
+    #[test]
+    fn select_rejects_incomplete_or_unknown_syntax() {
+        for source in [
+            "async fn f() { tokio::select! {} }",
+            "async fn f() { tokio::select! { else => {} } }",
+            "async fn f() { tokio::select! { _ = a() => 1 _ = b() => 2 } }",
+            "async fn f() { tokio::select! { _ = a() => {}, else => {}, _ = b() => {} } }",
+            "async fn f() { tokio::select! { _ = a() => unknown!() } }",
+            "async fn f() { select! { _ = a() => {} } }",
+        ] {
+            assert!(inventory(source).is_err(), "{source}");
+        }
+    }
+
+    #[test]
+    fn select_preserves_source_spans_and_counts_handlers() {
+        let source = "async fn f() { tokio::select! { result = a() => return result?, _ = b() => { if stopped {} } } }";
+        let rows = inventory(source).unwrap();
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0].complexity, 4);
+        assert_eq!(rows[0].start, [1, 1]);
+        assert_eq!(rows[0].end, [1, source.len() + 1]);
     }
 }
