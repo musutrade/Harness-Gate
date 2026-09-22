@@ -13,9 +13,9 @@ It handles changed paths, secret scanning, architecture auditing, environment va
 
 ## Current releases
 
-Core **0.4.2** is published with staged-host input and large native-report fixes. Rust-specific native measurement is an optional, independently installed plugin; Core owns orchestration and quality decisions. See the [documentation index](docs/README.md) and [release status, acceptance and remaining work](docs/release-status.md).
+Core **0.4.7** provides configurable collector artifact capacity and the corrected Rust source-risk package. Independently installed Rust source-risk RC6, TypeScript risk RC4 and HTTP JSON contract RC5 candidate packages are included in the release. Core owns orchestration and quality decisions. See the [release guide](docs/releases/0.4.7.zh-CN.md) and [verified delivery status](docs/release-status.md).
 
-Core **0.4.5** selects standalone Rust plugin **0.1.0-rc.6** by default. Native CRAP evaluation reads the project policy; matching Rust/LLVM and Python remain external dependencies. See the [standalone installation guide](docs/quality/standalone-installation.md) for publication status and exact version selection.
+Core **0.4.7** selects standalone Rust/MIR plugin **0.1.0-rc.7** by default. RC7 adds dependency-attribution caching and signed monorepo source-prefix binding. Matching Rust/LLVM and Python remain external dependencies; see the [standalone installation guide](docs/quality/standalone-installation.md).
 
 ## Navigation
 
@@ -66,13 +66,13 @@ actual collector/series. New metric semantics require separate contract review.
 ### Install from Crates.io (Recommended)
 
 ```bash
-cargo install harness-gate --version 0.4.2 --locked
+cargo install harness-gate --version 0.4.7 --locked
 ```
 
 ### Install from GitHub Release (Pre-built Binaries)
 
 Download the binary for your platform from an immutable [GitHub Release
-tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.2):
+tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.7):
 
 - **Linux (x86_64)**: `harness-gate-linux-amd64`
 - **macOS (Intel)**: `harness-gate-macos-amd64`
@@ -86,8 +86,8 @@ the pinned source revision, then select the immutable Core release explicitly:
 ```bash
 curl --fail --show-error --location --proto '=https' --tlsv1.2 \
   -o /tmp/harness-gate-install.sh \
-  https://raw.githubusercontent.com/musutrade/Harness-Gate/9ffa2b829ec25ca54fcb00a9bc720284c3913924/install.sh
-bash /tmp/harness-gate-install.sh --version v0.4.2
+  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.4.7/install.sh
+bash /tmp/harness-gate-install.sh --version v0.4.7
 harness-gate --version
 ```
 
@@ -102,11 +102,12 @@ source installation additionally requires `git` and Rust `cargo`.
 Core does not download a Rust analysis toolchain by default. The
 [native standalone delivery](docs/quality/native-external-toolchain.md) retains
 the old measurement engine and publishes the compiled plugin using Core's signed
-release process. Matching Rust/LLVM and Python are external dependencies. Native
-Core `0.4.3` and native `0.1.0-rc.6` are published for all four platforms.
-Native RC6 adds [configured CRAP evaluation](docs/quality/native-crap-policy.md).
-Source Core `0.4.5` updates its TLS dependency and selects RC6 by default;
-Core `0.4.4` was blocked before publication. Check the release guide for status.
+release process. Matching Rust/LLVM and Python are external dependencies.
+Core `0.4.7` selects native `0.1.0-rc.7`, which is published for all four platforms.
+Core 0.4.7 publication is tracked in the [release record](docs/release-status.md).
+RC7 adds dependency-attribution caching and signed monorepo source-prefix binding.
+The three new independent candidate packages and their measurement-series
+boundaries are described in the [release guide](docs/releases/0.4.7.zh-CN.md).
 
 The [standalone installation guide](docs/quality/standalone-installation.md)
 explains `--with-rust`, `--rust-only` and independent `--rust-version` selection.
@@ -124,7 +125,7 @@ sha256sum --check SHA256SUMS
 cosign verify-blob --signature harness-gate-linux-amd64.sig \
   --certificate harness-gate-linux-amd64.crt \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity 'https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v0.4.2' \
+  --certificate-identity 'https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v0.4.7' \
   harness-gate-linux-amd64
 ```
 
