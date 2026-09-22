@@ -1,5 +1,33 @@
 # Published releases and acceptance
 
+## Verified corrected release, 2026-09-22
+
+Core [0.4.7](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.7)
+and [crates.io 0.4.7](https://crates.io/crates/harness-gate/0.4.7) are published
+from `3e7b49f32b2b4afa79c8bf1edbb55ed5e2e96ee2`. The release includes the corrected
+**Rust source-risk RC6** Linux archive and the byte-identical **TypeScript RC4**
+and **HTTP JSON contract RC5** Node packages. The independently published
+[native Rust/MIR RC7](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-v0.1.0-rc.7)
+remains the installer default and retains its original source identity.
+
+All 69 current release assets (39 Core/package assets and 30 native assets),
+checksums, exact-tag signatures and exact-source attestations were verified:
+[Core 0.4.7 and packages](quality/release-0.4.7/published-verification.json),
+[native RC7](quality/release-native-rc7/published-verification.json).
+The [registry download](quality/release-0.4.7/crate-public-verification.json)
+matches its registry checksum, version and tagged clean source.
+
+The actual public Linux installation passed **82 runtime tests without skips**:
+23 Core/native, 20 TypeScript, 19 HTTP contract and 20 Rust source-risk tests.
+[Clean-install receipt](quality/release-0.4.7/public-install-verification.json).
+The test harness uses the tagged repository's Python reference transport only
+for the Node transport test; installed runtime modules come from the signed
+public packages. Core evaluator code and metric formulas are unchanged.
+
+Follow the [0.4.7 release and installation guide](releases/0.4.7.zh-CN.md).
+The incomplete RC5 archive and its failed acceptance remain recorded below;
+no published tag or asset was moved or overwritten.
+
 ## Packaging repair and published delivery, 2026-09-22
 
 Core [0.4.6](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.6),
@@ -20,9 +48,9 @@ and [failed runtime output](quality/release-0.4.6/rust-source-public-tests.log)
 retain that result. The existing release notes identify the defect; no asset or
 tag was overwritten.
 
-Core **0.4.7** / Rust source-risk **RC6** prepare the corrected delivery. Its
+Core **0.4.7** / Rust source-risk **RC6** provide the corrected delivery. Its
 [release guide](releases/0.4.7.zh-CN.md) documents the repair and exact installation.
-Publication is pending final CI and release acceptance. Native RC7, TypeScript
+Publication and public acceptance are complete, as recorded above. Native RC7, TypeScript
 RC4 and HTTP JSON contract RC5 retain their identities. All collectors remain
 independent RC candidates; no metric threshold or baseline is changed.
 
