@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.7] - 2026-09-22
+
+### Fixed
+
+- Include `ast/Cargo.lock` in the Rust source-risk RC6 archive. The public RC5
+  archive omitted this runtime input, so measurement-series construction failed.
+  Core 0.4.6, native RC7 and both Node collectors passed public consumer checks;
+  their existing tags and assets are retained.
+- Run the full Rust runtime tests against the extracted archive before signing,
+  and both Node suites against clean installed runtime files. Missing package
+  inputs or skipped Rust acceptance tests fail publication.
+- Core evaluation and metric formulas are unchanged. Core 0.4.7 is the corrected
+  delivery; native RC7, TypeScript RC4 and HTTP JSON contract RC5 retain their
+  independent identities. Rust source-risk RC6 requires updated host pins.
+
 ## [0.4.6] - 2026-09-22
 
 ### Added

@@ -6,6 +6,7 @@ import argparse
 import json
 import importlib.util
 import os
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -16,9 +17,9 @@ import tomllib
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def run(*args: str, cwd: Path = ROOT, env=None, echo=True) -> str:
+def run(*args: str, cwd: Path = ROOT, env=None, echo=True, combine=False) -> str:
     result = subprocess.run(args, cwd=cwd, env=env, check=True, text=True,
-                            stdout=subprocess.PIPE)
+                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT if combine else None)
     if echo:
         print(result.stdout, end="", flush=True)
     return result.stdout
@@ -49,6 +50,16 @@ def node_package(directory: str, output: Path) -> None:
         version = run(str(executable), "--version")
         if package["version"] not in version:
             raise RuntimeError("installed collector version mismatch")
+        # Run the source test harness against the actual installed runtime files.
+        installed = consumer / "node_modules" / package["name"]
+        tests = (["test.cjs", "test-core.cjs"] if directory == "typescript-risk"
+                 else ["test.cjs", "business.test.cjs"])
+        for filename in tests:
+            shutil.copy2(source / filename, installed / filename)
+        core = tomllib.loads((ROOT / "tools/harness-gate/Cargo.toml").read_text())
+        run("node", "--test", *tests, cwd=installed, env=dict(
+            os.environ, HARNESS_GATE_EXPECTED_VERSION=core["package"]["version"],
+            NODE_PATH=str(source / "node_modules"), PYTHONPATH=str(source.parent)))
         # Generate the actual installed runtime dependency inventory.
         sbom = run("npm", "sbom", "--sbom-format=cyclonedx", "--omit=dev",
                    cwd=consumer, echo=False)
@@ -77,6 +88,8 @@ def rust_package(output: Path) -> None:
         for filename in ("plugin.py", "measure.py", "capture.py", "plugin.json", "LICENSE", "README.md"):
             shutil.copy2(source / filename, package / filename)
         shutil.copy2(inventory, package / "inventory")
+        (package / "ast").mkdir()
+        shutil.copy2(source / "ast/Cargo.lock", package / "ast/Cargo.lock")
         run("python3", str(package / "plugin.py"), "--help", cwd=stage)
         metadata = stage / "cargo-metadata.json"
         metadata.write_text(run("cargo", "metadata", "--locked", "--format-version", "1",
@@ -103,9 +116,31 @@ def rust_package(output: Path) -> None:
             raise RuntimeError("packaged inventory smoke test failed")
         with tarfile.open(output / (name + ".tar.gz"), "w:gz") as archive:
             archive.add(package, arcname=name)
+        accept_rust_archive(output / (name + ".tar.gz"), source, stage / "consumer")
         run("python3", "tools/release/generate-sbom.py", "--metadata", str(metadata),
             "--lockfile", str(source / "ast/Cargo.lock"),
             "--output", str(output / (name + ".tar.gz.sbom.cdx.json")))
+
+
+def accept_rust_archive(archive: Path, source: Path, consumer: Path) -> None:
+    """Exercise the extracted archive; source-tree tests alone miss omitted files."""
+    consumer.mkdir()
+    with tarfile.open(archive) as stream:
+        stream.extractall(consumer, filter="data")
+    installed = consumer / archive.name.removesuffix(".tar.gz")
+    required = ("plugin.py", "measure.py", "capture.py", "plugin.json", "inventory",
+                "ast/Cargo.lock", "LICENSE", "THIRD_PARTY_NOTICES.txt")
+    for name in required:
+        if not (installed / name).is_file():
+            raise RuntimeError("incomplete Rust collector archive: " + name)
+    for test in source.glob("test_*.py"):
+        shutil.copy2(test, installed / test.name)
+    shutil.copytree(source / "fixtures", installed / "fixtures")
+    output = run("python3", "-m", "unittest", "discover", "-s", str(installed),
+                 "-p", "test_*.py", "-v", cwd=consumer, combine=True, env=dict(
+                     os.environ, PYTHONPATH="", RUST_SOURCE_INVENTORY=str(installed / "inventory")))
+    if "skipped=" in output or not re.search(r"Ran [1-9][0-9]* tests", output):
+        raise RuntimeError("extracted Rust collector acceptance skipped tests")
 
 
 def main() -> None:
