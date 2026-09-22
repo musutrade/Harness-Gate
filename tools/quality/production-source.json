@@ -387,7 +387,7 @@
     {
       "path": "src/config/quality/model.rs",
       "reason": "Type declarations and derived implementations have no executable LLVM source mapping on this target; the AST inventory contains no handwritten functions or closures.",
-      "sha256": "db020b01377e044ffd590f52a08149c6dde8e59cfb946098fd2d2d7b8f05529c"
+      "sha256": "4206caf213e60bfa47ba267a58ce3c0d2bb2fb4bf65e8fb58d431f54c1d15a0e"
     }
   ],
   "source_roots": [
