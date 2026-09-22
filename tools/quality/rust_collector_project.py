@@ -147,8 +147,10 @@ def project_report(report, binding):
                      (not prefix or all(part not in ('', '.', '..') for part in prefix.split('/'))) and
                      not any(char in prefix for char in ('\\', ':')) and
                      not any(ord(char) < 32 for char in prefix), 'invalid package source prefix')
+
     def project_path(relative):
         return prefix + '/' + relative if prefix else relative
+
     sources = {project_path(p['relative']): p['sha256'] for p in report['source_inventory']}
     # Resolve every owner/source before creating any output. No partial success.
     rows = []
