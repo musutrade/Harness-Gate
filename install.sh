@@ -15,7 +15,7 @@ PLATFORM=""
 INSTALL_NAME="$BINARY_NAME"
 ATOMIC_TEMPORARY=""
 RELEASE_WORKFLOW="release.yml"
-RUST_VERSION="${HARNESS_GATE_RUST_VERSION:-0.1.0-rc.6}"
+RUST_VERSION="${HARNESS_GATE_RUST_VERSION:-0.1.0-rc.7}"
 RUST_INSTALL_DIR=""
 VERIFIER_CACHE_DIR="${HOME}/.cache/harness-gate/collector"
 STAGED_BINARY=""
@@ -33,7 +33,7 @@ bound to an immutable release tag.
 The installer verifies SHA256 and the Sigstore keyless certificate before it
 changes the destination directory.
 The optional Rust collector is a standalone binary, versioned independently of
-Core. It defaults to 0.1.0-rc.6; --rust-version selects another exact version.
+Core. It defaults to 0.1.0-rc.7; --rust-version selects another exact version.
 Rust 1.97.1, matching LLVM tools and Python 3.12+ remain external dependencies.
 --rust-root DIR installs only the collector executable in DIR/bin.
 --cache-dir DIR selects an existing checksum-pinned verifier cache.

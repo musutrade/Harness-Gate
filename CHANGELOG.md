@@ -35,7 +35,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Reuse one instrumented build per critical-path collection and overlap up to
   two isolated tests by default (`--jobs` accepts 1–8).
-- Existing native Rust/MIR RC6 remains the installer default. New plugins remain
+- Native Rust/MIR RC7 caches successful dependency-root attribution per LLVM
+  export and adds signed monorepo source-prefix binding. Its independent
+  four-platform release becomes the installer default. New plugins remain
   independent RC candidates; Core alone owns policy decisions and baselines.
 
 ## [0.4.5] - 2026-09-14
