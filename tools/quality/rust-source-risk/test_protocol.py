@@ -1,4 +1,5 @@
 import copy
+import json
 import os
 from pathlib import Path
 import tempfile
@@ -7,6 +8,10 @@ from unittest.mock import patch
 from plugin import COLLECTOR, TYPES, canonical, file, project, relative, series, sha
 
 class ProtocolTests(unittest.TestCase):
+    def test_manifest_matches_protocol_identity(self):
+        manifest = json.loads(Path(__file__).with_name("plugin.json").read_text())
+        self.assertEqual(manifest["version"], COLLECTOR["version"])
+
     def test_relative_paths_and_symlinks_rejected(self):
         for value in ('../a', '/a', 'a/../b', 'a//b', '.', 'a\\b'):
             with self.assertRaises(ValueError): relative(value)
