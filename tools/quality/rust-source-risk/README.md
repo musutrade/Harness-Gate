@@ -1,4 +1,4 @@
-# Rust source-risk collector (candidate 0.1.0-rc.5)
+# Rust source-risk collector (candidate 0.1.0-rc.6)
 
 This is an independent Harness-Gate collector plugin. It does not modify Core,
 change a policy threshold, sign its own requests, or replace the MIR measurement
@@ -73,7 +73,11 @@ other independent collectors can publish their own directories in the same run.
 Existing files in this plugin's directory are rejected. Collectors never issue
 quality overrides or contain signing keys.
 
-## Build and use
+## Build and use (source checkout)
+
+The following build commands require the repository checkout. The published
+archive already includes `inventory` and its runtime `ast/Cargo.lock`; preserve
+both when installing or moving the plugin.
 
 ```sh
 cargo build --locked --release --manifest-path ast/Cargo.toml
@@ -146,4 +150,12 @@ Exact `#[cfg(test)]` modules are excluded from the production boundary, includin
 
 The Linux x86-64 archive includes the compiled `inventory`, Python entrypoints,
 license, manifest and this guide. Rust/LLVM and Python remain external. See the
-[release installation guide](../../../docs/releases/0.4.6.zh-CN.md).
+[release installation guide](../../../docs/releases/0.4.7.zh-CN.md).
+
+## rc.6 package completeness
+
+RC6 includes the dependency lockfile read by the measurement-series fingerprint.
+The published RC5 archive omitted this file and cannot form a series. RC6 keeps
+the measurement formulas unchanged, but its new collector identity and executable
+pins require explicit host binding review. Release acceptance now extracts the
+archive and runs the full runtime suite against its installed files.

@@ -6,31 +6,28 @@ Python are external dependencies. The stable engine remains an explicit candidat
 
 ## Publication status
 
-Core `0.4.3` and native `0.1.0-rc.6` are published for all four supported
-platforms. Native RC6 fixes [direct native CRAP configuration](native-crap-policy.md).
-Core `0.4.4` was blocked by a dependency audit and was not published. Source Core
-`0.4.5` updates the affected dependency and selects RC6 by default; see the
-[release record](../release-status.md).
-
-After Core `0.4.5` is published, the immutable installation command will be:
+Core `0.4.7` selects native `0.1.0-rc.7`, which is published for all four
+supported platforms. Core publication is tracked in the release record. RC7 adds dependency-attribution caching and signed monorepo
+source-prefix binding. See the [verified release record](../release-status.md)
+and [independent candidate package guide](../releases/0.4.7.zh-CN.md).
 
 ```bash
 curl --fail --show-error --location --proto '=https' --tlsv1.2 \
   -o /tmp/harness-gate-install.sh \
-  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.4.5/install.sh
-bash /tmp/harness-gate-install.sh --version v0.4.5 --with-rust \
-  --rust-version 0.1.0-rc.6
+  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.4.7/install.sh
+bash /tmp/harness-gate-install.sh --version v0.4.7 --with-rust \
+  --rust-version 0.1.0-rc.7
 ```
 
-Core alone still uses `--version v0.4.5`. To install only the plugin, use
-`--rust-only --rust-version 0.1.0-rc.6`; no Core version is required. These
+Core alone uses `--version v0.4.7`. To install only the native plugin, use
+`--rust-only --rust-version 0.1.0-rc.7`; no Core version is required. These
 commands use Bash (Git Bash on Windows). No default Rust toolchain is changed.
 
 ## Versions, platforms and destinations
 
 `--version` selects an exact Core `vX.Y.Z` tag. `--rust-version` accepts an exact
-plugin version without the tag prefix; for example, `0.1.0-rc.6` downloads from
-`rust-collector-v0.1.0-rc.6`. `HARNESS_GATE_RUST_VERSION` can set the same explicit
+plugin version without the tag prefix; for example, `0.1.0-rc.7` downloads from
+`rust-collector-v0.1.0-rc.7`. `HARNESS_GATE_RUST_VERSION` can set the same explicit
 version; the command-line option takes precedence. There is no latest-release
 lookup or fallback to another platform, engine or historical runtime bundle.
 
@@ -41,7 +38,7 @@ lookup or fallback to another platform, engine or historical runtime bundle.
 | macOS Apple Silicon | `harness-gate-rust-collector-macos-arm64` |
 | Windows x86_64 | `harness-gate-rust-collector-windows-amd64.exe` |
 
-RC6 passed release acceptance on these four hosts. This does not certify an
+RC7 passed release acceptance on these four hosts. This does not certify an
 arbitrary host ABI. Missing release assets fail installation.
 
 Both programs default to `~/.local/bin`. `--install-dir` changes that private
