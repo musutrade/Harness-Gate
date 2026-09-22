@@ -1,4 +1,4 @@
-# Rust source-risk collector (candidate 0.1.0-rc.2)
+# Rust source-risk collector (candidate 0.1.0-rc.5)
 
 This is an independent Harness-Gate collector plugin. It does not modify Core,
 change a policy threshold, sign its own requests, or replace the MIR measurement
@@ -141,3 +141,9 @@ be substituted. Missing mappings are reported together, with source locations
 and callable kinds, instead of requiring repeated attempts to expose each one.
 
 Exact `#[cfg(test)]` modules are excluded from the production boundary, including external test modules. Other conditional configurations remain unsupported and fail closed.
+
+## Signed candidate distribution
+
+The Linux x86-64 archive includes the compiled `inventory`, Python entrypoints,
+license, manifest and this guide. Rust/LLVM and Python remain external. See the
+[release installation guide](../../../docs/releases/0.4.6.zh-CN.md).
