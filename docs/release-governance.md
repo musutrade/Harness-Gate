@@ -13,7 +13,7 @@ The repository must retain all of these controls:
 | Protected `main` | Active ruleset requiring pull requests and `Required Quality Aggregate` |
 | Version tags | Active tag ruleset for `refs/tags/v*` with update and deletion prohibited and no bypass actor |
 | Publication environment | `release`, administrator bypass disabled, explicit reviewer required |
-| Deployment source | Custom tag policy `v*`; branches and other tags are rejected |
+| Deployment source | Custom tag policies `v*` and `rust-collector-v*`; branches and other tags are rejected |
 
 The environment currently permits self-review because the repository has only
 one maintainer. Disable self-review when an independent release reviewer or
@@ -49,24 +49,22 @@ Historical release evidence (2026-09-03):
   constitute DevRail staging, shadow/canary, rollback-authority, or R-07
   OS-sandbox acceptance.
 
-## Current publication status (2026-09-12)
+## Current publication status (2026-09-22)
 
-Core 0.4.0 was published on 2026-09-11. Core **0.4.1** is now published on GitHub
-and crates.io from `62313a251f1862707a887480cbf593130da2ba4a`, after successful
-[exact-main CI](https://github.com/musutrade/Harness-Gate/actions/runs/34704575706).
-The existing [release workflow](https://github.com/musutrade/Harness-Gate/actions/runs/34706873399)
-passed eligibility, four-platform builds, quality gates, signing, GitHub publication
-and the separate protected crates.io job. The normal workflow already publishes
-the crate; no second cargo publication workflow is needed.
+Core **0.4.6** is published on GitHub and crates.io; **0.4.7** prepares the
+corrected Rust source-risk RC6 package. Native Rust/MIR **RC7**
+is published through its independent four-platform workflow. The Core release
+also carries independently versioned Rust source-risk RC6, TypeScript risk RC4
+and HTTP JSON contract RC5 candidate packages, each covered by the exact release
+inventory, checksum, signature and provenance operations.
 
-Rust collector 0.1.0-rc.2 and installer 0.1.0-rc.3 use their separate immutable
-tags and the existing collector workflow. Its dedicated environment uses the
-owner-approved single-maintainer v2 policy: required pinned-owner review,
-self-review allowed, no admin bypass and main-only deployment. This replaces the
-historical collector v1 two-person assumption, not Core's release controls.
-See [release receipts and remaining integration](release-status.md) and the
-[current collector installation/release guide](quality/rust-collector-installation.md).
-Relevant Engineering Policy semantics remain unchanged.
+The `release` environment retains required owner review with self-review allowed,
+no administrator bypass, and its existing `v*` / `rust-collector-v*` tag policies.
+No release control was removed. The legacy bundled collector delivery retains
+its separate historical environment and immutable source records.
+
+See [public verification receipts](release-status.md) and the
+[installation and compatibility guide](releases/0.4.7.zh-CN.md).
 
 ## Release Procedure
 

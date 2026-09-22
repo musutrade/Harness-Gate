@@ -1,14 +1,30 @@
 # Published releases and acceptance
 
-## Core and independent collector release preparation, 2026-09-22
+## Packaging repair and published delivery, 2026-09-22
 
-Core 0.4.5 is published on GitHub and crates.io. PR #277 is merged and included
-in the Core 0.4.6 candidate. The [0.4.6 release guide](releases/0.4.6.zh-CN.md)
-records the Core update, Rust source-risk RC5, TypeScript risk RC4 and HTTP JSON
-contract RC5 packages, installation and verification. These new packages retain
-RC status. Native Rust/MIR RC7 adds dependency-attribution caching and monorepo
-source-prefix binding and becomes the installer default. Publication and public
-verification of 0.4.6 are pending; the historical evidence below is retained.
+Core [0.4.6](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.6),
+[crates.io 0.4.6](https://crates.io/crates/harness-gate/0.4.6), and native
+[RC7](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-v0.1.0-rc.7)
+are published from `4ecde0305572e5439dc9e6513cd0fe2de2d73224`.
+All 69 uploaded assets passed public inventory, checksum, exact-tag signature and
+source-provenance verification: [Core and packages](quality/release-0.4.6/published-verification.json),
+[native RC7](quality/release-native-rc7/published-verification.json),
+[registry source](quality/release-0.4.6/crate-public-verification.json).
+
+Public clean installation passed 23 Core/native tests, 20 TypeScript tests and
+19 HTTP contract tests. The Rust source-risk RC5 archive failed two of its 20
+runtime tests because `ast/Cargo.lock` was omitted. This is a package defect,
+not a signature failure or a quality waiver. The
+[partial acceptance record](quality/release-0.4.6/public-install-verification.json)
+and [failed runtime output](quality/release-0.4.6/rust-source-public-tests.log)
+retain that result. The existing release notes identify the defect; no asset or
+tag was overwritten.
+
+Core **0.4.7** / Rust source-risk **RC6** prepare the corrected delivery. Its
+[release guide](releases/0.4.7.zh-CN.md) documents the repair and exact installation.
+Publication is pending final CI and release acceptance. Native RC7, TypeScript
+RC4 and HTTP JSON contract RC5 retain their identities. All collectors remain
+independent RC candidates; no metric threshold or baseline is changed.
 
 ## Standalone delivery update, 2026-09-14
 
@@ -44,9 +60,9 @@ blocked publication on newly published
 `rustls 0.23.43` requires `>=0.23.45`. No Core 0.4.4 release or crate was published.
 The tag and failed evidence remain immutable; no audit exception is added.
 
-Source Core `0.4.5` locks `rustls 0.23.45` and retains native RC6 as its installer
-default. It requires its own exact-commit CI, four-platform release and public
-verification. Existing release records below retain their original identities.
+Core [0.4.5](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.5) was
+subsequently published with `rustls 0.23.45` and native RC6 as its installer
+default. Existing release records below retain their original identities.
 
 ## Bundled delivery acceptance, 2026-09-13
 
