@@ -13,6 +13,12 @@ impl QualityConfig {
             .context("resolve quality repository root")?;
         let root = canonical_root.as_path();
         ensure!(self.version == 1, "quality.version must be 1");
+        if let Some(limits) = &self.limits {
+            ensure!(
+                limits.max_artifact_bytes > 0,
+                "quality.limits.max_artifact_bytes must be positive"
+            );
+        }
         identifier(&self.project.id)?;
         ensure!(
             self.project.name == flow.project.name,

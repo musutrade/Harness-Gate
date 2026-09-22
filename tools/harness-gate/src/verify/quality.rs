@@ -13,6 +13,7 @@ use std::{collections::BTreeSet, fs, path::Path};
 pub(super) struct Prepared {
     state: compiler::TrustedState,
     keys: Vec<TrustedKey>,
+    max_artifact_bytes: Option<u64>,
     baseline: Option<baseline::Request>,
     output: String,
     formats: BTreeSet<ReportFormat>,
@@ -131,6 +132,10 @@ pub(super) fn prepare(
     compiler::compile(root, &state)?;
     validate_selection(&config, &state, scope)?;
     Ok(Some(Prepared {
+        max_artifact_bytes: config
+            .limits
+            .as_ref()
+            .map(|limits| limits.max_artifact_bytes),
         participation: config.participation(profile),
         complete: participation.assurance == Assurance::Complete,
         has_policy: !participation.policies.is_empty(),
@@ -229,6 +234,9 @@ fn evaluate(project: &Project, work: Prepared, result: &mut QualityResult) -> Re
         &work.state,
         &HostPolicy {
             trusted_keys: work.keys,
+            max_artifact_bytes: work
+                .max_artifact_bytes
+                .or(HostPolicy::default().max_artifact_bytes),
             ..HostPolicy::default()
         },
     )?;
