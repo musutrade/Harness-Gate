@@ -145,10 +145,42 @@ jobs:
       - name: Verify documentation consistency
         run: python3 tools/quality/docs_consistency.py
 
+  collectors:
+    name: Package and accept independent collectors
+    runs-on: ubuntu-24.04
+    needs: [policy, build]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.14'
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - uses: dtolnay/rust-toolchain@4360b52568e2003a75bf9bc1d59f33a8e3fc893c # stable
+        with:
+          toolchain: '1.97.1'
+          components: llvm-tools-preview
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+        with:
+          name: release-harness-gate-linux-amd64
+          path: core
+      - name: Test, package and clean-install candidates
+        env:
+          HARNESS_GATE_BINARY: ${{ github.workspace }}/core/harness-gate-linux-amd64
+        run: |
+          chmod +x "$HARNESS_GATE_BINARY"
+          python3 tools/release/package_independent_collectors.py --output collector-dist
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: release-harness-gate-independent-collectors
+          path: collector-dist/*
+          if-no-files-found: error
+
   publish:
     name: Publish signed release
     runs-on: ubuntu-latest
-    needs: [policy, build, quality]
+    needs: [policy, build, quality, collectors]
     environment: release
     permissions:
       contents: write
@@ -161,8 +193,7 @@ jobs:
         uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
         with:
           # Keep the policy evidence artifact out of the publication dist.
-          # Only artifacts whose names start with release-harness-gate- are
-          # platform binaries uploaded by the build matrix.
+          # Include only tested platform binaries and independent collector packages.
           pattern: release-harness-gate-*
           path: dist
           merge-multiple: true
@@ -198,6 +229,12 @@ jobs:
             --binary harness-gate-macos-arm64 \
             --binary harness-gate-windows-amd64.exe \
             --sbom harness-gate.sbom.cdx.json \
+            --package harness-gate-typescript-collector-0.1.0-rc.4.tgz \
+            --package harness-gate-http-json-contract-collector-0.1.0-rc.5.tgz \
+            --package harness-gate-rust-source-risk-0.1.0-rc.5-linux-amd64.tar.gz \
+            --sbom harness-gate-typescript-collector-0.1.0-rc.4.tgz.sbom.cdx.json \
+            --sbom harness-gate-http-json-contract-collector-0.1.0-rc.5.tgz.sbom.cdx.json \
+            --sbom harness-gate-rust-source-risk-0.1.0-rc.5-linux-amd64.tar.gz.sbom.cdx.json \
             --tag "$TAG" \
             --commit "$COMMIT" \
             --repository "$REPOSITORY"
@@ -299,7 +336,12 @@ jobs:
             upload_paths+=("dist/${name}")
           done < <(python tools/release/release_inventory.py list \
             --inventory dist/release-inventory.json --operation upload)
-          gh release create "$TAG" --verify-tag --generate-notes "${upload_paths[@]}"
+          notes_args=(--generate-notes)
+          notes_file="docs/releases/${TAG#v}.zh-CN.md"
+          if [[ -f "$notes_file" ]]; then
+            notes_args=(--notes-file "$notes_file")
+          fi
+          gh release create "$TAG" --verify-tag "${notes_args[@]}" "${upload_paths[@]}"
 
   publish-crate:
     name: Publish to crates.io
