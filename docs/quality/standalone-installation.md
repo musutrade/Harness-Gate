@@ -7,7 +7,7 @@ Python are external dependencies. The stable engine remains an explicit candidat
 ## Publication status
 
 Core `0.4.7` selects native `0.1.0-rc.7`, which is published for all four
-supported platforms. Core publication is tracked in the release record. RC7 adds dependency-attribution caching and signed monorepo
+supported platforms. Core 0.4.7 is also published and publicly verified; see the release record. RC7 adds dependency-attribution caching and signed monorepo
 source-prefix binding. See the [verified release record](../release-status.md)
 and [independent candidate package guide](../releases/0.4.7.zh-CN.md).
 

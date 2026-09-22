@@ -51,8 +51,8 @@ Historical release evidence (2026-09-03):
 
 ## Current publication status (2026-09-22)
 
-Core **0.4.6** is published on GitHub and crates.io; **0.4.7** prepares the
-corrected Rust source-risk RC6 package. Native Rust/MIR **RC7**
+Core **0.4.7** is published on GitHub and crates.io with the corrected
+Rust source-risk RC6 package. Native Rust/MIR **RC7**
 is published through its independent four-platform workflow. The Core release
 also carries independently versioned Rust source-risk RC6, TypeScript risk RC4
 and HTTP JSON contract RC5 candidate packages, each covered by the exact release

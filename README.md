@@ -13,7 +13,7 @@ It handles changed paths, secret scanning, architecture auditing, environment va
 
 ## Current releases
 
-Core **0.4.7** provides configurable collector artifact capacity and the corrected Rust source-risk package. Independently installed Rust source-risk RC6, TypeScript risk RC4 and HTTP JSON contract RC5 candidate packages are included in the release. Core owns orchestration and quality decisions. See the [release guide](docs/releases/0.4.7.zh-CN.md) and [verified delivery status](docs/release-status.md).
+Core **0.4.7** is published with configurable collector artifact capacity and the corrected Rust source-risk package. Independently installed Rust source-risk RC6, TypeScript risk RC4 and HTTP JSON contract RC5 candidate packages are included in the release. Core owns orchestration and quality decisions. See the [release guide](docs/releases/0.4.7.zh-CN.md) and [verified delivery status](docs/release-status.md).
 
 Core **0.4.7** selects standalone Rust/MIR plugin **0.1.0-rc.7** by default. RC7 adds dependency-attribution caching and signed monorepo source-prefix binding. Matching Rust/LLVM and Python remain external dependencies; see the [standalone installation guide](docs/quality/standalone-installation.md).
 
@@ -104,7 +104,7 @@ Core does not download a Rust analysis toolchain by default. The
 the old measurement engine and publishes the compiled plugin using Core's signed
 release process. Matching Rust/LLVM and Python are external dependencies.
 Core `0.4.7` selects native `0.1.0-rc.7`, which is published for all four platforms.
-Core 0.4.7 publication is tracked in the [release record](docs/release-status.md).
+Core 0.4.7 is published; see the [verified release record](docs/release-status.md).
 RC7 adds dependency-attribution caching and signed monorepo source-prefix binding.
 The three new independent candidate packages and their measurement-series
 boundaries are described in the [release guide](docs/releases/0.4.7.zh-CN.md).
