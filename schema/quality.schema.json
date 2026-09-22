@@ -28,6 +28,16 @@
         "$ref": "#/definitions/Component"
       }
     },
+    "limits": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/CollectionLimits"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "policies": {
       "type": "object",
       "additionalProperties": {
@@ -152,6 +162,22 @@
           "additionalProperties": false
         }
       ]
+    },
+    "CollectionLimits": {
+      "description": "Host-reviewed collection resource limits, bound by the quality configuration digest.",
+      "type": "object",
+      "required": [
+        "max_artifact_bytes"
+      ],
+      "properties": {
+        "max_artifact_bytes": {
+          "description": "Aggregate on-disk bytes in the shared artifact root, including undeclared files.",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 1.0
+        }
+      },
+      "additionalProperties": false
     },
     "Collector": {
       "type": "object",

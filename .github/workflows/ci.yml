@@ -528,6 +528,17 @@ jobs:
           python3 -m unittest discover -s tools/quality/tests -v
           python3 -m py_compile tools/quality/*.py tools/quality/tests/*.py
 
+      - name: Test Rust source macros and native closure counters
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+          CARGO_TARGET_DIR: ${{ runner.temp }}/rust-source-inventory
+          RUST_SOURCE_INVENTORY: ${{ runner.temp }}/rust-source-inventory/debug/harness-gate-rust-source-inventory
+        run: |
+          cargo test --locked --manifest-path tools/quality/rust-source-risk/ast/Cargo.toml
+          cargo build --locked --manifest-path tools/quality/rust-source-risk/ast/Cargo.toml
+          cp "$RUST_SOURCE_INVENTORY" tools/quality/rust-source-risk/inventory
+          python3 -m unittest discover -s tools/quality/rust-source-risk -p 'test_*.py' -v
+
   quality-required:
     name: Required Quality Aggregate
     if: ${{ always() }}

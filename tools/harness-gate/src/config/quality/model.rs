@@ -9,6 +9,8 @@ pub struct QualityConfig {
     #[schemars(range(min = 1, max = 1))]
     pub version: u32,
     pub project: QualityProject,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub limits: Option<CollectionLimits>,
     pub components: BTreeMap<String, Component>,
     #[serde(default)]
     pub subjects: BTreeMap<String, Subject>,
@@ -19,6 +21,15 @@ pub struct QualityConfig {
     pub profiles: BTreeMap<String, Participation>,
     pub baseline: Baseline,
     pub reporting: Reporting,
+}
+
+/// Host-reviewed collection resource limits, bound by the quality configuration digest.
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct CollectionLimits {
+    /// Aggregate on-disk bytes in the shared artifact root, including undeclared files.
+    #[schemars(range(min = 1))]
+    pub max_artifact_bytes: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]

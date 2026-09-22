@@ -117,16 +117,21 @@ def measure(source_root, production_files, llvm_path, ast_binary, coverage_root=
             names.add(key)
             matches = [i for i, f in enumerate(inventories[relative]) if first[:2] in f['anchors']]
             if len(matches) != 1:
-                raise ValueError(f'non-unique exact source anchor: {relative}:{first[:2]}')
+                detail = 'missing' if not matches else 'ambiguous'
+                raise ValueError(f'{detail} exact source anchor: {relative}:{first[:2]}')
             native[relative, matches[0]].append(function)
+    missing = [f'{relative}:{f["start"]} ({f["kind"]})'
+               for relative, functions in inventories.items()
+               for index, f in enumerate(functions) if not native[relative, index]]
+    if missing:
+        raise ValueError('source callable missing native mapping: ' + '; '.join(missing)
+                         + '; no exact LLVM entry counter; parent execution is not a substitute')
     results = []
     for relative, functions in inventories.items():
         source = (root / relative).read_bytes()
         spans = [(point_offset(source, f['start']), point_offset(source, f['end'])) for f in functions]
         for index, f in enumerate(functions):
             records = native[relative, index]
-            if not records:
-                raise ValueError(f'source callable missing native mapping: {relative}:{f["start"]}')
             bounds = spans[index]
             excluded = [s for i, s in enumerate(spans) if i != index and bounds[0] <= s[0] and s[1] <= bounds[1]]
             regions = {}
