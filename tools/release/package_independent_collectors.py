@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import tarfile
 import tempfile
+import tomllib
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -27,7 +28,9 @@ def node_package(directory: str, output: Path) -> None:
     run("npm", "ci", "--ignore-scripts", cwd=source)
     run("npm", "test", cwd=source)
     if directory == "typescript-risk":
-        run("npm", "run", "test:core", cwd=source)
+        core = tomllib.loads((ROOT / "tools/harness-gate/Cargo.toml").read_text())
+        run("npm", "run", "test:core", cwd=source, env=dict(
+            os.environ, HARNESS_GATE_EXPECTED_VERSION=core["package"]["version"]))
     packed = json.loads(run("npm", "pack", "--ignore-scripts", "--json",
                             "--pack-destination", str(output), cwd=source))
     archive = output / packed[0]["filename"]
