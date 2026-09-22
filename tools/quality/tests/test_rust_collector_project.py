@@ -74,6 +74,27 @@ def request_for(binding, path):
 
 
 class ProjectTransportTests(unittest.TestCase):
+    def test_repository_relative_package_prefix_is_pinned_and_checked(self):
+        package = self.root / 'apps/server'
+        package.mkdir(parents=True)
+        (package / 'fixture.rs').write_bytes((self.root / 'fixture.rs').read_bytes())
+        binding = copy.deepcopy(self.binding)
+        binding['source_prefix'] = 'apps/server'
+        subject = binding['project']['subjects'][0]
+        subject['path'] = 'apps/server/fixture.rs'
+        subject['id'] = model.subject_id(binding['project']['id'], subject)
+        for claim in binding['input']['bindings']:
+            claim['subject'] = subject['id']
+        response = adapter.project_report(self.report, binding)
+        record = response['collection']['evidence'][0]
+        self.assertEqual(record['source']['path'], 'apps/server/fixture.rs')
+        raw = json.loads((self.output / record['artifacts'][0]['path']).read_text())
+        self.assertEqual(raw['source_prefix'], 'apps/server')
+        for prefix in ('../apps', '/apps', 'apps//server', 'apps/./server', 'apps\\server'):
+            binding['source_prefix'] = prefix
+            with self.assertRaisesRegex(ValueError, 'invalid package source prefix'):
+                adapter.project_report(self.report, binding)
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
