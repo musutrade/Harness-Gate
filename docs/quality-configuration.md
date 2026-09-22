@@ -121,3 +121,18 @@ See [profile assurance and retained evidence](quality-profiles.md) for hook/full
 For direct standalone native evaluation, see [native CRAP policy configuration](quality/native-crap-policy.md).
 The command selects `policies.<binding>.policy_file` and `.rule` explicitly; the
 referenced rule's rational `limit` is the ceiling Core actually evaluates.
+
+## Collection artifact capacity
+
+`quality.toml` can set a host-reviewed artifact budget for both `verify` and
+`quality collect`. Omission retains the 64 MiB default. The positive byte count
+covers the entire shared artifact directory, including files not declared by a
+collector; it is not a per-file or per-collector allowance. Zero and unlimited
+values are rejected. Configuration changes invalidate signed collection inputs.
+
+```toml
+[limits]
+max_artifact_bytes = 1073741824 # 1 GiB
+```
+
+This is a storage resource limit, independent of coverage and complexity policy.

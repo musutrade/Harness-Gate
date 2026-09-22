@@ -105,3 +105,39 @@ Unknown macros and malformed grammar still fail closed. Generated macro/derive
 control flow remains outside this source-only metric. Exact LLVM entry anchors
 include the argument of single-argument Ok/Err/Some closure bodies, where Rust
 lowering omits the constructor wrapper. No nearest-position/name fallback is used.
+
+## Select source syntax candidate
+
+Fully qualified `tokio::select!` accepts `biased;`, future branches, optional
+preconditions, block handlers without commas, and a final `else`. Complexity
+adds alternatives minus one, syntactically refutable patterns, and preconditions.
+Source decisions in futures, guards, and handlers are visited normally; nested
+closures and async blocks retain their own source owners. Macro-generated poll
+loops are excluded. Identifier bindings, wildcards, and empty tuple patterns are
+syntactically irrefutable under this rule; this is not name/type resolution.
+Malformed syntax and unknown nested macros fail closed. This syntax support does
+not waive exact LLVM ownership or missing execution counters.
+
+## Closure entry mapping candidate
+
+Closure entry anchors follow the leading source AST expression through constructor
+wrappers (`Ok`, `Err`, `Some`, including generic arguments), tuples, arrays, struct
+fields, parentheses, unary/reference/cast/try/await expressions, and the first
+operand or condition. Only structurally derived entry positions are accepted;
+there is no nearest-position, name-based, or arbitrary contained-region fallback.
+Nested callable ownership and source decision counts remain separate. A closure
+returning an async block can have its factory counter at the closing brace;
+this does not count the future as polled or cover its body.
+
+`test_closures.py` compiles and executes real instrumented Rust fixtures, exports
+LLVM coverage, and checks the joined metrics. The tests include uncalled closures,
+unpolled async blocks, nested owners, and rejection of a later tuple element
+masquerading as the entry. Set `RUST_SOURCE_INVENTORY` to test a candidate binary.
+
+Some trivial projection closures (for example `|value: &i32| *value`) have no
+independent coverage record in the tested compiler output. These still reject:
+source syntax does not prove execution, and a parent's execution count must not
+be substituted. Missing mappings are reported together, with source locations
+and callable kinds, instead of requiring repeated attempts to expose each one.
+
+Exact `#[cfg(test)]` modules are excluded from the production boundary, including external test modules. Other conditional configurations remain unsupported and fail closed.
