@@ -677,3 +677,37 @@ fn certified_reference_policy_participates_in_complete_profiles_with_original_li
         assert!(missing.validate(&flow, &root).is_err());
     }
 }
+
+#[test]
+fn artifact_budget_is_optional_positive_and_digest_visible() {
+    let (root, flow, original) = fixture();
+    assert!(original.limits.is_none());
+    let legacy = serde_json::to_value(&original).unwrap();
+    assert!(legacy.get("limits").is_none());
+    for bytes in [1, 64 * 1024 * 1024, 1024 * 1024 * 1024] {
+        let mut configured = original.clone();
+        configured.limits = Some(CollectionLimits {
+            max_artifact_bytes: bytes,
+        });
+        configured.validate(&flow, &root).unwrap();
+        let encoded = toml::to_string(&configured).unwrap();
+        let roundtrip: QualityConfig = toml::from_str(&encoded).unwrap();
+        assert_eq!(roundtrip.limits.unwrap().max_artifact_bytes, bytes);
+        assert_ne!(serde_json::to_value(&configured).unwrap(), legacy);
+    }
+    let mut invalid = original;
+    invalid.limits = Some(CollectionLimits {
+        max_artifact_bytes: 0,
+    });
+    assert!(invalid
+        .validate(&flow, &root)
+        .unwrap_err()
+        .to_string()
+        .contains("must be positive"));
+    for invalid in ["-1", "18446744073709551616", "'unlimited'"] {
+        assert!(toml::from_str::<QualityConfig>(&format!(
+            "{QUALITY}\n[limits]\nmax_artifact_bytes = {invalid}\n"
+        ))
+        .is_err());
+    }
+}

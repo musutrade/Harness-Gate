@@ -1,5 +1,5 @@
 use crate::config::quality::compiler::{self, TrustedState};
-use crate::config::quality::{baseline, collectors};
+use crate::config::quality::{baseline, collectors, QualityConfig};
 use crate::process::adapter::{HostPolicy, TrustedKey};
 use anyhow::{Context, Result};
 use clap::{Args, Subcommand};
@@ -153,7 +153,18 @@ fn collect(args: &CollectArgs) -> Result<bool> {
         [Some(&args.inputs.state), Some(&args.trusted_keys)],
     )?;
     let trusted_keys: Vec<TrustedKey> = serde_json::from_value(read(&args.trusted_keys)?)?;
+    let root = args.inputs.repository_root.canonicalize()?;
+    let flow = crate::config::FlowConfig::load_with_diagnostics(
+        &root.join(crate::config::DEFAULT_CONFIG_PATH),
+        Some(&root),
+    )?;
+    let config = QualityConfig::load_optional(&root, &flow)?.context("missing quality config")?;
     let policy = HostPolicy {
+        max_artifact_bytes: config
+            .limits
+            .as_ref()
+            .map(|limits| limits.max_artifact_bytes)
+            .or(HostPolicy::default().max_artifact_bytes),
         trusted_keys,
         replay_state_dir: Some(
             args.inputs

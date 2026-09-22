@@ -1382,3 +1382,86 @@ fn retained_evidence_rejects_stale_or_tampered_inputs_without_fallback() {
         );
     }
 }
+
+impl Fixture {
+    fn artifact_budget(&mut self, bytes: u64) {
+        let root = self.dir.path().to_path_buf();
+        let mut config = self.config();
+        config.limits = Some(super::super::model::CollectionLimits {
+            max_artifact_bytes: bytes,
+        });
+        fs::write(
+            root.join(".harness-gate/quality.toml"),
+            toml::to_string(&config).unwrap(),
+        )
+        .unwrap();
+        self.pin();
+        let inputs = compiler::compile(&root, &self.state).unwrap();
+        let id = self.request.step_id.clone();
+        self.request.config_digest = binding_digest(&config, &self.state, &inputs).unwrap();
+        self.request.input = input(
+            &inputs,
+            &self.state,
+            &id,
+            &claims(&config, &self.state, &id).unwrap(),
+        );
+        self.sign();
+        write(&root.join(".harness-gate/workflow-state.json"), &self.state);
+    }
+}
+
+#[test]
+fn configured_artifact_budget_reaches_verify_and_collection_cli() {
+    use clap::Parser;
+    #[derive(Parser)]
+    struct Command {
+        #[command(subcommand)]
+        action: crate::app::quality::QualityAction,
+    }
+    for verify in [true, false] {
+        for bytes in [1, 1024 * 1024 * 1024] {
+            let mut fixture = Fixture::workflow("pass", true, false);
+            fixture.artifact_budget(bytes);
+            if verify {
+                let quality = fixture.quality_result();
+                assert_eq!(
+                    quality["status"],
+                    if bytes == 1 { "blocked" } else { "pass" },
+                    "{quality:#}"
+                );
+                if bytes == 1 {
+                    assert!(quality["error"]
+                        .as_str()
+                        .unwrap()
+                        .contains("artifact root exceeds 1 bytes"));
+                }
+            } else {
+                let root = fixture.dir.path();
+                let command = Command::try_parse_from([
+                    "quality",
+                    "collect",
+                    "--repository-root",
+                    root.to_str().unwrap(),
+                    "--state",
+                    root.join(".harness-gate/workflow-state.json")
+                        .to_str()
+                        .unwrap(),
+                    "--trusted-keys",
+                    root.join(".harness-gate/workflow-keys.json")
+                        .to_str()
+                        .unwrap(),
+                    "--output",
+                    root.join("collection.json").to_str().unwrap(),
+                ])
+                .unwrap();
+                let result = crate::app::quality::run(&command.action);
+                if bytes == 1 {
+                    assert!(format!("{:#}", result.unwrap_err())
+                        .contains("artifact root exceeds 1 bytes"));
+                } else {
+                    assert!(result.unwrap());
+                }
+            }
+        }
+    }
+}
