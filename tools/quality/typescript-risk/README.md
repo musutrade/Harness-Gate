@@ -1,4 +1,4 @@
-# TypeScript risk collector plugin (candidate 0.1.0-rc.2)
+# TypeScript risk collector plugin (candidate 0.1.0-rc.4)
 
 An independently installed Node measurement plugin. Core owns thresholds,
 requiredness, ratchets and final decisions. Existing reference presets and Core
@@ -11,7 +11,7 @@ npm ci --ignore-scripts
 npm test
 HARNESS_GATE_BINARY=/absolute/core-0.4.5 npm run test:core
 npm pack
-npm install --prefix /private/plugin-root ./harness-gate-typescript-collector-0.1.0-rc.2.tgz
+npm install --prefix /private/plugin-root ./harness-gate-typescript-collector-0.1.0-rc.4.tgz
 /private/plugin-root/node_modules/.bin/harness-gate-typescript-collector --version
 ```
 
@@ -19,7 +19,8 @@ Node 24 and TypeScript 6.0.2 are explicit dependencies. The npm shrinkwrap pins
 installation. No parent repository Python modules or Core checkout are runtime
 dependencies. Install the package and dependencies in a trusted runtime and pin
 the entire runtime, including Node and transitive code. npm version metadata does
-not authenticate package bytes or grant a signing identity. Publication is pending.
+not authenticate package bytes or grant a signing identity. Signed candidate packages are distributed as GitHub release assets; see
+[the release guide](../../../docs/releases/0.4.6.zh-CN.md).
 
 ## Measurement contract
 

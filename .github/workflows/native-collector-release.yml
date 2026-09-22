@@ -315,4 +315,9 @@ jobs:
           release_options=()
           release_version="${TAG#rust-collector-v}"
           if [[ "${release_version%%+*}" == *-* ]]; then release_options+=(--prerelease); fi
-          gh release create "$TAG" --verify-tag --generate-notes "${release_options[@]}" "${upload_paths[@]}"
+          notes_args=(--generate-notes)
+          notes_file="docs/releases/rust-collector-${release_version}.zh-CN.md"
+          if [[ -f "$notes_file" ]]; then
+            notes_args=(--notes-file "$notes_file")
+          fi
+          gh release create "$TAG" --verify-tag "${notes_args[@]}" "${release_options[@]}" "${upload_paths[@]}"

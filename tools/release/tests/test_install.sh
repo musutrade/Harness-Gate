@@ -36,7 +36,7 @@ printf 'signed-subject=%s\n' "$windows_binary_name" >"$FIXTURE/$windows_binary_n
 printf 'identity=https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v0.3.3\n' >"$FIXTURE/$windows_binary_name.crt"
 
 # Native fixture tags are intentionally independent of the Core fixture tag.
-for rust_version in 0.1.0-rc.4 0.1.0-rc.6; do
+for rust_version in 0.1.0-rc.4 0.1.0-rc.7; do
     native_fixture="$FIXTURE/rust-collector-v$rust_version"
     mkdir -p "$native_fixture"
     : >"$native_fixture/SHA256SUMS"
@@ -69,7 +69,7 @@ filename="${url##*/}"
 relative="${url#"$expected_prefix"}"
 case "$relative" in
     v0.3.3/*) source_file="$HARNESS_GATE_TEST_FIXTURE/$filename" ;;
-    rust-collector-v0.1.0-rc.4/*|rust-collector-v0.1.0-rc.6/*)
+    rust-collector-v0.1.0-rc.4/*|rust-collector-v0.1.0-rc.7/*)
         source_file="$HARNESS_GATE_TEST_FIXTURE/$relative" ;;
     *) exit 22 ;;
 esac
@@ -101,7 +101,7 @@ while (($# > 0)); do
     esac
 done
 case "$subject" in
-    */rust/*) expected_identity="https://github.com/musutrade/Harness-Gate/.github/workflows/native-collector-release.yml@refs/tags/rust-collector-v${HARNESS_GATE_TEST_EXPECTED_RUST_VERSION:-0.1.0-rc.6}" ;;
+    */rust/*) expected_identity="https://github.com/musutrade/Harness-Gate/.github/workflows/native-collector-release.yml@refs/tags/rust-collector-v${HARNESS_GATE_TEST_EXPECTED_RUST_VERSION:-0.1.0-rc.7}" ;;
     *) expected_identity='https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v0.3.3' ;;
 esac
 [[ "$issuer" == 'https://token.actions.githubusercontent.com' ]] || exit 1
@@ -402,7 +402,7 @@ for platform in linux macos-amd64 macos-arm64 windows; do
         windows) asset=windows-amd64.exe; executable=harness-gate-rust-collector.exe ;;
         *) asset="$platform"; executable=harness-gate-rust-collector ;;
     esac
-    cmp "$FIXTURE/rust-collector-v0.1.0-rc.6/harness-gate-rust-collector-$asset" "$destination/$executable"
+    cmp "$FIXTURE/rust-collector-v0.1.0-rc.7/harness-gate-rust-collector-$asset" "$destination/$executable"
     [[ "$(mode_of "$destination/$executable")" == 755 ]]
     [[ ! -e "$destination/harness-gate" && ! -e "$destination/harness-gate.exe" ]]
 done
@@ -425,7 +425,7 @@ combined="$TEMP_ROOT/combined"
 : >"$TEMP_ROOT/cosign.log"
 run_installer "$combined" --with-rust >/dev/null
 assert_file_content "$combined/harness-gate"
-native_fixture="$FIXTURE/rust-collector-v0.1.0-rc.6"
+native_fixture="$FIXTURE/rust-collector-v0.1.0-rc.7"
 native_asset=harness-gate-rust-collector-linux-amd64
 cmp "$native_fixture/$native_asset" "$combined/harness-gate-rust-collector"
 [[ "$(wc -l <"$TEMP_ROOT/cosign.log")" -eq 4 ]]
@@ -455,7 +455,7 @@ for failure in tampered missing-signature wrong-workflow wrong-tag; do
     case "$failure" in
         tampered) printf 'corrupted\n' >"$native_fixture/$native_asset" ;;
         missing-signature) mv "$native_fixture/$native_asset.sig" "$TEMP_ROOT/missing-native-signature" ;;
-        wrong-workflow) printf 'identity=https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/rust-collector-v0.1.0-rc.6\n' >"$native_fixture/$native_asset.crt" ;;
+        wrong-workflow) printf 'identity=https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/rust-collector-v0.1.0-rc.7\n' >"$native_fixture/$native_asset.crt" ;;
         wrong-tag) printf 'identity=https://github.com/musutrade/Harness-Gate/.github/workflows/native-collector-release.yml@refs/tags/rust-collector-v0.1.0-rc.4\n' >"$native_fixture/$native_asset.crt" ;;
     esac
     if run_installer "$rejected" --with-rust >/dev/null 2>&1; then
@@ -469,7 +469,7 @@ for failure in tampered missing-signature wrong-workflow wrong-tag; do
     cp "$TEMP_ROOT/saved-certificate" "$native_fixture/$native_asset.crt"
 done
 
-for invalid_version in latest v0.1.0-rc.6 0.1 00.1.0 0.1.0-01 '../escape'; do
+for invalid_version in latest v0.1.0-rc.7 0.1 00.1.0 0.1.0-01 '../escape'; do
     if run_installer "$TEMP_ROOT/native-invalid" --rust-only --rust-version "$invalid_version" >/dev/null 2>&1; then
         exit 1
     fi

@@ -120,8 +120,8 @@ def _asset_names(inventory: dict[str, object]) -> list[str]:
     for asset in assets:
         if not isinstance(asset, dict) or not isinstance(asset.get("name"), str):
             raise InventoryError("inventory contains an invalid asset")
-        if asset.get("kind") not in {"binary", "sbom"}:
-            raise InventoryError("inventory asset kind must be binary or sbom")
+        if asset.get("kind") not in {"binary", "sbom", "package"}:
+            raise InventoryError("inventory asset kind must be binary, sbom or package")
         size = asset.get("size_bytes")
         if isinstance(size, bool) or not isinstance(size, int) or size < 0:
             raise InventoryError("inventory asset size_bytes must be a non-negative integer")
@@ -173,6 +173,7 @@ def generate(
     tag: str,
     commit: str,
     repository: str,
+    packages: Iterable[str] = (),
 ) -> dict[str, object]:
     binary_names = sorted({_safe_name(name) for name in binaries})
     if not binary_names:
@@ -182,6 +183,7 @@ def generate(
         raise InventoryError("at least one SBOM is required")
     assets = [_asset(dist, name, "binary") for name in binary_names]
     assets.extend(_asset(dist, name, "sbom") for name in sbom_names)
+    assets.extend(_asset(dist, name, "package") for name in sorted(packages))
     inventory_name = _safe_name(output.name)
     if output.parent.resolve() != dist.resolve():
         raise InventoryError("inventory output must be directly inside dist")
@@ -334,6 +336,7 @@ def main(argv: list[str]) -> int:
     generate_parser = subparsers.add_parser("generate")
     generate_parser.add_argument("--dist", type=Path, required=True)
     generate_parser.add_argument("--output", type=Path, required=True)
+    generate_parser.add_argument("--package", action="append", default=[])
     generate_parser.add_argument("--binary", action="append", required=True)
     generate_parser.add_argument("--sbom", action="append", required=True)
     generate_parser.add_argument("--tag", default="")
@@ -364,6 +367,7 @@ def main(argv: list[str]) -> int:
                 args.tag,
                 args.commit,
                 args.repository,
+                args.package,
             )
             expected_upload_names(inventory)
         elif args.command == "checksums":
