@@ -166,7 +166,10 @@ function evaluate(root) {
 }
 test("released Core alone decides the exact 10 boundary from fresh native evidence", () => {
   const version = spawnSync(binary, ["--version"], { encoding: "utf8" });
-  assert.equal(version.stdout.trim(), "harness-gate 0.4.5");
+  assert.equal(
+    version.stdout.trim(),
+    "harness-gate " + (process.env.HARNESS_GATE_EXPECTED_VERSION || "0.4.5"),
+  );
   for (const [cc, invoke, state] of [
     [10, "for(let i=-1;i<10;i++) subject(i);", "pass"],
     [11, "for(let i=-1;i<11;i++) subject(i);", "fail"],

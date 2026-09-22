@@ -1,5 +1,15 @@
 # Published releases and acceptance
 
+## Core and independent collector release preparation, 2026-09-22
+
+Core 0.4.5 is published on GitHub and crates.io. PR #277 is merged and included
+in the Core 0.4.6 candidate. The [0.4.6 release guide](releases/0.4.6.zh-CN.md)
+records the Core update, Rust source-risk RC5, TypeScript risk RC4 and HTTP JSON
+contract RC5 packages, installation and verification. These new packages retain
+RC status. Native Rust/MIR RC7 adds dependency-attribution caching and monorepo
+source-prefix binding and becomes the installer default. Publication and public
+verification of 0.4.6 are pending; the historical evidence below is retained.
+
 ## Standalone delivery update, 2026-09-14
 
 The native old-engine standalone [0.1.0-rc.4 release](https://github.com/musutrade/Harness-Gate/releases/tag/rust-collector-v0.1.0-rc.4)

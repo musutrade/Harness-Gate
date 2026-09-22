@@ -55,6 +55,26 @@ class ReleaseInventoryTests(unittest.TestCase):
     def test_exact_inventory_is_valid(self) -> None:
         self.assert_valid()
 
+    def test_collector_package_is_signed_attested_and_tamper_checked(self) -> None:
+        package = "collector-0.1.0-rc.1.tgz"
+        (self.dist / package).write_bytes(b"tested collector")
+        self.data = inventory.generate(
+            self.dist, self.inventory_path,
+            ["harness-gate-linux-amd64", "harness-gate-windows-amd64.exe"],
+            "harness-gate.sbom.cdx.json", "v0.4.6", "exact-source",
+            "https://github.com/example/fixture", packages=[package],
+        )
+        inventory.write_checksums(self.dist, self.data)
+        for name in inventory.list_operation(self.data, "sign"):
+            (self.dist / f"{name}.sig").write_text("signature\n")
+            (self.dist / f"{name}.crt").write_text("certificate\n")
+        self.assertIn(package, self.attested())
+        self.assertIn(package, inventory.list_operation(self.data, "sign"))
+        self.assert_valid()
+        (self.dist / package).write_bytes(b"changed collector")
+        with self.assertRaises(inventory.InventoryError):
+            self.assert_valid()
+
     def test_missing_asset_blocks(self) -> None:
         (self.dist / "harness-gate-linux-amd64").unlink()
         with self.assertRaisesRegex(inventory.InventoryError, "missing"):

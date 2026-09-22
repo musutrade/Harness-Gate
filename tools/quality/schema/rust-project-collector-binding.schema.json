@@ -15,6 +15,9 @@
     "capabilities"
   ],
   "properties": {
+    "source_prefix": {
+      "type": "string"
+    },
     "schema": {
       "const": "rust-project-collector-binding/v1"
     },

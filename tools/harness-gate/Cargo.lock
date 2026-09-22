@@ -494,7 +494,7 @@ dependencies = [
 
 [[package]]
 name = "harness-gate"
-version = "0.4.6-rc.1"
+version = "0.4.6"
 dependencies = [
  "anyhow",
  "base64",
