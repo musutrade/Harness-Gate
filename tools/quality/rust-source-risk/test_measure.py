@@ -4,7 +4,8 @@ import subprocess
 import tempfile
 import unittest
 from fractions import Fraction
-from measure import crap, line_coverage, measure, strict_json
+from unittest.mock import patch
+from measure import crap, line_coverage, measure, source_inventories, strict_json
 
 HERE = Path(__file__).resolve().parent
 
@@ -92,5 +93,34 @@ fn main() { ten(true); eleven(true); std::mem::drop(unpolled()); }
         def change(rows):
             rows.append(next(f for f in rows if f['filenames'][0] == str(self.source)))
         with self.assertRaisesRegex(ValueError, 'duplicate native'): self.result(self.mutate(change))
+
+    def test_all_bad_anchors_and_missing_owners_reported_together(self):
+        def change(rows):
+            for f in rows:
+                if f['regions'][0][0] in (1, 2):
+                    f['regions'][0][1] += 1
+            rows[:] = [f for f in rows if f['regions'][0][0] != 3]
+        with self.assertRaises(ValueError) as error:
+            self.result(self.mutate(change))
+        message = str(error.exception)
+        self.assertIn('missing exact source anchor: sample.rs:[1, 2]', message)
+        self.assertIn('missing exact source anchor: sample.rs:[2, 2]', message)
+        self.assertIn('source callable missing native mapping', message)
+        self.assertIn('sample.rs:[3, 1]', message)
+        self.assertIn('no measurements produced', message)
+
+    def test_ambiguous_and_missing_anchors_are_both_reported(self):
+        inventories = source_inventories(self.root, ['sample.rs'], HERE / 'inventory')
+        first, second = inventories['sample.rs'][:2]
+        second['anchors'].append(first['anchors'][0])
+        def change(rows):
+            for f in rows:
+                if f['regions'][0][0] == 2:
+                    f['regions'][0][1] += 1
+        with patch('measure.source_inventories', return_value=inventories):
+            with self.assertRaises(ValueError) as error:
+                self.result(self.mutate(change))
+        self.assertIn('ambiguous exact source anchor: sample.rs:[1, 1]', str(error.exception))
+        self.assertIn('missing exact source anchor: sample.rs:[2, 2]', str(error.exception))
 
 if __name__ == '__main__': unittest.main()
