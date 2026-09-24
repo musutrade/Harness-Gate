@@ -11,8 +11,10 @@ from pathlib import Path
 import shlex
 import shutil
 import subprocess
+import sys
 import uuid
 from plugin import COLLECTOR, TYPES, canonical, discover, inventory, series, sha
+from measure import source_inventories
 
 
 def main():
@@ -50,6 +52,11 @@ def main():
             target.write_bytes(data)
             inputs[str(relative)] = sha(data)
     (root / '.local-capture-snapshot').write_text('backend-source-only rehearsal\n')
+    # Inspect the same immutable input snapshot that will be compiled. Cheap
+    # syntax/Serde failures must be reported together before cargo is started.
+    sources = inventory({'workspace_root': str(root),
+                         'parameters': {'source_roots': args.source_root}})
+    source_inventories(root, list(sources), Path(__file__).resolve().parent / 'inventory')
     env = dict(os.environ, CARGO_TARGET_DIR=str(args.target_dir.absolute()))
     command = ['cargo', 'llvm-cov', '--manifest-path', str(root / args.manifest), '--locked', '--json', '--output-path', str(out / 'cargo-coverage.json'), '--verbose']
     for test in args.test:
@@ -98,4 +105,8 @@ def main():
     print(canonical({'bundle': str(out / 'bundle.json'), 'subjects': len(request['parameters']['subjects']), 'series': bundle['series']['id']}))
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except ValueError as error:
+        print(str(error), file=sys.stderr)
+        raise SystemExit(1)

@@ -70,14 +70,14 @@ def line_coverage(source, regions, excluded):
             cursor += len(fragment)
     return sum(lines.values()), len(lines)
 
-def measure(source_root, production_files, llvm_path, ast_binary, coverage_root=None):
+def source_inventories(source_root, production_files, ast_binary):
+    """Validate paths first, then report compatibility failures across all files.
+
+    Failed inventories are never returned as an incomplete production boundary.
+    Corrupt paths or unavailable tooling remain immediate infrastructure errors.
+    """
     root = Path(source_root).resolve(strict=True)
-    native_root = Path(coverage_root or root)
-    llvm = strict_json(llvm_path)
-    if llvm.get('type') != 'llvm.coverage.json.export' or llvm.get('version') != '3.1.0':
-        raise ValueError('unsupported LLVM source coverage format')
     paths = {}
-    inventories = {}
     for relative in production_files:
         p = Path(relative)
         if p.is_absolute() or '..' in p.parts or str(p) != relative or p.suffix != '.rs':
@@ -85,13 +85,34 @@ def measure(source_root, production_files, llvm_path, ast_binary, coverage_root=
         path = root / p
         if path.is_symlink() or not path.resolve(strict=True).is_relative_to(root):
             raise ValueError('source escapes root')
-        absolute = str(native_root / relative)
-        if absolute in paths:
+        if relative in paths:
             raise ValueError('duplicate source')
-        paths[absolute] = relative
-        inventories[relative] = json.loads(subprocess.check_output([str(ast_binary), str(path)], text=True))
+        paths[relative] = path
+    inventories = {}
+    errors = []
+    for relative, path in sorted(paths.items()):
+        result = subprocess.run([str(ast_binary), str(path)], capture_output=True, text=True)
+        if result.returncode == 1:
+            errors.append(f'{relative}: {result.stderr.strip() or "inventory rejected source"}')
+        else:
+            result.check_returncode()
+            inventories[relative] = json.loads(result.stdout)
+    if errors:
+        raise ValueError('source compatibility failed; no measurements produced:\n' + '\n'.join(errors))
+    return inventories
+
+
+def measure(source_root, production_files, llvm_path, ast_binary, coverage_root=None):
+    root = Path(source_root).resolve(strict=True)
+    native_root = Path(coverage_root or root)
+    llvm = strict_json(llvm_path)
+    if llvm.get('type') != 'llvm.coverage.json.export' or llvm.get('version') != '3.1.0':
+        raise ValueError('unsupported LLVM source coverage format')
+    inventories = source_inventories(root, production_files, ast_binary)
+    paths = {str(native_root / relative): relative for relative in inventories}
     native = defaultdict(list)
     names = set()
+    mapping_errors = []
     for unit in llvm['data']:
         for function in unit['functions']:
             if not function['regions']:
@@ -109,7 +130,7 @@ def measure(source_root, production_files, llvm_path, ast_binary, coverage_root=
             if relative is None:
                 # Dependencies are outside the signed production inventory.
                 if Path(filename).is_relative_to(native_root) and '/tests/' not in filename:
-                    raise ValueError(f'uninventoried project function: {filename}')
+                    mapping_errors.append(f'uninventoried project function: {filename}:{first[:2]}')
                 continue
             key = (filename, function['name'])
             if key in names:
@@ -118,14 +139,20 @@ def measure(source_root, production_files, llvm_path, ast_binary, coverage_root=
             matches = [i for i, f in enumerate(inventories[relative]) if first[:2] in f['anchors']]
             if len(matches) != 1:
                 detail = 'missing' if not matches else 'ambiguous'
-                raise ValueError(f'{detail} exact source anchor: {relative}:{first[:2]}')
+                mapping_errors.append(f'{detail} exact source anchor: {relative}:{first[:2]}')
+                continue
             native[relative, matches[0]].append(function)
     missing = [f'{relative}:{f["start"]} ({f["kind"]})'
                for relative, functions in inventories.items()
                for index, f in enumerate(functions) if not native[relative, index]]
     if missing:
-        raise ValueError('source callable missing native mapping: ' + '; '.join(missing)
-                         + '; no exact LLVM entry counter; parent execution is not a substitute')
+        mapping_errors.append('source callable missing native mapping: ' + '; '.join(missing)
+                              + '; no exact LLVM entry counter; parent execution is not a substitute')
+    if mapping_errors:
+        # Monomorphizations may repeat the same bad source position. Retain
+        # every distinct diagnostic without flooding the operator with copies.
+        raise ValueError('source mapping failed; no measurements produced:\n'
+                         + '\n'.join(dict.fromkeys(mapping_errors)))
     results = []
     for relative, functions in inventories.items():
         source = (root / relative).read_bytes()
