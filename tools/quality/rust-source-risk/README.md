@@ -1,4 +1,4 @@
-# Rust source-risk collector (candidate 0.1.0-rc.6)
+# Rust source-risk collector (candidate 0.1.0-rc.7)
 
 This is an independent Harness-Gate collector plugin. It does not modify Core,
 change a policy threshold, sign its own requests, or replace the MIR measurement
@@ -159,3 +159,21 @@ The published RC5 archive omitted this file and cannot form a series. RC6 keeps
 the measurement formulas unchanged, but its new collector identity and executable
 pins require explicit host binding review. Release acceptance now extracts the
 archive and runs the full runtime suite against its installed files.
+
+## rc.7 complete compatibility diagnostics
+
+Capture scans every production source file in the captured input snapshot before
+starting cargo/llvm-cov. Unsupported syntax and Serde metadata are collected
+across files, including all diagnostics emitted for each file. A rejected source
+inventory never becomes a partial production boundary.
+
+After native coverage is available, measurement collects unmatched or ambiguous
+entry anchors, uninventoried project functions, and missing source-owner counters
+before reporting failure. No measurements or successful capture bundle are
+returned when any mapping is missing or ambiguous; parents' hits are never
+substituted. Unsafe paths, unavailable tools, malformed native data and duplicate
+native identities still stop immediately because continuing cannot be trusted.
+
+This change does not broaden accepted Rust syntax, change coverage/CRAP formulas,
+or lower thresholds. The new version and implementation digest require an
+explicit host binding update; existing signed captures retain their old identity.
