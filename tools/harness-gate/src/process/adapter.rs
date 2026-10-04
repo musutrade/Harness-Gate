@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
-use std::fs::{self, File, OpenOptions};
+use std::fs::{self, File};
 use std::io::{self, Read, Write};
 use std::path::{Component, Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -133,41 +133,91 @@ pub struct HostPolicy {
     pub reader_deadline: Duration,
     pub max_artifact_bytes: Option<u64>,
     pub replay_guard: ReplayGuard,
-    /// Optional durable nonce ledger directory. The CLI supplies a sidecar
-    /// directory next to the request; embedders may point this at their own
-    /// control-plane storage.
+    /// Durable host-owned nonce ledger. Verify and quality collect share a
+    /// repository default; --replay-state-dir selects external control-plane
+    /// storage. Embedders must isolate this from untrusted child processes.
     pub replay_state_dir: Option<PathBuf>,
 }
 
 /// In-memory replay state, optionally paired with an atomic durable sidecar.
 /// Long-lived orchestrators can point the sidecar at their control-plane
-/// storage; the CLI supplies a request-adjacent sidecar by default.
+/// storage. Verify and quality collect share a repository ledger by default.
 #[derive(Debug, Clone, Default)]
 pub struct ReplayGuard {
-    seen: Arc<Mutex<BTreeMap<String, u64>>>,
+    state: Arc<Mutex<ReplayState>>,
+}
+
+#[derive(Debug, Default)]
+struct ReplayState {
+    seen: BTreeMap<String, u64>,
+    ledger: Option<super::replay::Ledger>,
 }
 
 impl ReplayGuard {
+    fn isolate_artifacts(
+        &self,
+        state_dir: Option<&Path>,
+        artifact_root: &Path,
+    ) -> Result<(), AdapterError> {
+        if let Some(path) = state_dir {
+            let ledger = super::replay::Ledger::open(path)?;
+            ledger.ensure_separate(artifact_root)?;
+            self.bind(ledger)?;
+        } else {
+            let state = self
+                .state
+                .lock()
+                .map_err(|_| AdapterError::Protocol("replay guard state is poisoned".into()))?;
+            if let Some(ledger) = &state.ledger {
+                ledger.ensure_separate(artifact_root)?;
+            }
+        }
+        Ok(())
+    }
+
+    pub(super) fn bind(&self, ledger: super::replay::Ledger) -> Result<(), AdapterError> {
+        let mut state = self
+            .state
+            .lock()
+            .map_err(|_| AdapterError::Protocol("replay guard state is poisoned".into()))?;
+        if let Some(bound) = &state.ledger {
+            if bound.path != ledger.path {
+                return Err(AdapterError::Protocol("replay ledger scope changed".into()));
+            }
+            bound.validate()?;
+        } else {
+            state.ledger = Some(ledger);
+        }
+        Ok(())
+    }
     fn claim(
         &self,
         nonce: &str,
         issued_at_ms: u64,
         expires_at_ms: u64,
+        accepted_until_ms: u64,
         now_ms: u64,
         state_dir: Option<&Path>,
     ) -> Result<(), AdapterError> {
-        let mut seen = self.seen.lock().map_err(|_| {
+        let mut state = self.state.lock().map_err(|_| {
             AdapterError::Protocol("replay guard state is poisoned; refusing request".into())
         })?;
-        seen.retain(|_, expiry| *expiry >= now_ms);
-        if seen.contains_key(nonce) {
+        state.seen.retain(|_, expiry| *expiry >= now_ms);
+        if state.seen.contains_key(nonce) {
             return Err(AdapterError::Protocol(
                 "adapter request nonce has already been used".into(),
             ));
         }
-        seen.insert(nonce.to_string(), expires_at_ms);
+        state.seen.insert(nonce.to_string(), accepted_until_ms);
         if let Some(state_dir) = state_dir {
-            claim_durable_nonce(state_dir, nonce, issued_at_ms, expires_at_ms, now_ms)?;
+            if state.ledger.is_none() {
+                state.ledger = Some(super::replay::Ledger::open(state_dir)?);
+            }
+            let ledger = state.ledger.as_ref().expect("bound ledger");
+            if !ledger.matches_path(state_dir)? {
+                return Err(AdapterError::Protocol("replay ledger scope changed".into()));
+            }
+            ledger.claim(nonce, issued_at_ms, expires_at_ms, now_ms)?;
         }
         Ok(())
     }
@@ -246,8 +296,12 @@ fn prepare_request(
     request: &AdapterRequest,
     policy: &HostPolicy,
 ) -> Result<PreparedRequest, AdapterError> {
-    validate_request(request, policy)?;
+    let now_ms = unix_time_millis()?;
+    let accepted_until_ms = validate_request_envelope_at(request, policy, now_ms)?;
     let artifact_root = canonical_directory(&request.artifact_root, "artifact root")?;
+    policy
+        .replay_guard
+        .isolate_artifacts(policy.replay_state_dir.as_deref(), &artifact_root)?;
     let executable = canonical_file(&request.adapter.executable, "adapter executable")?;
     let request_json = serde_json::to_vec(&request)
         .map_err(|error| AdapterError::Protocol(format!("serialize request: {error}")))?;
@@ -257,6 +311,14 @@ fn prepare_request(
             MAX_REQUEST_BYTES
         )));
     }
+    policy.replay_guard.claim(
+        &request.nonce,
+        request.issued_at_ms,
+        request.expires_at_ms,
+        accepted_until_ms,
+        now_ms,
+        policy.replay_state_dir.as_deref(),
+    )?;
 
     Ok(PreparedRequest {
         artifact_root,
@@ -653,15 +715,33 @@ pub fn read_request(path: &Path) -> Result<AdapterRequest, AdapterError> {
     serde_json::from_value(value).map_err(|error| AdapterError::Request(anyhow::Error::new(error)))
 }
 
+#[cfg(test)]
 fn validate_request(request: &AdapterRequest, policy: &HostPolicy) -> Result<(), AdapterError> {
     validate_request_at(request, policy, unix_time_millis()?)
 }
 
+#[cfg(test)]
 fn validate_request_at(
     request: &AdapterRequest,
     policy: &HostPolicy,
     now_ms: u64,
 ) -> Result<(), AdapterError> {
+    let accepted_until_ms = validate_request_envelope_at(request, policy, now_ms)?;
+    policy.replay_guard.claim(
+        &request.nonce,
+        request.issued_at_ms,
+        request.expires_at_ms,
+        accepted_until_ms,
+        now_ms,
+        policy.replay_state_dir.as_deref(),
+    )
+}
+
+fn validate_request_envelope_at(
+    request: &AdapterRequest,
+    policy: &HostPolicy,
+    now_ms: u64,
+) -> Result<u64, AdapterError> {
     if request.protocol_version != PROTOCOL_VERSION {
         return Err(AdapterError::Protocol(format!(
             "unsupported protocol version {}",
@@ -758,14 +838,7 @@ fn validate_request_at(
             "adapter executable digest mismatch".into(),
         ));
     }
-    policy.replay_guard.claim(
-        &request.nonce,
-        request.issued_at_ms,
-        request.expires_at_ms,
-        now_ms,
-        policy.replay_state_dir.as_deref(),
-    )?;
-    Ok(())
+    Ok(request.expires_at_ms.saturating_add(skew_ms))
 }
 
 fn validate_capabilities(
@@ -939,61 +1012,6 @@ fn unix_time_millis() -> Result<u64, AdapterError> {
         .map_err(|error| {
             AdapterError::Protocol(format!("system clock is before Unix epoch: {error}"))
         })
-}
-
-fn claim_durable_nonce(
-    state_dir: &Path,
-    nonce: &str,
-    issued_at_ms: u64,
-    expires_at_ms: u64,
-    now_ms: u64,
-) -> Result<(), AdapterError> {
-    if let Ok(metadata) = fs::symlink_metadata(state_dir) {
-        if metadata.file_type().is_symlink() || !metadata.is_dir() {
-            return Err(AdapterError::Protocol(
-                "adapter replay state path is not a regular directory".into(),
-            ));
-        }
-    } else {
-        fs::create_dir_all(state_dir).map_err(|error| {
-            AdapterError::Protocol(format!("create adapter replay state directory: {error}"))
-        })?;
-    }
-    let digest = Sha256::digest(nonce.as_bytes());
-    let marker = state_dir.join(format!("nonce-{digest:x}.json"));
-    let mut file = match OpenOptions::new()
-        .write(true)
-        .create_new(true)
-        .open(&marker)
-    {
-        Ok(file) => file,
-        Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
-            return Err(AdapterError::Protocol(
-                "adapter request nonce has already been used".into(),
-            ));
-        }
-        Err(error) => {
-            return Err(AdapterError::Protocol(format!(
-                "claim adapter replay nonce: {error}"
-            )))
-        }
-    };
-    let record = serde_json::json!({
-        "nonce": nonce,
-        "issued_at_ms": issued_at_ms,
-        "claimed_at_ms": now_ms,
-        "expires_at_ms": expires_at_ms,
-    });
-    if let Err(error) = file
-        .write_all(record.to_string().as_bytes())
-        .and_then(|_| file.sync_all())
-    {
-        let _ = fs::remove_file(&marker);
-        return Err(AdapterError::Protocol(format!(
-            "persist adapter replay nonce: {error}"
-        )));
-    }
-    Ok(())
 }
 
 fn map_reader_error(
@@ -1666,8 +1684,9 @@ mod tests {
     #[test]
     fn durable_nonce_sidecar_rejects_replay_after_host_restart() {
         let directory = tempdir().unwrap();
+        let host = tempdir().unwrap();
         let (request, mut first_policy) = fixture_request(directory.path(), "pass");
-        let replay_dir = directory.path().join("replay-state");
+        let replay_dir = host.path().canonicalize().unwrap().join("replay-state");
         first_policy.replay_state_dir = Some(replay_dir.clone());
         run(request.clone(), &first_policy).expect("first durable nonce use");
 
@@ -1675,6 +1694,203 @@ mod tests {
         second_policy.replay_state_dir = Some(replay_dir);
         let error = run(request, &second_policy).expect_err("sidecar must reject replay");
         assert!(error.to_string().contains("nonce has already been used"));
+    }
+
+    #[test]
+    fn public_adapter_rejects_overlapping_ledger_before_nonce_claim_or_spawn() {
+        for relation in [
+            "equal",
+            "ledger-inside-artifacts",
+            "artifacts-inside-ledger",
+        ] {
+            let host = tempdir().unwrap();
+            let root = host.path().canonicalize().unwrap();
+            let artifacts = root.join("artifacts");
+            fs::create_dir(&artifacts).unwrap();
+            let ledger = match relation {
+                "equal" => artifacts.clone(),
+                "ledger-inside-artifacts" => artifacts.join("ledger"),
+                _ => root.clone(),
+            };
+            let (request, mut policy) = fixture_request(&artifacts, "pass");
+            policy.replay_state_dir = Some(ledger.clone());
+            let error = run(request, &policy).unwrap_err();
+            assert!(
+                error.to_string().contains("must be separate"),
+                "{relation}: {error}"
+            );
+            assert!(
+                !artifacts.join("adapter-result.txt").exists(),
+                "child ran: {relation}"
+            );
+            assert!(policy.replay_guard.state.lock().unwrap().seen.is_empty());
+            assert!(fs::read_dir(&ledger).unwrap().all(|entry| !entry
+                .unwrap()
+                .file_name()
+                .to_string_lossy()
+                .starts_with("nonce-")));
+        }
+    }
+
+    #[test]
+    fn public_adapter_checks_bound_ledger_even_without_a_policy_path() {
+        let host = tempdir().unwrap();
+        let root = host.path().canonicalize().unwrap();
+        let artifacts = root.join("artifacts");
+        fs::create_dir(&artifacts).unwrap();
+        let (request, policy) = fixture_request(&artifacts, "pass");
+        policy
+            .replay_guard
+            .bind(super::super::replay::Ledger::open(&root).unwrap())
+            .unwrap();
+        let error = run(request, &policy).unwrap_err();
+        assert!(error.to_string().contains("must be separate"));
+        assert!(!artifacts.join("adapter-result.txt").exists());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn public_adapter_rejects_artifact_alias_to_the_ledger() {
+        let host = tempdir().unwrap();
+        let root = host.path().canonicalize().unwrap();
+        let ledger = root.join("ledger");
+        fs::create_dir(&ledger).unwrap();
+        let alias = root.join("artifact-alias");
+        std::os::unix::fs::symlink(&ledger, &alias).unwrap();
+        let (request, mut policy) = fixture_request(&alias, "pass");
+        policy.replay_state_dir = Some(ledger.clone());
+        let error = run(request, &policy).unwrap_err();
+        assert!(error.to_string().contains("must be separate"));
+        assert!(fs::read_dir(&ledger).unwrap().next().is_none());
+        assert!(policy.replay_guard.state.lock().unwrap().seen.is_empty());
+    }
+
+    #[test]
+    fn public_adapter_accepts_equivalent_ledger_spellings_and_separate_siblings() {
+        let host = tempdir().unwrap();
+        let root = host.path().canonicalize().unwrap();
+        let artifacts = root.join("ledger-artifacts");
+        fs::create_dir(&artifacts).unwrap();
+        let path = root.join("ledger");
+        let (request, mut policy) = fixture_request(&artifacts, "pass");
+        policy
+            .replay_guard
+            .bind(super::super::replay::Ledger::open(&path).unwrap())
+            .unwrap();
+        policy.replay_state_dir = Some(root.join(".").join("ledger"));
+        run(request, &policy).unwrap();
+        assert!(artifacts.join("adapter-result.txt").is_file());
+        assert_eq!(fs::read_dir(path).unwrap().count(), 1);
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn windows_public_adapter_rejects_ordinary_and_verbatim_artifact_overlap() {
+        let host = tempdir().unwrap();
+        let ordinary = host
+            .path()
+            .canonicalize()
+            .unwrap()
+            .to_string_lossy()
+            .strip_prefix(r"\\?\")
+            .unwrap()
+            .to_string();
+        let root = PathBuf::from(ordinary);
+        let artifacts = root.join("artifacts");
+        fs::create_dir(&artifacts).unwrap();
+        for ledger in [&artifacts, &artifacts.join("ledger"), &root] {
+            let (request, mut policy) = fixture_request(&artifacts, "pass");
+            policy.replay_state_dir = Some(ledger.clone());
+            let error = run(request, &policy).unwrap_err();
+            assert!(error.to_string().contains("must be separate"), "{error}");
+            assert!(!artifacts.join("adapter-result.txt").exists());
+        }
+    }
+
+    #[test]
+    fn replay_retention_covers_the_entire_accepted_window() {
+        for durable in [false, true] {
+            for delta in [0, 1, 2, 30_001, 30_002] {
+                let directory = tempdir().unwrap();
+                let (mut request, mut policy) = fixture_request(directory.path(), "pass");
+                request.issued_at_ms = 100_000;
+                request.expires_at_ms = 101_000;
+                resign_request(&mut request);
+                if durable {
+                    policy.replay_state_dir =
+                        Some(directory.path().canonicalize().unwrap().join("ledger"));
+                }
+                validate_request_at(&request, &policy, 100_999).unwrap();
+                let now = 100_999 + delta;
+                let error = validate_request_at(&request, &policy, now).unwrap_err();
+                let expected = if now <= 131_000 {
+                    "nonce has already been used"
+                } else {
+                    "expired"
+                };
+                assert!(
+                    error.to_string().contains(expected),
+                    "durable={durable}, now={now}: {error}"
+                );
+                // A genuinely unused signed nonce stays usable at every accepted
+                // boundary, including equality with expires + clock skew.
+                request.nonce.push_str("-fresh");
+                resign_request(&mut request);
+                assert_eq!(
+                    validate_request_at(&request, &policy, now).is_ok(),
+                    now <= 131_000
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn memory_replay_markers_prune_only_after_the_inclusive_boundary() {
+        let guard = ReplayGuard::default();
+        guard.claim("used", 1, 2, 3, 1, None).unwrap();
+        assert!(guard.claim("used", 1, 2, 3, 3, None).is_err());
+        guard.claim("new", 4, 5, 6, 4, None).unwrap();
+        assert!(!guard.state.lock().unwrap().seen.contains_key("used"));
+    }
+
+    #[test]
+    fn replay_retention_saturates_without_wrapping_at_u64_max() {
+        let directory = tempdir().unwrap();
+        let (mut request, policy) = fixture_request(directory.path(), "pass");
+        request.issued_at_ms = u64::MAX - 1000;
+        request.expires_at_ms = u64::MAX - 1;
+        resign_request(&mut request);
+        validate_request_at(&request, &policy, u64::MAX - 2).unwrap();
+        let error = validate_request_at(&request, &policy, u64::MAX).unwrap_err();
+        assert!(error.to_string().contains("nonce has already been used"));
+    }
+
+    #[test]
+    fn durable_nonce_claims_are_atomic_between_independent_hosts() {
+        let directory = tempdir().unwrap();
+        let ledger = directory.path().canonicalize().unwrap().join("ledger");
+        let barrier = Arc::new(std::sync::Barrier::new(12));
+        let (request, policy) = fixture_request(directory.path(), "pass");
+        let threads: Vec<_> = (0..12)
+            .map(|_| {
+                let request = request.clone();
+                let mut policy = policy.clone();
+                policy.replay_guard = ReplayGuard::default();
+                policy.replay_state_dir = Some(ledger.clone());
+                let barrier = barrier.clone();
+                thread::spawn(move || {
+                    barrier.wait();
+                    validate_request_at(&request, &policy, request.issued_at_ms).is_ok()
+                })
+            })
+            .collect();
+        assert_eq!(
+            threads
+                .into_iter()
+                .map(|t| usize::from(t.join().unwrap()))
+                .sum::<usize>(),
+            1
+        );
     }
 
     #[test]

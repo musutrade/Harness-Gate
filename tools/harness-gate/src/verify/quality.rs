@@ -12,8 +12,7 @@ use std::{collections::BTreeSet, fs, path::Path};
 
 pub(super) struct Prepared {
     state: compiler::TrustedState,
-    keys: Vec<TrustedKey>,
-    max_artifact_bytes: Option<u64>,
+    host_policy: HostPolicy,
     baseline: Option<baseline::Request>,
     output: String,
     formats: BTreeSet<ReportFormat>,
@@ -132,15 +131,24 @@ pub(super) fn prepare(
     compiler::compile(root, &state)?;
     validate_selection(&config, &state, scope)?;
     Ok(Some(Prepared {
-        max_artifact_bytes: config
-            .limits
-            .as_ref()
-            .map(|limits| limits.max_artifact_bytes),
+        host_policy: crate::process::replay::collector_policy(
+            HostPolicy {
+                trusted_keys: read::<Vec<TrustedKey>>(trust_root, &workflow.trusted_keys)?,
+                max_artifact_bytes: config
+                    .limits
+                    .as_ref()
+                    .map(|limits| limits.max_artifact_bytes)
+                    .or(HostPolicy::default().max_artifact_bytes),
+                ..HostPolicy::default()
+            },
+            &project.root,
+            project.replay_state_dir.as_deref(),
+            &root.join(&state.artifact_root),
+        )?,
         participation: config.participation(profile),
         complete: participation.assurance == Assurance::Complete,
         has_policy: !participation.policies.is_empty(),
         state,
-        keys: read(trust_root, &workflow.trusted_keys)?,
         baseline: workflow
             .baseline_request
             .as_ref()
@@ -229,17 +237,7 @@ fn evaluate(project: &Project, work: Prepared, result: &mut QualityResult) -> Re
         .map(|_| read(&base_root, "evidence.json"))
         .transpose()?;
     result.phase = "collection";
-    let collection = collectors::collect(
-        root,
-        &work.state,
-        &HostPolicy {
-            trusted_keys: work.keys,
-            max_artifact_bytes: work
-                .max_artifact_bytes
-                .or(HostPolicy::default().max_artifact_bytes),
-            ..HostPolicy::default()
-        },
-    )?;
+    let collection = collectors::collect(root, &work.state, &work.host_policy)?;
     result.inputs = serde_json::to_value(&collection.inputs)?;
     result.evidence = collection.evidence;
     result.producers = serde_json::to_value(collection.producers)?;
