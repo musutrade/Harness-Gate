@@ -351,3 +351,61 @@ sha256 = "21192d57f52741f9eb8fd5477b595c960cb8e21881cbedecdd742b7b9ecff021"
 line = 797
 column = 9
 text = "bail!(\"runtime object identity changed since the lease was recorded\");"
+
+[[paths]]
+id = "adapter.replay_window"
+module = "process"
+test = "process::adapter::tests::replay_retention_covers_the_entire_accepted_window"
+platforms = ["linux", "macos", "windows"]
+platform_note = "Deterministic signed request and filesystem tests run on all supported hosts without external services."
+observable = "Used nonces stay blocked through the entire accepted expiry/skew window"
+rule = "critical-path-source-v2"
+owner = "Harness-Gate maintainers"
+review_date = "2026-10-04"
+binary = "harness-gate"
+assertions = ["assert_eq!(", "now <= 131_000"]
+[paths.source]
+path = "src/process/adapter.rs"
+symbol = "claim"
+start = 193
+end = 223
+sha256 = "ef7a3a0c7617f13f48db4e9d24279dc4d53fc2ed84788c7f4d3e195b98a228d4"
+[paths.test_source]
+path = "src/process/adapter.rs"
+symbol = "replay_retention_covers_the_entire_accepted_window"
+start = 1811
+end = 1845
+sha256 = "ef7a3a0c7617f13f48db4e9d24279dc4d53fc2ed84788c7f4d3e195b98a228d4"
+[[paths.probes]]
+line = 205
+column = 9
+text = "state.seen.retain(|_, expiry| *expiry >= now_ms);"
+
+[[paths]]
+id = "adapter.atomic_durable_nonce"
+module = "process"
+test = "process::adapter::tests::durable_nonce_claims_are_atomic_between_independent_hosts"
+platforms = ["linux", "macos", "windows"]
+platform_note = "Deterministic signed request and filesystem tests run on all supported hosts without external services."
+observable = "Independent hosts authorize at most one signed nonce and persist before launch"
+rule = "critical-path-source-v2"
+owner = "Harness-Gate maintainers"
+review_date = "2026-10-04"
+binary = "harness-gate"
+assertions = [".map(|t| usize::from(t.join().unwrap()))", ".sum::<usize>()"]
+[paths.source]
+path = "src/process/replay.rs"
+symbol = "claim"
+start = 103
+end = 128
+sha256 = "f0f243606fd5c3ab9098a8e1a9b07dc7bc9f9ed4d942c19abd54b35e1b65d8e6"
+[paths.test_source]
+path = "src/process/adapter.rs"
+symbol = "durable_nonce_claims_are_atomic_between_independent_hosts"
+start = 1869
+end = 1894
+sha256 = "ef7a3a0c7617f13f48db4e9d24279dc4d53fc2ed84788c7f4d3e195b98a228d4"
+[[paths.probes]]
+line = 126
+column = 9
+text = "platform::sync_directory(&self.directory).map_err(failure)?;"

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Share durable adapter nonce protection between `verify` and `quality collect`.
+  Global `--replay-state-dir` selects persistent host storage outside read-only
+  snapshots. Atomic claims, protected directory handles and fail-closed path
+  checks reject replays before collector execution, including after restart and
+  artifact cleanup (GH-269).
+- Retain in-memory adapter nonces through the complete clock-skew acceptance
+  window, including equality and saturated timestamp arithmetic. Signature,
+  source/configuration binding and quality policy checks are unchanged.
+
 ## [0.4.7] - 2026-09-22
 
 ### Fixed

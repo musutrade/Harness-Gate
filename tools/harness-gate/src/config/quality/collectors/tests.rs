@@ -725,7 +725,7 @@ fn collection_cli_publishes_measurements_and_removes_stale_output_on_failure() {
             output.to_str().unwrap(),
         ])
         .unwrap();
-        let result = crate::app::quality::run(&command.action);
+        let result = crate::app::quality::run(&command.action, None);
         if mode == "pass" {
             assert!(result.unwrap());
             let value: Value = serde_json::from_slice(&fs::read(&output).unwrap()).unwrap();
@@ -957,7 +957,7 @@ fn direct_equivalent(quality: &Value, root: &Path) {
     args.extend(["--output".into(), output.to_str().unwrap().into()]);
     let command = Command::try_parse_from(args).unwrap();
     assert_eq!(
-        crate::app::quality::run(&command.action).unwrap(),
+        crate::app::quality::run(&command.action, None).unwrap(),
         quality["status"] == "pass"
     );
     let direct: Value = serde_json::from_slice(&fs::read(output).unwrap()).unwrap();
@@ -1454,7 +1454,7 @@ fn configured_artifact_budget_reaches_verify_and_collection_cli() {
                     root.join("collection.json").to_str().unwrap(),
                 ])
                 .unwrap();
-                let result = crate::app::quality::run(&command.action);
+                let result = crate::app::quality::run(&command.action, None);
                 if bytes == 1 {
                     assert!(format!("{:#}", result.unwrap_err())
                         .contains("artifact root exceeds 1 bytes"));
@@ -1464,4 +1464,520 @@ fn configured_artifact_budget_reaches_verify_and_collection_cli() {
             }
         }
     }
+}
+
+// Execute the actual CLI dispatcher in fresh processes while reusing the signed
+// fixture builder. No clock sleeps or installed binary are required.
+#[test]
+fn replay_cli_child_fixture() {
+    use clap::Parser;
+    let Some(args) = std::env::var_os("HARNESS_GATE_REPLAY_TEST_ARGS") else {
+        return;
+    };
+    let args: Vec<String> = serde_json::from_str(&args.to_string_lossy()).unwrap();
+    let cli = crate::cli::Cli::try_parse_from(args).unwrap();
+    match crate::app::run_cli(cli) {
+        Ok(true) => (),
+        Ok(false) => std::process::exit(1),
+        Err(error) => {
+            eprintln!("{error}");
+            std::process::exit(1);
+        }
+    }
+}
+
+fn replay_cli_command(
+    fixture: &Fixture,
+    operation: &str,
+    ledger: Option<&Path>,
+) -> std::process::Command {
+    let root = fixture.dir.path();
+    let mut args = vec!["harness-gate".to_string(), "--color".into(), "never".into()];
+    if let Some(ledger) = ledger {
+        args.extend(["--replay-state-dir".into(), ledger.to_str().unwrap().into()]);
+    }
+    if matches!(
+        operation,
+        "verify" | "staged" | "hook" | "compat" | "compat-staged"
+    ) {
+        args.extend(["--project-root".into(), root.to_str().unwrap().into()]);
+        match operation {
+            "hook" => args.push("hook".into()),
+            "compat" | "compat-staged" => {
+                let staged = operation == "compat-staged";
+                let input = root.join("compat-request.json");
+                write(
+                    &input,
+                    &json!({
+                        "schema_version": 1, "profile": fixture.state.profile,
+                        "staged": staged, "all": !staged, "request_id": "replay-path-override"
+                    }),
+                );
+                args.extend([
+                    "compat".into(),
+                    "run".into(),
+                    "--input".into(),
+                    input.to_str().unwrap().into(),
+                    "--output".into(),
+                    root.join("compat-response.json").to_str().unwrap().into(),
+                ]);
+            }
+            _ => args.extend([
+                "verify".into(),
+                "--profile".into(),
+                fixture.state.profile.clone(),
+                if operation == "staged" {
+                    "--staged"
+                } else {
+                    "--all"
+                }
+                .into(),
+            ]),
+        }
+    } else if operation == "adapter" {
+        let key = root.join("adapter-key.json");
+        write(
+            &key,
+            &json!({
+                "key_id": fixture.policy.trusted_keys[0].key_id,
+                "public_key": fixture.policy.trusted_keys[0].public_key
+            }),
+        );
+        args.extend([
+            "adapter".into(),
+            "run".into(),
+            "--request".into(),
+            root.join(".harness-gate/coverage-request.json")
+                .to_str()
+                .unwrap()
+                .into(),
+            "--trusted-key".into(),
+            key.to_str().unwrap().into(),
+        ]);
+    } else if operation == "collect" {
+        args.extend(["quality".into(), "collect".into()]);
+        for (flag, path) in [
+            ("--repository-root", root.to_path_buf()),
+            ("--state", root.join(".harness-gate/workflow-state.json")),
+            (
+                "--trusted-keys",
+                root.join(".harness-gate/workflow-keys.json"),
+            ),
+            ("--output", root.join("collection.json")),
+        ] {
+            args.extend([flag.into(), path.to_str().unwrap().into()]);
+        }
+    } else {
+        panic!("unknown replay test operation: {operation}");
+    }
+    let mut command = std::process::Command::new(std::env::current_exe().unwrap());
+    command
+        .args([
+            "--exact",
+            "config::quality::collectors::tests::replay_cli_child_fixture",
+            "--nocapture",
+        ])
+        .env(
+            "HARNESS_GATE_REPLAY_TEST_ARGS",
+            serde_json::to_string(&args).unwrap(),
+        );
+    command
+}
+
+fn empty_replay_artifacts(fixture: &Fixture) {
+    let path = fixture.dir.path().join(&fixture.state.artifact_root);
+    fs::remove_dir_all(&path).unwrap();
+    fs::create_dir(&path).unwrap();
+}
+
+#[cfg(unix)]
+#[test]
+fn adapter_cli_uses_external_replay_state_and_rejects_overlap() {
+    let fixture = Fixture::workflow("pass", true, false);
+    let host = tempdir().unwrap();
+    let ledger = host.path().canonicalize().unwrap().join("nonces");
+    let first = replay_cli_command(&fixture, "adapter", Some(&ledger))
+        .output()
+        .unwrap();
+    assert!(
+        first.status.success(),
+        "{} {}",
+        String::from_utf8_lossy(&first.stdout),
+        String::from_utf8_lossy(&first.stderr)
+    );
+    assert_eq!(fs::read_dir(&ledger).unwrap().count(), 1);
+    assert!(fixture.request.artifact_root.join("raw.json").is_file());
+    let default = fixture
+        .dir
+        .path()
+        .join(".harness-gate/.harness-gate-adapter-replay");
+    assert!(!default.exists());
+    assert!(!fixture
+        .dir
+        .path()
+        .join(".harness-gate/collector-nonces")
+        .exists());
+    empty_replay_artifacts(&fixture);
+    let repeated = replay_cli_command(&fixture, "adapter", Some(&ledger))
+        .output()
+        .unwrap();
+    assert!(!repeated.status.success());
+    assert!(String::from_utf8_lossy(&repeated.stderr).contains("nonce has already been used"));
+    assert!(!fixture.request.artifact_root.join("raw.json").exists());
+    assert_eq!(fs::read_dir(&ledger).unwrap().count(), 1);
+    for overlap in [
+        fixture.request.artifact_root.clone(),
+        fixture.request.artifact_root.join("nonces"),
+        fixture.dir.path().canonicalize().unwrap(),
+    ] {
+        let output = replay_cli_command(&fixture, "adapter", Some(&overlap))
+            .output()
+            .unwrap();
+        assert!(!output.status.success());
+        assert!(String::from_utf8_lossy(&output.stderr).contains("must be separate"));
+        assert!(!fixture.request.artifact_root.join("raw.json").exists());
+    }
+    assert!(!default.exists());
+}
+
+#[cfg(unix)]
+#[test]
+fn staged_hook_and_compat_use_external_replay_state() {
+    for operation in ["staged", "hook", "compat-staged", "compat"] {
+        let mut fixture = Fixture::workflow("pass", true, false);
+        fixture.select_profile("hook", true);
+        let root = fixture.dir.path();
+        let mut files: Vec<_> = fixture.state.config_files.keys().cloned().collect();
+        files.extend([
+            "src/lib.rs".into(),
+            "execution.py".into(),
+            ".harness-gate/audit.toml".into(),
+            ".harness-gate/secrets.toml".into(),
+        ]);
+        assert!(std::process::Command::new("git")
+            .arg("add")
+            .args(&files)
+            .current_dir(root)
+            .status()
+            .unwrap()
+            .success());
+        let host = tempdir().unwrap();
+        let ledger = host.path().canonicalize().unwrap().join("nonces");
+        let output = replay_cli_command(&fixture, operation, Some(&ledger))
+            .output()
+            .unwrap();
+        assert!(
+            output.status.success(),
+            "{operation}: {} {}",
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        );
+        // This partial profile has no collector. The host still binds precisely
+        // the configured external ledger before evaluating quality participation.
+        assert!(ledger.is_dir(), "override was dropped by {operation}");
+        assert_eq!(fs::read_dir(&ledger).unwrap().count(), 0);
+        assert!(!root.join(".harness-gate/collector-nonces").exists());
+        let report: Value = serde_json::from_slice(
+            &fs::read(root.join(".harness-gate/reports/test_result.json")).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(
+            report["quality"]["status"], "not_collected",
+            "{operation}: {report}"
+        );
+        if operation.starts_with("compat") {
+            let result: Value =
+                serde_json::from_slice(&fs::read(root.join("compat-response.json")).unwrap())
+                    .unwrap();
+            assert_eq!(result["passed"], true);
+            assert_eq!(result["invocation_id"], report["invocation_id"]);
+        }
+        // A bad override must fail instead of silently using the repository
+        // default, including after staged snapshot and compatibility cloning.
+        let missing = host.path().canonicalize().unwrap().join("missing/nonces");
+        let output = replay_cli_command(&fixture, operation, Some(&missing))
+            .output()
+            .unwrap();
+        assert!(
+            !output.status.success(),
+            "bad override ignored by {operation}"
+        );
+        let report: Value = serde_json::from_slice(
+            &fs::read(root.join(".harness-gate/reports/test_result.json")).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(report["quality"]["status"], "blocked");
+        assert!(report["quality"]["error"]
+            .as_str()
+            .unwrap()
+            .contains("adapter replay state"));
+        assert!(!root.join(".harness-gate/collector-nonces").exists());
+    }
+}
+
+#[cfg(unix)]
+#[test]
+fn compat_collectors_claim_only_the_configured_external_ledger() {
+    let fixture = Fixture::workflow("pass", true, false);
+    let host = tempdir().unwrap();
+    let ledger = host.path().canonicalize().unwrap().join("nonces");
+    let output = replay_cli_command(&fixture, "compat", Some(&ledger))
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "{} {}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert_eq!(fs::read_dir(&ledger).unwrap().count(), 1);
+    assert!(!fixture
+        .dir
+        .path()
+        .join(".harness-gate/collector-nonces")
+        .exists());
+    empty_replay_artifacts(&fixture);
+    let output = replay_cli_command(&fixture, "compat", Some(&ledger))
+        .output()
+        .unwrap();
+    assert!(!output.status.success());
+    let report: Value = serde_json::from_slice(
+        &fs::read(
+            fixture
+                .dir
+                .path()
+                .join(".harness-gate/reports/test_result.json"),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert!(report["quality"]["error"]
+        .as_str()
+        .unwrap()
+        .contains("nonce has already been used"));
+    assert!(!fixture.request.artifact_root.join("raw.json").exists());
+    assert_eq!(fs::read_dir(&ledger).unwrap().count(), 1);
+}
+
+#[cfg(unix)]
+#[test]
+fn verify_and_collect_share_durable_nonces_across_processes_and_empty_artifacts() {
+    for external in [false, true] {
+        for (first, second) in [
+            ("verify", "verify"),
+            ("verify", "collect"),
+            ("collect", "verify"),
+        ] {
+            let mut fixture = Fixture::workflow("pass", true, false);
+            let host = tempdir().unwrap();
+            let ledger = external.then(|| host.path().canonicalize().unwrap().join("nonces"));
+            let output = replay_cli_command(&fixture, first, ledger.as_deref())
+                .output()
+                .unwrap();
+            assert!(
+                output.status.success(),
+                "{first}: {} {}",
+                String::from_utf8_lossy(&output.stdout),
+                String::from_utf8_lossy(&output.stderr)
+            );
+            empty_replay_artifacts(&fixture);
+            let output = replay_cli_command(&fixture, second, ledger.as_deref())
+                .output()
+                .unwrap();
+            assert!(
+                !output.status.success(),
+                "replay accepted: {first} -> {second}"
+            );
+            let artifact_root = fixture.dir.path().join(&fixture.state.artifact_root);
+            assert!(
+                fs::read_dir(&artifact_root).unwrap().next().is_none(),
+                "replayed collector executed"
+            );
+            if second == "verify" {
+                let report: Value = serde_json::from_slice(
+                    &fs::read(
+                        fixture
+                            .dir
+                            .path()
+                            .join(".harness-gate/reports/test_result.json"),
+                    )
+                    .unwrap(),
+                )
+                .unwrap();
+                assert!(
+                    report["quality"]["error"]
+                        .as_str()
+                        .unwrap()
+                        .contains("nonce has already been used"),
+                    "{report}"
+                );
+            } else {
+                assert!(
+                    String::from_utf8_lossy(&output.stderr).contains("nonce has already been used")
+                );
+                assert!(!fixture.dir.path().join("collection.json").exists());
+            }
+            fixture.request.nonce.push_str("-fresh");
+            fixture.sign();
+            write(
+                &fixture.dir.path().join(".harness-gate/workflow-state.json"),
+                &fixture.state,
+            );
+            let output = replay_cli_command(&fixture, second, ledger.as_deref())
+                .output()
+                .unwrap();
+            assert!(
+                output.status.success(),
+                "fresh nonce failed: {} {}",
+                String::from_utf8_lossy(&output.stdout),
+                String::from_utf8_lossy(&output.stderr)
+            );
+            assert!(artifact_root.join("raw.json").exists());
+        }
+    }
+}
+
+#[cfg(unix)]
+#[test]
+fn concurrent_collection_processes_execute_at_most_one_collector() {
+    let fixture = Fixture::workflow("pass", true, false);
+    let host = tempdir().unwrap();
+    let ledger = host.path().canonicalize().unwrap().join("nonces");
+    let mut children = Vec::new();
+    for _ in 0..6 {
+        children.push(
+            replay_cli_command(&fixture, "collect", Some(&ledger))
+                .stdout(std::process::Stdio::null())
+                .stderr(std::process::Stdio::null())
+                .spawn()
+                .unwrap(),
+        );
+    }
+    let successes: usize = children
+        .into_iter()
+        .map(|mut child| usize::from(child.wait().unwrap().success()))
+        .sum();
+    assert_eq!(successes, 1);
+    assert_eq!(fs::read_dir(ledger).unwrap().count(), 1);
+    assert!(fixture.dir.path().join("target/evidence/raw.json").exists());
+}
+
+#[cfg(unix)]
+#[test]
+fn read_only_source_configuration_uses_external_host_ledger() {
+    use std::os::unix::fs::PermissionsExt;
+    let fixture = Fixture::workflow("pass", true, false);
+    let host = tempdir().unwrap();
+    let ledger = host.path().canonicalize().unwrap().join("nonces");
+    let root = fixture.dir.path();
+    // Provision output separately before removing source-directory write access.
+    fs::create_dir_all(root.join(".harness-gate/reports")).unwrap();
+    fs::create_dir_all(root.join("target/quality")).unwrap();
+    let mut source_files: Vec<_> = fs::read_dir(root.join(".harness-gate"))
+        .unwrap()
+        .map(|entry| entry.unwrap().path())
+        .filter(|path| path.is_file())
+        .collect();
+    source_files.extend([
+        root.join("src/lib.rs"),
+        root.join("execution.py"),
+        root.join("collector.py"),
+    ]);
+    let permissions: Vec<_> = source_files
+        .iter()
+        .map(|path| (path.clone(), fs::metadata(path).unwrap().permissions()))
+        .collect();
+    for path in &source_files {
+        let mode = if path.file_name().unwrap() == "collector.py" {
+            0o500
+        } else {
+            0o400
+        };
+        fs::set_permissions(path, fs::Permissions::from_mode(mode)).unwrap();
+    }
+    for path in [
+        root.to_path_buf(),
+        root.join("src"),
+        root.join(".harness-gate"),
+    ] {
+        fs::set_permissions(path, fs::Permissions::from_mode(0o500)).unwrap();
+    }
+    let first = replay_cli_command(&fixture, "verify", Some(&ledger))
+        .output()
+        .unwrap();
+    empty_replay_artifacts(&fixture);
+    let second = replay_cli_command(&fixture, "collect", Some(&ledger))
+        .output()
+        .unwrap();
+    for (path, permission) in permissions {
+        fs::set_permissions(path, permission).unwrap();
+    }
+    for path in [
+        root.to_path_buf(),
+        root.join("src"),
+        root.join(".harness-gate"),
+    ] {
+        fs::set_permissions(path, fs::Permissions::from_mode(0o700)).unwrap();
+    }
+    assert!(
+        first.status.success(),
+        "{} {}",
+        String::from_utf8_lossy(&first.stdout),
+        String::from_utf8_lossy(&first.stderr)
+    );
+    assert!(!second.status.success());
+    assert!(String::from_utf8_lossy(&second.stderr).contains("nonce has already been used"));
+    assert!(fs::read_dir(root.join("target/evidence"))
+        .unwrap()
+        .next()
+        .is_none());
+    assert!(!root.join(".harness-gate/collector-nonces").exists());
+}
+
+#[cfg(unix)]
+#[test]
+fn verify_rejects_ledger_replaced_by_an_execution_step_before_collecting() {
+    let mut fixture = Fixture::workflow("pass", true, false);
+    let host = tempdir().unwrap();
+    let ledger = host.path().canonicalize().unwrap().join("nonces");
+    fs::write(fixture.dir.path().join("execution.py"), format!(
+        "from pathlib import Path\np=Path({:?})\np.rename(p.with_name('old'))\np.symlink_to(p.with_name('old'), target_is_directory=True)\n", ledger.to_str().unwrap()
+    )).unwrap();
+    // The execution script is an ordinary project step, not a trusted ledger
+    // writer; this simulates a sandbox failure without weakening source pins.
+    fixture.pin();
+    write(
+        &fixture.dir.path().join(".harness-gate/workflow-state.json"),
+        &fixture.state,
+    );
+    let output = replay_cli_command(&fixture, "verify", Some(&ledger))
+        .output()
+        .unwrap();
+    assert!(!output.status.success());
+    let report: Value = serde_json::from_slice(
+        &fs::read(
+            fixture
+                .dir
+                .path()
+                .join(".harness-gate/reports/test_result.json"),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(report["steps"][0]["passed"], true);
+    assert!(
+        report["quality"]["error"]
+            .as_str()
+            .unwrap()
+            .contains("adapter replay state"),
+        "{report}"
+    );
+    assert!(fs::read_dir(fixture.dir.path().join("target/evidence"))
+        .unwrap()
+        .next()
+        .is_none());
+    assert!(fs::read_dir(host.path().join("old"))
+        .unwrap()
+        .next()
+        .is_none());
 }
