@@ -426,7 +426,21 @@ mod tests {
         std::fs::write(&file, "not a directory").unwrap();
         assert!(Ledger::open(&file).is_err());
         assert!(Ledger::open(&root.join("missing/ledger")).is_err());
-        assert!(Ledger::open(&root.join("artifacts/../ledger")).is_err());
+        // PathBuf::join normalizes '..' when the Windows base is verbatim.
+        // Append raw native separators so Ledger receives the traversal input.
+        let separator = std::path::MAIN_SEPARATOR;
+        let mut traversal = root.as_os_str().to_os_string();
+        traversal.push(format!(
+            "{separator}artifacts{separator}..{separator}ledger"
+        ));
+        let traversal = PathBuf::from(traversal);
+        assert!(traversal
+            .components()
+            .any(|c| matches!(c, Component::ParentDir)));
+        assert!(Ledger::open(&traversal)
+            .unwrap_err()
+            .to_string()
+            .contains("parent traversal is forbidden"));
     }
 
     #[cfg(unix)]
