@@ -16,7 +16,7 @@ import uuid
 from critical_paths import require_committed_sources
 from production_coverage import require
 from quality_common import ROOT, git_sha, metadata, sha256, write_json
-from source_measure import SOURCE_FILES
+from source_measure import SOURCE_FILES, compiler_configuration
 
 COMMON = ('test', 'test-cross-platform', 'security-audit', 'fmt', 'clippy', 'build', 'quality-coverage',
           'quality-contracts', 'docs-consistency', 'release-contracts', 'quality-scripts')
@@ -147,20 +147,21 @@ class Collector:
         self.command('analyzer-build', ['cargo', 'build', '--locked', '--manifest-path',
                                       str(ROOT / 'tools/quality/rust-measure/Cargo.toml')])
         binary = Path(self.environment['CARGO_TARGET_DIR']) / 'debug/harness-gate-rust-measure'
+        target = compiler_configuration()['target']
         for label, commit in (('base', base), ('head', head)):
             snapshot = self.snapshot(label, commit)
             crate = snapshot / 'tools/harness-gate'
             manifest = self.directory / f'{label}-manifest.json'
             self.python(f'{label}-prepare', 'source_measure.py', 'prepare', '--crate', crate,
-                        '--binary', binary, '--manifest', manifest)
+                        '--binary', binary, '--manifest', manifest, '--target', target)
             # Include the separate base core package and linked head core in the same series.
             cargo_manifest = str(crate / 'Cargo.toml')
             self.command(f'{label}-coverage', ['cargo', 'llvm-cov', 'nextest', '--workspace', '--locked',
-                         '--manifest-path', cargo_manifest, '--json', '--output-path',
+                         '--manifest-path', cargo_manifest, '--target', target, '--json', '--output-path',
                          str(self.directory / f'{label}-coverage.json')])
             for flag, suffix in (('--lcov', 'lcov'), ('--cobertura', 'cobertura.xml')):
                 self.command(f'{label}-{suffix}', ['cargo', 'llvm-cov', 'report', '--workspace', '--manifest-path',
-                             cargo_manifest, flag, '--output-path', str(self.directory / f'{label}-coverage.{suffix}')])
+                             cargo_manifest, '--target', target, flag, '--output-path', str(self.directory / f'{label}-coverage.{suffix}')])
             # A complete base report may contain historical selected failures.
             # The compare command enforces every selected head threshold.
             self.python(f'{label}-measure', 'source_measure.py', 'measure', '--crate', crate,
@@ -186,7 +187,7 @@ class Collector:
         (self.directory / 'risk.md').write_text('# Candidate function risk\n\n'
             f'Base: `{base}`\n\nHead: `{head}`\n\n'
             f"Identities: {len(comparison['identities'])}; failures: {len(comparison['failures'])}.\n\n"
-            'Scope: GH-94 files, staged snapshot input, CLI dispatch, quality configuration, preset composition and all linked generic-core production sources. Raw counters, exact rational CRAP and historical debt are retained in head-risk.json. '
+            'Scope: GH-94 files, staged snapshot input, adapter replay, project discovery, CLI dispatch, quality configuration, preset composition and all linked generic-core production sources. Raw counters, exact rational CRAP and historical debt are retained in head-risk.json. '
             'Branch coverage is unsupported. This candidate is not an accepted baseline.\n')
 
     def matrix(self):
