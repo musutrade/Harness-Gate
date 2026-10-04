@@ -107,11 +107,14 @@ fn read(path: &PathBuf) -> Result<Value> {
         .with_context(|| format!("parse {}", path.display()))
 }
 
-pub(crate) fn run(action: &QualityAction) -> Result<bool> {
+pub(crate) fn run(
+    action: &QualityAction,
+    replay_state_dir: Option<&std::path::Path>,
+) -> Result<bool> {
     match action {
         QualityAction::Compile(args) => compile_inputs(args),
         QualityAction::Evaluate(args) => evaluate(args),
-        QualityAction::Collect(args) => collect(args),
+        QualityAction::Collect(args) => collect(args, replay_state_dir),
         QualityAction::Baseline(args) => {
             let state = read_state(&args.state)?;
             let request = args
@@ -130,7 +133,7 @@ pub(crate) fn run(action: &QualityAction) -> Result<bool> {
     }
 }
 
-fn collect(args: &CollectArgs) -> Result<bool> {
+fn collect(args: &CollectArgs, replay_state_dir: Option<&std::path::Path>) -> Result<bool> {
     let state = read_state(&args.inputs.state);
     if let Ok(state) = &state {
         protect_output(&args.inputs.output, &args.inputs.repository_root, state)?;
@@ -166,14 +169,16 @@ fn collect(args: &CollectArgs) -> Result<bool> {
             .map(|limits| limits.max_artifact_bytes)
             .or(HostPolicy::default().max_artifact_bytes),
         trusted_keys,
-        replay_state_dir: Some(
-            args.inputs
-                .repository_root
-                .join(".harness-gate/collector-nonces"),
-        ),
         ..HostPolicy::default()
     };
-    let collection = collectors::collect(&args.inputs.repository_root, &state?, &policy)?;
+    let state = state?;
+    let policy = crate::process::replay::collector_policy(
+        policy,
+        &root,
+        replay_state_dir,
+        &root.join(&state.artifact_root),
+    )?;
+    let collection = collectors::collect(&args.inputs.repository_root, &state, &policy)?;
     crate::utils::fs::atomic_write(
         &args.inputs.output,
         format!("{}\n", serde_json::to_string_pretty(&collection)?),
