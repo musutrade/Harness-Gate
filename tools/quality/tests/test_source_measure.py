@@ -11,7 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "tools/quality"))
-from source_measure import HOTSPOTS, SERIES, SOURCE_FILES, prepare, ast, closure_name, compare, complexity, digest, instrument, measure, original_point
+from source_measure import HOTSPOTS, SERIES, SOURCE_FILES, prepare, ast, closure_name, compare, compiler_configuration, complexity, digest, instrument, measure, original_point
 
 
 class SourceMeasureTests(unittest.TestCase):
@@ -23,11 +23,86 @@ class SourceMeasureTests(unittest.TestCase):
                        env={**os.environ, "CARGO_TARGET_DIR": str(target)}, check=True, capture_output=True)
         cls.binary = target / "debug/harness-gate-rust-measure"
 
-    def inventory(self, source):
+    def inventory(self, source, target=None):
         with tempfile.TemporaryDirectory() as temp:
             file = Path(temp) / "input.rs"
             file.write_text(source)
-            return ast(file, self.binary)
+            return ast(file, self.binary, compiler_configuration(target))
+
+    def test_compiler_target_filters_modules_methods_fields_and_body_blocks(self):
+        source = '''
+struct State { #[cfg(windows)] handle: usize, #[cfg(unix)] fd: usize }
+#[cfg(unix)] mod platform { fn open() { if true {} } }
+#[cfg(windows)] mod platform { fn open() { if true {} if true {} } }
+impl State { #[cfg(unix)] fn unix() {} #[cfg(windows)] fn windows() {} }
+trait Run { #[cfg(unix)] fn unix() {} #[cfg(windows)] fn windows() {} }
+#[cfg(not(test))]
+fn both() {
+    #[cfg(unix)] { if true {} }
+    #[cfg(windows)] { if true {} if true {} let hidden = || if true {}; }
+    #[cfg(test)] { unsupported!(a => b); }
+}
+#[cfg(test)] mod tests { #[test] fn ignored() { unsupported!(a => b); } }
+#[cfg(all(test, unix))] mod external_tests;
+#[test] fn ignored_function() { unsupported!(a => b); }
+'''
+        unix = self.inventory(source, 'x86_64-unknown-linux-gnu')
+        windows = self.inventory(source, 'x86_64-pc-windows-msvc')
+        self.assertIn('unix', unix['configuration']['cfg'])
+        self.assertIn('windows', windows['configuration']['cfg'])
+        self.assertEqual([s['name'] for s in unix['symbols']], ['platform::open', 'State::unix', 'unix', 'both'])
+        self.assertEqual([complexity(s['raw']) for s in unix['symbols']], [2, 1, 1, 2])
+        self.assertEqual([s['name'] for s in windows['symbols']], ['platform::open', 'State::windows', 'windows', 'both', 'both::closure_10_58'])
+        self.assertEqual([complexity(s['raw']) for s in windows['symbols']], [3, 1, 1, 3, 2])
+        for result in (unix, windows):
+            self.assertTrue(result['excluded'])
+            self.assertFalse(any(s['test'] for s in result['symbols']))
+
+    def test_unsupported_configuration_fails_without_partial_inventory(self):
+        for source in (
+            '#[cfg(feature="extra")] fn f() {}',
+            '#[cfg(any(unix, windows))] fn f() {}',
+            '#[cfg(target_os="linux")] fn f() {}',
+            '#[cfg(not(not(test)))] fn f() {}',
+            '#[cfg(all(test, feature="extra"))] mod unsupported;',
+            '#[cfg_attr(unix, inline)] fn f() {}',
+            '#[cfg(windows)] #[cfg(feature="extra")] fn f() {}',
+            'fn f() { let x = #[cfg(windows)] { 1 }; }',
+            'fn f() { println!("{}", #[cfg(unix)] { 1 }); }',
+        ):
+            with self.subTest(source=source), tempfile.TemporaryDirectory() as temp:
+                file = Path(temp) / 'input.rs'; file.write_text(source)
+                result = subprocess.run([str(self.binary), str(file), '--target-cfg'],
+                                        input=json.dumps(compiler_configuration()), text=True, capture_output=True)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn('unsupported', result.stderr)
+                self.assertEqual(result.stdout, '')
+
+    def test_replay_and_project_sources_are_measured_for_the_host_target(self):
+        for path in ('process/replay.rs', 'project/discovery.rs', 'project/mod.rs'):
+            with self.subTest(path=path):
+                self.assertIn(path, SOURCE_FILES)
+                source = ROOT / 'tools/harness-gate/src' / path
+                result = ast(source, self.binary)
+                self.assertTrue(result['symbols'])
+                self.assertFalse(any(s['test'] for s in result['symbols']))
+                if path == 'process/replay.rs':
+                    names = {s['name'] for s in result['symbols']}
+                    self.assertIn('platform::open_at', names)
+                    self.assertNotIn('platform::open_directory', names)
+                    windows = ast(source, self.binary, compiler_configuration('x86_64-pc-windows-msvc'))
+                    windows_names = {s['name'] for s in windows['symbols']}
+                    self.assertIn('platform::open_directory', windows_names)
+                    self.assertNotIn('platform::open_at', windows_names)
+
+    def test_compare_rejects_mixed_target_configurations(self):
+        base = {'series': SERIES, 'tools': {}, 'configuration': compiler_configuration(), 'functions': []}
+        head = dict(base, configuration=compiler_configuration('x86_64-pc-windows-msvc'))
+        with self.assertRaisesRegex(ValueError, 'incompatible base/head target configurations'):
+            compare(base, head)
+        del base['configuration']; del head['configuration']
+        with self.assertRaisesRegex(ValueError, 'incompatible base/head target configurations'):
+            compare(base, head)
 
     def test_native_inventory_has_separate_identity_and_contracts(self):
         subprocess.run(["cargo", "test", "--locked", "--manifest-path",
@@ -113,9 +188,9 @@ fn outer(xs: &[bool]) -> bool {
 #[cfg(test)] mod tests { #[test] fn only_test() {} }
 '''
         symbols = self.inventory(source)["symbols"]
-        self.assertEqual([s["name"] for s in symbols], ["outer", "outer::nested", "outer::closure_5_34", "tests::only_test"])
-        self.assertEqual([complexity(s["raw"]) for s in symbols], [4, 2, 2, 1])
-        self.assertEqual([s["test"] for s in symbols], [False, False, False, True])
+        self.assertEqual([s["name"] for s in symbols], ["outer", "outer::nested", "outer::closure_5_34"])
+        self.assertEqual([complexity(s["raw"]) for s in symbols], [4, 2, 2])
+        self.assertEqual([s["test"] for s in symbols], [False, False, False])
         self.assertEqual(symbols[0]["raw"]["nested_functions"], 1)
         self.assertNotIn("and_and", symbols[0]["raw"])
         controls = self.inventory('''fn controls(mut xs: impl Iterator<Item=bool>) -> Option<()> {
@@ -162,7 +237,7 @@ fn outer(xs: &[bool]) -> bool {
                                  crap_exact=[1, 1], passed=True))
         closure = dict(rows[0], name="run_check::closure_1_1", kind="closure", syntax_sha256="b" * 64,
                        passed=False, crap_exact=[2, 1])
-        base = {"series": SERIES, "tools": {"fixture": "same"}, "functions": rows + [closure]}
+        base = {"series": SERIES, "configuration": compiler_configuration(), "tools": {"fixture": "same"}, "functions": rows + [closure]}
         head = copy.deepcopy(base)
         head["functions"][-1]["name"] = "check_path::closure_2_1"
         head["functions"][-1]["span"] = [2, 1, 2, 20]
@@ -210,7 +285,14 @@ fn outer(xs: &[bool]) -> bool {
     def test_instrumentation_distinguishes_unexecuted_closure_and_rejects_missing_evidence(self):
         source = '''struct Step { passed: bool }
 #[inline(never)]
-fn field_only(steps: &[Step]) -> bool { steps.iter().all(|step| step.passed) }
+fn field_only(steps: &[Step]) -> bool {
+    #[cfg(windows)] {
+        let hidden = || if true { 10 } else { 20 };
+        unsupported!(a => b);
+    }
+    steps.iter().all(|step| step.passed)
+}
+#[cfg(test)] mod tests { #[test] fn ignored() { unsupported!(a => b); } }
 fn main() {
     let empty = std::env::args().nth(1).unwrap() == "empty";
     if empty { assert!(field_only(&[])); }
@@ -224,9 +306,10 @@ fn main() {
             file = crate / "quality-core/fixture.rs"
             file.write_text(source)
             inventory = ast(file, self.binary)
+            self.assertEqual(len([s for s in inventory['symbols'] if s['kind'] == 'closure']), 1)
             transformed, edits = instrument(source, inventory)
             file.write_text(transformed)
-            manifest = {"series": SERIES, "files": {"../quality-core/fixture.rs": {
+            manifest = {"series": SERIES, "configuration": compiler_configuration(), "files": {"../quality-core/fixture.rs": {
                 "original": source, "original_sha256": digest(source.encode()),
                 "instrumented_sha256": digest(transformed.encode()), "edits": edits, "inventory": inventory}}}
             executable = crate / "fixture"
@@ -242,6 +325,8 @@ fn main() {
                 subprocess.run([str(llvm_bin / "llvm-profdata"), "merge", "-sparse", str(raw), "-o", str(profile)], check=True, capture_output=True)
                 llvm = json.loads(subprocess.check_output([str(llvm_bin / "llvm-cov"), "export", str(executable), f"-instr-profile={profile}"]))
                 results[mode] = measure(manifest, llvm, crate, self.binary)
+                parent = next(row for row in results[mode] if row['name'] == 'field_only')
+                self.assertLessEqual(parent['lines']['count'], 3, 'uncompiled body lines must leave the denominator')
             closures = {mode: next(s for s in rows if s["kind"] == "closure") for mode, rows in results.items()}
             self.assertEqual(closures["empty"]["instances"][0]["count"], 0)
             self.assertEqual(closures["empty"]["lines"]["covered"], 0)

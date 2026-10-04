@@ -60,6 +60,9 @@ class RiskScopeTests(unittest.TestCase):
             collector = gate.Collector(Path(temporary) / 'candidate', 'base', 'head', 'scope-test')
             for path, supported in (
                 ('tools/harness-gate/src/process/tests.rs', True),
+                ('tools/harness-gate/src/process/replay.rs', True),
+                ('tools/harness-gate/src/project/discovery.rs', True),
+                ('tools/harness-gate/src/project/mod.rs', True),
                 ('tools/harness-gate/src/process/unknown.rs', False),
                 ('tools/harness-gate/src/process/tests/unknown.rs', False),
                 ('tools/harness-gate/src/unknown/tests.rs', False),
