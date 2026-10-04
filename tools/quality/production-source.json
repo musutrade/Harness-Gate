@@ -125,6 +125,7 @@
         "src/process/isolation.rs",
         "src/process/mod.rs",
         "src/process/reader.rs",
+        "src/process/replay.rs",
         "src/process/signal.rs",
         "src/process/task.rs"
       ]
@@ -367,7 +368,7 @@
     {
       "path": "src/process/mod.rs",
       "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
-      "sha256": "96373822a3f5f1aa1d87bab33834f76d220b9485e885f535f638d2899218a7dc"
+      "sha256": "feca5b47192877daa1564a7c56e135d168de28390de3601ebd5f886e2d6ee880"
     },
     {
       "path": "src/scope/mod.rs",
