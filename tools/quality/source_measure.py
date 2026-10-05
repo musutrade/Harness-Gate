@@ -62,7 +62,7 @@ def compiler_configuration(target=None) -> dict:
 def ast(source: Path, binary: Path, configuration=None) -> dict:
     configuration = compiler_configuration() if configuration is None else configuration
     result = json.loads(subprocess.check_output([str(binary.resolve()), str(source), "--target-cfg"],
-                                               input=json.dumps(configuration), text=True))
+                                               input=json.dumps(configuration), encoding="utf-8"))
     require((result.get("analyzer"), result.get("version"), result.get("rule")) ==
             ("harness-gate-rust-measure", "0.3.1", "mccabe-rust-3"), "incompatible AST analyzer")
     require(result.get("configuration") == configuration, "AST target configuration mismatch")
@@ -138,12 +138,12 @@ def prepare(crate: Path, binary: Path, paths=None, target=None) -> dict:
             require(path not in HOTSPOTS, f"missing selected source: {path}")
             manifest["absent_sources"].append(path)
             continue
-        source = file.read_text()
+        source = file.read_text(encoding="utf-8")
         inventory = ast(file, binary, configuration)
         transformed, edits = instrument(source, inventory)
         manifest["files"][path] = {"original": source, "original_sha256": digest(source.encode()),
             "instrumented_sha256": digest(transformed.encode()), "inventory": inventory, "edits": edits}
-        file.write_text(transformed)
+        file.write_bytes(transformed.encode())
     return manifest
 
 
@@ -174,10 +174,10 @@ def measure(manifest: dict, llvm: dict, crate: Path, binary: Path) -> list[dict]
         require((crate / "src" / path).read_bytes() == transformed.encode(), "instrumented source mismatch")
         # Reparse original source without changing the measured source file.
         import tempfile
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".rs") as tmp:
-            tmp.write(source)
-            tmp.flush()
-            require(ast(Path(tmp.name), binary, configuration) == file["inventory"], "AST inventory does not reproduce")
+        with tempfile.TemporaryDirectory() as temp:
+            original = Path(temp) / "original.rs"
+            original.write_bytes(source.encode())
+            require(ast(original, binary, configuration) == file["inventory"], "AST inventory does not reproduce")
         excluded[path] = [byte_span(source, span) for span in file["inventory"]["excluded"]]
         for symbol in file["inventory"]["symbols"]:
             span = byte_span(source, symbol["span"])
@@ -188,7 +188,7 @@ def measure(manifest: dict, llvm: dict, crate: Path, binary: Path) -> list[dict]
             require(key not in symbols, "duplicate AST symbol")
             symbols[key] = {**symbol, "instances": [], "regions": {}}
     names = json.loads(subprocess.check_output([str(binary.resolve()), "--demangle"],
-        input=json.dumps([f["name"] for f in llvm["data"][0]["functions"]]), text=True))
+        input=json.dumps([f["name"] for f in llvm["data"][0]["functions"]]), encoding="utf-8"))
     for index, function in enumerate(llvm["data"][0]["functions"]):
         require(function["regions"], "LLVM function without regions")
         first = function["regions"][0]
