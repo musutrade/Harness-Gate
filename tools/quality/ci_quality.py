@@ -146,7 +146,7 @@ class Collector:
                 + ', '.join(unsupported))
         self.command('analyzer-build', ['cargo', 'build', '--locked', '--manifest-path',
                                       str(ROOT / 'tools/quality/rust-measure/Cargo.toml')])
-        binary = Path(self.environment['CARGO_TARGET_DIR']) / 'debug/harness-gate-rust-measure'
+        binary = Path(self.environment['CARGO_TARGET_DIR']) / 'debug' / ('harness-gate-rust-measure' + ('.exe' if os.name == 'nt' else ''))
         target = compiler_configuration()['target']
         for label, commit in (('base', base), ('head', head)):
             snapshot = self.snapshot(label, commit)
