@@ -554,8 +554,11 @@ harness-gate adapter run \
 host 使用协议 v2，在启动前校验覆盖完整请求的 Ed25519 签名（adapter 身份、invocation/step、
 参数、输入、环境、能力、超时、配置摘要、产物根目录、nonce 和有效期）以及可执行文件
 SHA-256；清空继承环境，执行协议级能力白名单，限制 stdout/stderr 和产物预算，并拒绝
-malformed 结果或越过 invocation 根目录的产物。nonce 在 host policy（CLI 另有持久化 sidecar）
-下只允许使用一次；超限、超时、取消、重放和其他协议错误统一记录为
+malformed 结果或越过 invocation 根目录的产物。nonce 只允许使用一次；`verify` 与
+`quality collect` 共用持久化 ledger。只读快照或不可信测试环境应通过全局
+`--replay-state-dir PATH` 指定挂载之外的可信宿主状态，`adapter run` 也可共用该路径。
+[作用域与生命周期](docs/quality-collectors.md#durable-replay-protection)包含隔离和清理要求。
+超限、超时、取消、重放和其他协议错误统一记录为
 `ADAPTER_PROTOCOL_FAILURE`。
 
 请求是一个独立的 JSON 文档，不从 `flow.toml` 读取，也不会自动启用内置步骤的

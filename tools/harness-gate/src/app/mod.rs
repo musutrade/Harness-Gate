@@ -13,10 +13,15 @@ use std::collections::BTreeSet;
 use std::fs;
 
 pub(crate) fn run() -> Result<bool, CliError> {
-    let cli = Cli::parse();
+    run_cli(Cli::parse())
+}
+
+pub(crate) fn run_cli(cli: Cli) -> Result<bool, CliError> {
     crate::ui::configure(cli.color);
     match &cli.command {
-        Commands::Quality { action } => quality::run(action).map_err(Into::into),
+        Commands::Quality { action } => {
+            quality::run(action, cli.replay_state_dir.as_deref()).map_err(Into::into)
+        }
         Commands::Init { preset, force } => {
             crate::preset::init(&standalone_root(&cli)?, preset, *force)?;
             Ok(true)
@@ -25,7 +30,7 @@ pub(crate) fn run() -> Result<bool, CliError> {
             crate::preset::print_presets();
             Ok(true)
         }
-        Commands::Adapter { action } => run_adapter(action),
+        Commands::Adapter { action } => run_adapter(action, cli.replay_state_dir.as_deref()),
         Commands::Compat {
             action: CompatAction::Compare { old, new, output },
         } => compare_files(old, new, output),
@@ -83,7 +88,12 @@ pub(crate) fn run() -> Result<bool, CliError> {
                 format: ConfigFormat::Json,
             },
         } => check_config_json(standalone_root(&cli)?, cli.config.clone()),
-        _ => run_project(cli.project_root, cli.config, cli.command),
+        _ => run_project(
+            cli.project_root,
+            cli.config,
+            cli.command,
+            cli.replay_state_dir,
+        ),
     }
 }
 
@@ -94,7 +104,10 @@ fn standalone_root(cli: &Cli) -> Result<std::path::PathBuf, CliError> {
         .unwrap_or(std::env::current_dir().context("read current directory")?))
 }
 
-fn run_adapter(action: &AdapterAction) -> Result<bool, CliError> {
+fn run_adapter(
+    action: &AdapterAction,
+    replay_state_dir: Option<&std::path::Path>,
+) -> Result<bool, CliError> {
     let AdapterAction::Run {
         request,
         trusted_keys,
@@ -121,9 +134,16 @@ fn run_adapter(action: &AdapterAction) -> Result<bool, CliError> {
             resources: allow_resources.iter().cloned().collect::<BTreeSet<_>>(),
             environment: allow_environment.iter().cloned().collect::<BTreeSet<_>>(),
         },
-        replay_state_dir: request_path
-            .parent()
-            .map(|parent| parent.join(".harness-gate-adapter-replay")),
+        replay_state_dir: Some(
+            replay_state_dir
+                .map(std::path::Path::to_path_buf)
+                .unwrap_or_else(|| {
+                    request_path
+                        .parent()
+                        .unwrap_or(std::path::Path::new("."))
+                        .join(".harness-gate-adapter-replay")
+                }),
+        ),
         ..crate::process::HostPolicy::default()
     };
     let outcome = crate::process::run_adapter(request, &policy)
@@ -214,6 +234,7 @@ fn run_project(
     root: Option<std::path::PathBuf>,
     config: Option<std::path::PathBuf>,
     command: Commands,
+    replay_state_dir: Option<std::path::PathBuf>,
 ) -> Result<bool, CliError> {
     let is_config_check = matches!(
         &command,
@@ -221,7 +242,7 @@ fn run_project(
             action: ConfigAction::Check { .. }
         }
     );
-    let project = match Project::discover(root, config) {
+    let mut project = match Project::discover(root, config) {
         Ok(project) => project,
         Err(error) if is_config_check => {
             print_human_config_error(&error);
@@ -229,6 +250,7 @@ fn run_project(
         }
         Err(error) => return Err(error.into()),
     };
+    project.replay_state_dir = replay_state_dir;
     if !is_config_check {
         project.prepare()?;
     }
