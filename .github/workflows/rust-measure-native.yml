@@ -1,0 +1,88 @@
+name: Rust Measure Native Validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/rust-measure-native.yml'
+      - 'tools/quality/rust-measure/**'
+      - 'tools/quality/source_measure.py'
+      - 'tools/quality/ci_quality.py'
+      - 'tools/quality/function_risk.py'
+      - 'tools/quality/production_coverage.py'
+      - 'tools/quality/production-source.json'
+      - 'tools/quality/tests/test_source_measure.py'
+      - 'tools/harness-gate/src/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Supplemental native analyzer validation; no replacement for Required Quality
+# Aggregate, product-platform tests, or the Linux base/head risk comparison.
+concurrency:
+  group: rust-measure-native-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    name: rust-measure (windows)
+    runs-on: windows-latest
+    timeout-minutes: 15
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      PYTHONUTF8: '1'
+      RUST_MEASURE_NATIVE_EVIDENCE: ${{ github.workspace }}/target/rust-measure-native
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.x'
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+      - name: Build analyzer and run native AST-to-LLVM contract tests
+        run: python -B -m unittest discover -s tools/quality/tests -p test_source_measure.py -v
+      - name: Retain bounded native measurement evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-measure-windows-${{ github.run_id }}-${{ github.run_attempt }}
+          path: target/rust-measure-native/
+          if-no-files-found: error
+          retention-days: 7
+
+  macos:
+    name: rust-measure (macos)
+    needs: windows
+    # Collect macOS diagnostics even if Windows validation fails.
+    if: ${{ always() && !cancelled() }}
+    runs-on: macos-latest
+    timeout-minutes: 15
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      PYTHONUTF8: '1'
+      RUST_MEASURE_NATIVE_EVIDENCE: ${{ github.workspace }}/target/rust-measure-native
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.x'
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+      - name: Build analyzer and run native AST-to-LLVM contract tests
+        run: python -B -m unittest discover -s tools/quality/tests -p test_source_measure.py -v
+      - name: Retain bounded native measurement evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-measure-macos-${{ github.run_id }}-${{ github.run_attempt }}
+          path: target/rust-measure-native/
+          if-no-files-found: error
+          retention-days: 7
+
