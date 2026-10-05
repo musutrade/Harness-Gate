@@ -539,8 +539,10 @@ clears inherited environment variables, applies the declared capability
 allowlist, enforces bounded stdout/stderr and artifact budgets, attempts bounded
 process-tree cleanup on timeout or cancellation, and rejects malformed results
 or artifacts outside the invocation root. Adapter failures are reported as
-`ADAPTER_PROTOCOL_FAILURE`. Nonces are single-use within the host policy; a
-long-lived orchestrator should persist its replay ledger across host restarts.
+`ADAPTER_PROTOCOL_FAILURE`. Nonces are single-use. `verify` and `quality collect` share durable replay
+storage; use global `--replay-state-dir PATH` for persistent host-controlled
+storage outside read-only snapshots and untrusted mounts. `adapter run` can
+share that override. See [replay scope and lifecycle](docs/quality-collectors.md#durable-replay-protection).
 
 The request is a single JSON document; it is not read from `flow.toml` and does
 not enable adapters in built-in steps. Repeat `--trusted-key` for every trusted

@@ -3,8 +3,9 @@
 
 This required series covers the original hotspots and linked generic production.
 The version 1 analyzer remains reproducible.
-Only inserted bytes are removed from the coverage denominator. Every original
-production function must have its own LLVM record; every LLVM record must join.
+Inserted bytes and compiler-excluded ranges leave the coverage denominator.
+Every compiled production function must have its own LLVM record; every LLVM
+record in the production boundary must join.
 """
 from __future__ import annotations
 
@@ -12,15 +13,16 @@ import hashlib
 import json
 import re
 import subprocess
+from functools import lru_cache
 from collections import defaultdict
 from pathlib import Path
 
 from function_risk import contains, crap_line, own_lines
 from production_coverage import counts, require
 
-SERIES = {"analyzer": "harness-gate-rust-measure/0.3.0", "rule": "mccabe-rust-3/1",
+SERIES = {"analyzer": "harness-gate-rust-measure/0.3.1", "rule": "mccabe-rust-3/1",
           "instrumentation": "closure-black-box/1", "mapping": "insertions-utf8/1",
-          "selection": "gh206-serial-resource-validation/1"}
+          "selection": "gh269-adapter-replay-and-project-input/1", "configuration": "compiler-target-production/1"}
 PREFIX = "{ ::std::hint::black_box(()); "
 SUFFIX = " }"
 HOTSPOTS = {
@@ -37,7 +39,7 @@ HOTSPOTS = {
 
 # Source paths remain relative to src for lineage with the established series.
 # Both commits are measured with this exact inventory and tool version.
-SOURCE_FILES = sorted({f"preset/{name}.rs" for name in ("catalog", "composition", "filesystem", "import", "initialize", "migration", "mod")} | set(HOTSPOTS) | {"app/mod.rs", "app/quality.rs", "cli.rs", "lib.rs", "config/mod.rs", "config/import.rs", "config/validation/mod.rs", "process/mod.rs", "failure.rs", "verify/quality.rs", "verify/report.rs"} |
+SOURCE_FILES = sorted({f"preset/{name}.rs" for name in ("catalog", "composition", "filesystem", "import", "initialize", "migration", "mod")} | set(HOTSPOTS) | {"app/mod.rs", "app/quality.rs", "cli.rs", "lib.rs", "config/mod.rs", "config/import.rs", "config/validation/mod.rs", "process/mod.rs", "process/replay.rs", "project/discovery.rs", "project/mod.rs", "failure.rs", "verify/quality.rs", "verify/report.rs"} |
     {f"config/quality/{name}.rs" for name in ("mod", "model", "policy", "validation", "compiler", "collectors", "baseline", "baseline/git")} |
     {f"../quality-core/{name}.rs" for name in (
     "comparison", "cross_component", "evidence", "json", "mod", "model",
@@ -47,17 +49,31 @@ def digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def ast(source: Path, binary: Path) -> dict:
-    result = json.loads(subprocess.check_output([str(binary.resolve()), str(source)], text=True))
+@lru_cache(maxsize=8)
+def compiler_configuration(target=None) -> dict:
+    if target is None:
+        version = subprocess.check_output(["rustc", "-vV"], text=True)
+        target = next(line.removeprefix("host: ") for line in version.splitlines() if line.startswith("host: "))
+    values = subprocess.check_output(["rustc", "--print", "cfg", "--target", target], text=True).splitlines()
+    require(bool(values) and len(values) == len(set(values)), "invalid compiler target configuration")
+    return {"target": target, "cfg": sorted(values)}
+
+
+def ast(source: Path, binary: Path, configuration=None) -> dict:
+    configuration = compiler_configuration() if configuration is None else configuration
+    result = json.loads(subprocess.check_output([str(binary.resolve()), str(source), "--target-cfg"],
+                                               input=json.dumps(configuration), encoding="utf-8"))
     require((result.get("analyzer"), result.get("version"), result.get("rule")) ==
-            ("harness-gate-rust-measure", "0.3.0", "mccabe-rust-3"), "incompatible AST analyzer")
+            ("harness-gate-rust-measure", "0.3.1", "mccabe-rust-3"), "incompatible AST analyzer")
+    require(result.get("configuration") == configuration, "AST target configuration mismatch")
     return result
 
 
 def provenance(binary: Path) -> dict:
     root = Path(__file__).resolve().parent
     files = ["source_measure.py", "function_risk.py", "production_coverage.py",
-             "rust-measure/Cargo.toml", "rust-measure/Cargo.lock", "rust-measure/src/main.rs"]
+             "rust-measure/Cargo.toml", "rust-measure/Cargo.lock", "rust-measure/src/main.rs",
+             "rust-measure/src/configuration.rs"]
     return {"sources": {p: digest((root / p).read_bytes()) for p in files},
             "binary_sha256": digest(binary.read_bytes()),
             "rustc": subprocess.check_output(["rustc", "-vV"], text=True).strip()}
@@ -113,20 +129,21 @@ def original_point(point: list[int], edits: list[dict]) -> tuple[int, int]:
     return line, column - shift
 
 
-def prepare(crate: Path, binary: Path, paths=None) -> dict:
-    manifest = {"series": SERIES, "files": {}, "absent_sources": []}
+def prepare(crate: Path, binary: Path, paths=None, target=None) -> dict:
+    configuration = compiler_configuration(target)
+    manifest = {"series": SERIES, "configuration": configuration, "files": {}, "absent_sources": []}
     for path in (SOURCE_FILES if paths is None else paths):
         file = crate / "src" / path
         if not file.exists():
             require(path not in HOTSPOTS, f"missing selected source: {path}")
             manifest["absent_sources"].append(path)
             continue
-        source = file.read_text()
-        inventory = ast(file, binary)
+        source = file.read_text(encoding="utf-8")
+        inventory = ast(file, binary, configuration)
         transformed, edits = instrument(source, inventory)
         manifest["files"][path] = {"original": source, "original_sha256": digest(source.encode()),
             "instrumented_sha256": digest(transformed.encode()), "inventory": inventory, "edits": edits}
-        file.write_text(transformed)
+        file.write_bytes(transformed.encode())
     return manifest
 
 
@@ -143,6 +160,8 @@ def closure_name(name: str) -> bool:
 
 def measure(manifest: dict, llvm: dict, crate: Path, binary: Path) -> list[dict]:
     require(manifest["series"] == SERIES, "incompatible measurement series")
+    configuration = manifest["configuration"]
+    require(configuration == compiler_configuration(configuration["target"]), "compiler target configuration changed")
     require(llvm["type"] == "llvm.coverage.json.export" and len(llvm["data"]) == 1, "invalid LLVM dataset")
     symbols, excluded = {}, {}
     source_paths = {(crate / "src" / path).resolve(): path for path in manifest["files"]}
@@ -155,11 +174,11 @@ def measure(manifest: dict, llvm: dict, crate: Path, binary: Path) -> list[dict]
         require((crate / "src" / path).read_bytes() == transformed.encode(), "instrumented source mismatch")
         # Reparse original source without changing the measured source file.
         import tempfile
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".rs") as tmp:
-            tmp.write(source)
-            tmp.flush()
-            require(ast(Path(tmp.name), binary) == file["inventory"], "AST inventory does not reproduce")
-        excluded[path] = []
+        with tempfile.TemporaryDirectory() as temp:
+            original = Path(temp) / "original.rs"
+            original.write_bytes(source.encode())
+            require(ast(original, binary, configuration) == file["inventory"], "AST inventory does not reproduce")
+        excluded[path] = [byte_span(source, span) for span in file["inventory"]["excluded"]]
         for symbol in file["inventory"]["symbols"]:
             span = byte_span(source, symbol["span"])
             if symbol["test"]:
@@ -169,7 +188,7 @@ def measure(manifest: dict, llvm: dict, crate: Path, binary: Path) -> list[dict]
             require(key not in symbols, "duplicate AST symbol")
             symbols[key] = {**symbol, "instances": [], "regions": {}}
     names = json.loads(subprocess.check_output([str(binary.resolve()), "--demangle"],
-        input=json.dumps([f["name"] for f in llvm["data"][0]["functions"]]), text=True))
+        input=json.dumps([f["name"] for f in llvm["data"][0]["functions"]]), encoding="utf-8"))
     for index, function in enumerate(llvm["data"][0]["functions"]):
         require(function["regions"], "LLVM function without regions")
         first = function["regions"][0]
@@ -208,6 +227,7 @@ def measure(manifest: dict, llvm: dict, crate: Path, binary: Path) -> list[dict]
         path, *span = key
         require(symbol["instances"], f"missing LLVM function: {path}:{symbol['name']}:{span}")
         children = [k[1:] for k in symbols if k != key and k[0] == path and contains(tuple(span), k[1:])]
+        children += [s for s in excluded[path] if contains(tuple(span), s)]
         regions = {r: n for r, n in symbol["regions"].items() if not any(contains(c, r[:4]) for c in children)}
         lines = counts(own_lines(regions, children))
         code = counts({r: n for r, n in regions.items() if r[4] == 0})
@@ -227,6 +247,9 @@ def compare(base: dict, head: dict, *, series=SERIES, hotspots=HOTSPOTS) -> dict
     """Apply the documented incremental ratchet without losing closure debt."""
     require(base["series"] == head["series"] == series, "incompatible base/head series")
     require(base["tools"] == head["tools"], "incompatible base/head measurement tools")
+    if series == SERIES or "configuration" in base or "configuration" in head:
+        require(base.get("configuration") == head.get("configuration") and base.get("configuration") is not None,
+                "incompatible base/head target configurations")
     for report in (base, head):
         if "source_inventory" in report:
             require(set(report["source_inventory"]) == set(SOURCE_FILES), "incomplete production source inventory")
@@ -263,6 +286,7 @@ def compare(base: dict, head: dict, *, series=SERIES, hotspots=HOTSPOTS) -> dict
         if not passed:
             failures.append(f"{row['source']}::{row['name']}")
     return {"series": series, "identities": decisions, "failures": failures,
+            **({"configuration": head["configuration"]} if "configuration" in head else {}),
             "decompositions": hotspots,
             "retired_or_changed_base": [{k: r[k] for k in ("source", "name", "span", "syntax_sha256")}
                 for rows in old.values() for r in rows]}
@@ -279,6 +303,7 @@ def main() -> None:
     parser.add_argument("--output", type=Path)
     parser.add_argument("--base", type=Path)
     parser.add_argument("--head", type=Path)
+    parser.add_argument("--target", help="compiler target triple; use the same target for coverage")
     args = parser.parse_args()
     if args.operation == "compare":
         require(all((args.base, args.head, args.output)), "compare needs --base, --head and --output")
@@ -289,7 +314,7 @@ def main() -> None:
     require(all((args.crate, args.binary, args.manifest)), "prepare/measure need --crate, --binary and --manifest")
     if args.operation == "prepare":
         require(not args.manifest.exists(), "refusing to overwrite an instrumentation manifest")
-        manifest = prepare(args.crate, args.binary)
+        manifest = prepare(args.crate, args.binary, target=args.target)
         args.manifest.write_text(json.dumps(manifest, indent=2) + "\n")
     else:
         require(args.llvm is not None and args.output is not None, "measure needs --llvm and --output")
@@ -300,7 +325,7 @@ def main() -> None:
         rows = measure(manifest, json.loads(args.llvm.read_text()), args.crate, args.binary)
         for row in rows:
             row["selected"] = row["name"] in HOTSPOTS.get(row["source"], [])
-        report = {"series": SERIES, "tools": provenance(args.binary), "functions": rows,
+        report = {"series": SERIES, "configuration": manifest["configuration"], "tools": provenance(args.binary), "functions": rows,
                   "source_inventory": {**{p: f["original_sha256"] for p, f in manifest["files"].items()},
                                        **{p: None for p in manifest["absent_sources"]}},
                   "manifest_sha256": digest(args.manifest.read_bytes()),

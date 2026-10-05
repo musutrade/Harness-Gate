@@ -24,6 +24,10 @@ pub(crate) struct Cli {
     #[arg(long, global = true, value_name = "PATH")]
     pub(crate) config: Option<PathBuf>,
 
+    /// Host-owned durable nonce ledger shared by verify, quality collect and adapter run.
+    #[arg(long, global = true, value_name = "PATH")]
+    pub(crate) replay_state_dir: Option<PathBuf>,
+
     #[command(subcommand)]
     pub(crate) command: Commands,
 }

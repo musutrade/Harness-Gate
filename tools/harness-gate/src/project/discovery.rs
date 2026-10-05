@@ -45,7 +45,9 @@ impl Project {
                 )
             })?;
         let input = InvocationInput::materialize_staged(&self.root, config_relative)?;
-        Self::from_input(self.root.clone(), config_relative, input)
+        let mut snapshot = Self::from_input(self.root.clone(), config_relative, input)?;
+        snapshot.replay_state_dir = self.replay_state_dir.clone();
+        Ok(snapshot)
     }
 
     fn from_input(root: PathBuf, config_relative: &Path, input: InvocationInput) -> Result<Self> {
@@ -135,6 +137,7 @@ impl Project {
 
         let project = Self {
             root,
+            replay_state_dir: None,
             execution_root,
             invocation_input: input,
             config_path,

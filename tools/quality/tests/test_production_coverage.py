@@ -77,6 +77,7 @@ class ProductionCoverageTests(unittest.TestCase):
         self.assertTrue(inventory["unmapped_sources"])
         self.assertEqual(owners["quality-core/policy.rs"], "quality-core")
         self.assertEqual(owners["quality-core/replay.rs"], "quality-core")
+        self.assertEqual(owners["src/process/replay.rs"], "process")
 
     def test_exact_threshold_passes_and_keeps_separate_raw_metrics(self):
         result = self.evaluate()

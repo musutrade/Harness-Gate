@@ -3,6 +3,7 @@ mod capture;
 mod command;
 mod isolation;
 mod reader;
+pub(crate) mod replay;
 mod signal;
 mod task;
 #[cfg(test)]
