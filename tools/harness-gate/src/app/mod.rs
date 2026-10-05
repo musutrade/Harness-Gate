@@ -87,7 +87,7 @@ pub(crate) fn run_cli(cli: Cli) -> Result<bool, CliError> {
             action: ConfigAction::Check {
                 format: ConfigFormat::Json,
             },
-        } => check_config_json(standalone_root(&cli)?, cli.config.clone()),
+        } => check_config_json(cli.project_root.clone(), cli.config.clone()),
         _ => run_project(
             cli.project_root,
             cli.config,
@@ -201,10 +201,10 @@ fn export_schema(
 }
 
 fn check_config_json(
-    root: std::path::PathBuf,
+    root: Option<std::path::PathBuf>,
     config: Option<std::path::PathBuf>,
 ) -> Result<bool, CliError> {
-    match Project::discover(Some(root), config).and_then(|project| {
+    match Project::discover(root, config).and_then(|project| {
         crate::config::quality::QualityConfig::load_optional(
             &project.execution_root,
             &project.config,
