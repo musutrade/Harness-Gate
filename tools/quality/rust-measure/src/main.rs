@@ -1,4 +1,5 @@
 //! Development-only AST inventory. Never linked into the product.
+mod configuration;
 mod native;
 
 use proc_macro2::Span;
@@ -98,6 +99,11 @@ impl<'ast> Visit<'ast> for Inventory {
             self.provenance
                 .push(json!({"kind": "attribute", "span": span(node.span()),
                 "syntax": node.to_token_stream().to_string(), "compiler_resolved": false}));
+        } else if node.path().is_ident("cfg") || node.path().is_ident("cfg_attr") {
+            self.errors.push(format!(
+                "unsupported conditional attribute in macro at {:?}",
+                node.span().start()
+            ));
         }
         visit::visit_attribute(self, node);
     }
@@ -294,7 +300,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     } else {
         first
     };
-    if args.next().is_some() {
+    let configured = args.next();
+    if configured.as_deref().is_some_and(|a| a != "--target-cfg") || args.next().is_some() {
         return Err("unexpected argument".into());
     }
     if path == "--demangle" {
@@ -307,7 +314,31 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
     let source = fs::read_to_string(path)?;
-    let ast = syn::parse_file(&source)?;
+    let mut ast = syn::parse_file(&source)?;
+    let mut excluded = Vec::new();
+    let mut target_configuration = Value::Null;
+    if !native {
+        if configured.is_none() {
+            return Err("production inventory requires --target-cfg on stdin".into());
+        }
+        target_configuration = serde_json::from_reader(std::io::stdin())?;
+        let values = target_configuration["cfg"]
+            .as_array()
+            .ok_or("missing compiler cfg")?
+            .iter()
+            .map(|v| v.as_str().map(String::from).ok_or("invalid compiler cfg"))
+            .collect::<Result<Vec<_>, _>>()?;
+        let mut filter = configuration::Configuration {
+            values,
+            excluded: vec![],
+            errors: vec![],
+        };
+        syn::visit_mut::VisitMut::visit_file_mut(&mut filter, &mut ast);
+        if !filter.errors.is_empty() {
+            return Err(filter.errors.join("\n").into());
+        }
+        excluded = filter.excluded;
+    }
     let mut inventory = Inventory {
         native,
         ..Inventory::default()
@@ -328,7 +359,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     println!(
         "{}",
-        json!({"analyzer": "harness-gate-rust-measure", "version": "0.3.0", "rule": "mccabe-rust-3", "symbols": inventory.symbols})
+        json!({"analyzer": "harness-gate-rust-measure", "version": "0.3.1", "rule": "mccabe-rust-3", "configuration": target_configuration, "excluded": excluded, "symbols": inventory.symbols})
     );
     Ok(())
 }

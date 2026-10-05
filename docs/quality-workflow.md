@@ -33,6 +33,9 @@ requests, trusted compiler state and key allowlist (generated presets reference
 [collector inputs](quality-collectors.md) and [verification inputs](quality-verification.md).
 Even `hook` requires its configured trusted state. Missing inputs block verification.
 Configuration validation alone is not evidence of measurement or quality PASS.
+For read-only snapshots, select persistent host-controlled nonce storage with
+`--replay-state-dir PATH`; `verify` and `quality collect` must use the same ledger.
+See [replay scope and lifecycle](quality-collectors.md#durable-replay-protection).
 
 Inspect the final `test_result.json` status and linked project report. A successful
 command step cannot override required quality failure, and quality success cannot

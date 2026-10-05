@@ -17,7 +17,9 @@ Its artifact inventory and existing artifact root must be empty. The output
 belongs outside that root. Trusted keys are a host-owned
 JSON array of `{ "key_id": "…", "public_key": "base64 Ed25519 key" }` objects.
 The CLI uses the adapter host's default capability, timeout, request age, output
-and artifact budgets and durable nonce storage in `.harness-gate/collector-nonces`.
+and artifact budgets. Both `verify` and `quality collect` persist consumed nonces
+in `<canonical repository root>/.harness-gate/collector-nonces` by default.
+See [durable replay protection](#durable-replay-protection) for external host storage.
 The internal orchestration entry point accepts a host-owned `HostPolicy` for
 explicit limits. Collectors cannot enlarge those limits or grant themselves trust.
 
@@ -108,3 +110,78 @@ requests and combines the resulting quality decision with execution gates.
 Automatic request construction remains a host/pack responsibility.
 
 [Retained head evidence](quality-profiles.md#retained-head-collection) permits host-authenticated reuse before fresh producer launches; invalid retention fails closed.
+
+
+## Durable replay protection
+
+Use the global `--replay-state-dir PATH` option to select trusted host storage.
+It applies to `verify`, `quality collect`, `hook`, compatibility verification and
+`adapter run`; repository configuration and signed collector payloads cannot
+select or override it. Relative overrides resolve against the host's current
+working directory. Provision its parent first; Core creates only the ledger
+leaf directory. Use an absolute path without symlink components or `..`.
+
+```sh
+harness-gate --replay-state-dir /srv/gate-host/project-a/nonces \
+  --project-root /srv/snapshots/project-a verify --profile ci --all
+harness-gate --replay-state-dir /srv/gate-host/project-a/nonces \
+  quality collect --repository-root /srv/snapshots/project-a \
+  --state /srv/gate-host/project-a/state.json \
+  --trusted-keys /srv/gate-host/project-a/keys.json \
+  --output /srv/gate-host/project-a/collection.json
+```
+
+The ledger path defines the scope: every signer, profile, invocation and command
+using that directory shares one nonce namespace. Mint globally unique nonces
+within that scope. Keep the same path across process restarts, source snapshots,
+workspace relocation and artifact cleanup. Default verify storage uses the
+original repository root, including staged verification, rather than the
+throwaway execution snapshot. Advanced `adapter run` retains its request-adjacent
+`.harness-gate-adapter-replay` default; pass the same override to share the
+collector scope explicitly. Library embedders must set `HostPolicy.replay_state_dir`
+for protection across host restarts; its default remains in memory.
+
+Core authenticates the request and checks freshness, executable identity and
+collector source/configuration bindings before claiming its nonce. Claim uses
+exclusive file creation, flushes the record before starting the collector and
+retains the marker after timeout, crash or measurement failure. Concurrent hosts
+can authorize at most one execution. Empty, malformed, symlinked or partial
+markers for the same nonce all remain consumed. Markers are never automatically
+removed, even after request expiry; artifact retention does not control them.
+In-memory markers remain through the inclusive `expires_at_ms + clock_skew`
+boundary, with saturating arithmetic. Request age and signature checks remain
+unchanged.
+
+The ledger is trusted host control-plane state. Keep it outside writable test or
+collector mounts and outside the artifact tree. Use OS sandboxing or a separate
+identity to prevent untrusted children from writing the ledger or any ancestor;
+protocol capability checks do not enforce that isolation. Unix ledger directories
+must belong to the host UID and forbid group/other writes; ancestors must belong
+to that UID or the filesystem root owner and forbid shared writes (root-owned sticky temporary roots
+are permitted). Windows storage requires equivalent host-managed ACLs. Core
+rejects symlink/reparse components and unwritable/non-directory storage, pins the
+directory before verify's execution steps and rejects replacement before launch.
+Unix claims use descriptor-relative no-follow operations; Windows directory
+handles deny rename/delete sharing and marker writes use write-through flushing.
+
+No filesystem ledger can detect host-authorized deletion or rollback of all its
+state across a restart. Restrict deletion, backup restoration and cleanup to the
+trusted host. Do not reset or prune an active scope: archived signatures could
+become replayable, especially after clock rollback or increased skew. Retire a
+ledger only together with its signer/request scope and preserve it as evidence.
+Read-only source snapshots need the external override and separately provisioned
+writable artifact/report destinations. Missing or unsafe state fails closed;
+Core never silently falls back to memory for a configured durable ledger.
+
+The public adapter request preparation path enforces the same directory boundary
+as `verify` and `quality collect`: the ledger and artifact root must be different
+directories, and neither may contain the other. Overlap is rejected before nonce
+claim or child launch, including artifact paths that resolve through an alias.
+Ledger names are canonicalized only after the no-follow directory walk and are
+revalidated against the pinned directory. This gives ordinary Windows paths and
+their `\\?\` representations one ledger scope without accepting reparse points.
+
+GH-269 strengthens request integrity only. Generic Core remains language-neutral;
+measurement identities, formulas, required gates, thresholds, baselines, debt,
+ratchets and release authority in the [Engineering Policy](engineering-policy.md)
+are unchanged.
