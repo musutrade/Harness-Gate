@@ -1222,7 +1222,7 @@ mod tests {
     #[test]
     fn heartbeat_failure_blocks_release_and_retains_the_marker() {
         let (_workspace, project) = runtime_project("lease-heartbeat-failure");
-        let lease = super::ResourceLease::acquire(
+        let mut lease = super::ResourceLease::acquire(
             &project,
             "step:heartbeat-failure",
             "workspace",
@@ -1232,14 +1232,15 @@ mod tests {
         )
         .expect("acquire heartbeat lease");
         let path = lease.path.clone();
-        let original = std::fs::read(&path).expect("read ownership evidence");
         // Make the real heartbeat's filesystem read fail, without racing an
         // in-flight renewal or replacing its error field with a mock result.
-        {
+        let original = {
             let _record = lease.record.lock().expect("lock renewal");
+            let original = std::fs::read(&path).expect("read ownership evidence");
             std::fs::remove_file(&path).expect("remove marker");
             std::fs::create_dir(&path).expect("obstruct marker read");
-        }
+            original
+        };
         let deadline = Instant::now() + Duration::from_secs(10);
         while lease
             .heartbeat_error
@@ -1253,6 +1254,10 @@ mod tests {
             );
             std::thread::sleep(Duration::from_millis(20));
         }
+        // Join the heartbeat while reads are still obstructed. Otherwise a
+        // later renewal can rewrite the restored marker before release_checked
+        // stops the thread, racing the byte-for-byte retention assertion.
+        lease.stop_heartbeat();
         std::fs::remove_dir(&path).expect("remove obstruction");
         std::fs::write(&path, &original).expect("restore ownership evidence");
 
