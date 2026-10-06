@@ -14,7 +14,7 @@ import time
 import uuid
 
 from critical_paths import require_committed_sources
-from production_coverage import require
+from production_coverage import CoverageTokenizer, require
 from quality_common import ROOT, git_sha, metadata, sha256, write_json
 from source_measure import SOURCE_FILES, compiler_configuration
 
@@ -44,6 +44,53 @@ def relocated_migration_sources(base: str, head: str) -> set[str]:
         ['git', 'diff', '--name-status', '--find-renames=100%', base, head, '--', old, new],
         cwd=ROOT, text=True)
     return {old} if change == f'R100\t{old}\t{new}\n' else set()
+
+
+def terminal_test_module_boundary(source: str) -> tuple[str, str] | None:
+    """Retain every byte except one exact top-level terminal cfg(test) body."""
+    # The fixture lexer does not implement Rust's special shebang/BOM handling.
+    # Reject that boundary rather than letting ignored text spoof a test module.
+    if source.startswith(('#!', '\ufeff')):
+        return None
+    tokens = CoverageTokenizer(source).tokenize()
+    header = ['#', '[', 'cfg', '(', 'test', ')', ']', 'mod', 'tests', '{']
+    stack, pairs, modules = [], {}, []
+    for index, token in enumerate(tokens):
+        if not stack and [t.text for t in tokens[index:index + len(header)]] == header:
+            modules.append(index + len(header) - 1)
+        if token.text in ('(', '[', '{'):
+            stack.append(index)
+        elif token.text in (')', ']', '}'):
+            require(bool(stack), 'unbalanced Rust source')
+            opening = stack.pop()
+            require(tokens[opening].text == {')': '(', ']': '[', '}': '{'}[token.text],
+                    'unbalanced Rust source')
+            pairs[opening] = index
+    require(not stack, 'unbalanced Rust source')
+    if len(modules) != 1 or pairs[modules[0]] != len(tokens) - 1:
+        return None
+    opening, closing = tokens[modules[0]], tokens[pairs[modules[0]]]
+    return source[:opening.offset + 1], source[closing.offset:]
+
+
+def only_terminal_test_module_changed(base: str, head: str, path: str) -> bool:
+    """Prove unchanged production source bytes, not macro/runtime equivalence."""
+    try:
+        snapshots = []
+        for commit in (base, head):
+            mode = subprocess.check_output(
+                ['git', '--literal-pathspecs', 'ls-tree', '-z',
+                 '--format=%(objectmode) %(objecttype)', commit, '--', path],
+                cwd=ROOT, stderr=subprocess.PIPE)
+            require(mode in (b'100644 blob\0', b'100755 blob\0'), 'not one regular source file')
+            source = subprocess.check_output(['git', 'show', f'{commit}:{path}'],
+                                             cwd=ROOT, stderr=subprocess.PIPE).decode('utf-8')
+            snapshots.append((mode, terminal_test_module_boundary(source)))
+        return snapshots[0][1] is not None and snapshots[0] == snapshots[1]
+    except (OSError, UnicodeError, ValueError, subprocess.CalledProcessError):
+        # Missing files, unsupported lexical forms and malformed input retain
+        # the existing measurement-review failure, never a guessed exemption.
+        return False
 
 
 def aggregate(event: str, needs: dict) -> list[str]:
@@ -142,6 +189,7 @@ class Collector:
                               'tools/harness-gate/src/config/quality/collectors/tests.rs',
                               'tools/harness-gate/src/config/quality/collectors/tests/dogfood_acceptance.rs',
                               'tools/harness-gate/src/config/quality/collectors/ci_acceptance.rs'))]
+        unsupported = [p for p in unsupported if not only_terminal_test_module_changed(base, head, p)]
         require(not unsupported, 'production changes outside supported risk series; measurement review required: '
                 + ', '.join(unsupported))
         self.command('analyzer-build', ['cargo', 'build', '--locked', '--manifest-path',
