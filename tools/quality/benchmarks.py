@@ -155,15 +155,32 @@ def verification_sample(
         CRATE.parent.parent,
         environment,
     )
+    # Preserve diagnostics before any validation can fail and the temporary
+    # fixture is removed. Archiving stays outside the measured command time.
+    archive = raw_root / mode / f"sample-{number}"
+    archive.parent.mkdir(parents=True, exist_ok=True)
+    if reports.is_dir():
+        shutil.copytree(reports, archive)
+    else:
+        archive.mkdir()
+    if state_path.is_file():
+        shutil.copy2(state_path, archive / "parallel-state.json")
+    output_limit = 64 * 1024
+    write_json(archive / "command-result.json", {
+        "exit_code": result.returncode,
+        "seconds": seconds,
+        "stdout_tail": result.stdout[-output_limit:],
+        "stderr_tail": result.stderr[-output_limit:],
+        "stdout_truncated": len(result.stdout) > output_limit,
+        "stderr_truncated": len(result.stderr) > output_limit,
+    })
     if result.returncode != 0:
-        fail(f"benchmark verification sample {number} failed: {result.stderr or result.stdout}")
+        fail(f"benchmark verification sample {number} failed: {result.stderr or result.stdout}\n"
+             f"retained evidence: {archive}")
     report_path = reports / "test_result.json"
     if not report_path.is_file():
         fail(f"benchmark verification sample {number} did not write {report_path}")
     report = json.loads(report_path.read_text())
-    archive = raw_root / mode / f"sample-{number}"
-    archive.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copytree(reports, archive)
     if not state_path.is_file():
         fail(f"benchmark verification sample {number} did not write {state_path}")
     observed = json.loads(state_path.read_text())
@@ -182,7 +199,6 @@ def verification_sample(
             f"benchmark verification sample {number} observed peak {observed_peak} "
             f"outside configured limit {max_parallel}"
         )
-    shutil.copy2(state_path, archive / "parallel-state.json")
     steps = []
     for step in report["steps"]:
         source_log = Path(step["log"])
