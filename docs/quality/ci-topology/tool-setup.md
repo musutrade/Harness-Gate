@@ -1,4 +1,4 @@
-# GH-165: pinned tool setup
+# Pinned CI tool setup
 
 OpenSpec `optimize-ci-execution-topology` tasks 2.1–2.3 implement design D3,
 under the unchanged [Engineering Policy](../../engineering-policy.md) and
@@ -14,6 +14,7 @@ uses [one version map and verifier](../../../.github/actions/install-ci-tool/too
 | cargo-nextest | 0.9.143 | Linux/macOS/Windows full tests, quality collection, push benchmarks, scheduled/manual baseline refresh |
 | cargo-llvm-cov | 0.9.0 | Quality collection; existing coverage version retained |
 | cargo-audit | 0.22.2 | Required security audit and release governance audit |
+| cargo-tarpaulin | 0.37.5 | Push-only Code Coverage; unchanged LLVM engine and Cobertura XML output |
 
 Nextest and audit previously floated. These pins match the available local
 validation tools; downloaded Linux releases independently passed the verifier.
@@ -22,7 +23,7 @@ platforms, event conditions, release authority, or aggregate behavior change.
 Both audit commands retain `--deny warnings` and their original lockfile scope.
 
 The installer is pinned to
-[`taiki-e/install-action` d438492cf8a250514fa2d34b30bc3c0dc37c65ff](https://github.com/taiki-e/install-action/tree/d438492cf8a250514fa2d34b30bc3c0dc37c65ff).
+[`taiki-e/install-action` 183e4297cca2404691e9380e1307288dced5c82a](https://github.com/taiki-e/install-action/tree/183e4297cca2404691e9380e1307288dced5c82a).
 Its immutable manifests supply release URLs and SHA-256 checksums. Checksums
 are explicitly enabled. Supported releases are downloaded on every invocation,
 overwriting any old executable restored by the existing Cargo cache. The
@@ -36,7 +37,9 @@ silently select another binary. Installation failure or failed/missing/wrong
 `cargo <subcommand> --version` evidence fails the job before its gate can run.
 There is no `continue-on-error` or cache-hit condition. Output retains the full
 effective version, including nextest build metadata. Audit 0.22.2 reports
-`cargo-audit-audit`; the verifier accepts that release's name explicitly.
+`cargo-audit-audit`, and tarpaulin 0.37.5 reports `cargo-tarpaulin-tarpaulin`;
+the verifier accepts those releases' names explicitly without relaxing version
+matching or allowing those aliases for other tools.
 
 To diagnose failures, expand the named resolve/install/verify steps. The
 installer reports the selected platform, release, checksum verification and
@@ -46,7 +49,61 @@ update the version contract tests, and require native hosted tests. Nextest's
 macOS asset at this pin is x86_64; the installer supports its existing macOS
 architecture fallback. Native macOS/Windows job execution remains mandatory.
 
-## Hosted evidence and remaining acceptance
+## GH-291: tarpaulin setup extension
+
+The preceding GH-165 optimization intentionally left tarpaulin outside its
+scope. GH-291 removes that remaining unconditional source rebuild by adopting
+the same installation and verification contract. The successful pre-change
+[Code Coverage job](https://github.com/musutrade/Harness-Gate/actions/runs/37411168218/job/112099699928)
+installed `cargo-tarpaulin v0.37.5` from source on 2026-10-06, spending about
+118 seconds on that installation. Its retained result was 87.99% coverage
+(10248/11647 lines). Pinning 0.37.5 preserves that effective release; this is
+not a tool upgrade or a coverage-series/baseline reset.
+
+The previous installer commit `d438492cf8a250514fa2d34b30bc3c0dc37c65ff`
+only included tarpaulin through 0.37.2. The new immutable installer revision
+(v2.87.25) adds support for the required release. Comparing both revisions
+confirmed byte-identical `main.sh` and `action.yml`, plus identical version
+entries and URL templates for the existing nextest 0.9.143, llvm-cov 0.9.0,
+and audit 0.22.2 pins. Their versions, binaries, platform selection, checksum
+behavior and locked source fallback are unchanged.
+
+The official [tarpaulin 0.37.5 release](https://github.com/xd009642/tarpaulin/releases/tag/0.37.5)
+and the installer's
+[immutable tarpaulin manifest](https://github.com/taiki-e/install-action/blob/183e4297cca2404691e9380e1307288dced5c82a/manifests/cargo-tarpaulin.json)
+agree on the Linux x86_64 musl archive SHA-256:
+`edd214e46aedd1692bf8601f9754da5c6ade83da78f73d291f5dd611c940b590`.
+The actual pinned installer downloaded and checked that asset locally, and
+the installed binary passed the repository's Cargo-dispatched version verifier.
+No new cache is introduced. The tarpaulin job retains its separate instrumented
+target, disabled target cache, push-only condition, exact `--engine llvm`
+coverage command, timeout, XML path and existing Codecov transport behavior.
+All required checks, matrices, warm samples, thresholds, coverage/CRAP semantics,
+evidence requirements and release authority are unchanged; no policy delta is
+proposed.
+
+Local regression coverage freezes the ordered resolve/install/verify steps,
+exact installer identity, checksum setting and locked fallback selection, and
+checks tarpaulin's effective name/version, error status and consuming command.
+An isolated smoke test additionally executed the actual pinned upstream
+installer with controlled Cargo/download boundaries:
+
+| Scenario | Observed outcome |
+| --- | --- |
+| Unsupported platform | Invoked exactly `cargo install --locked cargo-tarpaulin@0.37.5`; successful fixture version then passed the required verifier |
+| Source fallback failure | Installer returned 42; verification was not run |
+| Source fallback reports 0.37.4 | Installation returned 0; required verifier failed |
+| Corrupt archive | SHA-256 verification failed; no source fallback or gate execution |
+| Failed download | Installer failed; no source fallback or gate execution |
+
+The fallback smoke exercises control flow with a Cargo stub, not a second full
+source compilation. Full-repository coverage parity and hosted setup timings
+for the changed workflow still require a post-change Code Coverage run; the
+prebuilt/version smoke alone does not establish measurement parity or a measured
+CI speedup. Raw local setup logs are retained under
+`target/quality/issue291-tool-setup/` during validation.
+
+## GH-165 hosted evidence and remaining acceptance
 
 The retained [hosted baseline](hosted-baseline.json) contains three successful
 pre-change runs (34303413318, 34301967575, 34291282719). Audit installs took
@@ -55,7 +112,7 @@ pre-change runs (34303413318, 34301967575, 34291282719). Audit installs took
 Linux/macOS and 2–3 seconds on Windows. That already-cheap prebuilt path is
 retained, now with explicit version and installer identity. The unconditional
 source installs in quality, audit, benchmarks, refresh and release are replaced.
-Unrelated tarpaulin setup remains outside tasks 2.1–2.3.
+Tarpaulin setup was outside tasks 2.1–2.3; its later extension is recorded above.
 
 These are before-state measurements, not a claimed speedup. The submitting
 agent must not poll CI. The controller must confirm the submitted commit's
@@ -63,7 +120,7 @@ agent must not poll CI. The controller must confirm the submitted commit's
 setup reduction (or record a platform fallback's reason). Comparable after-state
 capture remains tasks 6.1–6.2; this change does not claim whole-proposal acceptance.
 
-## Local validation
+## GH-165 local validation (historical)
 
 Before editing, all 3 frozen topology tests passed, confirming the inherited
 GH-164 event contract. Source inspection reproduced the ineffective audit cache:

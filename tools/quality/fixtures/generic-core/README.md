@@ -92,3 +92,11 @@ See [commands, comparator rules and acceptance evidence](../../../../docs/qualit
 The original Python replay above remains available. No golden/schema bytes,
 required gates or release authority change. Both the Rust replay and the Python
 reference remain non-authoritative; authority transfer is still tasks 6–7.
+
+## Profiling replay transport
+
+`profile_oracles.py` runs fresh policy, evidence, replay and differential workers
+with separate instrumented and ordinary samples. It is opt-in diagnostic tooling;
+see the [GH-291 measurement record](../../../../docs/quality/ci-topology/issue291.md).
+Transient equality uses compact sorted UTF-8 JSON while persisted canonical
+serialization, frozen expected bytes and every semantic comparison stay unchanged.
