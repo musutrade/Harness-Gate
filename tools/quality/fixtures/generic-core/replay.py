@@ -26,6 +26,20 @@ def canonical(value):
                        allow_nan=False) + '\n').encode('utf-8')
 
 
+def same_json(expected, actual):
+    """Compare exact JSON types without pretty-printing transient strings.
+
+    Keep canonical() unchanged for persisted evidence. Compact encoding uses
+    the C encoder where available, while retaining its JSON and UTF-8 errors
+    and distinctions such as True/1 and 1/1.0 that Python equality loses.
+    Neither an oracle result nor a mutable input is cached.
+    """
+    def encoded(value):
+        return json.dumps(value, sort_keys=True, separators=(',', ':'),
+                          ensure_ascii=False, allow_nan=False).encode('utf-8')
+    return encoded(expected) == encoded(actual)
+
+
 def digest(data):
     return hashlib.sha256(data).hexdigest()
 
@@ -50,7 +64,7 @@ def missing_file_source(value):
 
 def oracle_matches(expected, actual, path=''):
     """Preserve every semantic field; allow only known OS missing-file wording."""
-    if canonical(expected) == canonical(actual):
+    if same_json(expected, actual):
         return True
     if isinstance(expected, dict) and isinstance(actual, dict):
         return expected.keys() == actual.keys() and all(

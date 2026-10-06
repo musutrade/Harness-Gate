@@ -1,0 +1,1506 @@
+{
+  "schema": "issue291-local-profile/v1",
+  "authoritative": false,
+  "base_sha": "64c6c59c30bbb76884cd767b8ae0ea35ed91d747",
+  "sources": {
+    "tools/quality/fixtures/generic-core/replay.py": {
+      "before": "1b25c0655298e0ef80b40d105a3122c698334adbcfcffa6f526ec07035212d56",
+      "after": "2368be42324e77233c7ea34d52685025ccc6e8cb19e153aeefabc668efe2deed"
+    },
+    "tools/quality/fixtures/generic-core/authority.py": {
+      "before": "8950feb88a54a9f5085fef3e944c13c251ebbe3e0ab489d1059f9340d08fba1b",
+      "after": "d0b4a2cc1ae0edc2ce4271d116f9d20586c0ff2d5f1612233a7ceb812274e671"
+    },
+    "tools/quality/fixtures/generic-core/manifest.json": {
+      "before": "1dc68d35d79709a5bbf98d7fc15f1084271b70cdcfe159aa12916dded14322f5",
+      "after": "1dc68d35d79709a5bbf98d7fc15f1084271b70cdcfe159aa12916dded14322f5"
+    }
+  },
+  "caveats": [
+    "Local Linux diagnostic runs, not hosted CI measurements or a causal latency claim.",
+    "cProfile magnifies Python-level work; do not mix profiled and fresh-process wall timings. Cumulative function times overlap and must not be added.",
+    "Both primary profile cohorts use tmpfs work roots and fresh processes/materialized files. OS page caches and shared-host load are uncontrolled.",
+    "Initial three direct-process baseline samples are retained separately because they lack worker CPU instrumentation.",
+    "An exploratory after run used overlay work roots; retained as excluded-from-comparison observations because filesystem differs."
+  ],
+  "parity": {
+    "policy_cases": 826,
+    "policy_reference_tests": 31,
+    "frozen_cases": 33,
+    "policy_transport_normalization": "Replace only each oracle WORK root with $WORK; no semantic field normalization.",
+    "policy_transport_sha256": "6d63f97d6db2dd694e65f4e202eaf01858c07a2795b44a3f60bd9a7116fd215a",
+    "replay_output_sha256": "60c331f6570dc2b749a0161df380b3de00dfc37a2b76b971513bdd340b3ff437",
+    "byte_equal": true
+  },
+  "before": {
+    "authoritative": false,
+    "created_at": "2026-10-06T04:33:58.398163+00:00",
+    "environment": {
+      "GITHUB_RUN_ATTEMPT": null,
+      "GITHUB_RUN_ID": null,
+      "RUNNER_ARCH": null,
+      "RUNNER_OS": null
+    },
+    "interpreter_startup_seconds": [
+      0.018414293001114856
+    ],
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "schema": "oracle-profile/v1",
+    "sha": "64c6c59c30bbb76884cd767b8ae0ea35ed91d747",
+    "workloads": {
+      "policy": [
+        {
+          "child_cpu_seconds": 0.4,
+          "cpu_seconds": 63.833597717,
+          "evidence": "policy/profiled",
+          "process_wall_seconds": 66.70946886599995,
+          "profiled": true,
+          "wall_seconds": 66.19523695600219,
+          "selected_functions": [
+            {
+              "calls": 1,
+              "cumulative_seconds": 66.184155796,
+              "file": "<frozen runpy>",
+              "function": "run_path",
+              "line": 262,
+              "primitive_calls": 1,
+              "self_seconds": 2.1419000000000003e-05
+            },
+            {
+              "calls": 44,
+              "cumulative_seconds": 66.176920853,
+              "file": "~",
+              "function": "<built-in method builtins.exec>",
+              "line": 0,
+              "primitive_calls": 2,
+              "self_seconds": 0.000584953
+            },
+            {
+              "calls": 1,
+              "cumulative_seconds": 66.17676491900001,
+              "file": "<frozen runpy>",
+              "function": "_run_module_code",
+              "line": 91,
+              "primitive_calls": 1,
+              "self_seconds": 1.8407000000000002e-05
+            },
+            {
+              "calls": 1,
+              "cumulative_seconds": 66.17671889,
+              "file": "<frozen runpy>",
+              "function": "_run_code",
+              "line": 65,
+              "primitive_calls": 1,
+              "self_seconds": 3.972e-06
+            },
+            {
+              "calls": 1,
+              "cumulative_seconds": 66.176693235,
+              "file": "tools/harness-gate/quality-core/tests/policy_reference.py",
+              "function": "<module>",
+              "line": 1,
+              "primitive_calls": 1,
+              "self_seconds": 0.123029118
+            },
+            {
+              "calls": 147,
+              "cumulative_seconds": 51.788220242,
+              "file": "tools/harness-gate/quality-core/tests/policy_reference.py",
+              "function": "evaluate_case",
+              "line": 68,
+              "primitive_calls": 147,
+              "self_seconds": 0.015566134
+            },
+            {
+              "calls": 262,
+              "cumulative_seconds": 37.032440433000005,
+              "file": "tools/quality/policy_engine.py",
+              "function": "evaluate",
+              "line": 179,
+              "primitive_calls": 262,
+              "self_seconds": 0.064083046
+            },
+            {
+              "calls": 695,
+              "cumulative_seconds": 30.254025212000002,
+              "file": "tools/harness-gate/quality-core/tests/policy_reference.py",
+              "function": "outcome",
+              "line": 45,
+              "primitive_calls": 693,
+              "self_seconds": 0.022078925000000003
+            },
+            {
+              "calls": 147,
+              "cumulative_seconds": 29.137353627000003,
+              "file": "tools/harness-gate/quality-core/tests/policy_reference.py",
+              "function": "<lambda>",
+              "line": 69,
+              "primitive_calls": 147,
+              "self_seconds": 0.0038879810000000004
+            },
+            {
+              "calls": 322,
+              "cumulative_seconds": 26.627543478000003,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "validate_evidence",
+              "line": 182,
+              "primitive_calls": 322,
+              "self_seconds": 0.014939946
+            },
+            {
+              "calls": 2535,
+              "cumulative_seconds": 22.668804065,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "_record",
+              "line": 127,
+              "primitive_calls": 2535,
+              "self_seconds": 0.436596902
+            },
+            {
+              "calls": 61785,
+              "cumulative_seconds": 21.667673332,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/__init__.py",
+              "function": "dumps",
+              "line": 183,
+              "primitive_calls": 61785,
+              "self_seconds": 0.194891895
+            },
+            {
+              "calls": 30381,
+              "cumulative_seconds": 21.571955406,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "_shape",
+              "line": 72,
+              "primitive_calls": 30381,
+              "self_seconds": 0.238539727
+            },
+            {
+              "calls": 61785,
+              "cumulative_seconds": 21.454851733,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/encoder.py",
+              "function": "encode",
+              "line": 183,
+              "primitive_calls": 61785,
+              "self_seconds": 1.37910314
+            },
+            {
+              "calls": 1,
+              "cumulative_seconds": 20.318429506,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/runner.py",
+              "function": "run",
+              "line": 224,
+              "primitive_calls": 1,
+              "self_seconds": 0.00021474500000000002
+            },
+            {
+              "calls": 7,
+              "cumulative_seconds": 20.318139794,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/suite.py",
+              "function": "__call__",
+              "line": 83,
+              "primitive_calls": 1,
+              "self_seconds": 0.00029420600000000004
+            },
+            {
+              "calls": 7,
+              "cumulative_seconds": 20.318136003000003,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/suite.py",
+              "function": "run",
+              "line": 102,
+              "primitive_calls": 1,
+              "self_seconds": 0.0029867410000000002
+            },
+            {
+              "calls": 31,
+              "cumulative_seconds": 20.314171050000002,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/case.py",
+              "function": "__call__",
+              "line": 689,
+              "primitive_calls": 31,
+              "self_seconds": 7.536500000000001e-05
+            },
+            {
+              "calls": 31,
+              "cumulative_seconds": 20.314095685,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/case.py",
+              "function": "run",
+              "line": 599,
+              "primitive_calls": 31,
+              "self_seconds": 0.001124687
+            },
+            {
+              "calls": 31,
+              "cumulative_seconds": 19.924798064,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/case.py",
+              "function": "_callTestMethod",
+              "line": 588,
+              "primitive_calls": 31,
+              "self_seconds": 0.000866428
+            },
+            {
+              "calls": 63,
+              "cumulative_seconds": 19.813769957,
+              "file": "tools/quality/fixtures/generic-core/replay.py",
+              "function": "oracle_matches",
+              "line": 51,
+              "primitive_calls": 63,
+              "self_seconds": 0.019554417
+            },
+            {
+              "calls": 126,
+              "cumulative_seconds": 19.79421554,
+              "file": "tools/quality/fixtures/generic-core/replay.py",
+              "function": "canonical",
+              "line": 24,
+              "primitive_calls": 126,
+              "self_seconds": 0.056914519000000004
+            },
+            {
+              "calls": 3673,
+              "cumulative_seconds": 19.738032797000002,
+              "file": "tools/harness-gate/quality-core/tests/policy_reference.py",
+              "function": "wrapped",
+              "line": 128,
+              "primitive_calls": 414,
+              "self_seconds": 0.015405792000000001
+            },
+            {
+              "calls": 9743240,
+              "cumulative_seconds": 18.092615807,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/encoder.py",
+              "function": "_iterencode",
+              "line": 414,
+              "primitive_calls": 9743240,
+              "self_seconds": 1.817713257
+            },
+            {
+              "calls": 53231118,
+              "cumulative_seconds": 16.27483438,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/encoder.py",
+              "function": "_iterencode_dict",
+              "line": 334,
+              "primitive_calls": 9743240,
+              "self_seconds": 11.836004456000001
+            },
+            {
+              "calls": 1622171,
+              "cumulative_seconds": 13.509592302000001,
+              "file": "~",
+              "function": "<built-in method builtins.any>",
+              "line": 0,
+              "primitive_calls": 1622171,
+              "self_seconds": 3.0528682480000002
+            },
+            {
+              "calls": 1775315,
+              "cumulative_seconds": 13.064745734,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "_json_domain",
+              "line": 47,
+              "primitive_calls": 33555,
+              "self_seconds": 2.598008959
+            },
+            {
+              "calls": 9822778,
+              "cumulative_seconds": 10.37541013,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/encoder.py",
+              "function": "_iterencode_list",
+              "line": 278,
+              "primitive_calls": 7903622,
+              "self_seconds": 2.0944795590000003
+            },
+            {
+              "calls": 47,
+              "cumulative_seconds": 10.108090818,
+              "file": "tools/quality/tests/test_policy_ratchet.py",
+              "function": "evaluate",
+              "line": 43,
+              "primitive_calls": 47,
+              "self_seconds": 0.0034720600000000003
+            },
+            {
+              "calls": 791,
+              "cumulative_seconds": 8.686384127,
+              "file": "tools/quality/project_model.py",
+              "function": "validate_project",
+              "line": 96,
+              "primitive_calls": 791,
+              "self_seconds": 0.127749821
+            },
+            {
+              "calls": 3814,
+              "cumulative_seconds": 1.105152033,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/shutil.py",
+              "function": "copytree",
+              "line": 557,
+              "primitive_calls": 332,
+              "self_seconds": 0.035917611
+            },
+            {
+              "calls": 1799,
+              "cumulative_seconds": 0.08215269800000001,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py",
+              "function": "write_bytes",
+              "line": 1030,
+              "primitive_calls": 1799,
+              "self_seconds": 0.0033283640000000003
+            },
+            {
+              "calls": 6,
+              "cumulative_seconds": 0.002665756,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py",
+              "function": "_execute_child",
+              "line": 1791,
+              "primitive_calls": 6,
+              "self_seconds": 0.00014802
+            }
+          ],
+          "full_profile_sha256": "064c5de38c02dab7c9e1d1d187f9481ac8876c599dad2cb5661021f6b8a32051",
+          "full_function_count": 1151
+        },
+        {
+          "child_cpu_seconds": 0.49,
+          "cpu_seconds": 15.410293717,
+          "evidence": "policy/run-1",
+          "process_wall_seconds": 16.327158519001387,
+          "profiled": false,
+          "wall_seconds": 15.924509740994836
+        }
+      ],
+      "replay": [
+        {
+          "child_cpu_seconds": 0.0,
+          "cpu_seconds": 49.488453515,
+          "evidence": "replay/profiled",
+          "process_wall_seconds": 49.64034419699601,
+          "profiled": true,
+          "wall_seconds": 49.51554689200566,
+          "selected_functions": [
+            {
+              "calls": 1,
+              "cumulative_seconds": 49.512093572000005,
+              "file": "<frozen runpy>",
+              "function": "run_path",
+              "line": 262,
+              "primitive_calls": 1,
+              "self_seconds": 2.0091e-05
+            },
+            {
+              "calls": 26,
+              "cumulative_seconds": 49.510113321000006,
+              "file": "~",
+              "function": "<built-in method builtins.exec>",
+              "line": 0,
+              "primitive_calls": 2,
+              "self_seconds": 0.000519527
+            },
+            {
+              "calls": 1,
+              "cumulative_seconds": 49.509925846,
+              "file": "<frozen runpy>",
+              "function": "_run_module_code",
+              "line": 91,
+              "primitive_calls": 1,
+              "self_seconds": 4.2932e-05
+            },
+            {
+              "calls": 1,
+              "cumulative_seconds": 49.509865186000006,
+              "file": "<frozen runpy>",
+              "function": "_run_code",
+              "line": 65,
+              "primitive_calls": 1,
+              "self_seconds": 4.278e-06
+            },
+            {
+              "calls": 1,
+              "cumulative_seconds": 49.509854593,
+              "file": "tools/quality/fixtures/generic-core/replay.py",
+              "function": "<module>",
+              "line": 1,
+              "primitive_calls": 1,
+              "self_seconds": 0.000347521
+            },
+            {
+              "calls": 1,
+              "cumulative_seconds": 49.494865450000006,
+              "file": "tools/quality/fixtures/generic-core/replay.py",
+              "function": "replay",
+              "line": 141,
+              "primitive_calls": 1,
+              "self_seconds": 0.09231721500000001
+            },
+            {
+              "calls": 33,
+              "cumulative_seconds": 30.604447761000003,
+              "file": "tools/quality/fixtures/generic-core/replay.py",
+              "function": "evaluate",
+              "line": 92,
+              "primitive_calls": 33,
+              "self_seconds": 0.014046796
+            },
+            {
+              "calls": 70,
+              "cumulative_seconds": 24.599537276000003,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "validate_evidence",
+              "line": 182,
+              "primitive_calls": 70,
+              "self_seconds": 0.012881248000000001
+            },
+            {
+              "calls": 2637,
+              "cumulative_seconds": 20.422854124,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "_record",
+              "line": 127,
+              "primitive_calls": 2637,
+              "self_seconds": 0.360774973
+            },
+            {
+              "calls": 50722,
+              "cumulative_seconds": 18.293150781,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/__init__.py",
+              "function": "dumps",
+              "line": 183,
+              "primitive_calls": 50722,
+              "self_seconds": 0.14614221000000002
+            },
+            {
+              "calls": 50722,
+              "cumulative_seconds": 18.134880699,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/encoder.py",
+              "function": "encode",
+              "line": 183,
+              "primitive_calls": 50722,
+              "self_seconds": 1.2056396150000002
+            },
+            {
+              "calls": 33,
+              "cumulative_seconds": 18.093653748,
+              "file": "tools/quality/fixtures/generic-core/replay.py",
+              "function": "oracle_matches",
+              "line": 51,
+              "primitive_calls": 33,
+              "self_seconds": 0.014565967
+            },
+            {
+              "calls": 67,
+              "cumulative_seconds": 18.079566264,
+              "file": "tools/quality/fixtures/generic-core/replay.py",
+              "function": "canonical",
+              "line": 24,
+              "primitive_calls": 67,
+              "self_seconds": 0.042945365
+            },
+            {
+              "calls": 33,
+              "cumulative_seconds": 17.860433292,
+              "file": "tools/quality/policy_engine.py",
+              "function": "evaluate",
+              "line": 179,
+              "primitive_calls": 33,
+              "self_seconds": 0.031388876
+            },
+            {
+              "calls": 9744271,
+              "cumulative_seconds": 16.658428573000002,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/encoder.py",
+              "function": "_iterencode",
+              "line": 414,
+              "primitive_calls": 9744271,
+              "self_seconds": 1.6335244590000002
+            },
+            {
+              "calls": 22138,
+              "cumulative_seconds": 16.336736192,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "_shape",
+              "line": 72,
+              "primitive_calls": 22138,
+              "self_seconds": 0.13226506200000002
+            },
+            {
+              "calls": 59386809,
+              "cumulative_seconds": 15.024818810000001,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/encoder.py",
+              "function": "_iterencode_dict",
+              "line": 334,
+              "primitive_calls": 9744271,
+              "self_seconds": 11.243508328
+            },
+            {
+              "calls": 1253562,
+              "cumulative_seconds": 11.709195375,
+              "file": "~",
+              "function": "<built-in method builtins.any>",
+              "line": 0,
+              "primitive_calls": 1253562,
+              "self_seconds": 2.584182847
+            },
+            {
+              "calls": 1387116,
+              "cumulative_seconds": 10.457315417,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "_json_domain",
+              "line": 47,
+              "primitive_calls": 24785,
+              "self_seconds": 1.796985199
+            },
+            {
+              "calls": 9823165,
+              "cumulative_seconds": 8.915818979,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/encoder.py",
+              "function": "_iterencode_list",
+              "line": 278,
+              "primitive_calls": 7904009,
+              "self_seconds": 1.8041064080000002
+            },
+            {
+              "calls": 18014346,
+              "cumulative_seconds": 6.609167737000001,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "<genexpr>",
+              "line": 52,
+              "primitive_calls": 18014346,
+              "self_seconds": 4.380287808
+            },
+            {
+              "calls": 121,
+              "cumulative_seconds": 6.422657766,
+              "file": "tools/quality/project_model.py",
+              "function": "validate_project",
+              "line": 96,
+              "primitive_calls": 121,
+              "self_seconds": 0.061656379000000004
+            },
+            {
+              "calls": 6131,
+              "cumulative_seconds": 4.744211888000001,
+              "file": "tools/quality/project_model.py",
+              "function": "validate_shape",
+              "line": 33,
+              "primitive_calls": 6131,
+              "self_seconds": 0.040645112000000004
+            },
+            {
+              "calls": 904814,
+              "cumulative_seconds": 4.296791923000001,
+              "file": "tools/quality/quality_evidence.py",
+              "function": "_schema_matches",
+              "line": 96,
+              "primitive_calls": 28269,
+              "self_seconds": 2.566960469
+            },
+            {
+              "calls": 2647,
+              "cumulative_seconds": 3.9015040150000004,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "validate_series",
+              "line": 94,
+              "primitive_calls": 2647,
+              "self_seconds": 0.060233661
+            },
+            {
+              "calls": 7064,
+              "cumulative_seconds": 3.671173537,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "_file",
+              "line": 113,
+              "primitive_calls": 7064,
+              "self_seconds": 0.075014466
+            },
+            {
+              "calls": 143249,
+              "cumulative_seconds": 3.3706124060000002,
+              "file": "tools/quality/project_model.py",
+              "function": "_validate_metadata",
+              "line": 41,
+              "primitive_calls": 6131,
+              "self_seconds": 0.16730593600000002
+            },
+            {
+              "calls": 6001,
+              "cumulative_seconds": 3.199451455,
+              "file": "tools/quality/project_model.py",
+              "function": "subject_id",
+              "line": 70,
+              "primitive_calls": 6001,
+              "self_seconds": 0.07276315600000001
+            },
+            {
+              "calls": 45870304,
+              "cumulative_seconds": 3.0016040210000003,
+              "file": "~",
+              "function": "<built-in method builtins.ord>",
+              "line": 0,
+              "primitive_calls": 45870304,
+              "self_seconds": 3.0016040210000003
+            },
+            {
+              "calls": 28336,
+              "cumulative_seconds": 2.557103489,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/__init__.py",
+              "function": "loads",
+              "line": 299,
+              "primitive_calls": 28336,
+              "self_seconds": 0.046590658
+            },
+            {
+              "calls": 48,
+              "cumulative_seconds": 0.25309696400000004,
+              "file": "tools/quality/fixtures/generic-core/replay.py",
+              "function": "materialize",
+              "line": 78,
+              "primitive_calls": 48,
+              "self_seconds": 0.006494992000000001
+            },
+            {
+              "calls": 1782,
+              "cumulative_seconds": 0.08316396300000001,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py",
+              "function": "write_bytes",
+              "line": 1030,
+              "primitive_calls": 1782,
+              "self_seconds": 0.00321328
+            }
+          ],
+          "full_profile_sha256": "aef4ac79b6a9fcff1dece0164089aecae11d4169fc6a623eea685c88f4c8da3f",
+          "full_function_count": 810
+        },
+        {
+          "child_cpu_seconds": 0.0,
+          "cpu_seconds": 12.587118641,
+          "evidence": "replay/run-1",
+          "process_wall_seconds": 12.68316787200456,
+          "profiled": false,
+          "wall_seconds": 12.600486802999512
+        }
+      ]
+    }
+  },
+  "after": {
+    "authoritative": false,
+    "created_at": "2026-10-06T04:39:57.350357+00:00",
+    "environment": {
+      "GITHUB_RUN_ATTEMPT": null,
+      "GITHUB_RUN_ID": null,
+      "RUNNER_ARCH": null,
+      "RUNNER_OS": null
+    },
+    "interpreter_startup_seconds": [
+      0.014692896998894867,
+      0.014631105004809797,
+      0.014312594001239631
+    ],
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "schema": "oracle-profile/v1",
+    "sha": "64c6c59c30bbb76884cd767b8ae0ea35ed91d747",
+    "sources": {
+      "tools/harness-gate/quality-core/tests/policy_reference.py": "549a71dd2c842e1c6919e201539a82be5a3dac873ba0e397e57fd7fd095cf642",
+      "tools/harness-gate/quality-core/tests/reference.py": "48502457a4f4c7f6b9976f69cb2c62e1f53b3c99b630a8d7fe8f4be5e0da711e",
+      "tools/quality/fixtures/generic-core/authority.py": "d0b4a2cc1ae0edc2ce4271d116f9d20586c0ff2d5f1612233a7ceb812274e671",
+      "tools/quality/fixtures/generic-core/differential.py": "2449feadd88a7cd3267a74abda8c967e5bd539ca352e3952897e48e324d897c9",
+      "tools/quality/fixtures/generic-core/manifest.json": "1dc68d35d79709a5bbf98d7fc15f1084271b70cdcfe159aa12916dded14322f5",
+      "tools/quality/fixtures/generic-core/replay.py": "2368be42324e77233c7ea34d52685025ccc6e8cb19e153aeefabc668efe2deed"
+    },
+    "status": "completed",
+    "workloads": {
+      "policy": [
+        {
+          "child_cpu_seconds": 0.46,
+          "cpu_seconds": 42.051045736999995,
+          "evidence": "policy/profiled",
+          "process_wall_seconds": 42.99645905599755,
+          "profiled": true,
+          "wall_seconds": 42.55668396799592,
+          "selected_functions": [
+            {
+              "calls": 1,
+              "cumulative_seconds": 42.546043739000005,
+              "file": "<frozen runpy>",
+              "function": "run_path",
+              "line": 262,
+              "primitive_calls": 1,
+              "self_seconds": 2.3102e-05
+            },
+            {
+              "calls": 43,
+              "cumulative_seconds": 42.542519182,
+              "file": "~",
+              "function": "<built-in method builtins.exec>",
+              "line": 0,
+              "primitive_calls": 2,
+              "self_seconds": 0.000988664
+            },
+            {
+              "calls": 1,
+              "cumulative_seconds": 42.542327157,
+              "file": "<frozen runpy>",
+              "function": "_run_module_code",
+              "line": 91,
+              "primitive_calls": 1,
+              "self_seconds": 1.7413e-05
+            },
+            {
+              "calls": 1,
+              "cumulative_seconds": 42.542282055,
+              "file": "<frozen runpy>",
+              "function": "_run_code",
+              "line": 65,
+              "primitive_calls": 1,
+              "self_seconds": 4.048e-06
+            },
+            {
+              "calls": 1,
+              "cumulative_seconds": 42.542258129000004,
+              "file": "tools/harness-gate/quality-core/tests/policy_reference.py",
+              "function": "<module>",
+              "line": 1,
+              "primitive_calls": 1,
+              "self_seconds": 0.08571482500000001
+            },
+            {
+              "calls": 262,
+              "cumulative_seconds": 33.291886674000004,
+              "file": "tools/quality/policy_engine.py",
+              "function": "evaluate",
+              "line": 179,
+              "primitive_calls": 262,
+              "self_seconds": 0.057941041000000006
+            },
+            {
+              "calls": 147,
+              "cumulative_seconds": 29.563291147,
+              "file": "tools/harness-gate/quality-core/tests/policy_reference.py",
+              "function": "evaluate_case",
+              "line": 68,
+              "primitive_calls": 147,
+              "self_seconds": 0.011287257
+            },
+            {
+              "calls": 695,
+              "cumulative_seconds": 27.123081222000003,
+              "file": "tools/harness-gate/quality-core/tests/policy_reference.py",
+              "function": "outcome",
+              "line": 45,
+              "primitive_calls": 693,
+              "self_seconds": 0.016863319
+            },
+            {
+              "calls": 147,
+              "cumulative_seconds": 26.354996875,
+              "file": "tools/harness-gate/quality-core/tests/policy_reference.py",
+              "function": "<lambda>",
+              "line": 69,
+              "primitive_calls": 147,
+              "self_seconds": 0.005647493
+            },
+            {
+              "calls": 322,
+              "cumulative_seconds": 24.087802982000003,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "validate_evidence",
+              "line": 182,
+              "primitive_calls": 322,
+              "self_seconds": 0.016631444000000002
+            },
+            {
+              "calls": 2535,
+              "cumulative_seconds": 20.459761632000003,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "_record",
+              "line": 127,
+              "primitive_calls": 2535,
+              "self_seconds": 0.398792544
+            },
+            {
+              "calls": 30381,
+              "cumulative_seconds": 19.187433098,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "_shape",
+              "line": 72,
+              "primitive_calls": 30381,
+              "self_seconds": 0.18445645500000002
+            },
+            {
+              "calls": 1,
+              "cumulative_seconds": 17.839704309000002,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/runner.py",
+              "function": "run",
+              "line": 224,
+              "primitive_calls": 1,
+              "self_seconds": 6.9743e-05
+            },
+            {
+              "calls": 7,
+              "cumulative_seconds": 17.839558509,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/suite.py",
+              "function": "__call__",
+              "line": 83,
+              "primitive_calls": 1,
+              "self_seconds": 0.00019868000000000002
+            },
+            {
+              "calls": 7,
+              "cumulative_seconds": 17.839553515000002,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/suite.py",
+              "function": "run",
+              "line": 102,
+              "primitive_calls": 1,
+              "self_seconds": 0.003114196
+            },
+            {
+              "calls": 31,
+              "cumulative_seconds": 17.835642094,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/case.py",
+              "function": "__call__",
+              "line": 689,
+              "primitive_calls": 31,
+              "self_seconds": 6.7174e-05
+            },
+            {
+              "calls": 31,
+              "cumulative_seconds": 17.835574920000003,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/case.py",
+              "function": "run",
+              "line": 599,
+              "primitive_calls": 31,
+              "self_seconds": 0.001167393
+            },
+            {
+              "calls": 31,
+              "cumulative_seconds": 17.561281381,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/case.py",
+              "function": "_callTestMethod",
+              "line": 588,
+              "primitive_calls": 31,
+              "self_seconds": 0.000826186
+            },
+            {
+              "calls": 3673,
+              "cumulative_seconds": 17.212480275,
+              "file": "tools/harness-gate/quality-core/tests/policy_reference.py",
+              "function": "wrapped",
+              "line": 128,
+              "primitive_calls": 414,
+              "self_seconds": 0.012284621
+            },
+            {
+              "calls": 1622171,
+              "cumulative_seconds": 12.036040450000002,
+              "file": "~",
+              "function": "<built-in method builtins.any>",
+              "line": 0,
+              "primitive_calls": 1622171,
+              "self_seconds": 2.7237721400000003
+            },
+            {
+              "calls": 1775315,
+              "cumulative_seconds": 11.588211139,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "_json_domain",
+              "line": 47,
+              "primitive_calls": 33555,
+              "self_seconds": 2.311678092
+            },
+            {
+              "calls": 47,
+              "cumulative_seconds": 9.078033614,
+              "file": "tools/quality/tests/test_policy_ratchet.py",
+              "function": "evaluate",
+              "line": 43,
+              "primitive_calls": 47,
+              "self_seconds": 0.0028699370000000004
+            },
+            {
+              "calls": 791,
+              "cumulative_seconds": 8.024874705,
+              "file": "tools/quality/project_model.py",
+              "function": "validate_project",
+              "line": 96,
+              "primitive_calls": 791,
+              "self_seconds": 0.118929191
+            },
+            {
+              "calls": 17994918,
+              "cumulative_seconds": 6.947535462,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "<genexpr>",
+              "line": 52,
+              "primitive_calls": 17994918,
+              "self_seconds": 4.662798907
+            },
+            {
+              "calls": 1222997,
+              "cumulative_seconds": 5.894414502,
+              "file": "tools/quality/quality_evidence.py",
+              "function": "_schema_matches",
+              "line": 96,
+              "primitive_calls": 38311,
+              "self_seconds": 3.6176068530000003
+            },
+            {
+              "calls": 7931,
+              "cumulative_seconds": 5.642749951000001,
+              "file": "tools/quality/project_model.py",
+              "function": "validate_shape",
+              "line": 33,
+              "primitive_calls": 7931,
+              "self_seconds": 0.046376398000000006
+            },
+            {
+              "calls": 101,
+              "cumulative_seconds": 5.027287772,
+              "file": "tools/quality/policy_ratchet.py",
+              "function": "validate_base",
+              "line": 12,
+              "primitive_calls": 101,
+              "self_seconds": 0.000808621
+            },
+            {
+              "calls": 3165,
+              "cumulative_seconds": 5.006266841,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "validate_series",
+              "line": 94,
+              "primitive_calls": 3165,
+              "self_seconds": 0.074701155
+            },
+            {
+              "calls": 27,
+              "cumulative_seconds": 4.796653272,
+              "file": "tools/quality/tests/test_project_report.py",
+              "function": "evaluate",
+              "line": 28,
+              "primitive_calls": 27,
+              "self_seconds": 0.0019830340000000003
+            },
+            {
+              "calls": 308,
+              "cumulative_seconds": 3.9486313510000004,
+              "file": "tools/quality/policy_engine.py",
+              "function": "validate_policy",
+              "line": 48,
+              "primitive_calls": 308,
+              "self_seconds": 0.008703896000000001
+            },
+            {
+              "calls": 3814,
+              "cumulative_seconds": 1.1461840220000001,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/shutil.py",
+              "function": "copytree",
+              "line": 557,
+              "primitive_calls": 332,
+              "self_seconds": 0.028338278
+            },
+            {
+              "calls": 63,
+              "cumulative_seconds": 0.625601001,
+              "file": "tools/quality/fixtures/generic-core/replay.py",
+              "function": "oracle_matches",
+              "line": 65,
+              "primitive_calls": 63,
+              "self_seconds": 0.00045332600000000004
+            },
+            {
+              "calls": 63,
+              "cumulative_seconds": 0.625147675,
+              "file": "tools/quality/fixtures/generic-core/replay.py",
+              "function": "same_json",
+              "line": 29,
+              "primitive_calls": 63,
+              "self_seconds": 0.006946399000000001
+            },
+            {
+              "calls": 1799,
+              "cumulative_seconds": 0.092953455,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py",
+              "function": "write_bytes",
+              "line": 1030,
+              "primitive_calls": 1799,
+              "self_seconds": 0.0030716700000000003
+            },
+            {
+              "calls": 6,
+              "cumulative_seconds": 0.002941892,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py",
+              "function": "_execute_child",
+              "line": 1791,
+              "primitive_calls": 6,
+              "self_seconds": 0.00012665700000000002
+            }
+          ],
+          "full_profile_sha256": "3a3072cf30229415217ee0126dd2f2bc463412487124abefc2f4951b1e393fba",
+          "full_function_count": 1135
+        },
+        {
+          "child_cpu_seconds": 0.43000000000000005,
+          "cpu_seconds": 14.26250705,
+          "evidence": "policy/run-1",
+          "process_wall_seconds": 15.088171028997749,
+          "profiled": false,
+          "wall_seconds": 14.712242730995058
+        },
+        {
+          "child_cpu_seconds": 0.4,
+          "cpu_seconds": 13.922091872000001,
+          "evidence": "policy/run-2",
+          "process_wall_seconds": 14.716484787000809,
+          "profiled": false,
+          "wall_seconds": 14.351709949005453
+        },
+        {
+          "child_cpu_seconds": 0.41000000000000003,
+          "cpu_seconds": 13.919721866,
+          "evidence": "policy/run-3",
+          "process_wall_seconds": 14.776329077998525,
+          "profiled": false,
+          "wall_seconds": 14.3491419819984
+        }
+      ],
+      "replay": [
+        {
+          "child_cpu_seconds": 0.0,
+          "cpu_seconds": 29.773386291999998,
+          "evidence": "replay/profiled",
+          "process_wall_seconds": 29.894172673994035,
+          "profiled": true,
+          "wall_seconds": 29.78295423900272,
+          "selected_functions": [
+            {
+              "calls": 1,
+              "cumulative_seconds": 29.779849694000003,
+              "file": "<frozen runpy>",
+              "function": "run_path",
+              "line": 262,
+              "primitive_calls": 1,
+              "self_seconds": 1.8877000000000002e-05
+            },
+            {
+              "calls": 25,
+              "cumulative_seconds": 29.777485742000003,
+              "file": "~",
+              "function": "<built-in method builtins.exec>",
+              "line": 0,
+              "primitive_calls": 2,
+              "self_seconds": 0.000581976
+            },
+            {
+              "calls": 1,
+              "cumulative_seconds": 29.77734728,
+              "file": "<frozen runpy>",
+              "function": "_run_module_code",
+              "line": 91,
+              "primitive_calls": 1,
+              "self_seconds": 1.3945000000000001e-05
+            },
+            {
+              "calls": 1,
+              "cumulative_seconds": 29.777319821000003,
+              "file": "<frozen runpy>",
+              "function": "_run_code",
+              "line": 65,
+              "primitive_calls": 1,
+              "self_seconds": 3.191e-06
+            },
+            {
+              "calls": 1,
+              "cumulative_seconds": 29.777310301000004,
+              "file": "tools/quality/fixtures/generic-core/replay.py",
+              "function": "<module>",
+              "line": 1,
+              "primitive_calls": 1,
+              "self_seconds": 0.000317762
+            },
+            {
+              "calls": 1,
+              "cumulative_seconds": 29.760246430000002,
+              "file": "tools/quality/fixtures/generic-core/replay.py",
+              "function": "replay",
+              "line": 155,
+              "primitive_calls": 1,
+              "self_seconds": 0.077591246
+            },
+            {
+              "calls": 33,
+              "cumulative_seconds": 28.482455723,
+              "file": "tools/quality/fixtures/generic-core/replay.py",
+              "function": "evaluate",
+              "line": 106,
+              "primitive_calls": 33,
+              "self_seconds": 0.0030168960000000002
+            },
+            {
+              "calls": 70,
+              "cumulative_seconds": 22.905942368,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "validate_evidence",
+              "line": 182,
+              "primitive_calls": 70,
+              "self_seconds": 0.011762855000000001
+            },
+            {
+              "calls": 2637,
+              "cumulative_seconds": 18.842850725,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "_record",
+              "line": 127,
+              "primitive_calls": 2637,
+              "self_seconds": 0.342514248
+            },
+            {
+              "calls": 33,
+              "cumulative_seconds": 16.242531133,
+              "file": "tools/quality/policy_engine.py",
+              "function": "evaluate",
+              "line": 179,
+              "primitive_calls": 33,
+              "self_seconds": 0.028290870000000003
+            },
+            {
+              "calls": 22138,
+              "cumulative_seconds": 15.037203494000002,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "_shape",
+              "line": 72,
+              "primitive_calls": 22138,
+              "self_seconds": 0.12188892000000001
+            },
+            {
+              "calls": 1253562,
+              "cumulative_seconds": 11.163954527000001,
+              "file": "~",
+              "function": "<built-in method builtins.any>",
+              "line": 0,
+              "primitive_calls": 1253562,
+              "self_seconds": 2.4615452270000002
+            },
+            {
+              "calls": 1387116,
+              "cumulative_seconds": 9.777794026,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "_json_domain",
+              "line": 47,
+              "primitive_calls": 24785,
+              "self_seconds": 1.602197608
+            },
+            {
+              "calls": 18014346,
+              "cumulative_seconds": 6.27182172,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "<genexpr>",
+              "line": 52,
+              "primitive_calls": 18014346,
+              "self_seconds": 4.15772484
+            },
+            {
+              "calls": 121,
+              "cumulative_seconds": 6.224953769000001,
+              "file": "tools/quality/project_model.py",
+              "function": "validate_project",
+              "line": 96,
+              "primitive_calls": 121,
+              "self_seconds": 0.06256841
+            },
+            {
+              "calls": 6131,
+              "cumulative_seconds": 4.603023081,
+              "file": "tools/quality/project_model.py",
+              "function": "validate_shape",
+              "line": 33,
+              "primitive_calls": 6131,
+              "self_seconds": 0.034437924
+            },
+            {
+              "calls": 904814,
+              "cumulative_seconds": 3.988702845,
+              "file": "tools/quality/quality_evidence.py",
+              "function": "_schema_matches",
+              "line": 96,
+              "primitive_calls": 28269,
+              "self_seconds": 2.3883125520000004
+            },
+            {
+              "calls": 2647,
+              "cumulative_seconds": 3.5549782850000002,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "validate_series",
+              "line": 94,
+              "primitive_calls": 2647,
+              "self_seconds": 0.051632846
+            },
+            {
+              "calls": 143249,
+              "cumulative_seconds": 3.2823820840000004,
+              "file": "tools/quality/project_model.py",
+              "function": "_validate_metadata",
+              "line": 41,
+              "primitive_calls": 6131,
+              "self_seconds": 0.167775698
+            },
+            {
+              "calls": 7064,
+              "cumulative_seconds": 3.262748416,
+              "file": "tools/quality/harness_evidence.py",
+              "function": "_file",
+              "line": 113,
+              "primitive_calls": 7064,
+              "self_seconds": 0.066536465
+            },
+            {
+              "calls": 6001,
+              "cumulative_seconds": 3.1005401110000004,
+              "file": "tools/quality/project_model.py",
+              "function": "subject_id",
+              "line": 70,
+              "primitive_calls": 6001,
+              "self_seconds": 0.071499991
+            },
+            {
+              "calls": 45870304,
+              "cumulative_seconds": 2.8633490580000003,
+              "file": "~",
+              "function": "<built-in method builtins.ord>",
+              "line": 0,
+              "primitive_calls": 45870304,
+              "self_seconds": 2.8633490580000003
+            },
+            {
+              "calls": 28336,
+              "cumulative_seconds": 2.3139233050000003,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/__init__.py",
+              "function": "loads",
+              "line": 299,
+              "primitive_calls": 28336,
+              "self_seconds": 0.039273741
+            },
+            {
+              "calls": 28336,
+              "cumulative_seconds": 2.2433786110000002,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/decoder.py",
+              "function": "decode",
+              "line": 333,
+              "primitive_calls": 28336,
+              "self_seconds": 0.065308639
+            },
+            {
+              "calls": 11390984,
+              "cumulative_seconds": 2.222960193,
+              "file": "tools/quality/project_model.py",
+              "function": "<genexpr>",
+              "line": 45,
+              "primitive_calls": 11390984,
+              "self_seconds": 1.5297505820000001
+            },
+            {
+              "calls": 33,
+              "cumulative_seconds": 2.124625391,
+              "file": "tools/quality/policy_engine.py",
+              "function": "validate_policy",
+              "line": 48,
+              "primitive_calls": 33,
+              "self_seconds": 0.0018967110000000001
+            },
+            {
+              "calls": 28336,
+              "cumulative_seconds": 2.123263156,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/json/decoder.py",
+              "function": "raw_decode",
+              "line": 344,
+              "primitive_calls": 28336,
+              "self_seconds": 2.1231505150000003
+            },
+            {
+              "calls": 9,
+              "cumulative_seconds": 1.4142408830000002,
+              "file": "tools/quality/policy_ratchet.py",
+              "function": "validate_base",
+              "line": 12,
+              "primitive_calls": 9,
+              "self_seconds": 9.822200000000001e-05
+            },
+            {
+              "calls": 28270,
+              "cumulative_seconds": 1.402272906,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py",
+              "function": "read_text",
+              "line": 1022,
+              "primitive_calls": 28270,
+              "self_seconds": 0.06678489800000001
+            },
+            {
+              "calls": 179201,
+              "cumulative_seconds": 1.388832293,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py",
+              "function": "__str__",
+              "line": 437,
+              "primitive_calls": 179201,
+              "self_seconds": 0.21669622400000002
+            },
+            {
+              "calls": 33,
+              "cumulative_seconds": 0.544631408,
+              "file": "tools/quality/fixtures/generic-core/replay.py",
+              "function": "oracle_matches",
+              "line": 65,
+              "primitive_calls": 33,
+              "self_seconds": 7.2184e-05
+            },
+            {
+              "calls": 33,
+              "cumulative_seconds": 0.544559224,
+              "file": "tools/quality/fixtures/generic-core/replay.py",
+              "function": "same_json",
+              "line": 29,
+              "primitive_calls": 33,
+              "self_seconds": 0.006274401000000001
+            },
+            {
+              "calls": 48,
+              "cumulative_seconds": 0.26006026000000004,
+              "file": "tools/quality/fixtures/generic-core/replay.py",
+              "function": "materialize",
+              "line": 92,
+              "primitive_calls": 48,
+              "self_seconds": 0.006259608000000001
+            },
+            {
+              "calls": 1782,
+              "cumulative_seconds": 0.09207931700000001,
+              "file": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py",
+              "function": "write_bytes",
+              "line": 1030,
+              "primitive_calls": 1782,
+              "self_seconds": 0.002985503
+            }
+          ],
+          "full_profile_sha256": "a364795d9565b7a394bd0ed13a8b6fff7b3877ffe4ea9b63860ff86db35d41be",
+          "full_function_count": 796
+        },
+        {
+          "child_cpu_seconds": 0.0,
+          "cpu_seconds": 11.229895539000001,
+          "evidence": "replay/run-1",
+          "process_wall_seconds": 11.31481072799943,
+          "profiled": false,
+          "wall_seconds": 11.230066882002575
+        },
+        {
+          "child_cpu_seconds": 0.0,
+          "cpu_seconds": 10.720345359,
+          "evidence": "replay/run-2",
+          "process_wall_seconds": 10.801142903001164,
+          "profiled": false,
+          "wall_seconds": 10.720962997002061
+        },
+        {
+          "child_cpu_seconds": 0.0,
+          "cpu_seconds": 11.712585234,
+          "evidence": "replay/run-3",
+          "process_wall_seconds": 11.794916191000084,
+          "profiled": false,
+          "wall_seconds": 11.715077944994846
+        }
+      ]
+    }
+  },
+  "direct_process_before": [
+    {
+      "name": "policy",
+      "sample": 1,
+      "wall_seconds": 24.83676644699881,
+      "returncode": 0,
+      "stdout": "{\"frozen_cases\": 33, \"reference_tests\": 31, \"comparisons\": 826, \"kinds\": {\"_select\": 20, \"aggregate\": 267, \"compare\": 189, \"decision\": 36, \"evaluate\": 147, \"report\": 133, \"review_exceptions\": 1, \"validate_policy\": 33}}\n",
+      "stderr": ""
+    },
+    {
+      "name": "replay",
+      "sample": 1,
+      "wall_seconds": 15.914668229997915,
+      "returncode": 0,
+      "stdout": "Passed 33 frozen Python oracle cases (non-authoritative)\n",
+      "stderr": ""
+    },
+    {
+      "name": "policy",
+      "sample": 2,
+      "wall_seconds": 26.743827183003305,
+      "returncode": 0,
+      "stdout": "{\"frozen_cases\": 33, \"reference_tests\": 31, \"comparisons\": 826, \"kinds\": {\"_select\": 20, \"aggregate\": 267, \"compare\": 189, \"decision\": 36, \"evaluate\": 147, \"report\": 133, \"review_exceptions\": 1, \"validate_policy\": 33}}\n",
+      "stderr": ""
+    },
+    {
+      "name": "replay",
+      "sample": 2,
+      "wall_seconds": 14.823471509000228,
+      "returncode": 0,
+      "stdout": "Passed 33 frozen Python oracle cases (non-authoritative)\n",
+      "stderr": ""
+    },
+    {
+      "name": "policy",
+      "sample": 3,
+      "wall_seconds": 16.30530130000261,
+      "returncode": 0,
+      "stdout": "{\"frozen_cases\": 33, \"reference_tests\": 31, \"comparisons\": 826, \"kinds\": {\"_select\": 20, \"aggregate\": 267, \"compare\": 189, \"decision\": 36, \"evaluate\": 147, \"report\": 133, \"review_exceptions\": 1, \"validate_policy\": 33}}\n",
+      "stderr": ""
+    },
+    {
+      "name": "replay",
+      "sample": 3,
+      "wall_seconds": 11.939061741999467,
+      "returncode": 0,
+      "stdout": "Passed 33 frozen Python oracle cases (non-authoritative)\n",
+      "stderr": ""
+    }
+  ],
+  "excluded_overlay_after": {
+    "policy": [
+      {
+        "profiled": true,
+        "process_wall_seconds": 40.06622436500038,
+        "cpu_seconds": 39.030682208
+      },
+      {
+        "profiled": false,
+        "process_wall_seconds": 19.286326338995423,
+        "cpu_seconds": 18.453271122
+      },
+      {
+        "profiled": false,
+        "process_wall_seconds": 26.183208870003,
+        "cpu_seconds": 25.18901798
+      },
+      {
+        "profiled": false,
+        "process_wall_seconds": 23.257030954002403,
+        "cpu_seconds": 22.396155207000003
+      }
+    ],
+    "replay": [
+      {
+        "profiled": true,
+        "process_wall_seconds": 33.5205750630048,
+        "cpu_seconds": 33.354972472
+      },
+      {
+        "profiled": false,
+        "process_wall_seconds": 11.410590149003838,
+        "cpu_seconds": 11.315512862
+      },
+      {
+        "profiled": false,
+        "process_wall_seconds": 10.359595551002712,
+        "cpu_seconds": 10.271567257
+      },
+      {
+        "profiled": false,
+        "process_wall_seconds": 10.539096543994674,
+        "cpu_seconds": 10.457717285000001
+      }
+    ]
+  }
+}
