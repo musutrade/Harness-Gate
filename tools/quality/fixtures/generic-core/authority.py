@@ -17,7 +17,7 @@ def write(path, value):
 
 def compare(expected, actual, path=''):
     """Retain every differing leaf, applying GH-150's sole wording classification."""
-    if replay.canonical(expected) == replay.canonical(actual):
+    if replay.same_json(expected, actual):
         return []
     if isinstance(expected, dict) and isinstance(actual, dict):
         diffs = []

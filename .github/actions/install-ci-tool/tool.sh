@@ -7,6 +7,7 @@ case "$tool" in
   cargo-nextest) version=0.9.143 ;;
   cargo-llvm-cov) version=0.9.0 ;;
   cargo-audit) version=0.22.2 ;;
+  cargo-tarpaulin) version=0.37.5 ;;
   *) echo "::error::Unsupported CI tool: $tool" >&2; exit 1 ;;
 esac
 
@@ -17,8 +18,14 @@ case "$mode" in
     output=$(cargo "${tool#cargo-}" --version)
     printf '%s\n' "$output"
     read -r name actual rest <<< "$output"
+    # These pinned releases repeat their subcommand in Cargo's version output.
+    expected_name=$tool
+    case "$tool" in
+      cargo-audit) expected_name=cargo-audit-audit ;;
+      cargo-tarpaulin) expected_name=cargo-tarpaulin-tarpaulin ;;
+    esac
     if [[ "$actual" != "$version" ]] ||
-       [[ "$name" != "$tool" && !( "$tool" == cargo-audit && "$name" == cargo-audit-audit ) ]]; then
+       [[ "$name" != "$tool" && "$name" != "$expected_name" ]]; then
       echo "::error::Expected $tool $version; installed executable reported: $output" >&2
       exit 1
     fi

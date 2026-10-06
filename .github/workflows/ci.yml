@@ -207,7 +207,9 @@ jobs:
           cache-target: 'false'
 
       - name: Install tarpaulin
-        run: cargo install cargo-tarpaulin --locked --force
+        uses: ./.github/actions/install-ci-tool
+        with:
+          tool: cargo-tarpaulin
 
       - name: Generate coverage
         # The full CLI corpus spawns Rust subprocesses through Python. LLVM
