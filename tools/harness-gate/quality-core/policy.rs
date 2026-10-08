@@ -45,11 +45,38 @@ pub fn validate_policy_document(policy: &Value) -> Result<()> {
     index(&policy["rules"], "id", "policy ID")?;
     for rule in array(&policy["rules"]) {
         validate_rule_metric(rule)?;
+        validate_scope(&rule["scope"], false)?;
         if rule["scope"]["kind"] == "relationship" {
             validate_relationship_rule(rule)?;
         }
     }
     Ok(())
+}
+
+/// Validate one supported scope branch, without expanding the schema walker.
+/// Configuration documents may contain subject aliases until compilation;
+/// resolved policies and direct selection require canonical subject identities.
+fn validate_scope(scope: &Value, resolved: bool) -> Result<()> {
+    super::json::domain(scope)?;
+    require(
+        scope.is_object() && scope["kind"].is_string(),
+        "invalid policy scope",
+    )?;
+    let mut shape = array(&schema::POLICY["definitions"]["Rule"]["properties"]["scope"]["oneOf"])
+        .iter()
+        .find(|variant| {
+            let kind = &variant["properties"]["kind"];
+            kind["const"] == scope["kind"]
+                || kind["enum"]
+                    .as_array()
+                    .is_some_and(|values| values.contains(&scope["kind"]))
+        })
+        .cloned()
+        .ok_or_else(|| error("unknown policy scope kind"))?;
+    if !resolved && scope["kind"] == "subject" {
+        shape["properties"]["subject"] = json!({"type":"string", "minLength":1});
+    }
+    schema::shape(scope, &shape, None)
 }
 
 fn validate_rule_metric(rule: &Value) -> Result<()> {
@@ -104,10 +131,7 @@ pub fn validate_policy(policy: &Value, project: &Value) -> Result<()> {
     for rule in array(&policy["rules"]) {
         validate_rule_metric(rule)?;
         let scope = &rule["scope"];
-        require(
-            scope.is_object() && scope["kind"].is_string(),
-            "invalid policy scope",
-        )?;
+        validate_scope(scope, false)?;
         if scope["kind"] == "subject" {
             require(
                 array(&project["subjects"])
@@ -139,6 +163,9 @@ pub fn validate_policy(policy: &Value, project: &Value) -> Result<()> {
                 "policy boundary requires component",
             )?;
         }
+        // Preserve existing reference diagnostics (including unknown aliases)
+        // before requiring resolved canonical identity syntax.
+        validate_scope(scope, true)?;
     }
     Ok(())
 }
@@ -149,6 +176,7 @@ pub fn select<'a>(
     selection: &Value,
     target: &Value,
 ) -> Result<Vec<&'a Value>> {
+    validate_scope(scope, true)?;
     let subjects: Vec<_> = array(&project["subjects"])
         .iter()
         .filter(|s| s["target"] == *target)
@@ -184,7 +212,7 @@ pub fn select<'a>(
                 .filter(|s| unique.contains(string(&s["id"])))
                 .collect())
         }
-        _ => Ok(subjects
+        "project" | "component" | "boundary" => Ok(subjects
             .into_iter()
             .filter(|s| {
                 ["component", "boundary"]
@@ -192,6 +220,7 @@ pub fn select<'a>(
                     .all(|key| scope.get(key).is_none_or(|v| s[key] == *v))
             })
             .collect()),
+        _ => Err(error("unknown policy scope kind")),
     }
 }
 
