@@ -123,13 +123,35 @@ Main push 37411168218 failed the separate heartbeat test in Windows baseline.
 It is retained as a **censored diagnostic**, with no successful critical-path
 value. A shorter failed run must not count as a performance improvement.
 
-Still required before GH-291 is closed:
+The three successful after PR runs (37721721679, 37724107517,
+37726571334) and three successful after push runs (37429831983,
+37722931483, 37725407263) are now retained and independently reviewed.
+PR creation-to-aggregate median was 756s before and 809s after; push median
+was 1533s before and 1529s after. These mixed source/compiler/cache cohorts
+do not establish a causal overall speedup. First real PR runner delays are
+4/2/117s, median 4s; skipped virtual jobs are excluded.
 
-- Three representative successful hosted after PR runs and three after push
-  runs, with matched source/toolchain/cache caveats and per-event comparison
-- Hosted same-version LLVM coverage/evidence parity and installation timing
-- Exact submitted-commit required CI acceptance; local focused tests alone do
-  not satisfy required coverage/risk/critical-path gates
+Tarpaulin 0.37.5 installation was 117.790059s from source before and
+0.775141/0.443176/0.412105s for verified prebuilt installation after.
+The first before/after logs have identical covered/total counters for all
+92 files. This is same-version observational parity, without same-SHA
+controlled execution or raw XML byte parity. Later denominators differ.
+Codecov rejected tokenless transport; nonblocking action success does not
+prove ingestion. Separate source-risk artifacts are not tarpaulin output.
+
+See [the hosted evidence appendix](issue291-natural-main-appendix.md) and
+[structured run/identity record](issue291-natural-main-20261008.json).
+The five upstream installer boundary cases are now independently audited
+using separately identified new raw logs; the missing historical raw path
+is recorded, not relabeled as consumed.
+
+Acceptance evidence now covers the scoped implementation/parity tests,
+three successful PR and push cohorts, five warm samples on all platforms,
+native jobs, unchanged requiredness and the installer failure boundaries.
+The final documentation submission must pass its own Required Quality
+Aggregate bound to its actual commit. Historical observations do not replace
+that status. No additional natural runs or optional sparse-checkout experiment
+are needed to restate the measured boundaries.
 
 Push-only coverage and five-sample native baselines remain push-only. No trigger,
 platform, sample count, threshold, required job, aggregate condition or failure
