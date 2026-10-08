@@ -42,6 +42,7 @@ fn expression_attributes(expression: &mut Expr) -> Option<&mut Vec<Attribute>> {
         Expr::If(n) => Some(&mut n.attrs),
         Expr::Closure(n) => Some(&mut n.attrs),
         Expr::Async(n) => Some(&mut n.attrs),
+        Expr::Try(n) => Some(&mut n.attrs),
         _ => None,
     }
 }
@@ -197,6 +198,23 @@ impl VisitMut for Configuration {
         visit_mut::visit_block_mut(self, node);
     }
     fn visit_expr_mut(&mut self, node: &mut Expr) {
+        // A complete statement's attributes were already consumed by
+        // visit_block_mut. Residual Try attributes belong to a nested position
+        // that cannot be removed as a statement. Reject before active() can
+        // strip even a true predicate and accidentally admit that position.
+        if let Expr::Try(expression) = node {
+            if expression
+                .attrs
+                .iter()
+                .any(|attr| attr.path().is_ident("cfg") || attr.path().is_ident("cfg_attr"))
+            {
+                self.errors.push(
+                    "unsupported cfg try expression position; only removable statements are supported"
+                        .into(),
+                );
+                return;
+            }
+        }
         let location = node.span();
         if let Some(attrs) = expression_attributes(node) {
             if !self.active(attrs, location) {

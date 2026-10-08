@@ -61,6 +61,7 @@ class RiskScopeTests(unittest.TestCase):
             for path, supported in (
                 ('tools/harness-gate/src/process/tests.rs', True),
                 ('tools/harness-gate/src/process/replay.rs', True),
+                ('tools/harness-gate/src/process/command.rs', True),
                 ('tools/harness-gate/src/project/discovery.rs', True),
                 ('tools/harness-gate/src/project/mod.rs', True),
                 ('tools/harness-gate/src/utils/redaction.rs', True),
