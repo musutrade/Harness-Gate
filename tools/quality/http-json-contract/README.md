@@ -44,12 +44,20 @@ an observation with a null body and empty content type.
 plus `Response` (and `Request` for JSON request bodies). The complete source digest
 stamp is retained. The checker rejects edited/widened types, `any`, TypeScript
 suppression comments, missing consumers and undeclared operations.
+All expected declarations are compared in both directions, including JSON
+Request types and Response types with no current call site. Field types,
+requiredness and enum changes cannot be hidden by retaining declaration names
+or the digest stamp. Whitespace-only formatting remains accepted.
 
 Supported Angular forms are canonical `httpResource<T>(() => '/literal')` and
 `HttpClient` held in an explicitly typed/injected variable or class property,
 using typed get/post/put/patch/delete calls with literal or template paths.
 Dynamic/aliased HTTP APIs require an additional certified adapter; they are not
 silently ignored. Parameter templates must resolve to one declared route shape.
+Every use of a canonical `httpResource` binding must be its import declaration
+or a direct call. Assigning it to a variable/property, passing or returning it,
+re-exporting it, shadowing its name, and indirect calls fail inventory, including
+in files alongside an otherwise valid consumer.
 Request examples are checked against request schemas for successful responses;
 response types are checked structurally against generated operation types.
 
@@ -73,3 +81,8 @@ reuse the old series pin. Rollback selects the preserved rc.4 installation and
 its matching approved series, but restores the functional-import rejection.
 
 Signed candidate packages and installation: [release guide](../../../docs/releases/0.4.6.zh-CN.md).
+
+GH-282 strengthens those existing inventory and generated-type checks. The rule
+identity includes the collector implementation hash and therefore changes with
+this repair. New collection requires the matching approved series; previous
+evidence must retain its original identity.
