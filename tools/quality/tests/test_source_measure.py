@@ -342,7 +342,7 @@ fn both() {
         self.assertEqual(SERIES, {
             'analyzer': 'harness-gate-rust-measure/0.3.1', 'rule': 'mccabe-rust-3/1',
             'instrumentation': 'closure-black-box/1', 'mapping': 'insertions-utf8/1',
-            'selection': 'gh285-process-group/1', 'configuration': 'compiler-target-production/2',
+            'selection': 'gh285-process-group/1', 'configuration': 'compiler-target-production/3',
         })
         path = 'utils/redaction.rs'
         self.assertIn(path, SOURCE_FILES)
@@ -576,22 +576,30 @@ fn main() {
         return {'base': base.decode(), 'head': head.decode()}
 
     def test_actual_process_command_base_head_inventory_and_reparse(self):
+        retained = Path(os.environ.get('RUST_MEASURE_NATIVE_EVIDENCE', ROOT / 'target/gh285-native-evidence')).resolve()
+        retained.mkdir(parents=True, exist_ok=True)
+        evidence = Path(tempfile.mkdtemp(prefix='process-command-ast-', dir=retained))
         self.assertIn('process/command.rs', SOURCE_FILES)
         self.assertEqual(SERIES, {
             'analyzer': 'harness-gate-rust-measure/0.3.1', 'rule': 'mccabe-rust-3/1',
             'instrumentation': 'closure-black-box/1', 'mapping': 'insertions-utf8/1',
-            'selection': 'gh285-process-group/1', 'configuration': 'compiler-target-production/2',
+            'selection': 'gh285-process-group/1', 'configuration': 'compiler-target-production/3',
         })
         for label, source in self.process_command_sources().items():
             for target in ('x86_64-unknown-linux-gnu', 'aarch64-apple-darwin', 'x86_64-pc-windows-msvc'):
                 with self.subTest(source=label, target=target):
                     inventory = self.inventory(source, target)
+                    case = evidence / label / target
+                    case.mkdir(parents=True)
+                    (case / 'original.rs').write_bytes(source.encode('utf-8'))
+                    (case / 'inventory.json').write_text(json.dumps(inventory, indent=2) + '\n')
                     symbols = inventory['symbols']
                     windows = 'windows' in inventory['configuration']['cfg']
                     functions = [s['name'] for s in symbols if s['kind'] == 'function']
                     expected = ['isolate_process_tree', 'terminate'] if windows else (
                         ['isolate_process_tree', 'terminate', 'send_signal'] if label == 'base' else
-                        ['isolate_process_tree', 'terminate', 'terminate_with_signal', 'reap_timeout', 'observe_exit', 'send_signal'])
+                        ['isolate_process_tree', 'terminate', 'terminate_with_signal', 'reap_timeout', 'observe_exit', 'observe_pid', 'send_signal']
+                        + (['list_process_group', 'darwin_group_is_finished'] if 'target_os="macos"' in inventory['configuration']['cfg'] else []))
                     self.assertEqual(functions, expected)
                     closures = [s for s in symbols if s['kind'] == 'closure']
                     self.assertEqual(len(closures), 1)
@@ -602,6 +610,9 @@ fn main() {
                     transformed, edits = instrument(source, inventory)
                     self.assertEqual(len(edits), 2)
                     reparsed = self.inventory(transformed, target)
+                    (case / 'instrumented.rs').write_bytes(transformed.encode('utf-8'))
+                    (case / 'reparsed.json').write_text(json.dumps(reparsed, indent=2) + '\n')
+                    (case / 'edits.json').write_text(json.dumps(edits, indent=2) + '\n')
                     self.assertEqual([(s['name'].split('::closure_')[0], s['kind'], s['raw']) for s in symbols],
                                      [(s['name'].split('::closure_')[0], s['kind'], s['raw']) for s in reparsed['symbols']])
                     for original, inserted in zip(symbols, reparsed['symbols']):
@@ -609,6 +620,11 @@ fn main() {
                             mapped = byte_span(transformed, inserted[field])
                             self.assertEqual((*original_point(mapped[:2], edits), *original_point(mapped[2:], edits)),
                                              byte_span(source, original[field]))
+        (evidence / 'validated.json').write_text(json.dumps({'series': SERIES,
+            'base_commit': PROCESS_COMMAND_BASE_COMMIT, 'base_source_sha256': PROCESS_COMMAND_BASE_SHA256,
+            'test_source_sha256': digest(Path(__file__).read_bytes()),
+            'analyzer_build_record': {'path': str(self.build_record), 'sha256': digest(self.build_record.read_bytes())}},
+            indent=2) + '\n')
 
     def test_process_command_base_snapshot_missing_object_and_tamper(self):
         from unittest.mock import patch
@@ -626,6 +642,64 @@ fn main() {
         with patch.object(subprocess, 'run', return_value=failed):
             with self.assertRaisesRegex(AssertionError, 'repository unavailable'):
                 self.process_command_sources()
+
+    def test_cfg_macos_predicate_is_bounded_and_ranges_reparse(self):
+        source = '''#[cfg(target_os = "macos")]
+fn darwin() -> u8 { 7 }
+fn common() -> u8 {
+    #[cfg(target_os = "macos")]
+    { return darwin(); }
+    3
+}
+'''
+        retained = Path(os.environ.get('RUST_MEASURE_NATIVE_EVIDENCE', ROOT / 'target/gh285-native-evidence')).resolve()
+        retained.mkdir(parents=True, exist_ok=True)
+        evidence = Path(tempfile.mkdtemp(prefix='cfg-macos-ast-', dir=retained))
+        (evidence / 'source.rs').write_bytes(source.encode('utf-8'))
+        results = {}
+        for target in ('x86_64-unknown-linux-gnu', 'aarch64-apple-darwin', 'x86_64-pc-windows-msvc'):
+            configuration = compiler_configuration(target)
+            darwin = 'target_os="macos"' in configuration['cfg']
+            inventory = self.inventory(source, target)
+            self.assertEqual([row['name'] for row in inventory['symbols']],
+                             ['darwin', 'common'] if darwin else ['common'])
+            expected_excluded = [] if darwin else [
+                '#[cfg(target_os = "macos")]\nfn darwin() -> u8 { 7 }',
+                '#[cfg(target_os = "macos")]\n    { return darwin(); }',
+            ]
+            raw = source.encode('utf-8')
+            actual_excluded = []
+            for span in inventory['excluded']:
+                points = byte_span(source, span)
+                lines = raw.splitlines(keepends=True)
+                start = sum(map(len, lines[:points[0] - 1])) + points[1] - 1
+                end = sum(map(len, lines[:points[2] - 1])) + points[3] - 1
+                actual_excluded.append(raw[start:end].decode('utf-8'))
+            self.assertEqual(actual_excluded, expected_excluded)
+            transformed, edits = instrument(source, inventory)
+            self.assertEqual(edits, [])
+            self.assertEqual(self.inventory(transformed, target), inventory)
+            refusals = {}
+            for predicate in ('target_os="linux"', 'target_os="windows"', 'target_os="ios"',
+                              'target_os=7', 'target_arch="aarch64"',
+                              'not(target_os="macos")', 'all(unix, target_os="macos")'):
+                file = evidence / (target + '-' + str(len(refusals)) + '.rs')
+                file.write_bytes(('#[cfg(' + predicate + ')] fn f() {}\n').encode('utf-8'))
+                result = subprocess.run([str(self.binary), str(file), '--target-cfg'],
+                    input=json.dumps(configuration).encode(), capture_output=True, timeout=30)
+                (file.with_suffix('.stdout')).write_bytes(result.stdout)
+                (file.with_suffix('.stderr')).write_bytes(result.stderr)
+                self.assertNotEqual(result.returncode, 0, predicate)
+                self.assertEqual(result.stdout, b'')
+                self.assertIn(b'unsupported cfg', result.stderr)
+                refusals[predicate] = {'returncode': result.returncode,
+                                      'stderr': result.stderr.decode('utf-8')}
+            results[target] = {'configuration': configuration, 'inventory': inventory,
+                               'excluded_bytes': actual_excluded, 'refusals': refusals}
+            (evidence / 'results.json').write_text(json.dumps(results, indent=2) + '\n')
+        (evidence / 'validated.json').write_text(json.dumps({'series': SERIES,
+            'source_sha256': digest(raw), 'test_source_sha256': digest(Path(__file__).read_bytes()),
+            'analyzer_build_record': str(self.build_record), 'results': results}, indent=2) + '\n')
 
     def test_cfg_try_statements_and_nested_positions_are_bounded(self):
         retained = Path(os.environ.get('RUST_MEASURE_NATIVE_EVIDENCE', ROOT / 'target/gh285-native-evidence')).resolve()
@@ -679,7 +753,7 @@ fn main() {
                 self.assertNotEqual(result.returncode, 0, (target, name))
                 self.assertIn(error, result.stderr, (target, name))
                 self.assertEqual(result.stdout, '', 'rejection may not emit a partial production inventory')
-        (evidence / 'source.rs').write_text(CFG_TRY_SOURCE)
+        (evidence / 'source.rs').write_bytes(CFG_TRY_SOURCE.encode("utf-8"))
         (evidence / 'validated.json').write_text(json.dumps(results, indent=2) + '\n')
 
     def test_cfg_try_synthetic_interval_contract(self):
@@ -687,7 +761,7 @@ fn main() {
         retained = Path(os.environ.get('RUST_MEASURE_NATIVE_EVIDENCE', ROOT / 'target/gh285-native-evidence')).resolve()
         retained.mkdir(parents=True, exist_ok=True)
         evidence = Path(tempfile.mkdtemp(prefix='cfg-try-synthetic-', dir=retained))
-        (evidence / 'source.rs').write_text(CFG_TRY_SOURCE)
+        (evidence / 'source.rs').write_bytes(CFG_TRY_SOURCE.encode("utf-8"))
         before_lines = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
         # This is deliberately synthetic: LLVM's actual export has separate
         # regions, not this enclosing interval. Never add it to a native export.
@@ -734,18 +808,20 @@ fn main() {
         crate = evidence / 'crate'
         (crate / 'src').mkdir(parents=True)
         file = crate / 'src/configured.rs'
-        file.write_text(CFG_TRY_SOURCE)
+        file.write_bytes(CFG_TRY_SOURCE.encode("utf-8"))
+        self.assertEqual(file.read_bytes(), CFG_TRY_SOURCE.encode("utf-8"))
         configuration = compiler_configuration()
         inventory = ast(file, self.binary, configuration)
         transformed, edits = instrument(CFG_TRY_SOURCE, inventory)
-        file.write_text(transformed)
+        file.write_bytes(transformed.encode("utf-8"))
+        self.assertEqual(file.read_bytes(), transformed.encode("utf-8"))
         self.assertEqual(edits, [])
         self.assertEqual(len(inventory['excluded']), 1)
         manifest = {'series': SERIES, 'configuration': configuration, 'files': {'configured.rs': {
             'original': CFG_TRY_SOURCE, 'original_sha256': digest(CFG_TRY_SOURCE.encode()),
             'instrumented_sha256': digest(transformed.encode()), 'inventory': inventory, 'edits': edits}}}
         (evidence / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
-        (evidence / 'configured.original.rs').write_text(CFG_TRY_SOURCE)
+        (evidence / 'configured.original.rs').write_bytes(CFG_TRY_SOURCE.encode("utf-8"))
         main = crate / 'src/main.rs'
         main.write_text('''mod configured;
 fn main() {
@@ -892,11 +968,12 @@ fn main() {
         with self.assertRaisesRegex(ValueError, 'AST inventory does not reproduce'):
             measure(tampered, exports['combined'], crate, self.binary)
         negatives.append('omitted statement exclusion rejected at AST reproduction')
-        old = copy.deepcopy(manifest)
-        old['series']['configuration'] = 'compiler-target-production/1'
-        with self.assertRaisesRegex(ValueError, 'incompatible measurement series'):
-            measure(old, exports['combined'], crate, self.binary)
-        negatives.append('old configuration identity rejected before mapping')
+        for identity in ('compiler-target-production/1', 'compiler-target-production/2'):
+            old = copy.deepcopy(manifest)
+            old['series']['configuration'] = identity
+            with self.assertRaisesRegex(ValueError, 'incompatible measurement series'):
+                measure(old, exports['combined'], crate, self.binary)
+            negatives.append(identity + ' rejected before mapping')
         report = {'series': SERIES, 'configuration': configuration, 'tools': provenance(self.binary),
                   'analyzer_build_record': {'path': str(self.build_record), 'sha256': digest(self.build_record.read_bytes())},
                   'binary_sha256': digest(executable.read_bytes()), 'test_source_sha256': digest(Path(__file__).read_bytes()),
@@ -920,9 +997,15 @@ fn main() {
     let mode = std::env::args().nth(1).unwrap();
     #[cfg(unix)]
     let mut cmd = {
-        let mut cmd = Command::new("sh");
-        cmd.args(["-c", if mode == "kill-error" { "exec sleep 30" } else { "exit 7" }]);
-        cmd
+        if mode == "live-anchor" {
+            let mut cmd = Command::new("python3");
+            cmd.args(["-c", "import os,signal,time; from pathlib import Path; signal.signal(signal.SIGTERM,lambda *_:os._exit(7)); Path(os.environ['LIVE_READY']).write_text(str(os.getpid())); time.sleep(30)"]);
+            cmd
+        } else {
+            let mut cmd = Command::new("sh");
+            cmd.args(["-c", if mode == "kill-error" { "exec sleep 30" } else { "exit 7" }]);
+            cmd
+        }
     };
     #[cfg(windows)]
     let mut cmd = {
@@ -950,7 +1033,21 @@ fn main() {
         }
     }
     let mut child = cmd.spawn().unwrap();
-    #[cfg(unix)] if mode != "kill-error" {
+    #[cfg(unix)] if mode == "live-anchor" {
+        // A real owned live member, with the TERM handler installed before
+        // readiness, certifies both unmodified base and head callbacks.
+        let path = std::path::PathBuf::from(std::env::var("LIVE_READY").unwrap());
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+        loop {
+            if let Ok(pid) = std::fs::read_to_string(&path) {
+                assert_eq!(pid.parse::<u32>().unwrap(), child.id());
+                break;
+            }
+            assert!(std::time::Instant::now() < deadline, "live-anchor readiness timeout");
+            std::thread::sleep(std::time::Duration::from_millis(10));
+        }
+    }
+    #[cfg(unix)] if mode != "kill-error" && mode != "live-anchor" {
         // Observe natural exit without reaping, including for the exact base
         // implementation. TERM cannot race the intended exit-7 assertion.
         let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
@@ -964,13 +1061,60 @@ fn main() {
         }
     }
     HEAD_CASES
-    let status = command::terminate(&mut child).unwrap();
-    #[cfg(unix)] assert_eq!(status.code(), Some(7));
-    #[cfg(windows)] assert!(!status.success());
+    let outcome = command::terminate(&mut child);
+    #[cfg(target_os = "macos")]
+    if BASE_CASE && mode == "isolated" {
+        // Preserve the exact old implementation. This host's real raw outcome
+        // is evidence, not a claim that the base already fixed zombie groups.
+        match outcome {
+            Ok(status) => {
+                assert_eq!(status.code(), Some(7));
+                println!("outcome=ok status=7");
+            }
+            Err(error) => {
+                assert_eq!(error.raw_os_error(), Some(libc::EPERM));
+                println!("outcome=eperm status=7");
+                // No group signals after reap; WNOWAIT above proved exited.
+                assert_eq!(child.wait().unwrap().code(), Some(7));
+            }
+        }
+        assert!(child.try_wait().unwrap().is_some());
+        return;
+    }
+    let status = outcome.unwrap();
+    #[cfg(unix)] {
+        assert_eq!(status.code(), Some(7));
+        println!("outcome=ok status=7");
+    }
+    #[cfg(windows)] {
+        assert!(!status.success());
+        println!("outcome=terminated");
+    }
     assert!(child.try_wait().unwrap().is_some());
 }
 '''
         head_cases = r'''
+    #[cfg(target_os = "macos")]
+    if mode == "guard-checks" {
+        fn exited(_: i32) -> std::io::Result<bool> { Ok(true) }
+        fn live(_: i32) -> std::io::Result<bool> { Ok(false) }
+        fn reaped(_: i32) -> std::io::Result<bool> { Err(std::io::Error::from_raw_os_error(libc::ECHILD)) }
+        fn denied(_: i32) -> std::io::Result<bool> { Err(std::io::Error::from_raw_os_error(libc::EPERM)) }
+        fn forbidden(_: i32, _: &mut [libc::pid_t; 2]) -> i32 { panic!("query after unknown/live leader"); }
+        fn empty(_: i32, _: &mut [libc::pid_t; 2]) -> i32 { 0 }
+        fn negative(_: i32, _: &mut [libc::pid_t; 2]) -> i32 { -1 }
+        fn short(pid: i32, pids: &mut [libc::pid_t; 2]) -> i32 { pids[0] = pid; 2 }
+        fn nonintegral(pid: i32, pids: &mut [libc::pid_t; 2]) -> i32 { pids[0] = pid; 7 }
+        fn full(pid: i32, pids: &mut [libc::pid_t; 2]) -> i32 { *pids = [pid, pid + 1]; 8 }
+        fn wrong(pid: i32, pids: &mut [libc::pid_t; 2]) -> i32 { pids[0] = pid + 1; 4 }
+        for query in [empty, negative, short, nonintegral, full, wrong] {
+            assert!(!command::darwin_group_is_finished(child.id() as i32, exited, query));
+        }
+        for observe in [live, reaped, denied] {
+            assert!(!command::darwin_group_is_finished(child.id() as i32, observe, forbidden));
+        }
+        println!("guard_queries=6 observer_refusals=3");
+    }
     #[cfg(unix)] {
         if mode == "reaped" {
             child.wait().unwrap();
@@ -1048,16 +1192,20 @@ fn main() {
             crate = evidence / label
             (crate / 'src').mkdir(parents=True)
             file = crate / 'src/command.rs'
-            file.write_bytes(source.encode())
+            file.write_bytes(source.encode('utf-8'))
+            self.assertEqual(file.read_bytes(), source.encode('utf-8'))
             inventory = json.loads(run([str(self.binary.resolve()), str(file), '--target-cfg'], input=json.dumps(configuration).encode()))
             transformed, edits = instrument(source, inventory)
-            file.write_bytes(transformed.encode())
+            file.write_bytes(transformed.encode('utf-8'))
+            self.assertEqual(file.read_bytes(), transformed.encode('utf-8'))
             manifest = {'series': SERIES, 'configuration': configuration, 'files': {'command.rs': {
                 'original': source, 'original_sha256': digest(source.encode()),
                 'instrumented_sha256': digest(transformed.encode()), 'inventory': inventory, 'edits': edits}}}
             (crate / 'command.original.rs').write_bytes(source.encode())
             (crate / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
-            (crate / 'src/main.rs').write_text(driver.replace('HEAD_CASES', head_cases if label == 'head' else ''))
+            main_source = driver.replace('HEAD_CASES', head_cases if label == 'head' else '').replace('BASE_CASE', str(label == 'base').lower())
+            (crate / 'src/main.rs').write_bytes(main_source.encode('utf-8'))
+            self.assertEqual((crate / 'src/main.rs').read_bytes(), main_source.encode('utf-8'))
             (crate / 'Cargo.toml').write_text(cargo)
             (crate / 'Cargo.lock').write_bytes(lock)
             environment = {**os.environ, 'CARGO_TARGET_DIR': str(crate / 'target'), 'RUSTFLAGS': '-C instrument-coverage -C opt-level=0'}
@@ -1072,14 +1220,33 @@ fn main() {
             executable = crate / 'target' / configuration['target'] / 'debug' / ('process-native-fixture' + suffix)
             results, negatives = {}, []
             modes = ['plain', 'isolated']
+            if 'unix' in configuration['cfg']:
+                modes += ['live-anchor']
             if label == 'head' and 'unix' in configuration['cfg']:
                 modes += ['reaped', 'kill-error']
+                if 'target_os="macos"' in configuration['cfg']:
+                    modes += ['guard-checks']
             for mode in modes:
                 directory = crate / mode
                 directory.mkdir()
                 parent_pattern, child_pattern = directory / 'parent-%p.profraw', directory / 'child-%p.profraw'
-                run([str(executable), mode], cwd=crate, env={**environment, 'LLVM_PROFILE_FILE': str(parent_pattern), 'CHILD_PROFILE': str(child_pattern)},
-                    record_environment={'LLVM_PROFILE_FILE': str(parent_pattern), 'CHILD_PROFILE': str(child_pattern)})
+                mode_env = {'LLVM_PROFILE_FILE': str(parent_pattern), 'CHILD_PROFILE': str(child_pattern),
+                            'LIVE_READY': str(directory / 'live-ready')}
+                outcome = run([str(executable), mode], cwd=crate, env={**environment, **mode_env},
+                              record_environment=mode_env).decode('utf-8').splitlines()
+                darwin = 'target_os="macos"' in configuration['cfg']
+                if mode in ('reaped', 'kill-error'):
+                    self.assertEqual(outcome, [])
+                elif mode == 'guard-checks':
+                    self.assertEqual(outcome, ['guard_queries=6 observer_refusals=3', 'outcome=ok status=7'])
+                elif darwin and label == 'base' and mode == 'isolated':
+                    self.assertIn(outcome, [['outcome=eperm status=7'], ['outcome=ok status=7']])
+                elif 'windows' in configuration['cfg']:
+                    # taskkill inherits stdout; retain every raw line in outcome.
+                    self.assertEqual([line for line in outcome if line.startswith('outcome=')],
+                                     ['outcome=terminated'])
+                else:
+                    self.assertEqual(outcome, ['outcome=ok status=7'])
                 parent_files, child_files = list(directory.glob('parent-*.profraw')), list(directory.glob('child-*.profraw'))
                 self.assertEqual(len(parent_files), 1)
                 unix = 'unix' in configuration['cfg']
@@ -1142,9 +1309,17 @@ fn main() {
                         measure(manifest, missing, crate, self.binary)
                     negatives.append({'mode': mode, 'missing_child_closure': child_closure['name']})
                 results[mode] = {'ordinary_parent': parent_rows, 'fixture_combined': rows,
-                                 'child_flush': child_rows if child_files else None}
+                                 'child_flush': child_rows if child_files else None,
+                                 'actual_driver_outcome': outcome,
+                                 'legacy_eperm_permitted': darwin and label == 'base' and mode == 'isolated'}
                 (crate / 'results.json').write_text(json.dumps(results, indent=2) + '\n')
                 (crate / 'negative-checks.json').write_text(json.dumps(negatives, indent=2) + '\n')
+            if label == 'head' and 'target_os="macos"' in configuration['cfg']:
+                for owner in ('observe_pid', 'list_process_group', 'darwin_group_is_finished'):
+                    witnesses = [mode for mode, data in results.items()
+                                 if any(row['name'] == owner and any(i['count'] > 0 for i in row['instances'])
+                                        for row in data['ordinary_parent'])]
+                    self.assertTrue(witnesses, 'new Darwin owner needs its own positive native counter: ' + owner)
             report['sources'][label] = {'source_sha256': digest(source.encode()), 'inventory': inventory,
                                        'binary_sha256': digest(executable.read_bytes()), 'results': results, 'validated': negatives}
         (evidence / 'native-result.json').write_text(json.dumps(report, indent=2) + '\n')

@@ -54,6 +54,13 @@ impl Configuration {
             Meta::Path(path) if path.is_ident("unix") || path.is_ident("windows") => {
                 Ok(self.values.contains(&path.get_ident().unwrap().to_string()))
             }
+            Meta::NameValue(value)
+                if value.path.is_ident("target_os")
+                    && matches!(&value.value, Expr::Lit(expression)
+                        if matches!(&expression.lit, syn::Lit::Str(name) if name.value() == "macos")) =>
+            {
+                Ok(self.values.iter().any(|value| value == "target_os=\"macos\""))
+            }
             Meta::List(list) if list.path.is_ident("not") => {
                 let inner: Meta = syn::parse2(list.tokens.clone())?;
                 if !matches!(inner, Meta::Path(_)) {
@@ -83,7 +90,7 @@ impl Configuration {
             }
             _ => Err(syn::Error::new_spanned(
                 meta,
-                "unsupported cfg predicate (only unix/windows/test, not(atom), all(atoms))",
+                "unsupported cfg predicate (only unix/windows/test, target_os=macos, not(atom), all(atoms))",
             )),
         }
     }

@@ -22,7 +22,7 @@ from production_coverage import counts, require
 
 SERIES = {"analyzer": "harness-gate-rust-measure/0.3.1", "rule": "mccabe-rust-3/1",
           "instrumentation": "closure-black-box/1", "mapping": "insertions-utf8/1",
-          "selection": "gh285-process-group/1", "configuration": "compiler-target-production/2"}
+          "selection": "gh285-process-group/1", "configuration": "compiler-target-production/3"}
 PREFIX = "{ ::std::hint::black_box(()); "
 SUFFIX = " }"
 HOTSPOTS = {
