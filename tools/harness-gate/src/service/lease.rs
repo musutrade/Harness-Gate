@@ -1,3 +1,4 @@
+use super::report_directory::ReportDirectoryGuard;
 use crate::config::ContainerRuntimeKind;
 use crate::project::Project;
 use anyhow::{bail, Context, Result};
@@ -103,6 +104,8 @@ pub(crate) struct ResourceLease {
     stop_heartbeat: Option<mpsc::Sender<()>>,
     heartbeat: Option<JoinHandle<()>>,
     release_on_drop: bool,
+    // Closed only after Drop stops heartbeat and attempts the checked release.
+    report_directory_guard: Option<ReportDirectoryGuard>,
 }
 
 impl ResourceLease {
@@ -152,6 +155,20 @@ impl ResourceLease {
             );
         }
 
+        let report_directory_guard = if resource_kind_is_report(&record) {
+            let guard = ReportDirectoryGuard::try_acquire(project, &record.invocation_id)?
+                .ok_or_else(|| {
+                    anyhow::anyhow!("report-directory lease conflict: resource is in use")
+                })?;
+            guard.validate_record(&record)?;
+            // Invalidate any earlier release before creating/renewing a marker.
+            // A failed allocation or failed release never certifies completion.
+            guard.invalidate_release()?;
+            Some(guard)
+        } else {
+            None
+        };
+
         loop {
             match create_record(&path, &record) {
                 Ok(()) => {
@@ -190,6 +207,7 @@ impl ResourceLease {
                         stop_heartbeat: Some(stop_heartbeat),
                         heartbeat: Some(heartbeat),
                         release_on_drop: true,
+                        report_directory_guard,
                     });
                 }
                 Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
@@ -197,6 +215,11 @@ impl ResourceLease {
                         format!("inspect existing lease for resource {resource_id:?}")
                     })?;
                     validate_record(&existing, &resource_id, &path, &directory, project)?;
+                    if resource_kind_is_report(&record) {
+                        // Retained report markers must not be converted into
+                        // fresh ownership through the generic expiry fallback.
+                        bail!("report-directory marker is retained; explicit proven cleanup is required");
+                    }
                     if !is_stale(&existing, epoch_seconds()) {
                         bail!(
                             "resource lease conflict for {resource_id:?}: invocation {} (pid {}) owns it",
@@ -235,10 +258,21 @@ impl ResourceLease {
     /// cannot prove current ownership, dropping this value keeps the marker so
     /// an operator can inspect it instead of silently deleting it.
     pub(crate) fn release_checked(mut self) -> Result<()> {
+        self.finish_release()
+    }
+
+    fn finish_release(&mut self) -> Result<()> {
         self.stop_heartbeat();
         let result = self.release();
         self.release_on_drop = false;
         result
+    }
+
+    #[cfg(test)]
+    pub(crate) fn release_before_guard_close(&mut self) -> Result<()> {
+        // Exercise the real checked-release transition while a child process
+        // pauses before dropping the same guard that production Drop closes.
+        self.finish_release()
     }
 
     /// Bind a newly created runtime object to this lease. The object ID is
@@ -278,20 +312,43 @@ impl ResourceLease {
 
     pub(crate) fn release(&self) -> Result<()> {
         self.ensure_heartbeat_healthy()?;
+        if self.report_directory_guard.is_some() && self.heartbeat.is_some() {
+            bail!("report-directory release requires stopped heartbeat");
+        }
         let record = self
             .record
             .lock()
             .map_err(|_| anyhow::anyhow!("lease record lock was poisoned"))?;
         let contents = match fs::read(&self.path) {
             Ok(contents) => contents,
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                if self.report_directory_guard.is_some() {
+                    bail!("report-directory marker disappeared before checked release");
+                }
+                return Ok(());
+            }
             Err(error) => return Err(error).with_context(|| "read lease before release"),
         };
         let current: LeaseRecord =
             serde_json::from_slice(&contents).context("parse lease before release")?;
         ensure_owner(&current, &record)?;
+        // Persist the certificate while the JSON marker still protects the
+        // resource. A certificate write/sync failure leaves that marker intact;
+        // nothing fallible follows a successful marker removal.
+        if let Some(guard) = &self.report_directory_guard {
+            guard.mark_released(&record)?;
+        }
         match fs::remove_file(&self.path) {
             Ok(()) => Ok(()),
+            Err(error)
+                if error.kind() == std::io::ErrorKind::NotFound
+                    && self.report_directory_guard.is_some() =>
+            {
+                if let Some(guard) = &self.report_directory_guard {
+                    let _ = guard.invalidate_release();
+                }
+                Err(error).context("report-directory marker disappeared during release")
+            }
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
             Err(error) => {
                 Err(error).with_context(|| format!("release lease {}", self.path.display()))
@@ -432,7 +489,60 @@ fn cleanup_with_runtime<O: RuntimeOperations + ?Sized>(
             ));
             continue;
         }
-        let stale = is_stale(&record, epoch_seconds());
+        // Report retention, allocation, release and operator cleanup share this
+        // guard. A heartbeat's JSON replacement cannot look like a released lease.
+        let report_guard = if resource_kind_is_report(&record) {
+            match ReportDirectoryGuard::try_acquire(project, &record.invocation_id) {
+                Ok(Some(guard)) => {
+                    let checked = read_record(&path).and_then(|current| {
+                        ensure_owner(&current, &record)?;
+                        guard.validate_record(&current)
+                    });
+                    if let Err(error) = checked {
+                        report
+                            .failures
+                            .push(format!("{}: {error:#}", path.display()));
+                        continue;
+                    }
+                    Some(guard)
+                }
+                Ok(None) => {
+                    report.active += 1;
+                    report.resources.push(CleanupResource {
+                        resource_id: record.resource_id,
+                        resource_kind: record.resource_kind,
+                        invocation_id: record.invocation_id,
+                        state: "active".into(),
+                        action: "retained".into(),
+                        lease_file: path.display().to_string(),
+                    });
+                    continue;
+                }
+                Err(error) => {
+                    report
+                        .failures
+                        .push(format!("{}: {error:#}", path.display()));
+                    continue;
+                }
+            }
+        } else {
+            None
+        };
+        let stale = if report_guard.is_some() {
+            // Expiry is not proof of death when process observation is unknown.
+            match report_owner_has_ended(&record) {
+                Some(ended) => ended,
+                None => {
+                    report.failures.push(format!(
+                        "{}: LEASE_OWNERSHIP_UNCERTAIN: report owner state is unknown; retained",
+                        path.display()
+                    ));
+                    continue;
+                }
+            }
+        } else {
+            is_stale(&record, epoch_seconds())
+        };
         let lease_file = path.display().to_string();
         if !identity_is_proven(&record) {
             if stale {
@@ -712,7 +822,22 @@ fn identity_is_proven(record: &LeaseRecord) -> bool {
     }
 }
 
-fn resource_key(resource_id: &str) -> String {
+fn resource_kind_is_report(record: &LeaseRecord) -> bool {
+    record.resource_kind == "report-directory"
+}
+
+fn report_owner_has_ended(record: &LeaseRecord) -> Option<bool> {
+    if !identity_is_proven(record) {
+        return None;
+    }
+    if process_alive(record.pid) == Some(false) {
+        return Some(true);
+    }
+    process_start_identity_checked(record.pid)
+        .map(|identity| identity != record.process_start_identity)
+}
+
+pub(super) fn resource_key(resource_id: &str) -> String {
     let mut digest = Sha256::new();
     digest.update(resource_id.as_bytes());
     let encoded = format!("{:x}", digest.finalize());
@@ -804,7 +929,7 @@ fn verify_runtime_record<O: RuntimeOperations + ?Sized>(
     Ok(())
 }
 
-fn lease_directory(project: &Project) -> Result<PathBuf> {
+pub(super) fn lease_directory(project: &Project) -> Result<PathBuf> {
     let repository = project
         .root
         .canonicalize()
@@ -1267,6 +1392,137 @@ mod tests {
         assert!(format!("{error:#}").contains("LEASE_OWNERSHIP_UNCERTAIN"));
         assert!(path.exists(), "failed release must retain its marker");
         assert_eq!(std::fs::read(path).unwrap(), original);
+    }
+
+    fn retained_report_project(name: &str) -> (Option<tempfile::TempDir>, Project) {
+        let (temporary, root) = match std::env::var_os("GH286_RETENTION_EVIDENCE") {
+            Some(parent) => {
+                std::fs::create_dir_all(&parent).unwrap();
+                let temporary = tempfile::Builder::new()
+                    .prefix(name)
+                    .tempdir_in(parent)
+                    .unwrap();
+                (None, temporary.keep())
+            }
+            None => {
+                let temporary = tempfile::Builder::new().prefix(name).tempdir().unwrap();
+                let root = temporary.path().to_path_buf();
+                (Some(temporary), root)
+            }
+        };
+        crate::preset::init(&root, "generic", false).unwrap();
+        let output = std::process::Command::new("git")
+            .args(["init", "--quiet"])
+            .current_dir(&root)
+            .output()
+            .unwrap();
+        assert!(output.status.success());
+        let project = Project::discover(Some(root), None).unwrap();
+        (temporary, project)
+    }
+
+    fn report_lease(project: &Project, id: &str) -> (super::ResourceLease, PathBuf) {
+        let root = project.reports.join("invocations").join(id);
+        std::fs::create_dir_all(&root).unwrap();
+        let root = root.canonicalize().unwrap();
+        let lease = super::ResourceLease::acquire(
+            project,
+            format!("invocation:{id}"),
+            "report-directory",
+            id,
+            Some(root.to_string_lossy().into_owned()),
+            None,
+        )
+        .unwrap();
+        (lease, root)
+    }
+
+    #[test]
+    fn report_cleanup_shares_live_guard_and_preserves_expired_unknown_ownership() {
+        let (_workspace, project) = retained_report_project("gh286-report-cleanup-");
+        let (lease, root) = report_lease(&project, "inv-cleanup-guard");
+        let path = lease.path.clone();
+        let (runtime, stop_calls) = fake_runtime(ContainerRuntimeKind::Docker, None);
+        let report = cleanup_with_runtime(&project, false, &runtime).unwrap();
+        std::fs::write(
+            project.root.join("live-cleanup.json"),
+            serde_json::to_vec_pretty(&report).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(report.active, 1);
+        assert_eq!(report.reclaimed, 0);
+        assert!(path.is_file());
+        assert!(
+            super::ReportDirectoryGuard::try_acquire(&project, "inv-cleanup-guard")
+                .unwrap()
+                .is_none()
+        );
+        lease.retain();
+        let mut unknown = read_record(&path).unwrap();
+        unknown.pid = 0;
+        unknown.process_start_identity = "unavailable:expired-fixture".into();
+        unknown.heartbeat_at = 0;
+        unknown.expires_at = 0;
+        write_record(&path, &unknown).unwrap();
+        let bytes = std::fs::read(&path).unwrap();
+        let report = cleanup_with_runtime(&project, false, &runtime).unwrap();
+        std::fs::write(
+            project.root.join("unknown-cleanup.json"),
+            serde_json::to_vec_pretty(&report).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(report.reclaimed, 0);
+        assert!(report
+            .failures
+            .iter()
+            .any(|failure| failure.contains("LEASE_OWNERSHIP_UNCERTAIN")));
+        assert_eq!(std::fs::read(&path).unwrap(), bytes);
+        assert_eq!(stop_calls.load(Ordering::SeqCst), 0);
+        let guard = super::ReportDirectoryGuard::try_acquire(&project, "inv-cleanup-guard")
+            .unwrap()
+            .unwrap();
+        assert!(!guard.release_is_proven(&root).unwrap());
+    }
+
+    #[test]
+    fn report_real_heartbeat_failure_cannot_certify_a_release_even_without_marker() {
+        let (_workspace, project) = retained_report_project("gh286-report-heartbeat-fault-");
+        let (mut lease, root) = report_lease(&project, "inv-heartbeat-fault");
+        let path = lease.path.clone();
+        let original = {
+            let _record = lease.record.lock().unwrap();
+            let original = std::fs::read(&path).unwrap();
+            std::fs::remove_file(&path).unwrap();
+            std::fs::create_dir(&path).unwrap();
+            original
+        };
+        let deadline = Instant::now() + Duration::from_secs(10);
+        while lease.heartbeat_error.lock().unwrap().is_none() {
+            assert!(
+                Instant::now() < deadline,
+                "real heartbeat did not observe the read fault"
+            );
+            std::thread::sleep(Duration::from_millis(20));
+        }
+        std::fs::write(
+            project.root.join("heartbeat-error.txt"),
+            lease.heartbeat_error.lock().unwrap().as_deref().unwrap(),
+        )
+        .unwrap();
+        lease.stop_heartbeat();
+        std::fs::remove_dir(&path).unwrap();
+        std::fs::write(&path, &original).unwrap();
+        let error = lease.release_checked().unwrap_err();
+        std::fs::write(project.root.join("release-error.txt"), format!("{error:#}")).unwrap();
+        assert!(format!("{error:#}").contains("lease heartbeat failed"));
+        assert_eq!(std::fs::read(&path).unwrap(), original);
+        // Missing JSON cannot bypass the failed-release state in the stable,
+        // locked certificate. No PID or TTL inference is used by retention.
+        std::fs::remove_file(&path).unwrap();
+        let guard = super::ReportDirectoryGuard::try_acquire(&project, "inv-heartbeat-fault")
+            .unwrap()
+            .unwrap();
+        assert!(!guard.release_is_proven(&root).unwrap());
     }
 
     #[test]
