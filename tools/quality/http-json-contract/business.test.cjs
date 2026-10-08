@@ -65,3 +65,95 @@ test('interceptor support does not permit aliased or unknown HTTP imports',()=>{
  const source="import type {HttpInterceptorFn} from '@angular/common/http'; const interceptor:HttpInterceptorFn=(request,next)=>next(request);";
  assert.deepEqual(C.inventory({'auth.ts':source}),[]);
 });
+
+// Each mutation rewrites the capture receipt as well as the actual input bytes:
+// rejection must reach inventory/type integrity, rather than an obsolete hash.
+function withCliCapture(f,body){
+ const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),P=require('./protocol.cjs');
+ const retained=process.env.HARNESS_GATE_HTTP_TEST_EVIDENCE;
+ if(retained)fs.mkdirSync(retained,{recursive:true});
+ const root=fs.mkdtempSync(path.join(retained||os.tmpdir(),'http-integrity-'));
+ const context={commit:'2'.repeat(40),base_commit:'2'.repeat(40),target:'node',run:'integrity-test'};
+ const head=JSON.stringify(f.spec),hash=P.sha(head);
+ const files={'api/openapi.json':head,'web/angular/src/response.ts':S.generate(f.spec,'HealthResponse',hash),'web/angular/src/client.ts':f.client,'observations.json':JSON.stringify(f.observations)};
+ fs.mkdirSync(path.join(root,'web/angular/src'),{recursive:true});fs.mkdirSync(path.join(root,'api'));fs.mkdirSync(path.join(root,'evidence'));
+ fs.writeFileSync(path.join(root,'baseline.json'),head);
+ const request={schema:'harness-collector-request/v1',project:'fixture',component:'backend',collector:P.COLLECTOR,context,workspace_root:root,output_root:path.join(root,'evidence'),requested_capabilities:Object.keys(P.TYPES),parameters:{boundary:'contract',consumer_boundary:'production',consumer:'frontend',relationship:'api',contract:'api/openapi.json',type_file:'web/angular/src/response.ts',client:'web/angular/src/client.ts',type_name:'HealthResponse',consumer_source_root:'web/angular/src',exclude:[],observations:'observations.json',artifact_subdir:'contract'}};
+ const written=new Set();
+ function bind(){
+  for(const name of written)if(!Object.hasOwn(files,name)){fs.unlinkSync(path.join(root,name));written.delete(name);}
+  for(const [name,bytes]of Object.entries(files)){fs.writeFileSync(path.join(root,name),bytes);written.add(name);}
+  request.parameters.receipt={schema:'http-json-capture/v1',context,inputs:Object.fromEntries(Object.entries(files).map(([k,v])=>[k,P.sha(v)])),consumer_sources:Object.fromEntries(Object.entries(files).filter(([k])=>k.endsWith('.ts')).map(([k,v])=>[k,P.sha(v)])),baseline:{path:path.join(root,'baseline.json'),sha256:hash,commit:context.base_commit},observations_sha256:P.sha(files['observations.json'])};
+  fs.writeFileSync(path.join(root,'request.json'),JSON.stringify(request));
+ }
+ let invocation=0;
+ function cli(mode){
+  bind();
+  const result=require('node:child_process').spawnSync(process.execPath,[path.join(__dirname,'cli.cjs'),mode,path.join(root,'request.json')],{encoding:'utf8'});
+  const log=path.join(root,`${++invocation}-${mode}`);
+  fs.writeFileSync(log+'.request.json',JSON.stringify(request,null,2));fs.writeFileSync(log+'.stdout',result.stdout||'');fs.writeFileSync(log+'.stderr',result.stderr||'');
+  fs.writeFileSync(log+'.inputs.json',JSON.stringify({files,baseline:head},null,2));
+  fs.writeFileSync(log+'.status.json',JSON.stringify({status:result.status,signal:result.signal,error:result.error?.message||null},null,2));
+  assert.ifError(result.error);return result;
+ }
+ bind();
+ request.parameters.subjects=P.discover(request).subjects;
+ try{body({files,request,cli,root});}
+ catch(error){console.error('Retained HTTP integrity fixture: '+root);throw error;}
+ if(!retained)fs.rmSync(root,{recursive:true,force:true});
+}
+
+test('real discover and collect reject every indirect httpResource use across the scanned inventory',()=>{
+ const f={spec:{openapi:'3.0.3',info:{title:'Resource',version:'1'},paths:{'/api/public':{get:{operationId:'getHealth',responses:{200:{description:'OK',content:{'application/json':{schema:{type:'object',additionalProperties:false,required:['state'],properties:{state:{type:'string',enum:['ok','other']}}}}}}}}}}},observations:[{method:'GET',path:'/api/public',status:200,content_type:'application/json',body:{state:'ok'}}],client:"import {httpResource} from '@angular/common/http'; const health=httpResource<HealthResponse>(()=>'/api/public');"};
+ withCliCapture(f,({files,request,cli})=>{
+  const canonical=files['web/angular/src/client.ts'],imports="import {httpResource} from '@angular/common/http';";
+  assert.equal(cli('discover').status,0);
+  assert.equal(cli('collect').status,0);
+  for(const use of ["const alias=httpResource;alias<HealthResponse>(()=>'/api/public');",'consume(httpResource);','const stored={resource:httpResource};',"httpResource.call(null,()=>'/api/public');",'function shadow(httpResource:unknown){return httpResource;}','export {httpResource};']){
+   for(const placement of ['alongside','other-file','only-indirect']){
+    files['web/angular/src/client.ts']=placement==='only-indirect'?imports+use:canonical+(placement==='alongside'?use:'');
+    delete files['web/angular/src/extra.ts'];
+    if(placement==='other-file')files['web/angular/src/extra.ts']=imports+use;
+    for(const mode of ['discover','collect']){
+     const result=cli(mode);
+     assert.equal(result.status,1,`${placement}: ${use}: ${result.stderr}`);
+     assert.match(result.stderr,/unsupported (?:httpResource alias or indirect use|HTTP resource variant)/);
+    }
+   }
+  }
+  files['web/angular/src/client.ts']=canonical;delete files['web/angular/src/extra.ts'];
+  request.parameters.artifact_subdir='restored';
+  assert.equal(cli('discover').status,0);
+  const restored=cli('collect');assert.equal(restored.status,0,restored.stderr);
+ });
+});
+
+test('real CLI checks Request and uncalled Response structures with rebound receipts and unchanged stamps',()=>{
+ const f=fixture(),contract=f.spec.components.schemas.Contract;
+ contract.required.push('mode');contract.properties.mode={type:'string',enum:['public','other']};
+ // The POST request uses the same contract object; the PATCH is a copy sharing it.
+ for(const observation of f.observations){observation.request_body.mode='public';observation.body.contract.mode='public';}
+ f.spec.paths['/api/unread']={get:{operationId:'unread',responses:{200:{description:'Unread',content:{'application/json':{schema:{type:'object',additionalProperties:false,required:['title','mode'],properties:{title:{type:'string'},mode:{type:'string',enum:['public','other']}}}}}}}}};
+ f.observations.push({method:'GET',path:'/api/unread',status:200,content_type:'application/json',body:{title:'A',mode:'public'}});
+ withCliCapture(f,({files,request,cli})=>{
+  const generated=files[request.parameters.type_file],stamp=generated.split('\n')[0];
+  for(const declaration of ['CreateRequirementRequest','UnreadResponse']){
+   assert(!C.inventory({'client.ts':f.client}).some(call=>call.typeName===declaration));
+   for(const [name,change]of [['field-type',line=>line.replace('title: string','title: number')],['required',line=>line.replace('title: string','title?: string')],['enum',line=>line.replace(/mode: ([^;]+);/,'mode: $1 | "unexpected";')]]){
+    const changed=generated.split('\n').map(line=>line.startsWith('export type '+declaration+' = ')?change(line):line).join('\n');
+    assert.notEqual(changed,generated,`${declaration} ${name} must change the fixture`);
+    assert.equal(changed.split('\n')[0],stamp);
+    files[request.parameters.type_file]=changed;
+    const discovery=cli('discover');assert.equal(discovery.status,0,discovery.stderr);
+    assert.deepEqual(JSON.parse(discovery.stdout).subjects,request.parameters.subjects);
+    const result=cli('collect');assert.equal(result.status,1,result.stderr);
+    assert.match(result.stderr,/generated type was edited without regeneration/);
+   }
+  }
+  // Structural equivalence allows whitespace changes in the complete declarations.
+  files[request.parameters.type_file]=generated.split('\n').map((line,index)=>index?'  '+line+'  ':line).join('\n');
+  assert.equal(cli('discover').status,0);
+  const result=cli('collect');assert.equal(result.status,0,result.stderr);
+  assert.equal(JSON.parse(result.stdout).evidence.length,request.parameters.subjects.length);
+ });
+});
