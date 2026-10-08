@@ -92,14 +92,17 @@ python3 plugin.py collect --request /absolute/request.json
 refuses a real checkout and checks signature, stale context, expiration, replay
 and artifact tampering. It is not the project's complete production gate.
 
-The retained certification targets Rust 1.97.1 / LLVM 22.1.6, cargo-llvm-cov
-0.9.0, Python 3.14 and Linux x86-64. The GH-288 executable compatibility matrix
-also targets Rust 1.99.0 / LLVM 23.1.1; adding this test is not a certification
-result. Only a successful retained run and its reviewed exact identities establish
-that combination. New syntax/LLVM formats require compatibility tests and a new
-identity before adoption; existing captures and baselines are never relabeled.
-See [the matrix and evidence contract](../../../docs/quality/gh-288-source-risk-compatibility.md)
-for the bounded command, prerequisites, rejection states and source/native choice.
+The reviewed GH-288 Linux x86-64 matrix passed for Rust 1.97.1 / LLVM
+22.1.6 and Rust 1.99.0 / LLVM 23.1.1: each ran the existing 26 tests and
+seven compatibility tests, using cargo-llvm-cov 0.9.0 and Python 3.14.
+The retained Core build is bb813b8; its production sources are byte-identical
+to 3d887's Core, and its recorded identity is preserved. This does not certify
+later changed Core bytes or the Rust 1.99 compiler-private native ABI.
+The combinations have distinct measurement series and adopt no baseline.
+New syntax/LLVM formats require compatibility tests and a new identity before
+adoption; existing captures and baselines are never relabeled.
+See [the completed matrix and evidence contract](../../../docs/quality/gh-288-source-risk-compatibility.md)
+for exact evidence paths, identities, rejection boundaries and source/native choice.
 
 References: [LLVM coverage mapping](https://llvm.org/docs/CoverageMappingFormat.html)
 and [Rust instrument-coverage](https://doc.rust-lang.org/rustc/instrument-coverage.html).
