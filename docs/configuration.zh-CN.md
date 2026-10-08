@@ -921,6 +921,13 @@ invocation 和 step ID。报告声明、registry、manifest 和磁盘上的可�
 私钥块及常见数据库连接串的值都不会导出。默认保留最新 50 个 invocation；仅清理超过 15 分钟租约窗口
 且超出数量上限的旧目录，活动或最近修改的 invocation 不会被清理。
 
+日志或 JSON lines 内的 JSON 凭据字符串也会完整脱敏，包含转义引号、连续反斜杠和
+Unicode 转义。私钥 BEGIN 块缺少 END 时脱敏至文件尾。请求头可位于缩进或明确的日志前缀之后：
+以空白分隔的方括号字段、ISO 日期时间、TRACE/DEBUG/INFO/WARN/WARNING/ERROR/FATAL
+级别（可带冒号）以及 curl 的 `<`/`>` 方向标记。保留前缀，脱敏完整 header 值及 Cookie 属性；
+任意正文中出现 `cookie:` 不构成 header 边界。现有证据大小限制、Core 生成 JSON 的内容身份校验
+以及 Engineering Policy 的 required quality gate 语义保持不变。
+
 发布流程先生成一个由 `tools/release/release_inventory.py` 管理的显式
 `release-inventory.json`，其中列出每个平台二进制和 CycloneDX SBOM。checksum、Sigstore
 签名/证书、GitHub provenance 验证和最终上传集合都从同一 inventory 派生；inventory、
