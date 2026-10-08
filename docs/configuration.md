@@ -585,6 +585,17 @@ authorization headers, Bearer/Basic credentials, API keys, passwords, private
 key blocks, and common database URL values. The latest 50 invocations are
 retained; cleanup never removes an active or recently modified invocation.
 
+Text evidence also recognizes JSON credential strings embedded in logs or JSON
+lines, including escaped quotes, backslashes and Unicode escapes. Private-key
+BEGIN blocks without an END marker are redacted through the end of the file.
+Header values (including cookie attributes) are redacted after indentation or
+explicit log prefixes: whitespace-separated bracketed fields, ISO date/time
+stamps, TRACE/DEBUG/INFO/WARN/WARNING/ERROR/FATAL levels (with an optional colon),
+and curl's `<`/`>` markers. Prefixes are preserved; arbitrary prose containing
+`cookie:` does not establish a header boundary. These changes preserve the
+existing evidence limits, generated-JSON identity checks and required quality
+gate semantics described in the Engineering Policy.
+
 Webhooks run after report writing:
 
     [[notifications.webhooks]]
