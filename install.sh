@@ -14,6 +14,7 @@ ARCH=""
 PLATFORM=""
 INSTALL_NAME="$BINARY_NAME"
 ATOMIC_TEMPORARY=""
+INSTALL_TEMPORARY_ROOT=""
 RELEASE_WORKFLOW="release.yml"
 RUST_VERSION="${HARNESS_GATE_RUST_VERSION:-0.1.0-rc.7}"
 RUST_INSTALL_DIR=""
@@ -51,6 +52,17 @@ cleanup_atomic_temporary() {
         rm -f -- "$ATOMIC_TEMPORARY" 2>/dev/null || true
         ATOMIC_TEMPORARY=""
     fi
+}
+
+cleanup_installation() {
+    local status=$?
+    trap - EXIT
+    cleanup_atomic_temporary
+    if [[ -n "$INSTALL_TEMPORARY_ROOT" ]]; then
+        rm -rf -- "$INSTALL_TEMPORARY_ROOT" 2>/dev/null || true
+        INSTALL_TEMPORARY_ROOT=""
+    fi
+    exit "$status"
 }
 
 abort_on_signal() {
@@ -379,10 +391,10 @@ main() {
     ((with_rust || !rust_options)) || die "Rust options require --with-rust or --rust-only"
     ((!rust_only || !from_source)) || die "--from-source applies to Core, not --rust-only"
     if ((with_rust)); then validate_version "v$RUST_VERSION"; fi
-    local temporary_root
-    temporary_root="$(mktemp -d "${TMPDIR:-/tmp}/harness-gate-install.XXXXXXXX")" \
+    INSTALL_TEMPORARY_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/harness-gate-install.XXXXXXXX")" \
         || die "cannot create temporary installation directory"
-    trap 'cleanup_atomic_temporary; rm -rf "${temporary_root:-}"' EXIT
+    local temporary_root="$INSTALL_TEMPORARY_ROOT"
+    trap cleanup_installation EXIT
     trap 'abort_on_signal 129' HUP
     trap 'abort_on_signal 130' INT
     trap 'abort_on_signal 143' TERM

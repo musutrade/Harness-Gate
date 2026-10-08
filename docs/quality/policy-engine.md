@@ -30,6 +30,18 @@ Every rule evaluates each declared subject within the requested target:
 | `boundary` + `component` + `boundary` | Subjects in that component's source boundary |
 | `changed_subject` | Caller-supplied changed subject IDs |
 | `critical_subject` | Caller-supplied critical subject IDs |
+| `subject` + `subject` | The resolved canonical subject identity |
+| `relationship` + `relationship` | Provider-owned contract subjects on that relationship |
+
+The Rust Core validates the exact fields of each scope kind. `project` accepts
+only `kind`; adding `component` or `boundary` is an input error rather than a
+filter. Component and boundary scopes require their named nonempty fields;
+changed/critical scopes accept only `kind`. Relationship scopes require the
+relationship ID domain and subject scopes require a canonical subject ID after
+compilation. Configuration documents may use a nonempty subject alias before
+the compiler resolves it; resolved policy and independent selection validate
+canonical identities. Unknown kinds, extra/missing fields and control characters
+are rejected without changing the frozen schema walker or reference corpus.
 
 These are selection scopes; they do not average metrics across subjects or
 measurement series. A component or boundary summary can be represented as a
