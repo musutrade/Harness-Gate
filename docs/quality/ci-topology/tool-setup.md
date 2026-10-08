@@ -96,12 +96,23 @@ installer with controlled Cargo/download boundaries:
 | Corrupt archive | SHA-256 verification failed; no source fallback or gate execution |
 | Failed download | Installer failed; no source fallback or gate execution |
 
-The fallback smoke exercises control flow with a Cargo stub, not a second full
-source compilation. Full-repository coverage parity and hosted setup timings
-for the changed workflow still require a post-change Code Coverage run; the
-prebuilt/version smoke alone does not establish measurement parity or a measured
-CI speedup. Raw local setup logs are retained under
-`target/quality/issue291-tool-setup/` during validation.
+The fallback smoke exercises control flow with a Cargo stub, not a second
+actual source compilation. The earlier documented
+`target/quality/issue291-tool-setup/` raw directory could not be located.
+The new 2026-10-08 five-case raw evidence is retained under
+`/mnt/dev-ssd/dev-tmp/gh291-push-20261008/a5-installer-20261008T074405950771Z/`;
+its independent audit verified 311 file hashes and 54 checks. This new evidence
+does not assert consumption of the missing old logs.
+
+Hosted Code Coverage now retains three successful post-change observations
+with the same effective 0.37.5 version and LLVM/Cobertura command.
+Verified prebuilt installation took 0.775141/0.443176/0.412105s, compared
+with 117.790059s for the retained source installation. All 92 per-file
+covered/total rows agree in the first before/after log pair; later source
+changes have different denominators. This establishes same-version observed
+counter parity, without controlled same-SHA equivalence or raw XML byte parity.
+Codecov tokenless upload was rejected, so these logs do not prove ingestion.
+See [the exact cohorts and limitations](issue291-natural-main-appendix.md).
 
 ## GH-165 hosted evidence and remaining acceptance
 
