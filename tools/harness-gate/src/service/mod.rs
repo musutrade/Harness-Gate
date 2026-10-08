@@ -3,6 +3,7 @@ mod docker;
 mod inspection;
 mod lease;
 mod postgres;
+mod report_directory;
 mod runtime;
 
 #[cfg(test)]
@@ -19,6 +20,7 @@ use std::sync::{Arc, Condvar, Mutex};
 use std::time::{Duration, Instant};
 
 pub(crate) use lease::{cleanup as cleanup_resources, ResourceLease};
+pub(crate) use report_directory::ReportDirectoryGuard;
 
 const RESOURCE_LOCK_POLL: Duration = Duration::from_millis(25);
 const RESOURCE_LOCK_WAIT: Duration = Duration::from_secs(30);
