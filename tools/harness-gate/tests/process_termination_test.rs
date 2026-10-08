@@ -20,6 +20,27 @@ root, mode = Path(sys.argv[1]), sys.argv[2]
 group = os.getpgrp()
 assert group == os.getpid(), 'fixture must be its isolated group leader'
 signal.signal(signal.SIGTERM, signal.SIG_IGN if mode == 'ignore-leader' else lambda *_: os._exit(23))
+if mode == 'extra-zombie':
+    keeper = os.fork()
+    if keeper == 0:
+        os.setpgid(0, 0)
+        zombie = os.fork()
+        if zombie == 0:
+            os.setpgid(0, group)
+            os._exit(9)
+        deadline = time.monotonic() + 30
+        while os.waitid(os.P_PID, zombie, os.WEXITED | os.WNOHANG | os.WNOWAIT) is None:
+            assert time.monotonic() < deadline
+            time.sleep(.01)
+        (root / 'ready.tmp').write_text(f'{group} {zombie} {group}')
+        os.replace(root / 'ready.tmp', root / 'ready')
+        while not (root / 'cleanup').exists() and time.monotonic() < deadline:
+            time.sleep(.01)
+        os.waitpid(zombie, 0)
+        os._exit(0)
+    while not (root / 'ready').exists():
+        time.sleep(.01)
+    os._exit(7)
 pid = os.fork()
 if pid == 0:
     signal.signal(signal.SIGTERM, signal.SIG_DFL if mode == 'normal-group' else signal.SIG_IGN)
@@ -34,6 +55,10 @@ if pid == 0:
             os.killpg(os.getpgrp(), signal.SIGKILL)
         (root / 'heartbeat').write_text(str(time.monotonic_ns()))
         time.sleep(.02)
+if mode == 'exit-leader':
+    while not (root / 'ready').exists():
+        time.sleep(.01)
+    os._exit(7)
 while True:
     time.sleep(.02)
 "#;
@@ -268,6 +293,130 @@ while True:
         }
     }
 
+    #[cfg(target_os = "macos")]
+    fn list_group(pid: i32, pids: &mut [libc::pid_t; 2]) -> libc::c_int {
+        unsafe {
+            libc::proc_listpids(
+                2,
+                pid as u32,
+                pids.as_mut_ptr().cast(),
+                std::mem::size_of_val(pids) as libc::c_int,
+            )
+        }
+    }
+
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn darwin_guard_requires_a_complete_unique_waitable_leader() {
+        fn exited(_: i32) -> io::Result<bool> {
+            Ok(true)
+        }
+        fn live(_: i32) -> io::Result<bool> {
+            Ok(false)
+        }
+        fn reaped(_: i32) -> io::Result<bool> {
+            Err(io::Error::from_raw_os_error(libc::ECHILD))
+        }
+        fn forbidden(_: i32, _: &mut [libc::pid_t; 2]) -> i32 {
+            panic!("a live or reaped leader must not reach group enumeration")
+        }
+        fn unknown(_: i32, _: &mut [libc::pid_t; 2]) -> i32 {
+            0
+        }
+        fn negative(_: i32, _: &mut [libc::pid_t; 2]) -> i32 {
+            -1
+        }
+        fn short(pid: i32, pids: &mut [libc::pid_t; 2]) -> i32 {
+            pids[0] = pid;
+            2
+        }
+        fn nonintegral(pid: i32, pids: &mut [libc::pid_t; 2]) -> i32 {
+            pids[0] = pid;
+            7
+        }
+        fn full(pid: i32, pids: &mut [libc::pid_t; 2]) -> i32 {
+            *pids = [pid, pid + 1];
+            8
+        }
+        fn wrong(pid: i32, pids: &mut [libc::pid_t; 2]) -> i32 {
+            pids[0] = pid + 1;
+            4
+        }
+        fn denied(_: i32) -> io::Result<bool> {
+            Err(io::Error::from_raw_os_error(libc::EPERM))
+        }
+        fn injected(_: i32, _: i32) -> io::Result<()> {
+            Err(io::Error::from_raw_os_error(libc::EPERM))
+        }
+        for query in [unknown, negative, short, nonintegral, full, wrong] {
+            assert!(!command::darwin_group_is_finished(42, exited, query));
+        }
+        for observe in [live, reaped, denied] {
+            assert!(!command::darwin_group_is_finished(42, observe, forbidden));
+        }
+        for mode in ["ignore-leader", "exit-leader", "extra-zombie"] {
+            let mut fixture = Fixture::new();
+            fixture.start(mode);
+            let child = fixture.leader.as_ref().unwrap();
+            let pid = child.id() as i32;
+            if mode != "ignore-leader" {
+                let deadline = Instant::now() + Duration::from_secs(5);
+                while !command::observe_exit(child).unwrap() {
+                    assert!(Instant::now() < deadline);
+                    thread::sleep(Duration::from_millis(10));
+                }
+                let mut pids = [0; 2];
+                assert_eq!(list_group(pid, &mut pids), 8);
+                assert!(pids.contains(&pid) && pids.contains(&fixture.ready()[1]));
+                fs::write(
+                    fixture.root.join("guard-members.txt"),
+                    format!("{pids:?}\n"),
+                )
+                .unwrap();
+            }
+            assert!(!command::darwin_group_is_finished(
+                pid,
+                command::observe_pid,
+                list_group
+            ));
+            if mode == "exit-leader" {
+                assert_eq!(
+                    command::terminate(fixture.leader.as_mut().unwrap())
+                        .unwrap()
+                        .code(),
+                    Some(7)
+                );
+                fixture.assert_stopped();
+            }
+        }
+        let mut cmd = Command::new("sh");
+        cmd.args(["-c", "exit 7"]);
+        command::isolate_process_tree(&mut cmd);
+        let mut child = cmd.spawn().unwrap();
+        let deadline = Instant::now() + Duration::from_secs(5);
+        while !command::observe_exit(&child).unwrap() {
+            assert!(Instant::now() < deadline);
+            thread::sleep(Duration::from_millis(10));
+        }
+        assert!(command::darwin_group_is_finished(
+            child.id() as i32,
+            command::observe_pid,
+            list_group
+        ));
+        // An injected EPERM still propagates even for this proven zombie.
+        assert_eq!(
+            command::terminate_with_signal(&mut child, injected, Duration::ZERO)
+                .unwrap_err()
+                .raw_os_error(),
+            Some(libc::EPERM)
+        );
+        assert!(!command::darwin_group_is_finished(
+            child.id() as i32,
+            command::observe_pid,
+            forbidden
+        ));
+    }
+
     #[test]
     fn first_signal_error_survives_cleanup_and_failed_kill_is_bounded() {
         for kill_succeeds in [true, false] {
@@ -323,6 +472,45 @@ while True:
             Some(libc::EPERM)
         );
         assert!(started.elapsed() < Duration::from_secs(4));
+        assert!(fixture
+            .leader
+            .as_mut()
+            .unwrap()
+            .try_wait()
+            .unwrap()
+            .is_none());
+    }
+
+    #[test]
+    fn signal_callbacks_do_not_restart_the_shared_cleanup_deadline() {
+        fn delayed_failure(_: i32, signal: i32) -> io::Result<()> {
+            if signal == libc::SIGKILL {
+                thread::sleep(Duration::from_millis(1500));
+            }
+            Err(io::Error::from_raw_os_error(if signal == libc::SIGTERM {
+                libc::EACCES
+            } else {
+                libc::EPERM
+            }))
+        }
+        let mut fixture = Fixture::new();
+        fixture.start("ignore-leader");
+        let started = Instant::now();
+        let error = command::terminate_with_signal(
+            fixture.leader.as_mut().unwrap(),
+            delayed_failure,
+            Duration::from_secs(2),
+        )
+        .unwrap_err();
+        let elapsed = started.elapsed();
+        fs::write(
+            fixture.root.join("deadline.txt"),
+            format!("elapsed={elapsed:?}\nerror={error}\n"),
+        )
+        .unwrap();
+        assert_eq!(error.raw_os_error(), Some(libc::EACCES));
+        assert!(elapsed >= Duration::from_millis(1500));
+        assert!(elapsed < Duration::from_secs(3));
         assert!(fixture
             .leader
             .as_mut()
