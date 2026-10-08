@@ -173,6 +173,114 @@ The scheduled `Refresh Quality Baseline` workflow creates a pull request for a
 new candidate baseline rather than rewriting a canonical result on its own.
 Review its JSON, Markdown, and uploaded raw reports together before merging.
 
+### PR delivery and an existing candidate retry (GH-289)
+
+The selected and user-approved delivery mode is **PR**, including scheduled
+captures. Repository Actions PR creation was separately authorized, but its
+setting update was rejected with enterprise HTTP 409. This code changes no
+repository/organization setting and substitutes no token. An enterprise
+administrator must resolve that restriction before actual Actions PR delivery
+can be certified. Simulation tests do not establish that the restriction is gone.
+Artifact-only delivery is not selected; the workflow never silently changes to
+that mode. A diagnostic upload remains a candidate record, not baseline adoption.
+
+Before installing Rust or collecting samples, `baseline_delivery.py precheck`
+reads the Actions workflow permission setting. Explicit `false` returns `denied`
+and exits nonzero; `true` reports `policy-enabled`, which does not guarantee a
+later PR POST will succeed. Unreadable, malformed, forbidden, or timed-out reads
+report `unknown`, never precheck PASS, and retain PR intent. The workflow's
+explicit job permissions include `actions: read`, alongside the original capture
+contents/PR writes; retry needs only contents read and PR write. The setting GET
+may require administration read unavailable to `GITHUB_TOKEN`; unknown is an
+expected possibility, not a reason to add an administrator token. See GitHub's
+[permission API](https://docs.github.com/en/rest/actions/permissions#get-default-workflow-permissions-for-a-repository)
+and [Actions settings](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-your-repository).
+
+Capture still runs the original `benchmarks.py --samples 5`, uploads
+`target/quality` with `always()`, and uses `create-pull-request@v7` to commit/push
+the candidate. The raw upload retains its warning when failure diagnostics do
+not exist; a separate blocking step requires successful capture/upload and a
+real artifact ID and SHA-256 output before any PR action. Missing artifacts
+cannot become successful delivery. An always-running read-only summary reports
+the original run/attempt, measured SHA, existing candidate SHA/parent, artifact
+ID/digest, and exact dispatch inputs. Missing identities are explicit blockers
+and summary exits nonzero. It never reconstructs a missing candidate branch.
+New capture artifact names include the attempt. Original raw files and failed
+capture diagnostics are retained without requiring a new delivery manifest.
+
+After the permission problem is resolved, use the original summary's values:
+
+```bash
+gh workflow run quality-baseline-refresh.yml \
+  -f operation=delivery-only \
+  -f source_run_id=ORIGINAL_RUN_ID \
+  -f source_run_attempt=ORIGINAL_ATTEMPT \
+  -f candidate_sha=EXACT_EXISTING_CANDIDATE_SHA \
+  -f artifact_id=ORIGINAL_RAW_ARTIFACT_ID \
+  -f artifact_digest=sha256:ORIGINAL_ARCHIVE_SHA256
+```
+
+Delivery-only checks out the trusted default-branch helper, then reads API data
+and candidate blobs. It does not execute candidate code, install measurement
+tools, recollect metrics, create commits, rebase, force-push, or accept a baseline.
+The original run must be a same-repository default-branch scheduled/manual
+baseline workflow. Its exact attempt jobs must show successful capture/upload.
+The fixed `automation/quality-baseline-RUN_ID` branch must equal the supplied SHA,
+have the measured SHA as its sole parent, and change exactly `current.json` and
+`current.md`. `current.json.commit` must match that original measured SHA. The
+original tool versions, target, series, samples, and comparison bytes remain
+unchanged. Concurrent delivery attempts are serialized by original run ID, and
+the remote branch is checked immediately before and after PR delivery. A changed
+branch or a failed post-check is a delivery failure, even if a PR was created.
+
+Artifact verification binds API run/repository/HEAD identity, archive digest,
+attempt-specific job steps, and upload timestamps. Legacy names without an
+attempt are accepted only when the upload window uniquely identifies one of at
+most 20 attempts. Ambiguous/unavailable attempts, expired/missing artifacts,
+unverifiable source or changed bytes block delivery. API pagination is limited
+to ten 100-entry pages; ZIPs are limited to 32 MiB compressed, 128 MiB expanded,
+and 4096 entries before reading entries. No archive is extracted. Absolute,
+parent, backslash, ambiguous/duplicate paths, file/directory collisions, links,
+special files, and encrypted entries are rejected.
+
+The helper verifies the existing five warm sample values, five serial reports,
+five parallel reports, five scope records, report/summary correspondence,
+retained log references, concurrency records, and command results when present.
+It records hashes for original raw bytes and both candidate files without
+recomputing metric formulas. Historical artifacts have no delivery manifest;
+some have no verification `command-result.json` records. Those absences are
+explicitly reported, not retroactively filled. This format does not retain warm
+command evidence, so delivery does not certify those commands' execution. Missing
+required existing reports/logs/references still block delivery.
+
+Capture and retry PR bodies carry one `baseline-delivery-v1` JSON comment with
+repository, source run/attempt, measured SHA, artifact ID, and archive digest.
+Retry can create a PR or reuse one only after exact field/type/unique-comment
+matching, plus head/base/repository/SHA checks. A missing or conflicting existing
+PR association blocks reuse; the helper does not edit it or infer provenance
+from a substring. Historical candidates without a PR can receive a new correctly
+associated PR after verification. Delivery JSON and step summaries retain the
+original identities and `baseline_accepted: false`; retry diagnostics upload
+even on failure. Human review of candidate changes/raw evidence and all required
+gates remain necessary before adoption.
+
+Run the bounded simulation fixtures with retained evidence in a new directory:
+
+```bash
+BASELINE_DELIVERY_TEST_EVIDENCE=/path/to/new/evidence \
+  python3 -B -m unittest discover -s tools/quality/tests \
+  -p test_baseline_delivery.py -v
+```
+
+Fixtures create actual two-commit Git candidates and ZIP bytes, then simulate
+GitHub reads and PR POST responses. They keep each invocation's parameters,
+status, output, and API calls, including failed delivery followed by same-SHA
+retry. They verify rejection of permission, identity, attempt, artifact, sample,
+raw-reference, ZIP, conflicting-PR, and branch-movement failures. They establish
+no actual hosted PR permission. Engineering Policy measurement formulas,
+thresholds, five-sample capture, series identity, required gates, baseline/ratchet,
+and review/adoption authority are unchanged.
+
 ## Baseline Exceptions
 
 An exception never converts a failed quality result into a pass. It is a
