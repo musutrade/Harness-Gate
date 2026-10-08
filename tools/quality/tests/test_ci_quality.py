@@ -55,12 +55,25 @@ class SnapshotTests(unittest.TestCase):
 
 
 class RiskScopeTests(unittest.TestCase):
+    def test_darwin_configuration_identity_does_not_expand_source_selection(self):
+        from source_measure import SERIES, SOURCE_FILES
+        self.assertEqual(SERIES, {
+            'analyzer': 'harness-gate-rust-measure/0.3.1', 'rule': 'mccabe-rust-3/1',
+            'instrumentation': 'closure-black-box/1', 'mapping': 'insertions-utf8/1',
+            'selection': 'gh285-process-group/1', 'configuration': 'compiler-target-production/3',
+        })
+        self.assertIn('process/command.rs', SOURCE_FILES)
+        self.assertNotIn('process/task.rs', SOURCE_FILES)
+        self.assertNotIn('process/capture.rs', SOURCE_FILES)
+        self.assertNotIn('service/lease.rs', SOURCE_FILES)
+
     def test_process_test_module_reaches_measurement_but_unknown_sources_block(self):
         with tempfile.TemporaryDirectory() as temporary:
             collector = gate.Collector(Path(temporary) / 'candidate', 'base', 'head', 'scope-test')
             for path, supported in (
                 ('tools/harness-gate/src/process/tests.rs', True),
                 ('tools/harness-gate/src/process/replay.rs', True),
+                ('tools/harness-gate/src/process/command.rs', True),
                 ('tools/harness-gate/src/project/discovery.rs', True),
                 ('tools/harness-gate/src/project/mod.rs', True),
                 ('tools/harness-gate/src/utils/redaction.rs', True),
