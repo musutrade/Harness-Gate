@@ -22,7 +22,7 @@ from production_coverage import counts, require
 
 SERIES = {"analyzer": "harness-gate-rust-measure/0.3.1", "rule": "mccabe-rust-3/1",
           "instrumentation": "closure-black-box/1", "mapping": "insertions-utf8/1",
-          "selection": "gh285-process-group/1", "configuration": "compiler-target-production/3"}
+          "selection": "gh286-report-retention/1", "configuration": "compiler-target-production/4"}
 PREFIX = "{ ::std::hint::black_box(()); "
 SUFFIX = " }"
 HOTSPOTS = {
@@ -39,7 +39,7 @@ HOTSPOTS = {
 
 # Source paths remain relative to src for lineage with the established series.
 # Both commits are measured with this exact inventory and tool version.
-SOURCE_FILES = sorted({f"preset/{name}.rs" for name in ("catalog", "composition", "filesystem", "import", "initialize", "migration", "mod")} | set(HOTSPOTS) | {"app/mod.rs", "app/quality.rs", "cli.rs", "lib.rs", "config/mod.rs", "config/import.rs", "config/validation/mod.rs", "process/mod.rs", "process/command.rs", "process/replay.rs", "project/discovery.rs", "project/mod.rs", "failure.rs", "verify/quality.rs", "verify/report.rs", "utils/redaction.rs"} |
+SOURCE_FILES = sorted({f"preset/{name}.rs" for name in ("catalog", "composition", "filesystem", "import", "initialize", "migration", "mod")} | set(HOTSPOTS) | {"app/mod.rs", "app/quality.rs", "cli.rs", "lib.rs", "config/mod.rs", "config/import.rs", "config/validation/mod.rs", "process/mod.rs", "process/command.rs", "process/replay.rs", "project/discovery.rs", "project/mod.rs", "failure.rs", "verify/quality.rs", "verify/report.rs", "utils/redaction.rs", "service/lease.rs", "service/mod.rs", "service/report_directory.rs"} |
     {f"config/quality/{name}.rs" for name in ("mod", "model", "policy", "validation", "compiler", "collectors", "baseline", "baseline/git")} |
     {f"../quality-core/{name}.rs" for name in (
     "comparison", "cross_component", "evidence", "json", "mod", "model",

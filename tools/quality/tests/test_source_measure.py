@@ -116,6 +116,19 @@ pub fn configured(ok: bool) -> Result<u8, ()> {
 '''
 
 
+CFG_MATCH_ARM_SOURCE = '''pub fn configured(value: u8) -> u8 {
+    match value {
+        #[cfg(target_os = "linux")] 0 if value == 0 => { let hot = || if value == 0 { 7 } else { 8 }; hot() },
+        #[cfg(target_os = "macos")] 0 if value == 0 => { let hot = || if value == 0 { 7 } else { 8 }; hot() },
+        #[cfg(windows)] 0 if value == 0 => { let hot = || if value == 0 { 7 } else { 8 }; hot() },
+        #[cfg(not(any(unix, windows)))] 9 if value == 9 => { let hidden = || 99; hidden() }, 1 => { let cold = || 9; cold() },
+        _ => 3,
+    }
+}
+pub fn unused() -> u8 { 11 }
+'''
+
+
 class SourceMeasureTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -220,8 +233,8 @@ fn both() {
         inactive = "unix" if "windows" in compiler_configuration()["cfg"] else "windows"
         for source in (
             '#[cfg(feature="extra")] fn f() {}',
-            '#[cfg(any(unix, windows))] fn f() {}',
-            '#[cfg(target_os="linux")] fn f() {}',
+            '#[cfg(any(unix, any(windows, test)))] fn f() {}',
+            '#[cfg(target_os="android")] fn f() {}',
             '#[cfg(not(not(test)))] fn f() {}',
             '#[cfg(all(test, feature="extra"))] mod unsupported;',
             '#[cfg_attr(unix, inline)] fn f() {}',
@@ -338,11 +351,67 @@ fn both() {
                 transformed, _ = instrument(source.read_text(encoding="utf-8"), {'symbols': symbols})
                 self.assertEqual(len(self.inventory(transformed)['symbols']), len(symbols))
 
+    def test_report_retention_sources_inventory_and_instrumentation(self):
+        paths = {'service/lease.rs', 'service/mod.rs', 'service/report_directory.rs'}
+        self.assertEqual({path for path in SOURCE_FILES if path.startswith('service/')}, paths)
+        retained = Path(os.environ.get('RUST_MEASURE_NATIVE_EVIDENCE', ROOT / 'target/gh286-native-evidence')).resolve()
+        retained.mkdir(parents=True, exist_ok=True)
+        evidence = Path(tempfile.mkdtemp(prefix='service-three-target-', dir=retained))
+        for target, os_name in (('x86_64-unknown-linux-gnu', 'linux'),
+                                ('aarch64-apple-darwin', 'macos'),
+                                ('x86_64-pc-windows-msvc', 'windows')):
+            for path in sorted(paths):
+                with self.subTest(target=target, path=path):
+                    source_file = ROOT / 'tools/harness-gate/src' / path
+                    source = source_file.read_text(encoding='utf-8')
+                    inventory = ast(source_file, self.binary, compiler_configuration(target))
+                    symbols = inventory['symbols']
+                    self.assertTrue(any(not symbol['test'] for symbol in symbols))
+                    self.assertFalse(any(symbol['test'] for symbol in symbols))
+                    if path == 'service/lease.rs':
+                        variants = [symbol for symbol in symbols if symbol['name'] == 'process_start_identity_checked']
+                        self.assertEqual(len(variants), 1)
+                        self.assertIn(os_name + ':', variants[0]['syntax'])
+                        self.assertTrue(inventory['excluded'])
+                    elif path == 'service/report_directory.rs':
+                        exclusions = [self.cfg_source_slice(source, span) for span in inventory['excluded']]
+                        windows_arm = '#[cfg(windows)]\n            Err(error) if matches!(error.raw_os_error(), Some(32 | 33)) => return Ok(None),'
+                        self.assertEqual(windows_arm in exclusions, os_name != 'windows')
+                        self.assertTrue(any('not(any(unix, windows))' in fragment for fragment in exclusions))
+                    transformed, edits = instrument(source, inventory)
+                    reparsed = self.inventory(transformed, target)
+                    self.assertEqual([symbol['kind'] for symbol in reparsed['symbols']],
+                                     [symbol['kind'] for symbol in symbols])
+                    self.assertEqual([symbol['name'] for symbol in reparsed['symbols'] if symbol['kind'] == 'function'],
+                                     [symbol['name'] for symbol in symbols if symbol['kind'] == 'function'])
+                    self.assertEqual([symbol['raw'] for symbol in reparsed['symbols']],
+                                     [symbol['raw'] for symbol in symbols])
+                    # Map transformed exclusion endpoints back to original byte
+                    # coordinates; closure insertion must preserve full ranges.
+                    original_ranges = [byte_span(source, span) for span in inventory['excluded']]
+                    remapped_ranges = [(*original_point(byte_span(transformed, span)[:2], edits),
+                                        *original_point(byte_span(transformed, span)[2:], edits))
+                                       for span in reparsed['excluded']]
+                    self.assertEqual(remapped_ranges, original_ranges)
+                    case = evidence / target / path
+                    case.parent.mkdir(parents=True, exist_ok=True)
+                    case.write_text(json.dumps({'source_sha256': digest(source.encode()),
+                        'inventory': inventory, 'reparsed': reparsed, 'edits': edits,
+                        'analyzer_build_record': str(self.build_record)}, indent=2) + '\n')
+
+    @staticmethod
+    def cfg_source_slice(source, span):
+        points = byte_span(source, span)
+        lines = source.encode().splitlines(keepends=True)
+        start = sum(map(len, lines[:points[0] - 1])) + points[1] - 1
+        end = sum(map(len, lines[:points[2] - 1])) + points[3] - 1
+        return source.encode()[start:end].decode()
+
     def test_actual_redaction_source_inventory_and_instrumentation(self):
         self.assertEqual(SERIES, {
             'analyzer': 'harness-gate-rust-measure/0.3.1', 'rule': 'mccabe-rust-3/1',
             'instrumentation': 'closure-black-box/1', 'mapping': 'insertions-utf8/1',
-            'selection': 'gh285-process-group/1', 'configuration': 'compiler-target-production/3',
+            'selection': 'gh286-report-retention/1', 'configuration': 'compiler-target-production/4',
         })
         path = 'utils/redaction.rs'
         self.assertIn(path, SOURCE_FILES)
@@ -583,7 +652,7 @@ fn main() {
         self.assertEqual(SERIES, {
             'analyzer': 'harness-gate-rust-measure/0.3.1', 'rule': 'mccabe-rust-3/1',
             'instrumentation': 'closure-black-box/1', 'mapping': 'insertions-utf8/1',
-            'selection': 'gh285-process-group/1', 'configuration': 'compiler-target-production/3',
+            'selection': 'gh286-report-retention/1', 'configuration': 'compiler-target-production/4',
         })
         for label, source in self.process_command_sources().items():
             for target in ('x86_64-unknown-linux-gnu', 'aarch64-apple-darwin', 'x86_64-pc-windows-msvc'):
@@ -680,7 +749,7 @@ fn common() -> u8 {
             self.assertEqual(edits, [])
             self.assertEqual(self.inventory(transformed, target), inventory)
             refusals = {}
-            for predicate in ('target_os="linux"', 'target_os="windows"', 'target_os="ios"',
+            for predicate in ('target_os="ios"',
                               'target_os=7', 'target_arch="aarch64"',
                               'not(target_os="macos")', 'all(unix, target_os="macos")'):
                 file = evidence / (target + '-' + str(len(refusals)) + '.rs')
@@ -700,6 +769,273 @@ fn common() -> u8 {
         (evidence / 'validated.json').write_text(json.dumps({'series': SERIES,
             'source_sha256': digest(raw), 'test_source_sha256': digest(Path(__file__).read_bytes()),
             'analyzer_build_record': str(self.build_record), 'results': results}, indent=2) + '\n')
+
+    def test_configuration4_rejects_old_series_before_any_payload(self):
+        from unittest.mock import patch
+        for old in ('compiler-target-production/1', 'compiler-target-production/2', 'compiler-target-production/3'):
+            with self.subTest(old=old), patch('source_measure.compiler_configuration',
+                                             side_effect=AssertionError('must reject before compiler lookup')):
+                stale = dict(SERIES, configuration=old)
+                with self.assertRaisesRegex(ValueError, 'incompatible measurement series'):
+                    measure({'series': stale}, None, None, None)
+                for base, head in (({'series': stale}, {'series': SERIES}),
+                                   ({'series': SERIES}, {'series': stale}),
+                                   ({'series': stale}, {'series': stale})):
+                    with self.assertRaisesRegex(ValueError, 'incompatible base/head series'):
+                        compare(base, head)
+
+    def test_cfg_os_any_predicates_are_bounded_without_hidden_operands(self):
+        retained = Path(os.environ.get('RUST_MEASURE_NATIVE_EVIDENCE', ROOT / 'target/gh286-native-evidence')).resolve()
+        retained.mkdir(parents=True, exist_ok=True)
+        evidence = Path(tempfile.mkdtemp(prefix='bounded-os-any-', dir=retained))
+        rejected = ('target_os="ios"', 'target_os=7', 'target_arch="x86_64"',
+                    'any(unix, feature="extra")', 'any(windows, feature="extra")',
+                    'not(any(test, feature="extra"))', 'all(test, feature="extra")',
+                    'any(unix, any(windows, test))', 'not(any(unix, not(test)))',
+                    'not(not(test))', 'not(target_os="macos")', 'all(unix, target_os="macos")')
+        results = {}
+        for target, os_name in (('x86_64-unknown-linux-gnu', 'linux'),
+                                ('aarch64-apple-darwin', 'macos'),
+                                ('x86_64-pc-windows-msvc', 'windows')):
+            configuration = compiler_configuration(target)
+            cases = [(f'target_os="{name}"', os_name == name) for name in ('linux', 'macos', 'windows')]
+            cases += [('any(unix, windows)', True), ('any(test, target_os="linux")', os_name == 'linux'),
+                      ('not(any(target_os="linux", target_os="macos", target_os="windows"))', False),
+                      ('not(any(unix, windows))', False), ('all(test, unix)', False),
+                      ('not(test)', True), ('not(unix)', os_name == 'windows')]
+            for predicate, active in cases:
+                source = '#[cfg(' + predicate + ')] fn f() {}\n'
+                inventory = self.inventory(source, target)
+                self.assertEqual([row['name'] for row in inventory['symbols']], ['f'] if active else [])
+                self.assertEqual([self.cfg_source_slice(source, span) for span in inventory['excluded']],
+                                 [] if active else [source.rstrip()])
+            refusals = {}
+            for index, predicate in enumerate(rejected):
+                file = evidence / (target + '-' + str(index) + '.rs')
+                file.write_text('#[cfg(' + predicate + ')] fn f() {}\n')
+                result = subprocess.run([str(self.binary), str(file), '--target-cfg'],
+                    input=json.dumps(configuration).encode(), capture_output=True, timeout=30)
+                file.with_suffix('.stdout').write_bytes(result.stdout)
+                file.with_suffix('.stderr').write_bytes(result.stderr)
+                self.assertNotEqual(result.returncode, 0, (target, predicate))
+                self.assertEqual(result.stdout, b'')
+                self.assertIn(b'unsupported cfg', result.stderr)
+                refusals[predicate] = {'returncode': result.returncode}
+            results[target] = {'configuration': configuration, 'refusals': refusals}
+        (evidence / 'results.json').write_text(json.dumps(results, indent=2) + '\n')
+
+    def test_cfg_whole_match_arms_keep_cc_owners_ranges_and_same_line_neighbor(self):
+        from function_risk import own_lines
+        retained = Path(os.environ.get('RUST_MEASURE_NATIVE_EVIDENCE', ROOT / 'target/gh286-native-evidence')).resolve()
+        retained.mkdir(parents=True, exist_ok=True)
+        evidence = Path(tempfile.mkdtemp(prefix='whole-match-ast-', dir=retained))
+        results = {}
+        arms = [line.strip() for line in CFG_MATCH_ARM_SOURCE.splitlines()[2:6]]
+        arms[-1] = arms[-1].split(' 1 =>')[0]
+        for target, active in (('x86_64-unknown-linux-gnu', 0),
+                               ('aarch64-apple-darwin', 1), ('x86_64-pc-windows-msvc', 2)):
+            inventory = self.inventory(CFG_MATCH_ARM_SOURCE, target)
+            symbols = inventory['symbols']
+            self.assertEqual([row['kind'] for row in symbols], ['function', 'closure', 'closure', 'function'])
+            self.assertEqual([row['raw'] for row in symbols[:1]],
+                             [{'match': 1, 'match_arms': 3, 'match_decisions': 2, 'guards': 1, 'closures': 2}])
+            self.assertEqual([complexity(row['raw']) for row in symbols], [4, 2, 1, 1])
+            self.assertEqual([row['name'] for row in symbols if row['kind'] == 'function'], ['configured', 'unused'])
+            self.assertIn('hot', symbols[0]['syntax'])
+            self.assertNotIn('hidden', symbols[0]['syntax'])
+            self.assertNotIn('# [cfg', symbols[0]['syntax'])
+            self.assertEqual(symbols[1]['span'][0], active + 3)
+            self.assertEqual(symbols[2]['span'][0], 6)
+            actual = [self.cfg_source_slice(CFG_MATCH_ARM_SOURCE, span) for span in inventory['excluded']]
+            self.assertEqual(actual, [arm for index, arm in enumerate(arms) if index != active])
+            transformed, edits = instrument(CFG_MATCH_ARM_SOURCE, inventory)
+            reparsed = self.inventory(transformed, target)
+            self.assertEqual([row['raw'] for row in reparsed['symbols']], [row['raw'] for row in symbols])
+            remapped = [(*original_point(byte_span(transformed, span)[:2], edits),
+                         *original_point(byte_span(transformed, span)[2:], edits)) for span in reparsed['excluded']]
+            spans = [byte_span(CFG_MATCH_ARM_SOURCE, span) for span in inventory['excluded']]
+            self.assertEqual(remapped, spans)
+            # Synthetic byte intervals are a separate oracle, never inserted
+            # into a native LLVM export. Inactive bytes carry no denominator;
+            # the immediately adjacent cold closure on line 6 still counts.
+            for span in spans:
+                self.assertEqual(own_lines({(*span, 0): 1}, spans), {})
+            cold = byte_span(CFG_MATCH_ARM_SOURCE, symbols[2]['span'])
+            self.assertEqual(own_lines({(*cold, 0): 1}, spans), {6: 1})
+            results[target] = {'inventory': inventory, 'excluded_bytes': actual,
+                               'synthetic_only': {'cold_lines': [6], 'inactive_lines': []}}
+        (evidence / 'source.rs').write_text(CFG_MATCH_ARM_SOURCE)
+        (evidence / 'results.json').write_text(json.dumps(results, indent=2) + '\n')
+
+    def test_cfg_match_arm_unknown_and_residual_positions_fail_without_partial_output(self):
+        retained = Path(os.environ.get('RUST_MEASURE_NATIVE_EVIDENCE', ROOT / 'target/gh286-native-evidence')).resolve()
+        retained.mkdir(parents=True, exist_ok=True)
+        evidence = Path(tempfile.mkdtemp(prefix='match-arm-refusals-', dir=retained))
+        for target in ('x86_64-unknown-linux-gnu', 'aarch64-apple-darwin', 'x86_64-pc-windows-msvc'):
+            for index, arm in enumerate((
+                '#[cfg(windows)] #[cfg(feature="extra")] 0 => 1,',
+                '#[cfg(any(unix, feature="extra"))] 0 => 1,',
+                '#[cfg_attr(unix, inline)] 0 => 1,',
+                '0 if #[cfg(unix)] true => 1,',
+                '0 => (#[cfg(unix)] 1),',
+                '0 if { let _ = #[cfg(unix)] checked(true)?; true } => 1,',
+            )):
+                file = evidence / (target + '-' + str(index) + '.rs')
+                file.write_text('fn checked(ok: bool) -> Result<(), ()> { Ok(()) }\n'
+                                + 'fn f() { match 0 { ' + arm + ' _ => 2, }; }\n')
+                result = subprocess.run([str(self.binary), str(file), '--target-cfg'],
+                    input=json.dumps(compiler_configuration(target)).encode(), capture_output=True, timeout=30)
+                file.with_suffix('.stdout').write_bytes(result.stdout)
+                file.with_suffix('.stderr').write_bytes(result.stderr)
+                self.assertNotEqual(result.returncode, 0, (target, arm))
+                self.assertEqual(result.stdout, b'')
+                self.assertIn(b'unsupported', result.stderr)
+
+    def test_cfg_whole_match_arm_real_native_independent_and_zero_counters(self):
+        from function_risk import contains
+        retained = Path(os.environ.get('RUST_MEASURE_NATIVE_EVIDENCE', ROOT / 'target/gh286-native-evidence')).resolve()
+        retained.mkdir(parents=True, exist_ok=True)
+        evidence = Path(tempfile.mkdtemp(prefix='whole-match-native-', dir=retained))
+        crate = evidence / 'crate'
+        (crate / 'src').mkdir(parents=True)
+        file = crate / 'src/configured.rs'
+        file.write_bytes(CFG_MATCH_ARM_SOURCE.encode())
+        configuration = compiler_configuration()
+        inventory = ast(file, self.binary, configuration)
+        self.assertEqual([row['kind'] for row in inventory['symbols']],
+                         ['function', 'closure', 'closure', 'function'])
+        transformed, edits = instrument(CFG_MATCH_ARM_SOURCE, inventory)
+        file.write_bytes(transformed.encode())
+        manifest = {'series': SERIES, 'configuration': configuration, 'files': {'configured.rs': {
+            'original': CFG_MATCH_ARM_SOURCE, 'original_sha256': digest(CFG_MATCH_ARM_SOURCE.encode()),
+            'instrumented_sha256': digest(transformed.encode()), 'inventory': inventory, 'edits': edits}}}
+        (evidence / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
+        (evidence / 'original.rs').write_bytes(CFG_MATCH_ARM_SOURCE.encode())
+        main = crate / 'src/main.rs'
+        main.write_text('''mod configured;
+fn main() {
+    let mode = std::env::args().nth(1).unwrap();
+    if mode == "unused" { assert_eq!(configured::unused(), 11); }
+    else {
+        let (value, expected) = match mode.as_str() { "hot" => (0, 7), "cold" => (1, 9), "zero" => (2, 3), _ => panic!() };
+        assert_eq!(configured::configured(value), expected);
+    }
+}
+''')
+        commands = []
+
+        def run(argv, **kwargs):
+            record = {'argv': [str(arg) for arg in argv], 'cwd': str(crate),
+                      'environment': kwargs.pop('record_environment', {})}
+            commands.append(record)
+            try:
+                result = subprocess.run(argv, cwd=crate, capture_output=True, timeout=120, **kwargs)
+            except (OSError, subprocess.TimeoutExpired) as error:
+                record['error'] = str(error)
+                if isinstance(error, subprocess.TimeoutExpired):
+                    (evidence / f'command-{len(commands)}.stdout').write_bytes(error.stdout or b'')
+                    (evidence / f'command-{len(commands)}.stderr').write_bytes(error.stderr or b'')
+                (evidence / 'commands.json').write_text(json.dumps(commands, indent=2) + '\n')
+                raise
+            record['returncode'] = result.returncode
+            (evidence / f'command-{len(commands)}.stdout').write_bytes(result.stdout)
+            (evidence / f'command-{len(commands)}.stderr').write_bytes(result.stderr)
+            (evidence / 'commands.json').write_text(json.dumps(commands, indent=2) + '\n')
+            self.assertEqual(result.returncode, 0, result.stderr.decode(errors='replace'))
+            return result.stdout
+
+        suffix = '.exe' if os.name == 'nt' else ''
+        executable = crate / ('whole-match-native' + suffix)
+        run(['rustc', '--edition=2021', '--target', configuration['target'], '-C', 'instrument-coverage',
+             '-C', 'opt-level=0', str(main), '-o', str(executable)], env=os.environ.copy())
+        sysroot = Path(run(['rustc', '--print', 'sysroot']).decode().strip())
+        version = run(['rustc', '-vV']).decode().strip()
+        host = next(line.removeprefix('host: ') for line in version.splitlines() if line.startswith('host: '))
+        tools = {name: sysroot / 'lib/rustlib' / host / 'bin' / (name + suffix) for name in ('llvm-cov', 'llvm-profdata')}
+        versions = {name: run([str(path), '--version']).decode().strip() for name, path in tools.items()}
+        exclusions = [byte_span(CFG_MATCH_ARM_SOURCE, span) for span in inventory['excluded']]
+        results, negatives, real_denominators = {}, [], {}
+        for mode, expected in (('hot', [1, 1, 0, 0]), ('cold', [1, 0, 1, 0]),
+                               ('zero', [1, 0, 0, 0]), ('unused', [0, 0, 0, 1])):
+            raw, profile = evidence / f'{mode}.profraw', evidence / f'{mode}.profdata'
+            run([str(executable), mode], env={**os.environ, 'LLVM_PROFILE_FILE': str(raw)},
+                record_environment={'LLVM_PROFILE_FILE': str(raw)})
+            run([str(tools['llvm-profdata']), 'merge', '-sparse', str(raw), '-o', str(profile)])
+            exported = run([str(tools['llvm-cov']), 'export', str(executable), f'-instr-profile={profile}'])
+            (evidence / f'{mode}.llvm.json').write_bytes(exported)
+            llvm = json.loads(exported)
+            rows = measure(manifest, llvm, crate, self.binary)
+            self.assertEqual(len(rows), 4)
+            self.assertEqual([row['cc'] for row in rows], [4, 2, 1, 1])
+            self.assertEqual([len(row['instances']) for row in rows], [1, 1, 1, 1])
+            self.assertEqual([row['instances'][0]['count'] for row in rows], expected)
+            self.assertEqual(len({row['instances'][0]['index'] for row in rows}), 4)
+            denominators = {}
+            for row, count in zip(rows, expected):
+                self.assertGreater(row['lines']['count'], 0)
+                self.assertGreater(row['regions']['count'], 0)
+                if count == 0:
+                    self.assertEqual(row['lines']['covered'], 0)
+                    self.assertEqual(row['regions']['covered'], 0)
+                # Independent byte enumeration of REAL exported regions. This
+                # is separate from the synthetic interval test above.
+                span = byte_span(CFG_MATCH_ARM_SOURCE, row['span'])
+                children = exclusions + [byte_span(CFG_MATCH_ARM_SOURCE, symbol['span'])
+                    for symbol in inventory['symbols'] if symbol['span'] != row['span']
+                    and contains(span, byte_span(CFG_MATCH_ARM_SOURCE, symbol['span']))]
+                regions = {(*region['span'], region['kind']): region['count'] for region in row['raw_regions']}
+                lines = {}
+                for line_number, line in enumerate(CFG_MATCH_ARM_SOURCE.encode().splitlines(keepends=True), 1):
+                    for column in range(1, len(line) + 1):
+                        point = (line_number, column)
+                        if any(child[:2] <= point < child[2:] for child in children):
+                            continue
+                        candidates = [(region, hits) for region, hits in regions.items()
+                                      if region[:2] <= point < region[2:4]]
+                        if not candidates:
+                            continue
+                        inner = [(region, hits) for region, hits in candidates
+                                 if all(other[:2] <= region[:2] and region[2:4] <= other[2:4]
+                                        for other, _ in candidates)]
+                        self.assertEqual(len(inner), 1, 'real fixture requires unambiguous nested byte regions')
+                        region, hits = inner[0]
+                        if region[4] == 0:
+                            lines[line_number] = max(lines.get(line_number, 0), hits)
+                self.assertEqual(row['lines']['count'], len(lines))
+                self.assertEqual(row['lines']['covered'], sum(bool(hits) for hits in lines.values()))
+                if row['kind'] == 'closure' and row['span'][0] == 6:
+                    self.assertEqual(set(lines), {6}, 'active neighbor retains its real line denominator')
+                denominators[row['name']] = lines
+                missing = copy.deepcopy(llvm)
+                missing['data'][0]['functions'].pop(row['instances'][0]['index'])
+                with self.assertRaisesRegex(ValueError, re.escape('missing LLVM function: configured.rs:' + row['name'] + ':')):
+                    measure(manifest, missing, crate, self.binary)
+                negatives.append({'mode': mode, 'missing_owner': row['name'], 'counter': count})
+            parent = rows[0]
+            for child in rows[1:3]:
+                borrowed = copy.deepcopy(llvm)
+                function = borrowed['data'][0]['functions'][child['instances'][0]['index']]
+                native_parent = llvm['data'][0]['functions'][parent['instances'][0]['index']]
+                function['regions'] = copy.deepcopy(native_parent['regions'])
+                function['filenames'] = copy.deepcopy(native_parent['filenames'])
+                with self.assertRaisesRegex(ValueError, 'function kind mismatch: configured.rs:configured'):
+                    measure(manifest, borrowed, crate, self.binary)
+            results[mode], real_denominators[mode] = rows, denominators
+            (evidence / 'results.json').write_text(json.dumps(results, indent=2) + '\n')
+            (evidence / 'negative-checks.json').write_text(json.dumps(negatives, indent=2) + '\n')
+            (evidence / 'real-denominators.json').write_text(json.dumps(real_denominators, indent=2) + '\n')
+        tampered = copy.deepcopy(manifest)
+        tampered['files']['configured.rs']['inventory']['excluded'] = []
+        with self.assertRaisesRegex(ValueError, 'AST inventory does not reproduce'):
+            measure(tampered, llvm, crate, self.binary)
+        (evidence / 'validated.json').write_text(json.dumps({'series': SERIES,
+            'analyzer_build_record': {'path': str(self.build_record), 'sha256': digest(self.build_record.read_bytes())},
+            'compiler_configuration': configuration, 'binary_sha256': digest(executable.read_bytes()),
+            'source_sha256': digest(CFG_MATCH_ARM_SOURCE.encode()), 'test_source_sha256': digest(Path(__file__).read_bytes()),
+            'llvm_tools': {name: {'path': str(path), 'sha256': digest(path.read_bytes()), 'version': versions[name]}
+                           for name, path in tools.items()},
+            'boundaries': ['Host-native only; three-target AST is not three-platform native validation.',
+                           'Real LLVM exports remain separate from synthetic interval oracles.']}, indent=2) + '\n')
 
     def test_cfg_try_statements_and_nested_positions_are_bounded(self):
         retained = Path(os.environ.get('RUST_MEASURE_NATIVE_EVIDENCE', ROOT / 'target/gh285-native-evidence')).resolve()
@@ -968,7 +1304,7 @@ fn main() {
         with self.assertRaisesRegex(ValueError, 'AST inventory does not reproduce'):
             measure(tampered, exports['combined'], crate, self.binary)
         negatives.append('omitted statement exclusion rejected at AST reproduction')
-        for identity in ('compiler-target-production/1', 'compiler-target-production/2'):
+        for identity in ('compiler-target-production/1', 'compiler-target-production/2', 'compiler-target-production/3'):
             old = copy.deepcopy(manifest)
             old['series']['configuration'] = identity
             with self.assertRaisesRegex(ValueError, 'incompatible measurement series'):
@@ -1414,9 +1750,10 @@ fn outer(xs: &[bool]) -> bool {
             (crate / "quality-core").mkdir()
             source = "pub fn evaluate() { let f = |x: bool| x; }"
             (crate / "quality-core/core.rs").write_bytes(source.encode())
-            paths = ["../quality-core/core.rs", "app/quality.rs"]
+            paths = ["../quality-core/core.rs", "app/quality.rs", "service/report_directory.rs"]
             manifest = prepare(crate, self.binary, paths)
-            self.assertEqual(manifest["absent_sources"], ["app/quality.rs"])
+            self.assertEqual(manifest["absent_sources"], ["app/quality.rs", "service/report_directory.rs"])
+            self.assertNotIn("service/report_directory.rs", manifest["files"])
             self.assertEqual(manifest["files"][paths[0]]["original"], source)
             self.assertEqual(len(manifest["files"][paths[0]]["inventory"]["symbols"]), 2)
             transformed, _ = instrument(source, manifest["files"][paths[0]]["inventory"])
