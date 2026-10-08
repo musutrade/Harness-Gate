@@ -92,9 +92,14 @@ python3 plugin.py collect --request /absolute/request.json
 refuses a real checkout and checks signature, stale context, expiration, replay
 and artifact tampering. It is not the project's complete production gate.
 
-The candidate currently targets Rust 1.97.1 / LLVM 22.1.6, cargo-llvm-cov 0.9.0,
-Python 3.14 and Linux x86-64. New syntax/LLVM formats require compatibility tests
-and a new identity before adoption.
+The retained certification targets Rust 1.97.1 / LLVM 22.1.6, cargo-llvm-cov
+0.9.0, Python 3.14 and Linux x86-64. The GH-288 executable compatibility matrix
+also targets Rust 1.99.0 / LLVM 23.1.1; adding this test is not a certification
+result. Only a successful retained run and its reviewed exact identities establish
+that combination. New syntax/LLVM formats require compatibility tests and a new
+identity before adoption; existing captures and baselines are never relabeled.
+See [the matrix and evidence contract](../../../docs/quality/gh-288-source-risk-compatibility.md)
+for the bounded command, prerequisites, rejection states and source/native choice.
 
 References: [LLVM coverage mapping](https://llvm.org/docs/CoverageMappingFormat.html)
 and [Rust instrument-coverage](https://doc.rust-lang.org/rustc/instrument-coverage.html).
@@ -137,6 +142,16 @@ this does not count the future as polled or cover its body.
 LLVM coverage, and checks the joined metrics. The tests include uncalled closures,
 unpolled async blocks, nested owners, and rejection of a later tuple element
 masquerading as the entry. Set `RUST_SOURCE_INVENTORY` to test a candidate binary.
+
+Set `RUST_SOURCE_TEST_EVIDENCE` to a new evidence directory to retain original
+sources, binaries, raw profiles, merged profiles, exports, exact tool identities,
+command/status/stdout/stderr records and measured/rejected results from
+`test_measure.py` and `test_closures.py`. Without that option their disposable
+fixtures retain the existing cleanup behavior. The two-toolchain certification
+runner sets this option and builds its own AST analyzer in each combination's
+fresh target directory. Normal unittest discovery adds only its static contract
+test; expensive certification is an explicit command. Missing prerequisites in
+that command block certification, never silently skip or use another toolchain.
 
 Some trivial projection closures (for example `|value: &i32| *value`) have no
 independent coverage record in the tested compiler output. These still reject:
