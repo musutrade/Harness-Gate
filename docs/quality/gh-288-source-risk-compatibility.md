@@ -1,18 +1,18 @@
 # GH-288 source-risk toolchain compatibility
 
-This is a bounded executable certification procedure, not a claim that Rust
-1.99 fixes missing counters or makes the native compiler-private driver compatible.
-The implementation adds test fixtures and evidence retention only. Production
-AST parsing, source measurement, capture, plugin, Core, metric definitions and
-thresholds remain unchanged. Real results must come from the precise checkout's
-retained matrix; documentation alone does not certify a compiler.
+The retained Linux x86-64 matrix passed for Rust 1.97.1 / LLVM 22.1.6
+and Rust 1.99.0 / LLVM 23.1.1. Each combination passed the existing 26 tests
+and seven compatibility tests, including supported capture, independent plugin
+re-export and signed Core collection/evaluation. Certification applies to the
+retained implementations and supported source shapes below; missing independent
+counters and unsupported owners still reject measurement.
 
 ## Explicit combinations and prerequisites
 
 | Combination | rustc commit | Matching LLVM tools | Scope |
 | --- | --- | --- | --- |
 | Rust 1.97.1 | `8bab26f4f68e0e26f0bb7960be334d5b520ea452` | 22.1.6 | Retained source-risk combination; regression control |
-| Rust 1.99.0 | `b940084d7eb6a299eb4bfeb8e34901bc051e7ac4` | 23.1.1 | Source-risk certification candidate; actual run required |
+| Rust 1.99.0 | `b940084d7eb6a299eb4bfeb8e34901bc051e7ac4` | 23.1.1 | Source-risk matrix passed; bounded certification below |
 
 The fixture supports Linux x86-64. Each selected rustup toolchain must already
 have its matching `llvm-tools-preview`. Rust 1.99's tools were installed with
@@ -32,6 +32,44 @@ AST build uses the copied committed Cargo lockfile, explicit locked fetch and
 offline locked build; lock bytes are checked. No shared compiled analyzer or rlib
 from the other combination is trusted. Existing closure/arithmetic/native tests
 run against that combination's actual fresh analyzer and LLVM tools.
+
+## Completed matrix and precise source identity
+
+The 2026-10-08 evidence root is
+`/mnt/dev-ssd/dev-tmp/gh288-push-20261008/toolchain-matrix/`.
+`success.json`, `matrix.json` and `diagnostic-comparison.json` record both
+successful combinations; `1.97.1/tools.json` and `1.99.0/tools.json` retain
+the compiler/LLVM paths and hashes, implementation snapshots and Core binary.
+The command directories retain original stdout/stderr/status, and each
+combination retains its existing-test and compatibility-case records.
+
+The Core build record is **bb813b8b82e8b5636f82cde941354f9c8eea9948**, with
+binary SHA-256
+`cef1772b082521cda696905850d6edb69be82c0f45c9632bc268cd0a5628da96`.
+Commit **3d887a460bb72064b29a6f9ea71293e2949a16d7** added the five
+compatibility fixture/test/documentation files; its Core production sources
+are byte-identical to that recorded build. The build identity remains bb813b8:
+source equivalence does not change an executed command's `source_commit`.
+The source-risk implementation and case hashes were independently checked
+against the retained `tools.json` snapshots (164 file/hash checks).
+The [certification identity index](gh-288-certification-identity.json) records
+the exact five committed blobs and hashes, per-combination implementation
+hashes, Core subtree equivalence and retained evidence digests.
+
+Projection requires and observes rejection for its missing independent callable
+counter. Derive reports manual owners only. Both proc-attribute variants and
+both feature-cfg variants reject at capture preflight. Exact cfg(test) disabled
+is measurable; enabled retains the native mapping rejection. Supported capture,
+plugin re-export and signed Core evaluation pass, including stale-context,
+expiration, signature, replay and artifact-tamper negatives.
+
+The two recorded measurement series differ; `baseline_adopted=false`.
+The later process-cleanup changes in H
+`1ea9a0a55fcd6690972f60a56e07e0bf9617b417` and merged main G
+`e4a084be19de454cdaeebb44c41715fecf1f2b49` are outside this old Core build.
+Their separate source/native regression evidence does not relabel this matrix
+as a final-G Core certification. Rust 1.99 compiler-private native ABI remains
+uncertified; the native choice below continues to require Rust 1.97.1.
 
 ## Fresh Core and the explicit runner
 
@@ -147,8 +185,8 @@ debt/non-regression semantics remain unchanged.
 For manual business source decisions, select the source-risk collector explicitly
 and use its supported AST/LLVM boundary with the exact reviewed tool combination.
 For example, `RUSTUP_TOOLCHAIN=1.99.0 python3 .../capture.py ...` selects only that
-child process; it is usable for certified shapes only after the real matrix has
-passed. Missing source counters and unknown owners still block measurement.
+child process; the retained matrix certifies only the supported shapes and exact
+implementation identities above. Missing source counters and unknown owners still block measurement.
 
 For generated functions/MIR ownership, explicitly select the existing
 [native collector](native-external-toolchain.md). Its published runtime requires

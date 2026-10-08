@@ -1,0 +1,96 @@
+{
+  "schema": "gh288-certification-identity/v1",
+  "scope": "Retained source-risk Linux x86-64 matrix; no final-G Core or Rust1.99 native private ABI certification",
+  "core_recorded_source_commit": "bb813b8b82e8b5636f82cde941354f9c8eea9948",
+  "compatibility_commit": "3d887a460bb72064b29a6f9ea71293e2949a16d7",
+  "core_subtree": "tools/harness-gate",
+  "core_tree_oid_by_commit": {
+    "bb813b8b82e8b5636f82cde941354f9c8eea9948": "0263596ee6452ca07599b2eeb6f8f9bafee39cca",
+    "3d887a460bb72064b29a6f9ea71293e2949a16d7": "0263596ee6452ca07599b2eeb6f8f9bafee39cca"
+  },
+  "core_production_source_equivalent": true,
+  "compatibility_five_files": {
+    "docs/quality/gh-288-source-risk-compatibility.md": {
+      "commit": "3d887a460bb72064b29a6f9ea71293e2949a16d7",
+      "blob_oid": "a452e7c5c372088490252c062c7a20fa49d3d8a8",
+      "sha256": "0a3331be801c251948d20ca4d2772d2fc7932395684db897329ab78279573ea9"
+    },
+    "tools/quality/rust-source-risk/README.md": {
+      "commit": "3d887a460bb72064b29a6f9ea71293e2949a16d7",
+      "blob_oid": "effbdb8d4c5044800df5a7558c8a49df5aff467f",
+      "sha256": "5e283eed3330b36595e8e0ce8fc61ae55c627c476be51ff7e16d0ea1c69b3b41",
+      "matrix_implementation_hashes": {
+        "1.97.1": "5e283eed3330b36595e8e0ce8fc61ae55c627c476be51ff7e16d0ea1c69b3b41",
+        "1.99.0": "5e283eed3330b36595e8e0ce8fc61ae55c627c476be51ff7e16d0ea1c69b3b41"
+      }
+    },
+    "tools/quality/rust-source-risk/test_closures.py": {
+      "commit": "3d887a460bb72064b29a6f9ea71293e2949a16d7",
+      "blob_oid": "d74fdf588791e9e499e2075072dd3ea5b9298940",
+      "sha256": "f9a428ac4eea03895be7aaaae35b2097728078e833bb7a28935c32e157693fff",
+      "matrix_implementation_hashes": {
+        "1.97.1": "f9a428ac4eea03895be7aaaae35b2097728078e833bb7a28935c32e157693fff",
+        "1.99.0": "f9a428ac4eea03895be7aaaae35b2097728078e833bb7a28935c32e157693fff"
+      }
+    },
+    "tools/quality/rust-source-risk/test_measure.py": {
+      "commit": "3d887a460bb72064b29a6f9ea71293e2949a16d7",
+      "blob_oid": "22a6e1854265b2e74ba944ea18d0e4548069f09d",
+      "sha256": "81d8f2d2b3dbdb1b88ec75783e20e09cc299de6c37bc3103d2e966ff4f326a46",
+      "matrix_implementation_hashes": {
+        "1.97.1": "81d8f2d2b3dbdb1b88ec75783e20e09cc299de6c37bc3103d2e966ff4f326a46",
+        "1.99.0": "81d8f2d2b3dbdb1b88ec75783e20e09cc299de6c37bc3103d2e966ff4f326a46"
+      }
+    },
+    "tools/quality/rust-source-risk/test_toolchain_compatibility.py": {
+      "commit": "3d887a460bb72064b29a6f9ea71293e2949a16d7",
+      "blob_oid": "43422735c3a3876b7ba42a58e2078d97f8ecc6bf",
+      "sha256": "5437a95536d44bdf25b6d4873aad9f7dddb5f116a87a4b325d255e700899d0ab",
+      "matrix_implementation_hashes": {
+        "1.97.1": "5437a95536d44bdf25b6d4873aad9f7dddb5f116a87a4b325d255e700899d0ab",
+        "1.99.0": "5437a95536d44bdf25b6d4873aad9f7dddb5f116a87a4b325d255e700899d0ab"
+      }
+    }
+  },
+  "evidence_root": "/mnt/dev-ssd/dev-tmp/gh288-push-20261008/toolchain-matrix",
+  "evidence_files": {
+    "core-build.json": "a460faa88b5ffab7bbac0325809c5d6001d1c125b5aeb4b9d045bf6a4405d8df",
+    "matrix.json": "d571c60d41e94ff1ec8abd2925b2e00a9d78f3689f736742c9c5fbe4b9102a42",
+    "success.json": "0ef7ebd85aed8809b7b94cfe5f79fc41611123d6e0e241972e704e0737e7ab3f",
+    "diagnostic-comparison.json": "ac125bd09d393a162b78f9de8d890e5b8b8d4a68b848cf4a13712d323bcfc922",
+    "1.97.1/tools.json": "06d6da46b7ed612cf2673b9f172521601f00227c636bc19f9f430adadbbc5e50",
+    "1.99.0/tools.json": "07f63ffb14a4b6ec80b09b92af04911c23c4d7769390913f29d89d641ab1f58a"
+  },
+  "certified_combinations": {
+    "baseline_adopted": false,
+    "combinations": [
+      {
+        "errors": 0,
+        "failures": 0,
+        "series": "measurement-series/v1:33e5a39130268647d0f5fc6aba331c7d4b608236a6c923f10de059a28ff2a18b",
+        "state": "certified",
+        "tests": 7,
+        "toolchain": "1.97.1"
+      },
+      {
+        "errors": 0,
+        "failures": 0,
+        "series": "measurement-series/v1:e2fc6ec1398e1c73274dc4d943e4e2426aa2ab795165134d1d8b20e5cecf0ae3",
+        "state": "certified",
+        "tests": 7,
+        "toolchain": "1.99.0"
+      }
+    ],
+    "native_1_99_migration": false,
+    "state": "certified"
+  },
+  "boundaries": [
+    "Core record source_commit is preserved; full Core subtree is identical between bb813 and3d887.",
+    "G/H process changes are separate later regression evidence.",
+    "README/documentation bytes in this evidence describe the old executed snapshot; later documentation updates do not relabel it."
+  ],
+  "independent_source_equivalence_audit": {
+    "/mnt/dev-ssd/dev-tmp/gh291-audit-20261008/docs-candidate-v1-review/gh288-source-equivalence.json": "f53b664fa259f45f1be393a0dcfaed28ae38ef2890e8af5af8ca149d325cfc16",
+    "/mnt/dev-ssd/dev-tmp/gh291-audit-20261008/docs-candidate-v1-review/gh288-toolsource-case-checks.json": "c1b5544274f8cc659a3579f7f8706fbc7c27a3307a25b4749085a1f7a3c3fd56"
+  }
+}
