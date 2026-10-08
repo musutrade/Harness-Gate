@@ -3,16 +3,18 @@ from __future__ import annotations
 import copy
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
 import tempfile
+import tomllib
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "tools/quality"))
-from source_measure import HOTSPOTS, SERIES, SOURCE_FILES, prepare, ast, closure_name, compare, compiler_configuration, complexity, digest, instrument, measure, original_point, provenance
+from source_measure import HOTSPOTS, SERIES, SOURCE_FILES, prepare, ast, byte_span, closure_name, compare, compiler_configuration, complexity, digest, instrument, measure, original_point, provenance
 
 
 class SourceMeasureTests(unittest.TestCase):
@@ -181,6 +183,227 @@ fn both() {
                 transformed, _ = instrument(source.read_text(encoding="utf-8"), {'symbols': symbols})
                 self.assertEqual(len(self.inventory(transformed)['symbols']), len(symbols))
 
+    def test_actual_redaction_source_inventory_and_instrumentation(self):
+        self.assertEqual(SERIES, {
+            'analyzer': 'harness-gate-rust-measure/0.3.1', 'rule': 'mccabe-rust-3/1',
+            'instrumentation': 'closure-black-box/1', 'mapping': 'insertions-utf8/1',
+            'selection': 'gh287-text-redaction/1', 'configuration': 'compiler-target-production/1',
+        })
+        path = 'utils/redaction.rs'
+        self.assertIn(path, SOURCE_FILES)
+        source_file = ROOT / 'tools/harness-gate/src' / path
+        source = source_file.read_bytes().decode('utf-8')
+        inventory = ast(source_file, self.binary)
+        self.assertEqual(inventory, self.inventory(source))
+        symbols = inventory['symbols']
+        self.assertEqual([s['kind'] for s in symbols], ['function', 'closure', 'closure'])
+        self.assertEqual(symbols[0]['name'], 'redact_text')
+        self.assertTrue(all(s['name'].startswith('redact_text::closure_') for s in symbols[1:]))
+        self.assertFalse(any(s['test'] for s in symbols))
+        self.assertEqual([complexity(s['raw']) for s in symbols], [1, 1, 1])
+        self.assertTrue(inventory['excluded'], 'test module must leave production ranges')
+        transformed, edits = instrument(source, inventory)
+        self.assertEqual(len(edits), 4)
+        reparsed = self.inventory(transformed)
+        self.assertEqual([s['kind'] for s in reparsed['symbols']], [s['kind'] for s in symbols])
+        for original, inserted in zip(symbols, reparsed['symbols']):
+            self.assertEqual(complexity(original['raw']), complexity(inserted['raw']))
+            for field in ('span', 'body'):
+                mapped = byte_span(transformed, inserted[field])
+                self.assertEqual((*original_point(mapped[:2], edits),
+                                  *original_point(mapped[2:], edits)),
+                                 byte_span(source, original[field]))
+
+    def test_once_lock_regex_tuple_fold_has_independent_native_owners(self):
+        source = '''use regex::Regex;
+use std::sync::OnceLock;
+pub fn redact(input: &str, patterns: &OnceLock<Vec<(Regex, &'static str)>>, count: usize) -> String {
+    let patterns = patterns.get_or_init(|| {
+        vec![
+            (Regex::new("SYNTHETIC_A").expect("first regex"), "public-a"),
+            (Regex::new("SYNTHETIC_B").expect("second regex"), "public-b"),
+        ].into_iter().take(count).collect()
+    });
+    patterns.iter().fold(input.to_string(), |text, (pattern, replacement)| {
+        pattern.replace_all(&text, *replacement).into_owned()
+    })
+}
+#[cfg(test)] mod tests { #[test] fn excluded() { unsupported!(a => b); } }
+'''
+        main = '''mod redaction;
+use regex::Regex;
+use std::sync::OnceLock;
+fn main() {
+    let mode = std::env::args().nth(1).expect("mode");
+    let count = if mode.ends_with("zero") { 0 } else { 2 };
+    let patterns = OnceLock::new();
+    if mode.starts_with("preset") {
+        patterns.set(vec![
+            (Regex::new("SYNTHETIC_A").unwrap(), "public-a"),
+            (Regex::new("SYNTHETIC_B").unwrap(), "public-b"),
+        ].into_iter().take(count).collect()).unwrap();
+    }
+    let result = redaction::redact("public-context SYNTHETIC_A SYNTHETIC_B", &patterns, count);
+    assert_eq!(result, if count == 0 { "public-context SYNTHETIC_A SYNTHETIC_B" }
+                       else { "public-context public-a public-b" });
+}
+'''
+        # This fixture builds its own pinned regex dependency graph. Never join
+        # against an unbound rlib left by another build in a shared target dir.
+        repo_lock = (ROOT / 'tools/harness-gate/Cargo.lock').read_bytes()
+        packages = tomllib.loads(repo_lock.decode())['package']
+        by_name = {}
+        for package in packages:
+            by_name.setdefault(package['name'], []).append(package)
+        selected = {}
+        pending = ['regex']
+        while pending:
+            name = pending.pop()
+            if name in selected:
+                continue
+            self.assertEqual(len(by_name[name]), 1, f'ambiguous fixture dependency: {name}')
+            selected[name] = by_name[name][0]
+            pending.extend(dep.split()[0] for dep in selected[name].get('dependencies', []))
+        regex_version = selected['regex']['version']
+        cargo_manifest = ('[package]\nname = "redaction-native-fixture"\nversion = "0.0.0"\n'
+                          'edition = "2021"\n[workspace]\n[dependencies]\n'
+                          f'regex = "={regex_version}"\n')
+        lock = ('version = 4\n\n[[package]]\nname = "redaction-native-fixture"\n'
+                'version = "0.0.0"\ndependencies = ["regex"]\n\n')
+        for block in repo_lock.decode().split('[[package]]\n')[1:]:
+            package = tomllib.loads('[[package]]\n' + block)['package'][0]
+            if package['name'] in selected:
+                self.assertEqual(package, selected[package['name']])
+                lock += '[[package]]\n' + block
+        lock_bytes = lock.encode()
+        retained_root = Path(os.environ.get('RUST_MEASURE_NATIVE_EVIDENCE',
+                                            ROOT / 'target/gh287-native-evidence'))
+        retained_root.mkdir(parents=True, exist_ok=True)
+        evidence = Path(tempfile.mkdtemp(prefix='once-lock-fold-', dir=retained_root))
+        commands = []
+
+        def run(command, **kwargs):
+            record = {'argv': [str(arg) for arg in command], 'cwd': str(kwargs.get('cwd', ROOT)),
+                      'environment': kwargs.pop('record_environment', {})}
+            if 'input' in kwargs:
+                record['stdin_sha256'] = digest(kwargs['input'])
+            commands.append(record)
+            number = len(commands)
+            try:
+                result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs)
+            except OSError as error:
+                record['error'] = str(error)
+                (evidence / 'commands.json').write_text(json.dumps(commands, indent=2) + '\n')
+                raise
+            record['returncode'] = result.returncode
+            (evidence / f'command-{number}.stdout').write_bytes(result.stdout)
+            (evidence / f'command-{number}.stderr').write_bytes(result.stderr)
+            (evidence / 'commands.json').write_text(json.dumps(commands, indent=2) + '\n')
+            self.assertEqual(result.returncode, 0, f'{command}: {result.stderr.decode(errors="replace")}')
+            return result.stdout
+
+        with tempfile.TemporaryDirectory(dir=ROOT / 'target') as temp:
+            crate = Path(temp)
+            (crate / 'src').mkdir()
+            file = crate / 'src/redaction.rs'
+            file.write_bytes(source.encode())
+            configuration = compiler_configuration()
+            inventory = json.loads(run([str(self.binary), str(file), '--target-cfg'],
+                                       input=json.dumps(configuration).encode()))
+            self.assertEqual(inventory['configuration'], configuration)
+            self.assertEqual([s['kind'] for s in inventory['symbols']], ['function', 'closure', 'closure'])
+            self.assertEqual([complexity(s['raw']) for s in inventory['symbols']], [1, 1, 1])
+            transformed, edits = instrument(source, inventory)
+            file.write_bytes(transformed.encode())
+            (crate / 'src/main.rs').write_bytes(main.encode())
+            (crate / 'Cargo.toml').write_bytes(cargo_manifest.encode())
+            (crate / 'Cargo.lock').write_bytes(lock_bytes)
+            manifest = {'series': SERIES, 'configuration': configuration, 'files': {'redaction.rs': {
+                'original': source, 'original_sha256': digest(source.encode()),
+                'instrumented_sha256': digest(transformed.encode()), 'inventory': inventory, 'edits': edits}}}
+            for name, data in [('fixture.original.rs', source.encode()), ('fixture.instrumented.rs', transformed.encode()),
+                               ('main.rs', main.encode()), ('Cargo.toml', cargo_manifest.encode()), ('Cargo.lock', lock_bytes),
+                               ('repository.Cargo.lock', repo_lock)]:
+                (evidence / name).write_bytes(data)
+            (evidence / 'instrumentation-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
+            environment = {**os.environ, 'CARGO_TARGET_DIR': str(crate / 'build'),
+                           'RUSTFLAGS': '-C instrument-coverage -C opt-level=0'}
+            environment.pop('CARGO_ENCODED_RUSTFLAGS', None)
+            environment.pop('LLVM_PROFILE_FILE', None)
+            run(['cargo', 'fetch', '--locked', '--manifest-path', str(crate / 'Cargo.toml'),
+                 '--target', manifest['configuration']['target']], cwd=crate, env=environment)
+            self.assertEqual((crate / 'Cargo.lock').read_bytes(), lock_bytes)
+            run(['cargo', 'build', '--locked', '--offline', '--manifest-path', str(crate / 'Cargo.toml'),
+                 '--target', manifest['configuration']['target']], cwd=crate, env=environment,
+                record_environment={key: environment[key] for key in ('CARGO_TARGET_DIR', 'RUSTFLAGS')})
+            self.assertEqual((crate / 'Cargo.lock').read_bytes(), lock_bytes)
+            suffix = '.exe' if os.name == 'nt' else ''
+            executable = crate / 'build' / manifest['configuration']['target'] / 'debug' / ('redaction-native-fixture' + suffix)
+            shutil.copyfile(executable, evidence / executable.name)
+            sysroot = run(['rustc', '--print', 'sysroot']).decode().strip()
+            version = run(['rustc', '-vV']).decode().strip()
+            host = next(line.removeprefix('host: ') for line in version.splitlines() if line.startswith('host: '))
+            llvm_bin = Path(sysroot) / 'lib/rustlib' / host / 'bin'
+            llvm_tools = {name: llvm_bin / (name + suffix) for name in ('llvm-profdata', 'llvm-cov')}
+            tool_versions = {name: run([str(path), '--version']).decode().strip() for name, path in llvm_tools.items()}
+            results, rejected = {}, []
+            for mode in ('fresh-zero', 'fresh-multi', 'preset-zero', 'preset-multi'):
+                raw, profile = evidence / f'{mode}.profraw', evidence / f'{mode}.profdata'
+                run([str(executable), mode], env={**environment, 'LLVM_PROFILE_FILE': str(raw)},
+                    record_environment={'LLVM_PROFILE_FILE': str(raw)})
+                run([str(llvm_tools['llvm-profdata']), 'merge', '-sparse', str(raw), '-o', str(profile)])
+                exported = run([str(llvm_tools['llvm-cov']), 'export', str(executable), f'-instr-profile={profile}'])
+                (evidence / f'{mode}.llvm.json').write_bytes(exported)
+                llvm = json.loads(exported)
+                rows = measure(manifest, llvm, crate, self.binary)
+                self.assertEqual(len(rows), 3)
+                parent, initializer, fold = rows
+                self.assertEqual([r['kind'] for r in rows], ['function', 'closure', 'closure'])
+                expected = [1, int(mode.startswith('fresh')), 0 if mode.endswith('zero') else 2]
+                for row, count in zip(rows, expected):
+                    self.assertEqual(len(row['instances']), 1)
+                    self.assertEqual(row['instances'][0]['count'], count, (mode, row['name']))
+                    self.assertGreater(row['lines']['count'], 0)
+                    self.assertGreater(row['regions']['count'], 0)
+                    self.assertEqual(row['cc'], 1)
+                    if count == 0:
+                        self.assertEqual(row['lines']['covered'], 0)
+                        self.assertEqual(row['regions']['covered'], 0)
+                    else:
+                        self.assertEqual(row['lines']['covered'], row['lines']['count'])
+                        self.assertEqual(row['regions']['covered'], row['regions']['count'])
+                self.assertEqual(len({r['instances'][0]['index'] for r in rows}), 3)
+                results[mode] = rows
+                for owner, row in zip(('parent', 'initializer', 'fold'), rows):
+                    missing = copy.deepcopy(llvm)
+                    missing['data'][0]['functions'].pop(row['instances'][0]['index'])
+                    with self.assertRaisesRegex(ValueError, re.escape('missing LLVM function: redaction.rs:' + row['name'] + ':')):
+                        measure(manifest, missing, crate, self.binary)
+                    rejected.append(f'{mode}: missing {owner} (count={row["instances"][0]["count"]})')
+                for owner, row in (('initializer', initializer), ('fold', fold)):
+                    borrowed = copy.deepcopy(llvm)
+                    function = borrowed['data'][0]['functions'][row['instances'][0]['index']]
+                    native_parent = llvm['data'][0]['functions'][parent['instances'][0]['index']]
+                    function['regions'] = copy.deepcopy(native_parent['regions'])
+                    function['filenames'] = copy.deepcopy(native_parent['filenames'])
+                    with self.assertRaisesRegex(ValueError, 'function kind mismatch: redaction.rs:redact'):
+                        measure(manifest, borrowed, crate, self.binary)
+                    rejected.append(f'{mode}: {owner} cannot borrow parent mapping')
+                (evidence / 'results.json').write_text(json.dumps(results, indent=2) + '\n')
+                (evidence / 'negative-checks.json').write_text(json.dumps(rejected, indent=2) + '\n')
+            report = {'series': SERIES, 'configuration': manifest['configuration'], 'tools': provenance(self.binary),
+                      'checkout_sha': run(['git', 'rev-parse', 'HEAD'], cwd=ROOT).decode().strip(),
+                      'fixture_binary_sha256': digest(executable.read_bytes()),
+                      'test_source_sha256': digest(Path(__file__).read_bytes()),
+                      'repository_lock_sha256': digest(repo_lock), 'fixture_lock_sha256': digest(lock_bytes),
+                      'locked_packages': selected,
+                      'llvm_tools': {name: {'sha256': digest(path.read_bytes()), 'version': tool_versions[name]}
+                                     for name, path in llvm_tools.items()},
+                      'results': results, 'validated': rejected}
+            (evidence / 'native-result.json').write_text(json.dumps(report, indent=2) + '\n')
+            hashes = {path.name: digest(path.read_bytes()) for path in sorted(evidence.iterdir())}
+            (evidence / 'sha256.json').write_text(json.dumps(hashes, indent=2) + '\n')
+
     def test_ast_controls_and_nested_ownership(self):
         source = '''const N: usize = 2;
 fn outer(xs: &[bool]) -> bool {
@@ -331,7 +554,7 @@ fn main() {
             llvm_bin = Path(sysroot) / "lib/rustlib" / host / "bin"
             suffix = ".exe" if os.name == "nt" else ""
             llvm_tools = {name: llvm_bin / (name + suffix) for name in ("llvm-profdata", "llvm-cov")}
-            evidence = Path(os.environ["RUST_MEASURE_NATIVE_EVIDENCE"]) if os.environ.get("RUST_MEASURE_NATIVE_EVIDENCE") else None
+            evidence = Path(os.environ["RUST_MEASURE_NATIVE_EVIDENCE"]) / 'cfg-closure' if os.environ.get("RUST_MEASURE_NATIVE_EVIDENCE") else None
             if evidence:
                 evidence.mkdir(parents=True, exist_ok=False)
                 (evidence / "instrumentation-manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")

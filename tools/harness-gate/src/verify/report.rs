@@ -2853,6 +2853,60 @@ mod tests {
     }
 
     #[test]
+    fn publication_redacts_escaped_json_prefixed_headers_and_unclosed_private_keys() {
+        for label in ["PRIVATE KEY", "RSA PRIVATE KEY", "ENCRYPTED PRIVATE KEY"] {
+            let (_workspace, _original, invocation, project, current) =
+                complete_invocation_fixture("text-redaction-publication");
+            let json = r#"{"password":"postgres://u:p@db/PREFIX\"QUOTE_SUFFIX","token":"redis://u:p@db/PREFIX\\\"ODD_SUFFIX","secret":"\u0053UNICODE_SUFFIX","context":"public-context","count":7}"#;
+            let even = r#"{"token":"EVEN_PREFIX\\","context":"public-even"}"#;
+            let log = format!(
+                "INFO request {json}\n{even}\n{json}\n  Cookie: session=COOKIE_SECRET; other=COOKIE_OTHER; Path=/private path\r\n[2026-10-08T12:00:00Z] [INFO] Set-Cookie: session=SET_COOKIE_SECRET; SameSite=Lax; HttpOnly\r\nA guide mentions cookie: public example.\npublic-before-key\r\n-----BEGIN {label}-----\r\nPEM_SECRET\r\nPEM_EOF_SECRET"
+            );
+            std::fs::write(invocation.root.join("logs/unit.log"), log).unwrap();
+
+            write(&current, &project).expect("publish redacted evidence");
+            let published = std::fs::read_to_string(invocation.root.join("logs/unit.log"))
+                .expect("read final published evidence");
+            for secret in [
+                "PREFIX",
+                "QUOTE_SUFFIX",
+                "ODD_SUFFIX",
+                "UNICODE_SUFFIX",
+                "\\u0053",
+                "EVEN_PREFIX",
+                "COOKIE_SECRET",
+                "COOKIE_OTHER",
+                "SET_COOKIE_SECRET",
+                "/private path",
+                "PEM_SECRET",
+                "PEM_EOF_SECRET",
+            ] {
+                assert!(!published.contains(secret), "published secret: {secret}");
+            }
+            for context in [
+                "INFO request ",
+                "public-context",
+                "public-even",
+                "\"count\":7",
+                "  [REDACTED]\r\n",
+                "[2026-10-08T12:00:00Z] [INFO] [REDACTED]\r\n",
+                "A guide mentions cookie: public example.",
+                "public-before-key\r\n",
+            ] {
+                assert!(published.contains(context), "missing context: {context}");
+            }
+            assert!(published.ends_with("[REDACTED]"));
+            verify_manifest(&project).expect("manifest binds the final redacted bytes");
+            let result: serde_json::Value = serde_json::from_slice(
+                &std::fs::read(invocation.root.join(MACHINE_RESULT_FILE)).unwrap(),
+            )
+            .unwrap();
+            assert_eq!(result["evidence_complete"], true);
+            assert_eq!(result["passed"], true);
+        }
+    }
+
+    #[test]
     fn json_redaction_preserves_structure_and_decodes_escaped_values() {
         let mut value = serde_json::json!({
             "api_token": "opaque-json-secret", "count": 1778,
