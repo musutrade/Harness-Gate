@@ -30,6 +30,12 @@ function inventory(files){
   }
   binding(source);
   function visit(node){
+   if(ts.isIdentifier(node)&&node.text==='httpResource'){
+    const parent=node.parent;
+    const imported=ts.isImportSpecifier(parent)&&parent.name===node&&!parent.propertyName&&parent.parent.parent.parent.moduleSpecifier.text==='@angular/common/http';
+    const called=ts.isCallExpression(parent)&&parent.expression===node;
+    assert(imported||(resource&&called),'unsupported httpResource alias or indirect use');
+   }
    if(ts.isIdentifier(node)&&node.text==='fetch')assert.fail('unsupported fetch client');
    if(ts.isPropertyAccessExpression(node)&&['globalThis','window'].includes(node.expression.getText(source))&&node.name.text==='fetch')assert.fail('unsupported fetch client');
    if((ts.isIdentifier(node)||ts.isPropertyAccessExpression(node))&&receivers.has(node.getText(source))){
@@ -65,12 +71,14 @@ function equivalent(actual,expected,names){
  // TypeScript's checker compares the generated and declared structural types.
  // No client code is executed or emitted; only standard library declarations are read.
  const filename='/__harness_contract_types.ts';
- for(const name of names)assert(/^[A-Za-z_][A-Za-z0-9_]*$/.test(name));
  assert(!/@ts-(?:ignore|nocheck|expect-error)/.test(actual),'TypeScript suppression in generated types');
  const parsed=parse('actual.ts',actual),statements=parsed.statements;
  assert(!parsed.referencedFiles.length&&!parsed.typeReferenceDirectives.length&&!parsed.libReferenceDirectives.length,'external generated type reference');
  assert(statements.every(n=>ts.isInterfaceDeclaration(n)||ts.isTypeAliasDeclaration(n)),'generated file must contain type declarations only');
  const expectedDeclarations=parse('expected.ts',expected).statements;
+ // Caller response names cannot narrow the generated contract integrity check.
+ names=expectedDeclarations.map(node=>node.name.text);
+ for(const name of names)assert(/^[A-Za-z_][A-Za-z0-9_]*$/.test(name));
  if(S.canonical(statements.map(n=>n.name.text).sort())!==S.canonical(expectedDeclarations.map(n=>n.name.text).sort()))return false;
  function safe(node){assert(node.kind!==ts.SyntaxKind.AnyKeyword,'any is not a generated contract type');ts.forEachChild(node,safe);}
  for(const declaration of statements)safe(declaration);
