@@ -1,0 +1,114 @@
+name: GH285 supplemental macOS fixture evidence
+
+'on':
+  push:
+    branches: ['validation/gh285-native-evidence-20261008*']
+
+permissions:
+  contents: read
+
+jobs:
+  fixture:
+    runs-on: macos-latest
+    timeout-minutes: 25
+    env:
+      GH285_SOURCE_SHA: 1ea9a0a55fcd6690972f60a56e07e0bf9617b417
+      GH285_FROZEN_HASHES: >-
+        {"tools/harness-gate/src/process/command.rs":"42871289c5060b5f8221309dd2f4cc9263129397042bf069392dff6d4386ac65","tools/harness-gate/tests/process_termination_test.rs":"85f58fee4fc3e3daffe83a4ecb5eaf48a116b92f397f663432f8fc6a644c6e1d","tools/quality/source_measure.py":"d8ba973a1077ca875fed52bc2cd55f1752cc13358bb9d4d5085fb7ee1f36d7ee","tools/quality/tests/test_source_measure.py":"5e77770a8ce40b16bce6ec9641abd688421a0605e0349f69b4eb58dce71e791f","tools/quality/tests/test_ci_quality.py":"af9f5b447955737cc4a33d616fe659721f76b9ca5d0cc9869e4ad01e0ccea1b2","tools/quality/rust-measure/src/configuration.rs":"08c8baa8f28329764f560c6871f0ecc5d086f7bf32650f434a725430b818d6ea","docs/quality/gh-285-process-termination-risk-support.md":"9f68df952f06afe8da26c9fed4f0af740af24f5571db032a12339f1237c97504"}
+      CARGO_BUILD_JOBS: '4'
+      CARGO_TERM_COLOR: never
+      RUST_BACKTRACE: '1'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.GH285_SOURCE_SHA }}
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Execute exact-source integration and retain raw evidence
+        shell: bash
+        env:
+          GH285_EVIDENCE: ${{ runner.temp }}/gh285-native-evidence
+          GH285_PROCESS_EVIDENCE: ${{ runner.temp }}/gh285-native-evidence/fixtures
+          CARGO_TARGET_DIR: ${{ runner.temp }}/gh285-native-build
+        run: |
+          python3 - <<'PYTHON'
+          import datetime, hashlib, json, os, pathlib, re, subprocess, sys
+          source_sha = os.environ['GH285_SOURCE_SHA']
+          assert re.fullmatch('[0-9a-f]{40}', source_sha)
+          root = pathlib.Path.cwd()
+          evidence = pathlib.Path(os.environ['GH285_EVIDENCE'])
+          assert not evidence.exists(), 'refuse to overwrite prior evidence'
+          evidence.mkdir(parents=True)
+          frozen = json.loads(os.environ['GH285_FROZEN_HASHES'])
+          def digest(path):
+              return hashlib.sha256(path.read_bytes()).hexdigest()
+          def sources():
+              return {name: digest(root / name) for name in frozen}
+          def capture(argv):
+              result = subprocess.run(argv, capture_output=True, text=True, check=True)
+              return result.stdout.strip()
+          actual_sha = capture(['git', 'rev-parse', 'HEAD'])
+          assert actual_sha == source_sha, (actual_sha, source_sha)
+          before = sources()
+          assert before == frozen, 'source differs from root freeze'
+          for name in frozen:
+              copy = evidence / 'source' / name
+              copy.parent.mkdir(parents=True, exist_ok=True)
+              copy.write_bytes((root / name).read_bytes())
+          argv = ['cargo', 'test', '--locked', '--manifest-path',
+                  'tools/harness-gate/Cargo.toml', '--test',
+                  'process_termination_test', '--', '--nocapture']
+          record = {
+              'kind': 'supplemental macOS raw fixture evidence; not required CI or risk',
+              'source_commit': actual_sha,
+              'workflow_commit': os.environ['GITHUB_SHA'],
+              'run_id': os.environ['GITHUB_RUN_ID'],
+              'run_attempt': os.environ['GITHUB_RUN_ATTEMPT'],
+              'job': os.environ['GITHUB_JOB'],
+              'argv': argv, 'cwd': str(root), 'before': before,
+              'started_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+              'platform': capture(['uname', '-a']),
+              'rustc': capture(['rustc', '-vV']),
+              'cargo': capture(['cargo', '-V']),
+              'rustc_binary_sha256': digest(pathlib.Path(capture(['rustup', 'which', 'rustc']))),
+              'effective_environment': {key: os.environ.get(key) for key in
+                  ['GH285_PROCESS_EVIDENCE', 'CARGO_TARGET_DIR', 'CARGO_BUILD_JOBS',
+                   'CARGO_TERM_COLOR', 'RUST_BACKTRACE', 'RUSTUP_TOOLCHAIN',
+                   'RUSTFLAGS', 'CARGO_ENCODED_RUSTFLAGS']},
+          }
+          def save():
+              (evidence / 'invocation.json').write_text(json.dumps(record, indent=2) + '\n')
+          save()
+          try:
+              result = subprocess.run(argv, stdout=subprocess.PIPE,
+                                      stderr=subprocess.PIPE, timeout=1200)
+              stdout, stderr, status = result.stdout, result.stderr, result.returncode
+          except subprocess.TimeoutExpired as error:
+              stdout, stderr, status = error.stdout or b'', error.stderr or b'', 124
+              record['error'] = repr(error)
+          (evidence / 'command.stdout').write_bytes(stdout)
+          (evidence / 'command.stderr').write_bytes(stderr)
+          record.update(returncode=status, after=sources(),
+              ended_utc=datetime.datetime.now(datetime.timezone.utc).isoformat())
+          if record['after'] != frozen:
+              record['error'] = 'frozen source changed during execution'
+              status = status or 125
+          record['returncode'] = status
+          save()
+          manifest = {str(path.relative_to(evidence)): digest(path)
+                      for path in evidence.rglob('*') if path.is_file()}
+          (evidence / 'sha256.json').write_text(json.dumps(manifest, indent=2) + '\n')
+          sys.stdout.write(stdout.decode(errors='replace'))
+          sys.stderr.write(stderr.decode(errors='replace'))
+          sys.exit(status)
+          PYTHON
+      - name: Upload raw evidence on success or failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gh285-macos-raw-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/gh285-native-evidence/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
