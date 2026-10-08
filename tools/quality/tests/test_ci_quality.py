@@ -55,17 +55,18 @@ class SnapshotTests(unittest.TestCase):
 
 
 class RiskScopeTests(unittest.TestCase):
-    def test_darwin_configuration_identity_does_not_expand_source_selection(self):
+    def test_report_retention_scope_preserves_compiler_configuration_identity(self):
         from source_measure import SERIES, SOURCE_FILES
         self.assertEqual(SERIES, {
             'analyzer': 'harness-gate-rust-measure/0.3.1', 'rule': 'mccabe-rust-3/1',
             'instrumentation': 'closure-black-box/1', 'mapping': 'insertions-utf8/1',
-            'selection': 'gh285-process-group/1', 'configuration': 'compiler-target-production/3',
+            'selection': 'gh286-report-retention/1', 'configuration': 'compiler-target-production/4',
         })
         self.assertIn('process/command.rs', SOURCE_FILES)
         self.assertNotIn('process/task.rs', SOURCE_FILES)
         self.assertNotIn('process/capture.rs', SOURCE_FILES)
-        self.assertNotIn('service/lease.rs', SOURCE_FILES)
+        self.assertEqual({path for path in SOURCE_FILES if path.startswith('service/')},
+                         {'service/lease.rs', 'service/mod.rs', 'service/report_directory.rs'})
 
     def test_process_test_module_reaches_measurement_but_unknown_sources_block(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -81,6 +82,31 @@ class RiskScopeTests(unittest.TestCase):
                 ('tools/harness-gate/src/process/unknown.rs', False),
                 ('tools/harness-gate/src/process/tests/unknown.rs', False),
                 ('tools/harness-gate/src/unknown/tests.rs', False),
+            ):
+                with self.subTest(path=path), \
+                        patch.object(gate.subprocess, 'check_output', return_value=path + '\n'), \
+                        patch.object(gate, 'relocated_migration_sources', return_value=set()), \
+                        patch.object(gate, 'only_terminal_test_module_changed', return_value=False), \
+                        patch.object(collector, 'command',
+                                     side_effect=RuntimeError('measurement build reached')) as command:
+                    if supported:
+                        with self.assertRaisesRegex(RuntimeError, 'measurement build reached'):
+                            collector.risk()
+                        command.assert_called_once()
+                        self.assertEqual(command.call_args.args[0], 'analyzer-build')
+                    else:
+                        with self.assertRaisesRegex(ValueError, 'outside supported risk series'):
+                            collector.risk()
+                        command.assert_not_called()
+
+    def test_report_retention_sources_reach_analyzer_build_but_unknown_service_blocks(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            collector = gate.Collector(Path(temporary) / 'candidate', 'base', 'head', 'retention-scope')
+            for path, supported in (
+                ('tools/harness-gate/src/service/lease.rs', True),
+                ('tools/harness-gate/src/service/mod.rs', True),
+                ('tools/harness-gate/src/service/report_directory.rs', True),
+                ('tools/harness-gate/src/service/unknown.rs', False),
             ):
                 with self.subTest(path=path), \
                         patch.object(gate.subprocess, 'check_output', return_value=path + '\n'), \

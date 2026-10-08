@@ -52,8 +52,8 @@ sha256 = "bbb7f1d90d741f41c6cb761f1433f4cb7c8ca168fac0082bd366a9377ae149a8"
 path = "tests/failure_paths_test.rs"
 symbol = "verification_cleanup_cancel_and_report_precedence_retains_resource_evidence"
 start = 575
-end = 724
-sha256 = "97df519be3c31a60fd8266e24478d6ff500484115604e80e71203681978f8704"
+end = 812
+sha256 = "52ddee154904a475bb10f05b119321959187063d3627aa5d7bfedb0667759d31"
 [[paths.probes]]
 line = 250
 column = 24
@@ -250,7 +250,7 @@ path = "src/verify/report.rs"
 symbol = "write_report_file"
 start = 1243
 end = 1253
-sha256 = "c9425ebe9b9e19f8e61dfe146e1b2ec4f11597e5524ac08f3e5394e6a05e9907"
+sha256 = "49ab8f86bc1adce5e7c68b4fb1b8f402cc592973e15c3e7cf2531f102bf82391"
 
 [paths.test_source]
 path = "src/verify/tests.rs"
@@ -280,14 +280,14 @@ path = "src/verify/report.rs"
 symbol = "verify_manifest_without_result"
 start = 1822
 end = 1909
-sha256 = "c9425ebe9b9e19f8e61dfe146e1b2ec4f11597e5524ac08f3e5394e6a05e9907"
+sha256 = "49ab8f86bc1adce5e7c68b4fb1b8f402cc592973e15c3e7cf2531f102bf82391"
 
 [paths.test_source]
 path = "src/verify/report.rs"
 symbol = "manifest_records_digests_and_detects_tampering"
-start = 2800
-end = 2853
-sha256 = "c9425ebe9b9e19f8e61dfe146e1b2ec4f11597e5524ac08f3e5394e6a05e9907"
+start = 3402
+end = 3455
+sha256 = "49ab8f86bc1adce5e7c68b4fb1b8f402cc592973e15c3e7cf2531f102bf82391"
 
 [[paths.probes]]
 line = 1905
@@ -338,17 +338,17 @@ assertions = ["assert_failed_without_remove(&project, &path, &fake, \"runtime ob
 [paths.source]
 path = "src/service/lease.rs"
 symbol = "verify_runtime_record"
-start = 773
-end = 805
-sha256 = "d2c06bde912d5137116aa4142c1fb887e0c59c2f8d61e68d57e3071a7d5a168e"
+start = 898
+end = 930
+sha256 = "718de33d5a60cddb36981c15987b4aa86772cde4ab5d72f5702ba7af35e47601"
 [paths.test_source]
 path = "src/service/lease.rs"
 symbol = "fake_docker_and_podman_cleanup_requires_fresh_complete_ownership"
-start = 1376
-end = 1463
-sha256 = "d2c06bde912d5137116aa4142c1fb887e0c59c2f8d61e68d57e3071a7d5a168e"
+start = 1632
+end = 1719
+sha256 = "718de33d5a60cddb36981c15987b4aa86772cde4ab5d72f5702ba7af35e47601"
 [[paths.probes]]
-line = 797
+line = 922
 column = 9
 text = "bail!(\"runtime object identity changed since the lease was recorded\");"
 

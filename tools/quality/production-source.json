@@ -166,7 +166,8 @@
         "src/service/inspection.rs",
         "src/service/lease.rs",
         "src/service/mod.rs",
-        "src/service/postgres.rs"
+        "src/service/postgres.rs",
+        "src/service/report_directory.rs"
       ]
     },
     "service-adapters": {
