@@ -163,3 +163,17 @@ impl ReportDirectoryGuard {
             && released.root == self.root)
     }
 }
+
+#[cfg(unix)]
+impl Drop for ReportDirectoryGuard {
+    fn drop(&mut self) {
+        use std::os::fd::AsRawFd;
+        // A forked child can temporarily retain the same open file description
+        // before exec closes its CLOEXEC descriptor. End this owned guard's
+        // lock lifetime explicitly; inherited descriptors are not new guards.
+        // SAFETY: this guard still owns the live descriptor. Failure grants no
+        // release certificate: File still closes, and inherited copies may
+        // conservatively keep the lock busy until their exec or exit.
+        let _ = unsafe { libc::flock(self.file.as_raw_fd(), libc::LOCK_UN) };
+    }
+}
