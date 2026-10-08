@@ -2355,7 +2355,7 @@ mod tests {
                 }
             }
             let mut words = [0_u64; 8];
-            for (word, bytes) in words.iter_mut().zip(self.raw_ready.chunks_exact(8)) {
+            for (word, bytes) in words.iter_mut().zip(self.raw_ready.as_chunks::<8>().0) {
                 let mut native = [0_u8; 8];
                 native.copy_from_slice(bytes);
                 *word = u64::from_ne_bytes(native);
