@@ -21,14 +21,47 @@ getter. Calling `try_wait` after ECHILD would not prove a returned status belong
 to the original child, so this path conservatively returns the error.
 
 TERM failure does not short circuit the last group KILL attempt. The first
-signal error is retained while cleanup tries to reap the direct child. After
-the last signal, polling `try_wait` is bounded by a separate two-second deadline;
-there are no subsequent group signals. A failed KILL with a live leader cannot
+signal error is retained while cleanup tries to reap the direct child. One
+deadline starts after the initial WNOWAIT check: `start + grace + 2 seconds`
+(normally four seconds). A TERM error skips grace and only shortens that deadline
+to `start + 2 seconds`. Grace sleeps at most its remaining budget. The final KILL
+is attempted even if an earlier error or an expired budget exists, but never
+restarts the deadline. After it, one immediate `try_wait` is allowed even when
+the deadline expired; further polls use only the remaining budget. There are no
+subsequent group signals. This bounds this component's waiting, not a blocked OS
+system call; it cannot promise to cancel kernel calls. A failed KILL with a live leader cannot
 enter an unbounded `wait`. A cleanup timeout returns the first error, or
 `TimedOut` when there was no earlier error. That error does **not** assert the
 leader was reaped or the group was cleaned. ESRCH from group signaling continues
 to mean the group is absent. No unrelated task/capture/adapter code or its
 critical-path binding changes.
+
+## Darwin's zombie-only process-group error
+
+Darwin's group signal can return EPERM when its group has no eligible live
+member: XNU filters SZOMB before determining whether any member could be
+signaled. This is also a real permissions error, so EPERM alone is never success.
+See Apple's [signal implementation](https://github.com/apple-oss-distributions/xnu/blob/main/bsd/kern/kern_sig.c).
+
+Only the real Darwin `send_signal` path may examine this EPERM. Its non-reaping
+observer must prove the exclusively owned leader exited. The libproc group query
+uses selector `PROC_PGRP_ONLY` (2) and a fixed two-PID buffer. Success requires
+exactly one PID's byte count and that PID equals the leader. Apple enumerates
+live and zombie members under the same lock used to change group membership:
+[proc_info.c](https://github.com/apple-oss-distributions/xnu/blob/main/bsd/kern/proc_info.c)
+and [kern_proc.c](https://github.com/apple-oss-distributions/xnu/blob/main/bsd/kern/kern_proc.c).
+This establishes that the complete group contains only its anchored zombie at
+the enumeration point. It makes no claim about an escaped member later rejoining.
+
+Zero (including libproc's failure result), negative/short/nonintegral counts,
+full two-slot buffers, other PIDs, any other member including another zombie,
+a live leader, ECHILD and unknown observations preserve the **original** EPERM.
+The guard performs one query, without retry waits or per-PID status inferences.
+No query error replaces the first signal error. Injected signal functions bypass
+this guard, including injected EPERM for a proven solo zombie. Processes that
+leave the isolated session/group and external concurrent reapers remain outside
+this contract. Official source review is not evidence of a runner's actual kernel;
+the macOS fixtures and old failing tests must establish native behavior.
 
 ## Real process fixtures
 
@@ -62,11 +95,21 @@ Unix tests are:
 - `normal_group_and_term_ignoring_leader_are_reaped`
 - `waitable_exit_is_reaped_but_cached_or_external_reap_is_echild_without_signal`
 - `first_signal_error_survives_cleanup_and_failed_kill_is_bounded`
+- `signal_callbacks_do_not_restart_the_shared_cleanup_deadline`
 - `independent_cli_timeout_and_cancellation_stop_term_resistant_descendant`
 
 The last test launches separate real CLI processes for cancellation and timeout,
 preserves the existing exit-1/report-FAIL contract and checks the corresponding
 step flag. It never poisons the test runner's process-global cancellation state.
+macOS additionally runs `darwin_guard_requires_a_complete_unique_waitable_leader`.
+It checks real live-leader and exited-leader/live-descendant groups. A keeper in
+a different group retains a zombie member of the original group, so a full
+query remains a refusal rather than being guessed empty. Unknown, malformed,
+truncated and wrong-PID query results and observer errors are separate synthetic
+API negatives. The solo exited leader is a real positive, while an injected
+EPERM still propagates and reaps it; the subsequent ECHILD path cannot query.
+The existing waitable-exit test separately requires successful real termination.
+
 Windows has `windows_taskkill_termination_preserves_direct_child_behavior`;
 that test and the unchanged production bytes are a Windows-specific claim, not
 Unix native execution evidence.
@@ -77,8 +120,11 @@ The certified inventory adds only `process/command.rs`. Selection identity is
 `gh285-process-group/1`. Analyzer `harness-gate-rust-measure/0.3.1`, rule
 `mccabe-rust-3/1`, instrumentation `closure-black-box/1`, mapping
 `insertions-utf8/1` are unchanged. Configuration support identity is now
-`compiler-target-production/2`, certifying cfg attributes on complete Try
-statements. Predicate grammar and metric definitions stay unchanged. The final
+`compiler-target-production/3`, retaining complete Try-statement support and
+adding only `target_os = "macos"` as a standalone predicate, evaluated against
+the actual rustc configuration strings. Other target_os values, other key/value
+predicates, nested not/all key/value forms and cfg_attr remain unsupported.
+Metric definitions stay unchanged. The final
 configuration source and binary hashes are separately bound in provenance;
 neither identity change permits reuse or relabeling of an earlier series.
 
@@ -99,10 +145,25 @@ never head as base. Git errors or snapshot tampering still fail;
 
 Unix base has the isolation function, its setsid initializer closure,
 `terminate` and `send_signal`. Unix head additionally has
-`terminate_with_signal`, `reap_timeout` and `observe_exit`. Windows base and head
+`terminate_with_signal`, `reap_timeout`, `observe_exit` and its shared PID-level
+`observe_pid`. Actual macOS head additionally owns `list_process_group` and
+`darwin_group_is_finished`; other target inventories exclude their exact source
+ranges. Windows base and head
 have the unchanged isolation function, `terminate`, and its `is_ok_and` closure.
 The pre-exec closure has CC 2; the Windows status closure has CC 1. Counters in
 macro/string contents are not invented Rust decisions.
+
+## Bounded macOS predicate and Try-statement support
+
+`test_cfg_macos_predicate_is_bounded_and_ranges_reparse` inventories the real
+Linux/macOS/Windows rustc configurations, checks exact inactive item/statement
+bytes and reparses, and retains precise refusal diagnostics for the unsupported
+key/value and nested predicate forms. Actual command base/head source inventories
+include every new host-active function, with independent LLVM mapping and missing
+owner negatives even when a counter is zero. New Darwin owners must also have
+positive native counters in their own records. Cross-target AST parsing does not
+certify libproc execution on a different host. The configuration source/binary
+hashes and `/3` identity bind the final tool; `/1` and `/2` manifests are rejected.
 
 ## Bounded Try-statement support and analyzer build identity
 
@@ -145,8 +206,8 @@ The oracle and raw profiles remain available on failure.
 The Ok(7) return region must have an independent zero Err count and positive Ok
 count; this does not require its physical line to become uncovered when an
 enclosing interval still contributes on that line.
-Missing owners, omitted exclusions and the old `/1`
-configuration identity fail at their precise boundaries. Cross-target AST tests
+Missing owners, omitted exclusions and the old `/1` and `/2`
+configuration identities fail at their precise boundaries. Cross-target AST tests
 cannot substitute for native Windows/macOS evidence.
 
 `test_cfg_try_synthetic_interval_contract` separately checks interval clipping
@@ -168,11 +229,11 @@ assertions were **not executed** and have no PASS evidence from that run.
 The original export, binary, profile and oracle remain retained in
 `source-measure-suite-v2/native/cfg-try-native-30m3_je_/`.
 The 24 passes apply to their original test bytes/tool identity and do not certify
-the final corrected suite. Push must run a complete new v3 suite against the
-final frozen test SHA, in a new evidence directory. With the separate synthetic
-unit contract, the full source suite now contains 26 tests, preserving all 25
-previous cases. No parser, product, measurement formula, support identity or
-gate was changed by this test-contract correction.
+the corrected suite. That test-contract correction produced a complete v3
+suite of 26 tests, preserving all 25 previous cases, without changing parser,
+product, measurement formula, support identity or gates at that stage. The v3
+Linux passes remain bound to those original bytes and `/2` tool identity;
+the current `/3` suite must run again in a fresh directory as described below.
 
 The class helper now respects explicit `CARGO_TARGET_DIR` and passes the selected
 rustc host as Cargo's explicit `--target`. It records build argv/environment,
@@ -192,9 +253,15 @@ It records explicit `cargo fetch --locked`, then `cargo build --locked --offline
 and verifies lock bytes after both. Builds have independent target directories,
 actual selected compiler/LLVM identities, original and instrumented source,
 AST/configuration manifest, command logs, binary hashes and raw profiles.
-Unix modes expecting exit 7 first establish natural-exit readiness with bounded
-fixture-owned WNOWAIT observation. This does not reap the leader, works with the
-unaltered base, and avoids racing TERM against the intended natural status.
+Natural-exit Unix modes first establish bounded fixture-owned WNOWAIT readiness,
+without reaping. The unmodified Darwin base's isolated mode records its actual
+outcome: either legacy EPERM followed by a safe direct-child reap, or actual
+success on that kernel. No old-base failure is relabeled as a successful cleanup.
+Head must successfully return exit 7. A separate `live-anchor` mode installs its
+TERM handler before publishing its real PID; both base and head must terminate
+that live owned child with exit 7. This certifies callback persistence without
+requiring the frozen base to fix its historical zombie-only behavior. API refusal
+modes are labeled separately and never substitute for actual host process cases.
 
 Plain and isolated modes emit an ordinary parent profile. The isolated Unix
 mode registers a second **fixture-only** `pre_exec` after the unchanged original
@@ -261,3 +328,31 @@ record, unsupported syntax, or a failed ordinary coverage/risk gate blocks this
 extension; it does not authorize a measurement exemption or fixture-data fallback.
 No toolchain/default/installed host change or baseline adoption is part of this
 work. Issue 286 report locking remains separate.
+
+## PR303 failure boundary and fresh verification
+
+The exact 3c9e4c150ca8241912bf44bbab4bb086e3036503 CI failures remain in
+`/mnt/dev-ssd/dev-tmp/gh285-push-20261008/pr303-failures-37733282364-70/`.
+Windows's sole source-suite failure was a real instrumented-source byte mismatch:
+`Path.write_text` translated LF to CRLF while the manifest bound UTF-8 LF bytes.
+The fixture now writes precise source and instrumented bytes using `write_bytes`
+and asserts their actual bytes. The measurement's strict hash check is unchanged;
+original and instrumented retained evidence use exact bytes too.
+
+The macOS source suite stopped on the unmodified base's isolated natural-exit
+EPERM. Its product run had 416 passes and 9 failures, with 7 explicit EPERM
+diagnostics and 2 only indirectly consistent timeout/status failures. Neither
+indirect error is asserted to be a proven EPERM. The `Git whitespace check`
+label belongs to a fixture changed to `sh -c "sleep 2"`; it is not evidence of
+an independent whitespace failure. No task, capture, adapter, preset or old test
+contract is changed. All 9 regressions and subcases not reached after the early
+failures must pass on the actual final macOS binary.
+
+The old Linux `/2` ordinary-risk evidence (1044 identities, zero failures) is
+historical evidence for that exact tool and commit only, not `/3` certification.
+Preserved v1/v2/v3 profiles and all failure directories must not be overwritten.
+A fresh full source suite now contains 27 tests, and ci_quality contains 22.
+Push must bind the new suite/tool hashes, execute actual Linux/macOS/Windows
+native ownership, repeat the applicable Linux regressions and exact same-tool
+base/head risk chain, and obtain final-SHA required CI. Dev's static checks and
+audit's source review do not certify those runs; they are pending at freeze.
