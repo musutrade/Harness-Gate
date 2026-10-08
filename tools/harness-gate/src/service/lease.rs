@@ -1717,4 +1717,280 @@ mod tests {
             drop(workspace);
         }
     }
+
+    fn report_lock_path(project: &Project, invocation_id: &str) -> PathBuf {
+        super::lease_directory(project)
+            .unwrap()
+            .join("report-directory-locks")
+            .join(format!(
+                "{}.lock",
+                resource_key(&format!("invocation:{invocation_id}"))
+            ))
+    }
+
+    fn assert_report_guard_held(
+        lease: &super::ResourceLease,
+        project: &Project,
+        root: &Path,
+        id: &str,
+    ) {
+        assert!(lease.report_directory_guard.is_some());
+        assert!(super::ReportDirectoryGuard::try_acquire(project, id)
+            .unwrap()
+            .is_none());
+        assert!(!lease
+            .report_directory_guard
+            .as_ref()
+            .unwrap()
+            .release_is_proven(root)
+            .unwrap());
+    }
+
+    #[test]
+    fn direct_report_release_requires_stopped_heartbeat_and_keeps_held_state() {
+        let (_workspace, project) = retained_report_project("gh286-release-live-");
+        let id = "inv-release-live";
+        let (lease, root) = report_lease(&project, id);
+        // Prevent an actual renewal from changing the bytes during assertions.
+        // release must reject before taking this record lock; checked release
+        // is performed only after the lock has been dropped.
+        {
+            let _record = lease.record.lock().unwrap();
+            let bytes = std::fs::read(&lease.path).unwrap();
+            let error = lease.release().unwrap_err();
+            assert!(format!("{error:#}").contains("requires stopped heartbeat"));
+            assert_eq!(std::fs::read(&lease.path).unwrap(), bytes);
+            assert_report_guard_held(&lease, &project, &root, id);
+        }
+        lease.retain();
+        assert_eq!(
+            std::fs::read(report_lock_path(&project, id)).unwrap(),
+            b"held\n"
+        );
+    }
+
+    #[test]
+    fn stopped_report_release_rejects_missing_marker_without_certificate() {
+        let (_workspace, project) = retained_report_project("gh286-release-missing-");
+        let id = "inv-release-missing";
+        let (mut lease, root) = report_lease(&project, id);
+        lease.stop_heartbeat();
+        std::fs::remove_file(&lease.path).unwrap();
+        let error = lease.release().unwrap_err();
+        assert!(format!("{error:#}").contains("marker disappeared before checked release"));
+        assert!(!lease.path.exists());
+        assert!(root.is_dir());
+        assert_report_guard_held(&lease, &project, &root, id);
+        lease.retain();
+        assert_eq!(
+            std::fs::read(report_lock_path(&project, id)).unwrap(),
+            b"held\n"
+        );
+        let guard = super::ReportDirectoryGuard::try_acquire(&project, id)
+            .unwrap()
+            .unwrap();
+        assert!(!guard.release_is_proven(&root).unwrap());
+    }
+
+    #[test]
+    fn stopped_legacy_release_is_idempotent_when_marker_is_missing() {
+        let (_workspace, project) = runtime_project("release-missing-legacy");
+        let mut lease = super::ResourceLease::acquire(
+            &project,
+            "step:release-missing",
+            "workspace",
+            "inv-release-missing-legacy",
+            None,
+            None,
+        )
+        .unwrap();
+        lease.stop_heartbeat();
+        assert!(lease.report_directory_guard.is_none());
+        let path = lease.path.clone();
+        std::fs::remove_file(&path).unwrap();
+        lease.release().unwrap();
+        lease.release_checked().unwrap();
+        assert!(!path.exists());
+    }
+
+    #[test]
+    fn report_release_real_read_error_keeps_obstruction_and_held_certificate() {
+        let (_workspace, project) = retained_report_project("gh286-release-read-");
+        let id = "inv-release-read";
+        let (mut lease, root) = report_lease(&project, id);
+        lease.stop_heartbeat();
+        let path = lease.path.clone();
+        let original = std::fs::read(&path).unwrap();
+        std::fs::remove_file(&path).unwrap();
+        std::fs::create_dir(&path).unwrap();
+        let actual = std::fs::read(&path).unwrap_err();
+        assert_ne!(actual.kind(), std::io::ErrorKind::NotFound);
+        let error = lease.release().unwrap_err();
+        assert!(format!("{error:#}").contains("read lease before release"));
+        assert_eq!(
+            error.downcast_ref::<std::io::Error>().unwrap().kind(),
+            actual.kind()
+        );
+        assert!(path.is_dir());
+        assert_eq!(std::fs::read_dir(&path).unwrap().count(), 0);
+        assert_report_guard_held(&lease, &project, &root, id);
+        lease.retain();
+        assert_eq!(
+            std::fs::read(report_lock_path(&project, id)).unwrap(),
+            b"held\n"
+        );
+        std::fs::remove_dir(&path).unwrap();
+        std::fs::write(&path, &original).unwrap();
+        let guard = super::ReportDirectoryGuard::try_acquire(&project, id)
+            .unwrap()
+            .unwrap();
+        assert!(!guard.release_is_proven(&root).unwrap());
+        assert_eq!(std::fs::read(&path).unwrap(), original);
+    }
+
+    #[test]
+    fn report_release_malformed_marker_is_retained_without_certificate() {
+        let (_workspace, project) = retained_report_project("gh286-release-parse-");
+        let id = "inv-release-parse";
+        let (mut lease, root) = report_lease(&project, id);
+        lease.stop_heartbeat();
+        std::fs::write(&lease.path, b"{not-json").unwrap();
+        let error = lease.release().unwrap_err();
+        assert!(format!("{error:#}").contains("parse lease before release"));
+        assert_eq!(std::fs::read(&lease.path).unwrap(), b"{not-json");
+        assert_report_guard_held(&lease, &project, &root, id);
+        lease.retain();
+        assert_eq!(
+            std::fs::read(report_lock_path(&project, id)).unwrap(),
+            b"held\n"
+        );
+    }
+
+    #[test]
+    fn report_release_unknown_owner_is_retained_without_certificate() {
+        let (_workspace, project) = retained_report_project("gh286-release-owner-");
+        let id = "inv-release-owner";
+        let (mut lease, root) = report_lease(&project, id);
+        lease.stop_heartbeat();
+        let mut unknown = read_record(&lease.path).unwrap();
+        unknown.invocation_id = "different-invocation".into();
+        unknown.process_start_identity = "unavailable:unknown-owner".into();
+        write_record(&lease.path, &unknown).unwrap();
+        let bytes = std::fs::read(&lease.path).unwrap();
+        let error = lease.release().unwrap_err();
+        assert!(format!("{error:#}").contains("lease ownership changed"));
+        assert_eq!(std::fs::read(&lease.path).unwrap(), bytes);
+        assert_report_guard_held(&lease, &project, &root, id);
+        lease.retain();
+        assert_eq!(
+            std::fs::read(report_lock_path(&project, id)).unwrap(),
+            b"held\n"
+        );
+    }
+
+    #[cfg(unix)]
+    struct RestoreDirectoryPermissions {
+        path: PathBuf,
+        original: std::fs::Permissions,
+    }
+
+    #[cfg(unix)]
+    impl Drop for RestoreDirectoryPermissions {
+        fn drop(&mut self) {
+            std::fs::set_permissions(&self.path, self.original.clone())
+                .expect("restore lease directory permissions, including while unwinding");
+        }
+    }
+
+    #[test]
+    #[cfg(unix)]
+    fn report_release_real_remove_error_retains_marker_then_allows_checked_retry() {
+        use std::os::unix::fs::PermissionsExt;
+        // Root or DAC-bypass privileges could turn a permissions fixture into
+        // a successful remove. They are an explicit unsupported test identity,
+        // never a silent skip or a mocked permission error.
+        assert_ne!(
+            unsafe { libc::geteuid() },
+            0,
+            "run this fixture as an unprivileged Unix identity"
+        );
+        let (_workspace, project) = retained_report_project("gh286-release-remove-");
+        let id = "inv-release-remove";
+        let (mut lease, root) = report_lease(&project, id);
+        lease.stop_heartbeat();
+        let path = lease.path.clone();
+        let bytes = std::fs::read(&path).unwrap();
+        let directory = path.parent().unwrap().to_path_buf();
+        let restore = RestoreDirectoryPermissions {
+            original: std::fs::metadata(&directory).unwrap().permissions(),
+            path: directory.clone(),
+        };
+        std::fs::set_permissions(&directory, std::fs::Permissions::from_mode(0o555)).unwrap();
+        // Prove write denial against a real disposable sibling before release;
+        // traversing/reading the existing marker must remain possible.
+        let probe = directory.join("release-permission-probe");
+        let actual = std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&probe)
+            .unwrap_err();
+        assert_eq!(actual.kind(), std::io::ErrorKind::PermissionDenied);
+        assert_eq!(std::fs::read(&path).unwrap(), bytes);
+        let error = lease.release().unwrap_err();
+        assert!(format!("{error:#}").contains("release lease"));
+        assert_eq!(
+            error.downcast_ref::<std::io::Error>().unwrap().kind(),
+            std::io::ErrorKind::PermissionDenied
+        );
+        assert_eq!(std::fs::read(&path).unwrap(), bytes);
+        assert_report_guard_held(&lease, &project, &root, id);
+        // The release certificate was persisted, but the still-present marker
+        // blocks retention. Its exact bound fields are independently checked.
+        let certificate: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(report_lock_path(&project, id)).unwrap())
+                .unwrap();
+        assert_eq!(
+            certificate,
+            serde_json::json!({
+                "schema_version": 1,
+                "invocation_id": id,
+                "project_identity": project.input().project_identity,
+                "root": root,
+            })
+        );
+        drop(restore);
+        lease.release_checked().unwrap();
+        assert!(!path.exists());
+        let guard = super::ReportDirectoryGuard::try_acquire(&project, id)
+            .unwrap()
+            .unwrap();
+        assert!(guard.release_is_proven(&root).unwrap());
+        assert!(root.is_dir());
+    }
+
+    #[test]
+    fn report_release_invalid_certificate_binding_keeps_marker_and_held_state() {
+        let (_workspace, project) = retained_report_project("gh286-release-binding-");
+        let id = "inv-release-binding";
+        let (mut lease, root) = report_lease(&project, id);
+        lease.stop_heartbeat();
+        // Ordinary ownership fields still agree. The real report guard must
+        // independently reject a different root before writing its certificate.
+        let invalid = {
+            let mut record = lease.record.lock().unwrap();
+            record.resource_name = Some(root.join("different-root").to_string_lossy().into_owned());
+            record.clone()
+        };
+        write_record(&lease.path, &invalid).unwrap();
+        let bytes = std::fs::read(&lease.path).unwrap();
+        let error = lease.release().unwrap_err();
+        assert!(format!("{error:#}").contains("report-directory lease binding is uncertain"));
+        assert_eq!(std::fs::read(&lease.path).unwrap(), bytes);
+        assert_report_guard_held(&lease, &project, &root, id);
+        lease.retain();
+        assert_eq!(
+            std::fs::read(report_lock_path(&project, id)).unwrap(),
+            b"held\n"
+        );
+    }
 }
