@@ -657,19 +657,24 @@ fn read_record(path: &Path) -> Result<LeaseRecord> {
 
 fn write_record(path: &Path, record: &LeaseRecord) -> Result<()> {
     let counter = TEMP_COUNTER.fetch_add(1, Ordering::Relaxed);
-    let temporary = path.with_file_name(format!(".lease-{counter}.tmp"));
-    let result = (|| -> Result<()> {
-        let mut file = OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .open(&temporary)
-            .with_context(|| format!("create temporary lease {}", temporary.display()))?;
+    let temporary = path.with_file_name(format!(".lease-{}-{counter}.tmp", std::process::id()));
+    // A failed create_new grants no ownership of this path. In particular,
+    // cleanup must never unlink another writer's pre-existing temporary.
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&temporary)
+        .with_context(|| format!("create temporary lease {}", temporary.display()))?;
+    let publish_from = temporary.as_path();
+    // This closure owns the successfully created handle. Every early error
+    // closes it before the outer cleanup, including on Windows.
+    let result = (move || -> Result<()> {
         let contents = serde_json::to_vec_pretty(record).context("serialize lease")?;
         file.write_all(&contents)?;
         file.write_all(b"\n")?;
         file.sync_all()?;
         drop(file);
-        publish_replacement(&temporary, path)?;
+        publish_replacement(publish_from, path)?;
         Ok(())
     })();
     if result.is_err() {
@@ -1992,5 +1997,693 @@ mod tests {
             std::fs::read(report_lock_path(&project, id)).unwrap(),
             b"held\n"
         );
+    }
+
+    fn bounded_fixture_status(
+        child: &mut std::process::Child,
+        timeout: Duration,
+    ) -> std::io::Result<std::process::ExitStatus> {
+        let deadline = Instant::now() + timeout;
+        loop {
+            if let Some(status) = child.try_wait()? {
+                return Ok(status);
+            }
+            if Instant::now() >= deadline {
+                break;
+            }
+            std::thread::yield_now();
+        }
+        let kill = child.kill();
+        let reap_deadline = Instant::now() + Duration::from_secs(2);
+        loop {
+            match child.try_wait() {
+                Ok(Some(status)) => {
+                    return Err(std::io::Error::other(format!(
+                        "fixture child {} timed out; kill={kill:?}; reaped={status:?}",
+                        child.id()
+                    )));
+                }
+                Err(error) => return Err(error),
+                Ok(None) if Instant::now() < reap_deadline => std::thread::yield_now(),
+                Ok(None) => {
+                    return Err(std::io::Error::other(format!(
+                        "fixture child {} could not be reaped within deadline; kill={kill:?}",
+                        child.id()
+                    )));
+                }
+            }
+        }
+    }
+
+    struct FixtureProcess(std::process::Child);
+
+    impl Drop for FixtureProcess {
+        fn drop(&mut self) {
+            match self.0.try_wait() {
+                Ok(Some(_)) => {}
+                state => {
+                    let kill = self.0.kill();
+                    if let Err(error) = bounded_fixture_status(&mut self.0, Duration::from_secs(2))
+                    {
+                        eprintln!(
+                            "fixture cleanup FAIL: initial={state:?}; kill={kill:?}; {error}"
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    fn run_temp_ownership_child(mode: &str) {
+        let (_workspace, project) = retained_report_project("gh286-temp-ownership-");
+        let control = project.root.join("temp-ownership-child");
+        std::fs::create_dir(&control).unwrap();
+        let args = [
+            "--exact",
+            "service::lease::tests::lease_temp_ownership_child",
+            "--nocapture",
+            "--test-threads=1",
+        ];
+        std::fs::write(
+            control.join("command.json"),
+            serde_json::to_vec(&args).unwrap(),
+        )
+        .unwrap();
+        let child = std::process::Command::new(std::env::current_exe().unwrap())
+            .args(args)
+            .env("GH286_TEMP_CHILD", mode)
+            .env("GH286_TEMP_ROOT", &control)
+            .stdout(std::fs::File::create(control.join("stdout.log")).unwrap())
+            .stderr(std::fs::File::create(control.join("stderr.log")).unwrap())
+            .spawn()
+            .unwrap();
+        let mut child = FixtureProcess(child);
+        let result = bounded_fixture_status(&mut child.0, Duration::from_secs(20));
+        std::fs::write(
+            control.join("status.json"),
+            serde_json::to_vec(&serde_json::json!({
+                "pid": child.0.id(), "result": format!("{result:?}"),
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        let stdout = std::fs::read_to_string(control.join("stdout.log"));
+        let stderr = std::fs::read_to_string(control.join("stderr.log"));
+        let status = result.unwrap_or_else(|error| {
+            panic!("temp ownership child cleanup failed: {error}; stdout={stdout:?}; stderr={stderr:?}")
+        });
+        assert!(
+            status.success(),
+            "temp ownership child failed: {status:?}; stdout={stdout:?}; stderr={stderr:?}"
+        );
+    }
+
+    #[test]
+    fn write_record_create_collision_preserves_foreign_temporary() {
+        run_temp_ownership_child("collision");
+    }
+
+    #[test]
+    fn write_record_publish_failure_cleans_only_owned_temporary() {
+        run_temp_ownership_child("publish-failure");
+    }
+
+    #[test]
+    fn lease_temp_ownership_child() {
+        let Ok(mode) = std::env::var("GH286_TEMP_CHILD") else {
+            return;
+        };
+        let directory = PathBuf::from(std::env::var_os("GH286_TEMP_ROOT").unwrap());
+        // This exact child runs no other test and creates no heartbeat. Inspect
+        // the real initial counter; never reset it or race another writer.
+        let counter = super::TEMP_COUNTER.load(Ordering::Relaxed);
+        assert_eq!(counter, 1);
+        let pid = std::process::id();
+        let temporary = directory.join(format!(".lease-{pid}-{counter}.tmp"));
+        let legacy_temporary = directory.join(format!(".lease-{counter}.tmp"));
+        let target = directory.join("marker.json");
+        let record = LeaseRecord {
+            owner_marker: OWNER_MARKER.into(),
+            schema_version: LEASE_SCHEMA_VERSION,
+            project_identity: "temp-ownership-project".into(),
+            resource_id: "fixture".into(),
+            resource_kind: "workspace".into(),
+            invocation_id: "temp-ownership-invocation".into(),
+            pid,
+            process_start_identity: "isolated-counter-fixture".into(),
+            created_at: 1,
+            heartbeat_at: 1,
+            expires_at: 1,
+            resource_name: None,
+            runtime: None,
+            runtime_labels: BTreeMap::new(),
+            runtime_object_id: None,
+        };
+        let sentinel = b"pre-existing writer temporary must survive\n";
+        std::fs::write(
+            directory.join("temp-identity.json"),
+            serde_json::to_vec(&serde_json::json!({
+                "pid": pid, "counter": counter, "mode": mode,
+                "temporary": temporary, "legacy_temporary": legacy_temporary,
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        if mode == "collision" {
+            std::fs::write(&target, b"original marker\n").unwrap();
+            std::fs::write(&temporary, sentinel).unwrap();
+            // The same fixture on the old source reaches its old-name real
+            // create_new failure and exposes its unowned-temp deletion.
+            std::fs::write(&legacy_temporary, sentinel).unwrap();
+            let error = write_record(&target, &record).unwrap_err();
+            assert_eq!(
+                error.downcast_ref::<std::io::Error>().unwrap().kind(),
+                std::io::ErrorKind::AlreadyExists
+            );
+            assert_eq!(std::fs::read(&target).unwrap(), b"original marker\n");
+            assert_eq!(std::fs::read(&temporary).unwrap(), sentinel);
+            assert_eq!(std::fs::read(&legacy_temporary).unwrap(), sentinel);
+        } else {
+            assert_eq!(mode, "publish-failure");
+            std::fs::create_dir(&target).unwrap();
+            std::fs::write(target.join("sentinel"), b"original target directory\n").unwrap();
+            let foreign = directory.join(".lease-foreign.tmp");
+            std::fs::write(&foreign, sentinel).unwrap();
+            let error = write_record(&target, &record).unwrap_err();
+            assert!(error.downcast_ref::<std::io::Error>().is_some());
+            assert!(
+                format!("{error:#}").contains("publish lease")
+                    || format!("{error:#}").contains("replace existing lease")
+            );
+            assert!(!temporary.exists());
+            assert!(!legacy_temporary.exists());
+            assert_eq!(std::fs::read(&foreign).unwrap(), sentinel);
+            assert_eq!(
+                std::fs::read(target.join("sentinel")).unwrap(),
+                b"original target directory\n"
+            );
+        }
+    }
+
+    #[cfg(target_os = "linux")]
+    struct ForkGuardBarrier {
+        ready: std::fs::File,
+        gate: Option<std::fs::File>,
+        worker: Option<std::thread::JoinHandle<std::io::Result<std::process::Child>>>,
+        pidfd: Option<std::os::fd::OwnedFd>,
+        raw_ready: Vec<u8>,
+        cleanup_attempted: bool,
+    }
+
+    #[cfg(target_os = "linux")]
+    impl ForkGuardBarrier {
+        fn start(guard_fd: i32, control: &Path) -> std::io::Result<Self> {
+            use std::os::fd::{AsRawFd, FromRawFd, OwnedFd};
+            use std::os::unix::process::CommandExt;
+            fn pipe() -> std::io::Result<(OwnedFd, OwnedFd)> {
+                let mut pair = [-1; 2];
+                // SAFETY: pair has exactly the two writable descriptor slots.
+                if unsafe { libc::pipe2(pair.as_mut_ptr(), libc::O_CLOEXEC) } != 0 {
+                    return Err(std::io::Error::last_os_error());
+                }
+                // SAFETY: successful pipe2 returned two new owned descriptors.
+                Ok(unsafe { (OwnedFd::from_raw_fd(pair[0]), OwnedFd::from_raw_fd(pair[1])) })
+            }
+            let (ready_read, ready_write) = pipe()?;
+            let (gate_read, gate_write) = pipe()?;
+            let read_in_parent = ready_read.as_raw_fd();
+            let write_in_parent = gate_write.as_raw_fd();
+            let write_in_child = ready_write.as_raw_fd();
+            let read_in_child = gate_read.as_raw_fd();
+            // Keep the single-byte parent gate command nonblocking too.
+            // SAFETY: write_in_parent is the live, owned pipe writer.
+            let flags = unsafe { libc::fcntl(write_in_parent, libc::F_GETFL) };
+            if flags < 0
+                || unsafe { libc::fcntl(write_in_parent, libc::F_SETFL, flags | libc::O_NONBLOCK) }
+                    < 0
+            {
+                return Err(std::io::Error::last_os_error());
+            }
+            let stdout = std::fs::File::create(control.join("stdout.log"))?;
+            let stderr = std::fs::File::create(control.join("stderr.log"))?;
+            let worker = std::thread::spawn(move || {
+                let mut command = std::process::Command::new("/bin/true");
+                command.stdout(stdout).stderr(stderr);
+                // Preallocate every callback buffer before fork.
+                let mut stat = std::mem::MaybeUninit::<libc::stat>::zeroed();
+                let mut gate = 0_u8;
+                let mut frame: [u64; 8] = [
+                    0x4748_3238_3646_4f52,
+                    0,
+                    guard_fd as u64,
+                    0,
+                    0,
+                    0,
+                    read_in_child as u64,
+                    write_in_child as u64,
+                ];
+                // SAFETY: the callback uses only fixed stack storage and
+                // async-signal-safe syscalls. All allocation and file setup
+                // happens in the parent. OwnedFd drops run only in the parent.
+                unsafe {
+                    command.pre_exec(move || {
+                        if libc::close(read_in_parent) != 0 || libc::close(write_in_parent) != 0 {
+                            libc::_exit(81);
+                        }
+                        if libc::fstat(guard_fd, stat.as_mut_ptr()) != 0 {
+                            libc::_exit(82);
+                        }
+                        let actual = stat.assume_init_ref();
+                        let flags = libc::fcntl(guard_fd, libc::F_GETFD);
+                        if flags < 0 {
+                            libc::_exit(83);
+                        }
+                        frame[1] = libc::getpid() as u64;
+                        frame[3] = actual.st_dev;
+                        frame[4] = actual.st_ino;
+                        frame[5] = flags as u64;
+                        let mut sent = 0;
+                        while sent < std::mem::size_of_val(&frame) {
+                            let count = libc::write(
+                                write_in_child,
+                                frame.as_ptr().cast::<u8>().add(sent).cast(),
+                                std::mem::size_of_val(&frame) - sent,
+                            );
+                            if count > 0 {
+                                sent += count as usize;
+                            } else if count < 0 && *libc::__errno_location() == libc::EINTR {
+                                continue;
+                            } else {
+                                libc::_exit(84);
+                            }
+                        }
+                        // No fallible operation after ready can let this child
+                        // advance to exec without the parent's gate command.
+                        loop {
+                            let count = libc::read(read_in_child, (&mut gate as *mut u8).cast(), 1);
+                            if count == 1 && gate == b'x' {
+                                break;
+                            }
+                            if count < 0 && *libc::__errno_location() == libc::EINTR {
+                                continue;
+                            }
+                            libc::_exit(85); // Includes EOF during parent cleanup.
+                        }
+                        libc::close(write_in_child);
+                        libc::close(read_in_child);
+                        Ok(())
+                    });
+                }
+                let result = command.spawn();
+                drop(ready_write);
+                drop(gate_read);
+                result
+            });
+            Ok(Self {
+                ready: std::fs::File::from(ready_read),
+                gate: Some(std::fs::File::from(gate_write)),
+                worker: Some(worker),
+                pidfd: None,
+                raw_ready: Vec::new(),
+                cleanup_attempted: false,
+            })
+        }
+
+        fn receive_ready(&mut self) -> std::io::Result<[u64; 8]> {
+            use std::io::Read;
+            use std::os::fd::AsRawFd;
+            let deadline = Instant::now() + Duration::from_secs(20);
+            let mut frame = [0_u8; 64];
+            while self.raw_ready.len() < frame.len() {
+                let remaining = deadline.saturating_duration_since(Instant::now());
+                if remaining.is_zero() {
+                    return Err(std::io::Error::new(
+                        std::io::ErrorKind::TimedOut,
+                        "fork ready deadline",
+                    ));
+                }
+                let mut poll = libc::pollfd {
+                    fd: self.ready.as_raw_fd(),
+                    events: libc::POLLIN,
+                    revents: 0,
+                };
+                let milliseconds = remaining.as_millis().clamp(1, 20_000) as i32;
+                // SAFETY: poll points to one live descriptor record.
+                let count = unsafe { libc::poll(&mut poll, 1, milliseconds) };
+                if count < 0 {
+                    let error = std::io::Error::last_os_error();
+                    if error.kind() == std::io::ErrorKind::Interrupted {
+                        continue;
+                    }
+                    return Err(error);
+                }
+                if count == 0 {
+                    continue;
+                }
+                match self.ready.read(&mut frame[self.raw_ready.len()..]) {
+                    Ok(0) => {
+                        return Err(std::io::Error::new(
+                            std::io::ErrorKind::UnexpectedEof,
+                            "fork ready EOF",
+                        ))
+                    }
+                    Ok(count) => self
+                        .raw_ready
+                        .extend_from_slice(&frame[self.raw_ready.len()..][..count]),
+                    Err(error) if error.kind() == std::io::ErrorKind::Interrupted => {}
+                    Err(error) => return Err(error),
+                }
+            }
+            let mut words = [0_u64; 8];
+            for (word, bytes) in words.iter_mut().zip(self.raw_ready.chunks_exact(8)) {
+                let mut native = [0_u8; 8];
+                native.copy_from_slice(bytes);
+                *word = u64::from_ne_bytes(native);
+            }
+            Ok(words)
+        }
+
+        fn bind_owned_child(&mut self, pid: u32) -> std::io::Result<()> {
+            use std::os::fd::{AsRawFd, FromRawFd, OwnedFd};
+            // SAFETY: pidfd_open binds the actual ready PID to a kernel handle.
+            let fd = unsafe { libc::syscall(libc::SYS_pidfd_open, pid, 0) };
+            if fd < 0 {
+                return Err(std::io::Error::last_os_error());
+            }
+            // SAFETY: the syscall returned one newly owned descriptor.
+            let owned = unsafe { OwnedFd::from_raw_fd(fd as i32) };
+            let mut info = std::mem::MaybeUninit::<libc::siginfo_t>::zeroed();
+            // SAFETY: WNOWAIT proves this is our child without reaping it or
+            // racing Command's own spawn/wait ownership. Unrelated PIDfds fail.
+            if unsafe {
+                libc::waitid(
+                    libc::P_PIDFD,
+                    owned.as_raw_fd() as libc::id_t,
+                    info.as_mut_ptr(),
+                    libc::WEXITED | libc::WNOHANG | libc::WNOWAIT,
+                )
+            } != 0
+            {
+                return Err(std::io::Error::last_os_error());
+            }
+            self.pidfd = Some(owned);
+            Ok(())
+        }
+
+        fn blocked_child_is_alive(&self) -> std::io::Result<bool> {
+            use std::os::fd::AsRawFd;
+            let fd = self
+                .pidfd
+                .as_ref()
+                .ok_or_else(|| std::io::Error::other("no owned child pidfd"))?;
+            let mut poll = libc::pollfd {
+                fd: fd.as_raw_fd(),
+                events: libc::POLLIN,
+                revents: 0,
+            };
+            // SAFETY: this is a nonblocking observation of our owned child.
+            let result = unsafe { libc::poll(&mut poll, 1, 0) };
+            if result < 0 {
+                return Err(std::io::Error::last_os_error());
+            }
+            Ok(result == 0 && self.gate.is_some())
+        }
+
+        fn signal_owned_child(&self) -> std::io::Result<()> {
+            use std::os::fd::AsRawFd;
+            if let Some(pidfd) = &self.pidfd {
+                // SAFETY: this handle was validated by non-reaping waitid.
+                // No bare-PID kill can hit a reused, unrelated process.
+                if unsafe {
+                    libc::syscall(
+                        libc::SYS_pidfd_send_signal,
+                        pidfd.as_raw_fd(),
+                        libc::SIGKILL,
+                        std::ptr::null::<libc::siginfo_t>(),
+                        0,
+                    )
+                } < 0
+                {
+                    let error = std::io::Error::last_os_error();
+                    if error.raw_os_error() != Some(libc::ESRCH) {
+                        return Err(error);
+                    }
+                }
+            }
+            Ok(())
+        }
+
+        fn reap_after_finished_spawn_failure(&self) -> std::io::Result<()> {
+            use std::os::fd::AsRawFd;
+            self.signal_owned_child()?;
+            let Some(pidfd) = &self.pidfd else {
+                return Ok(()); // No validated ready PID; spawn's own error cleanup owns it.
+            };
+            let deadline = Instant::now() + Duration::from_secs(2);
+            loop {
+                let mut info = std::mem::MaybeUninit::<libc::siginfo_t>::zeroed();
+                // SAFETY: the worker is already finished, so it cannot race
+                // this bounded reap of our previously validated child pidfd.
+                let result = unsafe {
+                    libc::waitid(
+                        libc::P_PIDFD,
+                        pidfd.as_raw_fd() as libc::id_t,
+                        info.as_mut_ptr(),
+                        libc::WEXITED | libc::WNOHANG,
+                    )
+                };
+                if result != 0 {
+                    let error = std::io::Error::last_os_error();
+                    if error.raw_os_error() == Some(libc::ECHILD) {
+                        return Ok(()); // Command's failed spawn already reaped it.
+                    }
+                    if error.kind() != std::io::ErrorKind::Interrupted {
+                        return Err(error);
+                    }
+                } else if unsafe { info.assume_init().si_pid() } != 0 {
+                    return Ok(());
+                }
+                if Instant::now() >= deadline {
+                    return Err(std::io::Error::other(
+                        "failed spawn child could not be reaped within deadline",
+                    ));
+                }
+                std::thread::yield_now();
+            }
+        }
+
+        fn finish(&mut self, abort: bool) -> std::io::Result<std::process::ExitStatus> {
+            use std::io::Write;
+            self.cleanup_attempted = true;
+            let mut failures = Vec::new();
+            // Abort a known blocked child safely BEFORE closing the gate. If
+            // ready was unavailable, gate EOF is the cancellation protocol.
+            if abort {
+                if let Err(error) = self.signal_owned_child() {
+                    failures.push(error.to_string());
+                }
+            } else if let Some(gate) = &mut self.gate {
+                if let Err(error) = gate.write_all(b"x") {
+                    failures.push(error.to_string());
+                    if let Err(error) = self.signal_owned_child() {
+                        failures.push(error.to_string());
+                    }
+                }
+            }
+            drop(self.gate.take());
+            let worker = self
+                .worker
+                .take()
+                .ok_or_else(|| std::io::Error::other("spawn worker already collected"))?;
+            let deadline = Instant::now() + Duration::from_secs(20);
+            while !worker.is_finished() && Instant::now() < deadline {
+                std::thread::yield_now();
+            }
+            if !worker.is_finished() {
+                let kill = self.signal_owned_child();
+                let stop_deadline = Instant::now() + Duration::from_secs(2);
+                while !worker.is_finished() && Instant::now() < stop_deadline {
+                    std::thread::yield_now();
+                }
+                if !worker.is_finished() {
+                    // An OS-blocked spawn cannot be cancelled portably. This
+                    // is an explicit FAIL, never an unbounded join or cleanup PASS.
+                    return Err(std::io::Error::other(format!("spawn worker cannot be joined within deadline; owned-child kill={kill:?}; cleanup NOT certified")));
+                }
+                failures.push(format!(
+                    "spawn deadline exceeded; owned-child kill={kill:?}"
+                ));
+            }
+            // Joining is safe only after is_finished. The returned Child is
+            // then reaped with bounded try_wait, never blocking wait().
+            let spawned = match worker.join() {
+                Ok(spawned) => spawned,
+                Err(_) => {
+                    let cleanup = self.reap_after_finished_spawn_failure();
+                    return Err(std::io::Error::other(format!(
+                        "spawn worker panicked; child cleanup={cleanup:?}"
+                    )));
+                }
+            };
+            let mut child = match spawned {
+                Ok(child) => FixtureProcess(child),
+                Err(error) => {
+                    let cleanup = self.reap_after_finished_spawn_failure();
+                    return Err(std::io::Error::other(format!(
+                        "spawn failed: {error}; child cleanup={cleanup:?}"
+                    )));
+                }
+            };
+            let status = bounded_fixture_status(&mut child.0, Duration::from_secs(20))?;
+            if !failures.is_empty() {
+                return Err(std::io::Error::other(failures.join("; ")));
+            }
+            Ok(status)
+        }
+    }
+
+    #[cfg(target_os = "linux")]
+    impl Drop for ForkGuardBarrier {
+        fn drop(&mut self) {
+            if !self.cleanup_attempted {
+                if let Err(error) = self.finish(true) {
+                    eprintln!("fork guard cleanup FAIL: {error}");
+                }
+            }
+        }
+    }
+
+    #[cfg(target_os = "linux")]
+    fn actual_guard_fd(lock: &Path) -> std::io::Result<i32> {
+        use std::os::unix::fs::MetadataExt;
+        let expected = std::fs::metadata(lock)?;
+        let mut matches = Vec::new();
+        for entry in std::fs::read_dir("/proc/self/fd")? {
+            let entry = entry?;
+            let metadata = match std::fs::metadata(entry.path()) {
+                Ok(metadata) => metadata,
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
+                Err(error) => return Err(error),
+            };
+            if (metadata.dev(), metadata.ino()) == (expected.dev(), expected.ino()) {
+                let fd = entry
+                    .file_name()
+                    .to_string_lossy()
+                    .parse::<i32>()
+                    .map_err(std::io::Error::other)?;
+                matches.push(fd);
+            }
+        }
+        if matches.len() != 1 {
+            return Err(std::io::Error::other(format!(
+                "expected unique owned lock FD, got {matches:?}"
+            )));
+        }
+        Ok(matches[0])
+    }
+
+    #[cfg(target_os = "linux")]
+    fn consumed_report_guard_releases_while_fork_child_is_blocked(checked: bool) {
+        use std::os::unix::fs::MetadataExt;
+        let (_workspace, project) = retained_report_project("gh286-fork-guard-");
+        let id = if checked {
+            "inv-fork-checked"
+        } else {
+            "inv-fork-retain"
+        };
+        let (mut lease, root) = report_lease(&project, id);
+        lease.stop_heartbeat();
+        let marker = lease.path.clone();
+        let original = std::fs::read(&marker).unwrap();
+        let lock = report_lock_path(&project, id);
+        let metadata = std::fs::metadata(&lock).unwrap();
+        let guard_fd = actual_guard_fd(&lock).unwrap();
+        let control = project.root.join("fork-guard-child");
+        std::fs::create_dir(&control).unwrap();
+        std::fs::write(
+            control.join("command.json"),
+            b"{\"program\":\"/bin/true\",\"args\":[],\"pre_exec\":\"guard-fd-ready/gate\"}\n",
+        )
+        .unwrap();
+        let mut child = ForkGuardBarrier::start(guard_fd, &control).unwrap();
+        // Keep all errors as values until the gate has been resolved and the
+        // spawn worker/child reaped. The old-source None negative cannot hang.
+        let observation = (|| -> anyhow::Result<_> {
+            let ready = child.receive_ready()?;
+            anyhow::ensure!(
+                ready[0] == 0x4748_3238_3646_4f52,
+                "invalid fork ready magic"
+            );
+            let pid = u32::try_from(ready[1])?;
+            child.bind_owned_child(pid)?;
+            anyhow::ensure!(pid != std::process::id(), "child must have a distinct PID");
+            anyhow::ensure!(
+                ready[2] == guard_fd as u64
+                    && ready[3] == metadata.dev()
+                    && ready[4] == metadata.ino(),
+                "inherited actual guard FD/inode differs"
+            );
+            anyhow::ensure!(
+                ready[5] & libc::FD_CLOEXEC as u64 != 0,
+                "inherited guard FD must be CLOEXEC"
+            );
+            anyhow::ensure!(
+                child.blocked_child_is_alive()?,
+                "child exited before lifecycle transition"
+            );
+            let before_busy = super::ReportDirectoryGuard::try_acquire(&project, id)?.is_none();
+            if checked {
+                lease.release_checked()?;
+            } else {
+                lease.retain();
+            }
+            // Exactly one post-consumption attempt, while the gate is closed.
+            let acquired = super::ReportDirectoryGuard::try_acquire(&project, id)?;
+            let still_blocked = child.blocked_child_is_alive()?;
+            std::fs::write(
+                control.join("observation.json"),
+                serde_json::to_vec(&serde_json::json!({
+                    "parent_pid": std::process::id(), "child_pid": pid, "guard_fd": guard_fd,
+                    "lock": lock, "dev": metadata.dev(), "inode": metadata.ino(),
+                    "child_frame": ready, "checked_release": checked, "before_busy": before_busy,
+                    "after_acquired": acquired.is_some(), "child_alive_gate_closed": still_blocked,
+                }))?,
+            )?;
+            Ok((acquired, before_busy, still_blocked))
+        })();
+        let cleanup = child.finish(observation.is_err());
+        std::fs::write(control.join("ready.bin"), &child.raw_ready).unwrap();
+        std::fs::write(control.join("cleanup.json"), serde_json::to_vec(&serde_json::json!({
+            "result": format!("{cleanup:?}"), "observation_error": observation.as_ref().err().map(|error| format!("{error:#}")),
+        })).unwrap()).unwrap();
+        let status = cleanup.expect("fork fixture must join/reap within its explicit deadlines");
+        assert!(status.success(), "fork child status: {status:?}");
+        let (acquired, before_busy, still_blocked) =
+            observation.expect("actual fork observation failed");
+        assert!(before_busy, "parent still owns guard before consumption");
+        assert!(still_blocked, "observation must precede child exec");
+        let guard = acquired
+            .expect("consumed guard must unlock even while inherited child FD remains open");
+        if checked {
+            assert!(!marker.exists());
+            assert!(guard.release_is_proven(&root).unwrap());
+        } else {
+            assert_eq!(std::fs::read(&marker).unwrap(), original);
+            assert_eq!(std::fs::read(&lock).unwrap(), b"held\n");
+            assert!(!guard.release_is_proven(&root).unwrap());
+        }
+        assert!(root.is_dir());
+    }
+
+    #[test]
+    #[cfg(target_os = "linux")]
+    fn retain_ends_guard_lifetime_before_fork_child_exec() {
+        consumed_report_guard_releases_while_fork_child_is_blocked(false);
+    }
+
+    #[test]
+    #[cfg(target_os = "linux")]
+    fn checked_release_ends_guard_lifetime_before_fork_child_exec() {
+        consumed_report_guard_releases_while_fork_child_is_blocked(true);
     }
 }
