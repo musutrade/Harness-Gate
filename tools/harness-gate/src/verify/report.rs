@@ -2883,10 +2883,12 @@ mod tests {
                 if let Ok(bytes) = std::fs::read(self.control.join(name)) {
                     return bytes;
                 }
+                let status = self.child.try_wait().unwrap();
                 assert!(
-                    self.child.try_wait().unwrap().is_none(),
-                    "retention child exited before {name}; logs: {}",
-                    self.control.display()
+                    status.is_none(),
+                    "retention child exited before {name}; logs: {}\n{}",
+                    self.control.display(),
+                    retention_child_exit_diagnostic(&self.control, status.as_ref().unwrap())
                 );
                 assert!(
                     std::time::Instant::now() < deadline,
@@ -2908,8 +2910,9 @@ mod tests {
                     std::fs::write(self.control.join("status.json"), serde_json::to_vec(&serde_json::json!({"success": status.success(), "code": status.code()})).unwrap()).unwrap();
                     assert!(
                         status.success(),
-                        "retention child failed; logs: {}",
-                        self.control.display()
+                        "retention child failed; logs: {}\n{}",
+                        self.control.display(),
+                        retention_child_exit_diagnostic(&self.control, &status)
                     );
                     return;
                 }
@@ -4297,5 +4300,33 @@ mod tests {
         let mut success = report();
         success.passed = true;
         notify(&success, &project).expect("disabled success notification is skipped");
+    }
+
+    fn retention_child_exit_diagnostic(
+        control: &std::path::Path,
+        status: &std::process::ExitStatus,
+    ) -> String {
+        fn read_log(control: &std::path::Path, name: &str) -> String {
+            let path = control.join(name);
+            match std::fs::read(&path) {
+                Ok(bytes) => match std::str::from_utf8(&bytes) {
+                    Ok(text) => format!("{} ({} bytes):\n{text}", path.display(), bytes.len()),
+                    Err(error) => format!(
+                        "{} ({} bytes; invalid UTF-8: {error}); complete bytes: {bytes:?}",
+                        path.display(),
+                        bytes.len()
+                    ),
+                },
+                Err(error) => format!("{} read failed: {error:?}", path.display()),
+            }
+        }
+
+        format!(
+            "child status: {status:?}; success: {}; code: {:?}\n{}\n{}",
+            status.success(),
+            status.code(),
+            read_log(control, "stdout.log"),
+            read_log(control, "stderr.log")
+        )
     }
 }

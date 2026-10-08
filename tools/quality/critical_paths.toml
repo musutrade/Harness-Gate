@@ -250,7 +250,7 @@ path = "src/verify/report.rs"
 symbol = "write_report_file"
 start = 1243
 end = 1253
-sha256 = "49ab8f86bc1adce5e7c68b4fb1b8f402cc592973e15c3e7cf2531f102bf82391"
+sha256 = "e4496b6b707e070635c66751ff57f66ff3d9195e3a1e113a27faeeed68dd981b"
 
 [paths.test_source]
 path = "src/verify/tests.rs"
@@ -280,14 +280,14 @@ path = "src/verify/report.rs"
 symbol = "verify_manifest_without_result"
 start = 1822
 end = 1909
-sha256 = "49ab8f86bc1adce5e7c68b4fb1b8f402cc592973e15c3e7cf2531f102bf82391"
+sha256 = "e4496b6b707e070635c66751ff57f66ff3d9195e3a1e113a27faeeed68dd981b"
 
 [paths.test_source]
 path = "src/verify/report.rs"
 symbol = "manifest_records_digests_and_detects_tampering"
-start = 3402
-end = 3455
-sha256 = "49ab8f86bc1adce5e7c68b4fb1b8f402cc592973e15c3e7cf2531f102bf82391"
+start = 3405
+end = 3458
+sha256 = "e4496b6b707e070635c66751ff57f66ff3d9195e3a1e113a27faeeed68dd981b"
 
 [[paths.probes]]
 line = 1905
