@@ -420,14 +420,14 @@ fn both() {
         inventory = ast(source_file, self.binary)
         self.assertEqual(inventory, self.inventory(source))
         symbols = inventory['symbols']
-        self.assertEqual([s['kind'] for s in symbols], ['function', 'closure', 'closure'])
-        self.assertEqual(symbols[0]['name'], 'redact_text')
-        self.assertTrue(all(s['name'].startswith('redact_text::closure_') for s in symbols[1:]))
+        self.assertEqual([s['kind'] for s in symbols], ['function', 'function', 'closure'])
+        self.assertEqual([s['name'] for s in symbols],
+                         ['redact_text', 'redact_text_cow', 'redact_text_cow::closure_18_41'])
         self.assertFalse(any(s['test'] for s in symbols))
-        self.assertEqual([complexity(s['raw']) for s in symbols], [1, 1, 1])
+        self.assertEqual([complexity(s['raw']) for s in symbols], [1, 4, 1])
         self.assertTrue(inventory['excluded'], 'test module must leave production ranges')
         transformed, edits = instrument(source, inventory)
-        self.assertEqual(len(edits), 4)
+        self.assertEqual(len(edits), 2)
         reparsed = self.inventory(transformed)
         self.assertEqual([s['kind'] for s in reparsed['symbols']], [s['kind'] for s in symbols])
         for original, inserted in zip(symbols, reparsed['symbols']):
