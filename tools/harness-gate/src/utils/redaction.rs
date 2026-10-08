@@ -1,13 +1,19 @@
 //! Shared redaction for every text boundary that can leave an invocation.
 
 use regex::Regex;
-use std::sync::OnceLock;
+use std::{borrow::Cow, sync::OnceLock};
 
 pub(crate) const REDACTION_TEXT_LIMIT: usize = 16 * 1024 * 1024;
 
 /// Replace credential-bearing values while preserving enough surrounding
 /// context for a human to identify the failing rule or operation.
 pub(crate) fn redact_text(input: &str) -> String {
+    redact_text_cow(input).into_owned()
+}
+
+// Borrow the original input until a pattern actually replaces text. Public
+// callers keep the existing String return contract and regex traversal order.
+fn redact_text_cow(input: &str) -> Cow<'_, str> {
     static PATTERNS: OnceLock<Vec<(Regex, &'static str)>> = OnceLock::new();
     let patterns = PATTERNS.get_or_init(|| {
         vec![
@@ -31,11 +37,17 @@ pub(crate) fn redact_text(input: &str) -> String {
                 .expect("assignment redaction regex"), "[REDACTED]"),
         ]
     });
-    patterns
-        .iter()
-        .fold(input.to_string(), |text, (pattern, replacement)| {
-            pattern.replace_all(&text, *replacement).into_owned()
-        })
+    let mut text = Cow::Borrowed(input);
+    for (pattern, replacement) in patterns {
+        let replaced = match pattern.replace_all(text.as_ref(), *replacement) {
+            Cow::Owned(replaced) => Some(replaced),
+            Cow::Borrowed(_) => None,
+        };
+        if let Some(replaced) = replaced {
+            text = Cow::Owned(replaced);
+        }
+    }
+    text
 }
 
 #[cfg(test)]
@@ -167,5 +179,75 @@ mod tests {
         ] {
             assert_eq!(redact_text(public), public);
         }
+    }
+}
+
+#[cfg(test)]
+mod cow_parity_tests {
+    use super::*;
+
+    #[test]
+    fn cow_no_hit_borrows_and_mixed_replacements_match_frozen_g_bytes() {
+        let public = "INFO no credentials: public facts é😀\n".repeat(8192);
+        assert!(matches!(redact_text_cow(&public), Cow::Borrowed(_)));
+        assert_eq!(redact_text(&public), public);
+        let mut cases = vec![
+            String::new(),
+            public.clone(),
+            "Explain Authorization: Bearer opaque in prose\n".into(),
+            "[worker] INFO Cookie: x=first; y=second; Path=/\n".into(),
+            "password=opaque redis://u:p@db Bearer opaque\n".into(),
+            "-----BEGIN PRIVATE KEY-----\nunclosed-to-eof".into(),
+        ];
+        for count in 0..=6 {
+            let secret = format!(
+                "postgres://u:p@db/ Bearer opaque {}\"suffix é😀",
+                "\\".repeat(count)
+            );
+            cases.push(serde_json::json!({"token":secret,"context":"public"}).to_string());
+        }
+        cases.push(format!(
+            "{public}\n[worker] Authorization: Basic opaque; token=second\n{public}"
+        ));
+        for input in cases {
+            assert_eq!(redact_text_cow(&input).as_ref(), redact_text_g(&input));
+            assert_eq!(
+                redact_text(&input).as_bytes(),
+                redact_text_g(&input).as_bytes()
+            );
+        }
+        assert!(matches!(redact_text_cow("token=opaque"), Cow::Owned(_)));
+    }
+
+    // Frozen G text oracle; patterns and ordering remain byte-for-byte unchanged.
+    fn redact_text_g(input: &str) -> String {
+        static PATTERNS: OnceLock<Vec<(Regex, &'static str)>> = OnceLock::new();
+        let patterns = PATTERNS.get_or_init(|| {
+        vec![
+            // Run before other patterns can change string escape boundaries.
+            // A backslash consumes the next character, so only an unescaped
+            // quote ends a JSON string (including runs of odd/even backslashes).
+            (Regex::new(r#"(?i)("(?:\\.|[^"\\])*(?:api[_-]?key|access[_-]?token|refresh[_-]?token|id[_-]?token|token|password|passwd|secret|client[_-]?secret)(?:\\.|[^"\\])*"\s*:\s*)"(?:\\.|[^"\\])*""#)
+                .expect("json secret redaction regex"), "${1}\"[REDACTED]\""),
+            (Regex::new(r"(?is)-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----.*?(?:-----END [A-Z0-9 ]*PRIVATE KEY-----|\z)")
+                .expect("private key redaction regex"), "[REDACTED]"),
+            // Recognize only explicit log fields before a header, not arbitrary
+            // prose. Keep indentation, bracketed fields, ISO timestamps, levels
+            // and curl's direction marker; redact the entire header and attributes.
+            (Regex::new(r"(?im)^([ \t]*(?:(?:\[[^\]\r\n]*\]|\d{4}-\d{2}-\d{2}[T ][0-9:.]+(?:Z|[+-]\d{2}:?\d{2})?|(?:TRACE|DEBUG|INFO|WARN|WARNING|ERROR|FATAL)\b:?|[<>])[ \t]+)*)(?:authorization|proxy-authorization|cookie|set-cookie|x-api-key|x-auth-token)[ \t]*:[^\r\n]*")
+                .expect("header redaction regex"), "${1}[REDACTED]"),
+            (Regex::new(r#"(?i)\b(?:postgres(?:ql)?|mysql|redis|mongodb(?:\+srv)?)://[^\s<>'\"]+"#)
+                .expect("connection string redaction regex"), "[REDACTED]"),
+            (Regex::new(r"(?i)\b(?:bearer|basic)\s+[A-Za-z0-9._~+/=-]+")
+                .expect("authorization redaction regex"), "[REDACTED]"),
+            (Regex::new(r##"(?i)\b(?:api[_-]?key|access[_-]?token|refresh[_-]?token|id[_-]?token|token|password|passwd|secret|client[_-]?secret)\b\s*[:=]\s*["']?[^\s"'`,;}]+"##)
+                .expect("assignment redaction regex"), "[REDACTED]"),
+        ]
+    });
+        patterns
+            .iter()
+            .fold(input.to_string(), |text, (pattern, replacement)| {
+                pattern.replace_all(&text, *replacement).into_owned()
+            })
     }
 }
