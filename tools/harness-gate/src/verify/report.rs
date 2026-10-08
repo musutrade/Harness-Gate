@@ -3,7 +3,7 @@ use crate::config::WebhookConfig;
 use crate::failure::FailureCode;
 use crate::net_policy::{is_local_only, normalize_host};
 use crate::project::Project;
-use crate::service::ResourceLease;
+use crate::service::{ReportDirectoryGuard, ResourceLease};
 use crate::utils::redaction::{redact_text, REDACTION_TEXT_LIMIT};
 use anyhow::{bail, Context, Result};
 use serde::{ser::Serializer, Deserialize, Serialize};
@@ -2103,6 +2103,25 @@ fn redact_waiver(mut waiver: crate::process::WaiverEvidence) -> crate::process::
 }
 
 fn prune_old_invocations(project: &Project, current_id: &str) -> Result<()> {
+    prune_old_invocations_with(project, current_id, |_| {})
+}
+
+fn prune_old_invocations_with(
+    project: &Project,
+    current_id: &str,
+    before_delete: impl FnMut(&Path),
+) -> Result<()> {
+    prune_old_invocations_with_age(project, current_id, before_delete, |entry| {
+        entry.metadata().and_then(|metadata| metadata.modified())
+    })
+}
+
+fn prune_old_invocations_with_age(
+    project: &Project,
+    current_id: &str,
+    mut before_delete: impl FnMut(&Path),
+    mut read_age: impl FnMut(&fs::DirEntry) -> std::io::Result<std::time::SystemTime>,
+) -> Result<()> {
     let Some(invocations) = project.reports.parent() else {
         return Ok(());
     };
@@ -2123,10 +2142,9 @@ fn prune_old_invocations(project: &Project, current_id: &str) -> Result<()> {
         {
             continue;
         }
-        let modified = entry
-            .metadata()
-            .and_then(|metadata| metadata.modified())
-            .unwrap_or(std::time::SystemTime::UNIX_EPOCH);
+        let Ok(modified) = read_age(&entry) else {
+            continue; // An unreadable age is uncertainty, not the oldest age.
+        };
         directories.push((modified, path));
     }
     if directories.len() <= MAX_RETAINED_INVOCATIONS {
@@ -2136,14 +2154,69 @@ fn prune_old_invocations(project: &Project, current_id: &str) -> Result<()> {
     let cutoff = std::time::SystemTime::now()
         .checked_sub(Duration::from_secs(15 * 60))
         .unwrap_or(std::time::SystemTime::UNIX_EPOCH);
-    let remove_count = directories.len() - MAX_RETAINED_INVOCATIONS;
-    for (modified, path) in directories.into_iter().take(remove_count) {
-        if modified < cutoff {
-            fs::remove_dir_all(&path)
-                .with_context(|| format!("remove expired invocation {}", path.display()))?;
+    let mut remove_count = directories.len() - MAX_RETAINED_INVOCATIONS;
+    for (modified, path) in directories {
+        if remove_count == 0 || modified >= cutoff {
+            break;
         }
+        let Some(id) = path.file_name().and_then(|name| name.to_str()) else {
+            continue;
+        };
+        let guard = match ReportDirectoryGuard::try_acquire(project, id) {
+            Ok(Some(guard)) => guard,
+            Ok(None) | Err(_) => continue,
+        };
+        // The lock remains held across all checks and the actual deletion.
+        // Marker absence alone (including a failed heartbeat/release) is not a
+        // completion certificate. Unknown and retained markers always survive.
+        if !guard.release_is_proven(&path).unwrap_or(false)
+            || !retention_completion_is_bound(project, &path, id).unwrap_or(false)
+        {
+            continue;
+        }
+        let Ok(metadata) = fs::symlink_metadata(&path) else {
+            continue;
+        };
+        if !metadata.is_dir()
+            || metadata.file_type().is_symlink()
+            || !metadata.modified().is_ok_and(|time| time < cutoff)
+        {
+            continue;
+        }
+        before_delete(&path);
+        fs::remove_dir_all(&path)
+            .with_context(|| format!("remove expired invocation {}", path.display()))?;
+        remove_count -= 1;
     }
     Ok(())
+}
+
+fn retention_completion_is_bound(project: &Project, root: &Path, id: &str) -> Result<bool> {
+    fn read_document(path: &Path) -> Result<Vec<u8>> {
+        let metadata = fs::symlink_metadata(path)?;
+        if !metadata.is_file() || metadata.file_type().is_symlink() {
+            bail!("retention metadata is not a regular file");
+        }
+        let mut contents = Vec::new();
+        fs::File::open(path)?
+            .take(MAX_INVOCATION_EVIDENCE_BYTES + 1)
+            .read_to_end(&mut contents)?;
+        if contents.len() as u64 > MAX_INVOCATION_EVIDENCE_BYTES {
+            bail!("retention metadata exceeds the existing evidence limit");
+        }
+        Ok(contents)
+    }
+    let metadata: Value = serde_json::from_slice(&read_document(&root.join("invocation.json"))?)?;
+    let contents = read_document(&root.join(MACHINE_RESULT_FILE))?;
+    ensure_supported_machine_result(&contents)?;
+    let result: Value = serde_json::from_slice(&contents)?;
+    let identity = project.input().project_identity.as_str();
+    Ok(metadata["invocation_id"].as_str() == Some(id)
+        && metadata["project_identity"].as_str() == Some(identity)
+        && result["invocation_id"].as_str() == Some(id)
+        && result["project_identity"].as_str() == Some(identity)
+        && result["report_directory"].as_str() == Some(root.to_string_lossy().as_ref())
+        && result["evidence_complete"].as_bool() == Some(true))
 }
 
 fn resolve_report_root(project: &Project, repository: &Path) -> Result<PathBuf> {
@@ -2650,6 +2723,538 @@ mod tests {
         let value: serde_json::Value = serde_json::from_slice(&bytes).expect("parse result");
         assert_eq!(value["evidence_complete"], false);
         assert_eq!(value["passed"], false);
+    }
+
+    // A retained root is opt-in for the serial measurement role. Assertions,
+    // child stdout/stderr and filesystem fixtures survive both green and red.
+    fn retention_project(name: &str) -> (Option<tempfile::TempDir>, crate::project::Project) {
+        let (temporary, root) = match std::env::var_os("GH286_RETENTION_EVIDENCE") {
+            Some(parent) => {
+                std::fs::create_dir_all(&parent).unwrap();
+                let temporary = tempfile::Builder::new()
+                    .prefix(name)
+                    .tempdir_in(parent)
+                    .unwrap();
+                (None, temporary.keep())
+            }
+            None => {
+                let temporary = tempfile::Builder::new().prefix(name).tempdir().unwrap();
+                let root = temporary.path().to_path_buf();
+                (Some(temporary), root)
+            }
+        };
+        crate::preset::init(&root, "generic", false).unwrap();
+        let output = std::process::Command::new("git")
+            .args(["init", "--quiet"])
+            .current_dir(&root)
+            .output()
+            .unwrap();
+        assert!(output.status.success());
+        let project = crate::project::Project::discover(Some(root), None).unwrap();
+        (temporary, project)
+    }
+
+    fn retention_report(
+        invocation: &super::Invocation,
+        project: &crate::project::Project,
+    ) -> VerificationReport {
+        let mut current = report();
+        current.invocation_id = invocation.id.clone();
+        current.report_directory = invocation.root.to_string_lossy().into_owned();
+        current.project_identity = project.input().project_identity.clone();
+        current.source_identity = project.input().source_identity.clone();
+        current.input_mode = project.input().mode.as_str().into();
+        current.execution_root = project
+            .input()
+            .execution_root
+            .to_string_lossy()
+            .into_owned();
+        current.configuration_digest = project.input().configuration_digest.clone();
+        current.passed = true;
+        current.steps[0].passed = true;
+        current.steps[0].detail = None;
+        current.steps[0].step_id = Some("unit.tests".into());
+        current.steps[0].invocation_id = Some(invocation.id.clone());
+        current
+    }
+
+    fn retention_completed(project: &crate::project::Project) -> std::path::PathBuf {
+        let invocation = allocate_invocation(project).unwrap();
+        // Small sibling headers model completed evidence, but use real
+        // allocation, heartbeat shutdown and checked release, not forged leases.
+        std::fs::write(invocation.root.join("invocation.json"), serde_json::to_vec(&serde_json::json!({
+            "invocation_id": invocation.id, "project_identity": project.input().project_identity,
+        })).unwrap()).unwrap();
+        std::fs::write(
+            invocation.root.join(MACHINE_RESULT_FILE),
+            serde_json::to_vec(&serde_json::json!({
+                "schema_version": "1", "invocation_id": invocation.id,
+                "project_identity": project.input().project_identity,
+                "report_directory": invocation.root, "evidence_complete": true,
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        std::fs::write(
+            invocation.root.join("logs/unit.log"),
+            b"completed sibling\n",
+        )
+        .unwrap();
+        let root = invocation.root.clone();
+        drop(invocation);
+        root
+    }
+
+    fn age_retention_directory(root: &std::path::Path, seconds: u64) {
+        let mut options = std::fs::OpenOptions::new();
+        options.read(true);
+        #[cfg(windows)]
+        {
+            use std::os::windows::fs::OpenOptionsExt;
+            // FILE_FLAG_BACKUP_SEMANTICS permits a directory handle;
+            // FILE_WRITE_ATTRIBUTES is sufficient to set its timestamps.
+            options.custom_flags(0x0200_0000).access_mode(0x0100);
+        }
+        options
+            .open(root)
+            .unwrap()
+            .set_times(
+                std::fs::FileTimes::new()
+                    .set_modified(std::time::SystemTime::now() - Duration::from_secs(seconds)),
+            )
+            .unwrap();
+        assert!(
+            std::fs::metadata(root).unwrap().modified().unwrap()
+                < std::time::SystemTime::now() - Duration::from_secs(15 * 60)
+        );
+    }
+
+    fn retention_marker(project: &crate::project::Project, id: &str) -> std::path::PathBuf {
+        use sha2::Digest;
+        let key = format!("{:x}", sha2::Sha256::digest(format!("invocation:{id}")));
+        project.resource_leases.join(format!("{}.json", &key[..16]))
+    }
+
+    struct RetentionChild {
+        child: std::process::Child,
+        control: std::path::PathBuf,
+    }
+
+    impl RetentionChild {
+        fn start(
+            project: &crate::project::Project,
+            mode: &str,
+            current: &str,
+            target: &std::path::Path,
+        ) -> Self {
+            let control = project.root.join(format!("retention-child-{mode}"));
+            std::fs::create_dir(&control).unwrap();
+            let stdout = std::fs::File::create(control.join("stdout.log")).unwrap();
+            let stderr = std::fs::File::create(control.join("stderr.log")).unwrap();
+            let args = [
+                "--exact",
+                "verify::report::tests::retention_child_owner",
+                "--nocapture",
+                "--test-threads=1",
+            ];
+            std::fs::write(
+                control.join("command.json"),
+                serde_json::to_vec(&args).unwrap(),
+            )
+            .unwrap();
+            let child = std::process::Command::new(std::env::current_exe().unwrap())
+                .args(args)
+                .env("GH286_CHILD_ROOT", &project.root)
+                .env("GH286_CHILD_CONTROL", &control)
+                .env("GH286_CHILD_MODE", mode)
+                .env("GH286_CHILD_CURRENT", current)
+                .env("GH286_CHILD_TARGET", target)
+                .stdin(std::process::Stdio::piped())
+                .stdout(stdout)
+                .stderr(stderr)
+                .spawn()
+                .unwrap();
+            Self { child, control }
+        }
+
+        fn wait_for(&mut self, name: &str) -> Vec<u8> {
+            let deadline = std::time::Instant::now() + Duration::from_secs(20);
+            loop {
+                if let Ok(bytes) = std::fs::read(self.control.join(name)) {
+                    return bytes;
+                }
+                let status = self.child.try_wait().unwrap();
+                assert!(
+                    status.is_none(),
+                    "retention child exited before {name}; logs: {}\n{}",
+                    self.control.display(),
+                    retention_child_exit_diagnostic(&self.control, status.as_ref().unwrap())
+                );
+                assert!(
+                    std::time::Instant::now() < deadline,
+                    "retention child timed out at {name}; logs: {}",
+                    self.control.display()
+                );
+                std::thread::sleep(Duration::from_millis(10));
+            }
+        }
+
+        fn send(&mut self, command: &str) {
+            writeln!(self.child.stdin.as_mut().unwrap(), "{command}").unwrap();
+        }
+
+        fn finish(&mut self) {
+            let deadline = std::time::Instant::now() + Duration::from_secs(20);
+            loop {
+                if let Some(status) = self.child.try_wait().unwrap() {
+                    std::fs::write(self.control.join("status.json"), serde_json::to_vec(&serde_json::json!({"success": status.success(), "code": status.code()})).unwrap()).unwrap();
+                    assert!(
+                        status.success(),
+                        "retention child failed; logs: {}\n{}",
+                        self.control.display(),
+                        retention_child_exit_diagnostic(&self.control, &status)
+                    );
+                    return;
+                }
+                assert!(
+                    std::time::Instant::now() < deadline,
+                    "retention child did not finish"
+                );
+                std::thread::sleep(Duration::from_millis(10));
+            }
+        }
+    }
+
+    impl Drop for RetentionChild {
+        fn drop(&mut self) {
+            if self.child.try_wait().ok().flatten().is_none() {
+                let _ = self.child.kill();
+                let _ = self.child.wait();
+            }
+        }
+    }
+
+    #[test]
+    fn retention_child_owner() {
+        let Some(root) = std::env::var_os("GH286_CHILD_ROOT") else {
+            return;
+        };
+        use std::io::BufRead;
+        let control = std::path::PathBuf::from(std::env::var_os("GH286_CHILD_CONTROL").unwrap());
+        let mut project = crate::project::Project::discover(Some(root.into()), None).unwrap();
+        let mode = std::env::var("GH286_CHILD_MODE").unwrap();
+        let mut commands = std::io::stdin().lock().lines();
+        if mode == "live" {
+            let mut invocation = allocate_invocation(&project).unwrap();
+            write_invocation_metadata(&invocation, &project, "full", false).unwrap();
+            let current = retention_report(&invocation, &project);
+            project.reports = invocation.root.clone();
+            std::fs::write(project.reports.join("logs/unit.log"), b"live initial\n").unwrap();
+            write(&current, &project).unwrap();
+            // The fresh control directory has no ready.json target. Closing a
+            // complete sibling temporary before rename also publishes atomically
+            // on Windows, without replacing an existing destination.
+            let ready_temporary = control.join("ready.json.tmp");
+            std::fs::write(&ready_temporary, serde_json::to_vec(&serde_json::json!({
+                "root": invocation.root, "invocation_id": invocation.id, "pid": std::process::id(),
+            })).unwrap()).unwrap();
+            std::fs::rename(ready_temporary, control.join("ready.json")).unwrap();
+            assert_eq!(commands.next().unwrap().unwrap(), "append");
+            writeln!(
+                std::fs::OpenOptions::new()
+                    .append(true)
+                    .open(project.reports.join("logs/unit.log"))
+                    .unwrap(),
+                "live append"
+            )
+            .unwrap();
+            std::fs::write(control.join("appended"), b"ready").unwrap();
+            assert_eq!(commands.next().unwrap().unwrap(), "release");
+            write(&current, &project).unwrap();
+            verify_manifest(&project).unwrap();
+            invocation._lease.release_before_guard_close().unwrap();
+            std::fs::write(
+                control.join("checked-release"),
+                b"marker removed; guard held",
+            )
+            .unwrap();
+            assert_eq!(commands.next().unwrap().unwrap(), "close");
+            drop(invocation);
+            std::fs::write(control.join("released"), b"ready").unwrap();
+        } else {
+            let current = std::env::var("GH286_CHILD_CURRENT").unwrap();
+            project.reports = project.reports.join("invocations").join(&current);
+            let target = std::path::PathBuf::from(std::env::var_os("GH286_CHILD_TARGET").unwrap());
+            super::prune_old_invocations_with(&project, &current, |path| {
+                if mode == "prune-blocked" && path == target {
+                    std::fs::write(control.join("checked"), b"guard held").unwrap();
+                    assert_eq!(commands.next().unwrap().unwrap(), "delete");
+                }
+            })
+            .unwrap();
+            std::fs::write(control.join("finished"), b"ready").unwrap();
+        }
+    }
+
+    #[test]
+    fn retention_preserves_aged_live_child_and_prunes_released_siblings() {
+        let (_temporary, project) = retention_project("gh286-live-");
+        let current = allocate_invocation(&project).unwrap();
+        let mut child = RetentionChild::start(&project, "live", &current.id, &current.root);
+        let ready: serde_json::Value =
+            serde_json::from_slice(&child.wait_for("ready.json")).unwrap();
+        assert_ne!(
+            ready["pid"].as_u64().unwrap(),
+            u64::from(std::process::id())
+        );
+        let live = std::path::PathBuf::from(ready["root"].as_str().unwrap());
+        let live_id = ready["invocation_id"].as_str().unwrap();
+        let marker = retention_marker(&project, live_id);
+        let deadline = std::time::Instant::now() + Duration::from_secs(10);
+        let lease_record: serde_json::Value = loop {
+            if let Ok(bytes) = std::fs::read(&marker) {
+                if let Ok(record) = serde_json::from_slice(&bytes) {
+                    break record;
+                }
+            }
+            assert!(
+                std::time::Instant::now() < deadline,
+                "real live lease marker was not readable"
+            );
+            std::thread::sleep(Duration::from_millis(10));
+        };
+        assert_eq!(lease_record["pid"], ready["pid"]);
+        assert_eq!(lease_record["resource_kind"], "report-directory");
+        assert_eq!(lease_record["invocation_id"], live_id);
+        assert!(!lease_record["process_start_identity"]
+            .as_str()
+            .unwrap()
+            .starts_with("unavailable:"));
+        let siblings: Vec<_> = (0..52).map(|_| retention_completed(&project)).collect();
+        age_retention_directory(&live, 7200);
+        age_retention_directory(&current.root, 7200);
+        for (index, path) in siblings.iter().take(4).enumerate() {
+            age_retention_directory(path, 3600 - index as u64);
+        }
+        let aged = std::fs::metadata(&live).unwrap().modified().unwrap();
+        child.send("append");
+        child.wait_for("appended");
+        assert_eq!(
+            std::fs::metadata(&live).unwrap().modified().unwrap(),
+            aged,
+            "appending an existing log cannot freshen its parent"
+        );
+        let log = std::fs::read(live.join("logs/unit.log")).unwrap();
+        let machine = std::fs::read(live.join(MACHINE_RESULT_FILE)).unwrap();
+        assert!(
+            crate::service::ReportDirectoryGuard::try_acquire(&project, live_id)
+                .unwrap()
+                .is_none()
+        );
+        let mut invocation_project = project.clone();
+        invocation_project.reports = current.root.clone();
+        super::prune_old_invocations(&invocation_project, &current.id).unwrap();
+        assert_eq!(std::fs::read(live.join("logs/unit.log")).unwrap(), log);
+        assert_eq!(
+            std::fs::read(live.join(MACHINE_RESULT_FILE)).unwrap(),
+            machine
+        );
+        assert!(current.root.is_dir());
+        assert_eq!(
+            siblings.iter().filter(|path| !path.exists()).count(),
+            3,
+            "protected candidates must not prevent eligible completed siblings from being pruned"
+        );
+        child.send("release");
+        child.wait_for("checked-release");
+        // The child's final publication refreshed the directory mtime. It now
+        // waits for "close" with the guard held, so re-age after that barrier.
+        age_retention_directory(&live, 7200);
+        assert!(
+            std::fs::metadata(&live).unwrap().modified().unwrap()
+                < std::time::SystemTime::now() - Duration::from_secs(15 * 60),
+            "release-window protection must be exercised on an aged directory"
+        );
+        assert!(!retention_marker(&project, live_id).exists());
+        assert!(
+            crate::service::ReportDirectoryGuard::try_acquire(&project, live_id)
+                .unwrap()
+                .is_none()
+        );
+        let final_log = std::fs::read(live.join("logs/unit.log")).unwrap();
+        let final_machine = std::fs::read(live.join(MACHINE_RESULT_FILE)).unwrap();
+        retention_completed(&project);
+        super::prune_old_invocations(&invocation_project, &current.id).unwrap();
+        assert_eq!(
+            std::fs::read(live.join("logs/unit.log")).unwrap(),
+            final_log
+        );
+        assert_eq!(
+            std::fs::read(live.join(MACHINE_RESULT_FILE)).unwrap(),
+            final_machine
+        );
+        child.send("close");
+        child.wait_for("released");
+        child.finish();
+        assert!(!retention_marker(&project, live_id).exists());
+        let mut live_project = project.clone();
+        live_project.reports = live.clone();
+        verify_manifest(&live_project).unwrap();
+        // Restore pressure after actual child release: the same aged directory
+        // now becomes eligible. It was not kept by disabling retention.
+        retention_completed(&project);
+        super::prune_old_invocations(&invocation_project, &current.id).unwrap();
+        assert!(!live.exists());
+    }
+
+    #[test]
+    fn retention_keeps_unknown_markers_metadata_and_failed_release() {
+        let (_temporary, project) = retention_project("gh286-unknown-");
+        let current = allocate_invocation(&project).unwrap();
+        let mut protected = Vec::new();
+        for case in 0..11 {
+            let root = retention_completed(&project);
+            let id = root.file_name().unwrap().to_str().unwrap();
+            let marker = retention_marker(&project, id);
+            match case {
+                0 => std::fs::write(&marker, b"malformed marker").unwrap(),
+                1 => std::fs::write(&marker, br#"{"schema_version":999,"pid":0,"expires_at":0}"#)
+                    .unwrap(),
+                2 => std::fs::create_dir(&marker).unwrap(), // real read/type failure
+                3 => std::fs::write(
+                    root.join("invocation.json"),
+                    br#"{"invocation_id":"other","project_identity":"other"}"#,
+                )
+                .unwrap(),
+                4 => {
+                    std::fs::remove_file(root.join("invocation.json")).unwrap();
+                    std::fs::create_dir(root.join("invocation.json")).unwrap();
+                }
+                5 => std::fs::write(
+                    root.join(MACHINE_RESULT_FILE),
+                    br#"{"schema_version":"999"}"#,
+                )
+                .unwrap(),
+                6 => std::fs::write(
+                    root.join(MACHINE_RESULT_FILE),
+                    br#"{"schema_version":"1","evidence_complete":false}"#,
+                )
+                .unwrap(),
+                7 => {
+                    let key = marker.file_stem().unwrap();
+                    let lock = project
+                        .resource_leases
+                        .join("report-directory-locks")
+                        .join(key)
+                        .with_extension("lock");
+                    std::fs::write(lock, b"unknown release state").unwrap();
+                }
+                8 => {
+                    let guard = crate::service::ReportDirectoryGuard::try_acquire(&project, id)
+                        .unwrap()
+                        .unwrap();
+                    assert!(guard.release_is_proven(&root).unwrap());
+                    drop(guard);
+                    // Reacquire real ownership, then force its checked release
+                    // to fail even if no heartbeat poll has happened yet.
+                    let lease = crate::service::ResourceLease::acquire(
+                        &project,
+                        format!("invocation:{id}"),
+                        "report-directory",
+                        id,
+                        Some(root.to_string_lossy().into_owned()),
+                        None,
+                    )
+                    .unwrap();
+                    std::fs::remove_file(marker).unwrap();
+                    assert!(lease.release_checked().is_err());
+                }
+                9 => {
+                    let key = marker.file_stem().unwrap();
+                    let lock = project
+                        .resource_leases
+                        .join("report-directory-locks")
+                        .join(key)
+                        .with_extension("lock");
+                    // No release certificate from an older implementation is
+                    // ownership uncertainty, not automatic migration authority.
+                    std::fs::write(lock, b"").unwrap();
+                }
+                _ => {} // A timestamp read fault is injected at its actual read boundary below.
+            }
+            age_retention_directory(&root, 7200 - case);
+            protected.push(root);
+        }
+        let expired = retention_completed(&project);
+        age_retention_directory(&expired, 3600);
+        let recent: Vec<_> = (0..52).map(|_| retention_completed(&project)).collect();
+        let mut invocation_project = project.clone();
+        invocation_project.reports = current.root.clone();
+        let unreadable_age = protected.last().unwrap();
+        super::prune_old_invocations_with_age(
+            &invocation_project,
+            &current.id,
+            |_| {},
+            |entry| {
+                if entry.path() == *unreadable_age {
+                    Err(std::io::Error::new(
+                        std::io::ErrorKind::PermissionDenied,
+                        "injected directory timestamp read fault",
+                    ))
+                } else {
+                    entry.metadata().and_then(|metadata| metadata.modified())
+                }
+            },
+        )
+        .unwrap();
+        assert!(protected
+            .iter()
+            .all(|root| root.join("logs/unit.log").is_file()));
+        assert!(
+            !expired.exists(),
+            "normally released expired evidence must still be cleaned"
+        );
+        assert!(recent.iter().all(|root| root.exists()));
+    }
+
+    #[test]
+    fn retention_serializes_real_check_delete_and_competing_processes() {
+        let (_temporary, project) = retention_project("gh286-delete-race-");
+        let current = allocate_invocation(&project).unwrap();
+        let victim = retention_completed(&project);
+        age_retention_directory(&victim, 7200);
+        for _ in 0..51 {
+            retention_completed(&project);
+        }
+        let mut deleting = RetentionChild::start(&project, "prune-blocked", &current.id, &victim);
+        deleting.wait_for("checked"); // after all eligibility checks, before remove_dir_all
+        let id = victim.file_name().unwrap().to_str().unwrap();
+        assert!(
+            crate::service::ReportDirectoryGuard::try_acquire(&project, id)
+                .unwrap()
+                .is_none()
+        );
+        let error = crate::service::ResourceLease::acquire(
+            &project,
+            format!("invocation:{id}"),
+            "report-directory",
+            id,
+            Some(victim.to_string_lossy().into_owned()),
+            None,
+        )
+        .unwrap_err();
+        assert!(error
+            .to_string()
+            .contains("report-directory lease conflict"));
+        let mut competing = RetentionChild::start(&project, "prune-once", &current.id, &victim);
+        competing.wait_for("finished");
+        competing.finish();
+        assert!(victim.join("logs/unit.log").is_file(), "the second real pruner cannot delete while the first holds the checked-delete boundary");
+        deleting.send("delete");
+        deleting.wait_for("finished");
+        deleting.finish();
+        assert!(!victim.exists());
+        assert!(current.root.is_dir());
     }
 
     #[test]
@@ -3695,5 +4300,33 @@ mod tests {
         let mut success = report();
         success.passed = true;
         notify(&success, &project).expect("disabled success notification is skipped");
+    }
+
+    fn retention_child_exit_diagnostic(
+        control: &std::path::Path,
+        status: &std::process::ExitStatus,
+    ) -> String {
+        fn read_log(control: &std::path::Path, name: &str) -> String {
+            let path = control.join(name);
+            match std::fs::read(&path) {
+                Ok(bytes) => match std::str::from_utf8(&bytes) {
+                    Ok(text) => format!("{} ({} bytes):\n{text}", path.display(), bytes.len()),
+                    Err(error) => format!(
+                        "{} ({} bytes; invalid UTF-8: {error}); complete bytes: {bytes:?}",
+                        path.display(),
+                        bytes.len()
+                    ),
+                },
+                Err(error) => format!("{} read failed: {error:?}", path.display()),
+            }
+        }
+
+        format!(
+            "child status: {status:?}; success: {}; code: {:?}\n{}\n{}",
+            status.success(),
+            status.code(),
+            read_log(control, "stdout.log"),
+            read_log(control, "stderr.log")
+        )
     }
 }
