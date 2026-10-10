@@ -40,7 +40,7 @@ HOTSPOTS = {
 # Source paths remain relative to src for lineage with the established series.
 # Both commits are measured with this exact inventory and tool version.
 SOURCE_FILES = sorted({f"preset/{name}.rs" for name in ("catalog", "composition", "filesystem", "import", "initialize", "migration", "mod")} | set(HOTSPOTS) | {"app/mod.rs", "app/quality.rs", "cli.rs", "lib.rs", "config/mod.rs", "config/import.rs", "config/validation/mod.rs", "process/mod.rs", "process/command.rs", "process/replay.rs", "process/reader.rs", "project/discovery.rs", "project/mod.rs", "failure.rs", "verify/quality.rs", "verify/report.rs", "utils/redaction.rs", "service/lease.rs", "service/mod.rs", "service/report_directory.rs", "net_policy.rs",
-    "audit/runner.rs", "config/loader.rs", "config/migration.rs", "config/model.rs", "process/signal.rs", "secrets/config.rs"} |
+    "audit/runner.rs", "config/loader.rs", "config/migration.rs", "config/model.rs", "secrets/config.rs"} |
     {f"config/quality/{name}.rs" for name in ("mod", "model", "policy", "validation", "compiler", "collectors", "baseline", "baseline/git")} |
     {f"../quality-core/{name}.rs" for name in (
     "comparison", "cross_component", "evidence", "json", "mod", "model",
