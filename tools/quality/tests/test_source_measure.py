@@ -229,6 +229,24 @@ fn both() {
             self.assertTrue(result['excluded'])
             self.assertFalse(any(s['test'] for s in result['symbols']))
 
+    def test_statement_cfg_attributes_on_unsafe_blocks_are_removable(self):
+        source = '''pub fn configured() {
+    #[cfg(unix)]
+    unsafe { if true {} }
+    #[cfg(windows)]
+    unsafe { if true {} if true {} let hidden = || if true {}; }
+}
+'''
+        unix = self.inventory(source, 'x86_64-unknown-linux-gnu')
+        windows = self.inventory(source, 'x86_64-pc-windows-msvc')
+        self.assertEqual([s['name'] for s in unix['symbols']], ['configured'])
+        self.assertEqual([complexity(s['raw']) for s in unix['symbols']], [2])
+        self.assertEqual([s['name'] for s in windows['symbols']],
+                         ['configured', 'configured::closure_5_49'])
+        self.assertEqual([complexity(s['raw']) for s in windows['symbols']], [3, 2])
+        self.assertTrue(unix['excluded'])
+        self.assertTrue(windows['excluded'])
+
     def test_unsupported_configuration_fails_without_partial_inventory(self):
         inactive = "unix" if "windows" in compiler_configuration()["cfg"] else "windows"
         for source in (
@@ -438,10 +456,7 @@ fn both() {
                                          byte_span(source, original[field]))
     def test_review_low_sources_inventory_and_instrumentation(self):
         paths = ('audit/runner.rs', 'config/loader.rs', 'config/migration.rs', 'config/model.rs',
-                 'secrets/config.rs')
-        # process/signal.rs stays outside: its base revision uses statement-level
-        # cfg attributes, which the analyzer does not support (#317).
-        self.assertNotIn('process/signal.rs', SOURCE_FILES)
+                 'process/signal.rs', 'secrets/config.rs')
         for path in paths:
             self.assertIn(path, SOURCE_FILES)
             source_file = ROOT / 'tools/harness-gate/src' / path
