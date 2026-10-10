@@ -5,6 +5,28 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use tempfile::TempDir;
 
+/// The replay ledger deliberately rejects group/other-writable ancestors
+/// (#316). Pin the test process umask before any test runs so fixture
+/// directories do not inherit a user-private-group default (0002) and make
+/// local results diverge from CI. Child CLI processes inherit the same mask.
+#[cfg(any(target_os = "linux", target_os = "android", target_os = "freebsd"))]
+#[used]
+#[link_section = ".init_array"]
+static PIN_TEST_UMASK: extern "C" fn() = pin_test_umask;
+
+#[cfg(target_vendor = "apple")]
+#[used]
+#[link_section = "__DATA,__mod_init_func"]
+static PIN_TEST_UMASK: extern "C" fn() = pin_test_umask;
+
+#[cfg(unix)]
+extern "C" fn pin_test_umask() {
+    // SAFETY: umask only replaces the process file-mode creation mask.
+    unsafe {
+        libc::umask(0o022);
+    }
+}
+
 /// Own an isolated temporary project workspace and clean it up on drop.
 pub(crate) struct TestWorkspace {
     _temp_dir: TempDir,

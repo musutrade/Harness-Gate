@@ -288,7 +288,7 @@ where
 
 struct PreparedRequest {
     artifact_root: PathBuf,
-    executable: PathBuf,
+    executable: VerifiedExecutable,
     request_json: Vec<u8>,
 }
 
@@ -297,12 +297,11 @@ fn prepare_request(
     policy: &HostPolicy,
 ) -> Result<PreparedRequest, AdapterError> {
     let now_ms = unix_time_millis()?;
-    let accepted_until_ms = validate_request_envelope_at(request, policy, now_ms)?;
+    let (accepted_until_ms, executable) = validate_request_envelope_at(request, policy, now_ms)?;
     let artifact_root = canonical_directory(&request.artifact_root, "artifact root")?;
     policy
         .replay_guard
         .isolate_artifacts(policy.replay_state_dir.as_deref(), &artifact_root)?;
-    let executable = canonical_file(&request.adapter.executable, "adapter executable")?;
     let request_json = serde_json::to_vec(&request)
         .map_err(|error| AdapterError::Protocol(format!("serialize request: {error}")))?;
     if request_json.len() as u64 > MAX_REQUEST_BYTES {
@@ -350,12 +349,12 @@ fn run_process(
     request: &AdapterRequest,
     policy: &HostPolicy,
     artifact_root: &Path,
-    executable: &Path,
+    executable: &VerifiedExecutable,
     request_json: Vec<u8>,
     started: Instant,
     is_cancelled: &impl Fn() -> bool,
 ) -> Result<ProcessOutput, AdapterError> {
-    let mut command = Command::new(executable);
+    let mut command = Command::new(&executable.path);
     command
         .args(&request.args)
         .current_dir(artifact_root)
@@ -370,8 +369,13 @@ fn run_process(
         command.env(key, value);
     }
     isolate_process_tree(&mut command);
+    // Last check before exec: the path must still name the hashed file.
+    executable.revalidate()?;
     let mut child = command.spawn().map_err(|error| {
-        AdapterError::Protocol(format!("start adapter {}: {error}", executable.display()))
+        AdapterError::Protocol(format!(
+            "start adapter {}: {error}",
+            executable.path.display()
+        ))
     })?;
     let stdin = match child.stdin.take() {
         Some(stdin) => stdin,
@@ -726,7 +730,7 @@ fn validate_request_at(
     policy: &HostPolicy,
     now_ms: u64,
 ) -> Result<(), AdapterError> {
-    let accepted_until_ms = validate_request_envelope_at(request, policy, now_ms)?;
+    let (accepted_until_ms, _executable) = validate_request_envelope_at(request, policy, now_ms)?;
     policy.replay_guard.claim(
         &request.nonce,
         request.issued_at_ms,
@@ -741,7 +745,7 @@ fn validate_request_envelope_at(
     request: &AdapterRequest,
     policy: &HostPolicy,
     now_ms: u64,
-) -> Result<u64, AdapterError> {
+) -> Result<(u64, VerifiedExecutable), AdapterError> {
     if request.protocol_version != PROTOCOL_VERSION {
         return Err(AdapterError::Protocol(format!(
             "unsupported protocol version {}",
@@ -826,19 +830,135 @@ fn validate_request_envelope_at(
             "adapter name and version are required".into(),
         ));
     }
-    let executable = canonical_file(&declaration.executable, "adapter executable")?;
-    let digest = sha256_file(&executable).map_err(|error| {
-        AdapterError::Protocol(format!(
-            "hash adapter executable {}: {error}",
-            executable.display()
-        ))
-    })?;
-    if !constant_time_eq(&digest, &declaration.source_digest) {
-        return Err(AdapterError::Protocol(
-            "adapter executable digest mismatch".into(),
-        ));
+    let executable = VerifiedExecutable::open(&declaration.executable, &declaration.source_digest)?;
+    Ok((request.expires_at_ms.saturating_add(skew_ms), executable))
+}
+
+/// Executable whose digest was computed from one held file handle.
+///
+/// The handle and its file identity are the trust anchor between digest
+/// verification and process start: `revalidate` must succeed immediately
+/// before spawn, so a rename, symlink swap or in-place rewrite of the verified
+/// path after hashing fails closed instead of executing unverified bytes.
+#[derive(Debug)]
+struct VerifiedExecutable {
+    path: PathBuf,
+    file: File,
+    identity: FileIdentity,
+}
+
+/// Metadata that changes when a path is rebound or a file is rewritten.
+///
+/// On Unix `ctime` cannot be set by unprivileged callers, so any content,
+/// mode or link change after hashing is observable. Windows has no stable
+/// file index in `std`; the handle is instead opened without write/delete
+/// sharing, which blocks rewrite, rename and deletion while it is held.
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct FileIdentity {
+    len: u64,
+    modified: Option<SystemTime>,
+    #[cfg(unix)]
+    unix: (u64, u64, i64, i64),
+}
+
+impl FileIdentity {
+    fn of(metadata: &fs::Metadata) -> Self {
+        #[cfg(unix)]
+        use std::os::unix::fs::MetadataExt;
+        Self {
+            len: metadata.len(),
+            modified: metadata.modified().ok(),
+            #[cfg(unix)]
+            unix: (
+                metadata.dev(),
+                metadata.ino(),
+                metadata.ctime(),
+                metadata.ctime_nsec(),
+            ),
+        }
     }
-    Ok(request.expires_at_ms.saturating_add(skew_ms))
+}
+
+impl VerifiedExecutable {
+    fn open(path: &Path, expected_digest: &str) -> Result<Self, AdapterError> {
+        let path = canonical_file(path, "adapter executable")?;
+        let protocol = |action: &str, error: io::Error| {
+            AdapterError::Protocol(format!(
+                "{action} adapter executable {}: {error}",
+                path.display()
+            ))
+        };
+        let mut file = open_executable(&path).map_err(|error| protocol("open", error))?;
+        let before = file
+            .metadata()
+            .map_err(|error| protocol("inspect", error))?;
+        if !before.is_file() {
+            return Err(AdapterError::Protocol(
+                "adapter executable is not a file".into(),
+            ));
+        }
+        let identity = FileIdentity::of(&before);
+        let digest = sha256_reader(&mut file).map_err(|error| protocol("hash", error))?;
+        let verified = Self {
+            path,
+            file,
+            identity,
+        };
+        // A concurrent writer during hashing would make the digest describe
+        // bytes that no longer exist; require a stable identity across it.
+        verified.revalidate()?;
+        if !constant_time_eq(&digest, expected_digest) {
+            return Err(AdapterError::Protocol(
+                "adapter executable digest mismatch".into(),
+            ));
+        }
+        Ok(verified)
+    }
+
+    /// Confirm the held handle and the path still denote the hashed file.
+    fn revalidate(&self) -> Result<(), AdapterError> {
+        let changed = || {
+            AdapterError::Protocol(format!(
+                "adapter executable {} changed after digest verification",
+                self.path.display()
+            ))
+        };
+        let held = self.file.metadata().map_err(|_| changed())?;
+        let current = fs::symlink_metadata(&self.path).map_err(|_| changed())?;
+        if !current.is_file()
+            || FileIdentity::of(&held) != self.identity
+            || FileIdentity::of(&current) != self.identity
+        {
+            return Err(changed());
+        }
+        Ok(())
+    }
+}
+
+#[cfg(unix)]
+fn open_executable(path: &Path) -> io::Result<File> {
+    use std::os::unix::fs::OpenOptionsExt;
+    fs::OpenOptions::new()
+        .read(true)
+        .custom_flags(libc::O_NOFOLLOW)
+        .open(path)
+}
+
+#[cfg(windows)]
+fn open_executable(path: &Path) -> io::Result<File> {
+    use std::os::windows::fs::OpenOptionsExt;
+    // FILE_SHARE_READ only: other writers, renames and deletes are refused
+    // while the verified handle is held, and process creation may still read.
+    const FILE_SHARE_READ: u32 = 0x0000_0001;
+    fs::OpenOptions::new()
+        .read(true)
+        .share_mode(FILE_SHARE_READ)
+        .open(path)
+}
+
+#[cfg(not(any(unix, windows)))]
+fn open_executable(path: &Path) -> io::Result<File> {
+    File::open(path)
 }
 
 fn validate_capabilities(
@@ -1212,8 +1332,12 @@ fn canonical_file(path: &Path, label: &str) -> Result<PathBuf, AdapterError> {
     Ok(canonical)
 }
 
+#[cfg(test)]
 fn sha256_file(path: &Path) -> anyhow::Result<String> {
-    let mut file = File::open(path)?;
+    Ok(sha256_reader(&mut File::open(path)?)?)
+}
+
+fn sha256_reader(file: &mut impl Read) -> io::Result<String> {
     let mut hasher = Sha256::new();
     let mut buffer = [0_u8; 64 * 1024];
     loop {
@@ -1345,6 +1469,115 @@ mod tests {
         let outcome = run(request, &policy).expect("fixture succeeds");
         assert_eq!(outcome.response["status"], "PASS");
         assert!(directory.path().join("adapter-result.txt").is_file());
+    }
+
+    /// Sign a request whose executable is a private launcher script, so a
+    /// test can rebind or rewrite it between digest verification and spawn.
+    #[cfg(unix)]
+    fn launcher_request(root: &Path, bin: &Path) -> (AdapterRequest, HostPolicy, PathBuf) {
+        use std::os::unix::fs::PermissionsExt;
+        let (mut request, policy) = fixture_request(root, "pass");
+        let launcher = bin.join("adapter");
+        let script = format!(
+            "#!/bin/sh\nexec '{}' \"$@\"\n",
+            request.adapter.executable.display()
+        );
+        fs::write(&launcher, script).unwrap();
+        fs::set_permissions(&launcher, fs::Permissions::from_mode(0o755)).unwrap();
+        request.adapter.source_digest = sha256_file(&launcher).unwrap();
+        request.adapter.executable = launcher.clone();
+        resign_request(&mut request);
+        (request, policy, launcher)
+    }
+
+    #[cfg(unix)]
+    fn spawn_prepared(
+        request: &AdapterRequest,
+        policy: &HostPolicy,
+        prepared: PreparedRequest,
+    ) -> Result<ProcessOutput, AdapterError> {
+        run_process(
+            request,
+            policy,
+            &prepared.artifact_root,
+            &prepared.executable,
+            prepared.request_json,
+            Instant::now(),
+            &|| false,
+        )
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn verified_launcher_runs_when_unchanged() {
+        let (root, bin) = (tempdir().unwrap(), tempdir().unwrap());
+        let (request, policy, _) = launcher_request(root.path(), bin.path());
+        let outcome = run(request, &policy).expect("unchanged launcher runs");
+        assert_eq!(outcome.response["status"], "PASS");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn executable_replaced_after_digest_verification_is_not_started() {
+        use std::os::unix::fs::{symlink, PermissionsExt};
+        type Replace = fn(&Path, &Path);
+        let replacements: [(&str, Replace); 3] = [
+            ("rename over path", |launcher, bin| {
+                let other = bin.join("other");
+                fs::write(&other, "#!/bin/sh\ntouch \"$0.ran\"\n").unwrap();
+                fs::set_permissions(&other, fs::Permissions::from_mode(0o755)).unwrap();
+                fs::rename(&other, launcher).unwrap();
+            }),
+            ("rewrite in place", |launcher, _| {
+                // Same inode and length class: only ctime/mtime reveal it.
+                let mut file = fs::OpenOptions::new().write(true).open(launcher).unwrap();
+                file.write_all(b"#!/bin/sh\ntouch \"$0.ran\"\n").unwrap();
+                file.set_len(fs::metadata(launcher).unwrap().len()).unwrap();
+            }),
+            ("symlink swap", |launcher, bin| {
+                let other = bin.join("other");
+                fs::write(&other, "#!/bin/sh\ntouch \"$0.ran\"\n").unwrap();
+                fs::set_permissions(&other, fs::Permissions::from_mode(0o755)).unwrap();
+                fs::remove_file(launcher).unwrap();
+                symlink(&other, launcher).unwrap();
+            }),
+        ];
+        for (name, replace) in replacements {
+            let (root, bin) = (tempdir().unwrap(), tempdir().unwrap());
+            let (request, policy, launcher) = launcher_request(root.path(), bin.path());
+            // Coarse filesystem clocks can share one tick between creating the
+            // fixture and rewriting it; a real target is not freshly written.
+            thread::sleep(Duration::from_millis(50));
+            let prepared = prepare_request(&request, &policy).expect("signed request verifies");
+            replace(&launcher, bin.path());
+            let error = spawn_prepared(&request, &policy, prepared)
+                .err()
+                .unwrap_or_else(|| panic!("{name}: replaced executable must not start"));
+            assert!(
+                matches!(&error, AdapterError::Protocol(message)
+                    if message.contains("changed after digest verification")),
+                "{name}: {error}"
+            );
+            assert!(
+                fs::read_dir(bin.path()).unwrap().all(|entry| !entry
+                    .unwrap()
+                    .file_name()
+                    .to_string_lossy()
+                    .ends_with(".ran")),
+                "{name}: replacement must not execute"
+            );
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn executable_digest_is_bound_to_symlink_free_canonical_file() {
+        let (root, bin) = (tempdir().unwrap(), tempdir().unwrap());
+        let (request, _, launcher) = launcher_request(root.path(), bin.path());
+        let verified = VerifiedExecutable::open(&launcher, &request.adapter.source_digest).unwrap();
+        assert_eq!(verified.path, fs::canonicalize(&launcher).unwrap());
+        verified.revalidate().expect("unchanged file stays valid");
+        assert!(VerifiedExecutable::open(&launcher, &"0".repeat(64)).is_err());
     }
 
     #[test]
