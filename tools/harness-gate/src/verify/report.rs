@@ -2067,11 +2067,13 @@ fn redact_directory(
             continue;
         }
         let bytes = fs::read(&path).with_context(|| format!("read evidence {}", path.display()))?;
-        let Ok(text) = std::str::from_utf8(&bytes) else {
-            continue;
-        };
-        let redacted = redact_text(text);
-        if redacted.as_bytes() != bytes {
+        // Invalid UTF-8 (truncated multibyte output, binary fragments, UTF-16)
+        // must not exempt a file from redaction. Decode the whole file lossily
+        // so patterns spanning an invalid byte still match; untouched files
+        // keep their original bytes, redacted ones are published as UTF-8.
+        let text = String::from_utf8_lossy(&bytes);
+        let redacted = redact_text(&text);
+        if redacted != text {
             let relative = path
                 .strip_prefix(root)
                 .with_context(|| format!("resolve evidence path {}", path.display()))?;
@@ -3509,6 +3511,43 @@ mod tests {
             assert_eq!(result["evidence_complete"], true);
             assert_eq!(result["passed"], true);
         }
+    }
+
+    #[test]
+    fn publication_redacts_evidence_containing_invalid_utf8() {
+        let (_workspace, _original, invocation, project, current) =
+            complete_invocation_fixture("non-utf8-redaction-publication");
+        let mut log = b"\x1b[31mtruncated \xe2\x82 output\n".to_vec();
+        log.extend_from_slice(b"Authorization: Bearer BEARER_SECRET\n");
+        log.extend_from_slice(b"password=PASSWORD_SECRET \xff\xfe binary\n");
+        log.extend_from_slice(b"-----BEGIN PRIVATE KEY-----\nPEM_HEAD\x80\x81PEM_TAIL\n");
+        log.extend_from_slice(b"-----END PRIVATE KEY-----\npublic-after-key\n");
+        std::fs::write(invocation.root.join("logs/unit.log"), &log).unwrap();
+
+        write(&current, &project).expect("publish redacted evidence");
+        verify_manifest(&project).expect("manifest binds the final redacted bytes");
+        let manifest: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(invocation.root.join("manifest.json")).unwrap())
+                .unwrap();
+        assert!(manifest.to_string().contains("logs/unit.log"));
+        let published = std::fs::read(invocation.root.join("logs/unit.log")).unwrap();
+        let published = String::from_utf8(published).expect("redacted evidence is UTF-8");
+        for secret in ["BEARER_SECRET", "PASSWORD_SECRET", "PEM_HEAD", "PEM_TAIL"] {
+            assert!(!published.contains(secret), "published secret: {secret}");
+        }
+        assert!(published.contains("truncated") && published.contains("public-after-key"));
+
+        let (_workspace, _original, invocation, project, current) =
+            complete_invocation_fixture("non-utf8-untouched-publication");
+        let untouched = b"plain \xff\xfe binary without credentials\n".to_vec();
+        std::fs::write(invocation.root.join("logs/unit.log"), &untouched).unwrap();
+        write(&current, &project).expect("publish untouched evidence");
+        verify_manifest(&project).expect("manifest binds the original bytes");
+        assert_eq!(
+            std::fs::read(invocation.root.join("logs/unit.log")).unwrap(),
+            untouched,
+            "evidence without credentials keeps its original bytes"
+        );
     }
 
     #[test]

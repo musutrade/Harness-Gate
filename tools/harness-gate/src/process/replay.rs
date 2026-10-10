@@ -167,8 +167,10 @@ mod platform {
                 _ => None,
             })
             .collect();
+        let mut ancestor = PathBuf::from("/");
         for (index, name) in names.iter().enumerate() {
-            trusted_parent(&directory, root_owner)?;
+            trusted_parent(&directory, root_owner, &ancestor)?;
+            ancestor.push(name);
             let name = CString::new(name.as_bytes())?;
             directory = match open_at(&directory, &name) {
                 Ok(next) => next,
@@ -196,16 +198,30 @@ mod platform {
         })
     }
 
-    fn trusted_parent(directory: &File, root_owner: u32) -> io::Result<()> {
+    fn trusted_parent(directory: &File, root_owner: u32, path: &Path) -> io::Result<()> {
         let metadata = directory.metadata()?;
         let owner = metadata.uid();
         let current = unsafe { libc::geteuid() };
-        let shared = metadata.mode() & 0o022 != 0;
-        let sticky_root = owner == root_owner && metadata.mode() & 0o1000 != 0;
-        if (owner != current && owner != root_owner) || (shared && !sticky_root) {
-            return Err(io::Error::other(
-                "ledger ancestor is not protected by the host",
-            ));
+        let mode = metadata.mode() & 0o7777;
+        let shared = mode & 0o022 != 0;
+        let sticky_root = owner == root_owner && mode & 0o1000 != 0;
+        let remedy = "or pass --replay-state-dir with a private host-owned directory";
+        if owner != current && owner != root_owner {
+            return Err(io::Error::other(format!(
+                "ledger ancestor is not protected by the host: {} is owned by uid {owner}, \
+                 not the current user ({current}) or root; use a directory owned by the \
+                 current user {remedy}",
+                path.display()
+            )));
+        }
+        if shared && !sticky_root {
+            return Err(io::Error::other(format!(
+                "ledger ancestor is not protected by the host: {} has mode {mode:04o} and is \
+                 writable by group or others; run `chmod go-w {}` {remedy} \
+                 (a umask of 0002 creates such directories)",
+                path.display(),
+                path.display()
+            )));
         }
         Ok(())
     }
@@ -459,7 +475,17 @@ mod tests {
         }
         std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
         std::fs::set_permissions(root.path(), std::fs::Permissions::from_mode(0o777)).unwrap();
-        assert!(Ledger::open(&path).is_err());
+        let message = Ledger::open(&path).err().unwrap().to_string();
+        let shared = root.path().canonicalize().unwrap();
+        assert!(message.contains(&format!("{} has mode 0777", shared.display())));
+        assert!(message.contains(&format!("chmod go-w {}", shared.display())));
+        assert!(message.contains("--replay-state-dir"));
+        std::fs::set_permissions(root.path(), std::fs::Permissions::from_mode(0o775)).unwrap();
+        assert!(Ledger::open(&path)
+            .err()
+            .unwrap()
+            .to_string()
+            .contains("umask of 0002"));
         std::fs::set_permissions(root.path(), std::fs::Permissions::from_mode(0o700)).unwrap();
     }
 
