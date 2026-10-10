@@ -33,7 +33,7 @@ fn redact_text_cow(input: &str) -> Cow<'_, str> {
                 .expect("connection string redaction regex"), "[REDACTED]"),
             (Regex::new(r"(?i)\b(?:bearer|basic)\s+[A-Za-z0-9._~+/=-]+")
                 .expect("authorization redaction regex"), "[REDACTED]"),
-            (Regex::new(r##"(?i)\b(?:api[_-]?key|access[_-]?token|refresh[_-]?token|id[_-]?token|token|password|passwd|secret|client[_-]?secret)\b\s*[:=]\s*["']?[^\s"'`,;}]+"##)
+            (Regex::new(r##"(?i)\b(?:api[_-]?key|access[_-]?token|refresh[_-]?token|id[_-]?token|token|password|passwd|secret|client[_-]?secret)\b\s*[:=]\s*(?:"(?:\\.|[^"\\\r\n])*"?|'(?:\\.|[^'\\\r\n])*'?|[^\s"'`,;}]+)"##)
                 .expect("assignment redaction regex"), "[REDACTED]"),
         ]
     });
@@ -114,6 +114,38 @@ mod tests {
         assert_eq!(value["context"], "public\"quote");
         assert_eq!(value["count"], 9);
         assert!(!redacted.contains("SUFFIX"));
+    }
+
+    #[test]
+    fn quoted_assignment_values_are_redacted_to_the_closing_quote() {
+        for (input, expected) in [
+            (
+                r#"password="my secret phrase" user=alice"#,
+                "[REDACTED] user=alice",
+            ),
+            ("token: 'quoted value here', next", "[REDACTED], next"),
+            (
+                r#"secret="a \"quoted\" secret phrase" tail"#,
+                "[REDACTED] tail",
+            ),
+            (r"api_key='it\'s secret' tail", "[REDACTED] tail"),
+            (
+                "password=\"unclosed secret phrase\npublic-next",
+                "[REDACTED]\npublic-next",
+            ),
+            (
+                r#"user=alice password="first secret" region=eu token='second secret' ok"#,
+                "user=alice [REDACTED] region=eu [REDACTED] ok",
+            ),
+            ("password=plain-value, public", "[REDACTED], public"),
+            (r#"password="" public"#, "[REDACTED] public"),
+        ] {
+            let redacted = redact_text(input);
+            assert_eq!(redacted, expected, "input: {input}");
+            assert!(!redacted.contains("secret phrase") && !redacted.contains("second"));
+        }
+        let public = r#"message="no credentials here" status=ok"#;
+        assert_eq!(redact_text(public), public);
     }
 
     #[test]
@@ -198,6 +230,7 @@ mod cow_parity_tests {
             "[worker] INFO Cookie: x=first; y=second; Path=/\n".into(),
             "password=opaque redis://u:p@db Bearer opaque\n".into(),
             "-----BEGIN PRIVATE KEY-----\nunclosed-to-eof".into(),
+            "password=\"quoted secret phrase\" token='second one' public\n".into(),
         ];
         for count in 0..=6 {
             let secret = format!(
@@ -219,7 +252,8 @@ mod cow_parity_tests {
         assert!(matches!(redact_text_cow("token=opaque"), Cow::Owned(_)));
     }
 
-    // Frozen G text oracle; patterns and ordering remain byte-for-byte unchanged.
+    // Fold-based text oracle; patterns and ordering mirror `redact_text_cow`
+    // byte-for-byte (the assignment rule includes the #310 quoted-value form).
     fn redact_text_g(input: &str) -> String {
         static PATTERNS: OnceLock<Vec<(Regex, &'static str)>> = OnceLock::new();
         let patterns = PATTERNS.get_or_init(|| {
@@ -240,7 +274,7 @@ mod cow_parity_tests {
                 .expect("connection string redaction regex"), "[REDACTED]"),
             (Regex::new(r"(?i)\b(?:bearer|basic)\s+[A-Za-z0-9._~+/=-]+")
                 .expect("authorization redaction regex"), "[REDACTED]"),
-            (Regex::new(r##"(?i)\b(?:api[_-]?key|access[_-]?token|refresh[_-]?token|id[_-]?token|token|password|passwd|secret|client[_-]?secret)\b\s*[:=]\s*["']?[^\s"'`,;}]+"##)
+            (Regex::new(r##"(?i)\b(?:api[_-]?key|access[_-]?token|refresh[_-]?token|id[_-]?token|token|password|passwd|secret|client[_-]?secret)\b\s*[:=]\s*(?:"(?:\\.|[^"\\\r\n])*"?|'(?:\\.|[^'\\\r\n])*'?|[^\s"'`,;}]+)"##)
                 .expect("assignment redaction regex"), "[REDACTED]"),
         ]
     });

@@ -158,7 +158,12 @@ identity to prevent untrusted children from writing the ledger or any ancestor;
 protocol capability checks do not enforce that isolation. Unix ledger directories
 must belong to the host UID and forbid group/other writes; ancestors must belong
 to that UID or the filesystem root owner and forbid shared writes (root-owned sticky temporary roots
-are permitted). Windows storage requires equivalent host-managed ACLs. Core
+are permitted). A umask of `0002` (the default for many Linux user accounts)
+creates group-writable project directories, so the default
+`<request-parent>/.harness-gate-adapter-replay` ledger is rejected under such a
+project; the error names the directory and its mode. Run `chmod go-w` on the
+reported directory or select a private host-owned `--replay-state-dir`.
+Windows storage requires equivalent host-managed ACLs. Core
 rejects symlink/reparse components and unwritable/non-directory storage, pins the
 directory before verify's execution steps and rejects replacement before launch.
 Unix claims use descriptor-relative no-follow operations; Windows directory
