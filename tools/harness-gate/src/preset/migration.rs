@@ -15,7 +15,11 @@ pub fn migrate(
     let root = root
         .canonicalize()
         .with_context(|| format!("resolve project root {}", root.display()))?;
-    let input = input.unwrap_or_else(|| PathBuf::from("codex-audit-pipeline/.codex/flow.toml"));
+    // There is no conventional v1 location; guessing a historical path only
+    // produced a confusing missing-file error (#321).
+    let Some(input) = input else {
+        bail!("config migrate requires --input <PATH> naming the schema v1 flow.toml (or the global --config)");
+    };
     let input = resolve_inside(&root, input)?;
     let output = resolve_inside(
         &root,

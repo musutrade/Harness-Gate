@@ -208,6 +208,8 @@ pub enum DoctorCheckKind {
         path: String,
         #[serde(default)]
         path_type: PathType,
+        #[serde(default)]
+        path_scope: PathScope,
     },
     Glob {
         pattern: String,
@@ -219,6 +221,8 @@ pub enum DoctorCheckKind {
         env: String,
         path: String,
         contains: String,
+        #[serde(default)]
+        path_scope: PathScope,
     },
     GitConfig {
         key: String,
@@ -232,10 +236,23 @@ pub enum DoctorCheckKind {
         path: String,
         #[serde(default)]
         trim_prefix: String,
+        #[serde(default)]
+        path_scope: PathScope,
     },
     Service {
         service: String,
     },
+}
+
+/// Where a doctor check path may point. Paths stay inside the repository by
+/// default; `host` explicitly opts into probing a host location such as an
+/// installed tool or user-level credential file.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "lowercase")]
+pub enum PathScope {
+    #[default]
+    Repository,
+    Host,
 }
 
 #[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, JsonSchema)]

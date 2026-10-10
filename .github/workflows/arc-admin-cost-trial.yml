@@ -24,7 +24,7 @@ jobs:
       CARGO_TERM_COLOR: never
       CARGO_TARGET_DIR: ${{ github.workspace }}/target/harness-build
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           persist-credentials: false
       - name: Build measured Harness-Gate revision
@@ -48,7 +48,7 @@ jobs:
         run: python3 docs/dogfood/arc-admin/cost/selfhost_trial.py summarize --output target/arc-admin-ci-trial
       - name: Retain all successful and failed measurement receipts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: arc-admin-cost-${{ github.run_id }}-${{ github.run_attempt }}
           path: target/arc-admin-ci-trial/evidence/

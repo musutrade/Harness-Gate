@@ -163,6 +163,14 @@
             "path": {
               "type": "string"
             },
+            "path_scope": {
+              "default": "repository",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/PathScope"
+                }
+              ]
+            },
             "path_type": {
               "default": "any",
               "allOf": [
@@ -235,6 +243,14 @@
             },
             "path": {
               "type": "string"
+            },
+            "path_scope": {
+              "default": "repository",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/PathScope"
+                }
+              ]
             }
           },
           "additionalProperties": false
@@ -300,6 +316,14 @@
             },
             "path": {
               "type": "string"
+            },
+            "path_scope": {
+              "default": "repository",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/PathScope"
+                }
+              ]
             },
             "program": {
               "type": "string"
@@ -560,6 +584,14 @@
         }
       },
       "additionalProperties": false
+    },
+    "PathScope": {
+      "description": "Where a doctor check path may point. Paths stay inside the repository by default; `host` explicitly opts into probing a host location such as an installed tool or user-level credential file.",
+      "type": "string",
+      "enum": [
+        "repository",
+        "host"
+      ]
     },
     "PathType": {
       "type": "string",

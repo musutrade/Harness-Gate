@@ -98,9 +98,9 @@ class TopologyTests(unittest.TestCase):
         # Compare all step content: extra actions, multiline commands, conditional
         # evaluation and shell error suppression must all require policy review.
         expected = '''
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
       - name: Install Python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: '3.x'
       - name: Require every quality gate

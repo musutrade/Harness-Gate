@@ -118,9 +118,11 @@ download() {
     local output="$2"
     if command -v curl >/dev/null 2>&1; then
         curl --fail --show-error --location --proto '=https' --tlsv1.2 \
-            --retry 3 --retry-all-errors --output "$output" "$url"
+            --max-redirs 10 --retry 3 --retry-all-errors --output "$output" "$url"
     elif command -v wget >/dev/null 2>&1; then
-        wget --https-only --tries=3 --output-document="$output" "$url"
+        # TLSv1_2 rejects SSLv3/TLS 1.0/1.1 the same way curl's --tlsv1.2 does.
+        wget --https-only --secure-protocol=TLSv1_2 --max-redirect=10 \
+            --tries=3 --output-document="$output" "$url"
     else
         die "curl or wget is required"
     fi
@@ -142,7 +144,7 @@ verify_checksum() {
         (cd "$dist" && sha256sum --check --status "$(basename "$selected")") \
             || die "SHA256 checksum verification failed for $filename"
     elif command -v shasum >/dev/null 2>&1; then
-        (cd "$dist" && shasum -a 256 -c "$(basename "$selected")") \
+        (cd "$dist" && shasum -a 256 --check --status "$(basename "$selected")") \
             || die "SHA256 checksum verification failed for $filename"
     else
         die "sha256sum or shasum is required"

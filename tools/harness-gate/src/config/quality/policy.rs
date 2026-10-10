@@ -2,7 +2,7 @@
 use super::{model::*, validation::path};
 use anyhow::{ensure, Context, Result};
 use serde::Deserialize;
-use std::{collections::BTreeSet, fs, path::Path};
+use std::{collections::BTreeSet, path::Path};
 
 #[derive(Deserialize)]
 struct PolicyDocument {
@@ -32,7 +32,7 @@ pub(super) fn validate_binding(
     root: &Path,
 ) -> Result<bool> {
     let file = path(root, &binding.policy_file, "policy_file", true)?;
-    let source = fs::read_to_string(file).context("read policy_file")?;
+    let source = crate::config::read_config_source(&file).context("read policy_file")?;
     let value = harness_gate::quality::parse(&source)?;
     harness_gate::quality::policy::validate_policy_document(&value)?;
     let document: PolicyDocument = serde_json::from_value(value)

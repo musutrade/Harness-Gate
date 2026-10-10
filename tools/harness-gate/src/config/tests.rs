@@ -1293,6 +1293,60 @@ fn service_diagnostics_cover_runner_and_multi_service_injection_collisions() {
 }
 
 #[test]
+fn doctor_paths_outside_the_repository_require_host_scope() {
+    for (kind, value) in [
+        ("path", "/etc/passwd"),
+        ("path", "../outside"),
+        ("path", "{root}/../outside"),
+        ("env-or-file", "/home/user/.pgpass"),
+        ("version", "..\\outside\\.node-version"),
+    ] {
+        let path_kind = |path: &str, scope| match kind {
+            "path" => DoctorCheckKind::Path {
+                path: path.into(),
+                path_type: PathType::Any,
+                path_scope: scope,
+            },
+            "env-or-file" => DoctorCheckKind::EnvOrFile {
+                env: "DATABASE_URL".into(),
+                path: path.into(),
+                contains: "DATABASE_URL=".into(),
+                path_scope: scope,
+            },
+            _ => DoctorCheckKind::Version {
+                program: "node".into(),
+                args: vec!["--version".into()],
+                path: path.into(),
+                trim_prefix: "v".into(),
+                path_scope: scope,
+            },
+        };
+        let check = |scope| DoctorCheck {
+            id: "host.path".into(),
+            label: "host path".into(),
+            required: true,
+            help: None,
+            timeout_secs: 15,
+            kind: path_kind(value, scope),
+        };
+        let mut config = repository_config();
+        config.doctor.checks.push(check(PathScope::Repository));
+        let index = config.doctor.checks.len() - 1;
+        assert_diagnostic(
+            &config,
+            &format!("doctor.checks[{index}]"),
+            "HGCFG-INVALID-FIELD",
+        );
+        let mut config = repository_config();
+        config.doctor.checks.push(check(PathScope::Host));
+        assert!(
+            config.validate().is_ok(),
+            "{kind} {value}: host scope accepts an explicit host path"
+        );
+    }
+}
+
+#[test]
 fn doctor_parser_alias_and_scope_diagnostics_keep_configuration_paths() {
     let mut config = repository_config();
     config.doctor.checks.push(config.doctor.checks[0].clone());
@@ -1437,4 +1491,22 @@ fn serial_shared_service_consumers_load_without_added_dependencies() {
         config.steps[1].log = config.steps[0].log.clone();
         assert_diagnostic(&config, "steps[1].log", "HGCFG-DUPLICATE-LOG");
     }
+}
+
+#[test]
+fn configuration_documents_above_the_size_limit_are_rejected_before_parsing() {
+    let root = TestWorkspace::new("config-size-limit");
+    let path = root.root.join("flow.toml");
+    let limit = super::loader::MAX_CONFIG_BYTES as usize;
+    fs::write(&path, "#".repeat(limit)).unwrap();
+    assert_eq!(super::read_config_source(&path).unwrap().len(), limit);
+    fs::write(&path, "#".repeat(limit + 1)).unwrap();
+    let error = super::read_config_source(&path).unwrap_err();
+    assert_eq!(error.kind(), std::io::ErrorKind::InvalidData);
+    assert!(error.to_string().contains("configuration limit"));
+    let diagnostics = FlowConfig::load_with_diagnostics(&path, None).unwrap_err();
+    assert!(
+        format!("{diagnostics}").contains("exceeds the size limit"),
+        "{diagnostics}"
+    );
 }

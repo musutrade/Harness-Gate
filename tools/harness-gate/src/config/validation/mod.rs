@@ -2,8 +2,8 @@ use super::diagnostic::{
     ConfigDiagnostic, ConfigDiagnostics, DiagnosticSeverity, RelatedDiagnostic, SourceMap,
 };
 use super::model::{
-    DoctorCheck, DoctorCheckKind, ExternalValuePolicy, FlowConfig, ParserConfig, ScopeRule,
-    ServiceConfig, CONFIG_VERSION,
+    DoctorCheck, DoctorCheckKind, ExternalValuePolicy, FlowConfig, ParserConfig, PathScope,
+    ScopeRule, ServiceConfig, CONFIG_VERSION,
 };
 use anyhow::{bail, Context, Result};
 use globset::Glob;
@@ -790,7 +790,13 @@ fn validate_doctor_check(config: &FlowConfig, check: &DoctorCheck) -> Result<()>
             validate_program("doctor command", program)?;
             validate_arguments(config, &check.id, args)?;
         }
-        DoctorCheckKind::Path { path, .. } | DoctorCheckKind::Glob { pattern: path } => {
+        DoctorCheckKind::Path {
+            path, path_scope, ..
+        } => {
+            validate_template(config, &check.id, path)?;
+            validate_doctor_path_scope(&check.id, path, *path_scope)?;
+        }
+        DoctorCheckKind::Glob { pattern: path } => {
             validate_template(config, &check.id, path)?;
         }
         DoctorCheckKind::Env { name } => validate_env_name("doctor env", name)?,
@@ -798,9 +804,11 @@ fn validate_doctor_check(config: &FlowConfig, check: &DoctorCheck) -> Result<()>
             env,
             path,
             contains,
+            path_scope,
         } => {
             validate_env_name("doctor env", env)?;
             validate_template(config, &check.id, path)?;
+            validate_doctor_path_scope(&check.id, path, *path_scope)?;
             if contains.is_empty() {
                 bail!("doctor check {:?} requires non-empty contains", check.id);
             }
@@ -818,11 +826,13 @@ fn validate_doctor_check(config: &FlowConfig, check: &DoctorCheck) -> Result<()>
             program,
             args,
             path,
+            path_scope,
             ..
         } => {
             validate_program("doctor version program", program)?;
             validate_arguments(config, &check.id, args)?;
             validate_template(config, &check.id, path)?;
+            validate_doctor_path_scope(&check.id, path, *path_scope)?;
         }
         DoctorCheckKind::Service { service } => {
             if !config.services.contains_key(service) {
@@ -834,6 +844,25 @@ fn validate_doctor_check(config: &FlowConfig, check: &DoctorCheck) -> Result<()>
         }
     }
     Ok(())
+}
+
+/// Repository-scoped doctor paths are repository-relative, optionally behind
+/// one leading path placeholder such as `{root}` or a configured alias, and
+/// never traverse upward. Host locations require `path_scope = "host"`.
+fn validate_doctor_path_scope(id: &str, path: &str, scope: PathScope) -> Result<()> {
+    if scope == PathScope::Host {
+        return Ok(());
+    }
+    let relative = match path.strip_prefix('{').and_then(|rest| rest.split_once('}')) {
+        Some((_, rest)) => rest.trim_start_matches(['/', '\\']),
+        None => path,
+    };
+    if relative.is_empty() {
+        return Ok(());
+    }
+    validate_repo_path(&format!("doctor check {id:?} path"), relative).with_context(|| {
+        format!("doctor check {id:?} path {path:?} is outside the repository; set path_scope = \"host\" to probe a host location")
+    })
 }
 
 fn validate_scope_rule_with_components(
