@@ -338,17 +338,17 @@ assertions = ["assert_failed_without_remove(&project, &path, &fake, \"runtime ob
 [paths.source]
 path = "src/service/lease.rs"
 symbol = "verify_runtime_record"
-start = 903
-end = 935
-sha256 = "fa8c1bc0da453659e19fcd077f205126c38d0d4326e9aebea0fec8b0c274f7d5"
+start = 978
+end = 1010
+sha256 = "1f308c249e90cfd88c80271b2cf68f783ceda3a86f0c641a27425d4c2f52ae2b"
 [paths.test_source]
 path = "src/service/lease.rs"
 symbol = "fake_docker_and_podman_cleanup_requires_fresh_complete_ownership"
-start = 1637
-end = 1724
-sha256 = "fa8c1bc0da453659e19fcd077f205126c38d0d4326e9aebea0fec8b0c274f7d5"
+start = 1806
+end = 1893
+sha256 = "1f308c249e90cfd88c80271b2cf68f783ceda3a86f0c641a27425d4c2f52ae2b"
 [[paths.probes]]
-line = 927
+line = 1002
 column = 9
 text = "bail!(\"runtime object identity changed since the lease was recorded\");"
 

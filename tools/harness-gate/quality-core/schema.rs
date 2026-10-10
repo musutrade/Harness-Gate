@@ -235,3 +235,118 @@ fn walk(v: &Value, s: &Value, root: &Value, path: &str) -> Result<()> {
     // as in the frozen reference. Metadata gets its own project traversal.
     Ok(())
 }
+
+/// Explicit compensation for `uniqueItems`, which the frozen walker subset
+/// does not interpret (#313). Callers name the declaring field path.
+pub(super) fn require_unique(values: &Value, path: &str) -> Result<()> {
+    let values = values.as_array().map(Vec::as_slice).unwrap_or_default();
+    let unique = values
+        .iter()
+        .enumerate()
+        .all(|(i, value)| !values[..i].contains(value));
+    require(unique, format!("{path}: array violates uniqueItems"))
+}
+
+#[cfg(test)]
+mod keyword_tests {
+    use super::*;
+
+    /// Keywords `walk` enforces. `oneOf` is compensated by explicit
+    /// discriminator checks in the policy and evidence domains.
+    const ENFORCED: &[&str] = &[
+        "$ref",
+        "type",
+        "const",
+        "enum",
+        "pattern",
+        "minLength",
+        "maxLength",
+        "minimum",
+        "required",
+        "properties",
+        "additionalProperties",
+        "items",
+        "minItems",
+        "maxItems",
+    ];
+    /// `oneOf` uses explicit discriminator checks; `uniqueItems` uses
+    /// `require_unique` at each declaring field (policy remediation classes).
+    const COMPENSATED: &[&str] = &["oneOf", "uniqueItems"];
+    const ANNOTATIONS: &[&str] = &["$schema", "$id", "title", "description", "definitions"];
+
+    fn collect(schema: &Value, found: &mut Vec<String>) {
+        match schema {
+            Value::Object(object) => {
+                for (key, child) in object {
+                    found.push(key.clone());
+                    match key.as_str() {
+                        // Map keys under these are names, not keywords.
+                        "properties" | "definitions" => {
+                            for value in child.as_object().into_iter().flat_map(|o| o.values()) {
+                                collect(value, found);
+                            }
+                        }
+                        "const" | "enum" => {}
+                        _ => collect(child, found),
+                    }
+                }
+            }
+            Value::Array(items) => items.iter().for_each(|item| collect(item, found)),
+            _ => {}
+        }
+    }
+
+    #[test]
+    fn every_embedded_schema_keyword_is_enforced_or_compensated() {
+        for schema in [
+            &*PROJECT,
+            &*EVIDENCE,
+            &*REQUIREMENTS,
+            &*POLICY,
+            &*EXCEPTIONS,
+            &*MAPPINGS,
+        ] {
+            let mut found = Vec::new();
+            collect(schema, &mut found);
+            for keyword in found {
+                assert!(
+                    ENFORCED.contains(&keyword.as_str())
+                        || COMPENSATED.contains(&keyword.as_str())
+                        || ANNOTATIONS.contains(&keyword.as_str()),
+                    "schema keyword {keyword:?} is neither enforced nor compensated"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn require_unique_rejects_duplicates_with_field_path() {
+        require_unique(&serde_json::json!(["x", "y"]), "$.classes").unwrap();
+        let error = require_unique(&serde_json::json!(["x", "x"]), "$.classes")
+            .unwrap_err()
+            .to_string();
+        assert!(
+            error.contains("$.classes: array violates uniqueItems"),
+            "{error}"
+        );
+    }
+
+    #[test]
+    fn every_unique_items_declaration_is_compensated() {
+        // Keep this in sync with `require_unique` call sites.
+        let declared = POLICY.to_string().matches("\"uniqueItems\"").count();
+        assert_eq!(
+            declared, 1,
+            "policy remediation_classes is the only declaration"
+        );
+        for schema in [
+            &*PROJECT,
+            &*EVIDENCE,
+            &*REQUIREMENTS,
+            &*EXCEPTIONS,
+            &*MAPPINGS,
+        ] {
+            assert!(!schema.to_string().contains("\"uniqueItems\""));
+        }
+    }
+}

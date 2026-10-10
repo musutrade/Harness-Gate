@@ -43,7 +43,9 @@ pub fn validate_policy_document(policy: &Value) -> Result<()> {
     super::json::domain(policy)?;
     schema::shape(policy, &schema::POLICY, None)?;
     index(&policy["rules"], "id", "policy ID")?;
-    for rule in array(&policy["rules"]) {
+    for (i, rule) in array(&policy["rules"]).iter().enumerate() {
+        let classes = format!("$.rules[{i}].remediation_classes");
+        schema::require_unique(&rule["remediation_classes"], &classes)?;
         validate_rule_metric(rule)?;
         validate_scope(&rule["scope"], false)?;
         if rule["scope"]["kind"] == "relationship" {
@@ -128,7 +130,9 @@ pub fn validate_policy(policy: &Value, project: &Value) -> Result<()> {
     schema::shape(policy, &schema::POLICY, None)?;
     project::validate_project(project)?;
     index(&policy["rules"], "id", "policy ID")?;
-    for rule in array(&policy["rules"]) {
+    for (i, rule) in array(&policy["rules"]).iter().enumerate() {
+        let classes = format!("$.rules[{i}].remediation_classes");
+        schema::require_unique(&rule["remediation_classes"], &classes)?;
         validate_rule_metric(rule)?;
         let scope = &rule["scope"];
         validate_scope(scope, false)?;
