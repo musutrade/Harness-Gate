@@ -22,9 +22,9 @@ sha256 = "bbb7f1d90d741f41c6cb761f1433f4cb7c8ca168fac0082bd366a9377ae149a8"
 [paths.test_source]
 path = "src/process/tests.rs"
 symbol = "timeout_terminates_the_task"
-start = 11
-end = 23
-sha256 = "f457244e862fb38c8bbe65740c7e223f5ef2674fd4339d92a6ce8b9eab2c24c8"
+start = 34
+end = 46
+sha256 = "e4df8a76ec42569ad1fc189b51f132f8977efb2eaeeb915a64c5d76405b2691e"
 [[paths.probes]]
 line = 253
 column = 24
@@ -80,9 +80,9 @@ sha256 = "bbb7f1d90d741f41c6cb761f1433f4cb7c8ca168fac0082bd366a9377ae149a8"
 [paths.test_source]
 path = "src/process/tests.rs"
 symbol = "timeout_terminates_process_tree_without_a_descendant_leak"
-start = 156
-end = 197
-sha256 = "f457244e862fb38c8bbe65740c7e223f5ef2674fd4339d92a6ce8b9eab2c24c8"
+start = 179
+end = 220
+sha256 = "e4df8a76ec42569ad1fc189b51f132f8977efb2eaeeb915a64c5d76405b2691e"
 [[paths.probes]]
 line = 253
 column = 24
@@ -250,7 +250,7 @@ path = "src/verify/report.rs"
 symbol = "write_report_file"
 start = 1243
 end = 1253
-sha256 = "e4496b6b707e070635c66751ff57f66ff3d9195e3a1e113a27faeeed68dd981b"
+sha256 = "8f4e46f879d2e1f3a952632dbfa5bc8471f9744e560dbc664a80e50724cf3fb0"
 
 [paths.test_source]
 path = "src/verify/tests.rs"
@@ -280,14 +280,14 @@ path = "src/verify/report.rs"
 symbol = "verify_manifest_without_result"
 start = 1822
 end = 1909
-sha256 = "e4496b6b707e070635c66751ff57f66ff3d9195e3a1e113a27faeeed68dd981b"
+sha256 = "8f4e46f879d2e1f3a952632dbfa5bc8471f9744e560dbc664a80e50724cf3fb0"
 
 [paths.test_source]
 path = "src/verify/report.rs"
 symbol = "manifest_records_digests_and_detects_tampering"
-start = 3405
-end = 3458
-sha256 = "e4496b6b707e070635c66751ff57f66ff3d9195e3a1e113a27faeeed68dd981b"
+start = 3407
+end = 3460
+sha256 = "8f4e46f879d2e1f3a952632dbfa5bc8471f9744e560dbc664a80e50724cf3fb0"
 
 [[paths.probes]]
 line = 1905
@@ -369,13 +369,13 @@ path = "src/process/adapter.rs"
 symbol = "claim"
 start = 193
 end = 223
-sha256 = "ef7a3a0c7617f13f48db4e9d24279dc4d53fc2ed84788c7f4d3e195b98a228d4"
+sha256 = "0f3af3c911b38f7fac2c337881bb24fc57566da1c34d59daec05a856335ffda0"
 [paths.test_source]
 path = "src/process/adapter.rs"
 symbol = "replay_retention_covers_the_entire_accepted_window"
-start = 1811
-end = 1845
-sha256 = "ef7a3a0c7617f13f48db4e9d24279dc4d53fc2ed84788c7f4d3e195b98a228d4"
+start = 2044
+end = 2078
+sha256 = "0f3af3c911b38f7fac2c337881bb24fc57566da1c34d59daec05a856335ffda0"
 [[paths.probes]]
 line = 205
 column = 9
@@ -398,13 +398,13 @@ path = "src/process/replay.rs"
 symbol = "claim"
 start = 103
 end = 128
-sha256 = "6c287a1a885762f094b9f75b962a4e8997e76d52a188371a0cf7506a917648be"
+sha256 = "f7a87b71cebaaf93e80a3927cce9fa0fc7592f4f0c206076458359eaaf6f7ff6"
 [paths.test_source]
 path = "src/process/adapter.rs"
 symbol = "durable_nonce_claims_are_atomic_between_independent_hosts"
-start = 1869
-end = 1894
-sha256 = "ef7a3a0c7617f13f48db4e9d24279dc4d53fc2ed84788c7f4d3e195b98a228d4"
+start = 2102
+end = 2127
+sha256 = "0f3af3c911b38f7fac2c337881bb24fc57566da1c34d59daec05a856335ffda0"
 [[paths.probes]]
 line = 126
 column = 9
