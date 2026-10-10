@@ -156,12 +156,16 @@ while True:
                     let fields: Vec<_> = state.split_whitespace().collect();
                     assert_eq!(fields.len(), 2, "malformed ps result: {state}");
                     assert_eq!(fields[0].parse::<i32>().unwrap(), pid);
-                    assert!(
-                        fields[1].as_bytes()[0].is_ascii_alphabetic(),
-                        "malformed process state: {state}"
-                    );
+                    // BSD/macOS state strings are a run state surrounded by
+                    // flags, so strip both sides before reading the state.
+                    let run = fields[1]
+                        .trim_end_matches(|c: char| !c.is_ascii_alphabetic())
+                        .trim_start_matches(|c: char| !c.is_ascii_alphabetic());
+                    assert!(!run.is_empty(), "malformed process state: {state}");
                     // Zombies are stopped, though their new parent owns reap.
-                    if fields[1].starts_with('Z') {
+                    // A process already trying to exit has been reparented as
+                    // well: it will never run its fixture loop again.
+                    if run.starts_with(['Z', 'E']) {
                         return;
                     }
                 }
