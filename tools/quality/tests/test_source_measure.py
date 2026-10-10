@@ -438,7 +438,10 @@ fn both() {
                                          byte_span(source, original[field]))
     def test_review_low_sources_inventory_and_instrumentation(self):
         paths = ('audit/runner.rs', 'config/loader.rs', 'config/migration.rs', 'config/model.rs',
-                 'process/signal.rs', 'secrets/config.rs')
+                 'secrets/config.rs')
+        # process/signal.rs stays outside: its base revision uses statement-level
+        # cfg attributes, which the analyzer does not support (#317).
+        self.assertNotIn('process/signal.rs', SOURCE_FILES)
         for path in paths:
             self.assertIn(path, SOURCE_FILES)
             source_file = ROOT / 'tools/harness-gate/src' / path
@@ -459,9 +462,6 @@ fn both() {
                             self.assertEqual((*original_point(mapped[:2], edits),
                                               *original_point(mapped[2:], edits)),
                                              byte_span(source, original[field]))
-        signal = ast(ROOT / 'tools/harness-gate/src/process/signal.rs', self.binary,
-                     compiler_configuration('x86_64-pc-windows-msvc'))
-        self.assertNotIn('install_unix_handler', [s['name'] for s in signal['symbols']])
 
     def test_net_policy_source_inventory_and_instrumentation(self):
         path = 'net_policy.rs'
