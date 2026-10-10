@@ -74,8 +74,8 @@ done
 cat >"$FAKE_BIN/curl" <<'EOF'
 #!/usr/bin/env bash
 set -Eeuo pipefail
-expected=(--fail --show-error --location --proto '=https' --tlsv1.2 --retry 3 --retry-all-errors --output)
-[[ "$#" -eq 12 ]] || { printf 'unexpected curl argv: %s\n' "$*" >&2; exit 2; }
+expected=(--fail --show-error --location --proto '=https' --tlsv1.2 --max-redirs 10 --retry 3 --retry-all-errors --output)
+[[ "$#" -eq 14 ]] || { printf 'unexpected curl argv: %s\n' "$*" >&2; exit 2; }
 for argument in "${expected[@]}"; do
     [[ "${1:-}" == "$argument" ]] || { printf 'unexpected curl option: %s\n' "${1:-}" >&2; exit 2; }
     shift
