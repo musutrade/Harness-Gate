@@ -23,7 +23,15 @@ built-in steps.
 Before dispatch, Harness-Gate verifies the adapter binary digest and complete
 request signature, checks the supported protocol/result-schema matrix, checks
 the nonce validity window and replay guard, and rejects undeclared
-capabilities or invalid environment keys. A timeout, output-budget breach, or
+capabilities or invalid environment keys. The digest is computed from one
+held file handle opened without following symlinks; immediately before spawn
+the host re-checks that the handle and the canonical path still have the same
+file identity (Unix: device, inode, size, mtime and ctime; Windows: size and
+mtime, with the handle opened without write/delete sharing). A rename, symlink
+swap or rewrite after hashing fails with `ADAPTER_PROTOCOL_FAILURE`. The
+remaining window is between that final check and `execve`; a host that must
+exclude it should keep adapter executables in directories writable only by the
+host. A timeout, output-budget breach, or
 crash fails only the adapter node; dependency propagation, cancellation,
 leases, and report publication remain scheduler responsibilities. Upgrades
 require a new signed digest and can be rolled back by selecting the previous

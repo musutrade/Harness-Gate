@@ -4,7 +4,6 @@ use super::scanner::{resolve_rule_roots, scan_arch_rules, scan_files};
 use super::{log_parser, AuditError, AuditOutcome};
 use crate::utils::fs as output_fs;
 use anyhow::{Context, Result};
-use std::fs;
 use std::path::Path;
 
 pub fn run(
@@ -13,7 +12,7 @@ pub fn run(
     report_dir: &Path,
     emit_json: bool,
 ) -> std::result::Result<AuditOutcome, AuditError> {
-    let config_str = fs::read_to_string(config_path)
+    let config_str = crate::config::read_config_source(config_path)
         .with_context(|| format!("read audit config {}", config_path.display()))
         .map_err(AuditError::configuration)?;
     let config = parse_audit_config(&config_str)

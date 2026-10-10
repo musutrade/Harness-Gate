@@ -1,11 +1,12 @@
 import json
+import os
 from pathlib import Path
-import subprocess
 import tempfile
 import unittest
 from fractions import Fraction
 from unittest.mock import patch
 from measure import crap, line_coverage, measure, source_inventories, strict_json
+from test_toolchain_compatibility import logged_run, retained_measure, retained_root, tool_identity
 
 HERE = Path(__file__).resolve().parent
 
@@ -38,8 +39,11 @@ class ArithmeticTests(unittest.TestCase):
 class NativeTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.tmp = tempfile.TemporaryDirectory(prefix='rust-source-native-test-')
-        cls.root = Path(cls.tmp.name)
+        cls.root, cls.tmp = retained_root('rust-source-native-test-')
+        if cls.tmp:
+            cls.addClassCleanup(cls.tmp.cleanup)
+        cls.inventory = Path(os.environ.get('RUST_SOURCE_INVENTORY', HERE / 'inventory'))
+        identity = tool_identity(cls.root)
         cls.source = cls.root / 'sample.rs'
         cls.source.write_text('''fn ten(x: bool) { if x {} if x {} if x {} if x {} if x {} if x {} if x {} if x {} if x {} }
 fn eleven(x: bool) { if x {} if x {} if x {} if x {} if x {} if x {} if x {} if x {} if x {} if x {} }
@@ -47,23 +51,18 @@ async fn unpolled() { if true { std::hint::black_box(1); } }
 fn main() { ten(true); eleven(true); std::mem::drop(unpolled()); }
 ''')
         binary = cls.root / 'sample'
-        subprocess.run(['rustc', '--edition=2024', '-C', 'instrument-coverage', str(cls.source), '-o', str(binary)], check=True, capture_output=True)
-        import os
-        subprocess.run([str(binary)], check=True, env=dict(os.environ, LLVM_PROFILE_FILE=str(cls.root / 'raw-%p.profraw')))
-        sysroot = Path(subprocess.check_output(['rustc', '--print', 'sysroot'], text=True).strip())
-        host = next(s.split(': ')[1] for s in subprocess.check_output(['rustc', '-vV'], text=True).splitlines() if s.startswith('host: '))
-        tools = sysroot / 'lib/rustlib' / host / 'bin'
+        logged_run(cls.root, 'compile', ['rustc', '--edition=2024', '-C', 'instrument-coverage', cls.source, '-o', binary])
+        logged_run(cls.root, 'execute', [binary], env=dict(os.environ, LLVM_PROFILE_FILE=str(cls.root / 'raw-%p.profraw')))
+        tools = identity['tools']
         profile = cls.root / 'merged.profdata'
-        subprocess.run([str(tools / 'llvm-profdata'), 'merge', '-sparse', *map(str, cls.root.glob('*.profraw')), '-o', str(profile)], check=True, capture_output=True)
+        logged_run(cls.root, 'merge', [tools['llvm-profdata']['path'], 'merge', '-sparse', *cls.root.glob('*.profraw'), '-o', profile])
         cls.llvm = cls.root / 'llvm.json'
-        with cls.llvm.open('wb') as output:
-            subprocess.run([str(tools / 'llvm-cov'), 'export', '-instr-profile=' + str(profile), str(binary)], check=True, stdout=output, stderr=subprocess.PIPE)
-
-    @classmethod
-    def tearDownClass(cls): cls.tmp.cleanup()
+        exported = logged_run(cls.root, 'export', [tools['llvm-cov']['path'], 'export', '-instr-profile=' + str(profile), binary])
+        cls.llvm.write_bytes(exported.stdout)
 
     def result(self, path=None):
-        return measure(self.root, ['sample.rs'], path or self.llvm, HERE / 'inventory')
+        return retained_measure(self.root, self._testMethodName,
+                                lambda: measure(self.root, ['sample.rs'], path or self.llvm, self.inventory))
 
     def test_real_native_threshold_and_unpolled_async(self):
         rows = {f['name']: f for f in self.result()['functions']}
@@ -75,7 +74,7 @@ fn main() { ten(true); eleven(true); std::mem::drop(unpolled()); }
     def mutate(self, action):
         data = json.loads(self.llvm.read_text())
         action(data['data'][0]['functions'])
-        p = self.root / 'tampered.json'
+        p = self.root / (self._testMethodName + '-tampered.json')
         p.write_text(json.dumps(data))
         return p
 
@@ -110,7 +109,7 @@ fn main() { ten(true); eleven(true); std::mem::drop(unpolled()); }
         self.assertIn('no measurements produced', message)
 
     def test_ambiguous_and_missing_anchors_are_both_reported(self):
-        inventories = source_inventories(self.root, ['sample.rs'], HERE / 'inventory')
+        inventories = source_inventories(self.root, ['sample.rs'], self.inventory)
         first, second = inventories['sample.rs'][:2]
         second['anchors'].append(first['anchors'][0])
         def change(rows):

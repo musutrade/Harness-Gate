@@ -42,48 +42,73 @@ fn expression_attributes(expression: &mut Expr) -> Option<&mut Vec<Attribute>> {
         Expr::If(n) => Some(&mut n.attrs),
         Expr::Closure(n) => Some(&mut n.attrs),
         Expr::Async(n) => Some(&mut n.attrs),
+        Expr::Try(n) => Some(&mut n.attrs),
+        Expr::Unsafe(n) => Some(&mut n.attrs),
         _ => None,
     }
 }
 
 impl Configuration {
-    fn predicate(&self, meta: &Meta) -> syn::Result<bool> {
+    fn atom(&self, meta: &Meta) -> syn::Result<bool> {
         match meta {
             Meta::Path(path) if path.is_ident("test") => Ok(false),
             Meta::Path(path) if path.is_ident("unix") || path.is_ident("windows") => {
                 Ok(self.values.contains(&path.get_ident().unwrap().to_string()))
             }
+            Meta::NameValue(value) if value.path.is_ident("target_os") => {
+                if let Expr::Lit(expression) = &value.value {
+                    if let syn::Lit::Str(name) = &expression.lit {
+                        let name = name.value();
+                        if matches!(name.as_str(), "linux" | "macos" | "windows") {
+                            return Ok(self.values.contains(&format!("target_os={name:?}")));
+                        }
+                    }
+                }
+                Err(syn::Error::new_spanned(meta, "unsupported cfg predicate"))
+            }
+            _ => Err(syn::Error::new_spanned(meta, "unsupported cfg predicate")),
+        }
+    }
+
+    fn predicate(&self, meta: &Meta) -> syn::Result<bool> {
+        match meta {
             Meta::List(list) if list.path.is_ident("not") => {
                 let inner: Meta = syn::parse2(list.tokens.clone())?;
-                if !matches!(inner, Meta::Path(_)) {
-                    return Err(syn::Error::new_spanned(meta, "unsupported cfg predicate"));
+                match &inner {
+                    // Preserve the old not(atom) boundary; only a bounded any
+                    // is additionally removable. Other nesting stays rejected.
+                    Meta::Path(_) => Ok(!self.atom(&inner)?),
+                    Meta::List(list) if list.path.is_ident("any") => Ok(!self.predicate(&inner)?),
+                    _ => Err(syn::Error::new_spanned(meta, "unsupported cfg predicate")),
                 }
-                Ok(!self.predicate(&inner)?)
             }
-            Meta::List(list) if list.path.is_ident("all") => {
+            Meta::List(list) if list.path.is_ident("all") || list.path.is_ident("any") => {
                 let predicates = list.parse_args_with(
                     syn::punctuated::Punctuated::<Meta, syn::Token![,]>::parse_terminated,
                 )?;
-                // Existing production inventories use all(test, unix). Validate
-                // every atom even when test=false; never hide unsupported syntax.
+                let all = list.path.is_ident("all");
+                // Validate every operand before reducing, even when test=false
+                // or an earlier operand decides the result. all retains its
+                // existing path-only grammar; any accepts only known atoms.
                 let values = predicates
                     .iter()
                     .map(|meta| {
-                        if !matches!(meta, Meta::Path(_)) {
+                        if all && !matches!(meta, Meta::Path(_)) {
                             return Err(syn::Error::new_spanned(
                                 meta,
                                 "unsupported cfg all operand",
                             ));
                         }
-                        self.predicate(meta)
+                        self.atom(meta)
                     })
                     .collect::<syn::Result<Vec<_>>>()?;
-                Ok(values.into_iter().all(|value| value))
+                Ok(if all {
+                    values.into_iter().all(|value| value)
+                } else {
+                    values.into_iter().any(|value| value)
+                })
             }
-            _ => Err(syn::Error::new_spanned(
-                meta,
-                "unsupported cfg predicate (only unix/windows/test, not(atom), all(atoms))",
-            )),
+            _ => self.atom(meta),
         }
     }
 
@@ -197,6 +222,23 @@ impl VisitMut for Configuration {
         visit_mut::visit_block_mut(self, node);
     }
     fn visit_expr_mut(&mut self, node: &mut Expr) {
+        // A complete statement's attributes were already consumed by
+        // visit_block_mut. Residual Try attributes belong to a nested position
+        // that cannot be removed as a statement. Reject before active() can
+        // strip even a true predicate and accidentally admit that position.
+        if let Expr::Try(expression) = node {
+            if expression
+                .attrs
+                .iter()
+                .any(|attr| attr.path().is_ident("cfg") || attr.path().is_ident("cfg_attr"))
+            {
+                self.errors.push(
+                    "unsupported cfg try expression position; only removable statements are supported"
+                        .into(),
+                );
+                return;
+            }
+        }
         let location = node.span();
         if let Some(attrs) = expression_attributes(node) {
             if !self.active(attrs, location) {
@@ -208,6 +250,16 @@ impl VisitMut for Configuration {
             }
         }
         visit_mut::visit_expr_mut(self, node);
+    }
+    fn visit_expr_match_mut(&mut self, node: &mut syn::ExprMatch) {
+        node.arms.retain_mut(|arm| {
+            // The original whole-arm span includes attributes, guard, body and
+            // comma. Filtering before Inventory removes its CC and all owners;
+            // byte intervals preserve any active neighbor on the same line.
+            let location = arm.span();
+            self.active(&mut arm.attrs, location)
+        });
+        visit_mut::visit_expr_match_mut(self, node);
     }
     fn visit_fields_named_mut(&mut self, node: &mut syn::FieldsNamed) {
         node.named = std::mem::take(&mut node.named)

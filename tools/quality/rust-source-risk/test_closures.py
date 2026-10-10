@@ -2,11 +2,10 @@
 import json
 import os
 from pathlib import Path
-import subprocess
-import tempfile
 import unittest
 
 from measure import measure
+from test_toolchain_compatibility import logged_run, retained_measure, retained_root, tool_identity
 
 HERE = Path(__file__).resolve().parent
 
@@ -14,34 +13,31 @@ HERE = Path(__file__).resolve().parent
 class ClosureNativeTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.tmp = tempfile.TemporaryDirectory(prefix="rust-source-closures-")
-        cls.addClassCleanup(cls.tmp.cleanup)
-        cls.root = Path(cls.tmp.name)
+        cls.root, cls.tmp = retained_root('rust-source-closures-')
+        if cls.tmp:
+            cls.addClassCleanup(cls.tmp.cleanup)
         cls.inventory = Path(os.environ.get("RUST_SOURCE_INVENTORY", HERE / "inventory"))
-        sysroot = Path(subprocess.check_output(["rustc", "--print", "sysroot"], text=True).strip())
-        host = next(line.split(": ")[1] for line in subprocess.check_output(
-            ["rustc", "-vV"], text=True).splitlines() if line.startswith("host: "))
-        tools = sysroot / "lib/rustlib" / host / "bin"
+        tools = tool_identity(cls.root)['tools']
         for name in ("closures", "closure_without_counter"):
             source = cls.root / (name + ".rs")
             source.write_text((HERE / "fixtures" / source.name).read_text())
             binary = cls.root / name
-            subprocess.run(["rustc", "--edition=2024", "-C", "instrument-coverage",
-                            str(source), "-o", str(binary)], check=True, capture_output=True)
+            logged_run(cls.root, name + '-compile', ["rustc", "--edition=2024", "-C", "instrument-coverage",
+                                                    source, "-o", binary])
             raw = cls.root / (name + ".profraw")
-            subprocess.run([str(binary)], check=True,
-                           env=dict(os.environ, LLVM_PROFILE_FILE=str(raw)))
+            logged_run(cls.root, name + '-execute', [binary], env=dict(os.environ, LLVM_PROFILE_FILE=str(raw)))
             profile = cls.root / (name + ".profdata")
-            subprocess.run([str(tools / "llvm-profdata"), "merge", "-sparse", str(raw),
-                            "-o", str(profile)], check=True, capture_output=True)
-            with (cls.root / (name + ".json")).open("wb") as output:
-                subprocess.run([str(tools / "llvm-cov"), "export",
-                                "-instr-profile=" + str(profile), str(binary)],
-                               check=True, stdout=output, stderr=subprocess.PIPE)
+            logged_run(cls.root, name + '-merge', [tools['llvm-profdata']['path'], "merge", "-sparse", raw,
+                                                  "-o", profile])
+            exported = logged_run(cls.root, name + '-export', [tools['llvm-cov']['path'], "export",
+                                                              "-instr-profile=" + str(profile), binary])
+            (cls.root / (name + '.json')).write_bytes(exported.stdout)
 
     def result(self, name="closures", llvm=None):
-        return measure(self.root, [name + ".rs"], llvm or self.root / (name + ".json"),
-                       self.inventory)["functions"]
+        result = retained_measure(self.root, self._testMethodName,
+                                  lambda: measure(self.root, [name + ".rs"], llvm or self.root / (name + ".json"),
+                                                  self.inventory))
+        return result['functions']
 
     def row(self, rows, binding):
         lines = (self.root / "closures.rs").read_text().splitlines()

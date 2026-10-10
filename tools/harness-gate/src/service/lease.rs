@@ -1,3 +1,4 @@
+use super::report_directory::ReportDirectoryGuard;
 use crate::config::ContainerRuntimeKind;
 use crate::project::Project;
 use anyhow::{bail, Context, Result};
@@ -103,6 +104,8 @@ pub(crate) struct ResourceLease {
     stop_heartbeat: Option<mpsc::Sender<()>>,
     heartbeat: Option<JoinHandle<()>>,
     release_on_drop: bool,
+    // Closed only after Drop stops heartbeat and attempts the checked release.
+    report_directory_guard: Option<ReportDirectoryGuard>,
 }
 
 impl ResourceLease {
@@ -152,6 +155,20 @@ impl ResourceLease {
             );
         }
 
+        let report_directory_guard = if resource_kind_is_report(&record) {
+            let guard = ReportDirectoryGuard::try_acquire(project, &record.invocation_id)?
+                .ok_or_else(|| {
+                    anyhow::anyhow!("report-directory lease conflict: resource is in use")
+                })?;
+            guard.validate_record(&record)?;
+            // Invalidate any earlier release before creating/renewing a marker.
+            // A failed allocation or failed release never certifies completion.
+            guard.invalidate_release()?;
+            Some(guard)
+        } else {
+            None
+        };
+
         loop {
             match create_record(&path, &record) {
                 Ok(()) => {
@@ -190,6 +207,7 @@ impl ResourceLease {
                         stop_heartbeat: Some(stop_heartbeat),
                         heartbeat: Some(heartbeat),
                         release_on_drop: true,
+                        report_directory_guard,
                     });
                 }
                 Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
@@ -197,7 +215,19 @@ impl ResourceLease {
                         format!("inspect existing lease for resource {resource_id:?}")
                     })?;
                     validate_record(&existing, &resource_id, &path, &directory, project)?;
-                    if !is_stale(&existing, epoch_seconds()) {
+                    if resource_kind_is_report(&record) {
+                        // Retained report markers must not be converted into
+                        // fresh ownership through the generic expiry fallback.
+                        bail!("report-directory marker is retained; explicit proven cleanup is required");
+                    }
+                    let state = lease_state(&existing, epoch_seconds());
+                    if state == LeaseState::AliveIdentityUnknown {
+                        bail!(
+                            "LEASE_OWNERSHIP_UNCERTAIN: lease holder pid {} for {resource_id:?} is alive but its process identity cannot be read; resource retained",
+                            existing.pid
+                        );
+                    }
+                    if state != LeaseState::Stale {
                         bail!(
                             "resource lease conflict for {resource_id:?}: invocation {} (pid {}) owns it",
                             existing.invocation_id,
@@ -235,10 +265,21 @@ impl ResourceLease {
     /// cannot prove current ownership, dropping this value keeps the marker so
     /// an operator can inspect it instead of silently deleting it.
     pub(crate) fn release_checked(mut self) -> Result<()> {
+        self.finish_release()
+    }
+
+    fn finish_release(&mut self) -> Result<()> {
         self.stop_heartbeat();
         let result = self.release();
         self.release_on_drop = false;
         result
+    }
+
+    #[cfg(test)]
+    pub(crate) fn release_before_guard_close(&mut self) -> Result<()> {
+        // Exercise the real checked-release transition while a child process
+        // pauses before dropping the same guard that production Drop closes.
+        self.finish_release()
     }
 
     /// Bind a newly created runtime object to this lease. The object ID is
@@ -278,20 +319,43 @@ impl ResourceLease {
 
     pub(crate) fn release(&self) -> Result<()> {
         self.ensure_heartbeat_healthy()?;
+        if self.report_directory_guard.is_some() && self.heartbeat.is_some() {
+            bail!("report-directory release requires stopped heartbeat");
+        }
         let record = self
             .record
             .lock()
             .map_err(|_| anyhow::anyhow!("lease record lock was poisoned"))?;
         let contents = match fs::read(&self.path) {
             Ok(contents) => contents,
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                if self.report_directory_guard.is_some() {
+                    bail!("report-directory marker disappeared before checked release");
+                }
+                return Ok(());
+            }
             Err(error) => return Err(error).with_context(|| "read lease before release"),
         };
         let current: LeaseRecord =
             serde_json::from_slice(&contents).context("parse lease before release")?;
         ensure_owner(&current, &record)?;
+        // Persist the certificate while the JSON marker still protects the
+        // resource. A certificate write/sync failure leaves that marker intact;
+        // nothing fallible follows a successful marker removal.
+        if let Some(guard) = &self.report_directory_guard {
+            guard.mark_released(&record)?;
+        }
         match fs::remove_file(&self.path) {
             Ok(()) => Ok(()),
+            Err(error)
+                if error.kind() == std::io::ErrorKind::NotFound
+                    && self.report_directory_guard.is_some() =>
+            {
+                if let Some(guard) = &self.report_directory_guard {
+                    let _ = guard.invalidate_release();
+                }
+                Err(error).context("report-directory marker disappeared during release")
+            }
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
             Err(error) => {
                 Err(error).with_context(|| format!("release lease {}", self.path.display()))
@@ -432,7 +496,78 @@ fn cleanup_with_runtime<O: RuntimeOperations + ?Sized>(
             ));
             continue;
         }
-        let stale = is_stale(&record, epoch_seconds());
+        // Report retention, allocation, release and operator cleanup share this
+        // guard. A heartbeat's JSON replacement cannot look like a released lease.
+        let report_guard = if resource_kind_is_report(&record) {
+            match ReportDirectoryGuard::try_acquire(project, &record.invocation_id) {
+                Ok(Some(guard)) => {
+                    let checked = read_record(&path).and_then(|current| {
+                        ensure_owner(&current, &record)?;
+                        guard.validate_record(&current)
+                    });
+                    if let Err(error) = checked {
+                        report
+                            .failures
+                            .push(format!("{}: {error:#}", path.display()));
+                        continue;
+                    }
+                    Some(guard)
+                }
+                Ok(None) => {
+                    report.active += 1;
+                    report.resources.push(CleanupResource {
+                        resource_id: record.resource_id,
+                        resource_kind: record.resource_kind,
+                        invocation_id: record.invocation_id,
+                        state: "active".into(),
+                        action: "retained".into(),
+                        lease_file: path.display().to_string(),
+                    });
+                    continue;
+                }
+                Err(error) => {
+                    report
+                        .failures
+                        .push(format!("{}: {error:#}", path.display()));
+                    continue;
+                }
+            }
+        } else {
+            None
+        };
+        let stale = if report_guard.is_some() {
+            // Expiry is not proof of death when process observation is unknown.
+            match report_owner_has_ended(&record) {
+                Some(ended) => ended,
+                None => {
+                    report.failures.push(format!(
+                        "{}: LEASE_OWNERSHIP_UNCERTAIN: report owner state is unknown; retained",
+                        path.display()
+                    ));
+                    continue;
+                }
+            }
+        } else {
+            match lease_state(&record, epoch_seconds()) {
+                LeaseState::AliveIdentityUnknown => {
+                    report.active += 1;
+                    report.failures.push(format!(
+                        "{}: LEASE_OWNERSHIP_UNCERTAIN: holder pid {} is alive but its process identity cannot be read; resource retained",
+                        record.resource_id, record.pid
+                    ));
+                    report.resources.push(CleanupResource {
+                        resource_id: record.resource_id,
+                        resource_kind: record.resource_kind,
+                        invocation_id: record.invocation_id,
+                        state: "ownership-uncertain".into(),
+                        action: "retained".into(),
+                        lease_file: path.display().to_string(),
+                    });
+                    continue;
+                }
+                state => state == LeaseState::Stale,
+            }
+        };
         let lease_file = path.display().to_string();
         if !identity_is_proven(&record) {
             if stale {
@@ -547,19 +682,24 @@ fn read_record(path: &Path) -> Result<LeaseRecord> {
 
 fn write_record(path: &Path, record: &LeaseRecord) -> Result<()> {
     let counter = TEMP_COUNTER.fetch_add(1, Ordering::Relaxed);
-    let temporary = path.with_file_name(format!(".lease-{counter}.tmp"));
-    let result = (|| -> Result<()> {
-        let mut file = OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .open(&temporary)
-            .with_context(|| format!("create temporary lease {}", temporary.display()))?;
+    let temporary = path.with_file_name(format!(".lease-{}-{counter}.tmp", std::process::id()));
+    // A failed create_new grants no ownership of this path. In particular,
+    // cleanup must never unlink another writer's pre-existing temporary.
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&temporary)
+        .with_context(|| format!("create temporary lease {}", temporary.display()))?;
+    let publish_from = temporary.as_path();
+    // This closure owns the successfully created handle. Every early error
+    // closes it before the outer cleanup, including on Windows.
+    let result = (move || -> Result<()> {
         let contents = serde_json::to_vec_pretty(record).context("serialize lease")?;
         file.write_all(&contents)?;
         file.write_all(b"\n")?;
         file.sync_all()?;
         drop(file);
-        publish_replacement(&temporary, path)?;
+        publish_replacement(publish_from, path)?;
         Ok(())
     })();
     if result.is_err() {
@@ -665,15 +805,65 @@ fn ensure_owner(current: &LeaseRecord, expected: &LeaseRecord) -> Result<()> {
     Ok(())
 }
 
+/// Ownership state of an existing lease as observed by this host.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum LeaseState {
+    Active,
+    Stale,
+    /// The holder PID is alive but its start identity cannot be read, so PID
+    /// reuse cannot be distinguished from the original owner. Expiry is not
+    /// proof of death here; the lease must be retained (#311).
+    AliveIdentityUnknown,
+}
+
+#[cfg(test)]
 fn is_stale(record: &LeaseRecord, now: u64) -> bool {
-    match process_alive(record.pid) {
-        Some(true) => match process_start_identity_checked(record.pid) {
-            Some(identity) if identity != record.process_start_identity => true,
-            Some(_) => false,
-            None => now > record.expires_at,
+    lease_state(record, now) == LeaseState::Stale
+}
+
+#[cfg(not(test))]
+fn lease_state(record: &LeaseRecord, now: u64) -> LeaseState {
+    classify_lease(record, now, process_alive(record.pid), || {
+        process_start_identity_checked(record.pid)
+    })
+}
+
+/// Test builds may replace host process observation for one thread.
+#[cfg(test)]
+fn lease_state(record: &LeaseRecord, now: u64) -> LeaseState {
+    let observe = *tests::OBSERVE_PROCESS
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner);
+    match observe {
+        Some(observe) => {
+            let (alive, identity) = observe(record.pid);
+            classify_lease(record, now, alive, || identity)
+        }
+        None => classify_lease(record, now, process_alive(record.pid), || {
+            process_start_identity_checked(record.pid)
+        }),
+    }
+}
+
+fn classify_lease(
+    record: &LeaseRecord,
+    now: u64,
+    alive: Option<bool>,
+    identity: impl FnOnce() -> Option<String>,
+) -> LeaseState {
+    let expired = if now > record.expires_at {
+        LeaseState::Stale
+    } else {
+        LeaseState::Active
+    };
+    match alive {
+        Some(true) => match identity() {
+            Some(identity) if identity != record.process_start_identity => LeaseState::Stale,
+            Some(_) => LeaseState::Active,
+            None => LeaseState::AliveIdentityUnknown,
         },
-        Some(false) => true,
-        None => now > record.expires_at,
+        Some(false) => LeaseState::Stale,
+        None => expired,
     }
 }
 
@@ -712,7 +902,22 @@ fn identity_is_proven(record: &LeaseRecord) -> bool {
     }
 }
 
-fn resource_key(resource_id: &str) -> String {
+fn resource_kind_is_report(record: &LeaseRecord) -> bool {
+    record.resource_kind == "report-directory"
+}
+
+fn report_owner_has_ended(record: &LeaseRecord) -> Option<bool> {
+    if !identity_is_proven(record) {
+        return None;
+    }
+    if process_alive(record.pid) == Some(false) {
+        return Some(true);
+    }
+    process_start_identity_checked(record.pid)
+        .map(|identity| identity != record.process_start_identity)
+}
+
+pub(super) fn resource_key(resource_id: &str) -> String {
     let mut digest = Sha256::new();
     digest.update(resource_id.as_bytes());
     let encoded = format!("{:x}", digest.finalize());
@@ -804,7 +1009,7 @@ fn verify_runtime_record<O: RuntimeOperations + ?Sized>(
     Ok(())
 }
 
-fn lease_directory(project: &Project) -> Result<PathBuf> {
+pub(super) fn lease_directory(project: &Project) -> Result<PathBuf> {
     let repository = project
         .root
         .canonicalize()
@@ -957,6 +1162,13 @@ fn process_alive(pid: u32) -> Option<bool> {
 #[cfg(test)]
 mod tests {
     use super::process_start_identity_checked;
+
+    type ProcessObservation = fn(u32) -> (Option<bool>, Option<String>);
+
+    /// Test-only replacement for host process observation. Each nextest test
+    /// runs in its own process, so a process-global override is isolated.
+    pub(super) static OBSERVE_PROCESS: std::sync::Mutex<Option<ProcessObservation>> =
+        std::sync::Mutex::new(None);
     use super::{
         cleanup_with_runtime, is_stale, ownership_labels, read_record, resource_key, write_record,
         LeaseRecord, RuntimeOperations, LEASE_SCHEMA_VERSION, OWNER_MARKER,
@@ -1222,7 +1434,7 @@ mod tests {
     #[test]
     fn heartbeat_failure_blocks_release_and_retains_the_marker() {
         let (_workspace, project) = runtime_project("lease-heartbeat-failure");
-        let lease = super::ResourceLease::acquire(
+        let mut lease = super::ResourceLease::acquire(
             &project,
             "step:heartbeat-failure",
             "workspace",
@@ -1232,14 +1444,15 @@ mod tests {
         )
         .expect("acquire heartbeat lease");
         let path = lease.path.clone();
-        let original = std::fs::read(&path).expect("read ownership evidence");
         // Make the real heartbeat's filesystem read fail, without racing an
         // in-flight renewal or replacing its error field with a mock result.
-        {
+        let original = {
             let _record = lease.record.lock().expect("lock renewal");
+            let original = std::fs::read(&path).expect("read ownership evidence");
             std::fs::remove_file(&path).expect("remove marker");
             std::fs::create_dir(&path).expect("obstruct marker read");
-        }
+            original
+        };
         let deadline = Instant::now() + Duration::from_secs(10);
         while lease
             .heartbeat_error
@@ -1253,6 +1466,10 @@ mod tests {
             );
             std::thread::sleep(Duration::from_millis(20));
         }
+        // Join the heartbeat while reads are still obstructed. Otherwise a
+        // later renewal can rewrite the restored marker before release_checked
+        // stops the thread, racing the byte-for-byte retention assertion.
+        lease.stop_heartbeat();
         std::fs::remove_dir(&path).expect("remove obstruction");
         std::fs::write(&path, &original).expect("restore ownership evidence");
 
@@ -1262,6 +1479,137 @@ mod tests {
         assert!(format!("{error:#}").contains("LEASE_OWNERSHIP_UNCERTAIN"));
         assert!(path.exists(), "failed release must retain its marker");
         assert_eq!(std::fs::read(path).unwrap(), original);
+    }
+
+    fn retained_report_project(name: &str) -> (Option<tempfile::TempDir>, Project) {
+        let (temporary, root) = match std::env::var_os("GH286_RETENTION_EVIDENCE") {
+            Some(parent) => {
+                std::fs::create_dir_all(&parent).unwrap();
+                let temporary = tempfile::Builder::new()
+                    .prefix(name)
+                    .tempdir_in(parent)
+                    .unwrap();
+                (None, temporary.keep())
+            }
+            None => {
+                let temporary = tempfile::Builder::new().prefix(name).tempdir().unwrap();
+                let root = temporary.path().to_path_buf();
+                (Some(temporary), root)
+            }
+        };
+        crate::preset::init(&root, "generic", false).unwrap();
+        let output = std::process::Command::new("git")
+            .args(["init", "--quiet"])
+            .current_dir(&root)
+            .output()
+            .unwrap();
+        assert!(output.status.success());
+        let project = Project::discover(Some(root), None).unwrap();
+        (temporary, project)
+    }
+
+    fn report_lease(project: &Project, id: &str) -> (super::ResourceLease, PathBuf) {
+        let root = project.reports.join("invocations").join(id);
+        std::fs::create_dir_all(&root).unwrap();
+        let root = root.canonicalize().unwrap();
+        let lease = super::ResourceLease::acquire(
+            project,
+            format!("invocation:{id}"),
+            "report-directory",
+            id,
+            Some(root.to_string_lossy().into_owned()),
+            None,
+        )
+        .unwrap();
+        (lease, root)
+    }
+
+    #[test]
+    fn report_cleanup_shares_live_guard_and_preserves_expired_unknown_ownership() {
+        let (_workspace, project) = retained_report_project("gh286-report-cleanup-");
+        let (lease, root) = report_lease(&project, "inv-cleanup-guard");
+        let path = lease.path.clone();
+        let (runtime, stop_calls) = fake_runtime(ContainerRuntimeKind::Docker, None);
+        let report = cleanup_with_runtime(&project, false, &runtime).unwrap();
+        std::fs::write(
+            project.root.join("live-cleanup.json"),
+            serde_json::to_vec_pretty(&report).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(report.active, 1);
+        assert_eq!(report.reclaimed, 0);
+        assert!(path.is_file());
+        assert!(
+            super::ReportDirectoryGuard::try_acquire(&project, "inv-cleanup-guard")
+                .unwrap()
+                .is_none()
+        );
+        lease.retain();
+        let mut unknown = read_record(&path).unwrap();
+        unknown.pid = 0;
+        unknown.process_start_identity = "unavailable:expired-fixture".into();
+        unknown.heartbeat_at = 0;
+        unknown.expires_at = 0;
+        write_record(&path, &unknown).unwrap();
+        let bytes = std::fs::read(&path).unwrap();
+        let report = cleanup_with_runtime(&project, false, &runtime).unwrap();
+        std::fs::write(
+            project.root.join("unknown-cleanup.json"),
+            serde_json::to_vec_pretty(&report).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(report.reclaimed, 0);
+        assert!(report
+            .failures
+            .iter()
+            .any(|failure| failure.contains("LEASE_OWNERSHIP_UNCERTAIN")));
+        assert_eq!(std::fs::read(&path).unwrap(), bytes);
+        assert_eq!(stop_calls.load(Ordering::SeqCst), 0);
+        let guard = super::ReportDirectoryGuard::try_acquire(&project, "inv-cleanup-guard")
+            .unwrap()
+            .unwrap();
+        assert!(!guard.release_is_proven(&root).unwrap());
+    }
+
+    #[test]
+    fn report_real_heartbeat_failure_cannot_certify_a_release_even_without_marker() {
+        let (_workspace, project) = retained_report_project("gh286-report-heartbeat-fault-");
+        let (mut lease, root) = report_lease(&project, "inv-heartbeat-fault");
+        let path = lease.path.clone();
+        let original = {
+            let _record = lease.record.lock().unwrap();
+            let original = std::fs::read(&path).unwrap();
+            std::fs::remove_file(&path).unwrap();
+            std::fs::create_dir(&path).unwrap();
+            original
+        };
+        let deadline = Instant::now() + Duration::from_secs(10);
+        while lease.heartbeat_error.lock().unwrap().is_none() {
+            assert!(
+                Instant::now() < deadline,
+                "real heartbeat did not observe the read fault"
+            );
+            std::thread::sleep(Duration::from_millis(20));
+        }
+        std::fs::write(
+            project.root.join("heartbeat-error.txt"),
+            lease.heartbeat_error.lock().unwrap().as_deref().unwrap(),
+        )
+        .unwrap();
+        lease.stop_heartbeat();
+        std::fs::remove_dir(&path).unwrap();
+        std::fs::write(&path, &original).unwrap();
+        let error = lease.release_checked().unwrap_err();
+        std::fs::write(project.root.join("release-error.txt"), format!("{error:#}")).unwrap();
+        assert!(format!("{error:#}").contains("lease heartbeat failed"));
+        assert_eq!(std::fs::read(&path).unwrap(), original);
+        // Missing JSON cannot bypass the failed-release state in the stable,
+        // locked certificate. No PID or TTL inference is used by retention.
+        std::fs::remove_file(&path).unwrap();
+        let guard = super::ReportDirectoryGuard::try_acquire(&project, "inv-heartbeat-fault")
+            .unwrap()
+            .unwrap();
+        assert!(!guard.release_is_proven(&root).unwrap());
     }
 
     #[test]
@@ -1326,6 +1674,93 @@ mod tests {
             .expect_err("poisoned ownership state must block release");
         assert!(format!("{error:#}").contains("lease record lock was poisoned"));
         assert!(path.exists(), "poisoned ownership marker must be retained");
+    }
+
+    #[test]
+    fn alive_holder_with_unreadable_identity_is_never_stale() {
+        let mut record = LeaseRecord {
+            owner_marker: OWNER_MARKER.into(),
+            schema_version: LEASE_SCHEMA_VERSION,
+            project_identity: "fixture-project".into(),
+            resource_id: "fixture".into(),
+            resource_kind: "workspace".into(),
+            invocation_id: "invocation".into(),
+            pid: 42,
+            process_start_identity: "linux:42".into(),
+            created_at: 1,
+            heartbeat_at: 1,
+            expires_at: 1,
+            resource_name: None,
+            runtime: None,
+            runtime_labels: BTreeMap::new(),
+            runtime_object_id: None,
+        };
+        let state = |alive, identity: Option<&str>| {
+            super::classify_lease(&record, 2, alive, || identity.map(str::to_string))
+        };
+        assert_eq!(
+            state(Some(true), None),
+            super::LeaseState::AliveIdentityUnknown
+        );
+        assert_eq!(
+            state(Some(true), Some("linux:42")),
+            super::LeaseState::Active
+        );
+        assert_eq!(state(Some(true), Some("linux:7")), super::LeaseState::Stale);
+        assert_eq!(state(Some(false), None), super::LeaseState::Stale);
+        assert_eq!(state(None, None), super::LeaseState::Stale);
+        record.expires_at = 3;
+        let unexpired = super::classify_lease(&record, 2, None, || None);
+        assert_eq!(unexpired, super::LeaseState::Active);
+    }
+
+    #[test]
+    fn cleanup_retains_expired_lease_of_live_holder_with_unreadable_identity() {
+        let (_workspace, project) = runtime_project("lease-alive-identity-unknown");
+        let mut lease = super::ResourceLease::acquire(
+            &project,
+            "step:alive-unknown",
+            "workspace",
+            "invocation-alive-unknown",
+            None,
+            None,
+        )
+        .expect("acquire lease");
+        let path = lease.path.clone();
+        lease.stop_heartbeat();
+        let mut expired = read_record(&path).expect("read lease");
+        expired.heartbeat_at = 0;
+        expired.expires_at = 0;
+        write_record(&path, &expired).expect("write expired fixture");
+        lease.retain();
+
+        *OBSERVE_PROCESS.lock().unwrap() = Some(|_| (Some(true), None));
+        let (fake, remove_calls) = fake_runtime(ContainerRuntimeKind::Docker, None);
+        for dry_run in [true, false] {
+            let report = cleanup_with_runtime(&project, dry_run, &fake).expect("cleanup report");
+            assert_eq!(report.reclaimed, 0);
+            assert_eq!(report.resources.len(), 1);
+            assert_eq!(report.resources[0].state, "ownership-uncertain");
+            assert_eq!(report.resources[0].action, "retained");
+            assert!(report.failures.iter().any(|failure| {
+                failure.contains("LEASE_OWNERSHIP_UNCERTAIN")
+                    && failure.contains("process identity cannot be read")
+            }));
+        }
+        let Err(error) = super::ResourceLease::acquire(
+            &project,
+            "step:alive-unknown",
+            "workspace",
+            "invocation-contender",
+            None,
+            None,
+        ) else {
+            panic!("live holder keeps the lease");
+        };
+        *OBSERVE_PROCESS.lock().unwrap() = None;
+        assert!(format!("{error:#}").contains("LEASE_OWNERSHIP_UNCERTAIN"));
+        assert_eq!(remove_calls.load(Ordering::SeqCst), 0);
+        assert!(path.exists(), "live holder's marker must be retained");
     }
 
     #[test]
@@ -1455,5 +1890,969 @@ mod tests {
             assert!(path.exists());
             drop(workspace);
         }
+    }
+
+    fn report_lock_path(project: &Project, invocation_id: &str) -> PathBuf {
+        super::lease_directory(project)
+            .unwrap()
+            .join("report-directory-locks")
+            .join(format!(
+                "{}.lock",
+                resource_key(&format!("invocation:{invocation_id}"))
+            ))
+    }
+
+    fn assert_report_guard_held(
+        lease: &super::ResourceLease,
+        project: &Project,
+        root: &Path,
+        id: &str,
+    ) {
+        assert!(lease.report_directory_guard.is_some());
+        assert!(super::ReportDirectoryGuard::try_acquire(project, id)
+            .unwrap()
+            .is_none());
+        assert!(!lease
+            .report_directory_guard
+            .as_ref()
+            .unwrap()
+            .release_is_proven(root)
+            .unwrap());
+    }
+
+    #[test]
+    fn direct_report_release_requires_stopped_heartbeat_and_keeps_held_state() {
+        let (_workspace, project) = retained_report_project("gh286-release-live-");
+        let id = "inv-release-live";
+        let (lease, root) = report_lease(&project, id);
+        // Prevent an actual renewal from changing the bytes during assertions.
+        // release must reject before taking this record lock; checked release
+        // is performed only after the lock has been dropped.
+        {
+            let _record = lease.record.lock().unwrap();
+            let bytes = std::fs::read(&lease.path).unwrap();
+            let error = lease.release().unwrap_err();
+            assert!(format!("{error:#}").contains("requires stopped heartbeat"));
+            assert_eq!(std::fs::read(&lease.path).unwrap(), bytes);
+            assert_report_guard_held(&lease, &project, &root, id);
+        }
+        lease.retain();
+        assert_eq!(
+            std::fs::read(report_lock_path(&project, id)).unwrap(),
+            b"held\n"
+        );
+    }
+
+    #[test]
+    fn stopped_report_release_rejects_missing_marker_without_certificate() {
+        let (_workspace, project) = retained_report_project("gh286-release-missing-");
+        let id = "inv-release-missing";
+        let (mut lease, root) = report_lease(&project, id);
+        lease.stop_heartbeat();
+        std::fs::remove_file(&lease.path).unwrap();
+        let error = lease.release().unwrap_err();
+        assert!(format!("{error:#}").contains("marker disappeared before checked release"));
+        assert!(!lease.path.exists());
+        assert!(root.is_dir());
+        assert_report_guard_held(&lease, &project, &root, id);
+        lease.retain();
+        assert_eq!(
+            std::fs::read(report_lock_path(&project, id)).unwrap(),
+            b"held\n"
+        );
+        let guard = super::ReportDirectoryGuard::try_acquire(&project, id)
+            .unwrap()
+            .unwrap();
+        assert!(!guard.release_is_proven(&root).unwrap());
+    }
+
+    #[test]
+    fn stopped_legacy_release_is_idempotent_when_marker_is_missing() {
+        let (_workspace, project) = runtime_project("release-missing-legacy");
+        let mut lease = super::ResourceLease::acquire(
+            &project,
+            "step:release-missing",
+            "workspace",
+            "inv-release-missing-legacy",
+            None,
+            None,
+        )
+        .unwrap();
+        lease.stop_heartbeat();
+        assert!(lease.report_directory_guard.is_none());
+        let path = lease.path.clone();
+        std::fs::remove_file(&path).unwrap();
+        lease.release().unwrap();
+        lease.release_checked().unwrap();
+        assert!(!path.exists());
+    }
+
+    #[test]
+    fn report_release_real_read_error_keeps_obstruction_and_held_certificate() {
+        let (_workspace, project) = retained_report_project("gh286-release-read-");
+        let id = "inv-release-read";
+        let (mut lease, root) = report_lease(&project, id);
+        lease.stop_heartbeat();
+        let path = lease.path.clone();
+        let original = std::fs::read(&path).unwrap();
+        std::fs::remove_file(&path).unwrap();
+        std::fs::create_dir(&path).unwrap();
+        let actual = std::fs::read(&path).unwrap_err();
+        assert_ne!(actual.kind(), std::io::ErrorKind::NotFound);
+        let error = lease.release().unwrap_err();
+        assert!(format!("{error:#}").contains("read lease before release"));
+        assert_eq!(
+            error.downcast_ref::<std::io::Error>().unwrap().kind(),
+            actual.kind()
+        );
+        assert!(path.is_dir());
+        assert_eq!(std::fs::read_dir(&path).unwrap().count(), 0);
+        assert_report_guard_held(&lease, &project, &root, id);
+        lease.retain();
+        assert_eq!(
+            std::fs::read(report_lock_path(&project, id)).unwrap(),
+            b"held\n"
+        );
+        std::fs::remove_dir(&path).unwrap();
+        std::fs::write(&path, &original).unwrap();
+        let guard = super::ReportDirectoryGuard::try_acquire(&project, id)
+            .unwrap()
+            .unwrap();
+        assert!(!guard.release_is_proven(&root).unwrap());
+        assert_eq!(std::fs::read(&path).unwrap(), original);
+    }
+
+    #[test]
+    fn report_release_malformed_marker_is_retained_without_certificate() {
+        let (_workspace, project) = retained_report_project("gh286-release-parse-");
+        let id = "inv-release-parse";
+        let (mut lease, root) = report_lease(&project, id);
+        lease.stop_heartbeat();
+        std::fs::write(&lease.path, b"{not-json").unwrap();
+        let error = lease.release().unwrap_err();
+        assert!(format!("{error:#}").contains("parse lease before release"));
+        assert_eq!(std::fs::read(&lease.path).unwrap(), b"{not-json");
+        assert_report_guard_held(&lease, &project, &root, id);
+        lease.retain();
+        assert_eq!(
+            std::fs::read(report_lock_path(&project, id)).unwrap(),
+            b"held\n"
+        );
+    }
+
+    #[test]
+    fn report_release_unknown_owner_is_retained_without_certificate() {
+        let (_workspace, project) = retained_report_project("gh286-release-owner-");
+        let id = "inv-release-owner";
+        let (mut lease, root) = report_lease(&project, id);
+        lease.stop_heartbeat();
+        let mut unknown = read_record(&lease.path).unwrap();
+        unknown.invocation_id = "different-invocation".into();
+        unknown.process_start_identity = "unavailable:unknown-owner".into();
+        write_record(&lease.path, &unknown).unwrap();
+        let bytes = std::fs::read(&lease.path).unwrap();
+        let error = lease.release().unwrap_err();
+        assert!(format!("{error:#}").contains("lease ownership changed"));
+        assert_eq!(std::fs::read(&lease.path).unwrap(), bytes);
+        assert_report_guard_held(&lease, &project, &root, id);
+        lease.retain();
+        assert_eq!(
+            std::fs::read(report_lock_path(&project, id)).unwrap(),
+            b"held\n"
+        );
+    }
+
+    #[cfg(unix)]
+    struct RestoreDirectoryPermissions {
+        path: PathBuf,
+        original: std::fs::Permissions,
+    }
+
+    #[cfg(unix)]
+    impl Drop for RestoreDirectoryPermissions {
+        fn drop(&mut self) {
+            std::fs::set_permissions(&self.path, self.original.clone())
+                .expect("restore lease directory permissions, including while unwinding");
+        }
+    }
+
+    #[test]
+    #[cfg(unix)]
+    fn report_release_real_remove_error_retains_marker_then_allows_checked_retry() {
+        use std::os::unix::fs::PermissionsExt;
+        // Root or DAC-bypass privileges could turn a permissions fixture into
+        // a successful remove. They are an explicit unsupported test identity,
+        // never a silent skip or a mocked permission error.
+        assert_ne!(
+            unsafe { libc::geteuid() },
+            0,
+            "run this fixture as an unprivileged Unix identity"
+        );
+        let (_workspace, project) = retained_report_project("gh286-release-remove-");
+        let id = "inv-release-remove";
+        let (mut lease, root) = report_lease(&project, id);
+        lease.stop_heartbeat();
+        let path = lease.path.clone();
+        let bytes = std::fs::read(&path).unwrap();
+        let directory = path.parent().unwrap().to_path_buf();
+        let restore = RestoreDirectoryPermissions {
+            original: std::fs::metadata(&directory).unwrap().permissions(),
+            path: directory.clone(),
+        };
+        std::fs::set_permissions(&directory, std::fs::Permissions::from_mode(0o555)).unwrap();
+        // Prove write denial against a real disposable sibling before release;
+        // traversing/reading the existing marker must remain possible.
+        let probe = directory.join("release-permission-probe");
+        let actual = std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&probe)
+            .unwrap_err();
+        assert_eq!(actual.kind(), std::io::ErrorKind::PermissionDenied);
+        assert_eq!(std::fs::read(&path).unwrap(), bytes);
+        let error = lease.release().unwrap_err();
+        assert!(format!("{error:#}").contains("release lease"));
+        assert_eq!(
+            error.downcast_ref::<std::io::Error>().unwrap().kind(),
+            std::io::ErrorKind::PermissionDenied
+        );
+        assert_eq!(std::fs::read(&path).unwrap(), bytes);
+        assert_report_guard_held(&lease, &project, &root, id);
+        // The release certificate was persisted, but the still-present marker
+        // blocks retention. Its exact bound fields are independently checked.
+        let certificate: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(report_lock_path(&project, id)).unwrap())
+                .unwrap();
+        assert_eq!(
+            certificate,
+            serde_json::json!({
+                "schema_version": 1,
+                "invocation_id": id,
+                "project_identity": project.input().project_identity,
+                "root": root,
+            })
+        );
+        drop(restore);
+        lease.release_checked().unwrap();
+        assert!(!path.exists());
+        let guard = super::ReportDirectoryGuard::try_acquire(&project, id)
+            .unwrap()
+            .unwrap();
+        assert!(guard.release_is_proven(&root).unwrap());
+        assert!(root.is_dir());
+    }
+
+    #[test]
+    fn report_release_invalid_certificate_binding_keeps_marker_and_held_state() {
+        let (_workspace, project) = retained_report_project("gh286-release-binding-");
+        let id = "inv-release-binding";
+        let (mut lease, root) = report_lease(&project, id);
+        lease.stop_heartbeat();
+        // Ordinary ownership fields still agree. The real report guard must
+        // independently reject a different root before writing its certificate.
+        let invalid = {
+            let mut record = lease.record.lock().unwrap();
+            record.resource_name = Some(root.join("different-root").to_string_lossy().into_owned());
+            record.clone()
+        };
+        write_record(&lease.path, &invalid).unwrap();
+        let bytes = std::fs::read(&lease.path).unwrap();
+        let error = lease.release().unwrap_err();
+        assert!(format!("{error:#}").contains("report-directory lease binding is uncertain"));
+        assert_eq!(std::fs::read(&lease.path).unwrap(), bytes);
+        assert_report_guard_held(&lease, &project, &root, id);
+        lease.retain();
+        assert_eq!(
+            std::fs::read(report_lock_path(&project, id)).unwrap(),
+            b"held\n"
+        );
+    }
+
+    fn bounded_fixture_status(
+        child: &mut std::process::Child,
+        timeout: Duration,
+    ) -> std::io::Result<std::process::ExitStatus> {
+        let deadline = Instant::now() + timeout;
+        loop {
+            if let Some(status) = child.try_wait()? {
+                return Ok(status);
+            }
+            if Instant::now() >= deadline {
+                break;
+            }
+            std::thread::yield_now();
+        }
+        let kill = child.kill();
+        let reap_deadline = Instant::now() + Duration::from_secs(2);
+        loop {
+            match child.try_wait() {
+                Ok(Some(status)) => {
+                    return Err(std::io::Error::other(format!(
+                        "fixture child {} timed out; kill={kill:?}; reaped={status:?}",
+                        child.id()
+                    )));
+                }
+                Err(error) => return Err(error),
+                Ok(None) if Instant::now() < reap_deadline => std::thread::yield_now(),
+                Ok(None) => {
+                    return Err(std::io::Error::other(format!(
+                        "fixture child {} could not be reaped within deadline; kill={kill:?}",
+                        child.id()
+                    )));
+                }
+            }
+        }
+    }
+
+    struct FixtureProcess(std::process::Child);
+
+    impl Drop for FixtureProcess {
+        fn drop(&mut self) {
+            match self.0.try_wait() {
+                Ok(Some(_)) => {}
+                state => {
+                    let kill = self.0.kill();
+                    if let Err(error) = bounded_fixture_status(&mut self.0, Duration::from_secs(2))
+                    {
+                        eprintln!(
+                            "fixture cleanup FAIL: initial={state:?}; kill={kill:?}; {error}"
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    fn run_temp_ownership_child(mode: &str) {
+        let (_workspace, project) = retained_report_project("gh286-temp-ownership-");
+        let control = project.root.join("temp-ownership-child");
+        std::fs::create_dir(&control).unwrap();
+        let args = [
+            "--exact",
+            "service::lease::tests::lease_temp_ownership_child",
+            "--nocapture",
+            "--test-threads=1",
+        ];
+        std::fs::write(
+            control.join("command.json"),
+            serde_json::to_vec(&args).unwrap(),
+        )
+        .unwrap();
+        let child = std::process::Command::new(std::env::current_exe().unwrap())
+            .args(args)
+            .env("GH286_TEMP_CHILD", mode)
+            .env("GH286_TEMP_ROOT", &control)
+            .stdout(std::fs::File::create(control.join("stdout.log")).unwrap())
+            .stderr(std::fs::File::create(control.join("stderr.log")).unwrap())
+            .spawn()
+            .unwrap();
+        let mut child = FixtureProcess(child);
+        let result = bounded_fixture_status(&mut child.0, Duration::from_secs(20));
+        std::fs::write(
+            control.join("status.json"),
+            serde_json::to_vec(&serde_json::json!({
+                "pid": child.0.id(), "result": format!("{result:?}"),
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        let stdout = std::fs::read_to_string(control.join("stdout.log"));
+        let stderr = std::fs::read_to_string(control.join("stderr.log"));
+        let status = result.unwrap_or_else(|error| {
+            panic!("temp ownership child cleanup failed: {error}; stdout={stdout:?}; stderr={stderr:?}")
+        });
+        assert!(
+            status.success(),
+            "temp ownership child failed: {status:?}; stdout={stdout:?}; stderr={stderr:?}"
+        );
+    }
+
+    #[test]
+    fn write_record_create_collision_preserves_foreign_temporary() {
+        run_temp_ownership_child("collision");
+    }
+
+    #[test]
+    fn write_record_publish_failure_cleans_only_owned_temporary() {
+        run_temp_ownership_child("publish-failure");
+    }
+
+    #[test]
+    fn lease_temp_ownership_child() {
+        let Ok(mode) = std::env::var("GH286_TEMP_CHILD") else {
+            return;
+        };
+        let directory = PathBuf::from(std::env::var_os("GH286_TEMP_ROOT").unwrap());
+        // This exact child runs no other test and creates no heartbeat. Inspect
+        // the real initial counter; never reset it or race another writer.
+        let counter = super::TEMP_COUNTER.load(Ordering::Relaxed);
+        assert_eq!(counter, 1);
+        let pid = std::process::id();
+        let temporary = directory.join(format!(".lease-{pid}-{counter}.tmp"));
+        let legacy_temporary = directory.join(format!(".lease-{counter}.tmp"));
+        let target = directory.join("marker.json");
+        let record = LeaseRecord {
+            owner_marker: OWNER_MARKER.into(),
+            schema_version: LEASE_SCHEMA_VERSION,
+            project_identity: "temp-ownership-project".into(),
+            resource_id: "fixture".into(),
+            resource_kind: "workspace".into(),
+            invocation_id: "temp-ownership-invocation".into(),
+            pid,
+            process_start_identity: "isolated-counter-fixture".into(),
+            created_at: 1,
+            heartbeat_at: 1,
+            expires_at: 1,
+            resource_name: None,
+            runtime: None,
+            runtime_labels: BTreeMap::new(),
+            runtime_object_id: None,
+        };
+        let sentinel = b"pre-existing writer temporary must survive\n";
+        std::fs::write(
+            directory.join("temp-identity.json"),
+            serde_json::to_vec(&serde_json::json!({
+                "pid": pid, "counter": counter, "mode": mode,
+                "temporary": temporary, "legacy_temporary": legacy_temporary,
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        if mode == "collision" {
+            std::fs::write(&target, b"original marker\n").unwrap();
+            std::fs::write(&temporary, sentinel).unwrap();
+            // The same fixture on the old source reaches its old-name real
+            // create_new failure and exposes its unowned-temp deletion.
+            std::fs::write(&legacy_temporary, sentinel).unwrap();
+            let error = write_record(&target, &record).unwrap_err();
+            assert_eq!(
+                error.downcast_ref::<std::io::Error>().unwrap().kind(),
+                std::io::ErrorKind::AlreadyExists
+            );
+            assert_eq!(std::fs::read(&target).unwrap(), b"original marker\n");
+            assert_eq!(std::fs::read(&temporary).unwrap(), sentinel);
+            assert_eq!(std::fs::read(&legacy_temporary).unwrap(), sentinel);
+        } else {
+            assert_eq!(mode, "publish-failure");
+            std::fs::create_dir(&target).unwrap();
+            std::fs::write(target.join("sentinel"), b"original target directory\n").unwrap();
+            let foreign = directory.join(".lease-foreign.tmp");
+            std::fs::write(&foreign, sentinel).unwrap();
+            let error = write_record(&target, &record).unwrap_err();
+            assert!(error.downcast_ref::<std::io::Error>().is_some());
+            assert!(
+                format!("{error:#}").contains("publish lease")
+                    || format!("{error:#}").contains("replace existing lease")
+            );
+            assert!(!temporary.exists());
+            assert!(!legacy_temporary.exists());
+            assert_eq!(std::fs::read(&foreign).unwrap(), sentinel);
+            assert_eq!(
+                std::fs::read(target.join("sentinel")).unwrap(),
+                b"original target directory\n"
+            );
+        }
+    }
+
+    #[cfg(target_os = "linux")]
+    struct ForkGuardBarrier {
+        ready: std::fs::File,
+        gate: Option<std::fs::File>,
+        worker: Option<std::thread::JoinHandle<std::io::Result<std::process::Child>>>,
+        pidfd: Option<std::os::fd::OwnedFd>,
+        raw_ready: Vec<u8>,
+        cleanup_attempted: bool,
+    }
+
+    #[cfg(target_os = "linux")]
+    impl ForkGuardBarrier {
+        fn start(guard_fd: i32, control: &Path) -> std::io::Result<Self> {
+            use std::os::fd::{AsRawFd, FromRawFd, OwnedFd};
+            use std::os::unix::process::CommandExt;
+            fn pipe() -> std::io::Result<(OwnedFd, OwnedFd)> {
+                let mut pair = [-1; 2];
+                // SAFETY: pair has exactly the two writable descriptor slots.
+                if unsafe { libc::pipe2(pair.as_mut_ptr(), libc::O_CLOEXEC) } != 0 {
+                    return Err(std::io::Error::last_os_error());
+                }
+                // SAFETY: successful pipe2 returned two new owned descriptors.
+                Ok(unsafe { (OwnedFd::from_raw_fd(pair[0]), OwnedFd::from_raw_fd(pair[1])) })
+            }
+            let (ready_read, ready_write) = pipe()?;
+            let (gate_read, gate_write) = pipe()?;
+            let read_in_parent = ready_read.as_raw_fd();
+            let write_in_parent = gate_write.as_raw_fd();
+            let write_in_child = ready_write.as_raw_fd();
+            let read_in_child = gate_read.as_raw_fd();
+            // Keep the single-byte parent gate command nonblocking too.
+            // SAFETY: write_in_parent is the live, owned pipe writer.
+            let flags = unsafe { libc::fcntl(write_in_parent, libc::F_GETFL) };
+            if flags < 0
+                || unsafe { libc::fcntl(write_in_parent, libc::F_SETFL, flags | libc::O_NONBLOCK) }
+                    < 0
+            {
+                return Err(std::io::Error::last_os_error());
+            }
+            let stdout = std::fs::File::create(control.join("stdout.log"))?;
+            let stderr = std::fs::File::create(control.join("stderr.log"))?;
+            let worker = std::thread::spawn(move || {
+                let mut command = std::process::Command::new("/bin/true");
+                command.stdout(stdout).stderr(stderr);
+                // Preallocate every callback buffer before fork.
+                let mut stat = std::mem::MaybeUninit::<libc::stat>::zeroed();
+                let mut gate = 0_u8;
+                let mut frame: [u64; 8] = [
+                    0x4748_3238_3646_4f52,
+                    0,
+                    guard_fd as u64,
+                    0,
+                    0,
+                    0,
+                    read_in_child as u64,
+                    write_in_child as u64,
+                ];
+                // SAFETY: the callback uses only fixed stack storage and
+                // async-signal-safe syscalls. All allocation and file setup
+                // happens in the parent. OwnedFd drops run only in the parent.
+                unsafe {
+                    command.pre_exec(move || {
+                        if libc::close(read_in_parent) != 0 || libc::close(write_in_parent) != 0 {
+                            libc::_exit(81);
+                        }
+                        if libc::fstat(guard_fd, stat.as_mut_ptr()) != 0 {
+                            libc::_exit(82);
+                        }
+                        let actual = stat.assume_init_ref();
+                        let flags = libc::fcntl(guard_fd, libc::F_GETFD);
+                        if flags < 0 {
+                            libc::_exit(83);
+                        }
+                        frame[1] = libc::getpid() as u64;
+                        frame[3] = actual.st_dev;
+                        frame[4] = actual.st_ino;
+                        frame[5] = flags as u64;
+                        let mut sent = 0;
+                        while sent < std::mem::size_of_val(&frame) {
+                            let count = libc::write(
+                                write_in_child,
+                                frame.as_ptr().cast::<u8>().add(sent).cast(),
+                                std::mem::size_of_val(&frame) - sent,
+                            );
+                            if count > 0 {
+                                sent += count as usize;
+                            } else if count < 0 && *libc::__errno_location() == libc::EINTR {
+                                continue;
+                            } else {
+                                libc::_exit(84);
+                            }
+                        }
+                        // No fallible operation after ready can let this child
+                        // advance to exec without the parent's gate command.
+                        loop {
+                            let count = libc::read(read_in_child, (&mut gate as *mut u8).cast(), 1);
+                            if count == 1 && gate == b'x' {
+                                break;
+                            }
+                            if count < 0 && *libc::__errno_location() == libc::EINTR {
+                                continue;
+                            }
+                            libc::_exit(85); // Includes EOF during parent cleanup.
+                        }
+                        libc::close(write_in_child);
+                        libc::close(read_in_child);
+                        Ok(())
+                    });
+                }
+                let result = command.spawn();
+                drop(ready_write);
+                drop(gate_read);
+                result
+            });
+            Ok(Self {
+                ready: std::fs::File::from(ready_read),
+                gate: Some(std::fs::File::from(gate_write)),
+                worker: Some(worker),
+                pidfd: None,
+                raw_ready: Vec::new(),
+                cleanup_attempted: false,
+            })
+        }
+
+        fn receive_ready(&mut self) -> std::io::Result<[u64; 8]> {
+            use std::io::Read;
+            use std::os::fd::AsRawFd;
+            let deadline = Instant::now() + Duration::from_secs(20);
+            let mut frame = [0_u8; 64];
+            while self.raw_ready.len() < frame.len() {
+                let remaining = deadline.saturating_duration_since(Instant::now());
+                if remaining.is_zero() {
+                    return Err(std::io::Error::new(
+                        std::io::ErrorKind::TimedOut,
+                        "fork ready deadline",
+                    ));
+                }
+                let mut poll = libc::pollfd {
+                    fd: self.ready.as_raw_fd(),
+                    events: libc::POLLIN,
+                    revents: 0,
+                };
+                let milliseconds = remaining.as_millis().clamp(1, 20_000) as i32;
+                // SAFETY: poll points to one live descriptor record.
+                let count = unsafe { libc::poll(&mut poll, 1, milliseconds) };
+                if count < 0 {
+                    let error = std::io::Error::last_os_error();
+                    if error.kind() == std::io::ErrorKind::Interrupted {
+                        continue;
+                    }
+                    return Err(error);
+                }
+                if count == 0 {
+                    continue;
+                }
+                match self.ready.read(&mut frame[self.raw_ready.len()..]) {
+                    Ok(0) => {
+                        return Err(std::io::Error::new(
+                            std::io::ErrorKind::UnexpectedEof,
+                            "fork ready EOF",
+                        ))
+                    }
+                    Ok(count) => self
+                        .raw_ready
+                        .extend_from_slice(&frame[self.raw_ready.len()..][..count]),
+                    Err(error) if error.kind() == std::io::ErrorKind::Interrupted => {}
+                    Err(error) => return Err(error),
+                }
+            }
+            let mut words = [0_u64; 8];
+            for (word, bytes) in words.iter_mut().zip(self.raw_ready.as_chunks::<8>().0) {
+                let mut native = [0_u8; 8];
+                native.copy_from_slice(bytes);
+                *word = u64::from_ne_bytes(native);
+            }
+            Ok(words)
+        }
+
+        fn bind_owned_child(&mut self, pid: u32) -> std::io::Result<()> {
+            use std::os::fd::{AsRawFd, FromRawFd, OwnedFd};
+            // SAFETY: pidfd_open binds the actual ready PID to a kernel handle.
+            let fd = unsafe { libc::syscall(libc::SYS_pidfd_open, pid, 0) };
+            if fd < 0 {
+                return Err(std::io::Error::last_os_error());
+            }
+            // SAFETY: the syscall returned one newly owned descriptor.
+            let owned = unsafe { OwnedFd::from_raw_fd(fd as i32) };
+            let mut info = std::mem::MaybeUninit::<libc::siginfo_t>::zeroed();
+            // SAFETY: WNOWAIT proves this is our child without reaping it or
+            // racing Command's own spawn/wait ownership. Unrelated PIDfds fail.
+            if unsafe {
+                libc::waitid(
+                    libc::P_PIDFD,
+                    owned.as_raw_fd() as libc::id_t,
+                    info.as_mut_ptr(),
+                    libc::WEXITED | libc::WNOHANG | libc::WNOWAIT,
+                )
+            } != 0
+            {
+                return Err(std::io::Error::last_os_error());
+            }
+            self.pidfd = Some(owned);
+            Ok(())
+        }
+
+        fn blocked_child_is_alive(&self) -> std::io::Result<bool> {
+            use std::os::fd::AsRawFd;
+            let fd = self
+                .pidfd
+                .as_ref()
+                .ok_or_else(|| std::io::Error::other("no owned child pidfd"))?;
+            let mut poll = libc::pollfd {
+                fd: fd.as_raw_fd(),
+                events: libc::POLLIN,
+                revents: 0,
+            };
+            // SAFETY: this is a nonblocking observation of our owned child.
+            let result = unsafe { libc::poll(&mut poll, 1, 0) };
+            if result < 0 {
+                return Err(std::io::Error::last_os_error());
+            }
+            Ok(result == 0 && self.gate.is_some())
+        }
+
+        fn signal_owned_child(&self) -> std::io::Result<()> {
+            use std::os::fd::AsRawFd;
+            if let Some(pidfd) = &self.pidfd {
+                // SAFETY: this handle was validated by non-reaping waitid.
+                // No bare-PID kill can hit a reused, unrelated process.
+                if unsafe {
+                    libc::syscall(
+                        libc::SYS_pidfd_send_signal,
+                        pidfd.as_raw_fd(),
+                        libc::SIGKILL,
+                        std::ptr::null::<libc::siginfo_t>(),
+                        0,
+                    )
+                } < 0
+                {
+                    let error = std::io::Error::last_os_error();
+                    if error.raw_os_error() != Some(libc::ESRCH) {
+                        return Err(error);
+                    }
+                }
+            }
+            Ok(())
+        }
+
+        fn reap_after_finished_spawn_failure(&self) -> std::io::Result<()> {
+            use std::os::fd::AsRawFd;
+            self.signal_owned_child()?;
+            let Some(pidfd) = &self.pidfd else {
+                return Ok(()); // No validated ready PID; spawn's own error cleanup owns it.
+            };
+            let deadline = Instant::now() + Duration::from_secs(2);
+            loop {
+                let mut info = std::mem::MaybeUninit::<libc::siginfo_t>::zeroed();
+                // SAFETY: the worker is already finished, so it cannot race
+                // this bounded reap of our previously validated child pidfd.
+                let result = unsafe {
+                    libc::waitid(
+                        libc::P_PIDFD,
+                        pidfd.as_raw_fd() as libc::id_t,
+                        info.as_mut_ptr(),
+                        libc::WEXITED | libc::WNOHANG,
+                    )
+                };
+                if result != 0 {
+                    let error = std::io::Error::last_os_error();
+                    if error.raw_os_error() == Some(libc::ECHILD) {
+                        return Ok(()); // Command's failed spawn already reaped it.
+                    }
+                    if error.kind() != std::io::ErrorKind::Interrupted {
+                        return Err(error);
+                    }
+                } else if unsafe { info.assume_init().si_pid() } != 0 {
+                    return Ok(());
+                }
+                if Instant::now() >= deadline {
+                    return Err(std::io::Error::other(
+                        "failed spawn child could not be reaped within deadline",
+                    ));
+                }
+                std::thread::yield_now();
+            }
+        }
+
+        fn finish(&mut self, abort: bool) -> std::io::Result<std::process::ExitStatus> {
+            use std::io::Write;
+            self.cleanup_attempted = true;
+            let mut failures = Vec::new();
+            // Abort a known blocked child safely BEFORE closing the gate. If
+            // ready was unavailable, gate EOF is the cancellation protocol.
+            if abort {
+                if let Err(error) = self.signal_owned_child() {
+                    failures.push(error.to_string());
+                }
+            } else if let Some(gate) = &mut self.gate {
+                if let Err(error) = gate.write_all(b"x") {
+                    failures.push(error.to_string());
+                    if let Err(error) = self.signal_owned_child() {
+                        failures.push(error.to_string());
+                    }
+                }
+            }
+            drop(self.gate.take());
+            let worker = self
+                .worker
+                .take()
+                .ok_or_else(|| std::io::Error::other("spawn worker already collected"))?;
+            let deadline = Instant::now() + Duration::from_secs(20);
+            while !worker.is_finished() && Instant::now() < deadline {
+                std::thread::yield_now();
+            }
+            if !worker.is_finished() {
+                let kill = self.signal_owned_child();
+                let stop_deadline = Instant::now() + Duration::from_secs(2);
+                while !worker.is_finished() && Instant::now() < stop_deadline {
+                    std::thread::yield_now();
+                }
+                if !worker.is_finished() {
+                    // An OS-blocked spawn cannot be cancelled portably. This
+                    // is an explicit FAIL, never an unbounded join or cleanup PASS.
+                    return Err(std::io::Error::other(format!("spawn worker cannot be joined within deadline; owned-child kill={kill:?}; cleanup NOT certified")));
+                }
+                failures.push(format!(
+                    "spawn deadline exceeded; owned-child kill={kill:?}"
+                ));
+            }
+            // Joining is safe only after is_finished. The returned Child is
+            // then reaped with bounded try_wait, never blocking wait().
+            let spawned = match worker.join() {
+                Ok(spawned) => spawned,
+                Err(_) => {
+                    let cleanup = self.reap_after_finished_spawn_failure();
+                    return Err(std::io::Error::other(format!(
+                        "spawn worker panicked; child cleanup={cleanup:?}"
+                    )));
+                }
+            };
+            let mut child = match spawned {
+                Ok(child) => FixtureProcess(child),
+                Err(error) => {
+                    let cleanup = self.reap_after_finished_spawn_failure();
+                    return Err(std::io::Error::other(format!(
+                        "spawn failed: {error}; child cleanup={cleanup:?}"
+                    )));
+                }
+            };
+            let status = bounded_fixture_status(&mut child.0, Duration::from_secs(20))?;
+            if !failures.is_empty() {
+                return Err(std::io::Error::other(failures.join("; ")));
+            }
+            Ok(status)
+        }
+    }
+
+    #[cfg(target_os = "linux")]
+    impl Drop for ForkGuardBarrier {
+        fn drop(&mut self) {
+            if !self.cleanup_attempted {
+                if let Err(error) = self.finish(true) {
+                    eprintln!("fork guard cleanup FAIL: {error}");
+                }
+            }
+        }
+    }
+
+    #[cfg(target_os = "linux")]
+    fn actual_guard_fd(lock: &Path) -> std::io::Result<i32> {
+        use std::os::unix::fs::MetadataExt;
+        let expected = std::fs::metadata(lock)?;
+        let mut matches = Vec::new();
+        for entry in std::fs::read_dir("/proc/self/fd")? {
+            let entry = entry?;
+            let metadata = match std::fs::metadata(entry.path()) {
+                Ok(metadata) => metadata,
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
+                Err(error) => return Err(error),
+            };
+            if (metadata.dev(), metadata.ino()) == (expected.dev(), expected.ino()) {
+                let fd = entry
+                    .file_name()
+                    .to_string_lossy()
+                    .parse::<i32>()
+                    .map_err(std::io::Error::other)?;
+                matches.push(fd);
+            }
+        }
+        if matches.len() != 1 {
+            return Err(std::io::Error::other(format!(
+                "expected unique owned lock FD, got {matches:?}"
+            )));
+        }
+        Ok(matches[0])
+    }
+
+    #[cfg(target_os = "linux")]
+    fn consumed_report_guard_releases_while_fork_child_is_blocked(checked: bool) {
+        use std::os::unix::fs::MetadataExt;
+        let (_workspace, project) = retained_report_project("gh286-fork-guard-");
+        let id = if checked {
+            "inv-fork-checked"
+        } else {
+            "inv-fork-retain"
+        };
+        let (mut lease, root) = report_lease(&project, id);
+        lease.stop_heartbeat();
+        let marker = lease.path.clone();
+        let original = std::fs::read(&marker).unwrap();
+        let lock = report_lock_path(&project, id);
+        let metadata = std::fs::metadata(&lock).unwrap();
+        let guard_fd = actual_guard_fd(&lock).unwrap();
+        let control = project.root.join("fork-guard-child");
+        std::fs::create_dir(&control).unwrap();
+        std::fs::write(
+            control.join("command.json"),
+            b"{\"program\":\"/bin/true\",\"args\":[],\"pre_exec\":\"guard-fd-ready/gate\"}\n",
+        )
+        .unwrap();
+        let mut child = ForkGuardBarrier::start(guard_fd, &control).unwrap();
+        // Keep all errors as values until the gate has been resolved and the
+        // spawn worker/child reaped. The old-source None negative cannot hang.
+        let observation = (|| -> anyhow::Result<_> {
+            let ready = child.receive_ready()?;
+            anyhow::ensure!(
+                ready[0] == 0x4748_3238_3646_4f52,
+                "invalid fork ready magic"
+            );
+            let pid = u32::try_from(ready[1])?;
+            child.bind_owned_child(pid)?;
+            anyhow::ensure!(pid != std::process::id(), "child must have a distinct PID");
+            anyhow::ensure!(
+                ready[2] == guard_fd as u64
+                    && ready[3] == metadata.dev()
+                    && ready[4] == metadata.ino(),
+                "inherited actual guard FD/inode differs"
+            );
+            anyhow::ensure!(
+                ready[5] & libc::FD_CLOEXEC as u64 != 0,
+                "inherited guard FD must be CLOEXEC"
+            );
+            anyhow::ensure!(
+                child.blocked_child_is_alive()?,
+                "child exited before lifecycle transition"
+            );
+            let before_busy = super::ReportDirectoryGuard::try_acquire(&project, id)?.is_none();
+            if checked {
+                lease.release_checked()?;
+            } else {
+                lease.retain();
+            }
+            // Exactly one post-consumption attempt, while the gate is closed.
+            let acquired = super::ReportDirectoryGuard::try_acquire(&project, id)?;
+            let still_blocked = child.blocked_child_is_alive()?;
+            std::fs::write(
+                control.join("observation.json"),
+                serde_json::to_vec(&serde_json::json!({
+                    "parent_pid": std::process::id(), "child_pid": pid, "guard_fd": guard_fd,
+                    "lock": lock, "dev": metadata.dev(), "inode": metadata.ino(),
+                    "child_frame": ready, "checked_release": checked, "before_busy": before_busy,
+                    "after_acquired": acquired.is_some(), "child_alive_gate_closed": still_blocked,
+                }))?,
+            )?;
+            Ok((acquired, before_busy, still_blocked))
+        })();
+        let cleanup = child.finish(observation.is_err());
+        std::fs::write(control.join("ready.bin"), &child.raw_ready).unwrap();
+        std::fs::write(control.join("cleanup.json"), serde_json::to_vec(&serde_json::json!({
+            "result": format!("{cleanup:?}"), "observation_error": observation.as_ref().err().map(|error| format!("{error:#}")),
+        })).unwrap()).unwrap();
+        let status = cleanup.expect("fork fixture must join/reap within its explicit deadlines");
+        assert!(status.success(), "fork child status: {status:?}");
+        let (acquired, before_busy, still_blocked) =
+            observation.expect("actual fork observation failed");
+        assert!(before_busy, "parent still owns guard before consumption");
+        assert!(still_blocked, "observation must precede child exec");
+        let guard = acquired
+            .expect("consumed guard must unlock even while inherited child FD remains open");
+        if checked {
+            assert!(!marker.exists());
+            assert!(guard.release_is_proven(&root).unwrap());
+        } else {
+            assert_eq!(std::fs::read(&marker).unwrap(), original);
+            assert_eq!(std::fs::read(&lock).unwrap(), b"held\n");
+            assert!(!guard.release_is_proven(&root).unwrap());
+        }
+        assert!(root.is_dir());
+    }
+
+    #[test]
+    #[cfg(target_os = "linux")]
+    fn retain_ends_guard_lifetime_before_fork_child_exec() {
+        consumed_report_guard_releases_while_fork_child_is_blocked(false);
+    }
+
+    #[test]
+    #[cfg(target_os = "linux")]
+    fn checked_release_ends_guard_lifetime_before_fork_child_exec() {
+        consumed_report_guard_releases_while_fork_child_is_blocked(true);
     }
 }

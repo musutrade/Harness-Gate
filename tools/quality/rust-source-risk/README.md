@@ -92,9 +92,17 @@ python3 plugin.py collect --request /absolute/request.json
 refuses a real checkout and checks signature, stale context, expiration, replay
 and artifact tampering. It is not the project's complete production gate.
 
-The candidate currently targets Rust 1.97.1 / LLVM 22.1.6, cargo-llvm-cov 0.9.0,
-Python 3.14 and Linux x86-64. New syntax/LLVM formats require compatibility tests
-and a new identity before adoption.
+The reviewed GH-288 Linux x86-64 matrix passed for Rust 1.97.1 / LLVM
+22.1.6 and Rust 1.99.0 / LLVM 23.1.1: each ran the existing 26 tests and
+seven compatibility tests, using cargo-llvm-cov 0.9.0 and Python 3.14.
+The retained Core build is bb813b8; its production sources are byte-identical
+to 3d887's Core, and its recorded identity is preserved. This does not certify
+later changed Core bytes or the Rust 1.99 compiler-private native ABI.
+The combinations have distinct measurement series and adopt no baseline.
+New syntax/LLVM formats require compatibility tests and a new identity before
+adoption; existing captures and baselines are never relabeled.
+See [the completed matrix and evidence contract](../../../docs/quality/gh-288-source-risk-compatibility.md)
+for exact evidence paths, identities, rejection boundaries and source/native choice.
 
 References: [LLVM coverage mapping](https://llvm.org/docs/CoverageMappingFormat.html)
 and [Rust instrument-coverage](https://doc.rust-lang.org/rustc/instrument-coverage.html).
@@ -137,6 +145,16 @@ this does not count the future as polled or cover its body.
 LLVM coverage, and checks the joined metrics. The tests include uncalled closures,
 unpolled async blocks, nested owners, and rejection of a later tuple element
 masquerading as the entry. Set `RUST_SOURCE_INVENTORY` to test a candidate binary.
+
+Set `RUST_SOURCE_TEST_EVIDENCE` to a new evidence directory to retain original
+sources, binaries, raw profiles, merged profiles, exports, exact tool identities,
+command/status/stdout/stderr records and measured/rejected results from
+`test_measure.py` and `test_closures.py`. Without that option their disposable
+fixtures retain the existing cleanup behavior. The two-toolchain certification
+runner sets this option and builds its own AST analyzer in each combination's
+fresh target directory. Normal unittest discovery adds only its static contract
+test; expensive certification is an explicit command. Missing prerequisites in
+that command block certification, never silently skip or use another toolchain.
 
 Some trivial projection closures (for example `|value: &i32| *value`) have no
 independent coverage record in the tested compiler output. These still reject:

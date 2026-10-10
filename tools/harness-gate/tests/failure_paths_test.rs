@@ -704,10 +704,98 @@ connection = 'fixture:{host_port}'
         }
         assert!(root.path().join("runtime-object.json").is_file());
         let leases = root.path().join(".harness-gate/reports/leases");
+        let entries = fs::read_dir(&leases)
+            .unwrap()
+            .map(|entry| entry.unwrap())
+            .collect::<Vec<_>>();
+        let lease_files = entries
+            .iter()
+            .filter(|entry| {
+                entry.file_type().unwrap().is_file()
+                    && entry.path().extension() == Some(std::ffi::OsStr::new("json"))
+            })
+            .collect::<Vec<_>>();
         assert_eq!(
-            fs::read_dir(&leases).unwrap().count(),
+            lease_files.len(),
             1,
-            "failed cleanup must retain lease"
+            "failed cleanup must retain exactly one container lease"
+        );
+        let lease: Value =
+            serde_json::from_slice(&fs::read(lease_files[0].path()).unwrap()).unwrap();
+        let project_identity = root.path().canonicalize().unwrap();
+        let project_identity = project_identity.to_str().unwrap();
+        let invocation_id = json["invocation_id"].as_str().unwrap();
+        assert_eq!(lease["owner_marker"], "harness-gate");
+        assert_eq!(lease["schema_version"], 2);
+        assert_eq!(lease["resource_kind"], "container");
+        assert_eq!(lease["resource_id"], "service:fixture");
+        assert_eq!(lease["invocation_id"], invocation_id);
+        assert_eq!(lease["project_identity"], project_identity);
+        assert_eq!(lease["runtime"], "docker");
+        assert_eq!(lease["runtime_object_id"], "fixture-immutable-id");
+        let runtime: Value =
+            serde_json::from_slice(&fs::read(root.path().join("runtime-object.json")).unwrap())
+                .unwrap();
+        assert_eq!(lease["runtime_object_id"], runtime["Id"]);
+        assert_eq!(
+            runtime["Name"],
+            format!("/{}", lease["resource_name"].as_str().unwrap())
+        );
+        let labels = serde_json::json!({
+            "harness-gate.owner": "harness-gate",
+            "harness-gate.schema": "2",
+            "harness-gate.project": project_identity,
+            "harness-gate.resource": "service:fixture",
+            "harness-gate.kind": "container",
+            "harness-gate.invocation": invocation_id,
+        });
+        assert_eq!(lease["runtime_labels"], labels);
+        assert_eq!(runtime["Config"]["Labels"], labels);
+        let container_key = format!("{:x}", Sha256::digest(b"service:fixture"));
+        assert_eq!(
+            lease_files[0].file_name(),
+            std::ffi::OsStr::new(&format!("{}.json", &container_key[..16]))
+        );
+        let locks = leases.join("report-directory-locks");
+        assert!(fs::symlink_metadata(&locks).unwrap().file_type().is_dir());
+        for entry in &entries {
+            assert!(
+                entry.path() == lease_files[0].path() || entry.path() == locks,
+                "unexpected lease-directory entry: {:?}",
+                entry.path()
+            );
+        }
+        let sidecars = fs::read_dir(&locks)
+            .unwrap()
+            .map(|entry| entry.unwrap())
+            .collect::<Vec<_>>();
+        assert_eq!(sidecars.len(), 1, "one invocation has one stable lock");
+        assert!(sidecars[0].file_type().unwrap().is_file());
+        assert_eq!(
+            sidecars[0].path().extension(),
+            Some(std::ffi::OsStr::new("lock"))
+        );
+        let invocation_key = format!(
+            "{:x}",
+            Sha256::digest(format!("invocation:{invocation_id}").as_bytes())
+        );
+        assert_eq!(
+            sidecars[0].file_name(),
+            std::ffi::OsStr::new(&format!("{}.lock", &invocation_key[..16]))
+        );
+        // Invocation Drop releases its report lease even when service cleanup
+        // or current-report publication fails. Its certificate is a sidecar,
+        // while the failed container's ownership marker remains a JSON lease.
+        let released: Value =
+            serde_json::from_slice(&fs::read(sidecars[0].path()).unwrap()).unwrap();
+        assert_eq!(
+            released,
+            serde_json::json!({
+                "schema_version": 1,
+                "invocation_id": invocation_id,
+                "project_identity": project_identity,
+                "root": paths[0].canonicalize().unwrap(),
+            })
         );
         let cleanup = command(root.path())
             .args(["cleanup", "--dry-run"])

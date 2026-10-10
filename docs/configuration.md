@@ -297,16 +297,22 @@ default 15), and optional help.
 | Kind | Fields | Behavior |
 | --- | --- | --- |
 | command | program, args | Command must exit 0. |
-| path | path, path_type | Check any path, file, or directory. |
+| path | path, path_type, path_scope | Check any path, file, or directory. |
 | glob | pattern | Pattern must match at least one path. |
 | env | name | Variable must exist. |
-| env-or-file | env, path, contains | Variable exists, or a file has a line beginning with contains. |
+| env-or-file | env, path, contains, path_scope | Variable exists, or a file has a line beginning with contains. |
 | git-config | key, expected | Git value must equal expected. |
 | git-remotes | none | Validate Git remote configuration. |
-| version | program, args, path, trim_prefix | Compare command output with a version file. |
+| version | program, args, path, trim_prefix, path_scope | Compare command output with a version file. |
 | service | service | Check an environment or managed service. |
 
-path_type is any, file, or directory and defaults to any. Use
+path_type is any, file, or directory and defaults to any. path_scope is
+repository (default) or host. Repository-scoped paths must stay inside the
+project: a repository-relative path, optionally behind one leading placeholder
+such as {root} or an alias, with no `..` and no symlink that resolves outside.
+config check and doctor both reject other paths. Set path_scope = "host" only
+for an intended host location such as an installed tool or a user-level
+credential file; reports name the path but never echo file content. Use
 harness-gate doctor --strict in CI when warnings must fail the job.
 
 ### Lease and orphan cleanup
@@ -585,6 +591,17 @@ authorization headers, Bearer/Basic credentials, API keys, passwords, private
 key blocks, and common database URL values. The latest 50 invocations are
 retained; cleanup never removes an active or recently modified invocation.
 
+Text evidence also recognizes JSON credential strings embedded in logs or JSON
+lines, including escaped quotes, backslashes and Unicode escapes. Private-key
+BEGIN blocks without an END marker are redacted through the end of the file.
+Header values (including cookie attributes) are redacted after indentation or
+explicit log prefixes: whitespace-separated bracketed fields, ISO date/time
+stamps, TRACE/DEBUG/INFO/WARN/WARNING/ERROR/FATAL levels (with an optional colon),
+and curl's `<`/`>` markers. Prefixes are preserved; arbitrary prose containing
+`cookie:` does not establish a header boundary. These changes preserve the
+existing evidence limits, generated-JSON identity checks and required quality
+gate semantics described in the Engineering Policy.
+
 Webhooks run after report writing:
 
     [[notifications.webhooks]]
@@ -595,7 +612,10 @@ Webhooks run after report writing:
 
 URLs must use http or https, have no userinfo or wildcard host, and list an
 exact host in allowed_hosts. Each connection re-resolves the host and rejects
-loopback, private, link-local, unspecified, and multicast addresses. Redirects
+loopback, private, link-local, unspecified, multicast, shared (CGNAT
+100.64.0.0/10), benchmarking, documentation and reserved addresses, including
+IPv6 forms that embed a local IPv4 address (IPv4-mapped/compatible, NAT64
+`64:ff9b::/96`, 6to4). Redirects
 and proxy environment variables are disabled. Non-2xx responses, connection
 errors, and policy denials fail verification with E1404 without changing the
 written report. At least one result type must be enabled; webhooks run in

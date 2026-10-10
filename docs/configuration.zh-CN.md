@@ -364,14 +364,19 @@ args = ["--version"]
 | kind          | 字段                                     | 行为                                           |
 | ------------- | ---------------------------------------- | ---------------------------------------------- |
 | `command`     | `program`, `args`                        | 执行命令并要求退出码为 0                       |
-| `path`        | `path`, `path_type`                      | 检查任意路径、文件或目录                       |
+| `path`        | `path`, `path_type`, `path_scope`        | 检查任意路径、文件或目录                       |
 | `glob`        | `pattern`                                | 要求 glob 至少命中一个路径                     |
 | `env`         | `name`                                   | 要求环境变量存在                               |
-| `env-or-file` | `env`, `path`, `contains`                | 环境变量存在，或文件中有以 `contains` 开头的行 |
+| `env-or-file` | `env`, `path`, `contains`, `path_scope`  | 环境变量存在，或文件中有以 `contains` 开头的行 |
 | `git-config`  | `key`, `expected`                        | 要求 Git 配置等于预期值                        |
 | `git-remotes` | 无                                       | 检查 Git remote 配置                           |
-| `version`     | `program`, `args`, `path`, `trim_prefix` | 比较命令输出与版本文件                         |
+| `version`     | `program`, `args`, `path`, `trim_prefix`, `path_scope` | 比较命令输出与版本文件           |
 | `service`     | `service`                                | 检查 service 的外部变量或 Docker 可用性        |
+
+`path_scope` 取 `repository`（默认）或 `host`。repository 作用域的路径必须留在项目内：
+仓库相对路径，或以一个 `{root}`/别名占位符开头，不能含 `..`，也不能经符号链接解析到仓库外；
+`config check` 和 `doctor` 都会拒绝其他路径。只有确实要检查宿主位置（已安装工具、用户级凭据
+文件）时才设置 `path_scope = "host"`；报告只给出路径，不回显文件内容。
 
 示例：
 
@@ -921,6 +926,13 @@ invocation 和 step ID。报告声明、registry、manifest 和磁盘上的可�
 私钥块及常见数据库连接串的值都不会导出。默认保留最新 50 个 invocation；仅清理超过 15 分钟租约窗口
 且超出数量上限的旧目录，活动或最近修改的 invocation 不会被清理。
 
+日志或 JSON lines 内的 JSON 凭据字符串也会完整脱敏，包含转义引号、连续反斜杠和
+Unicode 转义。私钥 BEGIN 块缺少 END 时脱敏至文件尾。请求头可位于缩进或明确的日志前缀之后：
+以空白分隔的方括号字段、ISO 日期时间、TRACE/DEBUG/INFO/WARN/WARNING/ERROR/FATAL
+级别（可带冒号）以及 curl 的 `<`/`>` 方向标记。保留前缀，脱敏完整 header 值及 Cookie 属性；
+任意正文中出现 `cookie:` 不构成 header 边界。现有证据大小限制、Core 生成 JSON 的内容身份校验
+以及 Engineering Policy 的 required quality gate 语义保持不变。
+
 发布流程先生成一个由 `tools/release/release_inventory.py` 管理的显式
 `release-inventory.json`，其中列出每个平台二进制和 CycloneDX SBOM。checksum、Sigstore
 签名/证书、GitHub provenance 验证和最终上传集合都从同一 inventory 派生；inventory、
@@ -951,7 +963,8 @@ on_success = false
 ```
 
 Webhook 只支持 `http` 和 `https`，发送前会再次解析并拒绝 loopback、RFC1918/private、link-local、
-unspecified 和 multicast 地址；重定向被禁用。非 2xx 响应、连接错误或目的地策略拒绝会使本次验证
+unspecified、multicast、共享地址（CGNAT 100.64.0.0/10）、基准测试、文档及保留地址，并对内嵌
+IPv4 的 IPv6 形式（IPv4-mapped/compatible、NAT64 `64:ff9b::/96`、6to4）按内嵌地址判定；重定向被禁用。非 2xx 响应、连接错误或目的地策略拒绝会使本次验证
 返回报告错误（`E1404`），但不会改写已经生成的报告。`on_failure` 默认开启，`on_success` 默认关闭；
 至少启用一个结果类型。多个 webhook 按配置文件中的顺序发送；第一个请求失败后立即停止，后续 endpoint
 不会被调用。日志只保留 scheme 和规范化主机，不记录凭据或报告 body。
