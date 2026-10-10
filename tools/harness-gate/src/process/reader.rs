@@ -210,6 +210,12 @@ mod tests {
         for _ in 0..5 {
             collect();
         }
+        // A joined thread's /proc task entry can outlive pthread_join for a
+        // moment while the kernel reaps it; allow a bounded settle period.
+        let settle = std::time::Instant::now();
+        while count("/proc/self/task") > threads && settle.elapsed() < Duration::from_secs(2) {
+            std::thread::sleep(Duration::from_millis(10));
+        }
         assert_eq!(count("/proc/self/task"), threads, "reader threads leaked");
         assert_eq!(count("/proc/self/fd"), fds, "pipe descriptors leaked");
     }
