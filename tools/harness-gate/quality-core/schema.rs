@@ -230,21 +230,21 @@ fn walk(v: &Value, s: &Value, root: &Value, path: &str) -> Result<()> {
                 )?;
             }
         }
-        // The frozen Python walker ignored uniqueItems; enforce it here so a
-        // schema declaration is never silently unchecked (#313).
-        if s["uniqueItems"] == true {
-            require(
-                values
-                    .iter()
-                    .enumerate()
-                    .all(|(i, value)| !values[..i].contains(value)),
-                format!("{path}: array violates uniqueItems"),
-            )?;
-        }
     }
     // Value.oneOf is intentionally resolved by the explicit metric discriminator,
     // as in the frozen reference. Metadata gets its own project traversal.
     Ok(())
+}
+
+/// Explicit compensation for `uniqueItems`, which the frozen walker subset
+/// does not interpret (#313). Callers name the declaring field path.
+pub(super) fn require_unique(values: &Value, path: &str) -> Result<()> {
+    let values = values.as_array().map(Vec::as_slice).unwrap_or_default();
+    let unique = values
+        .iter()
+        .enumerate()
+        .all(|(i, value)| !values[..i].contains(value));
+    require(unique, format!("{path}: array violates uniqueItems"))
 }
 
 #[cfg(test)]
@@ -268,9 +268,10 @@ mod keyword_tests {
         "items",
         "minItems",
         "maxItems",
-        "uniqueItems",
     ];
-    const COMPENSATED: &[&str] = &["oneOf"];
+    /// `oneOf` uses explicit discriminator checks; `uniqueItems` uses
+    /// `require_unique` at each declaring field (policy remediation classes).
+    const COMPENSATED: &[&str] = &["oneOf", "uniqueItems"];
     const ANNOTATIONS: &[&str] = &["$schema", "$id", "title", "description", "definitions"];
 
     fn collect(schema: &Value, found: &mut Vec<String>) {
@@ -319,19 +320,33 @@ mod keyword_tests {
     }
 
     #[test]
-    fn unique_items_rejects_duplicates_with_field_path() {
-        let schema = serde_json::json!({
-            "type": "object",
-            "properties": {"classes": {"type": "array", "uniqueItems": true,
-                "items": {"type": "string"}}}
-        });
-        shape(&serde_json::json!({"classes": ["x", "y"]}), &schema, None).unwrap();
-        let error = shape(&serde_json::json!({"classes": ["x", "x"]}), &schema, None)
+    fn require_unique_rejects_duplicates_with_field_path() {
+        require_unique(&serde_json::json!(["x", "y"]), "$.classes").unwrap();
+        let error = require_unique(&serde_json::json!(["x", "x"]), "$.classes")
             .unwrap_err()
             .to_string();
         assert!(
             error.contains("$.classes: array violates uniqueItems"),
             "{error}"
         );
+    }
+
+    #[test]
+    fn every_unique_items_declaration_is_compensated() {
+        // Keep this in sync with `require_unique` call sites.
+        let declared = POLICY.to_string().matches("\"uniqueItems\"").count();
+        assert_eq!(
+            declared, 1,
+            "policy remediation_classes is the only declaration"
+        );
+        for schema in [
+            &*PROJECT,
+            &*EVIDENCE,
+            &*REQUIREMENTS,
+            &*EXCEPTIONS,
+            &*MAPPINGS,
+        ] {
+            assert!(!schema.to_string().contains("\"uniqueItems\""));
+        }
     }
 }
