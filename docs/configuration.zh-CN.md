@@ -958,7 +958,8 @@ on_success = false
 ```
 
 Webhook 只支持 `http` 和 `https`，发送前会再次解析并拒绝 loopback、RFC1918/private、link-local、
-unspecified 和 multicast 地址；重定向被禁用。非 2xx 响应、连接错误或目的地策略拒绝会使本次验证
+unspecified、multicast、共享地址（CGNAT 100.64.0.0/10）、基准测试、文档及保留地址，并对内嵌
+IPv4 的 IPv6 形式（IPv4-mapped/compatible、NAT64 `64:ff9b::/96`、6to4）按内嵌地址判定；重定向被禁用。非 2xx 响应、连接错误或目的地策略拒绝会使本次验证
 返回报告错误（`E1404`），但不会改写已经生成的报告。`on_failure` 默认开启，`on_success` 默认关闭；
 至少启用一个结果类型。多个 webhook 按配置文件中的顺序发送；第一个请求失败后立即停止，后续 endpoint
 不会被调用。日志只保留 scheme 和规范化主机，不记录凭据或报告 body。

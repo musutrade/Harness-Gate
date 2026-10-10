@@ -606,7 +606,10 @@ Webhooks run after report writing:
 
 URLs must use http or https, have no userinfo or wildcard host, and list an
 exact host in allowed_hosts. Each connection re-resolves the host and rejects
-loopback, private, link-local, unspecified, and multicast addresses. Redirects
+loopback, private, link-local, unspecified, multicast, shared (CGNAT
+100.64.0.0/10), benchmarking, documentation and reserved addresses, including
+IPv6 forms that embed a local IPv4 address (IPv4-mapped/compatible, NAT64
+`64:ff9b::/96`, 6to4). Redirects
 and proxy environment variables are disabled. Non-2xx responses, connection
 errors, and policy denials fail verification with E1404 without changing the
 written report. At least one result type must be enabled; webhooks run in
