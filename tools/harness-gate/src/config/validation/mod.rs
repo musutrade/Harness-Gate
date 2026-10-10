@@ -774,7 +774,9 @@ fn validate_parser_entry(id: &str, parser: &ParserConfig) -> Result<()> {
     Ok(())
 }
 
-fn validate_doctor_check(config: &FlowConfig, check: &DoctorCheck) -> Result<()> {
+/// Doctor fields that every kind shares, validated once before the kind is
+/// dispatched so the dispatch below stays within its complexity budget.
+fn validate_doctor_common_fields(check: &DoctorCheck) -> Result<()> {
     validate_id("doctor check id", &check.id)?;
     if check.label.trim().is_empty() {
         bail!("doctor check {:?} requires a label", check.id);
@@ -785,6 +787,11 @@ fn validate_doctor_check(config: &FlowConfig, check: &DoctorCheck) -> Result<()>
             check.id
         );
     }
+    Ok(())
+}
+
+fn validate_doctor_check(config: &FlowConfig, check: &DoctorCheck) -> Result<()> {
+    validate_doctor_common_fields(check)?;
     match &check.kind {
         DoctorCheckKind::Command { program, args } => {
             validate_program("doctor command", program)?;
