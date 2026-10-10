@@ -1347,6 +1347,49 @@ fn doctor_paths_outside_the_repository_require_host_scope() {
 }
 
 #[test]
+fn doctor_common_check_fields_are_validated_before_the_kind() {
+    let check = |label: &str, timeout_secs: u64| DoctorCheck {
+        id: "host.path".into(),
+        label: label.into(),
+        required: true,
+        help: None,
+        timeout_secs,
+        kind: DoctorCheckKind::Path {
+            path: "{root}/inside.txt".into(),
+            path_type: PathType::Any,
+            path_scope: PathScope::Repository,
+        },
+    };
+    for (label, timeout_secs, case) in [
+        ("", 15, "blank label"),
+        ("   ", 15, "whitespace label"),
+        ("host path", 0, "zero timeout"),
+        ("host path", 301, "timeout above the bound"),
+    ] {
+        let mut config = repository_config();
+        config.doctor.checks.push(check(label, timeout_secs));
+        let index = config.doctor.checks.len() - 1;
+        assert_diagnostic(
+            &config,
+            &format!("doctor.checks[{index}]"),
+            "HGCFG-INVALID-FIELD",
+        );
+        assert!(
+            config.validate().is_err(),
+            "{case}: strict validation must reject the check"
+        );
+    }
+    for timeout_secs in [1, 300] {
+        let mut config = repository_config();
+        config.doctor.checks.push(check("host path", timeout_secs));
+        assert!(
+            config.validate().is_ok(),
+            "timeout_secs = {timeout_secs} must remain inside the bounds"
+        );
+    }
+}
+
+#[test]
 fn doctor_parser_alias_and_scope_diagnostics_keep_configuration_paths() {
     let mut config = repository_config();
     config.doctor.checks.push(config.doctor.checks[0].clone());
