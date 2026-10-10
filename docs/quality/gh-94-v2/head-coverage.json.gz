@@ -1,0 +1,11 @@
+# Archived quality evidence
+
+This file was externalized from Git history to keep `main` small. The raw bytes remain available in the repository evidence archive.
+
+- Archive: https://github.com/musutrade/Harness-Gate/releases/download/evidence-archive-20261010/quality-evidence-current.tar.zst
+- Path inside archive: `docs/quality/gh-94-v2/head-coverage.json.gz`
+- Original size: 553885 bytes
+- Original SHA-256: `d106eaf280cf5f661afc142e434d79178cabfdcb6ef602695571ff0c6b40bde7`
+- Original Git blob: `71f3bf489e36a842666c0a707d3b57be2e1de035`
+
+Download the archive, extract `docs/quality/gh-94-v2/head-coverage.json.gz`, and verify the SHA-256 before use.

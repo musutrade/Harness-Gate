@@ -1,0 +1,11 @@
+# Archived quality evidence
+
+This file was externalized from Git history to keep `main` small. The raw bytes remain available in the repository evidence archive.
+
+- Archive: https://github.com/musutrade/Harness-Gate/releases/download/evidence-archive-20261010/quality-evidence-current.tar.zst
+- Path inside archive: `docs/quality/gh-220/source-replay-baseline.json`
+- Original size: 646588 bytes
+- Original SHA-256: `c4f39b7dd937b89e7213458700a32daf4eb9ae836ed380ce78a18c1b18ebb135`
+- Original Git blob: `624cf5f324274441b41b3eeb9b26d63bf01e7911`
+
+Download the archive, extract `docs/quality/gh-220/source-replay-baseline.json`, and verify the SHA-256 before use.

@@ -1,0 +1,11 @@
+# Archived quality evidence
+
+This file was externalized from Git history to keep `main` small. The raw bytes remain available in the repository evidence archive.
+
+- Archive: https://github.com/musutrade/Harness-Gate/releases/download/evidence-archive-20261010/quality-evidence-current.tar.zst
+- Path inside archive: `docs/quality/gh-230/project-evidence.tar.gz.parts/part-0001`
+- Original size: 2880000 bytes
+- Original SHA-256: `337101bdba5a04fbd1c6afe4803d517f361f236d0a77c4152f05d01965ab8607`
+- Original Git blob: `542afadb071f244bcb6d859427dacf911c795d46`
+
+Download the archive, extract `docs/quality/gh-230/project-evidence.tar.gz.parts/part-0001`, and verify the SHA-256 before use.
