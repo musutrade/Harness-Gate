@@ -1,5 +1,5 @@
 use super::report::DoctorReport;
-use crate::config::{DoctorCheck, DoctorCheckKind, PathType};
+use crate::config::{DoctorCheck, DoctorCheckKind, PathScope, PathType};
 use crate::project::Project;
 use anyhow::{bail, Context, Result};
 use globset::{Glob, GlobSetBuilder};
@@ -35,14 +35,19 @@ fn run_check(project: &Project, check: &DoctorCheck) -> Result<String> {
                 .collect::<Vec<_>>();
             command_output(project, program, &args, timeout)
         }
-        DoctorCheckKind::Path { path, path_type } => check_path(project, path, path_type),
+        DoctorCheckKind::Path {
+            path,
+            path_type,
+            path_scope,
+        } => check_path(project, path, path_type, *path_scope),
         DoctorCheckKind::Glob { pattern } => check_glob(project, pattern),
         DoctorCheckKind::Env { name } => check_env(name),
         DoctorCheckKind::EnvOrFile {
             env,
             path,
             contains,
-        } => check_env_or_file(project, env, path, contains),
+            path_scope,
+        } => check_env_or_file(project, env, path, contains, *path_scope),
         DoctorCheckKind::GitConfig { key, expected } => {
             check_git_config(project, key, expected, timeout)
         }
@@ -52,15 +57,29 @@ fn run_check(project: &Project, check: &DoctorCheck) -> Result<String> {
             args,
             path,
             trim_prefix,
-        } => check_version(project, program, args, path, trim_prefix, timeout),
+            path_scope,
+        } => check_version(
+            project,
+            program,
+            args,
+            path,
+            trim_prefix,
+            *path_scope,
+            timeout,
+        ),
         DoctorCheckKind::Service { service } => {
             crate::service::check_available(project, service, timeout)
         }
     }
 }
 
-fn check_path(project: &Project, path: &str, path_type: &PathType) -> Result<String> {
-    let path = resolve_check_path(project, path);
+pub(crate) fn check_path(
+    project: &Project,
+    path: &str,
+    path_type: &PathType,
+    scope: PathScope,
+) -> Result<String> {
+    let path = resolve_check_path(project, path, scope)?;
     let exists = match path_type {
         PathType::Any => path.exists(),
         PathType::File => path.is_file(),
@@ -77,11 +96,17 @@ fn check_env(name: &str) -> Result<String> {
     Ok(format!("{name} is configured"))
 }
 
-fn check_env_or_file(project: &Project, env: &str, path: &str, contains: &str) -> Result<String> {
+pub(crate) fn check_env_or_file(
+    project: &Project,
+    env: &str,
+    path: &str,
+    contains: &str,
+    scope: PathScope,
+) -> Result<String> {
     if std::env::var_os(env).is_some() {
         return Ok(format!("{env} is configured"));
     }
-    let path = resolve_check_path(project, path);
+    let path = resolve_check_path(project, path, scope)?;
     let found = fs::read_to_string(&path)
         .map(|content| {
             content
@@ -123,6 +148,7 @@ fn check_version(
     args: &[String],
     path: &str,
     trim_prefix: &str,
+    scope: PathScope,
     timeout: Duration,
 ) -> Result<String> {
     let args = args
@@ -132,7 +158,7 @@ fn check_version(
     let actual = command_output(project, program, &args, timeout)?
         .trim_start_matches(trim_prefix)
         .to_string();
-    let path = resolve_check_path(project, path);
+    let path = resolve_check_path(project, path, scope)?;
     let expected = fs::read_to_string(&path)
         .with_context(|| format!("read version file {}", path.display()))?
         .trim()
@@ -143,14 +169,52 @@ fn check_version(
     Ok(expected)
 }
 
-fn resolve_check_path(project: &Project, value: &str) -> PathBuf {
-    let expanded = project.expand(value);
+fn resolve_check_path(project: &Project, value: &str, scope: PathScope) -> Result<PathBuf> {
+    let mut expanded = project.expand(value);
+    if cfg!(windows) {
+        // `{root}` expands to a verbatim (extended-length) path on Windows, where `/`
+        // is not a separator; normalize so `{root}/file` names a child of root.
+        expanded = expanded.replace('/', "\\");
+    }
     let path = Path::new(&expanded);
-    if path.is_absolute() {
+    let path = if path.is_absolute() {
         path.to_path_buf()
     } else {
         project.root.join(path)
+    };
+    if scope == PathScope::Repository {
+        ensure_inside_repository(&project.root, &path).with_context(|| {
+            format!("{value:?} is outside the repository; set path_scope = \"host\" to probe a host location")
+        })?;
     }
+    Ok(path)
+}
+
+/// Lexical and symlink-resolved containment for repository-scoped checks. A
+/// missing target is judged by its nearest existing ancestor.
+fn ensure_inside_repository(root: &Path, path: &Path) -> Result<()> {
+    if path
+        .components()
+        .any(|component| matches!(component, std::path::Component::ParentDir))
+    {
+        bail!("path traverses upward: {}", path.display());
+    }
+    let root = root
+        .canonicalize()
+        .with_context(|| format!("resolve project root {}", root.display()))?;
+    let mut existing = path;
+    while fs::symlink_metadata(existing).is_err() {
+        existing = existing
+            .parent()
+            .ok_or_else(|| anyhow::anyhow!("cannot resolve {}", path.display()))?;
+    }
+    let resolved = existing
+        .canonicalize()
+        .with_context(|| format!("resolve {}", existing.display()))?;
+    if !resolved.starts_with(&root) {
+        bail!("path resolves outside the repository: {}", path.display());
+    }
+    Ok(())
 }
 
 fn command_output(

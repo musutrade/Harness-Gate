@@ -229,6 +229,24 @@ fn both() {
             self.assertTrue(result['excluded'])
             self.assertFalse(any(s['test'] for s in result['symbols']))
 
+    def test_statement_cfg_attributes_on_unsafe_blocks_are_removable(self):
+        source = '''pub fn configured() {
+    #[cfg(unix)]
+    unsafe { if true {} }
+    #[cfg(windows)]
+    unsafe { if true {} if true {} let hidden = || if true {}; }
+}
+'''
+        unix = self.inventory(source, 'x86_64-unknown-linux-gnu')
+        windows = self.inventory(source, 'x86_64-pc-windows-msvc')
+        self.assertEqual([s['name'] for s in unix['symbols']], ['configured'])
+        self.assertEqual([complexity(s['raw']) for s in unix['symbols']], [2])
+        self.assertEqual([s['name'] for s in windows['symbols']],
+                         ['configured', 'configured::closure_5_49'])
+        self.assertEqual([complexity(s['raw']) for s in windows['symbols']], [3, 2])
+        self.assertTrue(unix['excluded'])
+        self.assertTrue(windows['excluded'])
+
     def test_unsupported_configuration_fails_without_partial_inventory(self):
         inactive = "unix" if "windows" in compiler_configuration()["cfg"] else "windows"
         for source in (
@@ -436,6 +454,29 @@ fn both() {
                         self.assertEqual((*original_point(mapped[:2], edits),
                                           *original_point(mapped[2:], edits)),
                                          byte_span(source, original[field]))
+    def test_review_low_sources_inventory_and_instrumentation(self):
+        paths = ('audit/runner.rs', 'config/loader.rs', 'config/migration.rs', 'config/model.rs',
+                 'process/signal.rs', 'secrets/config.rs')
+        for path in paths:
+            self.assertIn(path, SOURCE_FILES)
+            source_file = ROOT / 'tools/harness-gate/src' / path
+            source = source_file.read_bytes().decode('utf-8')
+            for target in ('x86_64-unknown-linux-gnu', 'aarch64-apple-darwin', 'x86_64-pc-windows-msvc'):
+                with self.subTest(path=path, target=target):
+                    inventory = ast(source_file, self.binary, compiler_configuration(target))
+                    symbols = inventory['symbols']
+                    self.assertTrue(any(s['kind'] == 'function' for s in symbols))
+                    self.assertFalse(any(s['test'] for s in symbols))
+                    transformed, edits = instrument(source, inventory)
+                    reparsed = self.inventory(transformed, target)
+                    self.assertEqual([s['kind'] for s in reparsed['symbols']], [s['kind'] for s in symbols])
+                    for original, inserted in zip(symbols, reparsed['symbols']):
+                        self.assertEqual(complexity(original['raw']), complexity(inserted['raw']))
+                        for field in ('span', 'body'):
+                            mapped = byte_span(transformed, inserted[field])
+                            self.assertEqual((*original_point(mapped[:2], edits),
+                                              *original_point(mapped[2:], edits)),
+                                             byte_span(source, original[field]))
 
     def test_net_policy_source_inventory_and_instrumentation(self):
         path = 'net_policy.rs'
@@ -467,7 +508,7 @@ fn both() {
         self.assertEqual(SERIES, {
             'analyzer': 'harness-gate-rust-measure/0.3.1', 'rule': 'mccabe-rust-3/1',
             'instrumentation': 'closure-black-box/1', 'mapping': 'insertions-utf8/1',
-            'selection': 'gh312-process-reader/1', 'configuration': 'compiler-target-production/4',
+            'selection': 'gh315-review-low/1', 'configuration': 'compiler-target-production/4',
         })
         path = 'utils/redaction.rs'
         self.assertIn(path, SOURCE_FILES)
@@ -708,7 +749,7 @@ fn main() {
         self.assertEqual(SERIES, {
             'analyzer': 'harness-gate-rust-measure/0.3.1', 'rule': 'mccabe-rust-3/1',
             'instrumentation': 'closure-black-box/1', 'mapping': 'insertions-utf8/1',
-            'selection': 'gh312-process-reader/1', 'configuration': 'compiler-target-production/4',
+            'selection': 'gh315-review-low/1', 'configuration': 'compiler-target-production/4',
         })
         for label, source in self.process_command_sources().items():
             for target in ('x86_64-unknown-linux-gnu', 'aarch64-apple-darwin', 'x86_64-pc-windows-msvc'):

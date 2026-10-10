@@ -452,7 +452,7 @@ class BaselineDeliveryTests(unittest.TestCase):
         capture, retry = workflow.split('  delivery-only:\n')
         self.assertLess(capture.index('baseline_delivery.py precheck'), capture.index('name: Install Rust'))
         self.assertIn('--samples 5', capture)
-        self.assertIn('uses: peter-evans/create-pull-request@v7', capture)
+        self.assertIn('uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7', capture)
         self.assertIn('name: Upload raw benchmark evidence\n        id: evidence\n        if: ${{ always() }}', capture)
         self.assertIn('path: target/quality', capture)
         self.assertIn('if-no-files-found: warn', capture)

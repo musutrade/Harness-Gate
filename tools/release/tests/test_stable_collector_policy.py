@@ -39,7 +39,12 @@ class StableCollectorPolicyTests(unittest.TestCase):
                           'rust-native-driver/bootstrap.py', 'rustc-dev'):
             self.assertNotIn(forbidden, source)
         self.assertNotRegex(source, r'(?m)(?:^|\s)-Z(?:\s|[a-z])')
-        self.assertIn('dtolnay/rust-toolchain@stable', source)
+        # Every toolchain step uses the SHA-pinned commit of the action's
+        # `stable` branch, whose default toolchain input is `stable`.
+        refs = re.findall(r'dtolnay/rust-toolchain@\S+(?: # \S+)?', source)
+        self.assertTrue(refs)
+        self.assertEqual(set(refs), {
+            'dtolnay/rust-toolchain@4360b52568e2003a75bf9bc1d59f33a8e3fc893c # stable'})
         self.assertIn('python3 -m unittest discover -s tools/release/tests', source)
 
 

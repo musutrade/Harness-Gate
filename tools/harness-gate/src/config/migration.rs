@@ -1,8 +1,8 @@
 use super::model::{
     default_doctor_timeout, ContainerRuntimeKind, DoctorCheck, DoctorCheckKind, DoctorConfig,
     ExecutionConfig, ExternalValuePolicy, FlowConfig, NotificationsConfig, ParserConfig, PathAlias,
-    PathType, PathsConfig, PolicyConfig, ProjectConfig, ReportTemplatesConfig, ScopeConfig,
-    ServiceConfig, StepConfig, CONFIG_VERSION,
+    PathScope, PathType, PathsConfig, PolicyConfig, ProjectConfig, ReportTemplatesConfig,
+    ScopeConfig, ServiceConfig, StepConfig, CONFIG_VERSION,
 };
 use anyhow::{bail, Context, Result};
 use serde::Deserialize;
@@ -208,6 +208,7 @@ pub fn migrate_v1(source: &str, project_name: &str) -> Result<FlowConfig> {
             kind: DoctorCheckKind::Path {
                 path: "{frontend}/node_modules".into(),
                 path_type: PathType::Directory,
+                path_scope: PathScope::Repository,
             },
         },
         DoctorCheck {
@@ -220,6 +221,7 @@ pub fn migrate_v1(source: &str, project_name: &str) -> Result<FlowConfig> {
                 env: "DATABASE_URL".into(),
                 path: "{backend}/.env".into(),
                 contains: "DATABASE_URL=".into(),
+                path_scope: PathScope::Repository,
             },
         },
         DoctorCheck {
@@ -257,6 +259,7 @@ pub fn migrate_v1(source: &str, project_name: &str) -> Result<FlowConfig> {
                 args: vec!["--version".into()],
                 path: format!("{{root}}/{}", legacy.doctor.node_version_file),
                 trim_prefix: "v".into(),
+                path_scope: PathScope::Repository,
             },
         },
         DoctorCheck {

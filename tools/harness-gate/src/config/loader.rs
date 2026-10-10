@@ -10,7 +10,37 @@ use std::env;
 use std::error::Error;
 use std::fmt;
 use std::fs;
+use std::io::Read;
 use std::path::Path;
+
+/// Upper bound for every configuration document read from disk (#322).
+pub(crate) const MAX_CONFIG_BYTES: u64 = 4 * 1024 * 1024;
+
+/// Read a configuration document without allocating beyond
+/// `MAX_CONFIG_BYTES`, so a huge or growing file fails before parsing.
+pub(crate) fn read_config_source(path: &Path) -> std::io::Result<String> {
+    let too_large = || {
+        std::io::Error::new(
+            std::io::ErrorKind::InvalidData,
+            format!(
+                "{} exceeds the {} byte configuration limit",
+                path.display(),
+                MAX_CONFIG_BYTES
+            ),
+        )
+    };
+    let file = fs::File::open(path)?;
+    if file.metadata()?.len() > MAX_CONFIG_BYTES {
+        return Err(too_large());
+    }
+    let mut source = String::new();
+    file.take(MAX_CONFIG_BYTES + 1)
+        .read_to_string(&mut source)?;
+    if source.len() as u64 > MAX_CONFIG_BYTES {
+        return Err(too_large());
+    }
+    Ok(source)
+}
 
 const LEGACY_REPORT_DIR_ALIAS: &str = "REPORT_DIR";
 const REPORT_DIR_ALIAS_REPLACEMENT: &str = "HARNESS_GATE_REPORTS";
@@ -21,14 +51,19 @@ impl FlowConfig {
         path: &Path,
         repository_root: Option<&Path>,
     ) -> std::result::Result<Self, ConfigDiagnostics> {
-        let source = fs::read_to_string(path).map_err(|_| {
-            ConfigDiagnostics::single(
-                "HGCFG-READ",
-                "$",
-                "workflow configuration could not be read",
-                "check that the configured file exists and is readable",
-            )
-            .with_source(path)
+        let source = read_config_source(path).map_err(|error| {
+            let (message, help) = if error.kind() == std::io::ErrorKind::InvalidData {
+                (
+                    "workflow configuration exceeds the size limit",
+                    "keep flow.toml below 4 MiB",
+                )
+            } else {
+                (
+                    "workflow configuration could not be read",
+                    "check that the configured file exists and is readable",
+                )
+            };
+            ConfigDiagnostics::single("HGCFG-READ", "$", message, help).with_source(path)
         })?;
         Self::from_source_with_diagnostics(&source, Some(path), repository_root)
     }

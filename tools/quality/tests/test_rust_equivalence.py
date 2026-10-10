@@ -41,7 +41,7 @@ class ShadowWorkflowTests(unittest.TestCase):
         shadow = workflow.split('  quality-generic-shadow:\n')[1].split('  quality-contracts:\n')[0]
         collection = workflow.split('  quality-coverage:\n')[1].split('  quality-generic-shadow:\n')[0]
         self.assertIn('needs: [quality-coverage]', shadow)
-        self.assertIn('actions/download-artifact@v6', shadow)
+        self.assertIn('actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6', shadow)
         for identity in (
                 'BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}',
                 'HEAD_SHA: ${{ github.sha }}',

@@ -118,7 +118,7 @@ pub(super) struct SecretScanner {
 
 impl SecretScanner {
     pub(super) fn load(path: &Path) -> Result<Self> {
-        let source = fs::read_to_string(path)
+        let source = crate::config::read_config_source(path)
             .with_context(|| format!("read secret scan configuration {}", path.display()))?;
         Self::from_source(&source)
             .with_context(|| format!("parse secret scan configuration {}", path.display()))
@@ -261,7 +261,6 @@ use anyhow::{bail, Context, Result};
 use regex::bytes::Regex;
 use serde::Deserialize;
 use std::collections::HashSet;
-use std::fs;
 use std::path::Path;
 
 const SECRET_CONFIG_VERSION: u32 = 2;
