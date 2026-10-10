@@ -407,6 +407,36 @@ fn both() {
         end = sum(map(len, lines[:points[2] - 1])) + points[3] - 1
         return source.encode()[start:end].decode()
 
+    def test_process_reader_source_inventory_and_instrumentation(self):
+        path = 'process/reader.rs'
+        self.assertIn(path, SOURCE_FILES)
+        source_file = ROOT / 'tools/harness-gate/src' / path
+        source = source_file.read_bytes().decode('utf-8')
+        for target, unix in (('x86_64-unknown-linux-gnu', True), ('aarch64-apple-darwin', True),
+                             ('x86_64-pc-windows-msvc', False)):
+            with self.subTest(target=target):
+                inventory = ast(source_file, self.binary, compiler_configuration(target))
+                symbols = inventory['symbols']
+                functions = [s['name'] for s in symbols if s['kind'] == 'function']
+                for name in ('spawn_limited_reader', 'collect_limited_reader', 'read_limited'):
+                    self.assertEqual(functions.count(name), 1)
+                # Exactly one platform variant of the stop-aware wait is measured.
+                waits = [s for s in symbols if s['name'] == 'wait_readable']
+                self.assertEqual(len(waits), 1)
+                self.assertEqual('poll' in waits[0]['syntax'], unix)
+                self.assertFalse(any(s['test'] for s in symbols))
+                self.assertTrue(inventory['excluded'], 'platform and test items leave production ranges')
+                transformed, edits = instrument(source, inventory)
+                reparsed = self.inventory(transformed, target)
+                self.assertEqual([s['kind'] for s in reparsed['symbols']], [s['kind'] for s in symbols])
+                for original, inserted in zip(symbols, reparsed['symbols']):
+                    self.assertEqual(complexity(original['raw']), complexity(inserted['raw']))
+                    for field in ('span', 'body'):
+                        mapped = byte_span(transformed, inserted[field])
+                        self.assertEqual((*original_point(mapped[:2], edits),
+                                          *original_point(mapped[2:], edits)),
+                                         byte_span(source, original[field]))
+
     def test_net_policy_source_inventory_and_instrumentation(self):
         path = 'net_policy.rs'
         self.assertIn(path, SOURCE_FILES)
@@ -437,7 +467,7 @@ fn both() {
         self.assertEqual(SERIES, {
             'analyzer': 'harness-gate-rust-measure/0.3.1', 'rule': 'mccabe-rust-3/1',
             'instrumentation': 'closure-black-box/1', 'mapping': 'insertions-utf8/1',
-            'selection': 'gh309-net-policy/1', 'configuration': 'compiler-target-production/4',
+            'selection': 'gh312-process-reader/1', 'configuration': 'compiler-target-production/4',
         })
         path = 'utils/redaction.rs'
         self.assertIn(path, SOURCE_FILES)
@@ -678,7 +708,7 @@ fn main() {
         self.assertEqual(SERIES, {
             'analyzer': 'harness-gate-rust-measure/0.3.1', 'rule': 'mccabe-rust-3/1',
             'instrumentation': 'closure-black-box/1', 'mapping': 'insertions-utf8/1',
-            'selection': 'gh309-net-policy/1', 'configuration': 'compiler-target-production/4',
+            'selection': 'gh312-process-reader/1', 'configuration': 'compiler-target-production/4',
         })
         for label, source in self.process_command_sources().items():
             for target in ('x86_64-unknown-linux-gnu', 'aarch64-apple-darwin', 'x86_64-pc-windows-msvc'):
