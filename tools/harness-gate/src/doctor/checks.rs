@@ -170,7 +170,12 @@ fn check_version(
 }
 
 fn resolve_check_path(project: &Project, value: &str, scope: PathScope) -> Result<PathBuf> {
-    let expanded = project.expand(value);
+    let mut expanded = project.expand(value);
+    if cfg!(windows) {
+        // `{root}` expands to a verbatim (extended-length) path on Windows, where `/`
+        // is not a separator; normalize so `{root}/file` names a child of root.
+        expanded = expanded.replace('/', "\\");
+    }
     let path = Path::new(&expanded);
     let path = if path.is_absolute() {
         path.to_path_buf()
