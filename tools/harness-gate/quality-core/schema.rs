@@ -230,8 +230,108 @@ fn walk(v: &Value, s: &Value, root: &Value, path: &str) -> Result<()> {
                 )?;
             }
         }
+        // The frozen Python walker ignored uniqueItems; enforce it here so a
+        // schema declaration is never silently unchecked (#313).
+        if s["uniqueItems"] == true {
+            require(
+                values
+                    .iter()
+                    .enumerate()
+                    .all(|(i, value)| !values[..i].contains(value)),
+                format!("{path}: array violates uniqueItems"),
+            )?;
+        }
     }
     // Value.oneOf is intentionally resolved by the explicit metric discriminator,
     // as in the frozen reference. Metadata gets its own project traversal.
     Ok(())
+}
+
+#[cfg(test)]
+mod keyword_tests {
+    use super::*;
+
+    /// Keywords `walk` enforces. `oneOf` is compensated by explicit
+    /// discriminator checks in the policy and evidence domains.
+    const ENFORCED: &[&str] = &[
+        "$ref",
+        "type",
+        "const",
+        "enum",
+        "pattern",
+        "minLength",
+        "maxLength",
+        "minimum",
+        "required",
+        "properties",
+        "additionalProperties",
+        "items",
+        "minItems",
+        "maxItems",
+        "uniqueItems",
+    ];
+    const COMPENSATED: &[&str] = &["oneOf"];
+    const ANNOTATIONS: &[&str] = &["$schema", "$id", "title", "description", "definitions"];
+
+    fn collect(schema: &Value, found: &mut Vec<String>) {
+        match schema {
+            Value::Object(object) => {
+                for (key, child) in object {
+                    found.push(key.clone());
+                    match key.as_str() {
+                        // Map keys under these are names, not keywords.
+                        "properties" | "definitions" => {
+                            for value in child.as_object().into_iter().flat_map(|o| o.values()) {
+                                collect(value, found);
+                            }
+                        }
+                        "const" | "enum" => {}
+                        _ => collect(child, found),
+                    }
+                }
+            }
+            Value::Array(items) => items.iter().for_each(|item| collect(item, found)),
+            _ => {}
+        }
+    }
+
+    #[test]
+    fn every_embedded_schema_keyword_is_enforced_or_compensated() {
+        for schema in [
+            &*PROJECT,
+            &*EVIDENCE,
+            &*REQUIREMENTS,
+            &*POLICY,
+            &*EXCEPTIONS,
+            &*MAPPINGS,
+        ] {
+            let mut found = Vec::new();
+            collect(schema, &mut found);
+            for keyword in found {
+                assert!(
+                    ENFORCED.contains(&keyword.as_str())
+                        || COMPENSATED.contains(&keyword.as_str())
+                        || ANNOTATIONS.contains(&keyword.as_str()),
+                    "schema keyword {keyword:?} is neither enforced nor compensated"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn unique_items_rejects_duplicates_with_field_path() {
+        let schema = serde_json::json!({
+            "type": "object",
+            "properties": {"classes": {"type": "array", "uniqueItems": true,
+                "items": {"type": "string"}}}
+        });
+        shape(&serde_json::json!({"classes": ["x", "y"]}), &schema, None).unwrap();
+        let error = shape(&serde_json::json!({"classes": ["x", "x"]}), &schema, None)
+            .unwrap_err()
+            .to_string();
+        assert!(
+            error.contains("$.classes: array violates uniqueItems"),
+            "{error}"
+        );
+    }
 }
