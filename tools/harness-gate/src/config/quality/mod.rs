@@ -67,7 +67,8 @@ impl QualityConfig {
             "quality configuration",
             true,
         )?;
-        let source = fs::read_to_string(path).context("read quality configuration")?;
+        let source =
+            crate::config::read_config_source(&path).context("read quality configuration")?;
         let config: Self = toml::from_str(&source).context("parse quality.toml (unknown fields, including collector policy authority, are forbidden)")?;
         config.validate(flow, root)?;
         Ok(config)

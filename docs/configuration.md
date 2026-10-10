@@ -297,16 +297,22 @@ default 15), and optional help.
 | Kind | Fields | Behavior |
 | --- | --- | --- |
 | command | program, args | Command must exit 0. |
-| path | path, path_type | Check any path, file, or directory. |
+| path | path, path_type, path_scope | Check any path, file, or directory. |
 | glob | pattern | Pattern must match at least one path. |
 | env | name | Variable must exist. |
-| env-or-file | env, path, contains | Variable exists, or a file has a line beginning with contains. |
+| env-or-file | env, path, contains, path_scope | Variable exists, or a file has a line beginning with contains. |
 | git-config | key, expected | Git value must equal expected. |
 | git-remotes | none | Validate Git remote configuration. |
-| version | program, args, path, trim_prefix | Compare command output with a version file. |
+| version | program, args, path, trim_prefix, path_scope | Compare command output with a version file. |
 | service | service | Check an environment or managed service. |
 
-path_type is any, file, or directory and defaults to any. Use
+path_type is any, file, or directory and defaults to any. path_scope is
+repository (default) or host. Repository-scoped paths must stay inside the
+project: a repository-relative path, optionally behind one leading placeholder
+such as {root} or an alias, with no `..` and no symlink that resolves outside.
+config check and doctor both reject other paths. Set path_scope = "host" only
+for an intended host location such as an installed tool or a user-level
+credential file; reports name the path but never echo file content. Use
 harness-gate doctor --strict in CI when warnings must fail the job.
 
 ### Lease and orphan cleanup
