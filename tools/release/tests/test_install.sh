@@ -5,10 +5,30 @@ set -Eeuo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 TEMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/harness-gate-installer-test.XXXXXXXX")"
-trap 'rm -rf "$TEMP_ROOT"' EXIT
+finish_fixture() {
+    local status=$?
+    if [[ -n "${HARNESS_GATE_INSTALL_TEST_EVIDENCE:-}" ]]; then
+        if ! mkdir -p "$HARNESS_GATE_INSTALL_TEST_EVIDENCE" || \
+            ! /bin/cp -R "$TEMP_ROOT/." "$HARNESS_GATE_INSTALL_TEST_EVIDENCE/"; then
+            printf 'fixture evidence retained at %s (copy failed)\n' "$TEMP_ROOT" >&2
+            ((status != 0)) || status=1
+            exit "$status"
+        fi
+    elif ((status != 0)); then
+        printf 'failed fixture retained at %s\n' "$TEMP_ROOT" >&2
+        exit "$status"
+    fi
+    rm -rf -- "$TEMP_ROOT"
+    exit "$status"
+}
+trap finish_fixture EXIT
 FIXTURE="$TEMP_ROOT/fixture"
 FAKE_BIN="$TEMP_ROOT/fake-bin"
 mkdir -p "$FIXTURE" "$FAKE_BIN"
+INSTALL_CASE=0
+INSTALL_TMP_BASE="$TEMP_ROOT/tmp space ' quote"
+mkdir -p "$INSTALL_TMP_BASE"
+printf 'neighbor must survive\n' >"$INSTALL_TMP_BASE/neighbor-sentinel"
 export HARNESS_GATE_TEST_DOWNLOAD_LOG="$TEMP_ROOT/download.log"
 
 binary_name="harness-gate-linux-amd64"
@@ -54,8 +74,8 @@ done
 cat >"$FAKE_BIN/curl" <<'EOF'
 #!/usr/bin/env bash
 set -Eeuo pipefail
-expected=(--fail --show-error --location --proto '=https' --tlsv1.2 --retry 3 --retry-all-errors --output)
-[[ "$#" -eq 12 ]] || { printf 'unexpected curl argv: %s\n' "$*" >&2; exit 2; }
+expected=(--fail --show-error --location --proto '=https' --tlsv1.2 --max-redirs 10 --retry 3 --retry-all-errors --output)
+[[ "$#" -eq 14 ]] || { printf 'unexpected curl argv: %s\n' "$*" >&2; exit 2; }
 for argument in "${expected[@]}"; do
     [[ "${1:-}" == "$argument" ]] || { printf 'unexpected curl option: %s\n' "${1:-}" >&2; exit 2; }
     shift
@@ -65,6 +85,7 @@ url="$2"
 expected_prefix="https://github.com/musutrade/Harness-Gate/releases/download/"
 [[ "$url" == "$expected_prefix"* && "$url" != *'?'* && "$url" != *'#'* ]] || exit 22
 filename="${url##*/}"
+[[ "${HARNESS_GATE_TEST_DOWNLOAD_FAIL:-0}" != 1 ]] || exit 22
 [[ -n "$filename" && "$filename" != */* ]] || exit 22
 relative="${url#"$expected_prefix"}"
 case "$relative" in
@@ -163,6 +184,7 @@ set -Eeuo pipefail
 source_path="$4"
 [[ "${5:-}" == --root ]] || exit 2
 root="$6"
+[[ "${HARNESS_GATE_TEST_BUILD_FAIL:-0}" != 1 ]] || exit 23
 [[ "$source_path" == */source/tools/harness-gate ]] || exit 2
 mkdir -p "$root/bin"
 if [[ "${HARNESS_GATE_TEST_PLATFORM:-linux}" == windows ]]; then
@@ -202,6 +224,7 @@ if [[ "${HARNESS_GATE_TEST_BLOCK_CP:-0}" == 1 && "${2:-}" == */.harness-gate.* &
         sleep 0.05
     done
 fi
+if [[ "${HARNESS_GATE_TEST_ACTIVATION_FAIL:-0}" == 1 && "${2:-}" == */.harness-gate.* ]]; then exit 24; fi
 exec /bin/cp "$@"
 EOF
 chmod 755 "$FAKE_BIN/cp"
@@ -209,7 +232,12 @@ chmod 755 "$FAKE_BIN/cp"
 run_installer() {
     local destination="$1"
     shift
-    env \
+    INSTALL_CASE=$((INSTALL_CASE + 1))
+    local case_tmp="$INSTALL_TMP_BASE/case-$INSTALL_CASE" status
+    mkdir -p "$case_tmp"
+    find "$case_tmp" -name 'harness-gate-install.*' >"$TEMP_ROOT/tmp-$INSTALL_CASE.before"
+    if env \
+        TMPDIR="$case_tmp" \
         PATH="$FAKE_BIN:$PATH" \
         HARNESS_GATE_TEST_FIXTURE="$FIXTURE" \
         HARNESS_GATE_TEST_COSIGN_LOG="$TEMP_ROOT/cosign.log" \
@@ -217,7 +245,19 @@ run_installer() {
         HARNESS_GATE_TEST_BLOCK_CP="${HARNESS_GATE_TEST_BLOCK_CP:-0}" \
         HARNESS_GATE_TEST_CP_STARTED="${HARNESS_GATE_TEST_CP_STARTED:-}" \
         HARNESS_GATE_TEST_CP_RELEASE="${HARNESS_GATE_TEST_CP_RELEASE:-}" \
-        bash "$ROOT/install.sh" --version v0.3.3 --install-dir "$destination" "$@"
+        bash "$ROOT/install.sh" --version v0.3.3 --install-dir "$destination" "$@"; then
+        status=0
+    else
+        status=$?
+    fi
+    find "$case_tmp" -name 'harness-gate-install.*' >"$TEMP_ROOT/tmp-$INSTALL_CASE.after"
+    [[ ! -s "$TEMP_ROOT/tmp-$INSTALL_CASE.after" ]] || {
+        printf 'installer left temporary roots in %s\n' "$case_tmp" >&2
+        exit 1
+    }
+    grep -Fxq 'neighbor must survive' "$INSTALL_TMP_BASE/neighbor-sentinel" || exit 1
+    printf 'case=%s status=%s temporary-roots=0 args=%s\n' "$INSTALL_CASE" "$status" "$*" >>"$TEMP_ROOT/lifecycle.log"
+    return "$status"
 }
 
 mode_of() {
@@ -260,7 +300,7 @@ set +e
 run_installer "$tampered_dir" >/dev/null 2>&1
 tampered_status=$?
 set -e
-((tampered_status != 0)) || exit 1
+((tampered_status == 1)) || exit 1
 grep -Fxq 'old binary' "$tampered_dir/harness-gate" || exit 1
 mv "$FIXTURE/original-binary" "$FIXTURE/$binary_name"
 
@@ -271,7 +311,7 @@ set +e
 HARNESS_GATE_TEST_COSIGN_FAIL=1 run_installer "$signature_dir" >/dev/null 2>&1
 signature_status=$?
 set -e
-((signature_status != 0)) || exit 1
+((signature_status == 1)) || exit 1
 grep -Fxq 'old binary' "$signature_dir/harness-gate" || exit 1
 
 symlink_dir="$TEMP_ROOT/symlink"
@@ -318,46 +358,79 @@ HARNESS_GATE_TEST_PLATFORM=windows run_installer "$windows_dir" >/dev/null
 [[ ! -e "$windows_dir/harness-gate" ]] || exit 1
 cmp -s "$FIXTURE/$windows_binary_name" "$windows_dir/harness-gate.exe" || exit 1
 
-signal_dir="$TEMP_ROOT/signal-install"
-mkdir -m 700 "$signal_dir"
-printf 'old binary\n' >"$signal_dir/harness-gate"
-signal_started="$TEMP_ROOT/signal-cp-started"
-signal_release="$TEMP_ROOT/signal-cp-release"
-set +e
-HARNESS_GATE_TEST_BLOCK_CP=1 \
-HARNESS_GATE_TEST_CP_STARTED="$signal_started" \
-HARNESS_GATE_TEST_CP_RELEASE="$signal_release" \
-env \
-    PATH="$FAKE_BIN:$PATH" \
-    HARNESS_GATE_TEST_FIXTURE="$FIXTURE" \
-    HARNESS_GATE_TEST_COSIGN_LOG="$TEMP_ROOT/cosign.log" \
-    HARNESS_GATE_TEST_PLATFORM=linux \
-    HARNESS_GATE_TEST_BLOCK_CP=1 \
-    HARNESS_GATE_TEST_CP_STARTED="$signal_started" \
-    HARNESS_GATE_TEST_CP_RELEASE="$signal_release" \
-    bash "$ROOT/install.sh" --version v0.3.3 --install-dir "$signal_dir" >/dev/null 2>&1 &
-signal_pid=$!
-signal_ready=0
-for _ in {1..100}; do
-    if [[ -e "$signal_started" ]]; then
-        signal_ready=1
-        break
-    fi
-    if ! kill -0 "$signal_pid" 2>/dev/null; then
-        break
-    fi
-    sleep 0.05
+# Launch through a foreground Python driver: asynchronous shell jobs inherit an
+# ignored SIGINT and cannot exercise the installer's INT trap reliably.
+for signal_name in HUP INT TERM; do
+    signal_dir="$TEMP_ROOT/signal-$signal_name-install"
+    signal_tmp="$INSTALL_TMP_BASE/signal-$signal_name"
+    mkdir -m 700 "$signal_dir" "$signal_tmp"
+    printf 'old binary\n' >"$signal_dir/harness-gate"
+    env PATH="$FAKE_BIN:$PATH" \
+        HARNESS_GATE_TEST_FIXTURE="$FIXTURE" \
+        HARNESS_GATE_TEST_COSIGN_LOG="$TEMP_ROOT/cosign.log" \
+        HARNESS_GATE_TEST_PLATFORM=linux \
+        TMPDIR="$signal_tmp" \
+        python3 - "$ROOT/install.sh" "$signal_dir" "$signal_tmp" "$signal_name" <<'PY'
+import os, pathlib, signal, subprocess, sys, time
+script, destination, directory, name = sys.argv[1:]
+root = pathlib.Path(directory)
+ready, release = root / 'ready', root / 'release'
+environment = {**os.environ, 'HARNESS_GATE_TEST_BLOCK_CP': '1',
+               'HARNESS_GATE_TEST_CP_STARTED': str(ready), 'HARNESS_GATE_TEST_CP_RELEASE': str(release)}
+before = list(root.glob('harness-gate-install.*'))
+with (root / 'command.log').open('wb') as log:
+    child = subprocess.Popen(['bash', script, '--version', 'v0.3.3', '--install-dir', destination],
+                             env=environment, stdout=log, stderr=subprocess.STDOUT)
+    try:
+        deadline = time.monotonic() + 10
+        while not ready.exists():
+            assert child.poll() is None, 'installer exited before activation barrier'
+            assert time.monotonic() < deadline, 'activation readiness timed out'
+            time.sleep(0.01)
+        active = list(root.glob('harness-gate-install.*'))
+        assert len(active) == 1, 'signal fixture must own a temporary installation root'
+        number = getattr(signal, 'SIG' + name)
+        child.send_signal(number)
+        release.touch()
+        status = child.wait(timeout=10)
+        after = list(root.glob('harness-gate-install.*'))
+        (root / 'lifecycle.txt').write_text(f'before={before}\nactive={active}\nafter={after}\nstatus={status}\n')
+        assert status == 128 + number, (name, status)
+        assert not before and not after, 'signal cleanup leaked installation root'
+    finally:
+        release.touch()
+        if child.poll() is None:
+            child.kill()
+            child.wait(timeout=10)
+PY
+    grep -Fxq 'old binary' "$signal_dir/harness-gate" || exit 1
+    grep -Fxq 'neighbor must survive' "$INSTALL_TMP_BASE/neighbor-sentinel" || exit 1
+    [[ -z "$(find "$signal_dir" -maxdepth 1 -name '.harness-gate.*' -print -quit)" ]] || exit 1
 done
-if ((signal_ready == 1)); then
-    kill -TERM "$signal_pid" 2>/dev/null || true
-fi
-: >"$signal_release"
-wait "$signal_pid"
-signal_status=$?
-set -e
-((signal_ready == 1 && signal_status == 143)) || exit 1
-grep -Fxq 'old binary' "$signal_dir/harness-gate" || exit 1
-[[ -z "$(find "$signal_dir" -maxdepth 1 -name '.harness-gate.*' -print -quit)" ]] || exit 1
+
+for failure in DOWNLOAD BUILD ACTIVATION; do
+    failure_dir="$TEMP_ROOT/lifecycle-$failure"
+    mkdir -m 700 "$failure_dir"
+    printf 'old binary\n' >"$failure_dir/harness-gate"
+    options=()
+    [[ "$failure" != BUILD ]] || options=(--from-source)
+    case "$failure" in
+        DOWNLOAD) expected_status=22 ;;
+        BUILD) expected_status=23 ;;
+        ACTIVATION) expected_status=1 ;;
+    esac
+    export "HARNESS_GATE_TEST_${failure}_FAIL=1"
+    if run_installer "$failure_dir" "${options[@]}"; then
+        printf 'expected %s failure\n' "$failure" >&2
+        exit 1
+    else
+        failure_status=$?
+    fi
+    ((failure_status == expected_status)) || exit 1
+    unset "HARNESS_GATE_TEST_${failure}_FAIL"
+    grep -Fxq 'old binary' "$failure_dir/harness-gate" || exit 1
+    [[ -z "$(find "$failure_dir" -maxdepth 1 -name '.harness-gate.*' -print -quit)" ]] || exit 1
+done
 
 missing_dir="$TEMP_ROOT/missing-asset"
 mkdir -m 700 "$missing_dir"
@@ -410,12 +483,14 @@ done
 # --rust-only needs no Core version. Selecting an older native version verifies
 # against that exact tag, without downloading Core or using the bundled installer.
 : >"$TEMP_ROOT/download.log"
-env PATH="$FAKE_BIN:$PATH" HARNESS_GATE_VERSION='' \
+mkdir -p "$INSTALL_TMP_BASE/older"
+env PATH="$FAKE_BIN:$PATH" TMPDIR="$INSTALL_TMP_BASE/older" HARNESS_GATE_VERSION='' \
     HARNESS_GATE_TEST_FIXTURE="$FIXTURE" \
     HARNESS_GATE_TEST_COSIGN_LOG="$TEMP_ROOT/cosign.log" \
     HARNESS_GATE_TEST_EXPECTED_RUST_VERSION=0.1.0-rc.4 \
     bash "$ROOT/install.sh" --rust-only --rust-version 0.1.0-rc.4 \
     --install-dir "$TEMP_ROOT/native-older" >/dev/null
+[[ -z "$(find "$INSTALL_TMP_BASE/older" -name 'harness-gate-install.*' -print -quit)" ]] || exit 1
 cmp "$FIXTURE/rust-collector-v0.1.0-rc.4/harness-gate-rust-collector-linux-amd64" \
     "$TEMP_ROOT/native-older/harness-gate-rust-collector"
 [[ "$(wc -l <"$TEMP_ROOT/download.log")" -eq 6 ]]

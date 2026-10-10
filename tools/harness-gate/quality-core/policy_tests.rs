@@ -193,3 +193,125 @@ fn green_local_gates_and_breaking_contract_block_project_with_provenance(referen
         .is_empty());
     assert!(difference(&report, &case["project_report"], "$").is_none());
 }
+
+fn scope_policy(scope: Value) -> Value {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../quality/fixtures/workflow/compiler/direct.json"
+    ))
+    .unwrap();
+    let mut policy = fixture["policy"].clone();
+    policy["rules"][0]["scope"] = scope;
+    if policy["rules"][0]["scope"]["kind"] == "relationship" {
+        policy["rules"][0]["metric"] = json!("contract.compatible");
+        policy["rules"][0]["operator"] = json!("eq");
+        policy["rules"][0]["limit"] = json!({"type":"boolean", "value":true});
+    }
+    policy
+}
+
+#[test]
+fn scope_documents_validate_every_supported_kind_and_reject_invalid_fields() {
+    for scope in [
+        json!({"kind":"project"}),
+        json!({"kind":"component", "component":"app"}),
+        json!({"kind":"boundary", "component":"app", "boundary":"source"}),
+        json!({"kind":"changed_subject"}),
+        json!({"kind":"critical_subject"}),
+        json!({"kind":"relationship", "relationship":"api.contract-1"}),
+        json!({"kind":"subject", "subject":"module-alias"}),
+    ] {
+        policy::validate_policy_document(&scope_policy(scope.clone())).unwrap();
+        for field in scope.as_object().unwrap().keys() {
+            let mut missing = scope.clone();
+            missing.as_object_mut().unwrap().remove(field);
+            assert!(policy::validate_policy_document(&scope_policy(missing)).is_err());
+            for value in [Value::Null, json!(false), json!(1), json!(""), json!([])] {
+                let mut invalid = scope.clone();
+                invalid[field] = value;
+                assert!(policy::validate_policy_document(&scope_policy(invalid)).is_err());
+            }
+        }
+        let mut extra = scope.clone();
+        extra["unexpected"] = json!("value");
+        assert!(policy::validate_policy_document(&scope_policy(extra)).is_err());
+    }
+    for scope in [
+        json!({"kind":"unknown"}),
+        json!({"kind":"project", "component":"app"}),
+        json!({"kind":"project", "boundary":"source"}),
+        json!({"kind":"relationship", "relationship":"UPPER"}),
+        json!({"kind":"relationship", "relationship":"api\n"}),
+        Value::Null,
+        json!([]),
+    ] {
+        assert!(policy::validate_policy_document(&scope_policy(scope)).is_err());
+    }
+}
+
+#[test]
+fn resolved_scope_validation_preserves_alias_compilation_and_canonical_selection() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../quality/fixtures/workflow/compiler/direct.json"
+    ))
+    .unwrap();
+    let project = &fixture["project"];
+    let canonical = &project["subjects"][0]["id"];
+    let alias = scope_policy(json!({"kind":"subject", "subject":"module-alias"}));
+    policy::validate_policy_document(&alias).unwrap();
+    assert_eq!(
+        policy::validate_policy(&alias, project)
+            .unwrap_err()
+            .message,
+        "unknown policy subject"
+    );
+    let resolved = scope_policy(json!({"kind":"subject", "subject":canonical}));
+    policy::validate_policy(&resolved, project).unwrap();
+    for scope in [
+        json!({"kind":"project"}),
+        json!({"kind":"component", "component":"app"}),
+        json!({"kind":"boundary", "component":"app", "boundary":"source"}),
+        json!({"kind":"subject", "subject":canonical}),
+        json!({"kind":"changed_subject"}),
+        json!({"kind":"critical_subject"}),
+    ] {
+        policy::validate_policy(&scope_policy(scope.clone()), project).unwrap();
+        let selection = json!({"changed_subject":[canonical], "critical_subject":[canonical]});
+        assert_eq!(
+            policy::select(&scope, project, &selection, &json!("default"))
+                .unwrap()
+                .len(),
+            1
+        );
+    }
+    for scope in [
+        json!({"kind":"unknown"}),
+        json!({"kind":"project", "component":"app"}),
+        json!({"kind":"subject", "subject":"module-alias"}),
+    ] {
+        assert!(policy::select(&scope, project, &Value::Null, &json!("default")).is_err());
+    }
+    let newline = json!({"kind":"subject", "subject":format!("{}\n", canonical.as_str().unwrap())});
+    assert_eq!(
+        policy::select(&newline, project, &Value::Null, &json!("default"))
+            .unwrap_err()
+            .message,
+        "invalid character in evidence string"
+    );
+}
+
+#[test]
+fn duplicate_remediation_classes_are_rejected_with_field_path() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let text = fs::read_to_string(root.join("../quality/fixtures/policy/policy.json")).unwrap();
+    let mut document = json::parse(&text).unwrap();
+    policy::validate_policy_document(&document).expect("fixture policy is valid");
+    let class = document["rules"][0]["remediation_classes"][0].clone();
+    document["rules"][0]["remediation_classes"] = json!([class.clone(), class]);
+    let error = policy::validate_policy_document(&document)
+        .unwrap_err()
+        .to_string();
+    assert!(
+        error.contains("$.rules[0].remediation_classes: array violates uniqueItems"),
+        "{error}"
+    );
+}

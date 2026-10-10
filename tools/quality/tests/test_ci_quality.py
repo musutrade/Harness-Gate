@@ -55,14 +55,30 @@ class SnapshotTests(unittest.TestCase):
 
 
 class RiskScopeTests(unittest.TestCase):
+    def test_report_retention_scope_preserves_compiler_configuration_identity(self):
+        from source_measure import SERIES, SOURCE_FILES
+        self.assertEqual(SERIES, {
+            'analyzer': 'harness-gate-rust-measure/0.3.1', 'rule': 'mccabe-rust-3/1',
+            'instrumentation': 'closure-black-box/1', 'mapping': 'insertions-utf8/1',
+            'selection': 'gh315-review-low/1', 'configuration': 'compiler-target-production/4',
+        })
+        self.assertIn('process/command.rs', SOURCE_FILES)
+        self.assertNotIn('process/task.rs', SOURCE_FILES)
+        self.assertNotIn('process/capture.rs', SOURCE_FILES)
+        self.assertEqual({path for path in SOURCE_FILES if path.startswith('service/')},
+                         {'service/lease.rs', 'service/mod.rs', 'service/report_directory.rs'})
+
     def test_process_test_module_reaches_measurement_but_unknown_sources_block(self):
         with tempfile.TemporaryDirectory() as temporary:
             collector = gate.Collector(Path(temporary) / 'candidate', 'base', 'head', 'scope-test')
             for path, supported in (
                 ('tools/harness-gate/src/process/tests.rs', True),
                 ('tools/harness-gate/src/process/replay.rs', True),
+                ('tools/harness-gate/src/process/command.rs', True),
                 ('tools/harness-gate/src/project/discovery.rs', True),
                 ('tools/harness-gate/src/project/mod.rs', True),
+                ('tools/harness-gate/src/utils/redaction.rs', True),
+                ('tools/harness-gate/src/utils/unknown.rs', False),
                 ('tools/harness-gate/src/process/unknown.rs', False),
                 ('tools/harness-gate/src/process/tests/unknown.rs', False),
                 ('tools/harness-gate/src/unknown/tests.rs', False),
@@ -70,6 +86,7 @@ class RiskScopeTests(unittest.TestCase):
                 with self.subTest(path=path), \
                         patch.object(gate.subprocess, 'check_output', return_value=path + '\n'), \
                         patch.object(gate, 'relocated_migration_sources', return_value=set()), \
+                        patch.object(gate, 'only_terminal_test_module_changed', return_value=False), \
                         patch.object(collector, 'command',
                                      side_effect=RuntimeError('measurement build reached')) as command:
                     if supported:
@@ -81,6 +98,179 @@ class RiskScopeTests(unittest.TestCase):
                         with self.assertRaisesRegex(ValueError, 'outside supported risk series'):
                             collector.risk()
                         command.assert_not_called()
+
+    def test_report_retention_sources_reach_analyzer_build_but_unknown_service_blocks(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            collector = gate.Collector(Path(temporary) / 'candidate', 'base', 'head', 'retention-scope')
+            for path, supported in (
+                ('tools/harness-gate/src/service/lease.rs', True),
+                ('tools/harness-gate/src/service/mod.rs', True),
+                ('tools/harness-gate/src/service/report_directory.rs', True),
+                ('tools/harness-gate/src/service/unknown.rs', False),
+            ):
+                with self.subTest(path=path), \
+                        patch.object(gate.subprocess, 'check_output', return_value=path + '\n'), \
+                        patch.object(gate, 'relocated_migration_sources', return_value=set()), \
+                        patch.object(gate, 'only_terminal_test_module_changed', return_value=False), \
+                        patch.object(collector, 'command',
+                                     side_effect=RuntimeError('measurement build reached')) as command:
+                    if supported:
+                        with self.assertRaisesRegex(RuntimeError, 'measurement build reached'):
+                            collector.risk()
+                        command.assert_called_once()
+                        self.assertEqual(command.call_args.args[0], 'analyzer-build')
+                    else:
+                        with self.assertRaisesRegex(ValueError, 'outside supported risk series'):
+                            collector.risk()
+                        command.assert_not_called()
+
+
+class InlineTestScopeTests(unittest.TestCase):
+    SOURCE = 'fn live() { println!("production"); }\n#[cfg(test)]\nmod tests { fn check() {} }\n'
+
+    def prove(self, before, after):
+        with patch.object(gate.subprocess, 'check_output',
+                          side_effect=[b'100644 blob\0', before, b'100644 blob\0', after]):
+            return gate.only_terminal_test_module_changed('base', 'head', 'unknown.rs')
+
+    def test_only_test_body_changes_preserve_exact_production_bytes(self):
+        for body in ('fn check() { assert!(true); }',
+                     'fn check() { let s = r###"} #[cfg(test)] mod tests {"###; }',
+                     '/* outer { /* nested } */ } */ fn check() { let c = b\'}\'; }',
+                     'fn check() { let 文本 = "🦀"; }'):
+            with self.subTest(body=body):
+                changed = self.SOURCE.replace('fn check() {}', body)
+                self.assertTrue(self.prove(self.SOURCE.encode(), changed.encode()))
+
+    def test_production_header_suffix_and_encoding_changes_stay_blocked(self):
+        variants = {
+            'production': self.SOURCE.replace('production', 'changed'),
+            'cfg-not': self.SOURCE.replace('cfg(test)', 'cfg(not(test))'),
+            'cfg-any': self.SOURCE.replace('cfg(test)', 'cfg(any(test, unix))'),
+            'cfg-attr': self.SOURCE.replace('cfg(test)', 'cfg_attr(test, allow(dead_code))'),
+            'new-attribute': self.SOURCE.replace('mod tests', '#[allow(dead_code)]\nmod tests'),
+            'renamed-module': self.SOURCE.replace('mod tests', 'mod checks'),
+            'trailing-production': self.SOURCE + 'fn appended() {}\n',
+            'same-line-production': self.SOURCE.rstrip() + ' fn appended() {}\n',
+            'trailing-comment': self.SOURCE + '// changed suffix\n',
+            'changed-newlines': self.SOURCE.replace('\n', '\r\n'),
+            'unicode-production': self.SOURCE.replace('production', '🦀'),
+            'unclosed-module': self.SOURCE[:-2],
+            'mismatched-delimiter': self.SOURCE.replace('fn check() {}', 'fn check() { (] }'),
+            'unclosed-raw-string': self.SOURCE.replace('fn check() {}', 'fn check() { r#"'),
+            'unclosed-comment': self.SOURCE + '/*',
+        }
+        for label, source in variants.items():
+            with self.subTest(label=label):
+                self.assertFalse(self.prove(self.SOURCE.encode(), source.encode()))
+        self.assertFalse(self.prove(self.SOURCE.encode(), self.SOURCE.encode() + b'\xff'))
+
+    def test_spoofed_nested_and_ambiguous_modules_are_not_exempt(self):
+        for source in (
+            'const S: &str = "#[cfg(test)] mod tests {}";',
+            'const S: &str = r###"#[cfg(test)] mod tests {}"###;',
+            '// #[cfg(test)] mod tests {}\nfn live() {}',
+            '/* #[cfg(test)] mod tests {} */ fn live() {}',
+            'macro_rules! fake { () => { #[cfg(test)] mod tests {} }; }',
+            'mod outer { #[cfg(test)] mod tests {} }',
+            '#[cfg(test)] mod tests {}\n#[cfg(test)] mod tests {}',
+            '#[cfg(test)] mod tests {}\nfn live() {}',
+        ):
+            with self.subTest(source=source):
+                self.assertFalse(self.prove(source.encode(), source.encode()))
+
+    def test_shebang_and_bom_cannot_spoof_test_boundaries(self):
+        source = ('#! #[cfg(test)] mod tests { /*\nfn main() {\n'
+                  '    let _ = "*/"; // "\n    println!("production");\n}\n')
+        for prefix in ('', '\ufeff'):
+            before = (prefix + source).encode()
+            after = (prefix + source.replace('production', 'changed')).encode()
+            self.assertFalse(self.prove(before, after))
+        self.assertFalse(self.prove(('\ufeff' + self.SOURCE).encode(),
+                                    ('\ufeff' + self.SOURCE).encode()))
+
+    def test_missing_sources_and_git_failures_are_not_exempt(self):
+        error = subprocess.CalledProcessError(128, ['git', 'show'])
+        for results in ([error], [b'100644 blob\0', error],
+                        [b'100644 blob\0', self.SOURCE.encode(), error], [OSError('unavailable')]):
+            with self.subTest(results=results), \
+                    patch.object(gate.subprocess, 'check_output', side_effect=results):
+                self.assertFalse(gate.only_terminal_test_module_changed('base', 'head', 'unknown.rs'))
+
+    def test_symlinks_nonregular_files_and_mode_changes_are_not_exempt(self):
+        for modes in ((b'120000 blob\0', b'120000 blob\0'),
+                      (b'100644 blob\0', b'120000 blob\0'),
+                      (b'100644 blob\0', b'100755 blob\0'),
+                      (b'040000 tree\0', b'040000 tree\0'),
+                      (b'', b''), (b'100644 blob\0' * 2, b'100644 blob\0')):
+            with self.subTest(modes=modes), patch.object(
+                gate.subprocess, 'check_output',
+                side_effect=[modes[0], self.SOURCE.encode(), modes[1], self.SOURCE.encode()]
+            ):
+                self.assertFalse(gate.only_terminal_test_module_changed('base', 'head', 'unknown.rs'))
+
+    def test_committed_test_only_diff_reaches_collection_but_production_edit_blocks(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            path = root / 'tools/harness-gate/src/unknown.rs'
+            path.parent.mkdir(parents=True)
+
+            def git(*args):
+                return subprocess.check_output(['git', *args], cwd=root, stderr=subprocess.PIPE,
+                                               text=True).strip()
+
+            git('init')
+            git('config', 'user.name', 'Inline Test Scope')
+            git('config', 'user.email', 'scope@example.invalid')
+            path.write_text(self.SOURCE)
+            git('add', '.')
+            git('commit', '-m', 'base')
+            base = git('rev-parse', 'HEAD')
+            for index, (source, allowed) in enumerate((
+                (self.SOURCE.replace('fn check() {}', 'fn check() { assert!(true); }'), True),
+                (self.SOURCE.replace('production', 'changed'), False),
+            )):
+                path.write_text(source)
+                git('commit', '-am', 'candidate')
+                head = git('rev-parse', 'HEAD')
+                with patch.object(gate, 'ROOT', root):
+                    collector = gate.Collector(root / f'candidate-{index}', base, head, 'test-scope')
+                    with patch.object(collector, 'command',
+                                      side_effect=RuntimeError('measurement build reached')) as command:
+                        if allowed:
+                            with self.assertRaisesRegex(RuntimeError, 'measurement build reached'):
+                                collector.risk()
+                            command.assert_called_once()
+                            self.assertEqual(command.call_args.args[0], 'analyzer-build')
+                        else:
+                            with self.assertRaisesRegex(ValueError, 'outside supported risk series'):
+                                collector.risk()
+                            command.assert_not_called()
+
+    def test_git_symlink_target_text_cannot_masquerade_as_rust_source(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            path = 'tools/harness-gate/src/unknown.rs'
+
+            def git(*args):
+                return subprocess.check_output(['git', *args], cwd=root, stderr=subprocess.PIPE,
+                                               text=True).strip()
+
+            git('init')
+            git('config', 'user.name', 'Inline Test Scope')
+            git('config', 'user.email', 'scope@example.invalid')
+            commits = []
+            for name in ('old', 'new'):
+                target = f'payload\n#[cfg(test)] mod tests {{{name}}}\n'.encode()
+                blob = subprocess.check_output(['git', 'hash-object', '-w', '--stdin'],
+                                               input=target, cwd=root).decode().strip()
+                # Write the Git symlink entry directly, without depending on
+                # the host's symlink privileges or filename restrictions.
+                git('update-index', '--add', '--cacheinfo', f'120000,{blob},{path}')
+                git('commit', '-m', name)
+                commits.append(git('rev-parse', 'HEAD'))
+            with patch.object(gate, 'ROOT', root):
+                self.assertFalse(gate.only_terminal_test_module_changed(*commits, path))
 
 
 class AggregateTests(unittest.TestCase):

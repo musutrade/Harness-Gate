@@ -58,11 +58,18 @@ pub(super) fn integer(value: &Value) -> bool {
         .is_some_and(|n| !n.to_string().contains(['.', 'e', 'E']))
 }
 
-// Inputs have already been constrained to nonnegative integers by their schema.
+/// Compare arbitrary-precision JSON integers by sign, digit count and digits.
+/// serde_json integers carry no leading zeros or exponent, so this is exact
+/// for negative values too (#318).
 pub(super) fn integer_cmp(a: &Value, b: &Value) -> std::cmp::Ordering {
-    let a = a.to_string();
-    let b = b.to_string();
-    a.len().cmp(&b.len()).then_with(|| a.cmp(&b))
+    let (a, b) = (a.to_string(), b.to_string());
+    let magnitude = |x: &str, y: &str| x.len().cmp(&y.len()).then_with(|| x.cmp(y));
+    match (a.strip_prefix('-'), b.strip_prefix('-')) {
+        (None, None) => magnitude(&a, &b),
+        (Some(a), Some(b)) => magnitude(b, a),
+        (Some(_), None) => std::cmp::Ordering::Less,
+        (None, Some(_)) => std::cmp::Ordering::Greater,
+    }
 }
 
 pub(super) fn domain(value: &Value) -> Result<()> {
@@ -99,4 +106,30 @@ pub fn canonical(value: &Value) -> Result<Vec<u8>> {
 // round-trip a large integer through f64 (e.g. 10^100 becomes 1e+100).
 pub(super) fn decode<T: serde::de::DeserializeOwned>(value: &Value) -> Result<T> {
     serde_json::from_str(&value.to_string()).map_err(|e| error(e.to_string()))
+}
+
+#[cfg(test)]
+mod integer_tests {
+    use super::integer_cmp;
+    use serde_json::json;
+    use std::cmp::Ordering::{Equal, Greater, Less};
+
+    #[test]
+    fn integer_cmp_orders_signed_and_arbitrary_precision_integers() {
+        let big: serde_json::Value =
+            serde_json::from_str("123456789012345678901234567890").unwrap();
+        for (a, b, expected) in [
+            (json!(-5), json!(3), Less),
+            (json!(3), json!(-5), Greater),
+            (json!(-10), json!(-9), Less),
+            (json!(-9), json!(-10), Greater),
+            (json!(-7), json!(-7), Equal),
+            (json!(0), json!(-1), Greater),
+            (json!(10), json!(9), Greater),
+            (json!(42), json!(42), Equal),
+            (big.clone(), json!(u64::MAX), Greater),
+        ] {
+            assert_eq!(integer_cmp(&a, &b), expected, "{a} vs {b}");
+        }
+    }
 }

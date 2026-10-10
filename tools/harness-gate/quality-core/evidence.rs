@@ -4,7 +4,11 @@ use super::{
     ReasonClass, Result,
 };
 use serde_json::{json, Value};
-use std::{collections::BTreeSet, fs, path::Path};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    fs,
+    path::Path,
+};
 
 pub fn metric_type(name: &str) -> Option<&'static str> {
     Some(match name {
@@ -87,6 +91,36 @@ pub fn require_compatible_series(base: Option<&Value>, head: &Value) -> Result<(
     )
 }
 
+/// Read the canonical candidate through one handle and prove, after opening,
+/// that the handle is still the contained file that was checked. A symlink
+/// or rename swapped in after canonicalization is rejected (#319).
+fn read_contained(root: &Path, path: &str, candidate: &Path) -> std::io::Result<Vec<u8>> {
+    use std::io::Read;
+    let mut handle = fs::File::open(candidate)?;
+    let opened = handle.metadata()?;
+    let rechecked = fs::canonicalize(root.join(path))?;
+    let current = fs::symlink_metadata(candidate)?;
+    if rechecked != candidate || !opened.is_file() || !same_file(&opened, &current) {
+        return Err(std::io::Error::other(
+            "artifact/source changed while it was being read",
+        ));
+    }
+    let mut bytes = Vec::new();
+    handle.read_to_end(&mut bytes)?;
+    Ok(bytes)
+}
+
+#[cfg(unix)]
+fn same_file(a: &fs::Metadata, b: &fs::Metadata) -> bool {
+    use std::os::unix::fs::MetadataExt;
+    (a.dev(), a.ino()) == (b.dev(), b.ino())
+}
+
+#[cfg(not(unix))]
+fn same_file(a: &fs::Metadata, b: &fs::Metadata) -> bool {
+    b.is_file() && a.len() == b.len() && a.modified().ok() == b.modified().ok()
+}
+
 fn file(root: &Path, path: &str, expected_digest: &str, size: Option<&Value>) -> Result<()> {
     project::canonical_path(path).map_err(|e| error(format!("artifact/source {path}: {e}")))?;
     let io = |e: std::io::Error| error(format!("artifact/source {path}: {e}"));
@@ -94,7 +128,7 @@ fn file(root: &Path, path: &str, expected_digest: &str, size: Option<&Value>) ->
     let candidate = fs::canonicalize(root.join(path)).map_err(io)?;
     require(candidate.starts_with(&root), "path escapes declared root")?;
     require(candidate.is_file(), "artifact/source is not a regular file")?;
-    let bytes = fs::read(candidate).map_err(io)?;
+    let bytes = read_contained(&root, path, &candidate).map_err(io)?;
     require(
         digest(&bytes) == expected_digest,
         "artifact/source digest mismatch",
@@ -112,10 +146,12 @@ pub struct ValidationContext<'a> {
     pub expected: &'a Value,
 }
 
-fn record(
-    record: &Value,
+fn record<'a>(
+    record: &'a Value,
     context: &ValidationContext<'_>,
     series_validator: fn(&Value) -> Result<model::Series>,
+    project_subjects: &BTreeMap<&str, &Value>,
+    validated_series: &mut BTreeMap<&'a str, &'a Value>,
 ) -> Result<()> {
     let ValidationContext {
         project,
@@ -125,11 +161,18 @@ fn record(
     } = context;
     shape(record, None)?;
     shape(expected, Some("Context"))?;
-    series_validator(&record["series"])?;
+    let series = &record["series"];
+    let series_key = string(&series["id"]);
+    // A declared ID alone cannot certify content. Only an exactly equal Value
+    // previously accepted by this batch's validator can skip repeated checks.
+    if validated_series.get(series_key).copied() != Some(series) {
+        series_validator(series)?;
+        validated_series.insert(series_key, series);
+    }
     let subject = &record["subject"];
     require(record["project"] == project["id"], "project mismatch")?;
     require(
-        array(&project["subjects"]).contains(subject),
+        project_subjects.get(string(&subject["id"])).copied() == Some(subject),
         "unknown or altered subject",
     )?;
     require(
@@ -286,10 +329,22 @@ fn validate_batch(
             records.as_array().is_some_and(|r| !r.is_empty()),
             "evidence batch must be nonempty",
         )?;
+        // Project validation has already rejected duplicate subject identities.
+        let project_subjects: BTreeMap<_, _> = array(&context.project["subjects"])
+            .iter()
+            .map(|s| (string(&s["id"]), s))
+            .collect();
+        let mut validated_series = BTreeMap::new();
         let mut ids = BTreeSet::new();
         let mut subjects = BTreeSet::new();
         for r in array(records) {
-            record(r, context, series_validator)?;
+            record(
+                r,
+                context,
+                series_validator,
+                &project_subjects,
+                &mut validated_series,
+            )?;
             require(ids.insert(string(&r["id"])), "duplicate evidence ID")?;
             require(
                 subjects.insert((string(&r["subject"]["id"]), string(&r["series"]["id"]))),
@@ -355,4 +410,166 @@ pub fn evaluate_requirements(
         }
     }
     Ok(json!(results))
+}
+
+#[cfg(test)]
+pub(super) mod optimization_tests {
+    use super::*;
+    use tempfile::TempDir;
+
+    pub(crate) struct Fixture {
+        pub(crate) data: Value,
+        root: TempDir,
+    }
+
+    impl Fixture {
+        pub(crate) fn context(&self) -> ValidationContext<'_> {
+            ValidationContext {
+                project: &self.data["project"],
+                expected: &self.data["expected"],
+                source_root: self.root.path(),
+                artifact_root: self.root.path(),
+            }
+        }
+    }
+
+    pub(crate) fn two_subjects_fixture() -> Fixture {
+        let mut data: Value = serde_json::from_str(include_str!(
+            "../../quality/fixtures/workflow/compiler/direct.json"
+        ))
+        .unwrap();
+        let root = tempfile::tempdir().unwrap();
+        fs::create_dir(root.path().join("src")).unwrap();
+        fs::write(
+            root.path().join("src/lib.rs"),
+            include_bytes!("../../quality/fixtures/workflow/compiler/source.txt"),
+        )
+        .unwrap();
+        fs::write(
+            root.path().join("raw.json"),
+            include_bytes!("../../quality/fixtures/workflow/compiler/artifact.txt"),
+        )
+        .unwrap();
+        let mut subject = data["project"]["subjects"][0].clone();
+        subject["discriminator"] = json!("second-module");
+        subject["id"] =
+            json!(project::subject_id(string(&data["project"]["id"]), &subject).unwrap());
+        data["project"]["subjects"]
+            .as_array_mut()
+            .unwrap()
+            .push(subject.clone());
+        let mut record = data["records"][0].clone();
+        record["id"] = json!("second-evidence");
+        record["subject"] = subject;
+        data["records"].as_array_mut().unwrap().push(record);
+        Fixture { data, root }
+    }
+
+    fn failure(f: &Fixture, records: &Value, expected: &str) {
+        let error = validate_evidence(records, &f.context()).unwrap_err();
+        assert_eq!(error.class, ReasonClass::MeasurementError);
+        assert_eq!(error.message, expected);
+    }
+
+    #[test]
+    fn memo_full_value_and_subject_membership_keep_error_precedence() {
+        let f = two_subjects_fixture();
+        let records = &f.data["records"];
+        assert_eq!(records[0]["series"], records[1]["series"]);
+        assert_eq!(
+            serde_json::to_value(validate_evidence(records, &f.context()).unwrap()).unwrap(),
+            *records
+        );
+
+        let mut changed = records.clone();
+        changed[1]["series"]["runtime"]["version"] = json!("altered-under-same-id");
+        changed[1]["subject"]["metadata"] = json!({"altered":"yes"});
+        changed[1]["id"] = changed[0]["id"].clone();
+        failure(&f, &changed, "noncanonical measurement series identity");
+        assert_eq!(
+            validate_evidence_transport(&changed, &f.context())
+                .unwrap_err()
+                .message,
+            "noncanonical measurement series identity"
+        );
+
+        let mut changed = records.clone();
+        changed[1]["subject"]["metadata"] = json!({"altered":"yes"});
+        changed[1]["id"] = changed[0]["id"].clone();
+        failure(&f, &changed, "unknown or altered subject");
+        changed[1]["subject"] = records[1]["subject"].clone();
+        changed[1]["subject"]["id"] = json!(format!("subject-identity/v1:{}", "0".repeat(64)));
+        failure(&f, &changed, "unknown or altered subject");
+    }
+
+    #[test]
+    fn memo_does_not_hide_record_duplicates_or_unknown_metric_semantics() {
+        let f = two_subjects_fixture();
+        let records = &f.data["records"];
+        let mut changed = records.clone();
+        changed[1]["id"] = changed[0]["id"].clone();
+        failure(&f, &changed, "duplicate evidence ID");
+        changed[1]["subject"] = changed[0]["subject"].clone();
+        failure(&f, &changed, "duplicate evidence ID");
+        changed[1]["id"] = json!("distinct-id");
+        failure(&f, &changed, "duplicate subject/series evidence");
+        for (field, expected) in [
+            ("capabilities", "duplicate capability: coverage.line"),
+            ("metrics", "duplicate metric: coverage.line"),
+            ("artifacts", "duplicate artifact ID: raw"),
+        ] {
+            let mut changed = records.clone();
+            let duplicate = changed[1][field][0].clone();
+            changed[1][field].as_array_mut().unwrap().push(duplicate);
+            changed[1]["id"] = changed[0]["id"].clone();
+            failure(&f, &changed, expected);
+        }
+        let mut changed = records.clone();
+        changed[1]["series"]["metrics"][0]["name"] = json!("vendor.unknown");
+        changed[1]["series"]["id"] = json!(series_id(&changed[1]["series"]).unwrap());
+        changed[1]["capabilities"][0]["metric"] = json!("vendor.unknown");
+        changed[1]["metrics"][0]["name"] = json!("vendor.unknown");
+        // Transport acceptance cannot populate a cache shared with generic validation.
+        validate_evidence_transport(&changed, &f.context()).unwrap();
+        failure(&f, &changed, "unknown generic metric: vendor.unknown");
+    }
+
+    #[test]
+    fn successful_batch_memo_never_caches_source_bytes_between_calls() {
+        let f = two_subjects_fixture();
+        validate_evidence(&f.data["records"], &f.context()).unwrap();
+        fs::write(f.root.path().join("src/lib.rs"), b"changed source").unwrap();
+        failure(&f, &f.data["records"], "artifact/source digest mismatch");
+    }
+}
+
+#[cfg(all(test, unix))]
+mod read_contained_tests {
+    use super::{digest, read_contained};
+    use std::fs;
+
+    #[test]
+    fn swapped_symlink_after_canonicalization_is_rejected() {
+        let root = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let root_path = fs::canonicalize(root.path()).unwrap();
+        fs::write(root_path.join("artifact.json"), b"inside").unwrap();
+        fs::write(outside.path().join("artifact.json"), b"inside").unwrap();
+        let candidate = fs::canonicalize(root_path.join("artifact.json")).unwrap();
+        assert_eq!(
+            digest(&read_contained(&root_path, "artifact.json", &candidate).unwrap()),
+            digest(b"inside")
+        );
+        // Simulate the race: the checked path becomes an external symlink
+        // with identical content after canonicalization.
+        fs::remove_file(&candidate).unwrap();
+        std::os::unix::fs::symlink(outside.path().join("artifact.json"), &candidate).unwrap();
+        let error = read_contained(&root_path, "artifact.json", &candidate).unwrap_err();
+        assert!(
+            error
+                .to_string()
+                .contains("changed while it was being read"),
+            "{error}"
+        );
+    }
 }

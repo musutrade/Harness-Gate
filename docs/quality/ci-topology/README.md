@@ -42,9 +42,10 @@ the build-once docs experiment was reverted without losing any checks.
 | cargo-nextest | 0.9.143 | Full tests, quality collection, benchmarks and baseline refresh |
 | cargo-llvm-cov | 0.9.0 | Quality collection |
 | cargo-audit | 0.22.2 | Security and release audits; deny-warnings preserved |
+| cargo-tarpaulin | 0.37.5 | Push-only Code Coverage; LLVM engine and XML evidence retained |
 
 The [installer](../../../.github/actions/install-ci-tool/action.yml) pins
-`taiki-e/install-action` to `d438492cf8a250514fa2d34b30bc3c0dc37c65ff`, enables
+`taiki-e/install-action` to `183e4297cca2404691e9380e1307288dced5c82a`, enables
 checksums and verifies effective versions through the consuming Cargo command.
 Missing platform/version binaries use the explicit locked source fallback;
 download/checksum failures fail the job. There is no installed-tool cache or
@@ -53,10 +54,11 @@ platform details and the pin-update procedure.
 
 This is not a fully pinned environment: Rust remains `stable`, Python `3.x`,
 runner images use `*-latest`, and other actions retain their existing version
-tags. Push-only tarpaulin still uses its existing unversioned locked source
-install. Retained effective tool identities, rather than those moving labels,
-describe an actual measurement. Changing these remaining conventions is outside
-this documentation issue.
+tags. Tarpaulin's pin matches the source-installed version observed before
+GH-291; its installation now uses the same verified prebuilt/locked-fallback
+contract. Retained effective tool identities, rather than moving labels,
+describe an actual measurement. Changing the remaining conventions is outside
+the tool-setup optimization.
 
 ## Cache and artifact trust boundaries
 

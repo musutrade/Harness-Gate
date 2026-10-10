@@ -22,9 +22,9 @@ sha256 = "bbb7f1d90d741f41c6cb761f1433f4cb7c8ca168fac0082bd366a9377ae149a8"
 [paths.test_source]
 path = "src/process/tests.rs"
 symbol = "timeout_terminates_the_task"
-start = 11
-end = 23
-sha256 = "f457244e862fb38c8bbe65740c7e223f5ef2674fd4339d92a6ce8b9eab2c24c8"
+start = 34
+end = 46
+sha256 = "e4df8a76ec42569ad1fc189b51f132f8977efb2eaeeb915a64c5d76405b2691e"
 [[paths.probes]]
 line = 253
 column = 24
@@ -52,8 +52,8 @@ sha256 = "bbb7f1d90d741f41c6cb761f1433f4cb7c8ca168fac0082bd366a9377ae149a8"
 path = "tests/failure_paths_test.rs"
 symbol = "verification_cleanup_cancel_and_report_precedence_retains_resource_evidence"
 start = 575
-end = 724
-sha256 = "97df519be3c31a60fd8266e24478d6ff500484115604e80e71203681978f8704"
+end = 812
+sha256 = "52ddee154904a475bb10f05b119321959187063d3627aa5d7bfedb0667759d31"
 [[paths.probes]]
 line = 250
 column = 24
@@ -80,9 +80,9 @@ sha256 = "bbb7f1d90d741f41c6cb761f1433f4cb7c8ca168fac0082bd366a9377ae149a8"
 [paths.test_source]
 path = "src/process/tests.rs"
 symbol = "timeout_terminates_process_tree_without_a_descendant_leak"
-start = 156
-end = 197
-sha256 = "f457244e862fb38c8bbe65740c7e223f5ef2674fd4339d92a6ce8b9eab2c24c8"
+start = 179
+end = 220
+sha256 = "e4df8a76ec42569ad1fc189b51f132f8977efb2eaeeb915a64c5d76405b2691e"
 [[paths.probes]]
 line = 253
 column = 24
@@ -190,9 +190,9 @@ assertions = ["assert_failure(&output);"]
 [paths.source]
 path = "src/config/loader.rs"
 symbol = "from_source_with_diagnostics"
-start = 40
-end = 62
-sha256 = "3f733ab8a6ffc1e5cb1fdfa8f65b3f10d3029f57eb59bfe60403844a6729af26"
+start = 75
+end = 97
+sha256 = "9ef912226e2168f22d1e7979952c097cbfa4d0cf98ae5eac8dc8fae0b41c8f78"
 [paths.test_source]
 path = "tests/integration_test.rs"
 symbol = "test_config_check_invalid"
@@ -200,7 +200,7 @@ start = 114
 end = 125
 sha256 = "d784995f60b780c2f5b971b975c19645ffee1fd02d2e19518595d3c8f9350085"
 [[paths.probes]]
-line = 48
+line = 83
 column = 32
 text = "let mut config: Self = toml::from_str(&source)"
 
@@ -250,7 +250,7 @@ path = "src/verify/report.rs"
 symbol = "write_report_file"
 start = 1243
 end = 1253
-sha256 = "732fbabc404861e6f24c582fe45009f03153659f462c25f50476ef6b9de742b9"
+sha256 = "8f4e46f879d2e1f3a952632dbfa5bc8471f9744e560dbc664a80e50724cf3fb0"
 
 [paths.test_source]
 path = "src/verify/tests.rs"
@@ -280,14 +280,14 @@ path = "src/verify/report.rs"
 symbol = "verify_manifest_without_result"
 start = 1822
 end = 1909
-sha256 = "732fbabc404861e6f24c582fe45009f03153659f462c25f50476ef6b9de742b9"
+sha256 = "8f4e46f879d2e1f3a952632dbfa5bc8471f9744e560dbc664a80e50724cf3fb0"
 
 [paths.test_source]
 path = "src/verify/report.rs"
 symbol = "manifest_records_digests_and_detects_tampering"
-start = 2800
-end = 2853
-sha256 = "732fbabc404861e6f24c582fe45009f03153659f462c25f50476ef6b9de742b9"
+start = 3407
+end = 3460
+sha256 = "8f4e46f879d2e1f3a952632dbfa5bc8471f9744e560dbc664a80e50724cf3fb0"
 
 [[paths.probes]]
 line = 1905
@@ -338,17 +338,17 @@ assertions = ["assert_failed_without_remove(&project, &path, &fake, \"runtime ob
 [paths.source]
 path = "src/service/lease.rs"
 symbol = "verify_runtime_record"
-start = 773
-end = 805
-sha256 = "21192d57f52741f9eb8fd5477b595c960cb8e21881cbedecdd742b7b9ecff021"
+start = 978
+end = 1010
+sha256 = "1f308c249e90cfd88c80271b2cf68f783ceda3a86f0c641a27425d4c2f52ae2b"
 [paths.test_source]
 path = "src/service/lease.rs"
 symbol = "fake_docker_and_podman_cleanup_requires_fresh_complete_ownership"
-start = 1371
-end = 1458
-sha256 = "21192d57f52741f9eb8fd5477b595c960cb8e21881cbedecdd742b7b9ecff021"
+start = 1806
+end = 1893
+sha256 = "1f308c249e90cfd88c80271b2cf68f783ceda3a86f0c641a27425d4c2f52ae2b"
 [[paths.probes]]
-line = 797
+line = 1002
 column = 9
 text = "bail!(\"runtime object identity changed since the lease was recorded\");"
 
@@ -369,13 +369,13 @@ path = "src/process/adapter.rs"
 symbol = "claim"
 start = 193
 end = 223
-sha256 = "ef7a3a0c7617f13f48db4e9d24279dc4d53fc2ed84788c7f4d3e195b98a228d4"
+sha256 = "0f3af3c911b38f7fac2c337881bb24fc57566da1c34d59daec05a856335ffda0"
 [paths.test_source]
 path = "src/process/adapter.rs"
 symbol = "replay_retention_covers_the_entire_accepted_window"
-start = 1811
-end = 1845
-sha256 = "ef7a3a0c7617f13f48db4e9d24279dc4d53fc2ed84788c7f4d3e195b98a228d4"
+start = 2044
+end = 2078
+sha256 = "0f3af3c911b38f7fac2c337881bb24fc57566da1c34d59daec05a856335ffda0"
 [[paths.probes]]
 line = 205
 column = 9
@@ -398,13 +398,13 @@ path = "src/process/replay.rs"
 symbol = "claim"
 start = 103
 end = 128
-sha256 = "6c287a1a885762f094b9f75b962a4e8997e76d52a188371a0cf7506a917648be"
+sha256 = "f7a87b71cebaaf93e80a3927cce9fa0fc7592f4f0c206076458359eaaf6f7ff6"
 [paths.test_source]
 path = "src/process/adapter.rs"
 symbol = "durable_nonce_claims_are_atomic_between_independent_hosts"
-start = 1869
-end = 1894
-sha256 = "ef7a3a0c7617f13f48db4e9d24279dc4d53fc2ed84788c7f4d3e195b98a228d4"
+start = 2102
+end = 2127
+sha256 = "0f3af3c911b38f7fac2c337881bb24fc57566da1c34d59daec05a856335ffda0"
 [[paths.probes]]
 line = 126
 column = 9

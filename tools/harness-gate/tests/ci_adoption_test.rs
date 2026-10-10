@@ -101,6 +101,13 @@ fn migration_cli_preserves_source_and_refuses_overwrite() {
         include_str!("../presets/empty.audit.toml"),
     )
     .unwrap();
+    let missing = command(root.path())
+        .args(["config", "migrate"])
+        .output()
+        .unwrap();
+    assert!(!missing.status.success());
+    assert!(String::from_utf8_lossy(&missing.stderr).contains("requires --input"));
+    assert!(!root.path().join(".harness-gate/flow.toml").exists());
     success(
         command(root.path())
             .args(["--config", "legacy.toml", "config", "migrate"])

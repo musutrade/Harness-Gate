@@ -166,7 +166,8 @@
         "src/service/inspection.rs",
         "src/service/lease.rs",
         "src/service/mod.rs",
-        "src/service/postgres.rs"
+        "src/service/postgres.rs",
+        "src/service/report_directory.rs"
       ]
     },
     "service-adapters": {
@@ -348,7 +349,7 @@
     {
       "path": "src/config/mod.rs",
       "reason": "Module/type declarations and re-exports have no executable LLVM mapping on this target.",
-      "sha256": "4876465b396edab32af061c509b5d0886e03d5826605fb585ad6f5213fc8739e"
+      "sha256": "7f2d4a7b5d8e0d6fd74f178d3d7fb778968639071305e2b275f206e0c5269786"
     },
     {
       "path": "src/doctor/mod.rs",

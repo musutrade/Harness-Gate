@@ -3,6 +3,20 @@
   "issue": "GH-152",
   "modules": [
     {
+      "module": "tools/quality/baseline_delivery.py",
+      "category": "A",
+      "purpose": "Precheck Actions PR permission and bind the original run, attempt, artifact and exact candidate before PR delivery-only retry.",
+      "callers": [
+        ".github/workflows/quality-baseline-refresh.yml",
+        "tools/quality/tests/test_baseline_delivery.py"
+      ],
+      "ci_role": "Baseline refresh CI transport and delivery integrity; may block PR delivery. Quality Script Tests cover real Git/ZIP fixtures with simulated GitHub responses.",
+      "release_impact": "Not packaged in the release binary. Cannot measure metrics, adopt a baseline, approve a generic release or replace required Rust checks.",
+      "authoritative_status": "CI transport only; Rust retains generic policy and release decision authority. Unknown permission is not precheck PASS; enterprise policy restrictions remain external.",
+      "final_disposition": "Retain maintained Python CI delivery tooling with fail-closed candidate/evidence binding and independent human baseline review; no generic release-approval path.",
+      "sha256": "d7017a8557fb68140f1ec80edb3c7e834ebf775aa1c5b667c01d8a928f139470"
+    },
+    {
       "authoritative_status": "Non-authoritative for release; generic shadow/reference or development tooling",
       "callers": [
         ".github/workflows/ci.yml",
