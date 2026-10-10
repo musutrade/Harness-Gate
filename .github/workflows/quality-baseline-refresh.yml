@@ -44,14 +44,14 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
 
       - name: Precheck PR delivery policy
         id: precheck
         run: python3 tools/quality/baseline_delivery.py precheck
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@4360b52568e2003a75bf9bc1d59f33a8e3fc893c # stable
 
       - name: Install cargo-nextest
         uses: ./.github/actions/install-ci-tool
@@ -69,7 +69,7 @@ jobs:
       - name: Upload raw benchmark evidence
         id: evidence
         if: ${{ always() }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: quality-baseline-refresh-${{ github.run_id }}-${{ github.run_attempt }}
           path: target/quality
@@ -89,7 +89,7 @@ jobs:
 
       - name: Create baseline update pull request
         id: pr
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7
         with:
           branch: automation/quality-baseline-${{ github.run_id }}
           delete-branch: true
@@ -138,7 +138,7 @@ jobs:
       ARTIFACT_ID: ${{ inputs.artifact_id }}
       ARTIFACT_DIGEST: ${{ inputs.artifact_digest }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           ref: ${{ github.event.repository.default_branch }}
           persist-credentials: false
@@ -151,7 +151,7 @@ jobs:
             --output "$RUNNER_TEMP/baseline-delivery.json"
       - name: Retain delivery-only diagnostics
         if: ${{ always() }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: quality-baseline-delivery-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/baseline-delivery.json

@@ -241,6 +241,7 @@ pub(crate) enum ConfigAction {
     },
     /// Convert a schema v1 flow.toml to .harness-gate/flow.toml schema v2.
     Migrate {
+        /// Schema v1 flow.toml to convert (defaults to the global --config).
         #[arg(long, value_name = "PATH")]
         input: Option<PathBuf>,
         #[arg(long, value_name = "PATH")]

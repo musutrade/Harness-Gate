@@ -364,14 +364,19 @@ args = ["--version"]
 | kind          | 字段                                     | 行为                                           |
 | ------------- | ---------------------------------------- | ---------------------------------------------- |
 | `command`     | `program`, `args`                        | 执行命令并要求退出码为 0                       |
-| `path`        | `path`, `path_type`                      | 检查任意路径、文件或目录                       |
+| `path`        | `path`, `path_type`, `path_scope`        | 检查任意路径、文件或目录                       |
 | `glob`        | `pattern`                                | 要求 glob 至少命中一个路径                     |
 | `env`         | `name`                                   | 要求环境变量存在                               |
-| `env-or-file` | `env`, `path`, `contains`                | 环境变量存在，或文件中有以 `contains` 开头的行 |
+| `env-or-file` | `env`, `path`, `contains`, `path_scope`  | 环境变量存在，或文件中有以 `contains` 开头的行 |
 | `git-config`  | `key`, `expected`                        | 要求 Git 配置等于预期值                        |
 | `git-remotes` | 无                                       | 检查 Git remote 配置                           |
-| `version`     | `program`, `args`, `path`, `trim_prefix` | 比较命令输出与版本文件                         |
+| `version`     | `program`, `args`, `path`, `trim_prefix`, `path_scope` | 比较命令输出与版本文件           |
 | `service`     | `service`                                | 检查 service 的外部变量或 Docker 可用性        |
+
+`path_scope` 取 `repository`（默认）或 `host`。repository 作用域的路径必须留在项目内：
+仓库相对路径，或以一个 `{root}`/别名占位符开头，不能含 `..`，也不能经符号链接解析到仓库外；
+`config check` 和 `doctor` 都会拒绝其他路径。只有确实要检查宿主位置（已安装工具、用户级凭据
+文件）时才设置 `path_scope = "host"`；报告只给出路径，不回显文件内容。
 
 示例：
 

@@ -21,7 +21,7 @@ runs:
         CI_CARGO_PROFILES: ${{ inputs.profiles }}
       run: python tools/quality/ci_cargo.py --class "$CI_CARGO_CLASS" --profiles "$CI_CARGO_PROFILES"
     - name: Cache downloaded Cargo sources
-      uses: actions/cache@v5
+      uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
       with:
         path: |
           ${{ steps.state.outputs.cargo-home }}/registry/index/
@@ -30,13 +30,13 @@ runs:
         key: cargo-sources-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.state.outputs.lock }}
     - name: Cache disposable compilation state
       if: ${{ inputs.cache-target == 'true' }}
-      uses: actions/cache@v5
+      uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
       with:
         path: ${{ steps.state.outputs.target }}
         key: cargo-target-v1-${{ steps.state.outputs.identity }}-${{ github.sha }}
         restore-keys: cargo-target-v1-${{ steps.state.outputs.identity }}-
     - name: Retain Cargo cache boundary evidence
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
       with:
         name: cargo-state-${{ github.job }}-${{ runner.os }}-${{ runner.arch }}-${{ github.run_id }}-${{ github.run_attempt }}
         path: target/quality/cache/*.json
