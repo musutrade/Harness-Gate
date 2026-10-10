@@ -43,6 +43,7 @@ fn expression_attributes(expression: &mut Expr) -> Option<&mut Vec<Attribute>> {
         Expr::Closure(n) => Some(&mut n.attrs),
         Expr::Async(n) => Some(&mut n.attrs),
         Expr::Try(n) => Some(&mut n.attrs),
+        Expr::Unsafe(n) => Some(&mut n.attrs),
         _ => None,
     }
 }
