@@ -298,3 +298,20 @@ fn resolved_scope_validation_preserves_alias_compilation_and_canonical_selection
         "invalid character in evidence string"
     );
 }
+
+#[test]
+fn duplicate_remediation_classes_are_rejected_with_field_path() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let text = fs::read_to_string(root.join("../quality/fixtures/policy/policy.json")).unwrap();
+    let mut document = json::parse(&text).unwrap();
+    policy::validate_policy_document(&document).expect("fixture policy is valid");
+    let class = document["rules"][0]["remediation_classes"][0].clone();
+    document["rules"][0]["remediation_classes"] = json!([class.clone(), class]);
+    let error = policy::validate_policy_document(&document)
+        .unwrap_err()
+        .to_string();
+    assert!(
+        error.contains("$.rules[0].remediation_classes: array violates uniqueItems"),
+        "{error}"
+    );
+}

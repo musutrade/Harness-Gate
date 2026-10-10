@@ -220,7 +220,14 @@ impl ResourceLease {
                         // fresh ownership through the generic expiry fallback.
                         bail!("report-directory marker is retained; explicit proven cleanup is required");
                     }
-                    if !is_stale(&existing, epoch_seconds()) {
+                    let state = lease_state(&existing, epoch_seconds());
+                    if state == LeaseState::AliveIdentityUnknown {
+                        bail!(
+                            "LEASE_OWNERSHIP_UNCERTAIN: lease holder pid {} for {resource_id:?} is alive but its process identity cannot be read; resource retained",
+                            existing.pid
+                        );
+                    }
+                    if state != LeaseState::Stale {
                         bail!(
                             "resource lease conflict for {resource_id:?}: invocation {} (pid {}) owns it",
                             existing.invocation_id,
@@ -541,7 +548,25 @@ fn cleanup_with_runtime<O: RuntimeOperations + ?Sized>(
                 }
             }
         } else {
-            is_stale(&record, epoch_seconds())
+            match lease_state(&record, epoch_seconds()) {
+                LeaseState::AliveIdentityUnknown => {
+                    report.active += 1;
+                    report.failures.push(format!(
+                        "{}: LEASE_OWNERSHIP_UNCERTAIN: holder pid {} is alive but its process identity cannot be read; resource retained",
+                        record.resource_id, record.pid
+                    ));
+                    report.resources.push(CleanupResource {
+                        resource_id: record.resource_id,
+                        resource_kind: record.resource_kind,
+                        invocation_id: record.invocation_id,
+                        state: "ownership-uncertain".into(),
+                        action: "retained".into(),
+                        lease_file: path.display().to_string(),
+                    });
+                    continue;
+                }
+                state => state == LeaseState::Stale,
+            }
         };
         let lease_file = path.display().to_string();
         if !identity_is_proven(&record) {
@@ -780,15 +805,62 @@ fn ensure_owner(current: &LeaseRecord, expected: &LeaseRecord) -> Result<()> {
     Ok(())
 }
 
+/// Ownership state of an existing lease as observed by this host.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum LeaseState {
+    Active,
+    Stale,
+    /// The holder PID is alive but its start identity cannot be read, so PID
+    /// reuse cannot be distinguished from the original owner. Expiry is not
+    /// proof of death here; the lease must be retained (#311).
+    AliveIdentityUnknown,
+}
+
+#[cfg(test)]
 fn is_stale(record: &LeaseRecord, now: u64) -> bool {
-    match process_alive(record.pid) {
-        Some(true) => match process_start_identity_checked(record.pid) {
-            Some(identity) if identity != record.process_start_identity => true,
-            Some(_) => false,
-            None => now > record.expires_at,
+    lease_state(record, now) == LeaseState::Stale
+}
+
+#[cfg(not(test))]
+fn lease_state(record: &LeaseRecord, now: u64) -> LeaseState {
+    classify_lease(record, now, process_alive(record.pid), || {
+        process_start_identity_checked(record.pid)
+    })
+}
+
+/// Test builds may replace host process observation for one thread.
+#[cfg(test)]
+fn lease_state(record: &LeaseRecord, now: u64) -> LeaseState {
+    match tests::OBSERVE_PROCESS.with(std::cell::Cell::get) {
+        Some(observe) => {
+            let (alive, identity) = observe(record.pid);
+            classify_lease(record, now, alive, || identity)
+        }
+        None => classify_lease(record, now, process_alive(record.pid), || {
+            process_start_identity_checked(record.pid)
+        }),
+    }
+}
+
+fn classify_lease(
+    record: &LeaseRecord,
+    now: u64,
+    alive: Option<bool>,
+    identity: impl FnOnce() -> Option<String>,
+) -> LeaseState {
+    let expired = if now > record.expires_at {
+        LeaseState::Stale
+    } else {
+        LeaseState::Active
+    };
+    match alive {
+        Some(true) => match identity() {
+            Some(identity) if identity != record.process_start_identity => LeaseState::Stale,
+            Some(_) => LeaseState::Active,
+            None => LeaseState::AliveIdentityUnknown,
         },
-        Some(false) => true,
-        None => now > record.expires_at,
+        Some(false) => LeaseState::Stale,
+        None => expired,
     }
 }
 
@@ -1087,6 +1159,14 @@ fn process_alive(pid: u32) -> Option<bool> {
 #[cfg(test)]
 mod tests {
     use super::process_start_identity_checked;
+
+    type ProcessObservation = fn(u32) -> (Option<bool>, Option<String>);
+
+    thread_local! {
+        /// Test-only replacement for host process observation.
+        pub(super) static OBSERVE_PROCESS: std::cell::Cell<Option<ProcessObservation>> =
+            const { std::cell::Cell::new(None) };
+    }
     use super::{
         cleanup_with_runtime, is_stale, ownership_labels, read_record, resource_key, write_record,
         LeaseRecord, RuntimeOperations, LEASE_SCHEMA_VERSION, OWNER_MARKER,
@@ -1592,6 +1672,93 @@ mod tests {
             .expect_err("poisoned ownership state must block release");
         assert!(format!("{error:#}").contains("lease record lock was poisoned"));
         assert!(path.exists(), "poisoned ownership marker must be retained");
+    }
+
+    #[test]
+    fn alive_holder_with_unreadable_identity_is_never_stale() {
+        let mut record = LeaseRecord {
+            owner_marker: OWNER_MARKER.into(),
+            schema_version: LEASE_SCHEMA_VERSION,
+            project_identity: "fixture-project".into(),
+            resource_id: "fixture".into(),
+            resource_kind: "workspace".into(),
+            invocation_id: "invocation".into(),
+            pid: 42,
+            process_start_identity: "linux:42".into(),
+            created_at: 1,
+            heartbeat_at: 1,
+            expires_at: 1,
+            resource_name: None,
+            runtime: None,
+            runtime_labels: BTreeMap::new(),
+            runtime_object_id: None,
+        };
+        let state = |alive, identity: Option<&str>| {
+            super::classify_lease(&record, 2, alive, || identity.map(str::to_string))
+        };
+        assert_eq!(
+            state(Some(true), None),
+            super::LeaseState::AliveIdentityUnknown
+        );
+        assert_eq!(
+            state(Some(true), Some("linux:42")),
+            super::LeaseState::Active
+        );
+        assert_eq!(state(Some(true), Some("linux:7")), super::LeaseState::Stale);
+        assert_eq!(state(Some(false), None), super::LeaseState::Stale);
+        assert_eq!(state(None, None), super::LeaseState::Stale);
+        record.expires_at = 3;
+        let unexpired = super::classify_lease(&record, 2, None, || None);
+        assert_eq!(unexpired, super::LeaseState::Active);
+    }
+
+    #[test]
+    fn cleanup_retains_expired_lease_of_live_holder_with_unreadable_identity() {
+        let (_workspace, project) = runtime_project("lease-alive-identity-unknown");
+        let mut lease = super::ResourceLease::acquire(
+            &project,
+            "step:alive-unknown",
+            "workspace",
+            "invocation-alive-unknown",
+            None,
+            None,
+        )
+        .expect("acquire lease");
+        let path = lease.path.clone();
+        lease.stop_heartbeat();
+        let mut expired = read_record(&path).expect("read lease");
+        expired.heartbeat_at = 0;
+        expired.expires_at = 0;
+        write_record(&path, &expired).expect("write expired fixture");
+        lease.retain();
+
+        OBSERVE_PROCESS.with(|observe| observe.set(Some(|_| (Some(true), None))));
+        let (fake, remove_calls) = fake_runtime(ContainerRuntimeKind::Docker, None);
+        for dry_run in [true, false] {
+            let report = cleanup_with_runtime(&project, dry_run, &fake).expect("cleanup report");
+            assert_eq!(report.reclaimed, 0);
+            assert_eq!(report.resources.len(), 1);
+            assert_eq!(report.resources[0].state, "ownership-uncertain");
+            assert_eq!(report.resources[0].action, "retained");
+            assert!(report.failures.iter().any(|failure| {
+                failure.contains("LEASE_OWNERSHIP_UNCERTAIN")
+                    && failure.contains("process identity cannot be read")
+            }));
+        }
+        let Err(error) = super::ResourceLease::acquire(
+            &project,
+            "step:alive-unknown",
+            "workspace",
+            "invocation-contender",
+            None,
+            None,
+        ) else {
+            panic!("live holder keeps the lease");
+        };
+        OBSERVE_PROCESS.with(|observe| observe.set(None));
+        assert!(format!("{error:#}").contains("LEASE_OWNERSHIP_UNCERTAIN"));
+        assert_eq!(remove_calls.load(Ordering::SeqCst), 0);
+        assert!(path.exists(), "live holder's marker must be retained");
     }
 
     #[test]
