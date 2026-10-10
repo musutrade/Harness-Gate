@@ -60,7 +60,7 @@ class RiskScopeTests(unittest.TestCase):
         self.assertEqual(SERIES, {
             'analyzer': 'harness-gate-rust-measure/0.3.1', 'rule': 'mccabe-rust-3/1',
             'instrumentation': 'closure-black-box/1', 'mapping': 'insertions-utf8/1',
-            'selection': 'gh286-report-retention/1', 'configuration': 'compiler-target-production/4',
+            'selection': 'gh309-net-policy/1', 'configuration': 'compiler-target-production/4',
         })
         self.assertIn('process/command.rs', SOURCE_FILES)
         self.assertNotIn('process/task.rs', SOURCE_FILES)
