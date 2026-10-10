@@ -1,6 +1,6 @@
 {
   "accepted_baseline": {
-    "path": "docs/benchmarks/phase-1/current.json",
+    "path": "tools/quality/fixtures/rust-reference/phase-1-accepted-b92755f.json",
     "sha256": "062f4f607068abb332b67d28f6e1f9314abc2261a5f9a891c09ea86de5bf9928",
     "commit": "b92755f9ec87c251516863a0136c28f811187ab5",
     "series": "x86_64-unknown-linux-gnu:rustc 1.98.0 (88d9e12ae 2026-08-18):1:1:cold-and-warm",
