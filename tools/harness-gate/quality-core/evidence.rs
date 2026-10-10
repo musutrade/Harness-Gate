@@ -91,6 +91,36 @@ pub fn require_compatible_series(base: Option<&Value>, head: &Value) -> Result<(
     )
 }
 
+/// Read the canonical candidate through one handle and prove, after opening,
+/// that the handle is still the contained file that was checked. A symlink
+/// or rename swapped in after canonicalization is rejected (#319).
+fn read_contained(root: &Path, path: &str, candidate: &Path) -> std::io::Result<Vec<u8>> {
+    use std::io::Read;
+    let mut handle = fs::File::open(candidate)?;
+    let opened = handle.metadata()?;
+    let rechecked = fs::canonicalize(root.join(path))?;
+    let current = fs::symlink_metadata(candidate)?;
+    if rechecked != candidate || !opened.is_file() || !same_file(&opened, &current) {
+        return Err(std::io::Error::other(
+            "artifact/source changed while it was being read",
+        ));
+    }
+    let mut bytes = Vec::new();
+    handle.read_to_end(&mut bytes)?;
+    Ok(bytes)
+}
+
+#[cfg(unix)]
+fn same_file(a: &fs::Metadata, b: &fs::Metadata) -> bool {
+    use std::os::unix::fs::MetadataExt;
+    (a.dev(), a.ino()) == (b.dev(), b.ino())
+}
+
+#[cfg(not(unix))]
+fn same_file(a: &fs::Metadata, b: &fs::Metadata) -> bool {
+    b.is_file() && a.len() == b.len() && a.modified().ok() == b.modified().ok()
+}
+
 fn file(root: &Path, path: &str, expected_digest: &str, size: Option<&Value>) -> Result<()> {
     project::canonical_path(path).map_err(|e| error(format!("artifact/source {path}: {e}")))?;
     let io = |e: std::io::Error| error(format!("artifact/source {path}: {e}"));
@@ -98,7 +128,7 @@ fn file(root: &Path, path: &str, expected_digest: &str, size: Option<&Value>) ->
     let candidate = fs::canonicalize(root.join(path)).map_err(io)?;
     require(candidate.starts_with(&root), "path escapes declared root")?;
     require(candidate.is_file(), "artifact/source is not a regular file")?;
-    let bytes = fs::read(candidate).map_err(io)?;
+    let bytes = read_contained(&root, path, &candidate).map_err(io)?;
     require(
         digest(&bytes) == expected_digest,
         "artifact/source digest mismatch",
@@ -510,5 +540,36 @@ pub(super) mod optimization_tests {
         validate_evidence(&f.data["records"], &f.context()).unwrap();
         fs::write(f.root.path().join("src/lib.rs"), b"changed source").unwrap();
         failure(&f, &f.data["records"], "artifact/source digest mismatch");
+    }
+}
+
+#[cfg(all(test, unix))]
+mod read_contained_tests {
+    use super::{digest, read_contained};
+    use std::fs;
+
+    #[test]
+    fn swapped_symlink_after_canonicalization_is_rejected() {
+        let root = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let root_path = fs::canonicalize(root.path()).unwrap();
+        fs::write(root_path.join("artifact.json"), b"inside").unwrap();
+        fs::write(outside.path().join("artifact.json"), b"inside").unwrap();
+        let candidate = fs::canonicalize(root_path.join("artifact.json")).unwrap();
+        assert_eq!(
+            digest(&read_contained(&root_path, "artifact.json", &candidate).unwrap()),
+            digest(b"inside")
+        );
+        // Simulate the race: the checked path becomes an external symlink
+        // with identical content after canonicalization.
+        fs::remove_file(&candidate).unwrap();
+        std::os::unix::fs::symlink(outside.path().join("artifact.json"), &candidate).unwrap();
+        let error = read_contained(&root_path, "artifact.json", &candidate).unwrap_err();
+        assert!(
+            error
+                .to_string()
+                .contains("changed while it was being read"),
+            "{error}"
+        );
     }
 }
