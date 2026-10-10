@@ -478,156 +478,260 @@ fn cleanup_with_runtime<O: RuntimeOperations + ?Sized>(
             continue;
         }
         report.scanned += 1;
-        let record = match read_record(&path) {
-            Ok(record) => record,
-            Err(error) => {
-                report.failures.push(format!("{}: {error}", path.display()));
-                continue;
-            }
-        };
-        if let Err(error) =
-            validate_record(&record, &record.resource_id, &path, &directory, project)
-        {
-            // Unknown or malformed markers are intentionally never reclaimed,
-            // but the failure is retained as structured cleanup evidence.
-            report.failures.push(format!(
-                "{}: ownership validation failed: {error:#}",
-                path.display()
-            ));
-            continue;
-        }
-        // Report retention, allocation, release and operator cleanup share this
-        // guard. A heartbeat's JSON replacement cannot look like a released lease.
-        let report_guard = if resource_kind_is_report(&record) {
-            match ReportDirectoryGuard::try_acquire(project, &record.invocation_id) {
-                Ok(Some(guard)) => {
-                    let checked = read_record(&path).and_then(|current| {
-                        ensure_owner(&current, &record)?;
-                        guard.validate_record(&current)
-                    });
-                    if let Err(error) = checked {
-                        report
-                            .failures
-                            .push(format!("{}: {error:#}", path.display()));
-                        continue;
-                    }
-                    Some(guard)
-                }
-                Ok(None) => {
-                    report.active += 1;
-                    report.resources.push(CleanupResource {
-                        resource_id: record.resource_id,
-                        resource_kind: record.resource_kind,
-                        invocation_id: record.invocation_id,
-                        state: "active".into(),
-                        action: "retained".into(),
-                        lease_file: path.display().to_string(),
-                    });
-                    continue;
-                }
-                Err(error) => {
-                    report
-                        .failures
-                        .push(format!("{}: {error:#}", path.display()));
-                    continue;
-                }
-            }
-        } else {
-            None
-        };
-        let stale = if report_guard.is_some() {
-            // Expiry is not proof of death when process observation is unknown.
-            match report_owner_has_ended(&record) {
-                Some(ended) => ended,
-                None => {
-                    report.failures.push(format!(
-                        "{}: LEASE_OWNERSHIP_UNCERTAIN: report owner state is unknown; retained",
-                        path.display()
-                    ));
-                    continue;
-                }
-            }
-        } else {
-            match lease_state(&record, epoch_seconds()) {
-                LeaseState::AliveIdentityUnknown => {
-                    report.active += 1;
-                    report.failures.push(format!(
-                        "{}: LEASE_OWNERSHIP_UNCERTAIN: holder pid {} is alive but its process identity cannot be read; resource retained",
-                        record.resource_id, record.pid
-                    ));
-                    report.resources.push(CleanupResource {
-                        resource_id: record.resource_id,
-                        resource_kind: record.resource_kind,
-                        invocation_id: record.invocation_id,
-                        state: "ownership-uncertain".into(),
-                        action: "retained".into(),
-                        lease_file: path.display().to_string(),
-                    });
-                    continue;
-                }
-                state => state == LeaseState::Stale,
-            }
-        };
-        let lease_file = path.display().to_string();
-        if !identity_is_proven(&record) {
-            if stale {
-                report.stale += 1;
-            } else {
-                report.active += 1;
-            }
-            report.failures.push(format!(
-                "{}: LEASE_OWNERSHIP_UNCERTAIN: platform process identity is unavailable; resource retained",
-                record.resource_id
-            ));
-            report.resources.push(CleanupResource {
-                resource_id: record.resource_id,
-                resource_kind: record.resource_kind,
-                invocation_id: record.invocation_id,
-                state: "ownership-uncertain".into(),
-                action: "retained".into(),
-                lease_file,
-            });
-            continue;
-        }
-        if !stale {
-            report.active += 1;
-            report.resources.push(CleanupResource {
-                resource_id: record.resource_id,
-                resource_kind: record.resource_kind,
-                invocation_id: record.invocation_id,
-                state: "active".into(),
-                action: "保留".into(),
-                lease_file,
-            });
-            continue;
-        }
-        report.stale += 1;
-        let mut action = if dry_run {
-            "would-reclaim"
-        } else {
-            "reclaimed"
-        };
-        if !dry_run {
-            if let Err(error) = reclaim_resource_with_runtime(project, &path, &record, runtime) {
-                action = "failed";
-                report.failures.push(format!(
-                    "reclaim {} ({}) failed: {error:#}",
-                    record.resource_id, record.resource_kind
-                ));
-            } else {
-                report.reclaimed += 1;
-            }
-        }
-        report.resources.push(CleanupResource {
-            resource_id: record.resource_id,
-            resource_kind: record.resource_kind,
-            invocation_id: record.invocation_id,
-            state: "stale".into(),
-            action: action.into(),
-            lease_file,
-        });
+        process_lease_file(project, &path, &directory, dry_run, runtime, &mut report);
     }
     Ok(report)
+}
+
+enum GuardOutcome {
+    NotReport,
+    Acquired(ReportDirectoryGuard),
+    Skip,
+}
+
+#[derive(PartialEq, Eq)]
+enum EntryDisposition {
+    Retain,
+    Reclaim,
+}
+
+fn process_lease_file<O: RuntimeOperations + ?Sized>(
+    project: &Project,
+    path: &Path,
+    directory: &Path,
+    dry_run: bool,
+    runtime: &O,
+    report: &mut CleanupReport,
+) {
+    let record = match load_validated_record(path, directory, project, report) {
+        Some(record) => record,
+        None => return,
+    };
+    let report_guard = match acquire_report_guard(project, path, &record, report) {
+        GuardOutcome::NotReport => None,
+        GuardOutcome::Acquired(guard) => Some(guard),
+        GuardOutcome::Skip => return,
+    };
+    if classify_entry(&record, path, report_guard.is_some(), report) == EntryDisposition::Retain {
+        return;
+    }
+    reclaim_stale_entry(project, path, &record, dry_run, runtime, report);
+}
+
+fn load_validated_record(
+    path: &Path,
+    directory: &Path,
+    project: &Project,
+    report: &mut CleanupReport,
+) -> Option<LeaseRecord> {
+    let record = match read_record(path) {
+        Ok(record) => record,
+        Err(error) => {
+            report.failures.push(format!("{}: {error}", path.display()));
+            return None;
+        }
+    };
+    if let Err(error) = validate_record(&record, &record.resource_id, path, directory, project) {
+        // Unknown or malformed markers are intentionally never reclaimed,
+        // but the failure is retained as structured cleanup evidence.
+        report.failures.push(format!(
+            "{}: ownership validation failed: {error:#}",
+            path.display()
+        ));
+        return None;
+    }
+    Some(record)
+}
+
+fn acquire_report_guard(
+    project: &Project,
+    path: &Path,
+    record: &LeaseRecord,
+    report: &mut CleanupReport,
+) -> GuardOutcome {
+    if !resource_kind_is_report(record) {
+        return GuardOutcome::NotReport;
+    }
+    // Report retention, allocation, release and operator cleanup share this
+    // guard. A heartbeat's JSON replacement cannot look like a released lease.
+    match ReportDirectoryGuard::try_acquire(project, &record.invocation_id) {
+        Ok(Some(guard)) => {
+            if let Err(error) = validate_guard_record(&guard, path, record) {
+                report
+                    .failures
+                    .push(format!("{}: {error:#}", path.display()));
+                return GuardOutcome::Skip;
+            }
+            GuardOutcome::Acquired(guard)
+        }
+        Ok(None) => {
+            record_active(report, record, path, "retained");
+            GuardOutcome::Skip
+        }
+        Err(error) => {
+            report
+                .failures
+                .push(format!("{}: {error:#}", path.display()));
+            GuardOutcome::Skip
+        }
+    }
+}
+
+fn validate_guard_record(
+    guard: &ReportDirectoryGuard,
+    path: &Path,
+    record: &LeaseRecord,
+) -> Result<()> {
+    let current = read_record(path)?;
+    ensure_owner(&current, record)?;
+    guard.validate_record(&current)
+}
+
+fn classify_entry(
+    record: &LeaseRecord,
+    path: &Path,
+    report_guard_is_some: bool,
+    report: &mut CleanupReport,
+) -> EntryDisposition {
+    let Some(stale) = determine_stale(record, path, report_guard_is_some, report) else {
+        return EntryDisposition::Retain;
+    };
+    if !identity_is_proven(record) {
+        record_uncertain_retained(report, record, path, stale);
+        return EntryDisposition::Retain;
+    }
+    if !stale {
+        record_active(report, record, path, "保留");
+        return EntryDisposition::Retain;
+    }
+    EntryDisposition::Reclaim
+}
+
+fn determine_stale(
+    record: &LeaseRecord,
+    path: &Path,
+    report_guard_is_some: bool,
+    report: &mut CleanupReport,
+) -> Option<bool> {
+    if !report_guard_is_some {
+        return match lease_state(record, epoch_seconds()) {
+            LeaseState::AliveIdentityUnknown => {
+                record_alive_identity_unknown(report, record, path);
+                None
+            }
+            state => Some(state == LeaseState::Stale),
+        };
+    }
+    // Expiry is not proof of death when process observation is unknown.
+    match report_owner_has_ended(record) {
+        Some(ended) => Some(ended),
+        None => {
+            report.failures.push(format!(
+                "{}: LEASE_OWNERSHIP_UNCERTAIN: report owner state is unknown; retained",
+                path.display()
+            ));
+            None
+        }
+    }
+}
+
+fn record_active(report: &mut CleanupReport, record: &LeaseRecord, path: &Path, action: &str) {
+    report.active += 1;
+    report.resources.push(CleanupResource {
+        resource_id: record.resource_id.clone(),
+        resource_kind: record.resource_kind.clone(),
+        invocation_id: record.invocation_id.clone(),
+        state: "active".into(),
+        action: action.into(),
+        lease_file: path.display().to_string(),
+    });
+}
+
+fn record_alive_identity_unknown(report: &mut CleanupReport, record: &LeaseRecord, path: &Path) {
+    report.active += 1;
+    report.failures.push(format!(
+        "{}: LEASE_OWNERSHIP_UNCERTAIN: holder pid {} is alive but its process identity cannot be read; resource retained",
+        record.resource_id, record.pid
+    ));
+    report.resources.push(CleanupResource {
+        resource_id: record.resource_id.clone(),
+        resource_kind: record.resource_kind.clone(),
+        invocation_id: record.invocation_id.clone(),
+        state: "ownership-uncertain".into(),
+        action: "retained".into(),
+        lease_file: path.display().to_string(),
+    });
+}
+
+fn record_uncertain_retained(
+    report: &mut CleanupReport,
+    record: &LeaseRecord,
+    path: &Path,
+    stale: bool,
+) {
+    if stale {
+        report.stale += 1;
+    } else {
+        report.active += 1;
+    }
+    report.failures.push(format!(
+        "{}: LEASE_OWNERSHIP_UNCERTAIN: platform process identity is unavailable; resource retained",
+        record.resource_id
+    ));
+    report.resources.push(CleanupResource {
+        resource_id: record.resource_id.clone(),
+        resource_kind: record.resource_kind.clone(),
+        invocation_id: record.invocation_id.clone(),
+        state: "ownership-uncertain".into(),
+        action: "retained".into(),
+        lease_file: path.display().to_string(),
+    });
+}
+
+fn reclaim_stale_entry<O: RuntimeOperations + ?Sized>(
+    project: &Project,
+    path: &Path,
+    record: &LeaseRecord,
+    dry_run: bool,
+    runtime: &O,
+    report: &mut CleanupReport,
+) {
+    report.stale += 1;
+    let action = if dry_run {
+        "would-reclaim"
+    } else {
+        reclaim_or_record_failure(project, path, record, runtime, report)
+    };
+    report.resources.push(CleanupResource {
+        resource_id: record.resource_id.clone(),
+        resource_kind: record.resource_kind.clone(),
+        invocation_id: record.invocation_id.clone(),
+        state: "stale".into(),
+        action: action.into(),
+        lease_file: path.display().to_string(),
+    });
+}
+
+fn reclaim_or_record_failure<O: RuntimeOperations + ?Sized>(
+    project: &Project,
+    path: &Path,
+    record: &LeaseRecord,
+    runtime: &O,
+    report: &mut CleanupReport,
+) -> &'static str {
+    match reclaim_resource_with_runtime(project, path, record, runtime) {
+        Ok(()) => {
+            report.reclaimed += 1;
+            "reclaimed"
+        }
+        Err(error) => {
+            report.failures.push(format!(
+                "reclaim {} ({}) failed: {error:#}",
+                record.resource_id, record.resource_kind
+            ));
+            "failed"
+        }
+    }
 }
 
 fn reclaim_resource(project: &Project, path: &Path, record: &LeaseRecord) -> Result<()> {
@@ -1615,36 +1719,40 @@ mod tests {
     #[test]
     fn runtime_removal_failure_retains_evidence_and_allows_a_proven_retry() {
         for kind in [ContainerRuntimeKind::Docker, ContainerRuntimeKind::Podman] {
-            let (_workspace, project) = runtime_project("lease-removal-fault");
-            let (path, _, inspection) = container_lease(&project, kind, true);
-            let original = std::fs::read(&path).unwrap();
-            let (mut runtime, calls) = fake_runtime(kind, Some(inspection));
-            runtime.stop_fails = true;
-            let report = cleanup_with_runtime(&project, false, &runtime).unwrap();
-            assert_eq!(calls.load(Ordering::SeqCst), 1);
-            assert_eq!(report.reclaimed, 0);
-            assert!(report
-                .failures
-                .iter()
-                .any(|failure| failure.contains("injected runtime removal failure")));
-            assert_eq!(std::fs::read(&path).unwrap(), original);
-            // Loss of inspection certainty must not trigger a second remove.
-            let inspection = runtime.inspection.take();
-            assert_failed_without_remove(
-                &project,
-                &path,
-                &fake_runtime(kind, None).0,
-                "fake inspection failed",
-            );
-            assert_eq!(calls.load(Ordering::SeqCst), 1);
-            runtime.inspection = inspection;
-            runtime.stop_fails = false;
-            let report = cleanup_with_runtime(&project, false, &runtime).unwrap();
-            assert_eq!(calls.load(Ordering::SeqCst), 2);
-            assert_eq!(report.reclaimed, 1);
-            assert!(report.failures.is_empty());
-            assert!(!path.exists());
+            assert_runtime_removal_failure_retains_evidence(kind);
         }
+    }
+
+    fn assert_runtime_removal_failure_retains_evidence(kind: ContainerRuntimeKind) {
+        let (_workspace, project) = runtime_project("lease-removal-fault");
+        let (path, _, inspection) = container_lease(&project, kind, true);
+        let original = std::fs::read(&path).unwrap();
+        let (mut runtime, calls) = fake_runtime(kind, Some(inspection));
+        runtime.stop_fails = true;
+        let report = cleanup_with_runtime(&project, false, &runtime).unwrap();
+        assert_eq!(calls.load(Ordering::SeqCst), 1);
+        assert_eq!(report.reclaimed, 0);
+        assert!(report
+            .failures
+            .iter()
+            .any(|failure| failure.contains("injected runtime removal failure")));
+        assert_eq!(std::fs::read(&path).unwrap(), original);
+        // Loss of inspection certainty must not trigger a second remove.
+        let inspection = runtime.inspection.take();
+        assert_failed_without_remove(
+            &project,
+            &path,
+            &fake_runtime(kind, None).0,
+            "fake inspection failed",
+        );
+        assert_eq!(calls.load(Ordering::SeqCst), 1);
+        runtime.inspection = inspection;
+        runtime.stop_fails = false;
+        let report = cleanup_with_runtime(&project, false, &runtime).unwrap();
+        assert_eq!(calls.load(Ordering::SeqCst), 2);
+        assert_eq!(report.reclaimed, 1);
+        assert!(report.failures.is_empty());
+        assert!(!path.exists());
     }
 
     #[test]
@@ -1808,88 +1916,92 @@ mod tests {
             .into_iter()
             .enumerate()
         {
-            let (workspace, project) = runtime_project(&format!("runtime-owned-{index}"));
-            let (path, _record, inspection) = container_lease(&project, runtime, true);
-            let (fake, remove_calls) = fake_runtime(runtime, Some(inspection.clone()));
-            let report = cleanup_with_runtime(&project, false, &fake).expect("cleanup report");
-            assert_eq!(report.reclaimed, 1);
-            assert!(report.failures.is_empty());
-            assert_eq!(remove_calls.load(Ordering::SeqCst), 1);
-            assert!(!path.exists());
-            drop(workspace);
-
-            let (workspace, project) = runtime_project(&format!("runtime-object-{index}"));
-            let (path, _record, mut mismatch) = container_lease(&project, runtime, true);
-            mismatch.object_id = "replacement-object".into();
-            let (fake, _) = fake_runtime(runtime, Some(mismatch));
-            assert_failed_without_remove(&project, &path, &fake, "runtime object identity changed");
-            drop(workspace);
-
-            let (workspace, project) = runtime_project(&format!("runtime-label-{index}"));
-            let (path, _record, mut mismatch) = container_lease(&project, runtime, true);
-            mismatch
-                .labels
-                .insert(super::LABEL_PROJECT.into(), "other-project".into());
-            let (fake, _) = fake_runtime(runtime, Some(mismatch));
-            assert_failed_without_remove(&project, &path, &fake, "ownership label");
-            drop(workspace);
-
-            let (workspace, project) = runtime_project(&format!("runtime-renamed-{index}"));
-            let (path, _record, mut mismatch) = container_lease(&project, runtime, true);
-            mismatch.name = "harness-gate-renamed-container".into();
-            let (fake, _) = fake_runtime(runtime, Some(mismatch));
-            assert_failed_without_remove(&project, &path, &fake, "object name");
-            drop(workspace);
-
-            let (workspace, project) = runtime_project(&format!("runtime-inspect-{index}"));
-            let (path, _record, _inspection) = container_lease(&project, runtime, true);
-            let (fake, _) = fake_runtime(runtime, None);
-            assert_failed_without_remove(&project, &path, &fake, "fake inspection failed");
-            drop(workspace);
-
-            let (workspace, project) = runtime_project(&format!("runtime-cross-project-{index}"));
-            let (path, mut record, inspection) = container_lease(&project, runtime, true);
-            record.project_identity = "other-project".into();
-            write_record(&path, &record).expect("forge cross-project lease");
-            let (fake, _) = fake_runtime(runtime, Some(inspection));
-            assert_failed_without_remove(&project, &path, &fake, "project identity");
-            drop(workspace);
-
-            let (workspace, project) = runtime_project(&format!("runtime-forged-{index}"));
-            let (path, mut record, inspection) = container_lease(&project, runtime, true);
-            record.owner_marker = "forged".into();
-            write_record(&path, &record).expect("forge owner marker");
-            let (fake, _) = fake_runtime(runtime, Some(inspection));
-            assert_failed_without_remove(&project, &path, &fake, "owner marker");
-            drop(workspace);
-
-            let (workspace, project) = runtime_project(&format!("runtime-renamed-lease-{index}"));
-            let (path, _record, inspection) = container_lease(&project, runtime, true);
-            let renamed = path.with_file_name("renamed-lease.json");
-            std::fs::rename(&path, &renamed).expect("rename lease marker");
-            let (fake, _) = fake_runtime(runtime, Some(inspection));
-            assert_failed_without_remove(&project, &renamed, &fake, "deterministic resource key");
-            drop(workspace);
-
-            let (workspace, project) = runtime_project(&format!("runtime-malformed-{index}"));
-            let directory = super::lease_directory(&project).expect("lease directory");
-            let malformed = directory.join(format!("{}.json", resource_key("service:database")));
-            std::fs::write(&malformed, b"not-json").expect("write malformed lease");
-            let (fake, _) = fake_runtime(runtime, None);
-            assert_failed_without_remove(&project, &malformed, &fake, "parse");
-            drop(workspace);
-
-            let (workspace, project) = runtime_project(&format!("runtime-active-{index}"));
-            let (path, _record, inspection) = container_lease(&project, runtime, false);
-            let (fake, remove_calls) = fake_runtime(runtime, Some(inspection));
-            let report = cleanup_with_runtime(&project, false, &fake).expect("cleanup report");
-            assert_eq!(report.active, 1);
-            assert_eq!(report.reclaimed, 0);
-            assert!(report.failures.is_empty());
-            assert_eq!(remove_calls.load(Ordering::SeqCst), 0);
-            assert!(path.exists());
-            drop(workspace);
+            assert_runtime_cleanup_ownership(index, runtime);
         }
+    }
+
+    fn assert_runtime_cleanup_ownership(index: usize, runtime: ContainerRuntimeKind) {
+        let (workspace, project) = runtime_project(&format!("runtime-owned-{index}"));
+        let (path, _record, inspection) = container_lease(&project, runtime, true);
+        let (fake, remove_calls) = fake_runtime(runtime, Some(inspection.clone()));
+        let report = cleanup_with_runtime(&project, false, &fake).expect("cleanup report");
+        assert_eq!(report.reclaimed, 1);
+        assert!(report.failures.is_empty());
+        assert_eq!(remove_calls.load(Ordering::SeqCst), 1);
+        assert!(!path.exists());
+        drop(workspace);
+
+        let (workspace, project) = runtime_project(&format!("runtime-object-{index}"));
+        let (path, _record, mut mismatch) = container_lease(&project, runtime, true);
+        mismatch.object_id = "replacement-object".into();
+        let (fake, _) = fake_runtime(runtime, Some(mismatch));
+        assert_failed_without_remove(&project, &path, &fake, "runtime object identity changed");
+        drop(workspace);
+
+        let (workspace, project) = runtime_project(&format!("runtime-label-{index}"));
+        let (path, _record, mut mismatch) = container_lease(&project, runtime, true);
+        mismatch
+            .labels
+            .insert(super::LABEL_PROJECT.into(), "other-project".into());
+        let (fake, _) = fake_runtime(runtime, Some(mismatch));
+        assert_failed_without_remove(&project, &path, &fake, "ownership label");
+        drop(workspace);
+
+        let (workspace, project) = runtime_project(&format!("runtime-renamed-{index}"));
+        let (path, _record, mut mismatch) = container_lease(&project, runtime, true);
+        mismatch.name = "harness-gate-renamed-container".into();
+        let (fake, _) = fake_runtime(runtime, Some(mismatch));
+        assert_failed_without_remove(&project, &path, &fake, "object name");
+        drop(workspace);
+
+        let (workspace, project) = runtime_project(&format!("runtime-inspect-{index}"));
+        let (path, _record, _inspection) = container_lease(&project, runtime, true);
+        let (fake, _) = fake_runtime(runtime, None);
+        assert_failed_without_remove(&project, &path, &fake, "fake inspection failed");
+        drop(workspace);
+
+        let (workspace, project) = runtime_project(&format!("runtime-cross-project-{index}"));
+        let (path, mut record, inspection) = container_lease(&project, runtime, true);
+        record.project_identity = "other-project".into();
+        write_record(&path, &record).expect("forge cross-project lease");
+        let (fake, _) = fake_runtime(runtime, Some(inspection));
+        assert_failed_without_remove(&project, &path, &fake, "project identity");
+        drop(workspace);
+
+        let (workspace, project) = runtime_project(&format!("runtime-forged-{index}"));
+        let (path, mut record, inspection) = container_lease(&project, runtime, true);
+        record.owner_marker = "forged".into();
+        write_record(&path, &record).expect("forge owner marker");
+        let (fake, _) = fake_runtime(runtime, Some(inspection));
+        assert_failed_without_remove(&project, &path, &fake, "owner marker");
+        drop(workspace);
+
+        let (workspace, project) = runtime_project(&format!("runtime-renamed-lease-{index}"));
+        let (path, _record, inspection) = container_lease(&project, runtime, true);
+        let renamed = path.with_file_name("renamed-lease.json");
+        std::fs::rename(&path, &renamed).expect("rename lease marker");
+        let (fake, _) = fake_runtime(runtime, Some(inspection));
+        assert_failed_without_remove(&project, &renamed, &fake, "deterministic resource key");
+        drop(workspace);
+
+        let (workspace, project) = runtime_project(&format!("runtime-malformed-{index}"));
+        let directory = super::lease_directory(&project).expect("lease directory");
+        let malformed = directory.join(format!("{}.json", resource_key("service:database")));
+        std::fs::write(&malformed, b"not-json").expect("write malformed lease");
+        let (fake, _) = fake_runtime(runtime, None);
+        assert_failed_without_remove(&project, &malformed, &fake, "parse");
+        drop(workspace);
+
+        let (workspace, project) = runtime_project(&format!("runtime-active-{index}"));
+        let (path, _record, inspection) = container_lease(&project, runtime, false);
+        let (fake, remove_calls) = fake_runtime(runtime, Some(inspection));
+        let report = cleanup_with_runtime(&project, false, &fake).expect("cleanup report");
+        assert_eq!(report.active, 1);
+        assert_eq!(report.reclaimed, 0);
+        assert!(report.failures.is_empty());
+        assert_eq!(remove_calls.load(Ordering::SeqCst), 0);
+        assert!(path.exists());
+        drop(workspace);
     }
 
     fn report_lock_path(project: &Project, invocation_id: &str) -> PathBuf {
@@ -2110,14 +2222,7 @@ mod tests {
             .unwrap_err();
         assert_eq!(actual.kind(), std::io::ErrorKind::PermissionDenied);
         assert_eq!(std::fs::read(&path).unwrap(), bytes);
-        let error = lease.release().unwrap_err();
-        assert!(format!("{error:#}").contains("release lease"));
-        assert_eq!(
-            error.downcast_ref::<std::io::Error>().unwrap().kind(),
-            std::io::ErrorKind::PermissionDenied
-        );
-        assert_eq!(std::fs::read(&path).unwrap(), bytes);
-        assert_report_guard_held(&lease, &project, &root, id);
+        assert_release_permission_denied(&lease, &project, &root, id, &path, &bytes);
         // The release certificate was persisted, but the still-present marker
         // blocks retention. Its exact bound fields are independently checked.
         let certificate: serde_json::Value =
@@ -2140,6 +2245,24 @@ mod tests {
             .unwrap();
         assert!(guard.release_is_proven(&root).unwrap());
         assert!(root.is_dir());
+    }
+
+    fn assert_release_permission_denied(
+        lease: &super::ResourceLease,
+        project: &Project,
+        root: &Path,
+        id: &str,
+        path: &Path,
+        bytes: &[u8],
+    ) {
+        let error = lease.release().unwrap_err();
+        assert!(format!("{error:#}").contains("release lease"));
+        assert_eq!(
+            error.downcast_ref::<std::io::Error>().unwrap().kind(),
+            std::io::ErrorKind::PermissionDenied
+        );
+        assert_eq!(std::fs::read(path).unwrap(), bytes);
+        assert_report_guard_held(lease, project, root, id);
     }
 
     #[test]
@@ -2319,39 +2442,75 @@ mod tests {
         )
         .unwrap();
         if mode == "collision" {
-            std::fs::write(&target, b"original marker\n").unwrap();
-            std::fs::write(&temporary, sentinel).unwrap();
-            // The same fixture on the old source reaches its old-name real
-            // create_new failure and exposes its unowned-temp deletion.
-            std::fs::write(&legacy_temporary, sentinel).unwrap();
-            let error = write_record(&target, &record).unwrap_err();
-            assert_eq!(
-                error.downcast_ref::<std::io::Error>().unwrap().kind(),
-                std::io::ErrorKind::AlreadyExists
+            assert_collision_preserves_foreign_temporary(
+                &target,
+                &temporary,
+                &legacy_temporary,
+                &record,
+                sentinel,
             );
-            assert_eq!(std::fs::read(&target).unwrap(), b"original marker\n");
-            assert_eq!(std::fs::read(&temporary).unwrap(), sentinel);
-            assert_eq!(std::fs::read(&legacy_temporary).unwrap(), sentinel);
         } else {
-            assert_eq!(mode, "publish-failure");
-            std::fs::create_dir(&target).unwrap();
-            std::fs::write(target.join("sentinel"), b"original target directory\n").unwrap();
-            let foreign = directory.join(".lease-foreign.tmp");
-            std::fs::write(&foreign, sentinel).unwrap();
-            let error = write_record(&target, &record).unwrap_err();
-            assert!(error.downcast_ref::<std::io::Error>().is_some());
-            assert!(
-                format!("{error:#}").contains("publish lease")
-                    || format!("{error:#}").contains("replace existing lease")
-            );
-            assert!(!temporary.exists());
-            assert!(!legacy_temporary.exists());
-            assert_eq!(std::fs::read(&foreign).unwrap(), sentinel);
-            assert_eq!(
-                std::fs::read(target.join("sentinel")).unwrap(),
-                b"original target directory\n"
+            assert_publish_failure_cleans_only_owned_temporary(
+                &mode,
+                &directory,
+                &target,
+                &temporary,
+                &legacy_temporary,
+                &record,
+                sentinel,
             );
         }
+    }
+
+    fn assert_collision_preserves_foreign_temporary(
+        target: &Path,
+        temporary: &Path,
+        legacy_temporary: &Path,
+        record: &LeaseRecord,
+        sentinel: &[u8],
+    ) {
+        std::fs::write(target, b"original marker\n").unwrap();
+        std::fs::write(temporary, sentinel).unwrap();
+        // The same fixture on the old source reaches its old-name real
+        // create_new failure and exposes its unowned-temp deletion.
+        std::fs::write(legacy_temporary, sentinel).unwrap();
+        let error = write_record(target, record).unwrap_err();
+        assert_eq!(
+            error.downcast_ref::<std::io::Error>().unwrap().kind(),
+            std::io::ErrorKind::AlreadyExists
+        );
+        assert_eq!(std::fs::read(target).unwrap(), b"original marker\n");
+        assert_eq!(std::fs::read(temporary).unwrap(), sentinel);
+        assert_eq!(std::fs::read(legacy_temporary).unwrap(), sentinel);
+    }
+
+    fn assert_publish_failure_cleans_only_owned_temporary(
+        mode: &str,
+        directory: &Path,
+        target: &Path,
+        temporary: &Path,
+        legacy_temporary: &Path,
+        record: &LeaseRecord,
+        sentinel: &[u8],
+    ) {
+        assert_eq!(mode, "publish-failure");
+        std::fs::create_dir(target).unwrap();
+        std::fs::write(target.join("sentinel"), b"original target directory\n").unwrap();
+        let foreign = directory.join(".lease-foreign.tmp");
+        std::fs::write(&foreign, sentinel).unwrap();
+        let error = write_record(target, record).unwrap_err();
+        assert!(error.downcast_ref::<std::io::Error>().is_some());
+        assert!(
+            format!("{error:#}").contains("publish lease")
+                || format!("{error:#}").contains("replace existing lease")
+        );
+        assert!(!temporary.exists());
+        assert!(!legacy_temporary.exists());
+        assert_eq!(std::fs::read(&foreign).unwrap(), sentinel);
+        assert_eq!(
+            std::fs::read(target.join("sentinel")).unwrap(),
+            b"original target directory\n"
+        );
     }
 
     #[cfg(target_os = "linux")]
@@ -2833,13 +2992,24 @@ mod tests {
         assert!(still_blocked, "observation must precede child exec");
         let guard = acquired
             .expect("consumed guard must unlock even while inherited child FD remains open");
+        assert_consumed_guard_state(checked, &marker, &original, &lock, &guard, &root);
+    }
+
+    fn assert_consumed_guard_state(
+        checked: bool,
+        marker: &Path,
+        original: &[u8],
+        lock: &Path,
+        guard: &super::ReportDirectoryGuard,
+        root: &Path,
+    ) {
         if checked {
             assert!(!marker.exists());
-            assert!(guard.release_is_proven(&root).unwrap());
+            assert!(guard.release_is_proven(root).unwrap());
         } else {
-            assert_eq!(std::fs::read(&marker).unwrap(), original);
-            assert_eq!(std::fs::read(&lock).unwrap(), b"held\n");
-            assert!(!guard.release_is_proven(&root).unwrap());
+            assert_eq!(std::fs::read(marker).unwrap(), original);
+            assert_eq!(std::fs::read(lock).unwrap(), b"held\n");
+            assert!(!guard.release_is_proven(root).unwrap());
         }
         assert!(root.is_dir());
     }

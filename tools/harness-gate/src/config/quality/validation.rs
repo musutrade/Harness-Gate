@@ -19,6 +19,32 @@ impl QualityConfig {
                 "quality.limits.max_artifact_bytes must be positive"
             );
         }
+        self.validate_identity(flow)?;
+        self.validate_components(flow, root)?;
+        self.validate_subjects(root)?;
+        self.validate_relationships()?;
+        self.validate_collectors(root)?;
+        self.validate_workflow_inputs(root)?;
+        self.validate_baseline(root)?;
+        let requirements = self
+            .policies
+            .iter()
+            .map(|(id, binding)| {
+                self.validate_expectation(&binding.expectation)?;
+                let required = super::policy::validate_binding(self, binding, root)?;
+                Ok((id.as_str(), required))
+            })
+            .collect::<Result<std::collections::BTreeMap<_, _>>>()?;
+        self.validate_profiles(flow, &requirements)?;
+        path(root, &self.reporting.output, "reporting.output", false)?;
+        ensure!(
+            !self.reporting.formats.is_empty(),
+            "reporting.formats must not be empty"
+        );
+        Ok(())
+    }
+
+    fn validate_identity(&self, flow: &FlowConfig) -> Result<()> {
         identifier(&self.project.id)?;
         ensure!(
             self.project.name == flow.project.name,
@@ -39,22 +65,32 @@ impl QualityConfig {
         {
             identifier(id)?;
         }
-        self.validate_components(flow, root)?;
-        self.validate_subjects(root)?;
+        Ok(())
+    }
+
+    fn validate_relationships(&self) -> Result<()> {
         for relationship in self.relationships.values() {
             identifier(&relationship.kind)?;
             for endpoint in [&relationship.from, &relationship.to] {
-                ensure!(
-                    !matches!(endpoint, Target::Relationship { .. }),
-                    "relationship endpoints must be components or subjects"
-                );
-                self.validate_target(endpoint)?;
+                self.validate_endpoint(endpoint)?;
             }
             ensure!(
                 relationship.from != relationship.to,
                 "relationship endpoints must differ"
             );
         }
+        Ok(())
+    }
+
+    fn validate_endpoint(&self, endpoint: &Target) -> Result<()> {
+        ensure!(
+            !matches!(endpoint, Target::Relationship { .. }),
+            "relationship endpoints must be components or subjects"
+        );
+        self.validate_target(endpoint)
+    }
+
+    fn validate_collectors(&self, root: &Path) -> Result<()> {
         for collector in self.collectors.values() {
             path(root, &collector.request, "collector request", false)?;
             ensure!(
@@ -70,6 +106,10 @@ impl QualityConfig {
                 );
             }
         }
+        Ok(())
+    }
+
+    fn validate_workflow_inputs(&self, root: &Path) -> Result<()> {
         for profile in self.profiles.values() {
             if let Some(workflow) = &profile.workflow {
                 for reference in [
@@ -84,22 +124,6 @@ impl QualityConfig {
                 }
             }
         }
-        self.validate_baseline(root)?;
-        let requirements = self
-            .policies
-            .iter()
-            .map(|(id, binding)| {
-                self.validate_expectation(&binding.expectation)?;
-                let required = super::policy::validate_binding(self, binding, root)?;
-                Ok((id.as_str(), required))
-            })
-            .collect::<Result<std::collections::BTreeMap<_, _>>>()?;
-        self.validate_profiles(flow, &requirements)?;
-        path(root, &self.reporting.output, "reporting.output", false)?;
-        ensure!(
-            !self.reporting.formats.is_empty(),
-            "reporting.formats must not be empty"
-        );
         Ok(())
     }
 

@@ -166,17 +166,7 @@ fn green_local_gates_and_breaking_contract_block_project_with_provenance(referen
     let report =
         project_report::report(&result, &case["kwargs"]["project"], &case["args"][0]).unwrap();
     assert_eq!(report["aggregate"]["state"], "fail");
-    for component in ["api", "frontend"] {
-        assert_eq!(report["components"][component]["local"]["state"], "pass");
-        assert_eq!(
-            report["components"][component]["cross_component"]["state"],
-            "fail"
-        );
-        assert_eq!(
-            report["components"][component]["aggregate"]["state"],
-            "fail"
-        );
-    }
+    assert_components_are_locally_green_and_cross_component_failed(&report);
     assert_eq!(report["gates"].as_object().unwrap().len(), 5);
     assert_eq!(report["aggregate"]["blockers"].as_array().unwrap().len(), 3);
     let gate = report["gates"]
@@ -192,6 +182,20 @@ fn green_local_gates_and_breaking_contract_block_project_with_provenance(referen
         .unwrap()
         .is_empty());
     assert!(difference(&report, &case["project_report"], "$").is_none());
+}
+
+fn assert_components_are_locally_green_and_cross_component_failed(report: &Value) {
+    for component in ["api", "frontend"] {
+        assert_eq!(report["components"][component]["local"]["state"], "pass");
+        assert_eq!(
+            report["components"][component]["cross_component"]["state"],
+            "fail"
+        );
+        assert_eq!(
+            report["components"][component]["aggregate"]["state"],
+            "fail"
+        );
+    }
 }
 
 fn scope_policy(scope: Value) -> Value {

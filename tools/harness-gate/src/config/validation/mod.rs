@@ -285,12 +285,32 @@ impl FlowConfig {
             return;
         }
 
+        let (ids, profiles) = self.collect_step_ids(source_map, diagnostics);
+        let dependencies_are_valid =
+            self.collect_step_dependency_diagnostics(&ids, source_map, diagnostics);
+        if dependencies_are_valid {
+            collect_result(
+                source_map,
+                diagnostics,
+                ConfigIssueKind::DependencyCycle,
+                "steps",
+                validate_step_dependencies(self),
+            );
+        }
+        self.collect_profile_usage_diagnostics(&profiles, source_map, diagnostics);
+        self.collect_required_step_diagnostics(&ids, source_map, diagnostics);
+    }
+
+    fn collect_step_ids(
+        &self,
+        source_map: &SourceMap,
+        diagnostics: &mut ConfigDiagnostics,
+    ) -> (HashSet<String>, BTreeSet<String>) {
         let mut ids = HashSet::new();
         let mut profiles = BTreeSet::new();
-        let mut dependencies_are_valid = true;
         for (index, step) in self.steps.iter().enumerate() {
             let path = format!("steps[{index}]");
-            if !ids.insert(step.id.as_str()) {
+            if !ids.insert(step.id.clone()) {
                 push_diagnostic(
                     self,
                     source_map,
@@ -303,41 +323,42 @@ impl FlowConfig {
             collect_step_field_diagnostics(self, step, index, source_map, diagnostics);
             profiles.extend(step.profiles.iter().cloned());
         }
+        (ids, profiles)
+    }
+
+    fn collect_step_dependency_diagnostics(
+        &self,
+        ids: &HashSet<String>,
+        source_map: &SourceMap,
+        diagnostics: &mut ConfigDiagnostics,
+    ) -> bool {
+        let mut dependencies_are_valid = true;
         for (index, step) in self.steps.iter().enumerate() {
+            let path = format!("steps[{index}].depends_on");
             for dependency in &step.depends_on {
-                let path = format!("steps[{index}].depends_on");
-                if dependency == &step.id {
-                    dependencies_are_valid = false;
-                    push_diagnostic(
-                        self,
-                        source_map,
-                        diagnostics,
-                        &path,
-                        ConfigIssueKind::Dependency,
-                        "a step may not depend on itself",
-                    );
-                } else if !ids.contains(dependency.as_str()) {
-                    dependencies_are_valid = false;
-                    push_diagnostic(
-                        self,
-                        source_map,
-                        diagnostics,
-                        &path,
-                        ConfigIssueKind::Dependency,
-                        "a dependency references a missing step",
-                    );
-                }
+                let Some(message) = step_dependency_issue(ids, step, dependency) else {
+                    continue;
+                };
+                dependencies_are_valid = false;
+                push_diagnostic(
+                    self,
+                    source_map,
+                    diagnostics,
+                    &path,
+                    ConfigIssueKind::Dependency,
+                    message,
+                );
             }
         }
-        if dependencies_are_valid {
-            collect_result(
-                source_map,
-                diagnostics,
-                ConfigIssueKind::DependencyCycle,
-                "steps",
-                validate_step_dependencies(self),
-            );
-        }
+        dependencies_are_valid
+    }
+
+    fn collect_profile_usage_diagnostics(
+        &self,
+        profiles: &BTreeSet<String>,
+        source_map: &SourceMap,
+        diagnostics: &mut ConfigDiagnostics,
+    ) {
         for (path, profile) in [
             ("project.default_profile", &self.project.default_profile),
             ("project.hook_profile", &self.project.hook_profile),
@@ -353,6 +374,14 @@ impl FlowConfig {
                 );
             }
         }
+    }
+
+    fn collect_required_step_diagnostics(
+        &self,
+        ids: &HashSet<String>,
+        source_map: &SourceMap,
+        diagnostics: &mut ConfigDiagnostics,
+    ) {
         let mut required = HashSet::new();
         for id in &self.policy.required_steps {
             if !required.insert(id.as_str()) {
@@ -1252,6 +1281,20 @@ fn validate_step_dependencies(config: &FlowConfig) -> Result<()> {
         visit(&step.id, config, &mut visiting, &mut visited)?;
     }
     Ok(())
+}
+
+fn step_dependency_issue(
+    ids: &HashSet<String>,
+    step: &super::model::StepConfig,
+    dependency: &str,
+) -> Option<&'static str> {
+    if dependency == step.id.as_str() {
+        Some("a step may not depend on itself")
+    } else if !ids.contains(dependency) {
+        Some("a dependency references a missing step")
+    } else {
+        None
+    }
 }
 
 mod primitives;

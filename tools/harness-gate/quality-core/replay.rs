@@ -273,6 +273,18 @@ mod acceptance {
 
     #[test]
     fn retained_corpora_and_consolidated_negative_matrix() {
+        let (_work, input) = prepare_differential_input();
+        let result = replay(&input).unwrap();
+        assert_eq!(result["case_count"], 33);
+        assert_eq!(result["mismatch_count"], 0, "{result}");
+        // Explicit fail-closed checks in addition to complete golden equivalence.
+        assert_negative_categories(&result);
+        assert_breaking_contract(&result);
+        assert_counter_mutation_is_blocked(&result);
+        eprintln!("33 retained Rust/Angular/contract cases; 12 negative categories; zero unexplained mismatches");
+    }
+
+    fn prepare_differential_input() -> (tempfile::TempDir, Value) {
         let work = tempfile::tempdir().unwrap();
         let root = Path::new(env!("CARGO_MANIFEST_DIR"));
         let input_path = work.path().join("input.json");
@@ -290,10 +302,10 @@ mod acceptance {
             String::from_utf8_lossy(&output.stderr)
         );
         let input = super::super::parse(&fs::read_to_string(input_path).unwrap()).unwrap();
-        let result = replay(&input).unwrap();
-        assert_eq!(result["case_count"], 33);
-        assert_eq!(result["mismatch_count"], 0, "{result}");
-        // Explicit fail-closed checks in addition to complete golden equivalence.
+        (work, input)
+    }
+
+    fn assert_negative_categories(result: &Value) {
         let negative = [
             "missing-evidence",
             "stale-context",
@@ -329,6 +341,9 @@ mod acceptance {
                 );
             }
         }
+    }
+
+    fn assert_breaking_contract(result: &Value) {
         let breaking = result["cases"]
             .as_array()
             .unwrap()
@@ -339,7 +354,10 @@ mod acceptance {
             breaking["actual"]["project_report"]["aggregate"]["state"],
             "fail"
         );
-        // Prove the comparator blocks a counter mutation, with a useful field path.
+    }
+
+    // Prove the comparator blocks a counter mutation, with a useful field path.
+    fn assert_counter_mutation_is_blocked(result: &Value) {
         let mut changed = result["cases"][0]["actual"].clone();
         changed["policy_result"]["aggregate"]["state"] = json!("unexplained");
         let diff = compare(&result["cases"][0]["actual"], &changed);
@@ -347,6 +365,5 @@ mod acceptance {
             diff["mismatches"][0]["path"],
             "/policy_result/aggregate/state"
         );
-        eprintln!("33 retained Rust/Angular/contract cases; 12 negative categories; zero unexplained mismatches");
     }
 }

@@ -421,46 +421,50 @@ while True:
         ));
     }
 
-    #[test]
-    fn first_signal_error_survives_cleanup_and_failed_kill_is_bounded() {
-        for kill_succeeds in [true, false] {
-            let signal = if kill_succeeds {
-                term_error_then_real_kill
-            } else {
-                both_signals_fail
-            };
-            let mut fixture = Fixture::new();
-            fixture.start("ignore-leader");
-            let started = Instant::now();
-            let error = command::terminate_with_signal(
-                fixture.leader.as_mut().unwrap(),
-                signal,
-                Duration::ZERO,
-            )
-            .unwrap_err();
-            assert_eq!(error.raw_os_error(), Some(libc::EACCES));
-            assert!(started.elapsed() < Duration::from_secs(4));
-            if kill_succeeds {
-                fixture.assert_stopped();
-                assert!(fixture
+    fn assert_signal_error_and_reap(kill_succeeds: bool) {
+        let signal = if kill_succeeds {
+            term_error_then_real_kill
+        } else {
+            both_signals_fail
+        };
+        let mut fixture = Fixture::new();
+        fixture.start("ignore-leader");
+        let started = Instant::now();
+        let error = command::terminate_with_signal(
+            fixture.leader.as_mut().unwrap(),
+            signal,
+            Duration::ZERO,
+        )
+        .unwrap_err();
+        assert_eq!(error.raw_os_error(), Some(libc::EACCES));
+        assert!(started.elapsed() < Duration::from_secs(4));
+        if kill_succeeds {
+            fixture.assert_stopped();
+            assert!(fixture
+                .leader
+                .as_mut()
+                .unwrap()
+                .try_wait()
+                .unwrap()
+                .is_some());
+        } else {
+            assert!(
+                fixture
                     .leader
                     .as_mut()
                     .unwrap()
                     .try_wait()
                     .unwrap()
-                    .is_some());
-            } else {
-                assert!(
-                    fixture
-                        .leader
-                        .as_mut()
-                        .unwrap()
-                        .try_wait()
-                        .unwrap()
-                        .is_none(),
-                    "failed KILL must not be reported as reaped"
-                );
-            }
+                    .is_none(),
+                "failed KILL must not be reported as reaped"
+            );
+        }
+    }
+
+    #[test]
+    fn first_signal_error_survives_cleanup_and_failed_kill_is_bounded() {
+        for kill_succeeds in [true, false] {
+            assert_signal_error_and_reap(kill_succeeds);
         }
         let mut fixture = Fixture::new();
         fixture.start("ignore-leader");
@@ -524,30 +528,59 @@ while True:
             .is_none());
     }
 
-    #[test]
-    fn independent_cli_timeout_and_cancellation_stop_term_resistant_descendant() {
-        for cancel in [false, true] {
-            let mut fixture = Fixture::new();
-            let root = &fixture.root;
-            let binary = env!("CARGO_BIN_EXE_harness-gate");
-            assert!(Command::new(binary)
-                .arg("--project-root")
-                .arg(root)
-                .args(["init", "--preset", "generic"])
-                .output()
-                .unwrap()
-                .status
-                .success());
-            assert!(Command::new("git")
-                .arg("init")
-                .current_dir(root)
-                .output()
-                .unwrap()
-                .status
-                .success());
-            let timeout = if cancel { 20 } else { 2 };
-            let flow = format!(
-                r#"
+    fn cli_timeout_secs(cancel: bool) -> u32 {
+        if cancel {
+            20
+        } else {
+            2
+        }
+    }
+
+    fn termination_field(cancel: bool) -> &'static str {
+        if cancel {
+            "cancelled"
+        } else {
+            "timed_out"
+        }
+    }
+
+    fn wait_for_cli(child: &mut Child, root: &Path) -> std::process::ExitStatus {
+        let deadline = Instant::now() + Duration::from_secs(12);
+        loop {
+            if let Some(status) = child.try_wait().unwrap() {
+                break status;
+            }
+            assert!(
+                Instant::now() < deadline,
+                "CLI termination exceeded deadline: {}",
+                root.display()
+            );
+            thread::sleep(Duration::from_millis(10));
+        }
+    }
+
+    fn cli_termination_case(cancel: bool) {
+        let mut fixture = Fixture::new();
+        let root = &fixture.root;
+        let binary = env!("CARGO_BIN_EXE_harness-gate");
+        assert!(Command::new(binary)
+            .arg("--project-root")
+            .arg(root)
+            .args(["init", "--preset", "generic"])
+            .output()
+            .unwrap()
+            .status
+            .success());
+        assert!(Command::new("git")
+            .arg("init")
+            .current_dir(root)
+            .output()
+            .unwrap()
+            .status
+            .success());
+        let timeout = cli_timeout_secs(cancel);
+        let flow = format!(
+            r#"
 version = 2
 [project]
 name = "termination"
@@ -571,55 +604,48 @@ cwd = "{{root}}"
 log = "process.log"
 timeout_secs = {timeout}
 "#
+        );
+        fs::write(root.join(".harness-gate/flow.toml"), flow).unwrap();
+        let stdout = fs::File::create(root.join("cli.stdout")).unwrap();
+        let stderr = fs::File::create(root.join("cli.stderr")).unwrap();
+        fixture.leader = Some(
+            Command::new(binary)
+                .arg("--project-root")
+                .arg(root)
+                .args(["verify", "--all"])
+                .stdout(Stdio::from(stdout))
+                .stderr(Stdio::from(stderr))
+                .spawn()
+                .unwrap(),
+        );
+        // Here the owned Child is the CLI, not the worker group leader.
+        fixture.ready();
+        if cancel {
+            assert_eq!(
+                unsafe { libc::kill(fixture.leader.as_ref().unwrap().id() as i32, libc::SIGTERM) },
+                0
             );
-            fs::write(root.join(".harness-gate/flow.toml"), flow).unwrap();
-            let stdout = fs::File::create(root.join("cli.stdout")).unwrap();
-            let stderr = fs::File::create(root.join("cli.stderr")).unwrap();
-            fixture.leader = Some(
-                Command::new(binary)
-                    .arg("--project-root")
-                    .arg(root)
-                    .args(["verify", "--all"])
-                    .stdout(Stdio::from(stdout))
-                    .stderr(Stdio::from(stderr))
-                    .spawn()
-                    .unwrap(),
-            );
-            // Here the owned Child is the CLI, not the worker group leader.
-            fixture.ready();
-            if cancel {
-                assert_eq!(
-                    unsafe {
-                        libc::kill(fixture.leader.as_ref().unwrap().id() as i32, libc::SIGTERM)
-                    },
-                    0
-                );
-            }
-            let deadline = Instant::now() + Duration::from_secs(12);
-            let status = loop {
-                if let Some(status) = fixture.leader.as_mut().unwrap().try_wait().unwrap() {
-                    break status;
-                }
-                assert!(
-                    Instant::now() < deadline,
-                    "CLI termination exceeded deadline: {}",
-                    root.display()
-                );
-                thread::sleep(Duration::from_millis(10));
-            };
-            assert_eq!(status.code(), Some(1));
-            fs::write(root.join("cli.status"), "1\n").unwrap();
-            fixture.assert_stopped();
-            let report: serde_json::Value = serde_json::from_slice(
-                &fs::read(root.join(".harness-gate/reports/test_result.json")).unwrap(),
-            )
-            .unwrap();
-            assert_eq!(report["passed"], false);
-            assert!(report["steps"]
-                .as_array()
-                .unwrap()
-                .iter()
-                .any(|step| step[if cancel { "cancelled" } else { "timed_out" }] == true));
+        }
+        let status = wait_for_cli(fixture.leader.as_mut().unwrap(), root);
+        assert_eq!(status.code(), Some(1));
+        fs::write(root.join("cli.status"), "1\n").unwrap();
+        fixture.assert_stopped();
+        let report: serde_json::Value = serde_json::from_slice(
+            &fs::read(root.join(".harness-gate/reports/test_result.json")).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(report["passed"], false);
+        assert!(report["steps"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|step| step[termination_field(cancel)] == true));
+    }
+
+    #[test]
+    fn independent_cli_timeout_and_cancellation_stop_term_resistant_descendant() {
+        for cancel in [false, true] {
+            cli_termination_case(cancel);
         }
     }
 }

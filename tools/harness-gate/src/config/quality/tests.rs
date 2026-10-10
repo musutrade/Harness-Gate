@@ -564,25 +564,7 @@ fn unknown_pack_configures_cheap_and_expensive_profiles_without_ecosystem_dispat
     quality.policies.clear();
     policy["rules"] = serde_json::json!([]);
     let (_, _, template) = fixture();
-    for (name, metric) in metadata["capabilities"].as_object().unwrap() {
-        let mut collector = template.collectors["coverage"].clone();
-        collector.produces[0].capability = metric.as_str().unwrap().into();
-        let mut binding = template.policies["coverage"].clone();
-        binding.expectation = collector.produces[0].clone();
-        binding.rule = name.clone();
-        let mut rule = rule.clone();
-        rule["id"] = name.clone().into();
-        rule["metric"] = metric.clone();
-        rule["operator"] = "le".into();
-        rule["limit"] = if name == "cheap" {
-            serde_json::json!({"type":"size","value":10,"unit":"bytes"})
-        } else {
-            serde_json::json!({"type":"rational","numerator":30,"denominator":1})
-        };
-        policy["rules"].as_array_mut().unwrap().push(rule);
-        quality.collectors.insert(name.clone(), collector);
-        quality.policies.insert(name.clone(), binding);
-    }
+    configure_unknown_pack(&metadata, &template, &rule, &mut quality, &mut policy);
     fs::write(
         root.join(".harness-gate/policy.json"),
         serde_json::to_vec(&policy).unwrap(),
@@ -626,6 +608,34 @@ fn unknown_pack_configures_cheap_and_expensive_profiles_without_ecosystem_dispat
         quality.participation("custom-fast")["policies"]["expensive"]["state"],
         "participating"
     );
+}
+
+fn configure_unknown_pack(
+    metadata: &serde_json::Value,
+    template: &QualityConfig,
+    rule: &serde_json::Value,
+    quality: &mut QualityConfig,
+    policy: &mut serde_json::Value,
+) {
+    for (name, metric) in metadata["capabilities"].as_object().unwrap() {
+        let mut collector = template.collectors["coverage"].clone();
+        collector.produces[0].capability = metric.as_str().unwrap().into();
+        let mut binding = template.policies["coverage"].clone();
+        binding.expectation = collector.produces[0].clone();
+        binding.rule = name.clone();
+        let mut rule = rule.clone();
+        rule["id"] = name.clone().into();
+        rule["metric"] = metric.clone();
+        rule["operator"] = "le".into();
+        rule["limit"] = if name == "cheap" {
+            serde_json::json!({"type":"size","value":10,"unit":"bytes"})
+        } else {
+            serde_json::json!({"type":"rational","numerator":30,"denominator":1})
+        };
+        policy["rules"].as_array_mut().unwrap().push(rule);
+        quality.collectors.insert(name.clone(), collector);
+        quality.policies.insert(name.clone(), binding);
+    }
 }
 
 #[test]

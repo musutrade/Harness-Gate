@@ -46,6 +46,22 @@ fn arc_admin_controlled_quality_negatives_retain_truthful_outcomes() {
         "pass",
         true,
     ));
+    append_error_negatives(&mut cases);
+    append_baseline_negatives(&mut cases);
+    append_crap_ratchet(&mut cases);
+    append_profile_omission_cases(&mut cases);
+    append_matrix_cases(&mut cases);
+    if let Some(output) = std::env::var_os("HARNESS_GATE_DOGFOOD_NEGATIVES") {
+        let output = Path::new(&output);
+        fs::create_dir_all(output).unwrap();
+        write(
+            &output.join("quality.json"),
+            &json!({"schema":"arc-admin-negative-quality/v1", "measurement_origin":"synthetic signed transport fixtures", "cases":cases}),
+        );
+    }
+}
+
+fn append_error_negatives(cases: &mut Vec<Value>) {
     for (mode, error) in [
         ("crash", "ADAPTER_PROTOCOL_FAILURE: adapter exited with 17"),
         (
@@ -68,6 +84,9 @@ fn arc_admin_controlled_quality_negatives_retain_truthful_outcomes() {
             .contains(error));
         cases.push(case);
     }
+}
+
+fn append_baseline_negatives(cases: &mut Vec<Value>) {
     for mode in ["stale-baseline", "incompatible-baseline"] {
         let fixture = Fixture::workflow("crap", true, true);
         let path = fixture.dir.path().join(".harness-gate/base-request.json");
@@ -92,6 +111,9 @@ fn arc_admin_controlled_quality_negatives_retain_truthful_outcomes() {
         assert!(case["report"]["quality"]["project_report"].is_null());
         cases.push(case);
     }
+}
+
+fn append_crap_ratchet(cases: &mut Vec<Value>) {
     let crap = receipt(
         &Fixture::workflow("crap", true, true),
         "crap-ratchet",
@@ -110,6 +132,9 @@ fn arc_admin_controlled_quality_negatives_retain_truthful_outcomes() {
     assert_eq!(gate["record"]["ratchet"]["debt"], "regressed");
     assert_eq!(gate["record"]["ratchet"]["legacy_debt_allowed"], false);
     cases.push(crap);
+}
+
+fn append_profile_omission_cases(cases: &mut Vec<Value>) {
     for profile in ["hook", "full", "ci"] {
         let mut fixture = Fixture::workflow("crash", true, false);
         fixture.select_profile(profile, true);
@@ -134,68 +159,78 @@ fn arc_admin_controlled_quality_negatives_retain_truthful_outcomes() {
             false,
         ));
     }
+}
+
+fn append_matrix_cases(cases: &mut Vec<Value>) {
     let mut matrix: Value = serde_json::from_str(include_str!(
         "../../../../../../quality/fixtures/workflow/ci-matrix.json"
     ))
     .unwrap();
     // Isolate CRAP from coverage: the negative keeps coverage at its passing value.
-    for shape in matrix["shapes"].as_array_mut().unwrap() {
-        for component in shape["components"].as_array_mut().unwrap() {
-            for capability in component["capabilities"].as_array_mut().unwrap() {
-                if capability["name"] == "coverage.line" {
-                    capability["failure"] = capability["value"].clone();
-                }
-            }
-        }
-    }
+    isolate_crap_coverage(&mut matrix);
     for (shape, mode, expected, passed) in [
         ("rust", "pass", "pass", true),
         ("rust", "policy-failure", "fail", false),
         ("angular-reference", "pass", "pass", true),
     ] {
-        let shape = matrix["shapes"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .find(|s| s["id"] == shape)
-            .unwrap();
-        let fixture = ci_acceptance::configured_fixture(shape, mode, "ci");
-        let case = receipt(
-            &fixture,
-            &format!("{}-{mode}", shape["id"].as_str().unwrap()),
-            expected,
-            passed,
-        );
-        let quality = &case["report"]["quality"];
-        if shape["id"] == "angular-reference" {
-            for record in quality["evidence"].as_array().unwrap() {
-                assert!(record["capabilities"]
-                    .as_array()
-                    .unwrap()
-                    .iter()
-                    .any(|c| c["metric"] == "risk.crap" && c["state"] == "unsupported"));
-                assert!(!record["metrics"]
-                    .as_array()
-                    .unwrap()
-                    .iter()
-                    .any(|m| m["name"] == "risk.crap"));
-            }
-        } else if !passed {
-            assert!(quality["project_report"]["gates"]
-                .as_object()
-                .unwrap()
-                .values()
-                .any(|g| g["state"] == "fail" && g["record"]["metric"] == "risk.crap"));
-        }
-        cases.push(case);
+        cases.push(matrix_case(&matrix, shape, mode, expected, passed));
     }
-    if let Some(output) = std::env::var_os("HARNESS_GATE_DOGFOOD_NEGATIVES") {
-        let output = Path::new(&output);
-        fs::create_dir_all(output).unwrap();
-        write(
-            &output.join("quality.json"),
-            &json!({"schema":"arc-admin-negative-quality/v1", "measurement_origin":"synthetic signed transport fixtures", "cases":cases}),
-        );
+}
+
+fn isolate_crap_coverage(matrix: &mut Value) {
+    for shape in matrix["shapes"].as_array_mut().unwrap() {
+        isolate_shape_coverage(shape);
+    }
+}
+
+fn isolate_shape_coverage(shape: &mut Value) {
+    for component in shape["components"].as_array_mut().unwrap() {
+        for capability in component["capabilities"].as_array_mut().unwrap() {
+            if capability["name"] == "coverage.line" {
+                capability["failure"] = capability["value"].clone();
+            }
+        }
+    }
+}
+
+fn matrix_case(matrix: &Value, shape: &str, mode: &str, expected: &str, passed: bool) -> Value {
+    let shape = matrix["shapes"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|s| s["id"] == shape)
+        .unwrap();
+    let fixture = ci_acceptance::configured_fixture(shape, mode, "ci");
+    let case = receipt(
+        &fixture,
+        &format!("{}-{mode}", shape["id"].as_str().unwrap()),
+        expected,
+        passed,
+    );
+    verify_matrix_quality(&case["report"]["quality"], &shape["id"], passed);
+    case
+}
+
+fn verify_matrix_quality(quality: &Value, shape_id: &Value, passed: bool) {
+    if shape_id == "angular-reference" {
+        for record in quality["evidence"].as_array().unwrap() {
+            assert!(record["capabilities"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|c| c["metric"] == "risk.crap" && c["state"] == "unsupported"));
+            assert!(!record["metrics"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|m| m["name"] == "risk.crap"));
+        }
+    } else if !passed {
+        assert!(quality["project_report"]["gates"]
+            .as_object()
+            .unwrap()
+            .values()
+            .any(|g| g["state"] == "fail" && g["record"]["metric"] == "risk.crap"));
     }
 }
 
@@ -246,22 +281,7 @@ fn staged_partial_quality_reads_host_state_and_validates_the_index() {
         fs::write(root.join("target/evidence/old.json"), "old native evidence").unwrap();
         fs::write(root.join("src/lib.rs"), "unstaged working-tree content").unwrap();
         let state_path = root.join(".harness-gate/workflow-state.json");
-        match mode {
-            "missing-state" => fs::remove_file(&state_path).unwrap(),
-            "stale-source" => {
-                fixture.state.subjects.values_mut().next().unwrap()[0].source_sha256 =
-                    "f".repeat(64);
-                write(&state_path, &fixture.state);
-            }
-            "retained-artifacts" => {
-                fixture
-                    .state
-                    .artifacts
-                    .insert("old.json".into(), "f".repeat(64));
-                write(&state_path, &fixture.state);
-            }
-            _ => {}
-        }
+        configure_staged_mode(&mut fixture.state, &state_path, mode);
         let project = crate::project::Project::discover(Some(root.to_path_buf()), None).unwrap();
         let staged = project.staged_snapshot().unwrap();
         assert!(!staged
@@ -286,17 +306,36 @@ fn staged_partial_quality_reads_host_state_and_validates_the_index() {
             }
         );
         if mode == "pass" {
-            assert_eq!(result["quality"]["full_quality_status"], "not_collected");
-            assert_eq!(result["quality"]["producers"], json!({}));
-            assert!(staged.execution_root.join("target/evidence").is_dir());
-            assert!(!staged
-                .execution_root
-                .join("target/evidence/old.json")
-                .exists());
+            assert_staged_pass(&result, &staged);
         }
         assert_eq!(
             fs::read_to_string(root.join("src/lib.rs")).unwrap(),
             "unstaged working-tree content"
         );
     }
+}
+
+fn configure_staged_mode(state: &mut TrustedState, state_path: &Path, mode: &str) {
+    match mode {
+        "missing-state" => fs::remove_file(state_path).unwrap(),
+        "stale-source" => {
+            state.subjects.values_mut().next().unwrap()[0].source_sha256 = "f".repeat(64);
+            write(state_path, &*state);
+        }
+        "retained-artifacts" => {
+            state.artifacts.insert("old.json".into(), "f".repeat(64));
+            write(state_path, &*state);
+        }
+        _ => {}
+    }
+}
+
+fn assert_staged_pass(result: &Value, staged: &crate::project::Project) {
+    assert_eq!(result["quality"]["full_quality_status"], "not_collected");
+    assert_eq!(result["quality"]["producers"], json!({}));
+    assert!(staged.execution_root.join("target/evidence").is_dir());
+    assert!(!staged
+        .execution_root
+        .join("target/evidence/old.json")
+        .exists());
 }

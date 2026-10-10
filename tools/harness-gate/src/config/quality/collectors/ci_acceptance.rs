@@ -5,6 +5,22 @@ use std::time::Instant;
 
 const MATRIX: &str = include_str!("../../../../../quality/fixtures/workflow/ci-matrix.json");
 
+fn capability_metrics(shape: &Value) -> Value {
+    let mut metrics = BTreeMap::new();
+    for component in shape["components"].as_array().unwrap() {
+        for capability in component["capabilities"].as_array().unwrap() {
+            metrics.insert(
+                capability["name"].as_str().unwrap(),
+                capability["value"]["type"].clone(),
+            );
+        }
+    }
+    metrics
+        .into_iter()
+        .map(|(name, kind)| json!({"name":name,"type":kind}))
+        .collect()
+}
+
 pub(super) fn configured_fixture(shape: &Value, mode: &str, profile: &str) -> Fixture {
     let mut fixture = Fixture::workflow("pass", true, false);
     let root = fixture.dir.path().to_path_buf();
@@ -18,19 +34,7 @@ pub(super) fn configured_fixture(shape: &Value, mode: &str, profile: &str) -> Fi
     series["name"] = shape["series"].clone();
     series["tool"]["name"] = shape["tool"].clone();
     series["runtime"]["name"] = shape["runtime"].clone();
-    let mut metrics = BTreeMap::new();
-    for component in shape["components"].as_array().unwrap() {
-        for capability in component["capabilities"].as_array().unwrap() {
-            metrics.insert(
-                capability["name"].as_str().unwrap(),
-                capability["value"]["type"].clone(),
-            );
-        }
-    }
-    series["metrics"] = metrics
-        .into_iter()
-        .map(|(name, kind)| json!({"name":name,"type":kind}))
-        .collect();
+    series["metrics"] = capability_metrics(shape);
     series["id"] = json!(evidence::series_id(&series).unwrap());
     state["series"]["stargazer"] = series.clone();
     for key in ["components", "subjects"] {
@@ -197,145 +201,10 @@ fn configured_ci_acceptance_retains_parity_reuse_and_negative_evidence() {
             assert_eq!(original.evidence, reused.evidence);
             assert_eq!(original.responses, reused.responses);
             let report = unified(&fixture);
-            assert_eq!(
-                report["status"],
-                if mode == "pass" { "PASS" } else { "FAIL" },
-                "{report:#}"
-            );
-            assert_eq!(report["quality"]["producers"]["stargazer"], "retained");
-            let quality = &report["quality"];
-            assert_eq!(quality["evidence"], json!(original.evidence));
-            assert_eq!(
-                quality["project_report"]["components"]
-                    .as_object()
-                    .unwrap()
-                    .len(),
-                shape["components"].as_array().unwrap().len()
-            );
-            for component in shape["components"].as_array().unwrap() {
-                let compiled = quality["inputs"]["project"]["components"]
-                    .as_array()
-                    .unwrap()
-                    .iter()
-                    .find(|item| item["id"] == component["id"])
-                    .unwrap();
-                assert_eq!(compiled["metadata"], component["metadata"]);
-                let record = quality["evidence"]
-                    .as_array()
-                    .unwrap()
-                    .iter()
-                    .find(|item| item["component"] == component["id"])
-                    .unwrap();
-                assert_eq!(record["series"]["name"], shape["series"]);
-                assert_eq!(record["collector"]["name"], shape["producer"]);
-                for capability in component["capabilities"].as_array().unwrap() {
-                    assert!(record["capabilities"]
-                        .as_array()
-                        .unwrap()
-                        .iter()
-                        .any(|item| item["metric"] == capability["name"]));
-                }
-            }
+            verify_acceptance_case(&report, &original, shape, mode);
             direct_equivalent(&report["quality"], fixture.dir.path());
-            let mut files = BTreeMap::new();
-            for relative in fixture
-                .state
-                .config_files
-                .keys()
-                .chain(fixture.state.retained.values().map(|pin| &pin.path))
-            {
-                retain_file(fixture.dir.path(), relative, &mut files);
-            }
-            for relative in [
-                ".harness-gate/workflow-state.json",
-                ".harness-gate/workflow-keys.json",
-                "direct-report.json",
-            ] {
-                retain_file(fixture.dir.path(), relative, &mut files);
-            }
-            for component in shape["components"].as_array().unwrap() {
-                let id = component["id"].as_str().unwrap();
-                retain_file(
-                    fixture.dir.path(),
-                    &format!("{id}/src/source.txt"),
-                    &mut files,
-                );
-                retain_file(
-                    fixture.dir.path(),
-                    &format!("target/evidence/{id}.json"),
-                    &mut files,
-                );
-            }
-            let mut negatives = BTreeMap::new();
-            if mode == "pass" {
-                let pin = fixture.state.retained["stargazer"].clone();
-                let file = fixture.dir.path().join(&pin.path);
-                let bytes = fs::read(&file).unwrap();
-                for negative in matrix["negative_cases"].as_array().unwrap() {
-                    let negative = negative.as_str().unwrap();
-                    let mut envelope: Value = serde_json::from_slice(&bytes).unwrap();
-                    let first = shape["components"][0]["id"].as_str().unwrap();
-                    let mut modified_file = None;
-                    match negative {
-                        "capability" => {
-                            envelope["response"]["collection"]["evidence"][0]["series"]["metrics"]
-                                [0]["name"] = matrix["unsupported_capability"].clone()
-                        }
-                        "binding" => envelope["binding_digest"] = json!("stale"),
-                        "schema" => envelope["schema"] = json!("unknown/v1"),
-                        "run" => envelope["response"]["invocation_id"] = json!("another-run"),
-                        "series" => {
-                            envelope["response"]["collection"]["evidence"][0]["series"]["id"] =
-                                json!("another-series")
-                        }
-                        "subject" => {
-                            envelope["response"]["collection"]["evidence"][0]["subject"]["id"] =
-                                json!("another-subject")
-                        }
-                        "artifact" => {
-                            modified_file =
-                                Some(fixture.request.artifact_root.join(format!("{first}.json")))
-                        }
-                        "source" => {
-                            modified_file =
-                                Some(fixture.dir.path().join(format!("{first}/src/source.txt")))
-                        }
-                        "digest" | "missing" => {}
-                        other => panic!("unknown negative operation: {other}"),
-                    }
-                    write(&file, &envelope);
-                    fixture.state.retained.get_mut("stargazer").unwrap().sha256 =
-                        if negative == "digest" {
-                            "0".repeat(64)
-                        } else {
-                            format!("{:x}", Sha256::digest(fs::read(&file).unwrap()))
-                        };
-                    if negative == "missing" {
-                        fs::remove_file(&file).unwrap();
-                    }
-                    let original_file = modified_file.as_ref().map(|path| fs::read(path).unwrap());
-                    if let Some(path) = &modified_file {
-                        fs::write(path, "tampered").unwrap();
-                    }
-                    write(
-                        &fixture.dir.path().join(".harness-gate/workflow-state.json"),
-                        &fixture.state,
-                    );
-                    let rejected = unified(&fixture);
-                    assert_eq!(rejected["status"], "FAIL", "{negative}: {rejected:#}");
-                    assert_eq!(rejected["quality"]["status"], "blocked");
-                    assert_eq!(launch_count(&fixture), 1);
-                    negatives.insert(negative.to_owned(), rejected);
-                    if let Some(path) = modified_file {
-                        fs::write(path, original_file.unwrap()).unwrap();
-                    }
-                    fs::write(&file, &bytes).unwrap();
-                    fixture
-                        .state
-                        .retained
-                        .insert("stargazer".into(), pin.clone());
-                }
-            }
+            let files = retain_acceptance_files(&fixture, shape);
+            let negatives = run_negative_cases(&mut fixture, shape, &matrix, mode);
             assert_eq!(launch_count(&fixture), 1);
             cases.push(json!({"shape":shape["id"],"mode":mode,"profile":matrix["profile"],"status":"pass","seconds":tick.elapsed().as_secs_f64(),"producer_launches":1,"reuse_launches":0,"direct_parity":true,"report":report,"files":files,"negatives":negatives}));
         }
@@ -357,5 +226,190 @@ fn configured_ci_acceptance_retains_parity_reuse_and_negative_evidence() {
             &directory.join("receipt.json"),
             &json!({"schema":"quality-ci-acceptance/v1","matrix_sha256":format!("{:x}",Sha256::digest(MATRIX.as_bytes())),"identity":identity,"seconds":started.elapsed().as_secs_f64(),"cases":cases}),
         );
+    }
+}
+
+fn verify_acceptance_case(report: &Value, original: &Collection, shape: &Value, mode: &str) {
+    assert_eq!(
+        report["status"],
+        if mode == "pass" { "PASS" } else { "FAIL" },
+        "{report:#}"
+    );
+    assert_eq!(report["quality"]["producers"]["stargazer"], "retained");
+    let quality = &report["quality"];
+    assert_eq!(quality["evidence"], json!(&original.evidence));
+    assert_eq!(
+        quality["project_report"]["components"]
+            .as_object()
+            .unwrap()
+            .len(),
+        shape["components"].as_array().unwrap().len()
+    );
+    for component in shape["components"].as_array().unwrap() {
+        verify_acceptance_component(quality, shape, component);
+    }
+}
+
+fn verify_acceptance_component(quality: &Value, shape: &Value, component: &Value) {
+    let compiled = quality["inputs"]["project"]["components"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|item| item["id"] == component["id"])
+        .unwrap();
+    assert_eq!(compiled["metadata"], component["metadata"]);
+    let record = quality["evidence"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|item| item["component"] == component["id"])
+        .unwrap();
+    assert_eq!(record["series"]["name"], shape["series"]);
+    assert_eq!(record["collector"]["name"], shape["producer"]);
+    for capability in component["capabilities"].as_array().unwrap() {
+        assert!(record["capabilities"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|item| item["metric"] == capability["name"]));
+    }
+}
+
+fn retain_acceptance_files(fixture: &Fixture, shape: &Value) -> BTreeMap<String, Value> {
+    let mut files = BTreeMap::new();
+    for relative in fixture
+        .state
+        .config_files
+        .keys()
+        .chain(fixture.state.retained.values().map(|pin| &pin.path))
+    {
+        retain_file(fixture.dir.path(), relative, &mut files);
+    }
+    for relative in [
+        ".harness-gate/workflow-state.json",
+        ".harness-gate/workflow-keys.json",
+        "direct-report.json",
+    ] {
+        retain_file(fixture.dir.path(), relative, &mut files);
+    }
+    for component in shape["components"].as_array().unwrap() {
+        let id = component["id"].as_str().unwrap();
+        retain_file(
+            fixture.dir.path(),
+            &format!("{id}/src/source.txt"),
+            &mut files,
+        );
+        retain_file(
+            fixture.dir.path(),
+            &format!("target/evidence/{id}.json"),
+            &mut files,
+        );
+    }
+    files
+}
+
+fn run_negative_cases(
+    fixture: &mut Fixture,
+    shape: &Value,
+    matrix: &Value,
+    mode: &str,
+) -> BTreeMap<String, Value> {
+    let mut negatives = BTreeMap::new();
+    if mode != "pass" {
+        return negatives;
+    }
+    let file = fixture
+        .dir
+        .path()
+        .join(&fixture.state.retained["stargazer"].path);
+    let bytes = fs::read(&file).unwrap();
+    let first = shape["components"][0]["id"].as_str().unwrap();
+    for negative in matrix["negative_cases"].as_array().unwrap() {
+        let negative = negative.as_str().unwrap();
+        let rejected = run_negative_case(fixture, negative, first, matrix, &file, &bytes);
+        negatives.insert(negative.to_owned(), rejected);
+    }
+    negatives
+}
+
+fn run_negative_case(
+    fixture: &mut Fixture,
+    negative: &str,
+    first: &str,
+    matrix: &Value,
+    file: &Path,
+    bytes: &[u8],
+) -> Value {
+    let pin = fixture.state.retained["stargazer"].clone();
+    let mut envelope: Value = serde_json::from_slice(bytes).unwrap();
+    let mut modified_file = modify_envelope(&mut envelope, negative, first, fixture, matrix);
+    write(file, &envelope);
+    fixture.state.retained.get_mut("stargazer").unwrap().sha256 = if negative == "digest" {
+        "0".repeat(64)
+    } else {
+        format!("{:x}", Sha256::digest(fs::read(file).unwrap()))
+    };
+    if negative == "missing" {
+        fs::remove_file(file).unwrap();
+    }
+    let original_file = modified_file.as_ref().map(|path| fs::read(path).unwrap());
+    if let Some(path) = &modified_file {
+        fs::write(path, "tampered").unwrap();
+    }
+    write(
+        &fixture.dir.path().join(".harness-gate/workflow-state.json"),
+        &fixture.state,
+    );
+    let rejected = unified(fixture);
+    assert_eq!(rejected["status"], "FAIL", "{negative}: {rejected:#}");
+    assert_eq!(rejected["quality"]["status"], "blocked");
+    assert_eq!(launch_count(fixture), 1);
+    if let Some(path) = modified_file.take() {
+        fs::write(path, original_file.unwrap()).unwrap();
+    }
+    fs::write(file, bytes).unwrap();
+    fixture.state.retained.insert("stargazer".into(), pin);
+    rejected
+}
+
+fn modify_envelope(
+    envelope: &mut Value,
+    negative: &str,
+    first: &str,
+    fixture: &Fixture,
+    matrix: &Value,
+) -> Option<std::path::PathBuf> {
+    match negative {
+        "capability" => {
+            envelope["response"]["collection"]["evidence"][0]["series"]["metrics"][0]["name"] =
+                matrix["unsupported_capability"].clone();
+            None
+        }
+        "binding" => {
+            envelope["binding_digest"] = json!("stale");
+            None
+        }
+        "schema" => {
+            envelope["schema"] = json!("unknown/v1");
+            None
+        }
+        "run" => {
+            envelope["response"]["invocation_id"] = json!("another-run");
+            None
+        }
+        "series" => {
+            envelope["response"]["collection"]["evidence"][0]["series"]["id"] =
+                json!("another-series");
+            None
+        }
+        "subject" => {
+            envelope["response"]["collection"]["evidence"][0]["subject"]["id"] =
+                json!("another-subject");
+            None
+        }
+        "artifact" => Some(fixture.request.artifact_root.join(format!("{first}.json"))),
+        "source" => Some(fixture.dir.path().join(format!("{first}/src/source.txt"))),
+        "digest" | "missing" => None,
+        other => panic!("unknown negative operation: {other}"),
     }
 }
