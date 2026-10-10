@@ -180,15 +180,32 @@ mod tests {
     #[cfg(unix)]
     use std::process::{Command, Stdio};
 
-    #[cfg(target_os = "linux")]
-    fn count(path: &str) -> usize {
-        std::fs::read_dir(path).unwrap().count()
+    /// Pipe wrapper whose token is released only when the reader drops it,
+    /// i.e. when the reader thread has finished and closed the read end.
+    #[cfg(unix)]
+    struct TrackedPipe {
+        pipe: std::process::ChildStdout,
+        _token: Arc<()>,
     }
 
-    #[cfg(target_os = "linux")]
+    #[cfg(unix)]
+    impl Read for TrackedPipe {
+        fn read(&mut self, buffer: &mut [u8]) -> io::Result<usize> {
+            self.pipe.read(buffer)
+        }
+    }
+
+    #[cfg(unix)]
+    impl std::os::fd::AsFd for TrackedPipe {
+        fn as_fd(&self) -> std::os::fd::BorrowedFd<'_> {
+            self.pipe.as_fd()
+        }
+    }
+
+    #[cfg(unix)]
     #[test]
     fn timed_out_reader_is_joined_and_closes_its_pipe() {
-        let collect = || {
+        for _ in 0..5 {
             // The shell exits at once; its background child keeps stdout open.
             let mut child = Command::new("sh")
                 .args(["-c", "sleep 3 & echo started"])
@@ -197,27 +214,25 @@ mod tests {
                 .stderr(Stdio::null())
                 .spawn()
                 .unwrap();
-            let stdout = child.stdout.take().unwrap();
+            let token = Arc::new(());
+            let pipe = TrackedPipe {
+                pipe: child.stdout.take().unwrap(),
+                _token: Arc::clone(&token),
+            };
             let (reader, receiver) =
-                spawn_limited_reader(stdout, 1024, Arc::new(AtomicBool::new(false)));
+                spawn_limited_reader(pipe, 1024, Arc::new(AtomicBool::new(false)));
             child.wait().unwrap();
             let result =
                 collect_limited_reader(reader, receiver, Duration::from_millis(100), "stdout");
             assert_eq!(result.unwrap_err().kind(), io::ErrorKind::TimedOut);
-        };
-        collect();
-        let (threads, fds) = (count("/proc/self/task"), count("/proc/self/fd"));
-        for _ in 0..5 {
-            collect();
+            // Joined before returning: the reader dropped the pipe, so neither
+            // a thread nor a read descriptor survives the timeout (#312).
+            assert_eq!(
+                Arc::strong_count(&token),
+                1,
+                "reader thread outlived its timeout"
+            );
         }
-        // A joined thread's /proc task entry can outlive pthread_join for a
-        // moment while the kernel reaps it; allow a bounded settle period.
-        let settle = std::time::Instant::now();
-        while count("/proc/self/task") > threads && settle.elapsed() < Duration::from_secs(2) {
-            std::thread::sleep(Duration::from_millis(10));
-        }
-        assert_eq!(count("/proc/self/task"), threads, "reader threads leaked");
-        assert_eq!(count("/proc/self/fd"), fds, "pipe descriptors leaked");
     }
 
     #[cfg(unix)]
