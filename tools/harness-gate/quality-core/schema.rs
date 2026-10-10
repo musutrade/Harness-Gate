@@ -80,7 +80,19 @@ fn walk(v: &Value, s: &Value, root: &Value, path: &str) -> Result<()> {
             path,
         );
     }
-    let fail = |message: String| error(format!("{path}: {message}"));
+    check_type(v, s, path)?;
+    check_const(v, s, path)?;
+    check_enum(v, s, path)?;
+    check_string(v, s, path)?;
+    check_number(v, s, path)?;
+    check_object(v, s, root, path)?;
+    check_array(v, s, root, path)?;
+    // Value.oneOf is intentionally resolved by the explicit metric discriminator,
+    // as in the frozen reference. Metadata gets its own project traversal.
+    Ok(())
+}
+
+fn check_type(v: &Value, s: &Value, path: &str) -> Result<()> {
     if let Some(kind) = s.get("type") {
         let matches = |kind: &str| match kind {
             "object" => v.is_object(),
@@ -117,15 +129,25 @@ fn walk(v: &Value, s: &Value, root: &Value, path: &str) -> Result<()> {
                 Value::Array(_) => "array",
                 Value::Object(_) => "object",
             };
-            return Err(fail(format!("expected type [{expected}], got {got}")));
+            return Err(error(format!(
+                "{path}: expected type [{expected}], got {got}"
+            )));
         }
     }
+    Ok(())
+}
+
+fn check_const(v: &Value, s: &Value, path: &str) -> Result<()> {
     if let Some(c) = s.get("const") {
         require(
             v == c,
             format!("{path}: expected const {}, got {}", repr(c), repr(v)),
         )?;
     }
+    Ok(())
+}
+
+fn check_enum(v: &Value, s: &Value, path: &str) -> Result<()> {
     if let Some(values) = s["enum"].as_array() {
         require(
             values.contains(v),
@@ -136,6 +158,10 @@ fn walk(v: &Value, s: &Value, root: &Value, path: &str) -> Result<()> {
             ),
         )?;
     }
+    Ok(())
+}
+
+fn check_string(v: &Value, s: &Value, path: &str) -> Result<()> {
     if let Some(text) = v.as_str() {
         if let Some(pattern) = s["pattern"].as_str() {
             let mut patterns = PATTERNS.lock().unwrap();
@@ -155,22 +181,32 @@ fn walk(v: &Value, s: &Value, root: &Value, path: &str) -> Result<()> {
                 ),
             )?;
         }
-        for (key, ok) in [("minLength", true), ("maxLength", false)] {
-            if let Some(limit) = s[key].as_u64() {
-                require(
-                    if ok {
-                        text.chars().count() as u64 >= limit
-                    } else {
-                        text.chars().count() as u64 <= limit
-                    },
-                    format!(
-                        "{path}: string is {} than {limit}",
-                        if ok { "shorter" } else { "longer" }
-                    ),
-                )?;
-            }
+        check_string_length(text, s, path)?;
+    }
+    Ok(())
+}
+
+fn check_string_length(text: &str, s: &Value, path: &str) -> Result<()> {
+    for (key, lower) in [("minLength", true), ("maxLength", false)] {
+        if let Some(limit) = s[key].as_u64() {
+            let count = text.chars().count() as u64;
+            require(
+                if lower {
+                    count >= limit
+                } else {
+                    count <= limit
+                },
+                format!(
+                    "{path}: string is {} than {limit}",
+                    if lower { "shorter" } else { "longer" }
+                ),
+            )?;
         }
     }
+    Ok(())
+}
+
+fn check_number(v: &Value, s: &Value, path: &str) -> Result<()> {
     if let Some(minimum) = s.get("minimum") {
         require(
             json::integer(v)
@@ -179,6 +215,10 @@ fn walk(v: &Value, s: &Value, root: &Value, path: &str) -> Result<()> {
             format!("{path}: integer {v} is below minimum {minimum}"),
         )?;
     }
+    Ok(())
+}
+
+fn check_object(v: &Value, s: &Value, root: &Value, path: &str) -> Result<()> {
     if let Some(object) = v.as_object() {
         if let Some(required) = s["required"].as_array() {
             let missing: Vec<_> = required
@@ -212,6 +252,10 @@ fn walk(v: &Value, s: &Value, root: &Value, path: &str) -> Result<()> {
             )?;
         }
     }
+    Ok(())
+}
+
+fn check_array(v: &Value, s: &Value, root: &Value, path: &str) -> Result<()> {
     if let Some(values) = v.as_array() {
         if let Some(items) = s.get("items") {
             for (i, value) in values.iter().enumerate() {
@@ -231,8 +275,6 @@ fn walk(v: &Value, s: &Value, root: &Value, path: &str) -> Result<()> {
             }
         }
     }
-    // Value.oneOf is intentionally resolved by the explicit metric discriminator,
-    // as in the frozen reference. Metadata gets its own project traversal.
     Ok(())
 }
 

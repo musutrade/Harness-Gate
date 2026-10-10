@@ -10,6 +10,9 @@ description = "Non-authoritative differential runner for Harness-Gate generic se
 [lib]
 path = "lib.rs"
 
+[lints]
+workspace = true
+
 [dependencies]
 harness-gate = { path = "..", version = "0.4.7" }
 serde = { version = "1.0.229", features = ["derive"] }

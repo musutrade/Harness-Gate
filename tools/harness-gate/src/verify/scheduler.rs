@@ -106,41 +106,28 @@ pub(super) fn run_plan<'a>(
     let warmup_cancelled = Arc::new(AtomicBool::new(false));
 
     std::thread::scope(|scope| {
-        let mut warmup_handles = Vec::with_capacity(warmups.len());
-        for warmup in warmups {
-            let cancelled = Arc::clone(&warmup_cancelled);
-            warmup_handles.push(scope.spawn(move || warmup.run(&cancelled)));
-        }
+        let warmup_handles = spawn_warmups(scope, warmups, &warmup_cancelled);
         loop {
             if !cancellation_observed && crate::process::cancelled() {
                 cancellation_observed = true;
-                warmup_cancelled.store(true, std::sync::atomic::Ordering::Release);
-                mark_pending(
+                cancel_pending(
+                    &warmup_cancelled,
                     nodes,
                     &mut pending,
                     &mut statuses,
                     &mut results,
-                    NodeStatus::Cancelled,
-                    "verification cancelled before dispatch",
                 );
             }
             if !cancellation_observed {
                 let ready = readiness.take_ready(running.len(), limit, &pending);
-                for node_id in ready {
-                    if crate::process::cancelled() {
-                        break;
-                    }
+                for node_id in ready
+                    .into_iter()
+                    .take_while(|_| !crate::process::cancelled())
+                {
                     let node = &nodes[node_positions[&node_id]];
                     pending.remove(&node.id);
                     running.insert(node.id.clone());
-                    let sender = sender.clone();
-                    let node_id = node.id.clone();
-                    scope.spawn(move || {
-                        let result = worker_boundary(&node_id, || {
-                            execute_node(project, node, staged, services)
-                        });
-                        let _ = sender.send((node_id, result));
-                    });
+                    spawn_node(scope, node, &sender, project, staged, services);
                 }
             }
 
@@ -148,10 +135,8 @@ pub(super) fn run_plan<'a>(
                 break;
             }
             if running.is_empty() {
-                if cancellation_observed {
-                    continue;
-                }
-                return Err(SchedulerError::Execution(anyhow::anyhow!("verification scheduler could not make progress; plan dependencies are inconsistent")));
+                ensure_scheduler_progress(cancellation_observed)?;
+                continue;
             }
 
             let (node_id, worker_result) = receiver.recv().map_err(|_| {
@@ -174,25 +159,19 @@ pub(super) fn run_plan<'a>(
                 }
             };
             crate::verify::waiver::apply(project, &node_id, selected_scope, &mut task_result);
-            let status = if task_result.cancelled {
-                NodeStatus::Cancelled
-            } else if task_result.passed {
-                NodeStatus::Passed
-            } else {
-                NodeStatus::Failed
-            };
+            let status = node_status(&task_result);
             if !task_result.passed {
                 warmup_cancelled.store(true, std::sync::atomic::Ordering::Release);
             }
             statuses.insert(node_id.clone(), status);
-            let blocked = readiness.complete(&node_id, status, &pending);
-            for blocked_id in blocked {
-                if pending.remove(&blocked_id) {
-                    let blocked_node = &nodes[node_positions[&blocked_id]];
-                    statuses.insert(blocked_id, NodeStatus::Skipped);
-                    results.push(skipped(blocked_node, "blocked by a failed prerequisite"));
-                }
-            }
+            mark_blocked_nodes(
+                readiness.complete(&node_id, status, &pending),
+                nodes,
+                &node_positions,
+                &mut pending,
+                &mut statuses,
+                &mut results,
+            );
             let node_cancelled = status == NodeStatus::Cancelled;
             results.push(ScheduledResult {
                 node_id,
@@ -201,14 +180,12 @@ pub(super) fn run_plan<'a>(
             });
             if node_cancelled || crate::process::cancelled() {
                 cancellation_observed = true;
-                warmup_cancelled.store(true, std::sync::atomic::Ordering::Release);
-                mark_pending(
+                cancel_pending(
+                    &warmup_cancelled,
                     nodes,
                     &mut pending,
                     &mut statuses,
                     &mut results,
-                    NodeStatus::Cancelled,
-                    "verification cancelled before dispatch",
                 );
             }
         }
@@ -232,6 +209,94 @@ where
             "verification worker panicked while executing node {node_id:?}"
         )))
     })
+}
+
+fn ensure_scheduler_progress(
+    cancellation_observed: bool,
+) -> std::result::Result<(), SchedulerError> {
+    if cancellation_observed {
+        Ok(())
+    } else {
+        Err(SchedulerError::Execution(anyhow::anyhow!(
+            "verification scheduler could not make progress; plan dependencies are inconsistent"
+        )))
+    }
+}
+
+fn node_status(task_result: &TaskResult) -> NodeStatus {
+    if task_result.cancelled {
+        NodeStatus::Cancelled
+    } else if task_result.passed {
+        NodeStatus::Passed
+    } else {
+        NodeStatus::Failed
+    }
+}
+
+fn cancel_pending(
+    warmup_cancelled: &AtomicBool,
+    nodes: &[PlanNode<'_>],
+    pending: &mut HashSet<String>,
+    statuses: &mut HashMap<String, NodeStatus>,
+    results: &mut Vec<ScheduledResult>,
+) {
+    warmup_cancelled.store(true, std::sync::atomic::Ordering::Release);
+    mark_pending(
+        nodes,
+        pending,
+        statuses,
+        results,
+        NodeStatus::Cancelled,
+        "verification cancelled before dispatch",
+    );
+}
+
+fn mark_blocked_nodes<'a>(
+    blocked: Vec<String>,
+    nodes: &'a [PlanNode<'a>],
+    node_positions: &HashMap<String, usize>,
+    pending: &mut HashSet<String>,
+    statuses: &mut HashMap<String, NodeStatus>,
+    results: &mut Vec<ScheduledResult>,
+) {
+    for blocked_id in blocked {
+        if pending.remove(&blocked_id) {
+            let blocked_node = &nodes[node_positions[&blocked_id]];
+            statuses.insert(blocked_id, NodeStatus::Skipped);
+            results.push(skipped(blocked_node, "blocked by a failed prerequisite"));
+        }
+    }
+}
+
+fn spawn_warmups<'scope, 'env>(
+    scope: &'scope std::thread::Scope<'scope, 'env>,
+    warmups: Vec<crate::service::ServiceWarmup>,
+    warmup_cancelled: &Arc<AtomicBool>,
+) -> Vec<std::thread::ScopedJoinHandle<'scope, ()>> {
+    let mut handles = Vec::with_capacity(warmups.len());
+    for warmup in warmups {
+        let cancelled = Arc::clone(warmup_cancelled);
+        handles.push(scope.spawn(move || warmup.run(&cancelled)));
+    }
+    handles
+}
+
+fn spawn_node<'scope, 'env, 'a>(
+    scope: &'scope std::thread::Scope<'scope, 'env>,
+    node: &'a PlanNode<'a>,
+    sender: &mpsc::Sender<(String, WorkerResult)>,
+    project: &'a Project,
+    staged: bool,
+    services: &'a Mutex<ServiceManager<'a>>,
+) where
+    'a: 'scope,
+{
+    let sender = sender.clone();
+    let node_id = node.id.clone();
+    scope.spawn(move || {
+        let result = worker_boundary(&node_id, || execute_node(project, node, staged, services));
+        let _ = sender.send((node_id, result));
+    });
 }
 
 /// Return the earliest ready nodes that fit in the remaining worker slots.

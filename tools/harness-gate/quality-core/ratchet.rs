@@ -198,64 +198,90 @@ pub fn decision(rule: &Value, head: &Value, base: Option<&Value>) -> Result<(Str
     let op = string(&rule["operator"]);
     let absolute = compare(head, op, &rule["limit"])?;
     let base_pass = base.map(|b| compare(b, op, &rule["limit"])).transpose()?;
-    let trend = if let Some(base) = base {
-        if compare(head, "eq", base)? {
-            "unchanged"
-        } else if matches!(op, "lt" | "le" | "gt" | "ge") {
-            if compare(
-                head,
-                if matches!(op, "lt" | "le") {
-                    "lt"
-                } else {
-                    "gt"
-                },
-                base,
-            )? {
-                "improved"
-            } else {
-                "regressed"
-            }
-        } else if Some(absolute) != base_pass {
-            if absolute {
-                "improved"
-            } else {
-                "regressed"
-            }
-        } else {
-            "unchanged"
-        }
-    } else {
-        "new"
-    };
-    let debt = if absolute {
-        if base_pass == Some(false) {
-            "resolved"
-        } else {
-            "none"
-        }
-    } else if base_pass == Some(false) {
-        trend
-    } else {
-        "new"
-    };
+    let trend = trend(op, head, base, absolute, base_pass)?;
+    let debt = debt(absolute, base_pass, trend);
     let regression = trend == "regressed";
-    let legacy = !absolute
-        && base_pass == Some(false)
-        && !regression
-        && rule["ratchet"]["allow_legacy_debt"] == true;
-    let violated =
-        (!absolute && !legacy) || (regression && rule["ratchet"]["deny_regression"] == true);
-    let state = if violated {
-        string(&rule["on_violation"])
-    } else if legacy {
-        "informational"
-    } else {
-        "pass"
-    };
+    let legacy = allows_legacy(rule, absolute, base_pass, trend);
+    let state = gate_state(rule, absolute, base_pass, trend);
     Ok((
         state.into(),
         json!({"absolute_compliant":absolute,"base_absolute_compliant":base_pass,"trend":trend,"debt":debt,"remaining_debt":!absolute,"regression":regression,"legacy_debt_allowed":legacy}),
     ))
+}
+
+fn trend(
+    op: &str,
+    head: &Value,
+    base: Option<&Value>,
+    absolute: bool,
+    base_pass: Option<bool>,
+) -> Result<&'static str> {
+    let base = match base {
+        Some(base) => base,
+        None => return Ok("new"),
+    };
+    if compare(head, "eq", base)? {
+        return Ok("unchanged");
+    }
+    if matches!(op, "lt" | "le" | "gt" | "ge") {
+        let direction = if matches!(op, "lt" | "le") {
+            "lt"
+        } else {
+            "gt"
+        };
+        return Ok(if compare(head, direction, base)? {
+            "improved"
+        } else {
+            "regressed"
+        });
+    }
+    if Some(absolute) != base_pass {
+        return Ok(if absolute { "improved" } else { "regressed" });
+    }
+    Ok("unchanged")
+}
+
+fn debt(absolute: bool, base_pass: Option<bool>, trend: &str) -> &str {
+    if absolute {
+        return if base_pass == Some(false) {
+            "resolved"
+        } else {
+            "none"
+        };
+    }
+    if base_pass == Some(false) {
+        return trend;
+    }
+    "new"
+}
+
+fn allows_legacy(rule: &Value, absolute: bool, base_pass: Option<bool>, trend: &str) -> bool {
+    !absolute
+        && base_pass == Some(false)
+        && trend != "regressed"
+        && rule["ratchet"]["allow_legacy_debt"] == true
+}
+
+fn violates(rule: &Value, absolute: bool, base_pass: Option<bool>, trend: &str) -> bool {
+    if !absolute && !allows_legacy(rule, absolute, base_pass, trend) {
+        return true;
+    }
+    trend == "regressed" && rule["ratchet"]["deny_regression"] == true
+}
+
+fn gate_state<'a>(
+    rule: &'a Value,
+    absolute: bool,
+    base_pass: Option<bool>,
+    trend: &str,
+) -> &'a str {
+    if violates(rule, absolute, base_pass, trend) {
+        return string(&rule["on_violation"]);
+    }
+    if allows_legacy(rule, absolute, base_pass, trend) {
+        return "informational";
+    }
+    "pass"
 }
 
 fn expiry(value: &str) -> Result<DateTime<FixedOffset>> {

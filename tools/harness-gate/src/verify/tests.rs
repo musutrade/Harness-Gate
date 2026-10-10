@@ -399,118 +399,132 @@ fn json_parser_compatibility_preserves_success_zero_partial_and_command_failures
         run(&project, ScopeResult::all(&project), "full", false).expect("verify fixture")
     }
 
-    let success = run_json_fixture(
-        "verify-json-success",
-        r#"{"results":[{},{}]}"#,
-        ParserConfig::Json {
-            count_path: None,
-            minimum: 2,
-        },
-        0,
-    );
-    let success_step = success
-        .steps
-        .iter()
-        .find(|step| step.label == "Git whitespace check")
-        .expect("success fixture step");
-    assert!(success.passed);
-    assert!(success_step.passed);
-    assert_eq!(success_step.failure_code, None);
-    assert_eq!(
-        success_step.parser.as_ref().map(|parser| (
-            parser.observed,
-            parser.minimum,
-            parser.complete
-        )),
-        Some((2, 2, true))
-    );
+    assert_json_success_fixture();
+    assert_json_zero_fixture();
+    assert_json_partial_fixture();
+    assert_json_command_failure_fixture();
 
-    let zero = run_json_fixture(
-        "verify-json-zero",
-        r#"{"results":[]}"#,
-        ParserConfig::Json {
-            count_path: None,
-            minimum: 1,
-        },
-        0,
-    );
-    let zero_step = zero
-        .steps
-        .iter()
-        .find(|step| step.label == "Git whitespace check")
-        .expect("zero fixture step");
-    assert!(!zero.passed);
-    assert_eq!(
-        zero_step
-            .failure_code
-            .map(|code| code.to_string())
-            .as_deref(),
-        Some("RESULT_ZERO")
-    );
-    assert_eq!(
-        zero_step
-            .parser
-            .as_ref()
-            .map(|parser| (parser.observed, parser.minimum, parser.complete)),
-        Some((0, 1, false))
-    );
+    fn assert_json_success_fixture() {
+        let success = run_json_fixture(
+            "verify-json-success",
+            r#"{"results":[{},{}]}"#,
+            ParserConfig::Json {
+                count_path: None,
+                minimum: 2,
+            },
+            0,
+        );
+        let success_step = success
+            .steps
+            .iter()
+            .find(|step| step.label == "Git whitespace check")
+            .expect("success fixture step");
+        assert!(success.passed);
+        assert!(success_step.passed);
+        assert_eq!(success_step.failure_code, None);
+        assert_eq!(
+            success_step.parser.as_ref().map(|parser| (
+                parser.observed,
+                parser.minimum,
+                parser.complete
+            )),
+            Some((2, 2, true))
+        );
+    }
 
-    let partial = run_json_fixture(
-        "verify-json-partial",
-        r#"{"results":[{}]}"#,
-        ParserConfig::Json {
-            count_path: None,
-            minimum: 2,
-        },
-        0,
-    );
-    let partial_step = partial
-        .steps
-        .iter()
-        .find(|step| step.label == "Git whitespace check")
-        .expect("partial fixture step");
-    assert!(!partial.passed);
-    assert_eq!(
-        partial_step
-            .failure_code
-            .map(|code| code.to_string())
-            .as_deref(),
-        Some("RESULT_PARTIAL")
-    );
-    assert_eq!(
-        partial_step.parser.as_ref().map(|parser| (
-            parser.observed,
-            parser.minimum,
-            parser.complete
-        )),
-        Some((1, 2, false))
-    );
+    fn assert_json_zero_fixture() {
+        let zero = run_json_fixture(
+            "verify-json-zero",
+            r#"{"results":[]}"#,
+            ParserConfig::Json {
+                count_path: None,
+                minimum: 1,
+            },
+            0,
+        );
+        let zero_step = zero
+            .steps
+            .iter()
+            .find(|step| step.label == "Git whitespace check")
+            .expect("zero fixture step");
+        assert!(!zero.passed);
+        assert_eq!(
+            zero_step
+                .failure_code
+                .map(|code| code.to_string())
+                .as_deref(),
+            Some("RESULT_ZERO")
+        );
+        assert_eq!(
+            zero_step.parser.as_ref().map(|parser| (
+                parser.observed,
+                parser.minimum,
+                parser.complete
+            )),
+            Some((0, 1, false))
+        );
+    }
 
-    let command_failure = run_json_fixture(
-        "verify-json-command-failure",
-        r#"{"results":[{},{}]}"#,
-        ParserConfig::Json {
-            count_path: None,
-            minimum: 1,
-        },
-        7,
-    );
-    let command_failure_step = command_failure
-        .steps
-        .iter()
-        .find(|step| step.label == "Git whitespace check")
-        .expect("command failure fixture step");
-    assert!(!command_failure.passed);
-    assert!(!command_failure_step.passed);
-    assert_eq!(command_failure_step.failure_code, None);
-    assert!(command_failure_step
-        .detail
-        .as_deref()
-        .is_some_and(|detail| detail.contains("exit code 7")));
-    assert!(
-        command_failure_step.parser.is_none(),
-        "a command failure must not be masked by parser success"
-    );
+    fn assert_json_partial_fixture() {
+        let partial = run_json_fixture(
+            "verify-json-partial",
+            r#"{"results":[{}]}"#,
+            ParserConfig::Json {
+                count_path: None,
+                minimum: 2,
+            },
+            0,
+        );
+        let partial_step = partial
+            .steps
+            .iter()
+            .find(|step| step.label == "Git whitespace check")
+            .expect("partial fixture step");
+        assert!(!partial.passed);
+        assert_eq!(
+            partial_step
+                .failure_code
+                .map(|code| code.to_string())
+                .as_deref(),
+            Some("RESULT_PARTIAL")
+        );
+        assert_eq!(
+            partial_step.parser.as_ref().map(|parser| (
+                parser.observed,
+                parser.minimum,
+                parser.complete
+            )),
+            Some((1, 2, false))
+        );
+    }
+
+    fn assert_json_command_failure_fixture() {
+        let command_failure = run_json_fixture(
+            "verify-json-command-failure",
+            r#"{"results":[{},{}]}"#,
+            ParserConfig::Json {
+                count_path: None,
+                minimum: 1,
+            },
+            7,
+        );
+        let command_failure_step = command_failure
+            .steps
+            .iter()
+            .find(|step| step.label == "Git whitespace check")
+            .expect("command failure fixture step");
+        assert!(!command_failure.passed);
+        assert!(!command_failure_step.passed);
+        assert_eq!(command_failure_step.failure_code, None);
+        assert!(command_failure_step
+            .detail
+            .as_deref()
+            .is_some_and(|detail| detail.contains("exit code 7")));
+        assert!(
+            command_failure_step.parser.is_none(),
+            "a command failure must not be masked by parser success"
+        );
+    }
 }
 
 #[cfg(unix)]
@@ -621,22 +635,26 @@ fn report_publication_error_precedes_gate_adapter_error_and_preserves_invocation
     let error = run(&project, ScopeResult::all(&project), "full", false).unwrap_err();
     assert!(matches!(error, VerifyError::Report { .. }));
     assert_eq!(error.code(), "E1404");
-    let invocations = fs::read_dir(project.reports.join("invocations")).unwrap();
-    let paths = invocations
-        .map(|entry| entry.unwrap().path())
-        .collect::<Vec<_>>();
-    assert_eq!(paths.len(), 1);
-    let json: serde_json::Value =
-        serde_json::from_slice(&fs::read(paths[0].join("test_result.json")).unwrap()).unwrap();
-    assert_eq!(json["passed"], false);
-    let steps = json["steps"].as_array().unwrap();
-    assert!(steps
-        .iter()
-        .any(|step| step["label"] == "architecture audit" && step["passed"] == false));
-    assert!(steps.iter().all(|step| step["cancelled"] == false));
-    assert_eq!(json["evidence_complete"], false);
-    assert!(!json["failures"].as_array().unwrap().is_empty());
-    assert!(!paths[0].join("manifest.json").exists());
+    assert_published_invocation_evidence(&project);
+
+    fn assert_published_invocation_evidence(project: &Project) {
+        let invocations = fs::read_dir(project.reports.join("invocations")).unwrap();
+        let paths = invocations
+            .map(|entry| entry.unwrap().path())
+            .collect::<Vec<_>>();
+        assert_eq!(paths.len(), 1);
+        let json: serde_json::Value =
+            serde_json::from_slice(&fs::read(paths[0].join("test_result.json")).unwrap()).unwrap();
+        assert_eq!(json["passed"], false);
+        let steps = json["steps"].as_array().unwrap();
+        assert!(steps
+            .iter()
+            .any(|step| step["label"] == "architecture audit" && step["passed"] == false));
+        assert!(steps.iter().all(|step| step["cancelled"] == false));
+        assert_eq!(json["evidence_complete"], false);
+        assert!(!json["failures"].as_array().unwrap().is_empty());
+        assert!(!paths[0].join("manifest.json").exists());
+    }
 }
 
 #[test]

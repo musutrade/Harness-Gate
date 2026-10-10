@@ -27,9 +27,157 @@ fn write(path: &Path, value: &impl Serialize) {
     fs::write(path, serde_json::to_vec_pretty(value).unwrap()).unwrap();
 }
 
+fn apply_custom_metadata(
+    state: &mut TrustedState,
+    record: &mut Value,
+    rules: &mut Value,
+    quality: &mut String,
+    mode: &str,
+    metadata: &Value,
+) {
+    state.components.get_mut("app").unwrap().metadata = BTreeMap::from([(
+        "ecosystem".into(),
+        metadata["ecosystem"].as_str().unwrap().into(),
+    )]);
+    let series = state.series.get_mut("coverage").unwrap();
+    let old = series.id.clone();
+    series.collector.name = metadata["collector"].as_str().unwrap().into();
+    series.name = metadata["series"].as_str().unwrap().into();
+    series.tool.name = metadata["tool"].as_str().unwrap().into();
+    series.runtime.name = "quasar-vm".into();
+    let capability = &metadata[if mode == "custom-capability" {
+        "capability"
+    } else {
+        "normalized_capability"
+    }];
+    let mut value = serde_json::to_value(&series).unwrap();
+    value["metrics"] = json!([{"name":capability,"type":"size"}]);
+    value["id"] = json!(evidence::series_id(&value).unwrap());
+    *series = serde_json::from_value(value).unwrap();
+    *quality = quality
+        .replace(&old, &series.id)
+        .replace("coverage.line", capability.as_str().unwrap());
+    record["capabilities"][0]["metric"] = capability.clone();
+    record["metrics"][0]["name"] = capability.clone();
+    record["metrics"][0]["value"] = json!({"type":"size","value":5,"unit":"bytes"});
+    rules["rules"][0]["metric"] = capability.clone();
+    rules["rules"][0]["limit"] = json!({"type":"size","value":10,"unit":"bytes"});
+    rules["rules"][0]["operator"] = json!("le");
+}
+
+fn apply_crap_mode(
+    state: &mut TrustedState,
+    record: &mut Value,
+    rules: &mut Value,
+    quality: &mut String,
+) {
+    let series = state.series.get_mut("coverage").unwrap();
+    let old = series.id.clone();
+    let mut value = serde_json::to_value(&series).unwrap();
+    value["metrics"] = json!([{"name":"risk.crap","type":"decimal"}]);
+    value["id"] = json!(evidence::series_id(&value).unwrap());
+    *series = serde_json::from_value(value).unwrap();
+    *quality = quality
+        .replace(&old, &series.id)
+        .replace("bundle.size", "risk.crap");
+    record["capabilities"][0]["metric"] = json!("risk.crap");
+    record["metrics"][0]["name"] = json!("risk.crap");
+    record["metrics"][0]["value"] = json!({"type":"decimal","value":"40"});
+    *quality = quality
+        .replace("required = false", "required = true")
+        .replace(
+            "provider = { kind = \"none\" }",
+            "provider = { kind = \"retained_artifact\", manifest = \"base/manifest.json\" }",
+        );
+    rules["rules"][0]["metric"] = json!("risk.crap");
+    rules["rules"][0]["limit"] = json!({"type":"decimal","value":"30"});
+    rules["rules"][0]["ratchet"] = json!({"deny_regression":true,"allow_legacy_debt":true});
+    rules["rules"][0]["remediation_classes"] =
+        json!(["reduce_complexity", "increase_meaningful_coverage"]);
+}
+
+fn apply_custom_capability_config(quality: &mut String, rules: &mut Value) {
+    let mut config: QualityConfig = toml::from_str(quality).unwrap();
+    config
+        .policies
+        .get_mut("coverage")
+        .unwrap()
+        .expectation
+        .capability = "bundle.size".into();
+    rules["rules"][0]["metric"] = json!("bundle.size");
+    rules["rules"][0]["required"] = json!(false);
+    *quality = toml::to_string(&config).unwrap();
+}
+
+fn apply_record_mode(record: &mut Value, mode: &str) {
+    match mode {
+        "unsupported" | "not_collected" | "measurement_error" | "not_configured"
+        | "not_applicable" => {
+            record["capabilities"][0]["state"] = json!(mode);
+            record["metrics"] = json!([]);
+            record["status"] = json!(if mode == "measurement_error" {
+                "measurement_error"
+            } else {
+                "unavailable"
+            });
+        }
+        "dishonest" => record["capabilities"][0]["state"] = json!("unsupported"),
+        "missing-capability" => record["capabilities"] = json!([]),
+        "wrong-tool" => record["series"]["tool"]["version"] = json!("wrong"),
+        "stale-context" => record["context"]["run"] = json!("stale"),
+        "wrong-subject" => record["subject"]["id"] = json!("unknown"),
+        "malformed-evidence" => {
+            record["metrics"][0]["value"] = json!({"type":"ratio","covered":9,"total":1})
+        }
+        "artifact-identity" => record["artifacts"][0]["context"]["run"] = json!("other"),
+        _ => {}
+    }
+}
+
+fn apply_response_mode(response: &mut Value, record: &Value, mode: &str) {
+    match mode {
+        "duplicate-evidence" => {
+            response["collection"]["evidence"] = json!([record.clone(), record.clone()])
+        }
+        "approval" => response["collection"]["approved"] = json!(true),
+        "missing-evidence" => response["collection"]["evidence"] = json!([]),
+        "response-version" => {
+            response["collection"]["schema"] = json!("harness-project-collector-response/v2")
+        }
+        "transport-fail" => response["status"] = json!("FAIL"),
+        "measurement-fail" => response["collection"]["error"] = json!({"code":"measurement_error"}),
+        "missing-inventory" => response["artifacts"] = json!([]),
+        _ => {}
+    }
+}
+
 impl Fixture {
     fn new(mode: &str, custom: bool) -> Self {
         Self::in_dir(mode, custom, tempdir().unwrap())
+    }
+
+    fn rebind_custom(&mut self, config: &mut QualityConfig, fixtures: &Path) -> String {
+        let metadata: Value = serde_json::from_str(
+            &fs::read_to_string(fixtures.join("collectors/unknown-ecosystem.json")).unwrap(),
+        )
+        .unwrap();
+        let id = metadata["binding"].as_str().unwrap().to_owned();
+        let binding = config.collectors.remove("coverage").unwrap();
+        config.collectors.insert(id.clone(), binding);
+        for profile in config.profiles.values_mut() {
+            if profile.collectors.remove("coverage") {
+                profile.collectors.insert(id.clone());
+            }
+        }
+        let series = self.state.series.remove("coverage").unwrap();
+        self.state.series.insert(id.clone(), series);
+        fs::write(
+            self.dir.path().join(".harness-gate/quality.toml"),
+            toml::to_string(config).unwrap(),
+        )
+        .unwrap();
+        self.pin();
+        id
     }
 
     fn in_dir(mode: &str, custom: bool, dir: TempDir) -> Self {
@@ -65,95 +213,23 @@ impl Fixture {
                 &fs::read_to_string(fixtures.join("collectors/unknown-ecosystem.json")).unwrap(),
             )
             .unwrap();
-            state.components.get_mut("app").unwrap().metadata = BTreeMap::from([(
-                "ecosystem".into(),
-                metadata["ecosystem"].as_str().unwrap().into(),
-            )]);
-            let series = state.series.get_mut("coverage").unwrap();
-            let old = series.id.clone();
-            series.collector.name = metadata["collector"].as_str().unwrap().into();
-            series.name = metadata["series"].as_str().unwrap().into();
-            series.tool.name = metadata["tool"].as_str().unwrap().into();
-            series.runtime.name = "quasar-vm".into();
-            let capability = &metadata[if mode == "custom-capability" {
-                "capability"
-            } else {
-                "normalized_capability"
-            }];
-            let mut value = serde_json::to_value(&series).unwrap();
-            value["metrics"] = json!([{"name":capability,"type":"size"}]);
-            value["id"] = json!(evidence::series_id(&value).unwrap());
-            *series = serde_json::from_value(value).unwrap();
-            quality = quality
-                .replace(&old, &series.id)
-                .replace("coverage.line", capability.as_str().unwrap());
-            record["capabilities"][0]["metric"] = capability.clone();
-            record["metrics"][0]["name"] = capability.clone();
-            record["metrics"][0]["value"] = json!({"type":"size","value":5,"unit":"bytes"});
-            rules["rules"][0]["metric"] = capability.clone();
-            rules["rules"][0]["limit"] = json!({"type":"size","value":10,"unit":"bytes"});
-            rules["rules"][0]["operator"] = json!("le");
+            apply_custom_metadata(
+                &mut state,
+                &mut record,
+                &mut rules,
+                &mut quality,
+                mode,
+                &metadata,
+            );
         }
         if mode == "crap" {
-            let series = state.series.get_mut("coverage").unwrap();
-            let old = series.id.clone();
-            let mut value = serde_json::to_value(&series).unwrap();
-            value["metrics"] = json!([{"name":"risk.crap","type":"decimal"}]);
-            value["id"] = json!(evidence::series_id(&value).unwrap());
-            *series = serde_json::from_value(value).unwrap();
-            quality = quality
-                .replace(&old, &series.id)
-                .replace("bundle.size", "risk.crap");
-            record["capabilities"][0]["metric"] = json!("risk.crap");
-            record["metrics"][0]["name"] = json!("risk.crap");
-            record["metrics"][0]["value"] = json!({"type":"decimal","value":"40"});
-            quality = quality
-                .replace("required = false", "required = true")
-                .replace(
-                "provider = { kind = \"none\" }",
-                "provider = { kind = \"retained_artifact\", manifest = \"base/manifest.json\" }",
-            );
-            rules["rules"][0]["metric"] = json!("risk.crap");
-            rules["rules"][0]["limit"] = json!({"type":"decimal","value":"30"});
-            rules["rules"][0]["ratchet"] = json!({"deny_regression":true,"allow_legacy_debt":true});
-            rules["rules"][0]["remediation_classes"] =
-                json!(["reduce_complexity", "increase_meaningful_coverage"]);
+            apply_crap_mode(&mut state, &mut record, &mut rules, &mut quality);
         }
         record["series"] = serde_json::to_value(&state.series["coverage"]).unwrap();
         record["collector"] = record["series"]["collector"].clone();
-        match mode {
-            "unsupported" | "not_collected" | "measurement_error" | "not_configured"
-            | "not_applicable" => {
-                record["capabilities"][0]["state"] = json!(mode);
-                record["metrics"] = json!([]);
-                record["status"] = json!(if mode == "measurement_error" {
-                    "measurement_error"
-                } else {
-                    "unavailable"
-                });
-            }
-            "dishonest" => record["capabilities"][0]["state"] = json!("unsupported"),
-            "missing-capability" => record["capabilities"] = json!([]),
-            "wrong-tool" => record["series"]["tool"]["version"] = json!("wrong"),
-            "stale-context" => record["context"]["run"] = json!("stale"),
-            "wrong-subject" => record["subject"]["id"] = json!("unknown"),
-            "malformed-evidence" => {
-                record["metrics"][0]["value"] = json!({"type":"ratio","covered":9,"total":1})
-            }
-            "artifact-identity" => record["artifacts"][0]["context"]["run"] = json!("other"),
-            _ => {}
-        }
+        apply_record_mode(&mut record, mode);
         if mode == "custom-capability" {
-            let mut config: QualityConfig = toml::from_str(&quality).unwrap();
-            config
-                .policies
-                .get_mut("coverage")
-                .unwrap()
-                .expectation
-                .capability = "bundle.size".into();
-            rules["rules"][0]["metric"] = json!("bundle.size");
-            rules["rules"][0]["required"] = json!(false);
-            quality = toml::to_string(&config).unwrap();
+            apply_custom_capability_config(&mut quality, &mut rules);
         }
         fs::write(root.join(".harness-gate/quality.toml"), quality).unwrap();
         write(&root.join(".harness-gate/policy.json"), &rules);
@@ -163,22 +239,7 @@ impl Fixture {
         );
         let mut response = json!({"schema_version":"1", "status":"PASS", "invocation_id":state.expected.run,
             "artifacts":record["artifacts"], "collection":{"schema":"harness-project-collector-response/v1", "evidence":[record.clone()], "error":null}});
-        match mode {
-            "duplicate-evidence" => {
-                response["collection"]["evidence"] = json!([record.clone(), record])
-            }
-            "approval" => response["collection"]["approved"] = json!(true),
-            "missing-evidence" => response["collection"]["evidence"] = json!([]),
-            "response-version" => {
-                response["collection"]["schema"] = json!("harness-project-collector-response/v2")
-            }
-            "transport-fail" => response["status"] = json!("FAIL"),
-            "measurement-fail" => {
-                response["collection"]["error"] = json!({"code":"measurement_error"})
-            }
-            "missing-inventory" => response["artifacts"] = json!([]),
-            _ => {}
-        }
+        apply_response_mode(&mut response, &record, mode);
         let payload = json!({"mode":mode,"response":response,"raw":fs::read_to_string(fixtures.join("compiler/artifact.txt")).unwrap()});
         let script = fs::read_to_string(fixtures.join("collectors/collector.py"))
             .unwrap()
@@ -244,31 +305,10 @@ impl Fixture {
         fixture.pin();
         let mut config = fixture.config();
         let id = if custom {
-            let metadata: Value = serde_json::from_str(
-                &fs::read_to_string(fixtures.join("collectors/unknown-ecosystem.json")).unwrap(),
-            )
-            .unwrap();
-            metadata["binding"].as_str().unwrap().to_owned()
+            fixture.rebind_custom(&mut config, &fixtures)
         } else {
             "coverage".into()
         };
-        if custom {
-            let binding = config.collectors.remove("coverage").unwrap();
-            config.collectors.insert(id.clone(), binding);
-            for profile in config.profiles.values_mut() {
-                if profile.collectors.remove("coverage") {
-                    profile.collectors.insert(id.clone());
-                }
-            }
-            let series = fixture.state.series.remove("coverage").unwrap();
-            fixture.state.series.insert(id.clone(), series);
-            fs::write(
-                fixture.dir.path().join(".harness-gate/quality.toml"),
-                toml::to_string(&config).unwrap(),
-            )
-            .unwrap();
-            fixture.pin();
-        }
         let inputs = compiler::compile(fixture.dir.path(), &fixture.state).unwrap();
         // Bind the canonical root even when the temp directory uses a symlink
         // (for example, /var -> /private/var on macOS).
@@ -340,132 +380,149 @@ impl Fixture {
     }
 }
 
+fn assert_multiple_producers_rejected(fixture: &Fixture, result: Result<Collection>) {
+    assert!(result.is_err());
+    assert!(
+        !fixture.request.artifact_root.join("raw.json").exists(),
+        "duplicate ownership must fail before launch"
+    );
+}
+
+fn assert_multiple_producers_combined(
+    fixture: &mut Fixture,
+    root: &Path,
+    result: Result<Collection>,
+    mut second: AdapterRequest,
+) {
+    let collection = result.unwrap();
+    assert_eq!(collection.evidence.as_array().unwrap().len(), 2);
+    assert!(fixture.request.artifact_root.join("second.json").is_file());
+    // Reuse one authoritative producer and collect only the missing one.
+    fs::remove_file(fixture.request.artifact_root.join("second.json")).unwrap();
+    fixture.state.artifacts = inventory(&fixture.request.artifact_root).unwrap();
+    let path = ".harness-gate/retained-coverage.json";
+    write(&root.join(path), &collection.responses["coverage"]);
+    fixture.state.retained.insert(
+        "coverage".into(),
+        compiler::RetainedEvidence {
+            path: path.into(),
+            sha256: format!("{:x}", Sha256::digest(fs::read(root.join(path)).unwrap())),
+        },
+    );
+    second.nonce = "mixed-fresh-producer".into();
+    second.adapter.signature.value = BASE64.encode(
+        SigningKey::from_bytes(&[7; 32])
+            .sign(&adapter::signing_payload(&second).unwrap())
+            .to_bytes(),
+    );
+    write(&root.join(".harness-gate/second-request.json"), &second);
+    fixture.pin();
+    let mixed = fixture.collect().unwrap();
+    assert_eq!(mixed.evidence, collection.evidence);
+    assert_eq!(mixed.producers["coverage"], "retained");
+    assert_eq!(mixed.producers["second"], "collected");
+}
+
+fn multiple_producers_case(overlap: bool) {
+    let mut fixture = Fixture::new("pass", false);
+    let root = fixture.dir.path().to_path_buf();
+    let mut config = fixture.config();
+    let mut series = serde_json::to_value(&fixture.state.series["coverage"]).unwrap();
+    series["name"] = json!("independent-measurement");
+    if !overlap {
+        series["metrics"] = json!([{"name":"bundle.size","type":"size"}]);
+    }
+    series["id"] = json!(evidence::series_id(&series).unwrap());
+    fixture.state.series.insert(
+        "second".into(),
+        serde_json::from_value(series.clone()).unwrap(),
+    );
+    let mut binding = config.collectors["coverage"].clone();
+    binding.request = ".harness-gate/second-request.json".into();
+    binding.produces[0].series = series["id"].as_str().unwrap().into();
+    if overlap {
+        // Distinct configured targets still resolve to the same subject.
+        binding.produces[0].target = super::super::model::Target::Subject {
+            id: "module".into(),
+        };
+    } else {
+        binding.produces[0].capability = "bundle.size".into();
+    }
+    config.collectors.insert("second".into(), binding);
+    config
+        .profiles
+        .get_mut(&fixture.state.profile)
+        .unwrap()
+        .collectors
+        .insert("second".into());
+    fs::write(
+        root.join(".harness-gate/quality.toml"),
+        toml::to_string(&config).unwrap(),
+    )
+    .unwrap();
+    write(&root.join(".harness-gate/second-request.json"), &json!({}));
+    fixture.pin();
+    let mut payload = fixture.payload.clone();
+    let record = &mut payload["response"]["collection"]["evidence"][0];
+    record["series"] = series;
+    record["id"] = json!("second-evidence");
+    record["artifacts"][0]["path"] = json!("second.json");
+    if !overlap {
+        record["capabilities"][0]["metric"] = json!("bundle.size");
+        record["metrics"][0]["name"] = json!("bundle.size");
+        record["metrics"][0]["value"] = json!({"type":"size","value":5,"unit":"bytes"});
+    }
+    payload["response"]["artifacts"] = record["artifacts"].clone();
+    let template = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../quality/fixtures/workflow/collectors/collector.py");
+    let script = fs::read_to_string(template)
+        .unwrap()
+        .replace("raw.json", "second.json")
+        .replace(
+            "'PAYLOAD_PLACEHOLDER'",
+            &serde_json::to_string(&serde_json::to_string(&payload).unwrap()).unwrap(),
+        );
+    let executable = root.join("second.py");
+    fs::write(&executable, &script).unwrap();
+    fs::set_permissions(
+        &executable,
+        fs::metadata(&fixture.request.adapter.executable)
+            .unwrap()
+            .permissions(),
+    )
+    .unwrap();
+    let inputs = compiler::compile(&root, &fixture.state).unwrap();
+    fixture.request.config_digest = binding_digest(&config, &fixture.state, &inputs).unwrap();
+    let mut second = fixture.request.clone();
+    second.step_id = "second".into();
+    second.nonce = "second-nonce".into();
+    second.adapter.executable = executable;
+    second.adapter.source_digest = format!("{:x}", Sha256::digest(script.as_bytes()));
+    second.input = input(
+        &inputs,
+        &fixture.state,
+        "second",
+        &claims(&config, &fixture.state, "second").unwrap(),
+    );
+    second.adapter.signature.value = BASE64.encode(
+        SigningKey::from_bytes(&[7; 32])
+            .sign(&adapter::signing_payload(&second).unwrap())
+            .to_bytes(),
+    );
+    write(&root.join(".harness-gate/second-request.json"), &second);
+    fixture.sign();
+    let result = fixture.collect();
+    if overlap {
+        assert_multiple_producers_rejected(&fixture, result);
+    } else {
+        assert_multiple_producers_combined(&mut fixture, &root, result, second);
+    }
+}
+
 #[test]
 fn configured_multiple_producers_combine_distinct_series_and_reject_overlap() {
     for overlap in [false, true] {
-        let mut fixture = Fixture::new("pass", false);
-        let root = fixture.dir.path().to_path_buf();
-        let mut config = fixture.config();
-        let mut series = serde_json::to_value(&fixture.state.series["coverage"]).unwrap();
-        series["name"] = json!("independent-measurement");
-        if !overlap {
-            series["metrics"] = json!([{"name":"bundle.size","type":"size"}]);
-        }
-        series["id"] = json!(evidence::series_id(&series).unwrap());
-        fixture.state.series.insert(
-            "second".into(),
-            serde_json::from_value(series.clone()).unwrap(),
-        );
-        let mut binding = config.collectors["coverage"].clone();
-        binding.request = ".harness-gate/second-request.json".into();
-        binding.produces[0].series = series["id"].as_str().unwrap().into();
-        if overlap {
-            // Distinct configured targets still resolve to the same subject.
-            binding.produces[0].target = super::super::model::Target::Subject {
-                id: "module".into(),
-            };
-        } else {
-            binding.produces[0].capability = "bundle.size".into();
-        }
-        config.collectors.insert("second".into(), binding);
-        config
-            .profiles
-            .get_mut(&fixture.state.profile)
-            .unwrap()
-            .collectors
-            .insert("second".into());
-        fs::write(
-            root.join(".harness-gate/quality.toml"),
-            toml::to_string(&config).unwrap(),
-        )
-        .unwrap();
-        write(&root.join(".harness-gate/second-request.json"), &json!({}));
-        fixture.pin();
-        let mut payload = fixture.payload.clone();
-        let record = &mut payload["response"]["collection"]["evidence"][0];
-        record["series"] = series;
-        record["id"] = json!("second-evidence");
-        record["artifacts"][0]["path"] = json!("second.json");
-        if !overlap {
-            record["capabilities"][0]["metric"] = json!("bundle.size");
-            record["metrics"][0]["name"] = json!("bundle.size");
-            record["metrics"][0]["value"] = json!({"type":"size","value":5,"unit":"bytes"});
-        }
-        payload["response"]["artifacts"] = record["artifacts"].clone();
-        let template = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("../quality/fixtures/workflow/collectors/collector.py");
-        let script = fs::read_to_string(template)
-            .unwrap()
-            .replace("raw.json", "second.json")
-            .replace(
-                "'PAYLOAD_PLACEHOLDER'",
-                &serde_json::to_string(&serde_json::to_string(&payload).unwrap()).unwrap(),
-            );
-        let executable = root.join("second.py");
-        fs::write(&executable, &script).unwrap();
-        fs::set_permissions(
-            &executable,
-            fs::metadata(&fixture.request.adapter.executable)
-                .unwrap()
-                .permissions(),
-        )
-        .unwrap();
-        let inputs = compiler::compile(&root, &fixture.state).unwrap();
-        fixture.request.config_digest = binding_digest(&config, &fixture.state, &inputs).unwrap();
-        let mut second = fixture.request.clone();
-        second.step_id = "second".into();
-        second.nonce = "second-nonce".into();
-        second.adapter.executable = executable;
-        second.adapter.source_digest = format!("{:x}", Sha256::digest(script.as_bytes()));
-        second.input = input(
-            &inputs,
-            &fixture.state,
-            "second",
-            &claims(&config, &fixture.state, "second").unwrap(),
-        );
-        second.adapter.signature.value = BASE64.encode(
-            SigningKey::from_bytes(&[7; 32])
-                .sign(&adapter::signing_payload(&second).unwrap())
-                .to_bytes(),
-        );
-        write(&root.join(".harness-gate/second-request.json"), &second);
-        fixture.sign();
-        let result = fixture.collect();
-        if overlap {
-            assert!(result.is_err());
-            assert!(
-                !fixture.request.artifact_root.join("raw.json").exists(),
-                "duplicate ownership must fail before launch"
-            );
-        } else {
-            let collection = result.unwrap();
-            assert_eq!(collection.evidence.as_array().unwrap().len(), 2);
-            assert!(fixture.request.artifact_root.join("second.json").is_file());
-            // Reuse one authoritative producer and collect only the missing one.
-            fs::remove_file(fixture.request.artifact_root.join("second.json")).unwrap();
-            fixture.state.artifacts = inventory(&fixture.request.artifact_root).unwrap();
-            let path = ".harness-gate/retained-coverage.json";
-            write(&root.join(path), &collection.responses["coverage"]);
-            fixture.state.retained.insert(
-                "coverage".into(),
-                compiler::RetainedEvidence {
-                    path: path.into(),
-                    sha256: format!("{:x}", Sha256::digest(fs::read(root.join(path)).unwrap())),
-                },
-            );
-            second.nonce = "mixed-fresh-producer".into();
-            second.adapter.signature.value = BASE64.encode(
-                SigningKey::from_bytes(&[7; 32])
-                    .sign(&adapter::signing_payload(&second).unwrap())
-                    .to_bytes(),
-            );
-            write(&root.join(".harness-gate/second-request.json"), &second);
-            fixture.pin();
-            let mixed = fixture.collect().unwrap();
-            assert_eq!(mixed.evidence, collection.evidence);
-            assert_eq!(mixed.producers["coverage"], "retained");
-            assert_eq!(mixed.producers["second"], "collected");
-        }
+        multiple_producers_case(overlap);
     }
 }
 
@@ -1410,57 +1467,64 @@ impl Fixture {
     }
 }
 
-#[test]
-fn configured_artifact_budget_reaches_verify_and_collection_cli() {
+fn assert_artifact_budget_verify(fixture: &Fixture, bytes: u64) {
+    let quality = fixture.quality_result();
+    assert_eq!(
+        quality["status"],
+        if bytes == 1 { "blocked" } else { "pass" },
+        "{quality:#}"
+    );
+    if bytes == 1 {
+        assert!(quality["error"]
+            .as_str()
+            .unwrap()
+            .contains("artifact root exceeds 1 bytes"));
+    }
+}
+
+fn assert_artifact_budget_collect(fixture: &Fixture, bytes: u64) {
     use clap::Parser;
     #[derive(Parser)]
     struct Command {
         #[command(subcommand)]
         action: crate::app::quality::QualityAction,
     }
+    let root = fixture.dir.path();
+    let command = Command::try_parse_from([
+        "quality",
+        "collect",
+        "--repository-root",
+        root.to_str().unwrap(),
+        "--state",
+        root.join(".harness-gate/workflow-state.json")
+            .to_str()
+            .unwrap(),
+        "--trusted-keys",
+        root.join(".harness-gate/workflow-keys.json")
+            .to_str()
+            .unwrap(),
+        "--output",
+        root.join("collection.json").to_str().unwrap(),
+    ])
+    .unwrap();
+    let result = crate::app::quality::run(&command.action, None);
+    if bytes == 1 {
+        assert!(format!("{:#}", result.unwrap_err()).contains("artifact root exceeds 1 bytes"));
+    } else {
+        assert!(result.unwrap());
+    }
+}
+
+#[test]
+fn configured_artifact_budget_reaches_verify_and_collection_cli() {
     for verify in [true, false] {
         for bytes in [1, 1024 * 1024 * 1024] {
             let mut fixture = Fixture::workflow("pass", true, false);
             fixture.artifact_budget(bytes);
             if verify {
-                let quality = fixture.quality_result();
-                assert_eq!(
-                    quality["status"],
-                    if bytes == 1 { "blocked" } else { "pass" },
-                    "{quality:#}"
-                );
-                if bytes == 1 {
-                    assert!(quality["error"]
-                        .as_str()
-                        .unwrap()
-                        .contains("artifact root exceeds 1 bytes"));
-                }
+                assert_artifact_budget_verify(&fixture, bytes);
             } else {
-                let root = fixture.dir.path();
-                let command = Command::try_parse_from([
-                    "quality",
-                    "collect",
-                    "--repository-root",
-                    root.to_str().unwrap(),
-                    "--state",
-                    root.join(".harness-gate/workflow-state.json")
-                        .to_str()
-                        .unwrap(),
-                    "--trusted-keys",
-                    root.join(".harness-gate/workflow-keys.json")
-                        .to_str()
-                        .unwrap(),
-                    "--output",
-                    root.join("collection.json").to_str().unwrap(),
-                ])
-                .unwrap();
-                let result = crate::app::quality::run(&command.action, None);
-                if bytes == 1 {
-                    assert!(format!("{:#}", result.unwrap_err())
-                        .contains("artifact root exceeds 1 bytes"));
-                } else {
-                    assert!(result.unwrap());
-                }
+                assert_artifact_budget_collect(&fixture, bytes);
             }
         }
     }
@@ -1591,12 +1655,18 @@ fn empty_replay_artifacts(fixture: &Fixture) {
 }
 
 #[cfg(unix)]
-#[test]
-fn adapter_cli_uses_external_replay_state_and_rejects_overlap() {
-    let fixture = Fixture::workflow("pass", true, false);
-    let host = tempdir().unwrap();
-    let ledger = host.path().canonicalize().unwrap().join("nonces");
-    let first = replay_cli_command(&fixture, "adapter", Some(&ledger))
+fn assert_adapter_overlap_rejected(fixture: &Fixture, overlap: &Path) {
+    let output = replay_cli_command(fixture, "adapter", Some(overlap))
+        .output()
+        .unwrap();
+    assert!(!output.status.success());
+    assert!(String::from_utf8_lossy(&output.stderr).contains("must be separate"));
+    assert!(!fixture.request.artifact_root.join("raw.json").exists());
+}
+
+#[cfg(unix)]
+fn assert_adapter_replay_first_run(fixture: &Fixture, ledger: &Path) -> std::path::PathBuf {
+    let first = replay_cli_command(fixture, "adapter", Some(ledger))
         .output()
         .unwrap();
     assert!(
@@ -1605,39 +1675,119 @@ fn adapter_cli_uses_external_replay_state_and_rejects_overlap() {
         String::from_utf8_lossy(&first.stdout),
         String::from_utf8_lossy(&first.stderr)
     );
-    assert_eq!(fs::read_dir(&ledger).unwrap().count(), 1);
+    assert_eq!(fs::read_dir(ledger).unwrap().count(), 1);
     assert!(fixture.request.artifact_root.join("raw.json").is_file());
-    let default = fixture
+    fixture
         .dir
         .path()
-        .join(".harness-gate/.harness-gate-adapter-replay");
+        .join(".harness-gate/.harness-gate-adapter-replay")
+}
+
+#[cfg(unix)]
+fn assert_adapter_replay_rejected(fixture: &Fixture, ledger: &Path) {
+    empty_replay_artifacts(fixture);
+    let repeated = replay_cli_command(fixture, "adapter", Some(ledger))
+        .output()
+        .unwrap();
+    assert!(!repeated.status.success());
+    assert!(String::from_utf8_lossy(&repeated.stderr).contains("nonce has already been used"));
+    assert!(!fixture.request.artifact_root.join("raw.json").exists());
+    assert_eq!(fs::read_dir(ledger).unwrap().count(), 1);
+}
+
+#[cfg(unix)]
+#[test]
+fn adapter_cli_uses_external_replay_state_and_rejects_overlap() {
+    let fixture = Fixture::workflow("pass", true, false);
+    let host = tempdir().unwrap();
+    let ledger = host.path().canonicalize().unwrap().join("nonces");
+    let default = assert_adapter_replay_first_run(&fixture, &ledger);
     assert!(!default.exists());
     assert!(!fixture
         .dir
         .path()
         .join(".harness-gate/collector-nonces")
         .exists());
-    empty_replay_artifacts(&fixture);
-    let repeated = replay_cli_command(&fixture, "adapter", Some(&ledger))
-        .output()
-        .unwrap();
-    assert!(!repeated.status.success());
-    assert!(String::from_utf8_lossy(&repeated.stderr).contains("nonce has already been used"));
-    assert!(!fixture.request.artifact_root.join("raw.json").exists());
-    assert_eq!(fs::read_dir(&ledger).unwrap().count(), 1);
+    assert_adapter_replay_rejected(&fixture, &ledger);
     for overlap in [
         fixture.request.artifact_root.clone(),
         fixture.request.artifact_root.join("nonces"),
         fixture.dir.path().canonicalize().unwrap(),
     ] {
-        let output = replay_cli_command(&fixture, "adapter", Some(&overlap))
-            .output()
-            .unwrap();
-        assert!(!output.status.success());
-        assert!(String::from_utf8_lossy(&output.stderr).contains("must be separate"));
-        assert!(!fixture.request.artifact_root.join("raw.json").exists());
+        assert_adapter_overlap_rejected(&fixture, &overlap);
     }
     assert!(!default.exists());
+}
+
+#[cfg(unix)]
+fn assert_compat_result_matches(root: &Path, report: &Value) {
+    let result: Value =
+        serde_json::from_slice(&fs::read(root.join("compat-response.json")).unwrap()).unwrap();
+    assert_eq!(result["passed"], true);
+    assert_eq!(result["invocation_id"], report["invocation_id"]);
+}
+
+#[cfg(unix)]
+fn assert_staged_hook_compat_success(
+    fixture: &Fixture,
+    root: &Path,
+    ledger: &Path,
+    operation: &str,
+) {
+    let output = replay_cli_command(fixture, operation, Some(ledger))
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "{operation}: {} {}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    // This partial profile has no collector. The host still binds precisely
+    // the configured external ledger before evaluating quality participation.
+    assert!(ledger.is_dir(), "override was dropped by {operation}");
+    assert_eq!(fs::read_dir(ledger).unwrap().count(), 0);
+    assert!(!root.join(".harness-gate/collector-nonces").exists());
+    let report: Value = serde_json::from_slice(
+        &fs::read(root.join(".harness-gate/reports/test_result.json")).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(
+        report["quality"]["status"], "not_collected",
+        "{operation}: {report}"
+    );
+    if operation.starts_with("compat") {
+        assert_compat_result_matches(root, &report);
+    }
+}
+
+#[cfg(unix)]
+fn assert_staged_hook_compat_bad_override(
+    fixture: &Fixture,
+    root: &Path,
+    host: &Path,
+    operation: &str,
+) {
+    // A bad override must fail instead of silently using the repository
+    // default, including after staged snapshot and compatibility cloning.
+    let missing = host.canonicalize().unwrap().join("missing/nonces");
+    let output = replay_cli_command(fixture, operation, Some(&missing))
+        .output()
+        .unwrap();
+    assert!(
+        !output.status.success(),
+        "bad override ignored by {operation}"
+    );
+    let report: Value = serde_json::from_slice(
+        &fs::read(root.join(".harness-gate/reports/test_result.json")).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(report["quality"]["status"], "blocked");
+    assert!(report["quality"]["error"]
+        .as_str()
+        .unwrap()
+        .contains("adapter replay state"));
+    assert!(!root.join(".harness-gate/collector-nonces").exists());
 }
 
 #[cfg(unix)]
@@ -1663,55 +1813,8 @@ fn staged_hook_and_compat_use_external_replay_state() {
             .success());
         let host = tempdir().unwrap();
         let ledger = host.path().canonicalize().unwrap().join("nonces");
-        let output = replay_cli_command(&fixture, operation, Some(&ledger))
-            .output()
-            .unwrap();
-        assert!(
-            output.status.success(),
-            "{operation}: {} {}",
-            String::from_utf8_lossy(&output.stdout),
-            String::from_utf8_lossy(&output.stderr)
-        );
-        // This partial profile has no collector. The host still binds precisely
-        // the configured external ledger before evaluating quality participation.
-        assert!(ledger.is_dir(), "override was dropped by {operation}");
-        assert_eq!(fs::read_dir(&ledger).unwrap().count(), 0);
-        assert!(!root.join(".harness-gate/collector-nonces").exists());
-        let report: Value = serde_json::from_slice(
-            &fs::read(root.join(".harness-gate/reports/test_result.json")).unwrap(),
-        )
-        .unwrap();
-        assert_eq!(
-            report["quality"]["status"], "not_collected",
-            "{operation}: {report}"
-        );
-        if operation.starts_with("compat") {
-            let result: Value =
-                serde_json::from_slice(&fs::read(root.join("compat-response.json")).unwrap())
-                    .unwrap();
-            assert_eq!(result["passed"], true);
-            assert_eq!(result["invocation_id"], report["invocation_id"]);
-        }
-        // A bad override must fail instead of silently using the repository
-        // default, including after staged snapshot and compatibility cloning.
-        let missing = host.path().canonicalize().unwrap().join("missing/nonces");
-        let output = replay_cli_command(&fixture, operation, Some(&missing))
-            .output()
-            .unwrap();
-        assert!(
-            !output.status.success(),
-            "bad override ignored by {operation}"
-        );
-        let report: Value = serde_json::from_slice(
-            &fs::read(root.join(".harness-gate/reports/test_result.json")).unwrap(),
-        )
-        .unwrap();
-        assert_eq!(report["quality"]["status"], "blocked");
-        assert!(report["quality"]["error"]
-            .as_str()
-            .unwrap()
-            .contains("adapter replay state"));
-        assert!(!root.join(".harness-gate/collector-nonces").exists());
+        assert_staged_hook_compat_success(&fixture, root, &ledger, operation);
+        assert_staged_hook_compat_bad_override(&fixture, root, host.path(), operation);
     }
 }
 
@@ -1760,6 +1863,78 @@ fn compat_collectors_claim_only_the_configured_external_ledger() {
 }
 
 #[cfg(unix)]
+fn assert_nonce_replay_rejected(fixture: &Fixture, output: &std::process::Output, second: &str) {
+    if second == "verify" {
+        let report: Value = serde_json::from_slice(
+            &fs::read(
+                fixture
+                    .dir
+                    .path()
+                    .join(".harness-gate/reports/test_result.json"),
+            )
+            .unwrap(),
+        )
+        .unwrap();
+        assert!(
+            report["quality"]["error"]
+                .as_str()
+                .unwrap()
+                .contains("nonce has already been used"),
+            "{report}"
+        );
+    } else {
+        assert!(String::from_utf8_lossy(&output.stderr).contains("nonce has already been used"));
+        assert!(!fixture.dir.path().join("collection.json").exists());
+    }
+}
+
+#[cfg(unix)]
+fn verify_collect_nonce_case(external: bool, first: &str, second: &str) {
+    let mut fixture = Fixture::workflow("pass", true, false);
+    let host = tempdir().unwrap();
+    let ledger = external.then(|| host.path().canonicalize().unwrap().join("nonces"));
+    let output = replay_cli_command(&fixture, first, ledger.as_deref())
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "{first}: {} {}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    empty_replay_artifacts(&fixture);
+    let output = replay_cli_command(&fixture, second, ledger.as_deref())
+        .output()
+        .unwrap();
+    assert!(
+        !output.status.success(),
+        "replay accepted: {first} -> {second}"
+    );
+    let artifact_root = fixture.dir.path().join(&fixture.state.artifact_root);
+    assert!(
+        fs::read_dir(&artifact_root).unwrap().next().is_none(),
+        "replayed collector executed"
+    );
+    assert_nonce_replay_rejected(&fixture, &output, second);
+    fixture.request.nonce.push_str("-fresh");
+    fixture.sign();
+    write(
+        &fixture.dir.path().join(".harness-gate/workflow-state.json"),
+        &fixture.state,
+    );
+    let output = replay_cli_command(&fixture, second, ledger.as_deref())
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "fresh nonce failed: {} {}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert!(artifact_root.join("raw.json").exists());
+}
+
+#[cfg(unix)]
 #[test]
 fn verify_and_collect_share_durable_nonces_across_processes_and_empty_artifacts() {
     for external in [false, true] {
@@ -1768,71 +1943,7 @@ fn verify_and_collect_share_durable_nonces_across_processes_and_empty_artifacts(
             ("verify", "collect"),
             ("collect", "verify"),
         ] {
-            let mut fixture = Fixture::workflow("pass", true, false);
-            let host = tempdir().unwrap();
-            let ledger = external.then(|| host.path().canonicalize().unwrap().join("nonces"));
-            let output = replay_cli_command(&fixture, first, ledger.as_deref())
-                .output()
-                .unwrap();
-            assert!(
-                output.status.success(),
-                "{first}: {} {}",
-                String::from_utf8_lossy(&output.stdout),
-                String::from_utf8_lossy(&output.stderr)
-            );
-            empty_replay_artifacts(&fixture);
-            let output = replay_cli_command(&fixture, second, ledger.as_deref())
-                .output()
-                .unwrap();
-            assert!(
-                !output.status.success(),
-                "replay accepted: {first} -> {second}"
-            );
-            let artifact_root = fixture.dir.path().join(&fixture.state.artifact_root);
-            assert!(
-                fs::read_dir(&artifact_root).unwrap().next().is_none(),
-                "replayed collector executed"
-            );
-            if second == "verify" {
-                let report: Value = serde_json::from_slice(
-                    &fs::read(
-                        fixture
-                            .dir
-                            .path()
-                            .join(".harness-gate/reports/test_result.json"),
-                    )
-                    .unwrap(),
-                )
-                .unwrap();
-                assert!(
-                    report["quality"]["error"]
-                        .as_str()
-                        .unwrap()
-                        .contains("nonce has already been used"),
-                    "{report}"
-                );
-            } else {
-                assert!(
-                    String::from_utf8_lossy(&output.stderr).contains("nonce has already been used")
-                );
-                assert!(!fixture.dir.path().join("collection.json").exists());
-            }
-            fixture.request.nonce.push_str("-fresh");
-            fixture.sign();
-            write(
-                &fixture.dir.path().join(".harness-gate/workflow-state.json"),
-                &fixture.state,
-            );
-            let output = replay_cli_command(&fixture, second, ledger.as_deref())
-                .output()
-                .unwrap();
-            assert!(
-                output.status.success(),
-                "fresh nonce failed: {} {}",
-                String::from_utf8_lossy(&output.stdout),
-                String::from_utf8_lossy(&output.stderr)
-            );
-            assert!(artifact_root.join("raw.json").exists());
+            verify_collect_nonce_case(external, first, second);
         }
     }
 }
@@ -1863,9 +1974,46 @@ fn concurrent_collection_processes_execute_at_most_one_collector() {
 }
 
 #[cfg(unix)]
+fn restrict_source_permissions(source_files: &[std::path::PathBuf], root: &Path) {
+    use std::os::unix::fs::PermissionsExt;
+    for path in source_files {
+        let mode = if path.file_name().unwrap() == "collector.py" {
+            0o500
+        } else {
+            0o400
+        };
+        fs::set_permissions(path, fs::Permissions::from_mode(mode)).unwrap();
+    }
+    for path in [
+        root.to_path_buf(),
+        root.join("src"),
+        root.join(".harness-gate"),
+    ] {
+        fs::set_permissions(path, fs::Permissions::from_mode(0o500)).unwrap();
+    }
+}
+
+#[cfg(unix)]
+fn restore_source_permissions(
+    permissions: Vec<(std::path::PathBuf, fs::Permissions)>,
+    root: &Path,
+) {
+    use std::os::unix::fs::PermissionsExt;
+    for (path, permission) in permissions {
+        fs::set_permissions(path, permission).unwrap();
+    }
+    for path in [
+        root.to_path_buf(),
+        root.join("src"),
+        root.join(".harness-gate"),
+    ] {
+        fs::set_permissions(path, fs::Permissions::from_mode(0o700)).unwrap();
+    }
+}
+
+#[cfg(unix)]
 #[test]
 fn read_only_source_configuration_uses_external_host_ledger() {
-    use std::os::unix::fs::PermissionsExt;
     let fixture = Fixture::workflow("pass", true, false);
     let host = tempdir().unwrap();
     let ledger = host.path().canonicalize().unwrap().join("nonces");
@@ -1887,21 +2035,7 @@ fn read_only_source_configuration_uses_external_host_ledger() {
         .iter()
         .map(|path| (path.clone(), fs::metadata(path).unwrap().permissions()))
         .collect();
-    for path in &source_files {
-        let mode = if path.file_name().unwrap() == "collector.py" {
-            0o500
-        } else {
-            0o400
-        };
-        fs::set_permissions(path, fs::Permissions::from_mode(mode)).unwrap();
-    }
-    for path in [
-        root.to_path_buf(),
-        root.join("src"),
-        root.join(".harness-gate"),
-    ] {
-        fs::set_permissions(path, fs::Permissions::from_mode(0o500)).unwrap();
-    }
+    restrict_source_permissions(&source_files, root);
     let first = replay_cli_command(&fixture, "verify", Some(&ledger))
         .output()
         .unwrap();
@@ -1909,16 +2043,7 @@ fn read_only_source_configuration_uses_external_host_ledger() {
     let second = replay_cli_command(&fixture, "collect", Some(&ledger))
         .output()
         .unwrap();
-    for (path, permission) in permissions {
-        fs::set_permissions(path, permission).unwrap();
-    }
-    for path in [
-        root.to_path_buf(),
-        root.join("src"),
-        root.join(".harness-gate"),
-    ] {
-        fs::set_permissions(path, fs::Permissions::from_mode(0o700)).unwrap();
-    }
+    restore_source_permissions(permissions, root);
     assert!(
         first.status.success(),
         "{} {}",

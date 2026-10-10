@@ -227,84 +227,119 @@ fn interpolate_environment(
             continue;
         }
 
-        if in_basic_string {
-            if character == '\\' {
-                output.push_str(&source[index..index + width]);
-                index += width;
-                if index < source.len() {
-                    let escaped = source[index..]
-                        .chars()
-                        .next()
-                        .expect("index remains on a UTF-8 boundary");
-                    output.push_str(&source[index..index + escaped.len_utf8()]);
-                    index += escaped.len_utf8();
-                }
-                continue;
-            }
-            if character == '"' {
-                in_basic_string = false;
-            }
-        } else if in_literal_string {
-            if character == '\'' {
-                in_literal_string = false;
-            }
-        } else if character == '#' {
-            in_comment = true;
-        } else if character == '"' {
-            in_basic_string = true;
-        } else if character == '\'' {
-            in_literal_string = true;
+        if in_basic_string && character == '\\' {
+            index = copy_escaped_character(source, index, &mut output);
+            continue;
         }
 
         if in_basic_string && bytes[index..].starts_with(b"${") {
-            let end = source[index + 2..].find('}').ok_or_else(|| {
-                interpolation_diagnostic(
-                    source,
-                    index..index + 2,
-                    "environment interpolation is unterminated",
-                    "close the expression with `}` or remove the incomplete `${...` token",
-                    source_path,
-                )
-            })? + index
-                + 2;
-            let expression = &source[index + 2..end];
-            let (name, default) = expression
-                .split_once(":-")
-                .map_or((expression, None), |(name, default)| (name, Some(default)));
-            if name.is_empty()
-                || !name
-                    .bytes()
-                    .all(|byte| byte.is_ascii_alphanumeric() || byte == b'_')
-            {
-                return Err(interpolation_diagnostic(
-                    source,
-                    index..end + 1,
-                    "environment interpolation has an invalid variable name",
-                    "use an ASCII letter, digit, or underscore after `${`",
-                    source_path,
-                ));
-            }
-            let value = std::env::var(name)
-                .ok()
-                .or_else(|| default.map(str::to_owned))
-                .ok_or_else(|| {
-                    interpolation_diagnostic(
-                        source,
-                        index..end + 1,
-                        format!("environment variable {name} is not set and has no default"),
-                        format!("set {name} or use `${{{name}:-default}}`"),
-                        source_path,
-                    )
-                })?;
-            output.push_str(&escape_toml_basic_string(&value));
-            index = end + 1;
+            let (value, next_index) = interpolate_variable(source, index, source_path)?;
+            output.push_str(&value);
+            index = next_index;
             continue;
         }
+
+        update_toml_string_state(
+            character,
+            &mut in_basic_string,
+            &mut in_literal_string,
+            &mut in_comment,
+        );
 
         output.push_str(&source[index..index + width]);
         index += width;
     }
     Ok(output)
+}
+
+fn copy_escaped_character(source: &str, index: usize, output: &mut String) -> usize {
+    let width = source[index..]
+        .chars()
+        .next()
+        .expect("index remains on a UTF-8 boundary")
+        .len_utf8();
+    output.push_str(&source[index..index + width]);
+    let next_index = index + width;
+    if next_index < source.len() {
+        let escaped = source[next_index..]
+            .chars()
+            .next()
+            .expect("index remains on a UTF-8 boundary");
+        output.push_str(&source[next_index..next_index + escaped.len_utf8()]);
+        next_index + escaped.len_utf8()
+    } else {
+        next_index
+    }
+}
+
+fn update_toml_string_state(
+    character: char,
+    in_basic_string: &mut bool,
+    in_literal_string: &mut bool,
+    in_comment: &mut bool,
+) {
+    if *in_basic_string {
+        if character == '"' {
+            *in_basic_string = false;
+        }
+    } else if *in_literal_string {
+        if character == '\'' {
+            *in_literal_string = false;
+        }
+    } else if character == '#' {
+        *in_comment = true;
+    } else if character == '"' {
+        *in_basic_string = true;
+    } else if character == '\'' {
+        *in_literal_string = true;
+    }
+}
+
+fn interpolate_variable(
+    source: &str,
+    index: usize,
+    source_path: Option<&Path>,
+) -> std::result::Result<(String, usize), ConfigDiagnostics> {
+    let end = source[index + 2..].find('}').ok_or_else(|| {
+        interpolation_diagnostic(
+            source,
+            index..index + 2,
+            "environment interpolation is unterminated",
+            "close the expression with `}` or remove the incomplete `${...` token",
+            source_path,
+        )
+    })? + index
+        + 2;
+    let expression = &source[index + 2..end];
+    let (name, default) = expression
+        .split_once(":-")
+        .map_or((expression, None), |(name, default)| (name, Some(default)));
+    if name.is_empty()
+        || !name
+            .bytes()
+            .all(|byte| byte.is_ascii_alphanumeric() || byte == b'_')
+    {
+        return Err(interpolation_diagnostic(
+            source,
+            index..end + 1,
+            "environment interpolation has an invalid variable name",
+            "use an ASCII letter, digit, or underscore after `${`",
+            source_path,
+        ));
+    }
+    let value = std::env::var(name)
+        .ok()
+        .or_else(|| default.map(str::to_owned))
+        .ok_or_else(|| {
+            interpolation_diagnostic(
+                source,
+                index..end + 1,
+                format!("environment variable {name} is not set and has no default"),
+                format!("set {name} or use `${{{name}:-default}}`"),
+                source_path,
+            )
+        })?;
+    Ok((escape_toml_basic_string(&value), end + 1))
 }
 
 fn escape_toml_basic_string(value: &str) -> String {

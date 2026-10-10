@@ -3,6 +3,7 @@ use super::catalog::PRESETS;
 use super::filesystem::resolve_inside;
 use super::filesystem::{atomic_write, atomic_write_batch};
 use super::initialize::{init, project_id};
+use crate::config::quality::{Assurance, QualityConfig};
 use crate::config::FlowConfig;
 use crate::test_support::TestWorkspace;
 use std::fs;
@@ -139,7 +140,6 @@ fn atomic_write_batch_rejects_broken_symlink() {
 
 #[test]
 fn generated_reference_presets_cross_validate_quality_and_profile_boundaries() {
-    use crate::config::quality::{Assurance, QualityConfig};
     for preset in PRESETS {
         let root = TestWorkspace::new(preset.name);
         init(&root, preset.name, false).unwrap();
@@ -150,57 +150,85 @@ fn generated_reference_presets_cross_validate_quality_and_profile_boundaries() {
             continue;
         }
         let quality = quality.unwrap();
-        assert_eq!(quality.project.name, project.config.project.name);
-        assert_eq!(quality.profiles["hook"].assurance, Assurance::Partial);
-        assert!(quality.profiles["hook"].collectors.is_empty());
-        for profile in ["full", "ci"] {
-            assert_eq!(quality.profiles[profile].assurance, Assurance::Complete);
-            assert_eq!(
-                quality.profiles[profile].collectors.len(),
-                quality.collectors.len()
-            );
-            assert_eq!(
-                quality.profiles[profile].policies.len(),
-                quality.policies.len()
-            );
-            let mut invalid = quality.clone();
-            invalid
-                .profiles
-                .get_mut(profile)
-                .unwrap()
-                .collectors
-                .clear();
-            fs::write(
-                root.join(".harness-gate/quality.toml"),
-                toml::to_string_pretty(&invalid).unwrap(),
-            )
-            .unwrap();
-            assert!(QualityConfig::load_optional(&root, &project.config).is_err());
-        }
+        assert_quality_matches_project(&project.config, &quality);
+        assert_full_and_ci_profiles(&root, &project.config, &quality);
         if preset.name == "angular-rust-postgres" {
-            assert_eq!(
-                quality
-                    .components
-                    .keys()
-                    .map(String::as_str)
-                    .collect::<Vec<_>>(),
-                ["backend", "frontend"]
-            );
-            assert_eq!(quality.relationships.len(), 1);
-            assert!(project.config.services.contains_key("test-postgres"));
-            let contract = &quality.collectors["frontend-api"];
-            assert_eq!(contract.produces.len(), 3);
-            assert!(contract
-                .produces
-                .iter()
-                .all(|e| serde_json::to_value(&e.target).unwrap()["kind"] == "relationship"));
+            assert_angular_components(&quality);
+            assert_angular_contract(&project.config, &quality);
         }
     }
 }
 
+fn assert_quality_matches_project(flow: &FlowConfig, quality: &QualityConfig) {
+    assert_eq!(quality.project.name, flow.project.name);
+    assert_eq!(quality.profiles["hook"].assurance, Assurance::Partial);
+    assert!(quality.profiles["hook"].collectors.is_empty());
+}
+
+fn assert_full_and_ci_profiles(root: &TestWorkspace, flow: &FlowConfig, quality: &QualityConfig) {
+    for profile in ["full", "ci"] {
+        assert_profile_is_complete(quality, profile);
+        reject_profile_without_collectors(root, flow, quality, profile);
+    }
+}
+
+fn assert_profile_is_complete(quality: &QualityConfig, profile: &str) {
+    assert_eq!(quality.profiles[profile].assurance, Assurance::Complete);
+    assert_eq!(
+        quality.profiles[profile].collectors.len(),
+        quality.collectors.len()
+    );
+    assert_eq!(
+        quality.profiles[profile].policies.len(),
+        quality.policies.len()
+    );
+}
+
+fn reject_profile_without_collectors(
+    root: &TestWorkspace,
+    flow: &FlowConfig,
+    quality: &QualityConfig,
+    profile: &str,
+) {
+    let mut invalid = quality.clone();
+    invalid
+        .profiles
+        .get_mut(profile)
+        .unwrap()
+        .collectors
+        .clear();
+    fs::write(
+        root.join(".harness-gate/quality.toml"),
+        toml::to_string_pretty(&invalid).unwrap(),
+    )
+    .unwrap();
+    assert!(QualityConfig::load_optional(root, flow).is_err());
+}
+
+fn assert_angular_components(quality: &QualityConfig) {
+    assert_eq!(
+        quality
+            .components
+            .keys()
+            .map(String::as_str)
+            .collect::<Vec<_>>(),
+        ["backend", "frontend"]
+    );
+    assert_eq!(quality.relationships.len(), 1);
+}
+
+fn assert_angular_contract(flow: &FlowConfig, quality: &QualityConfig) {
+    assert!(flow.services.contains_key("test-postgres"));
+    let contract = &quality.collectors["frontend-api"];
+    assert_eq!(contract.produces.len(), 3);
+    assert!(contract
+        .produces
+        .iter()
+        .all(|e| serde_json::to_value(&e.target).unwrap()["kind"] == "relationship"));
+}
+
 #[test]
 fn unknown_ecosystem_pack_composes_without_catalog_or_core_changes() {
-    use crate::config::quality::QualityConfig;
     let root = TestWorkspace::new("nebula-unregistered-2049");
     init(&root, "generic", false).unwrap();
     let project = crate::project::Project::discover(Some(root.root.clone()), None).unwrap();

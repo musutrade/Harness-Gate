@@ -76,37 +76,40 @@ fn assert_outcome(case: &Value, result: Result<Value>) {
             );
             assert_eq!(actual, oracle["value"], "{}", case["name"]);
         }
-        Err(Error { class, message }) => {
-            assert_eq!(
-                oracle["accepted"], false,
-                "{}: Rust rejected: {message}",
-                case["name"]
-            );
-            assert_eq!(
-                format!("{class:?}"),
-                oracle["reason_class"].as_str().unwrap(),
-                "{}",
-                case["name"]
-            );
-            let expected = oracle["reason"].as_str().unwrap();
-            // Reference schema validation aggregates errors; Rust returns the
-            // first. OS error formatting also differs between the runtimes.
-            if expected.starts_with('$') {
-                assert!(
-                    message.starts_with('$'),
-                    "{}: {message} versus {expected}",
-                    case["name"]
-                );
-            } else if super::replay::missing_file_source(expected).is_some() {
-                assert!(
-                    super::replay::missing_file_source(&message)
-                        == super::replay::missing_file_source(expected),
-                    "{message}"
-                );
-            } else {
-                assert_eq!(message, expected, "{}", case["name"]);
-            }
-        }
+        Err(Error { class, message }) => assert_rejected(case, class, &message),
+    }
+}
+
+fn assert_rejected(case: &Value, class: ReasonClass, message: &str) {
+    let oracle = &case["oracle"];
+    assert_eq!(
+        oracle["accepted"], false,
+        "{}: Rust rejected: {message}",
+        case["name"]
+    );
+    assert_eq!(
+        format!("{class:?}"),
+        oracle["reason_class"].as_str().unwrap(),
+        "{}",
+        case["name"]
+    );
+    let expected = oracle["reason"].as_str().unwrap();
+    // Reference schema validation aggregates errors; Rust returns the
+    // first. OS error formatting also differs between the runtimes.
+    if expected.starts_with('$') {
+        assert!(
+            message.starts_with('$'),
+            "{}: {message} versus {expected}",
+            case["name"]
+        );
+    } else if super::replay::missing_file_source(expected).is_some() {
+        assert!(
+            super::replay::missing_file_source(message)
+                == super::replay::missing_file_source(expected),
+            "{message}"
+        );
+    } else {
+        assert_eq!(message, expected, "{}", case["name"]);
     }
 }
 

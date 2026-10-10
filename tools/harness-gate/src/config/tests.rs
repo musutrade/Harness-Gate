@@ -29,6 +29,14 @@ fn assert_diagnostic(config: &FlowConfig, path: &str, id: &str) {
     );
 }
 
+fn assert_validation_error_contains(config: &FlowConfig, expectation: &str, expected: &str) {
+    assert!(config
+        .validate()
+        .expect_err(expectation)
+        .to_string()
+        .contains(expected));
+}
+
 #[test]
 fn repository_configuration_is_valid() {
     repository_config().validate().expect("validate config");
@@ -172,64 +180,56 @@ fn runner_contract_rejects_invalid_fields() {
         version: 2,
         ..runner()
     });
-    assert!(config
-        .validate()
-        .expect_err("unsupported runner version")
-        .to_string()
-        .contains("runner version"));
+    assert_validation_error_contains(&config, "unsupported runner version", "runner version");
 
     config.steps[step_index].runner = Some(RunnerConfig {
         kind: "cargo-test".into(),
         ..runner()
     });
     config.steps[step_index].program = "git".into();
-    assert!(config
-        .validate()
-        .expect_err("cargo runner on another program")
-        .to_string()
-        .contains("requires program"));
+    assert_validation_error_contains(
+        &config,
+        "cargo runner on another program",
+        "requires program",
+    );
     config.steps[step_index].program = "cargo".into();
 
     config.steps[step_index].runner = Some(RunnerConfig {
         threads: Some(0),
         ..runner()
     });
-    assert!(config
-        .validate()
-        .expect_err("zero runner threads")
-        .to_string()
-        .contains("threads must be between"));
+    assert_validation_error_contains(&config, "zero runner threads", "threads must be between");
 
     config.steps[step_index].runner = Some(RunnerConfig {
         threads_env: Some("RUST_TEST_THREADS".into()),
         threads: None,
         ..runner()
     });
-    assert!(config
-        .validate()
-        .expect_err("thread environment without a count")
-        .to_string()
-        .contains("requires threads"));
+    assert_validation_error_contains(
+        &config,
+        "thread environment without a count",
+        "requires threads",
+    );
 
     config.steps[step_index].runner = Some(RunnerConfig {
         args_position: Some(99),
         ..runner()
     });
-    assert!(config
-        .validate()
-        .expect_err("runner argument position outside the step")
-        .to_string()
-        .contains("args_position"));
+    assert_validation_error_contains(
+        &config,
+        "runner argument position outside the step",
+        "args_position",
+    );
 
     config.steps[step_index].runner = Some(RunnerConfig {
         args: vec!["{unknown}".into()],
         ..runner()
     });
-    assert!(config
-        .validate()
-        .expect_err("unsupported runner argument placeholder")
-        .to_string()
-        .contains("unsupported placeholder"));
+    assert_validation_error_contains(
+        &config,
+        "unsupported runner argument placeholder",
+        "unsupported placeholder",
+    );
 
     config.steps[step_index].remove_env = vec!["RUST_TEST_THREADS".into()];
     config.steps[step_index].runner = Some(RunnerConfig {
@@ -237,11 +237,11 @@ fn runner_contract_rejects_invalid_fields() {
         threads_env: Some("RUST_TEST_THREADS".into()),
         ..runner()
     });
-    assert!(config
-        .validate()
-        .expect_err("removed runner thread environment")
-        .to_string()
-        .contains("may not remove runner threads_env"));
+    assert_validation_error_contains(
+        &config,
+        "removed runner thread environment",
+        "may not remove runner threads_env",
+    );
 
     config.steps[step_index].remove_env.clear();
     config.steps[step_index].runner = None;
@@ -256,18 +256,18 @@ fn runner_contract_rejects_invalid_fields() {
 
     config.steps[step_index].kind = None;
     config.steps[step_index].cwd = "{unknown}".into();
-    assert!(config
-        .validate()
-        .expect_err("unknown working directory placeholder")
-        .to_string()
-        .contains("cwd references unknown path"));
+    assert_validation_error_contains(
+        &config,
+        "unknown working directory placeholder",
+        "cwd references unknown path",
+    );
 
     config.steps[step_index].cwd = "root".into();
-    assert!(config
-        .validate()
-        .expect_err("non-placeholder working directory")
-        .to_string()
-        .contains("cwd must be one path placeholder"));
+    assert_validation_error_contains(
+        &config,
+        "non-placeholder working directory",
+        "cwd must be one path placeholder",
+    );
 }
 
 #[test]

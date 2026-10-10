@@ -3,7 +3,7 @@
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 use tempfile::TempDir;
 
@@ -184,6 +184,57 @@ fn project_owned_runner_replacement_preserves_generic_command_gate() {
     }
 }
 
+fn assert_doctor_detail(json: &Value, expected_level: &str) {
+    if expected_level != "pass" {
+        assert!(json["checks"][0]["detail"]
+            .as_str()
+            .unwrap()
+            .contains("fixture remediation"));
+    }
+}
+
+fn run_doctor_case(
+    kind: &str,
+    root: &Path,
+    fields: &str,
+    required: bool,
+    strict: bool,
+    expected_level: &str,
+    exit: i32,
+) {
+    if kind == "git-remotes" && expected_level != "pass" {
+        git(
+            root,
+            &[
+                "remote",
+                "set-url",
+                "origin",
+                "https://fixture:dummy@example.invalid/repo.git",
+            ],
+        );
+    }
+    let flow = format!("{FLOW}\n[services.available]\nkind = 'environment'\nsource_env = 'GH93_PRESENT'\ninject_env = 'AVAILABLE_URL'\n[services.missing]\nkind = 'environment'\nsource_env = 'GH93_SERVICE_ENV'\ninject_env = 'MISSING_URL'\n[[doctor.checks]]\nid = 'boundary'\nlabel = 'boundary'\nkind = '{kind}'\nrequired = {required}\nhelp = 'fixture remediation'\n{fields}\n");
+    fs::write(root.join(".harness-gate/flow.toml"), flow).unwrap();
+    let mut cmd = command(root);
+    cmd.env("GH93_PRESENT", "ready").args(["doctor", "--json"]);
+    if strict {
+        cmd.arg("--strict");
+    }
+    let output = cmd.output().unwrap();
+    assert_eq!(
+        output.status.code(),
+        Some(exit),
+        "{kind}: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert!(output.stderr.is_empty(), "{kind}: unexpected stderr");
+    let json: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(json["checks"][0]["level"], expected_level, "{kind}");
+    assert_eq!(json["failures"], usize::from(expected_level == "fail"));
+    assert_eq!(json["warnings"], usize::from(expected_level == "warn"));
+    assert_doctor_detail(&json, expected_level);
+}
+
 #[test]
 fn doctor_kinds_execute_success_required_failure_and_optional_warning() {
     let cases = [
@@ -236,44 +287,28 @@ fn doctor_kinds_execute_success_required_failure_and_optional_warning() {
             (fail, false, false, "warn", 0),
             (fail, false, true, "warn", 1),
         ] {
-            if kind == "git-remotes" && expected_level != "pass" {
-                git(
-                    root.path(),
-                    &[
-                        "remote",
-                        "set-url",
-                        "origin",
-                        "https://fixture:dummy@example.invalid/repo.git",
-                    ],
-                );
-            }
-            let flow = format!("{FLOW}\n[services.available]\nkind = 'environment'\nsource_env = 'GH93_PRESENT'\ninject_env = 'AVAILABLE_URL'\n[services.missing]\nkind = 'environment'\nsource_env = 'GH93_SERVICE_ENV'\ninject_env = 'MISSING_URL'\n[[doctor.checks]]\nid = 'boundary'\nlabel = 'boundary'\nkind = '{kind}'\nrequired = {required}\nhelp = 'fixture remediation'\n{fields}\n");
-            fs::write(root.path().join(".harness-gate/flow.toml"), flow).unwrap();
-            let mut cmd = command(root.path());
-            cmd.env("GH93_PRESENT", "ready").args(["doctor", "--json"]);
-            if strict {
-                cmd.arg("--strict");
-            }
-            let output = cmd.output().unwrap();
-            assert_eq!(
-                output.status.code(),
-                Some(exit),
-                "{kind}: {}",
-                String::from_utf8_lossy(&output.stderr)
+            run_doctor_case(
+                kind,
+                root.path(),
+                fields,
+                required,
+                strict,
+                expected_level,
+                exit,
             );
-            assert!(output.stderr.is_empty(), "{kind}: unexpected stderr");
-            let json: Value = serde_json::from_slice(&output.stdout).unwrap();
-            assert_eq!(json["checks"][0]["level"], expected_level, "{kind}");
-            assert_eq!(json["failures"], usize::from(expected_level == "fail"));
-            assert_eq!(json["warnings"], usize::from(expected_level == "warn"));
-            if expected_level != "pass" {
-                assert!(json["checks"][0]["detail"]
-                    .as_str()
-                    .unwrap()
-                    .contains("fixture remediation"));
-            }
         }
     }
+}
+
+fn assert_cli_failure(cmd: &mut Command, code: &str) {
+    let output = cmd.output().unwrap();
+    assert_eq!(output.status.code(), Some(1));
+    assert!(
+        String::from_utf8_lossy(&output.stderr).contains(code),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert!(output.stdout.is_empty());
 }
 
 #[test]
@@ -292,14 +327,7 @@ fn cli_selection_profile_alias_and_discovery_boundaries() {
         (vec!["step", "absent"], "E1401"),
         (vec!["verify", "--components", "absent"], "E1000"),
     ] {
-        let output = command(root.path()).args(args).output().unwrap();
-        assert_eq!(output.status.code(), Some(1));
-        assert!(
-            String::from_utf8_lossy(&output.stderr).contains(code),
-            "{}",
-            String::from_utf8_lossy(&output.stderr)
-        );
-        assert!(output.stdout.is_empty());
+        assert_cli_failure(command(root.path()).args(args), code);
     }
     let output = command(root.path())
         .args(["verify", "--all", "--staged"])
@@ -329,60 +357,64 @@ fn cli_selection_profile_alias_and_discovery_boundaries() {
     );
 }
 
+fn assert_staged_snapshot_controls(staged_exit: i32, working_exit: i32) {
+    let root = fixture();
+    let temp = TempDir::new().unwrap();
+    fs::write(
+        root.path().join("probe.sh"),
+        format!("echo staged-probe\nexit {staged_exit}\n"),
+    )
+    .unwrap();
+    git(root.path(), &["add", "."]);
+    fs::write(
+        root.path().join("probe.sh"),
+        format!("echo working-probe\nexit {working_exit}\n"),
+    )
+    .unwrap();
+    let output = command(root.path())
+        .env("TMPDIR", temp.path())
+        .args(["verify", "--staged"])
+        .output()
+        .unwrap();
+    assert_eq!(
+        output.status.code(),
+        Some(i32::from(staged_exit != 0)),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let json = report(root.path());
+    assert_eq!(json["passed"], staged_exit == 0);
+    assert_sealed_evidence(&json);
+    assert!(!Path::new(json["execution_root"].as_str().unwrap()).exists());
+    assert!(json["source_identity"]
+        .as_str()
+        .unwrap()
+        .starts_with("git-tree:"));
+    let step = json["steps"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|s| s["step_id"] == "probe")
+        .unwrap();
+    let log = fs::read_to_string(step["log"].as_str().unwrap()).unwrap();
+    assert!(log.contains("staged-probe"));
+    assert!(!log.contains("working-probe"));
+    assert_eq!(
+        fs::read_dir(temp.path()).unwrap().count(),
+        0,
+        "snapshot leaked"
+    );
+    let output = command(root.path())
+        .args(["verify", "--all"])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(i32::from(working_exit != 0)));
+}
+
 #[test]
 fn staged_content_controls_result_and_snapshots_are_cleaned_after_failure() {
     for (staged_exit, working_exit) in [(7, 0), (0, 7)] {
-        let root = fixture();
-        let temp = TempDir::new().unwrap();
-        fs::write(
-            root.path().join("probe.sh"),
-            format!("echo staged-probe\nexit {staged_exit}\n"),
-        )
-        .unwrap();
-        git(root.path(), &["add", "."]);
-        fs::write(
-            root.path().join("probe.sh"),
-            format!("echo working-probe\nexit {working_exit}\n"),
-        )
-        .unwrap();
-        let output = command(root.path())
-            .env("TMPDIR", temp.path())
-            .args(["verify", "--staged"])
-            .output()
-            .unwrap();
-        assert_eq!(
-            output.status.code(),
-            Some(i32::from(staged_exit != 0)),
-            "{}",
-            String::from_utf8_lossy(&output.stderr)
-        );
-        let json = report(root.path());
-        assert_eq!(json["passed"], staged_exit == 0);
-        assert_sealed_evidence(&json);
-        assert!(!Path::new(json["execution_root"].as_str().unwrap()).exists());
-        assert!(json["source_identity"]
-            .as_str()
-            .unwrap()
-            .starts_with("git-tree:"));
-        let step = json["steps"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .find(|s| s["step_id"] == "probe")
-            .unwrap();
-        let log = fs::read_to_string(step["log"].as_str().unwrap()).unwrap();
-        assert!(log.contains("staged-probe"));
-        assert!(!log.contains("working-probe"));
-        assert_eq!(
-            fs::read_dir(temp.path()).unwrap().count(),
-            0,
-            "snapshot leaked"
-        );
-        let output = command(root.path())
-            .args(["verify", "--all"])
-            .output()
-            .unwrap();
-        assert_eq!(output.status.code(), Some(i32::from(working_exit != 0)));
+        assert_staged_snapshot_controls(staged_exit, working_exit);
     }
     let root = fixture();
     let temp = TempDir::new().unwrap();
@@ -411,129 +443,159 @@ fn staged_content_controls_result_and_snapshots_are_cleaned_after_failure() {
         .exists());
 }
 
-#[test]
-fn configured_runner_service_isolation_and_shards_match_the_executed_process() {
-    for isolation in ["shared", "schema-per-worker", "database-per-worker"] {
-        for sharded in [false, true] {
-            let root = fixture();
-            let threads = if isolation == "shared" { 1 } else { 2 };
-            let runner = format!("\n[steps.runner]\nversion = 1\nkind = 'custom'\nthreads = {threads}\nthreads_env = 'PROBE_THREADS'\nargs = ['inserted']\nargs_position = 1\nresult_format = 'regex'\nisolation = '{isolation}'\n");
-            let mut flow = FLOW.replace(
-                "timeout_secs = 20",
-                "timeout_secs = 20\nservices = ['fixture']\nremove_env = ['GH93_REMOVED']",
-            );
-            flow.push_str(&runner);
-            flow.push_str("\n[services.fixture]\nkind = 'environment'\nsource_env = 'GH93_SERVICE_ENV'\ninject_env = 'PROBE_SERVICE'\n");
-            if sharded {
-                flow.push_str("\n[execution.shards.probe]\nindex = 1\ntotal = 3\n");
-            }
-            fs::write(root.path().join(".harness-gate/flow.toml"), &flow).unwrap();
-            fs::write(
-                root.path().join("probe.sh"),
-                r#"python3 - "$@" <<'PY'
+fn configured_runner_fixture(isolation: &str, sharded: bool) -> (TempDir, String, i32) {
+    let root = fixture();
+    let threads = if isolation == "shared" { 1 } else { 2 };
+    let runner = format!("\n[steps.runner]\nversion = 1\nkind = 'custom'\nthreads = {threads}\nthreads_env = 'PROBE_THREADS'\nargs = ['inserted']\nargs_position = 1\nresult_format = 'regex'\nisolation = '{isolation}'\n");
+    let mut flow = FLOW.replace(
+        "timeout_secs = 20",
+        "timeout_secs = 20\nservices = ['fixture']\nremove_env = ['GH93_REMOVED']",
+    );
+    flow.push_str(&runner);
+    flow.push_str("\n[services.fixture]\nkind = 'environment'\nsource_env = 'GH93_SERVICE_ENV'\ninject_env = 'PROBE_SERVICE'\n");
+    if sharded {
+        flow.push_str("\n[execution.shards.probe]\nindex = 1\ntotal = 3\n");
+    }
+    fs::write(root.path().join(".harness-gate/flow.toml"), &flow).unwrap();
+    fs::write(
+        root.path().join("probe.sh"),
+        r#"python3 - "$@" <<'PY'
 import json, os, sys
 from pathlib import Path
 Path('observed.json').write_text(json.dumps({'args': sys.argv[1:], 'env': dict(os.environ)}))
 print('probe-ran')
 PY
 "#,
-            )
-            .unwrap();
-            success(
-                command(root.path())
-                    .env("GH93_SERVICE_ENV", "fixture-value")
-                    .env("GH93_REMOVED", "must-disappear")
-                    .args(["verify", "--all"])
-                    .output()
-                    .unwrap(),
-            );
-            let observed: Value =
-                serde_json::from_slice(&fs::read(root.path().join("observed.json")).unwrap())
-                    .unwrap();
-            let json = report(root.path());
-            assert_eq!(json["passed"], true);
-            assert_sealed_evidence(&json);
-            let step = json["steps"]
-                .as_array()
-                .unwrap()
-                .iter()
-                .find(|s| s["step_id"] == "probe")
-                .unwrap();
-            let metadata = &step["runner"];
-            assert_eq!(
-                metadata["effective_args"],
-                serde_json::json!(["probe.sh", "inserted", "original"])
-            );
-            assert_eq!(
-                observed["args"],
-                serde_json::json!(["inserted", "original"])
-            );
-            assert_eq!(observed["env"]["PROBE_SERVICE"], "fixture-value");
-            assert_eq!(observed["env"]["PROBE_THREADS"], threads.to_string());
-            assert!(observed["env"].get("GH93_REMOVED").is_none());
-            for (name, value) in metadata["environment"].as_object().unwrap() {
-                assert_eq!(&observed["env"][name], value, "{name}");
-            }
-            assert_eq!(metadata["isolation"], isolation);
-            if isolation == "shared" {
-                assert_eq!(metadata["lock_decision"], "not-required");
-                assert!(metadata["worker_ids"].as_array().unwrap().is_empty());
-            } else {
-                assert_eq!(metadata["lock_decision"], "invocation-scoped");
-                assert_eq!(metadata["worker_ids"].as_array().unwrap().len(), 2);
-                let state_root = Path::new(metadata["isolation_root"].as_str().unwrap());
-                assert!(
-                    !state_root.join("probe.json").exists(),
-                    "isolation allocation must be released"
-                );
-            }
-            if sharded {
-                assert_eq!(metadata["shard_index"], 1);
-                assert_eq!(metadata["shard_total"], 3);
-                assert_eq!(metadata["merge_identity"], "probe:shard-1/3");
-            } else {
-                assert!(metadata["shard_index"].is_null());
-            }
+    )
+    .unwrap();
+    success(
+        command(root.path())
+            .env("GH93_SERVICE_ENV", "fixture-value")
+            .env("GH93_REMOVED", "must-disappear")
+            .args(["verify", "--all"])
+            .output()
+            .unwrap(),
+    );
+    (root, flow, threads)
+}
 
-            // Validation must reject collisions and malformed runner/shard inputs before spawn.
-            let mut invalid_flows = vec![
-                flow.replace(
-                    "threads_env = 'PROBE_THREADS'",
-                    "threads_env = 'PROBE_SERVICE'",
-                ),
-                flow.replace("args_position = 1", "args_position = 99"),
-                flow.replace(&format!("threads = {threads}"), "threads = 0"),
-            ];
-            if sharded {
-                invalid_flows.push(flow.replace("index = 1", "index = 4"));
-            }
-            for invalid in invalid_flows {
-                fs::remove_file(root.path().join("observed.json")).unwrap_or(());
-                fs::write(root.path().join(".harness-gate/flow.toml"), &invalid).unwrap();
-                let output = command(root.path())
-                    .env("GH93_SERVICE_ENV", "fixture-value")
-                    .args(["verify", "--all"])
-                    .output()
-                    .unwrap();
-                assert_eq!(
-                    output.status.code(),
-                    Some(1),
-                    "invalid flow: {invalid}\nstdout: {}\nstderr: {}",
-                    String::from_utf8_lossy(&output.stdout),
-                    String::from_utf8_lossy(&output.stderr)
-                );
-                assert!(
-                    String::from_utf8_lossy(&output.stderr).contains("E1000"),
-                    "{}",
-                    String::from_utf8_lossy(&output.stderr)
-                );
-                assert!(!root.path().join("observed.json").exists());
-                assert_eq!(
-                    report(root.path()),
-                    json,
-                    "invalid config must not overwrite prior evidence"
-                );
-            }
+fn assert_runner_environment(observed: &Value, metadata: &Value, threads: i32) {
+    assert_eq!(observed["env"]["PROBE_SERVICE"], "fixture-value");
+    assert_eq!(observed["env"]["PROBE_THREADS"], threads.to_string());
+    assert!(observed["env"].get("GH93_REMOVED").is_none());
+    for (name, value) in metadata["environment"].as_object().unwrap() {
+        assert_eq!(&observed["env"][name], value, "{name}");
+    }
+}
+
+fn assert_runner_lock_metadata(metadata: &Value, isolation: &str) {
+    if isolation == "shared" {
+        assert_eq!(metadata["lock_decision"], "not-required");
+        assert!(metadata["worker_ids"].as_array().unwrap().is_empty());
+    } else {
+        assert_eq!(metadata["lock_decision"], "invocation-scoped");
+        assert_eq!(metadata["worker_ids"].as_array().unwrap().len(), 2);
+        let state_root = Path::new(metadata["isolation_root"].as_str().unwrap());
+        assert!(
+            !state_root.join("probe.json").exists(),
+            "isolation allocation must be released"
+        );
+    }
+}
+
+fn assert_runner_shard_metadata(metadata: &Value, sharded: bool) {
+    if sharded {
+        assert_eq!(metadata["shard_index"], 1);
+        assert_eq!(metadata["shard_total"], 3);
+        assert_eq!(metadata["merge_identity"], "probe:shard-1/3");
+    } else {
+        assert!(metadata["shard_index"].is_null());
+    }
+}
+
+fn assert_runner_metadata(root: &Path, isolation: &str, sharded: bool, threads: i32) {
+    let observed: Value =
+        serde_json::from_slice(&fs::read(root.join("observed.json")).unwrap()).unwrap();
+    let json = report(root);
+    assert_eq!(json["passed"], true);
+    assert_sealed_evidence(&json);
+    let step = json["steps"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|s| s["step_id"] == "probe")
+        .unwrap();
+    let metadata = &step["runner"];
+    assert_eq!(
+        metadata["effective_args"],
+        serde_json::json!(["probe.sh", "inserted", "original"])
+    );
+    assert_eq!(
+        observed["args"],
+        serde_json::json!(["inserted", "original"])
+    );
+    assert_runner_environment(&observed, metadata, threads);
+    assert_eq!(metadata["isolation"], isolation);
+    assert_runner_lock_metadata(metadata, isolation);
+    assert_runner_shard_metadata(metadata, sharded);
+}
+
+// Validation must reject collisions and malformed runner/shard inputs before spawn.
+fn assert_invalid_runner_flows_rejected(
+    root: &Path,
+    flow: &str,
+    threads: i32,
+    sharded: bool,
+    json: &Value,
+) {
+    let mut invalid_flows = vec![
+        flow.replace(
+            "threads_env = 'PROBE_THREADS'",
+            "threads_env = 'PROBE_SERVICE'",
+        ),
+        flow.replace("args_position = 1", "args_position = 99"),
+        flow.replace(&format!("threads = {threads}"), "threads = 0"),
+    ];
+    if sharded {
+        invalid_flows.push(flow.replace("index = 1", "index = 4"));
+    }
+    for invalid in invalid_flows {
+        fs::remove_file(root.join("observed.json")).unwrap_or(());
+        fs::write(root.join(".harness-gate/flow.toml"), &invalid).unwrap();
+        let output = command(root)
+            .env("GH93_SERVICE_ENV", "fixture-value")
+            .args(["verify", "--all"])
+            .output()
+            .unwrap();
+        assert_eq!(
+            output.status.code(),
+            Some(1),
+            "invalid flow: {invalid}\nstdout: {}\nstderr: {}",
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        );
+        assert!(
+            String::from_utf8_lossy(&output.stderr).contains("E1000"),
+            "{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        assert!(!root.join("observed.json").exists());
+        assert_eq!(
+            report(root),
+            json.clone(),
+            "invalid config must not overwrite prior evidence"
+        );
+    }
+}
+
+#[test]
+fn configured_runner_service_isolation_and_shards_match_the_executed_process() {
+    for isolation in ["shared", "schema-per-worker", "database-per-worker"] {
+        for sharded in [false, true] {
+            let (root, flow, threads) = configured_runner_fixture(isolation, sharded);
+            assert_runner_metadata(root.path(), isolation, sharded, threads);
+            let json = report(root.path());
+            assert_invalid_runner_flows_rejected(root.path(), &flow, threads, sharded, &json);
         }
     }
 }
@@ -571,21 +633,55 @@ elif args[0] not in ('info', 'exec', 'image'):
     std::env::join_paths(paths).unwrap()
 }
 
-#[test]
-fn verification_cleanup_cancel_and_report_precedence_retains_resource_evidence() {
-    use std::process::Stdio;
+fn cancel_and_wait_task(
+    root: &Path,
+    mut child: std::process::Child,
+) -> (std::process::Child, libc::pid_t) {
     use std::time::{Duration, Instant};
-    for (cancel, block_report, expected_code) in [
-        (false, false, "E1403"),
-        (true, false, "E1402"),
-        (true, true, "E1404"),
-    ] {
-        let root = fixture();
-        let path = failing_cleanup_runtime(root.path());
-        let flow = FLOW.replace(
-            "timeout_secs = 20",
-            "timeout_secs = 20\nservices = ['fixture']",
-        ) + r#"
+    let deadline = Instant::now() + Duration::from_secs(15);
+    while !root.join("started").exists() {
+        if Instant::now() >= deadline || child.try_wait().unwrap().is_some() {
+            let _ = child.kill();
+            let output = child.wait_with_output().unwrap();
+            panic!(
+                "task did not start: {}",
+                String::from_utf8_lossy(&output.stderr)
+            );
+        }
+        std::thread::sleep(Duration::from_millis(20));
+    }
+    let pid = fs::read_to_string(root.join("started"))
+        .unwrap()
+        .trim()
+        .parse::<libc::pid_t>()
+        .unwrap();
+    assert_eq!(
+        unsafe { libc::kill(child.id() as libc::pid_t, libc::SIGTERM) },
+        0
+    );
+    (child, pid)
+}
+
+fn expected_cleanup_cause(cancel: bool) -> &'static str {
+    if cancel {
+        "internal command docker was cancelled"
+    } else {
+        "injected cleanup failure"
+    }
+}
+
+fn run_cleanup_case(
+    cancel: bool,
+    block_report: bool,
+    expected_code: &str,
+) -> (TempDir, Value, Vec<PathBuf>) {
+    use std::process::Stdio;
+    let root = fixture();
+    let path = failing_cleanup_runtime(root.path());
+    let flow = FLOW.replace(
+        "timeout_secs = 20",
+        "timeout_secs = 20\nservices = ['fixture']",
+    ) + r#"
 [services.fixture]
 kind = 'docker'
 image = 'fixture:local'
@@ -595,229 +691,267 @@ container_port = 5432
 healthcheck = ['ready']
 connection = 'fixture:{host_port}'
 "#;
-        fs::write(root.path().join(".harness-gate/flow.toml"), flow).unwrap();
-        fs::write(
-            root.path().join("probe.sh"),
-            if cancel {
-                // Publish readiness only after the PID is fully written. Shell
-                // redirection creates an empty file before echo writes to it.
-                "echo $$ > started.tmp\nmv started.tmp started\nexec sleep 30\n"
-            } else {
-                "echo completed\n"
-            },
-        )
-        .unwrap();
-        if block_report {
-            fs::create_dir_all(root.path().join(".harness-gate/reports/test_result.json")).unwrap();
-        }
-        let mut child = command(root.path())
-            .env("PATH", &path)
-            .args(["verify", "--all"])
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .spawn()
-            .unwrap();
-        let mut task_pid = None;
+    fs::write(root.path().join(".harness-gate/flow.toml"), flow).unwrap();
+    fs::write(
+        root.path().join("probe.sh"),
         if cancel {
-            let deadline = Instant::now() + Duration::from_secs(15);
-            while !root.path().join("started").exists() {
-                if Instant::now() >= deadline || child.try_wait().unwrap().is_some() {
-                    let _ = child.kill();
-                    let output = child.wait_with_output().unwrap();
-                    panic!(
-                        "task did not start: {}",
-                        String::from_utf8_lossy(&output.stderr)
-                    );
-                }
-                std::thread::sleep(Duration::from_millis(20));
-            }
-            task_pid = Some(
-                fs::read_to_string(root.path().join("started"))
-                    .unwrap()
-                    .trim()
-                    .parse::<libc::pid_t>()
-                    .unwrap(),
-            );
-            assert_eq!(
-                unsafe { libc::kill(child.id() as libc::pid_t, libc::SIGTERM) },
-                0
-            );
-        }
-        let output = child.wait_with_output().unwrap();
-        assert_eq!(output.status.code(), Some(1));
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        assert!(
-            stderr.contains(&format!("ERROR [{expected_code}]")),
-            "{stderr}"
-        );
-        let cleanup_cause = if cancel {
-            "internal command docker was cancelled"
+            // Publish readiness only after the PID is fully written. Shell
+            // redirection creates an empty file before echo writes to it.
+            "echo $$ > started.tmp\nmv started.tmp started\nexec sleep 30\n"
         } else {
-            "injected cleanup failure"
-        };
-        assert!(
-            stderr.contains(cleanup_cause),
-            "cancel={cancel} blocked={block_report}: {stderr}"
-        );
-        if let Some(pid) = task_pid {
-            assert_eq!(
-                unsafe { libc::kill(pid, 0) },
-                -1,
-                "cancelled child still alive"
-            );
-        }
-        let invocations = root.path().join(".harness-gate/reports/invocations");
-        let paths = fs::read_dir(invocations)
-            .unwrap()
-            .map(|entry| entry.unwrap().path())
-            .collect::<Vec<_>>();
-        assert_eq!(paths.len(), 1);
-        let json: Value =
-            serde_json::from_slice(&fs::read(paths[0].join("test_result.json")).unwrap()).unwrap();
-        assert_eq!(json["passed"], false);
-        assert_eq!(json["services"][0]["status"], "LEAKED");
-        let steps = json["steps"].as_array().unwrap();
-        let task = steps
-            .iter()
-            .find(|step| step["step_id"] == "probe")
-            .unwrap();
-        assert_eq!(task["cancelled"], cancel);
-        assert_eq!(task["passed"], !cancel);
-        let cleanup = steps.last().unwrap();
-        assert_eq!(cleanup["label"], "service cleanup");
-        assert_eq!(cleanup["passed"], false);
-        assert_eq!(cleanup["cancelled"], false);
-        assert_sealed_evidence(&json);
-        if !block_report {
-            assert_eq!(report(root.path()), json);
-        }
-        if cancel {
-            assert!(
-                !root.path().join("remove-calls").exists(),
-                "uncertain ownership must prevent removal"
-            );
-        } else {
-            assert_eq!(
-                fs::read_to_string(root.path().join("remove-calls")).unwrap(),
-                "remove\n"
-            );
-        }
-        assert!(root.path().join("runtime-object.json").is_file());
-        let leases = root.path().join(".harness-gate/reports/leases");
-        let entries = fs::read_dir(&leases)
-            .unwrap()
-            .map(|entry| entry.unwrap())
-            .collect::<Vec<_>>();
-        let lease_files = entries
-            .iter()
-            .filter(|entry| {
-                entry.file_type().unwrap().is_file()
-                    && entry.path().extension() == Some(std::ffi::OsStr::new("json"))
-            })
-            .collect::<Vec<_>>();
-        assert_eq!(
-            lease_files.len(),
-            1,
-            "failed cleanup must retain exactly one container lease"
-        );
-        let lease: Value =
-            serde_json::from_slice(&fs::read(lease_files[0].path()).unwrap()).unwrap();
-        let project_identity = root.path().canonicalize().unwrap();
-        let project_identity = project_identity.to_str().unwrap();
-        let invocation_id = json["invocation_id"].as_str().unwrap();
-        assert_eq!(lease["owner_marker"], "harness-gate");
-        assert_eq!(lease["schema_version"], 2);
-        assert_eq!(lease["resource_kind"], "container");
-        assert_eq!(lease["resource_id"], "service:fixture");
-        assert_eq!(lease["invocation_id"], invocation_id);
-        assert_eq!(lease["project_identity"], project_identity);
-        assert_eq!(lease["runtime"], "docker");
-        assert_eq!(lease["runtime_object_id"], "fixture-immutable-id");
-        let runtime: Value =
-            serde_json::from_slice(&fs::read(root.path().join("runtime-object.json")).unwrap())
-                .unwrap();
-        assert_eq!(lease["runtime_object_id"], runtime["Id"]);
-        assert_eq!(
-            runtime["Name"],
-            format!("/{}", lease["resource_name"].as_str().unwrap())
-        );
-        let labels = serde_json::json!({
-            "harness-gate.owner": "harness-gate",
-            "harness-gate.schema": "2",
-            "harness-gate.project": project_identity,
-            "harness-gate.resource": "service:fixture",
-            "harness-gate.kind": "container",
-            "harness-gate.invocation": invocation_id,
-        });
-        assert_eq!(lease["runtime_labels"], labels);
-        assert_eq!(runtime["Config"]["Labels"], labels);
-        let container_key = format!("{:x}", Sha256::digest(b"service:fixture"));
-        assert_eq!(
-            lease_files[0].file_name(),
-            std::ffi::OsStr::new(&format!("{}.json", &container_key[..16]))
-        );
-        let locks = leases.join("report-directory-locks");
-        assert!(fs::symlink_metadata(&locks).unwrap().file_type().is_dir());
-        for entry in &entries {
-            assert!(
-                entry.path() == lease_files[0].path() || entry.path() == locks,
-                "unexpected lease-directory entry: {:?}",
-                entry.path()
-            );
-        }
-        let sidecars = fs::read_dir(&locks)
-            .unwrap()
-            .map(|entry| entry.unwrap())
-            .collect::<Vec<_>>();
-        assert_eq!(sidecars.len(), 1, "one invocation has one stable lock");
-        assert!(sidecars[0].file_type().unwrap().is_file());
-        assert_eq!(
-            sidecars[0].path().extension(),
-            Some(std::ffi::OsStr::new("lock"))
-        );
-        let invocation_key = format!(
-            "{:x}",
-            Sha256::digest(format!("invocation:{invocation_id}").as_bytes())
-        );
-        assert_eq!(
-            sidecars[0].file_name(),
-            std::ffi::OsStr::new(&format!("{}.lock", &invocation_key[..16]))
-        );
-        // Invocation Drop releases its report lease even when service cleanup
-        // or current-report publication fails. Its certificate is a sidecar,
-        // while the failed container's ownership marker remains a JSON lease.
-        let released: Value =
-            serde_json::from_slice(&fs::read(sidecars[0].path()).unwrap()).unwrap();
-        assert_eq!(
-            released,
-            serde_json::json!({
-                "schema_version": 1,
-                "invocation_id": invocation_id,
-                "project_identity": project_identity,
-                "root": paths[0].canonicalize().unwrap(),
-            })
-        );
-        let cleanup = command(root.path())
-            .args(["cleanup", "--dry-run"])
-            .output()
-            .unwrap();
-        let cleanup = success(cleanup);
-        assert!(String::from_utf8_lossy(&cleanup.stdout).contains("Cleanup (dry-run): scanned 1"));
-        fs::write(leases.join("invalid.json"), "not JSON").unwrap();
-        let cleanup = command(root.path()).args(["cleanup"]).output().unwrap();
-        assert!(!cleanup.status.success());
-        assert!(String::from_utf8_lossy(&cleanup.stderr).contains("cleanup failure:"));
-        assert!(leases.join("invalid.json").is_file());
+            "echo completed\n"
+        },
+    )
+    .unwrap();
+    if block_report {
+        fs::create_dir_all(root.path().join(".harness-gate/reports/test_result.json")).unwrap();
     }
+    let mut child = command(root.path())
+        .env("PATH", &path)
+        .args(["verify", "--all"])
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    let mut task_pid = None;
+    if cancel {
+        let (returned, pid) = cancel_and_wait_task(root.path(), child);
+        child = returned;
+        task_pid = Some(pid);
+    }
+    let output = child.wait_with_output().unwrap();
+    assert_eq!(output.status.code(), Some(1));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains(&format!("ERROR [{expected_code}]")),
+        "{stderr}"
+    );
+    assert!(
+        stderr.contains(expected_cleanup_cause(cancel)),
+        "cancel={cancel} blocked={block_report}: {stderr}"
+    );
+    if let Some(pid) = task_pid {
+        assert_eq!(
+            unsafe { libc::kill(pid, 0) },
+            -1,
+            "cancelled child still alive"
+        );
+    }
+    let (json, paths) = invocation_evidence(root.path());
+    (root, json, paths)
+}
+
+fn invocation_evidence(root: &Path) -> (Value, Vec<PathBuf>) {
+    let invocations = root.join(".harness-gate/reports/invocations");
+    let paths = fs::read_dir(invocations)
+        .unwrap()
+        .map(|entry| entry.unwrap().path())
+        .collect::<Vec<_>>();
+    assert_eq!(paths.len(), 1);
+    let json: Value =
+        serde_json::from_slice(&fs::read(paths[0].join("test_result.json")).unwrap()).unwrap();
+    (json, paths)
+}
+
+fn assert_cleanup_steps(json: &Value, cancel: bool) {
+    assert_eq!(json["passed"], false);
+    assert_eq!(json["services"][0]["status"], "LEAKED");
+    let steps = json["steps"].as_array().unwrap();
+    let task = steps
+        .iter()
+        .find(|step| step["step_id"] == "probe")
+        .unwrap();
+    assert_eq!(task["cancelled"], cancel);
+    assert_eq!(task["passed"], !cancel);
+    let cleanup = steps.last().unwrap();
+    assert_eq!(cleanup["label"], "service cleanup");
+    assert_eq!(cleanup["passed"], false);
+    assert_eq!(cleanup["cancelled"], false);
+}
+
+fn assert_cleanup_report_state(root: &Path, json: &Value, cancel: bool, block_report: bool) {
+    assert_sealed_evidence(json);
+    if !block_report {
+        assert_eq!(report(root), json.clone());
+    }
+    if cancel {
+        assert!(
+            !root.join("remove-calls").exists(),
+            "uncertain ownership must prevent removal"
+        );
+    } else {
+        assert_eq!(
+            fs::read_to_string(root.join("remove-calls")).unwrap(),
+            "remove\n"
+        );
+    }
+    assert!(root.join("runtime-object.json").is_file());
+}
+
+fn assert_lease_identity(lease: &Value, invocation_id: &str, project_identity: &str) {
+    assert_eq!(lease["owner_marker"], "harness-gate");
+    assert_eq!(lease["schema_version"], 2);
+    assert_eq!(lease["resource_kind"], "container");
+    assert_eq!(lease["resource_id"], "service:fixture");
+    assert_eq!(lease["invocation_id"], invocation_id);
+    assert_eq!(lease["project_identity"], project_identity);
+    assert_eq!(lease["runtime"], "docker");
+    assert_eq!(lease["runtime_object_id"], "fixture-immutable-id");
+}
+
+fn assert_runtime_linkage(lease: &Value, runtime: &Value) {
+    assert_eq!(lease["runtime_object_id"], runtime["Id"]);
+    assert_eq!(
+        runtime["Name"],
+        format!("/{}", lease["resource_name"].as_str().unwrap())
+    );
+}
+
+fn expected_runtime_labels(project_identity: &str, invocation_id: &str) -> Value {
+    serde_json::json!({
+        "harness-gate.owner": "harness-gate",
+        "harness-gate.schema": "2",
+        "harness-gate.project": project_identity,
+        "harness-gate.resource": "service:fixture",
+        "harness-gate.kind": "container",
+        "harness-gate.invocation": invocation_id,
+    })
+}
+
+fn assert_lease_directory(
+    leases: &Path,
+    entries: &[fs::DirEntry],
+    lease_file: &fs::DirEntry,
+) -> Vec<fs::DirEntry> {
+    let locks = leases.join("report-directory-locks");
+    assert!(fs::symlink_metadata(&locks).unwrap().file_type().is_dir());
+    for entry in entries {
+        assert!(
+            entry.path() == lease_file.path() || entry.path() == locks,
+            "unexpected lease-directory entry: {:?}",
+            entry.path()
+        );
+    }
+    let sidecars = fs::read_dir(&locks)
+        .unwrap()
+        .map(|entry| entry.unwrap())
+        .collect::<Vec<_>>();
+    assert_eq!(sidecars.len(), 1, "one invocation has one stable lock");
+    assert!(sidecars[0].file_type().unwrap().is_file());
+    assert_eq!(
+        sidecars[0].path().extension(),
+        Some(std::ffi::OsStr::new("lock"))
+    );
+    sidecars
+}
+
+fn assert_lease_certificate(
+    sidecar: &fs::DirEntry,
+    invocation_id: &str,
+    project_identity: &str,
+    paths: &[PathBuf],
+) {
+    let invocation_key = format!(
+        "{:x}",
+        Sha256::digest(format!("invocation:{invocation_id}").as_bytes())
+    );
+    assert_eq!(
+        sidecar.file_name(),
+        std::ffi::OsStr::new(&format!("{}.lock", &invocation_key[..16]))
+    );
+    // Invocation Drop releases its report lease even when service cleanup
+    // or current-report publication fails. Its certificate is a sidecar,
+    // while the failed container's ownership marker remains a JSON lease.
+    let released: Value = serde_json::from_slice(&fs::read(sidecar.path()).unwrap()).unwrap();
+    assert_eq!(
+        released,
+        serde_json::json!({
+            "schema_version": 1,
+            "invocation_id": invocation_id,
+            "project_identity": project_identity,
+            "root": paths[0].canonicalize().unwrap(),
+        })
+    );
+}
+
+fn assert_cleanup_leases(root: &Path, json: &Value, paths: &[PathBuf]) {
+    let leases = root.join(".harness-gate/reports/leases");
+    let entries = fs::read_dir(&leases)
+        .unwrap()
+        .map(|entry| entry.unwrap())
+        .collect::<Vec<_>>();
+    let lease_files = entries
+        .iter()
+        .filter(|entry| {
+            entry.file_type().unwrap().is_file()
+                && entry.path().extension() == Some(std::ffi::OsStr::new("json"))
+        })
+        .collect::<Vec<_>>();
+    assert_eq!(
+        lease_files.len(),
+        1,
+        "failed cleanup must retain exactly one container lease"
+    );
+    let lease: Value = serde_json::from_slice(&fs::read(lease_files[0].path()).unwrap()).unwrap();
+    let project_identity = root.canonicalize().unwrap();
+    let project_identity = project_identity.to_str().unwrap();
+    let invocation_id = json["invocation_id"].as_str().unwrap();
+    assert_lease_identity(&lease, invocation_id, project_identity);
+    let runtime: Value =
+        serde_json::from_slice(&fs::read(root.join("runtime-object.json")).unwrap()).unwrap();
+    assert_runtime_linkage(&lease, &runtime);
+    let labels = expected_runtime_labels(project_identity, invocation_id);
+    assert_eq!(lease["runtime_labels"], labels);
+    assert_eq!(runtime["Config"]["Labels"], labels);
+    let container_key = format!("{:x}", Sha256::digest(b"service:fixture"));
+    assert_eq!(
+        lease_files[0].file_name(),
+        std::ffi::OsStr::new(&format!("{}.json", &container_key[..16]))
+    );
+    let sidecars = assert_lease_directory(&leases, &entries, lease_files[0]);
+    assert_lease_certificate(&sidecars[0], invocation_id, project_identity, paths);
+}
+
+fn assert_cleanup_commands(root: &Path) {
+    let cleanup = command(root)
+        .args(["cleanup", "--dry-run"])
+        .output()
+        .unwrap();
+    let cleanup = success(cleanup);
+    assert!(String::from_utf8_lossy(&cleanup.stdout).contains("Cleanup (dry-run): scanned 1"));
+    fs::write(
+        root.join(".harness-gate/reports/leases/invalid.json"),
+        "not JSON",
+    )
+    .unwrap();
+    let cleanup = command(root).args(["cleanup"]).output().unwrap();
+    assert!(!cleanup.status.success());
+    assert!(String::from_utf8_lossy(&cleanup.stderr).contains("cleanup failure:"));
+    assert!(root
+        .join(".harness-gate/reports/leases/invalid.json")
+        .is_file());
 }
 
 #[test]
-fn extracted_cli_handlers_preserve_text_json_and_hook_snapshot_contracts() {
-    let root = fixture();
-    let doctor = success(command(root.path()).args(["doctor"]).output().unwrap());
+fn verification_cleanup_cancel_and_report_precedence_retains_resource_evidence() {
+    for (cancel, block_report, expected_code) in [
+        (false, false, "E1403"),
+        (true, false, "E1402"),
+        (true, true, "E1404"),
+    ] {
+        let (root, json, paths) = run_cleanup_case(cancel, block_report, expected_code);
+        assert_cleanup_steps(&json, cancel);
+        assert_cleanup_report_state(root.path(), &json, cancel, block_report);
+        assert_cleanup_leases(root.path(), &json, &paths);
+        assert_cleanup_commands(root.path());
+    }
+}
+
+fn assert_read_only_handlers(root: &Path) {
+    let doctor = success(command(root).args(["doctor"]).output().unwrap());
     assert!(String::from_utf8_lossy(&doctor.stdout).contains("harness-gate doctor"));
     let scope = success(
-        command(root.path())
+        command(root)
             .args(["scope", "--all", "--benchmark-repeat", "2"])
             .output()
             .unwrap(),
@@ -825,7 +959,7 @@ fn extracted_cli_handlers_preserve_text_json_and_hook_snapshot_contracts() {
     let benchmark: Value = serde_json::from_slice(&scope.stdout).unwrap();
     assert!(benchmark.is_object());
     let scope = success(
-        command(root.path())
+        command(root)
             .args(["scope", "--all", "--json"])
             .output()
             .unwrap(),
@@ -836,16 +970,14 @@ fn extracted_cli_handlers_preserve_text_json_and_hook_snapshot_contracts() {
         .as_array()
         .unwrap()
         .contains(&Value::String("project".into())));
-    let secrets = success(
-        command(root.path())
-            .args(["secrets", "--json"])
-            .output()
-            .unwrap(),
-    );
+    let secrets = success(command(root).args(["secrets", "--json"]).output().unwrap());
     let clean: Value = serde_json::from_slice(&secrets.stdout).unwrap();
     assert_eq!(clean["passed"], true);
+}
+
+fn assert_secrets_rejection(root: &Path) {
     // A deterministic rule avoids placing real credentials in fixtures.
-    let config_path = root.path().join(".harness-gate/secrets.toml");
+    let config_path = root.join(".harness-gate/secrets.toml");
     let config = fs::read_to_string(&config_path).unwrap();
     fs::write(
         config_path,
@@ -854,16 +986,19 @@ fn extracted_cli_handlers_preserve_text_json_and_hook_snapshot_contracts() {
         ),
     )
     .unwrap();
-    fs::write(root.path().join("credential.txt"), "GH94_SENTINEL").unwrap();
-    let rejected = command(root.path()).args(["secrets"]).output().unwrap();
+    fs::write(root.join("credential.txt"), "GH94_SENTINEL").unwrap();
+    let rejected = command(root).args(["secrets"]).output().unwrap();
     assert!(!rejected.status.success());
     assert!(String::from_utf8_lossy(&rejected.stderr).contains("credential.txt"));
-    fs::remove_file(root.path().join("credential.txt")).unwrap();
+    fs::remove_file(root.join("credential.txt")).unwrap();
     // The rule itself contains the sentinel, so restore it before snapshotting.
-    fs::write(root.path().join(".harness-gate/secrets.toml"), config).unwrap();
-    git(root.path(), &["add", "."]);
+    fs::write(root.join(".harness-gate/secrets.toml"), config).unwrap();
+}
+
+fn assert_hook_snapshot(root: &Path) {
+    git(root, &["add", "."]);
     git(
-        root.path(),
+        root,
         &[
             "-c",
             "user.name=Fixture",
@@ -874,13 +1009,9 @@ fn extracted_cli_handlers_preserve_text_json_and_hook_snapshot_contracts() {
             "fixture",
         ],
     );
-    fs::write(root.path().join("probe.sh"), "echo staged-hook\n").unwrap();
-    git(root.path(), &["add", "probe.sh"]);
-    fs::write(
-        root.path().join("probe.sh"),
-        "echo unstaged-hook >&2\nexit 9\n",
-    )
-    .unwrap();
+    fs::write(root.join("probe.sh"), "echo staged-hook\n").unwrap();
+    git(root, &["add", "probe.sh"]);
+    fs::write(root.join("probe.sh"), "echo unstaged-hook >&2\nexit 9\n").unwrap();
     // Model macOS's symlinked temporary directory on every Unix runner.
     let temporary = TempDir::new().unwrap();
     let actual = temporary.path().join("actual");
@@ -888,28 +1019,28 @@ fn extracted_cli_handlers_preserve_text_json_and_hook_snapshot_contracts() {
     fs::create_dir(&actual).unwrap();
     std::os::unix::fs::symlink(&actual, &alias).unwrap();
     success(
-        command(root.path())
+        command(root)
             .env("TMPDIR", &alias)
             .args(["hook"])
             .output()
             .unwrap(),
     );
     assert_eq!(fs::read_dir(&actual).unwrap().count(), 0);
-    let evidence = report(root.path());
+    let evidence = report(root);
     assert_eq!(evidence["passed"], true);
     assert!(serde_json::to_string(&evidence).unwrap().contains("hook"));
     assert_sealed_evidence(&evidence);
     // Reject an unusable temporary parent without leaving snapshot debris.
     let not_directory = temporary.path().join("not-directory");
     fs::write(&not_directory, "not a directory").unwrap();
-    let rejected = command(root.path())
+    let rejected = command(root)
         .env("TMPDIR", &not_directory)
         .args(["hook"])
         .output()
         .unwrap();
     assert!(!rejected.status.success());
     assert!(String::from_utf8_lossy(&rejected.stderr).contains("create staged snapshot"));
-    let rejected = command(root.path())
+    let rejected = command(root)
         .env("TMPDIR", temporary.path().join("missing"))
         .args(["hook"])
         .output()
@@ -917,6 +1048,14 @@ fn extracted_cli_handlers_preserve_text_json_and_hook_snapshot_contracts() {
     assert!(!rejected.status.success());
     assert!(String::from_utf8_lossy(&rejected.stderr)
         .contains("resolve staged snapshot temporary directory"));
+}
+
+#[test]
+fn extracted_cli_handlers_preserve_text_json_and_hook_snapshot_contracts() {
+    let root = fixture();
+    assert_read_only_handlers(root.path());
+    assert_secrets_rejection(root.path());
+    assert_hook_snapshot(root.path());
 }
 
 #[test]

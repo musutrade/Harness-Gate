@@ -1590,16 +1590,7 @@ mod tests {
             isolate_process_tree(&mut command);
             let mut child = command.spawn().unwrap();
             let (sender, receiver) = mpsc::sync_channel(1);
-            if cause == "write-error" {
-                sender
-                    .send(Err(io::Error::new(
-                        io::ErrorKind::BrokenPipe,
-                        "fixture writer failure",
-                    )))
-                    .unwrap();
-            } else if cause != "disconnect" {
-                sender.send(Ok(())).unwrap();
-            }
+            deliver_waiter_writer(cause, &sender);
             drop(sender);
             let stdout = AtomicBool::new(cause == "stdout");
             let stderr = AtomicBool::new(cause == "stderr");
@@ -1613,22 +1604,42 @@ mod tests {
                 &|| false,
             )
             .unwrap();
-            assert!(!exit.status.success());
-            assert!(!exit.timed_out && !exit.was_cancelled);
-            assert!(child.try_wait().unwrap().is_some(), "child must be reaped");
-            match cause {
-                "write-error" => assert!(exit
-                    .request_write_error
-                    .unwrap()
-                    .to_string()
-                    .contains("fixture writer failure")),
-                "disconnect" => assert!(exit
-                    .request_write_error
-                    .unwrap()
-                    .to_string()
-                    .contains("writer disconnected")),
-                stream => assert_eq!(exit.output_limited.unwrap().0, stream),
-            }
+            assert_waiter_termination(cause, &exit, &mut child);
+        }
+    }
+
+    fn deliver_waiter_writer(cause: &str, sender: &mpsc::SyncSender<io::Result<()>>) {
+        match cause {
+            "write-error" => sender
+                .send(Err(io::Error::new(
+                    io::ErrorKind::BrokenPipe,
+                    "fixture writer failure",
+                )))
+                .unwrap(),
+            "disconnect" => {}
+            _ => sender.send(Ok(())).unwrap(),
+        }
+    }
+
+    fn assert_waiter_termination(cause: &str, exit: &ProcessExit, child: &mut std::process::Child) {
+        assert!(!exit.status.success());
+        assert!(!exit.timed_out);
+        assert!(!exit.was_cancelled);
+        assert!(child.try_wait().unwrap().is_some(), "child must be reaped");
+        match cause {
+            "write-error" => assert!(exit
+                .request_write_error
+                .as_ref()
+                .unwrap()
+                .to_string()
+                .contains("fixture writer failure")),
+            "disconnect" => assert!(exit
+                .request_write_error
+                .as_ref()
+                .unwrap()
+                .to_string()
+                .contains("writer disconnected")),
+            stream => assert_eq!(exit.output_limited.unwrap().0, stream),
         }
     }
 
@@ -1746,75 +1757,100 @@ mod tests {
         let directory = tempdir().unwrap();
         let (request, policy) = fixture_request(directory.path(), "pass");
 
+        request_file_validation_fails_closed(directory.path());
+        request_structure_validation_fails_closed(&request, &policy);
+        request_signature_field_validation_fails_closed(&request, &policy);
+        request_time_and_capability_validation_fails_closed(&request, &policy);
+        parse_response_validation_fails_closed();
+        artifact_validation_fails_closed(directory.path(), &request);
+        path_validation_fails_closed(directory.path());
+    }
+
+    fn request_file_validation_fails_closed(directory: &Path) {
         for invalid in [
             serde_json::to_vec(&serde_json::json!({"unknown": true})).unwrap(),
             b"not-json".to_vec(),
         ] {
-            let path = directory.path().join("request.json");
+            let path = directory.join("request.json");
             fs::write(&path, invalid).unwrap();
             assert!(read_request(&path).is_err());
         }
-        assert!(read_request(&directory.path().join("missing.json")).is_err());
+        assert!(read_request(&directory.join("missing.json")).is_err());
+    }
 
+    fn request_structure_validation_fails_closed(request: &AdapterRequest, policy: &HostPolicy) {
         let mut invalid = request.clone();
         invalid.protocol_version = 9;
-        assert!(validate_request(&invalid, &policy).is_err());
+        assert!(validate_request(&invalid, policy).is_err());
         invalid = request.clone();
         invalid.result_schema_version = "2".into();
-        assert!(validate_request(&invalid, &policy).is_err());
+        assert!(validate_request(&invalid, policy).is_err());
         invalid = request.clone();
         invalid.invocation_id.clear();
         resign_request(&mut invalid);
-        assert!(validate_request(&invalid, &policy).is_err());
+        assert!(validate_request(&invalid, policy).is_err());
         invalid = request.clone();
         invalid.timeout_ms = 0;
         resign_request(&mut invalid);
-        assert!(validate_request(&invalid, &policy).is_err());
+        assert!(validate_request(&invalid, policy).is_err());
         invalid = request.clone();
         invalid.environment.insert("UNDECLARED".into(), "x".into());
         resign_request(&mut invalid);
-        assert!(validate_request(&invalid, &policy).is_err());
+        assert!(validate_request(&invalid, policy).is_err());
         invalid = request.clone();
         invalid.adapter.name.clear();
         resign_request(&mut invalid);
-        assert!(validate_request(&invalid, &policy).is_err());
-        invalid = request.clone();
+        assert!(validate_request(&invalid, policy).is_err());
+    }
+
+    fn request_signature_field_validation_fails_closed(
+        request: &AdapterRequest,
+        policy: &HostPolicy,
+    ) {
+        let mut invalid = request.clone();
         invalid.adapter.source_digest = "0".repeat(64);
         resign_request(&mut invalid);
-        assert!(validate_request(&invalid, &policy).is_err());
+        assert!(validate_request(&invalid, policy).is_err());
         invalid = request.clone();
         invalid.adapter.signature.algorithm = "rsa".into();
-        assert!(validate_request(&invalid, &policy).is_err());
+        assert!(validate_request(&invalid, policy).is_err());
         invalid = request.clone();
         invalid.adapter.signature.key_id = "unknown".into();
-        assert!(validate_request(&invalid, &policy).is_err());
+        assert!(validate_request(&invalid, policy).is_err());
+    }
 
-        invalid = request.clone();
+    fn request_time_and_capability_validation_fails_closed(
+        request: &AdapterRequest,
+        policy: &HostPolicy,
+    ) {
+        let mut invalid = request.clone();
         invalid.issued_at_ms = unix_time_millis().unwrap().saturating_add(120_000);
         invalid.expires_at_ms = invalid.issued_at_ms.saturating_add(1_000);
         resign_request(&mut invalid);
-        assert!(validate_request(&invalid, &policy).is_err());
+        assert!(validate_request(&invalid, policy).is_err());
         invalid = request.clone();
         invalid.expires_at_ms = invalid.issued_at_ms.saturating_add(7_200_000);
         resign_request(&mut invalid);
-        assert!(validate_request(&invalid, &policy).is_err());
+        assert!(validate_request(&invalid, policy).is_err());
         invalid = request.clone();
         invalid.capabilities.network.insert("internet".into());
         resign_request(&mut invalid);
-        assert!(validate_request(&invalid, &policy).is_err());
+        assert!(validate_request(&invalid, policy).is_err());
         invalid = request.clone();
         invalid.capabilities.resources.insert("database".into());
         resign_request(&mut invalid);
-        assert!(validate_request(&invalid, &policy).is_err());
+        assert!(validate_request(&invalid, policy).is_err());
         invalid = request.clone();
         invalid.args.push("contains\0nul".into());
         resign_request(&mut invalid);
-        assert!(validate_request(&invalid, &policy).is_err());
+        assert!(validate_request(&invalid, policy).is_err());
         invalid = request.clone();
         invalid.nonce = "../reused".into();
         resign_request(&mut invalid);
-        assert!(validate_request(&invalid, &policy).is_err());
+        assert!(validate_request(&invalid, policy).is_err());
+    }
 
+    fn parse_response_validation_fails_closed() {
         for response in [
             b"".as_slice(),
             b"not-json".as_slice(),
@@ -1827,15 +1863,14 @@ mod tests {
             assert!(parse_response(response).is_err());
         }
         assert!(parse_response(br#"{"schema_version":"1","status":"PASS"}"#).is_ok());
+    }
+
+    fn artifact_validation_fails_closed(directory: &Path, request: &AdapterRequest) {
         let mismatch =
             serde_json::json!({"schema_version":"1", "status":"PASS", "invocation_id":"other"});
-        assert!(
-            validate_artifacts_with_budget(&mismatch, directory.path(), &request, None).is_err()
-        );
+        assert!(validate_artifacts_with_budget(&mismatch, directory, request, None).is_err());
         let missing = serde_json::json!({"schema_version":"1", "status":"PASS", "artifacts":[{"path":"missing.txt","kind":"x"}]});
-        assert!(
-            validate_artifacts_with_budget(&missing, directory.path(), &request, None).is_err()
-        );
+        assert!(validate_artifacts_with_budget(&missing, directory, request, None).is_err());
         for escaped_path in [
             r"..\escape.txt",
             r"C:\escape.txt",
@@ -1847,12 +1882,15 @@ mod tests {
                 "artifacts": [{"path": escaped_path, "kind": "x"}]
             });
             assert!(
-                validate_artifacts_with_budget(&escaped, directory.path(), &request, None).is_err(),
+                validate_artifacts_with_budget(&escaped, directory, request, None).is_err(),
                 "escaped artifact path must be rejected: {escaped_path}"
             );
         }
-        assert!(canonical_directory(&directory.path().join("missing"), "root").is_err());
-        assert!(canonical_file(directory.path(), "file").is_err());
+    }
+
+    fn path_validation_fails_closed(directory: &Path) {
+        assert!(canonical_directory(&directory.join("missing"), "root").is_err());
+        assert!(canonical_file(directory, "file").is_err());
         assert!(!constant_time_eq("a", "b"));
     }
 

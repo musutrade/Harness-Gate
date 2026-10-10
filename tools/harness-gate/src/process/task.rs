@@ -1,8 +1,8 @@
 use super::command::{isolate_process_tree, terminate};
 use super::isolation;
 use super::reader::{
-    collect_limited_reader, spawn_limited_reader, LimitedOutput, DEFAULT_CAPTURE_BYTES,
-    DEFAULT_READER_DEADLINE,
+    collect_limited_reader, spawn_limited_reader, LimitedOutput, ReaderThread,
+    DEFAULT_CAPTURE_BYTES, DEFAULT_READER_DEADLINE,
 };
 use super::signal::cancelled;
 use crate::config::{RunnerResultFormat, TestIsolation};
@@ -13,8 +13,9 @@ use std::collections::BTreeMap;
 use std::ffi::{OsStr, OsString};
 use std::io::Write;
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::{Child, Command, ExitStatus, Stdio};
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::mpsc::Receiver;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
@@ -227,108 +228,33 @@ impl Task {
         let (stderr_handle, stderr_receiver) =
             spawn_limited_reader(stderr, DEFAULT_CAPTURE_BYTES, Arc::clone(&stderr_overflow));
 
-        let mut output_limited = None;
-        let mut wait_round = 0_u32;
-        let (status, timed_out, was_cancelled) = loop {
-            if let Some(status) = child.try_wait()? {
-                if stdout_overflow.load(Ordering::Acquire) {
-                    output_limited = Some("stdout");
-                } else if stderr_overflow.load(Ordering::Acquire) {
-                    output_limited = Some("stderr");
-                }
-                break (status, false, false);
-            }
-            if stdout_overflow.load(Ordering::Acquire) {
-                output_limited = Some("stdout");
-                break (terminate(&mut child)?, false, false);
-            }
-            if stderr_overflow.load(Ordering::Acquire) {
-                output_limited = Some("stderr");
-                break (terminate(&mut child)?, false, false);
-            }
-            if cancelled() {
-                break (terminate(&mut child)?, false, true);
-            }
-            if started.elapsed() >= self.timeout {
-                break (terminate(&mut child)?, true, false);
-            }
-            // `Child::try_wait` is the portable API available on all supported
-            // platforms. Keep the initial delay short for fast commands, then
-            // back off to cap wakeups while preserving timeout/cancellation checks.
-            std::thread::sleep(wait_backoff(wait_round));
-            wait_round = wait_round.saturating_add(1);
-        };
+        let (status, timed_out, was_cancelled, output_limited) = wait_for_task(
+            &mut child,
+            started,
+            self.timeout,
+            &stdout_overflow,
+            &stderr_overflow,
+        )?;
 
         let reader_started = Instant::now();
-        let mut reader_error = None;
-        let stdout = match collect_limited_reader(
+        let (stdout, stdout_error) = collect_task_stream(
             stdout_handle,
             stdout_receiver,
             DEFAULT_READER_DEADLINE,
             "task stdout",
-        ) {
-            Ok(output) => output,
-            Err(error) => {
-                reader_error = Some(format!("task stdout reader deadline/error: {error}"));
-                LimitedOutput {
-                    bytes: Vec::new(),
-                    truncated: false,
-                }
-            }
-        };
+        );
         let remaining_reader_deadline =
             DEFAULT_READER_DEADLINE.saturating_sub(reader_started.elapsed());
-        let stderr = match collect_limited_reader(
+        let (stderr, stderr_error) = collect_task_stream(
             stderr_handle,
             stderr_receiver,
             remaining_reader_deadline,
             "task stderr",
-        ) {
-            Ok(output) => output,
-            Err(error) => {
-                reader_error
-                    .get_or_insert_with(|| format!("task stderr reader deadline/error: {error}"));
-                LimitedOutput {
-                    bytes: Vec::new(),
-                    truncated: false,
-                }
-            }
-        };
+        );
+        let reader_error = stdout_error.or(stderr_error);
 
-        let mut failure_code = None;
-        let mut limit_detail = None;
-        let combined_bytes = stdout.bytes.len().saturating_add(stderr.bytes.len());
-        if let Some(stream) = output_limited
-            .or_else(|| {
-                stdout
-                    .truncated
-                    .then_some("stdout")
-                    .or_else(|| stderr.truncated.then_some("stderr"))
-            })
-            .or_else(|| {
-                (combined_bytes > DEFAULT_CAPTURE_BYTES.saturating_mul(2)).then_some("combined")
-            })
-        {
-            failure_code = Some(FailureCode::OutputLimitExceeded);
-            let captured = if stream == "stdout" {
-                stdout.bytes.len()
-            } else if stream == "stderr" {
-                stderr.bytes.len()
-            } else {
-                combined_bytes
-            };
-            limit_detail = Some(format!(
-                "{stream} output exceeded {} bytes (captured {captured} bytes; truncated=true)",
-                if stream == "combined" {
-                    DEFAULT_CAPTURE_BYTES.saturating_mul(2)
-                } else {
-                    DEFAULT_CAPTURE_BYTES
-                }
-            ));
-        } else if let Some(error) = reader_error {
-            failure_code = Some(FailureCode::ReaderDeadlineExceeded);
-            limit_detail = Some(error);
-        }
+        let (failure_code, limit_detail) =
+            output_failure(output_limited, &stdout, &stderr, reader_error);
 
         log_file.write_all(&stdout.bytes)?;
         if !stdout.bytes.is_empty() && !stderr.bytes.is_empty() {
@@ -343,17 +269,7 @@ impl Task {
             .publish()
             .with_context(|| format!("publish log {}", self.log.display()))?;
 
-        let detail = if let Some(detail) = limit_detail {
-            Some(detail)
-        } else if was_cancelled {
-            Some("cancelled".to_string())
-        } else if timed_out {
-            Some("timed out".to_string())
-        } else if status.success() {
-            None
-        } else {
-            status.code().map(|code| format!("exit code {code}"))
-        };
+        let detail = task_detail(limit_detail, was_cancelled, timed_out, &status);
 
         Ok(TaskResult {
             step_id: None,
@@ -378,6 +294,145 @@ impl Task {
             runner: self.runner,
         })
     }
+}
+
+fn observed_overflow(
+    stdout_overflow: &AtomicBool,
+    stderr_overflow: &AtomicBool,
+) -> Option<&'static str> {
+    if stdout_overflow.load(Ordering::Acquire) {
+        Some("stdout")
+    } else if stderr_overflow.load(Ordering::Acquire) {
+        Some("stderr")
+    } else {
+        None
+    }
+}
+
+type TaskOutcome = (ExitStatus, bool, bool, Option<&'static str>);
+
+fn poll_task(
+    child: &mut Child,
+    started: Instant,
+    timeout: Duration,
+    stdout_overflow: &AtomicBool,
+    stderr_overflow: &AtomicBool,
+) -> Result<Option<TaskOutcome>> {
+    if let Some(status) = child.try_wait()? {
+        return Ok(Some((
+            status,
+            false,
+            false,
+            observed_overflow(stdout_overflow, stderr_overflow),
+        )));
+    }
+    if let Some(stream) = observed_overflow(stdout_overflow, stderr_overflow) {
+        return Ok(Some((terminate(child)?, false, false, Some(stream))));
+    }
+    if cancelled() {
+        return Ok(Some((terminate(child)?, false, true, None)));
+    }
+    if started.elapsed() >= timeout {
+        return Ok(Some((terminate(child)?, true, false, None)));
+    }
+    Ok(None)
+}
+
+fn wait_for_task(
+    child: &mut Child,
+    started: Instant,
+    timeout: Duration,
+    stdout_overflow: &AtomicBool,
+    stderr_overflow: &AtomicBool,
+) -> Result<TaskOutcome> {
+    // `Child::try_wait` is the portable API available on all supported
+    // platforms. Keep the initial delay short for fast commands, then
+    // back off to cap wakeups while preserving timeout/cancellation checks.
+    let mut wait_round = 0_u32;
+    loop {
+        if let Some(outcome) = poll_task(child, started, timeout, stdout_overflow, stderr_overflow)?
+        {
+            return Ok(outcome);
+        }
+        std::thread::sleep(wait_backoff(wait_round));
+        wait_round = wait_round.saturating_add(1);
+    }
+}
+
+fn collect_task_stream(
+    handle: ReaderThread,
+    receiver: Receiver<std::io::Result<LimitedOutput>>,
+    deadline: Duration,
+    stream: &str,
+) -> (LimitedOutput, Option<String>) {
+    match collect_limited_reader(handle, receiver, deadline, stream) {
+        Ok(output) => (output, None),
+        Err(error) => (
+            LimitedOutput {
+                bytes: Vec::new(),
+                truncated: false,
+            },
+            Some(format!("{stream} reader deadline/error: {error}")),
+        ),
+    }
+}
+
+fn output_failure(
+    output_limited: Option<&'static str>,
+    stdout: &LimitedOutput,
+    stderr: &LimitedOutput,
+    reader_error: Option<String>,
+) -> (Option<FailureCode>, Option<String>) {
+    let combined_bytes = stdout.bytes.len().saturating_add(stderr.bytes.len());
+    let limited = output_limited
+        .or_else(|| stdout.truncated.then_some("stdout"))
+        .or_else(|| stderr.truncated.then_some("stderr"))
+        .or_else(|| {
+            (combined_bytes > DEFAULT_CAPTURE_BYTES.saturating_mul(2)).then_some("combined")
+        });
+    if let Some(stream) = limited {
+        let captured = match stream {
+            "stdout" => stdout.bytes.len(),
+            "stderr" => stderr.bytes.len(),
+            _ => combined_bytes,
+        };
+        let budget = if stream == "combined" {
+            DEFAULT_CAPTURE_BYTES.saturating_mul(2)
+        } else {
+            DEFAULT_CAPTURE_BYTES
+        };
+        return (
+            Some(FailureCode::OutputLimitExceeded),
+            Some(format!(
+                "{stream} output exceeded {budget} bytes (captured {captured} bytes; truncated=true)"
+            )),
+        );
+    }
+    if let Some(error) = reader_error {
+        return (Some(FailureCode::ReaderDeadlineExceeded), Some(error));
+    }
+    (None, None)
+}
+
+fn task_detail(
+    limit_detail: Option<String>,
+    was_cancelled: bool,
+    timed_out: bool,
+    status: &ExitStatus,
+) -> Option<String> {
+    if let Some(detail) = limit_detail {
+        return Some(detail);
+    }
+    if was_cancelled {
+        return Some("cancelled".to_string());
+    }
+    if timed_out {
+        return Some("timed out".to_string());
+    }
+    if status.success() {
+        return None;
+    }
+    status.code().map(|code| format!("exit code {code}"))
 }
 
 fn wait_backoff(round: u32) -> Duration {

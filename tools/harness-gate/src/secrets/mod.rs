@@ -147,66 +147,7 @@ pub fn scan(project: &Project, mode: SecretMode) -> std::result::Result<Vec<Stri
         if crate::process::cancelled() {
             return Err(SecretsError::scan(anyhow::anyhow!("secret scan cancelled")));
         }
-        let bytes = match mode {
-            SecretMode::WorkingTree => {
-                let path = project.execution_root.join(&file);
-                let metadata = match fs::symlink_metadata(&path) {
-                    Ok(metadata) => metadata,
-                    Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
-                    Err(error) => {
-                        return Err(SecretsError::scan(
-                            anyhow::Error::from(error).context(format!("inspect {file}")),
-                        ));
-                    }
-                };
-                if metadata.file_type().is_symlink() || !metadata.file_type().is_file() {
-                    continue;
-                }
-                let size = fs::metadata(&path)
-                    .map_err(|error| SecretsError::scan(anyhow::Error::from(error)))?
-                    .len();
-                match read_working_tree_file(&path, &file, size).map_err(SecretsError::scan)? {
-                    Some(bytes) => bytes,
-                    None => continue,
-                }
-            }
-            SecretMode::Staged => {
-                if project.input().is_snapshot() {
-                    let path = project.execution_root.join(&file);
-                    let metadata = match fs::symlink_metadata(&path) {
-                        Ok(metadata) => metadata,
-                        Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
-                        Err(error) => {
-                            return Err(SecretsError::scan(
-                                anyhow::Error::from(error).context(format!("inspect {file}")),
-                            ));
-                        }
-                    };
-                    if metadata.file_type().is_symlink() || !metadata.is_file() {
-                        continue;
-                    }
-                    match read_working_tree_file(&path, &file, metadata.len())
-                        .map_err(SecretsError::scan)?
-                    {
-                        Some(bytes) => bytes,
-                        None => continue,
-                    }
-                } else {
-                    let Some(size) =
-                        git::staged_file_size(&project.root, &file).map_err(SecretsError::scan)?
-                    else {
-                        continue;
-                    };
-                    reject_oversized_file(&file, size).map_err(SecretsError::scan)?;
-                    match git::staged_file(&project.root, &file).map_err(SecretsError::scan)? {
-                        Some(bytes) => bytes,
-                        None => continue,
-                    }
-                }
-            }
-        };
-        reject_oversized_file(&file, bytes.len() as u64).map_err(SecretsError::scan)?;
-        if patterns.is_match(&bytes) {
+        if let Some(file) = scan_file(project, mode, &patterns, file)? {
             findings.push(file);
         }
     }
@@ -227,4 +168,79 @@ pub fn scan(project: &Project, mode: SecretMode) -> std::result::Result<Vec<Stri
     )
     .map_err(SecretsError::scan)?;
     Ok(findings)
+}
+
+fn scan_file(
+    project: &Project,
+    mode: SecretMode,
+    patterns: &SecretScanner,
+    file: String,
+) -> std::result::Result<Option<String>, SecretsError> {
+    let bytes = match mode {
+        SecretMode::WorkingTree => working_tree_bytes(project, &file)?,
+        SecretMode::Staged => staged_bytes(project, &file)?,
+    };
+    let Some(bytes) = bytes else {
+        return Ok(None);
+    };
+    reject_oversized_file(&file, bytes.len() as u64).map_err(SecretsError::scan)?;
+    Ok(patterns.is_match(&bytes).then_some(file))
+}
+
+fn working_tree_bytes(
+    project: &Project,
+    file: &str,
+) -> std::result::Result<Option<Vec<u8>>, SecretsError> {
+    let path = project.execution_root.join(file);
+    let Some(metadata) = inspected_metadata(&path, file)? else {
+        return Ok(None);
+    };
+    if metadata.file_type().is_symlink() || !metadata.file_type().is_file() {
+        return Ok(None);
+    }
+    let size = fs::metadata(&path)
+        .map_err(|error| SecretsError::scan(anyhow::Error::from(error)))?
+        .len();
+    read_working_tree_file(&path, file, size).map_err(SecretsError::scan)
+}
+
+fn snapshot_staged_bytes(
+    project: &Project,
+    file: &str,
+) -> std::result::Result<Option<Vec<u8>>, SecretsError> {
+    let path = project.execution_root.join(file);
+    let Some(metadata) = inspected_metadata(&path, file)? else {
+        return Ok(None);
+    };
+    if metadata.file_type().is_symlink() || !metadata.is_file() {
+        return Ok(None);
+    }
+    read_working_tree_file(&path, file, metadata.len()).map_err(SecretsError::scan)
+}
+
+fn staged_bytes(
+    project: &Project,
+    file: &str,
+) -> std::result::Result<Option<Vec<u8>>, SecretsError> {
+    if project.input().is_snapshot() {
+        return snapshot_staged_bytes(project, file);
+    }
+    let Some(size) = git::staged_file_size(&project.root, file).map_err(SecretsError::scan)? else {
+        return Ok(None);
+    };
+    reject_oversized_file(file, size).map_err(SecretsError::scan)?;
+    git::staged_file(&project.root, file).map_err(SecretsError::scan)
+}
+
+fn inspected_metadata(
+    path: &Path,
+    file: &str,
+) -> std::result::Result<Option<fs::Metadata>, SecretsError> {
+    match fs::symlink_metadata(path) {
+        Ok(metadata) => Ok(Some(metadata)),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(error) => Err(SecretsError::scan(
+            anyhow::Error::from(error).context(format!("inspect {file}")),
+        )),
+    }
 }

@@ -55,6 +55,9 @@ windows-sys = { version = "0.61.2", features = [
     "Win32_System_Threading",
 ] }
 
+[lints]
+workspace = true
+
 [profile.dev]
 # Cargo's dev defaults (incremental = true, codegen-units = 256, opt-level = 0) are
 # already tuned for iteration: measured 1.1s incremental rebuild, 0.5s `cargo check`.
@@ -84,3 +87,6 @@ codegen-units = 1     # Pinned back to 1: distribution builds trade compile time
 members = ["quality-replay"]
 default-members = [".", "quality-replay"]
 resolver = "2"
+
+[workspace.lints.clippy]
+cognitive_complexity = "warn"

@@ -2998,23 +2998,10 @@ mod tests {
         }
     }
 
-    #[test]
-    fn retention_preserves_aged_live_child_and_prunes_released_siblings() {
-        let (_temporary, project) = retention_project("gh286-live-");
-        let current = allocate_invocation(&project).unwrap();
-        let mut child = RetentionChild::start(&project, "live", &current.id, &current.root);
-        let ready: serde_json::Value =
-            serde_json::from_slice(&child.wait_for("ready.json")).unwrap();
-        assert_ne!(
-            ready["pid"].as_u64().unwrap(),
-            u64::from(std::process::id())
-        );
-        let live = std::path::PathBuf::from(ready["root"].as_str().unwrap());
-        let live_id = ready["invocation_id"].as_str().unwrap();
-        let marker = retention_marker(&project, live_id);
+    fn wait_for_live_lease_marker(marker: &std::path::Path) -> serde_json::Value {
         let deadline = std::time::Instant::now() + Duration::from_secs(10);
-        let lease_record: serde_json::Value = loop {
-            if let Ok(bytes) = std::fs::read(&marker) {
+        loop {
+            if let Ok(bytes) = std::fs::read(marker) {
                 if let Ok(record) = serde_json::from_slice(&bytes) {
                     break record;
                 }
@@ -3024,7 +3011,16 @@ mod tests {
                 "real live lease marker was not readable"
             );
             std::thread::sleep(Duration::from_millis(10));
-        };
+        }
+    }
+
+    fn assert_live_lease_marker(
+        project: &crate::project::Project,
+        ready: &serde_json::Value,
+        live_id: &str,
+    ) {
+        let marker = retention_marker(project, live_id);
+        let lease_record = wait_for_live_lease_marker(&marker);
         assert_eq!(lease_record["pid"], ready["pid"]);
         assert_eq!(lease_record["resource_kind"], "report-directory");
         assert_eq!(lease_record["invocation_id"], live_id);
@@ -3032,24 +3028,44 @@ mod tests {
             .as_str()
             .unwrap()
             .starts_with("unavailable:"));
-        let siblings: Vec<_> = (0..52).map(|_| retention_completed(&project)).collect();
-        age_retention_directory(&live, 7200);
-        age_retention_directory(&current.root, 7200);
+    }
+
+    fn age_siblings_for_retention(
+        project: &crate::project::Project,
+        live: &std::path::Path,
+        current_root: &std::path::Path,
+    ) -> Vec<std::path::PathBuf> {
+        let siblings: Vec<_> = (0..52).map(|_| retention_completed(project)).collect();
+        age_retention_directory(live, 7200);
+        age_retention_directory(current_root, 7200);
         for (index, path) in siblings.iter().take(4).enumerate() {
             age_retention_directory(path, 3600 - index as u64);
         }
-        let aged = std::fs::metadata(&live).unwrap().modified().unwrap();
+        siblings
+    }
+
+    fn assert_append_does_not_freshen_parent(child: &mut RetentionChild, live: &std::path::Path) {
+        let aged = std::fs::metadata(live).unwrap().modified().unwrap();
         child.send("append");
         child.wait_for("appended");
         assert_eq!(
-            std::fs::metadata(&live).unwrap().modified().unwrap(),
+            std::fs::metadata(live).unwrap().modified().unwrap(),
             aged,
             "appending an existing log cannot freshen its parent"
         );
+    }
+
+    fn retain_live_evidence_and_prune(
+        project: &crate::project::Project,
+        current: &super::Invocation,
+        live: &std::path::Path,
+        live_id: &str,
+        siblings: &[std::path::PathBuf],
+    ) -> crate::project::Project {
         let log = std::fs::read(live.join("logs/unit.log")).unwrap();
         let machine = std::fs::read(live.join(MACHINE_RESULT_FILE)).unwrap();
         assert!(
-            crate::service::ReportDirectoryGuard::try_acquire(&project, live_id)
+            crate::service::ReportDirectoryGuard::try_acquire(project, live_id)
                 .unwrap()
                 .is_none()
         );
@@ -3067,26 +3083,37 @@ mod tests {
             3,
             "protected candidates must not prevent eligible completed siblings from being pruned"
         );
+        invocation_project
+    }
+
+    fn release_live_retention_child(
+        project: &crate::project::Project,
+        invocation_project: &crate::project::Project,
+        child: &mut RetentionChild,
+        current: &super::Invocation,
+        live: &std::path::Path,
+        live_id: &str,
+    ) {
         child.send("release");
         child.wait_for("checked-release");
         // The child's final publication refreshed the directory mtime. It now
         // waits for "close" with the guard held, so re-age after that barrier.
-        age_retention_directory(&live, 7200);
+        age_retention_directory(live, 7200);
         assert!(
-            std::fs::metadata(&live).unwrap().modified().unwrap()
+            std::fs::metadata(live).unwrap().modified().unwrap()
                 < std::time::SystemTime::now() - Duration::from_secs(15 * 60),
             "release-window protection must be exercised on an aged directory"
         );
-        assert!(!retention_marker(&project, live_id).exists());
+        assert!(!retention_marker(project, live_id).exists());
         assert!(
-            crate::service::ReportDirectoryGuard::try_acquire(&project, live_id)
+            crate::service::ReportDirectoryGuard::try_acquire(project, live_id)
                 .unwrap()
                 .is_none()
         );
         let final_log = std::fs::read(live.join("logs/unit.log")).unwrap();
         let final_machine = std::fs::read(live.join(MACHINE_RESULT_FILE)).unwrap();
-        retention_completed(&project);
-        super::prune_old_invocations(&invocation_project, &current.id).unwrap();
+        retention_completed(project);
+        super::prune_old_invocations(invocation_project, &current.id).unwrap();
         assert_eq!(
             std::fs::read(live.join("logs/unit.log")).unwrap(),
             final_log
@@ -3095,18 +3122,64 @@ mod tests {
             std::fs::read(live.join(MACHINE_RESULT_FILE)).unwrap(),
             final_machine
         );
+    }
+
+    fn verify_released_live_directory(
+        project: &crate::project::Project,
+        invocation_project: &crate::project::Project,
+        child: &mut RetentionChild,
+        current: &super::Invocation,
+        live: &std::path::Path,
+        live_id: &str,
+    ) {
         child.send("close");
         child.wait_for("released");
         child.finish();
-        assert!(!retention_marker(&project, live_id).exists());
+        assert!(!retention_marker(project, live_id).exists());
         let mut live_project = project.clone();
-        live_project.reports = live.clone();
+        live_project.reports = live.to_path_buf();
         verify_manifest(&live_project).unwrap();
         // Restore pressure after actual child release: the same aged directory
         // now becomes eligible. It was not kept by disabling retention.
-        retention_completed(&project);
-        super::prune_old_invocations(&invocation_project, &current.id).unwrap();
+        retention_completed(project);
+        super::prune_old_invocations(invocation_project, &current.id).unwrap();
         assert!(!live.exists());
+    }
+
+    #[test]
+    fn retention_preserves_aged_live_child_and_prunes_released_siblings() {
+        let (_temporary, project) = retention_project("gh286-live-");
+        let current = allocate_invocation(&project).unwrap();
+        let mut child = RetentionChild::start(&project, "live", &current.id, &current.root);
+        let ready: serde_json::Value =
+            serde_json::from_slice(&child.wait_for("ready.json")).unwrap();
+        assert_ne!(
+            ready["pid"].as_u64().unwrap(),
+            u64::from(std::process::id())
+        );
+        let live = std::path::PathBuf::from(ready["root"].as_str().unwrap());
+        let live_id = ready["invocation_id"].as_str().unwrap();
+        assert_live_lease_marker(&project, &ready, live_id);
+        let siblings = age_siblings_for_retention(&project, &live, &current.root);
+        assert_append_does_not_freshen_parent(&mut child, &live);
+        let invocation_project =
+            retain_live_evidence_and_prune(&project, &current, &live, live_id, &siblings);
+        release_live_retention_child(
+            &project,
+            &invocation_project,
+            &mut child,
+            &current,
+            &live,
+            live_id,
+        );
+        verify_released_live_directory(
+            &project,
+            &invocation_project,
+            &mut child,
+            &current,
+            &live,
+            live_id,
+        );
     }
 
     #[test]

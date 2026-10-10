@@ -80,31 +80,42 @@ mod tests {
 
     #[test]
     fn json_strings_redact_escaped_quotes_backslashes_and_unicode_in_logs() {
+        assert_json_escaped_secrets_are_redacted();
+        assert_unicode_prefixed_secret_is_redacted();
+    }
+
+    fn assert_json_escaped_secrets_are_redacted() {
         for key in ["password", "token", "secret", "client_secret", "api_key"] {
             for count in 0..=6 {
                 for suffix in ["\"SYNTHETIC_SUFFIX", "SYNTHETIC_SUFFIX"] {
-                    // URI and auth replacements must not alter JSON boundaries
-                    // before the complete credential value has been consumed.
-                    let secret = format!(
-                        "postgres://u:p@db/SYNTHETIC_PREFIX Bearer opaque {}{suffix}",
-                        "\\".repeat(count)
-                    );
-                    let json =
-                        serde_json::json!({key: secret, "context": "keep-context", "count": 7});
-                    let input = format!("INFO request {json}\n{json}\n");
-                    let redacted = redact_text(&input);
-                    assert!(!redacted.contains("SYNTHETIC_"), "leaked: {redacted}");
-                    assert!(redacted.starts_with("INFO request "));
-                    for line in redacted.lines() {
-                        let json = line.strip_prefix("INFO request ").unwrap_or(line);
-                        let value: serde_json::Value = serde_json::from_str(json).unwrap();
-                        assert_eq!(value[key], "[REDACTED]");
-                        assert_eq!(value["context"], "keep-context");
-                        assert_eq!(value["count"], 7);
-                    }
+                    assert_json_secret_is_redacted(key, count, suffix);
                 }
             }
         }
+    }
+
+    fn assert_json_secret_is_redacted(key: &str, count: usize, suffix: &str) {
+        // URI and auth replacements must not alter JSON boundaries
+        // before the complete credential value has been consumed.
+        let secret = format!(
+            "postgres://u:p@db/SYNTHETIC_PREFIX Bearer opaque {}{suffix}",
+            "\\".repeat(count)
+        );
+        let json = serde_json::json!({key: secret, "context": "keep-context", "count": 7});
+        let input = format!("INFO request {json}\n{json}\n");
+        let redacted = redact_text(&input);
+        assert!(!redacted.contains("SYNTHETIC_"), "leaked: {redacted}");
+        assert!(redacted.starts_with("INFO request "));
+        for line in redacted.lines() {
+            let json = line.strip_prefix("INFO request ").unwrap_or(line);
+            let value: serde_json::Value = serde_json::from_str(json).unwrap();
+            assert_eq!(value[key], "[REDACTED]");
+            assert_eq!(value["context"], "keep-context");
+            assert_eq!(value["count"], 7);
+        }
+    }
+
+    fn assert_unicode_prefixed_secret_is_redacted() {
         let input = r#"{"password":"prefix\"QUOTE_SUFFIX","token":"prefix\\","secret":"\u0053UNICODE_SUFFIX","context":"public\"quote","count":9}"#;
         let redacted = redact_text(input);
         let value: serde_json::Value = serde_json::from_str(&redacted).unwrap();

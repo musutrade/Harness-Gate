@@ -443,44 +443,16 @@ pub fn evaluate(
     options: &EvaluationOptions<'_>,
 ) -> Result<Value> {
     validate_policy(policy, context.project)?;
-    let validation = || -> Result<Option<ratchet::Lineage>> {
-        if records.as_array().is_some_and(Vec::is_empty) {
-        } else {
-            evidence::validate_evidence(records, context)?;
-        }
-        if options.base_records.is_some()
-            || options.base_context.is_some()
-            || options.mappings.is_some()
-        {
-            ratchet::validate_base(
-                options.base_records,
-                options.base_context,
-                context,
-                options.mappings,
-            )
-            .map(Some)
-        } else {
-            Ok(None)
-        }
-    };
     let mut results = Vec::new();
-    match validation() {
+    match validate_inputs(records, context, options) {
         Err(e) => {
-            for rule in array(&policy["rules"]) {
-                results.push(result(
-                    rule,
-                    None,
-                    GateState::MeasurementError,
-                    e.message.clone(),
-                    context,
-                    None,
-                    None,
-                ));
-            }
+            results.extend(measurement_error_results(policy, &e.message, context));
         }
         Ok(lineage) => {
-            let head_index = evidence_index(records);
-            let base_index = options.base_records.map(evidence_index).unwrap_or_default();
+            let indices = EvaluationIndices {
+                head: evidence_index(records),
+                base: options.base_records.map(evidence_index).unwrap_or_default(),
+            };
             for rule in array(&policy["rules"]) {
                 let subjects = match select(
                     &rule["scope"],
@@ -514,121 +486,14 @@ pub fn evaluate(
                     ));
                 }
                 for subject in subjects {
-                    let (mut head, mut base, mut baseline, mut assessment) =
-                        (None, None, None, None);
-                    let mut evaluate_subject = || -> Result<(GateState, String)> {
-                        let key = (string(&subject["id"]), string(&rule["metric"]));
-                        let candidates: Vec<_> = head_index
-                            .get(&key)
-                            .into_iter()
-                            .flatten()
-                            .filter(|entry| {
-                                rule["scope"]["kind"] != "relationship"
-                                    || entry.record["contract"]
-                                        .get("relationship")
-                                        .unwrap_or(&rule["scope"]["relationship"])
-                                        == &rule["scope"]["relationship"]
-                            })
-                            .collect();
-                        require(
-                            candidates.len() == 1,
-                            "missing or ambiguous subject metric evidence",
-                        )?;
-                        let entry = candidates[0];
-                        let h = entry.record;
-                        head = Some(h);
-                        if rule.get("ratchet").is_some() {
-                            let lineage = lineage
-                                .as_ref()
-                                .ok_or_else(|| error("missing base for incremental policy"))?;
-                            let (b, info) = ratchet::baseline(
-                                h,
-                                &rule["metric"],
-                                options.base_records.unwrap(),
-                                options.base_context.unwrap(),
-                                lineage,
-                            )?;
-                            base = b;
-                            baseline = Some(info);
-                        } else if options.base_records.is_some() {
-                            let prior: Vec<_> = base_index
-                                .get(&key)
-                                .into_iter()
-                                .flatten()
-                                .map(|entry| entry.record)
-                                .collect();
-                            require(prior.len() <= 1, "ambiguous base evidence")?;
-                            base = prior.first().copied();
-                            if let Some(b) = base {
-                                evidence::require_compatible_series(
-                                    Some(&b["series"]),
-                                    &h["series"],
-                                )?;
-                            }
-                        }
-                        let cap = entry.capability;
-                        let unavailable = match string(&cap["state"]) {
-                            "unsupported" => Some(GateState::Unsupported),
-                            "not_applicable" => Some(GateState::NotApplicable),
-                            "not_configured" => Some(GateState::Blocked),
-                            "not_collected" => Some(GateState::Skipped),
-                            "measurement_error" => Some(GateState::MeasurementError),
-                            _ => None,
-                        };
-                        if let Some(state) = unavailable {
-                            return Ok((state, string(&cap["state"]).into()));
-                        }
-                        let value = entry.value.expect("validated supported metric");
-                        if rule["scope"]["kind"] == "relationship" {
-                            cross_component::validate(h, rule, context.project)?;
-                        }
-                        if rule.get("ratchet").is_some() {
-                            if let Some(b) = base {
-                                let cap = array(&b["capabilities"])
-                                    .iter()
-                                    .find(|c| c["metric"] == rule["metric"])
-                                    .unwrap();
-                                require(
-                                    cap["state"] == "supported",
-                                    format!("base metric unavailable: {}", string(&cap["state"])),
-                                )?;
-                            }
-                            let (s, info) =
-                                ratchet::decision(rule, value, metric(base, &rule["metric"]))?;
-                            let reason = format!(
-                                "ratchet {}; debt {}",
-                                string(&info["trend"]),
-                                string(&info["debt"])
-                            );
-                            assessment = Some(info);
-                            Ok((state(&s)?, reason))
-                        } else {
-                            let passed = compare(value, string(&rule["operator"]), &rule["limit"])?;
-                            Ok((
-                                if passed {
-                                    GateState::Pass
-                                } else {
-                                    state(string(&rule["on_violation"]))?
-                                },
-                                if passed {
-                                    "comparison satisfied"
-                                } else {
-                                    "policy limit violated"
-                                }
-                                .into(),
-                            ))
-                        }
-                    };
-                    let (s, reason) = evaluate_subject()
-                        .unwrap_or_else(|e| (GateState::MeasurementError, e.message));
-                    let mut r = result(rule, Some(subject), s, reason, context, head, base);
-                    if let Some(info) = baseline {
-                        r.record["baseline"] = info;
-                    }
-                    if let Some(info) = assessment {
-                        r.record["ratchet"] = info;
-                    }
-                    results.push(r);
+                    results.push(evaluate_subject_rule(
+                        rule,
+                        subject,
+                        &indices,
+                        lineage.as_ref(),
+                        options,
+                        context,
+                    ));
                 }
             }
         }
@@ -639,7 +504,64 @@ pub fn evaluate(
         context.project,
         options.now,
     );
-    for r in &mut results {
+    attach_exception_reviews(&mut results, &review);
+    let quality = aggregate(policy, &results)?;
+    let mut combined = quality.clone();
+    if !array(&review["errors"]).is_empty() {
+        combined["state"] = json!("measurement_error");
+        combined["blockers"].as_array_mut().unwrap().push(json!({"state":"measurement_error","reason":"invalid exception metadata","errors":review["errors"]}));
+    }
+    Ok(
+        json!({"schema":"harness-policy-results/v1","mode":"shadow","aggregate":combined,"quality_aggregate":quality,"exception_review":review,"results":results,"debt_ledger":results.iter().filter(|r| r.record["ratchet"].get("debt").is_some_and(|d| d != "none")).collect::<Vec<_>>(),"violations":results.iter().filter(|r| r.state != GateState::Pass).collect::<Vec<_>>()}),
+    )
+}
+
+fn validate_inputs(
+    records: &Value,
+    context: &evidence::ValidationContext<'_>,
+    options: &EvaluationOptions<'_>,
+) -> Result<Option<ratchet::Lineage>> {
+    if !records.as_array().is_some_and(Vec::is_empty) {
+        evidence::validate_evidence(records, context)?;
+    }
+    if options.base_records.is_none()
+        && options.base_context.is_none()
+        && options.mappings.is_none()
+    {
+        return Ok(None);
+    }
+    ratchet::validate_base(
+        options.base_records,
+        options.base_context,
+        context,
+        options.mappings,
+    )
+    .map(Some)
+}
+
+fn measurement_error_results(
+    policy: &Value,
+    message: &str,
+    context: &evidence::ValidationContext<'_>,
+) -> Vec<GateResult> {
+    array(&policy["rules"])
+        .iter()
+        .map(|rule| {
+            result(
+                rule,
+                None,
+                GateState::MeasurementError,
+                message.to_owned(),
+                context,
+                None,
+                None,
+            )
+        })
+        .collect()
+}
+
+fn attach_exception_reviews(results: &mut [GateResult], review: &Value) {
+    for r in results {
         let matching: Vec<_> = review["exceptions"]
             .as_array()
             .into_iter()
@@ -651,15 +573,214 @@ pub fn evaluate(
             .collect();
         r.record["exception_review"] = json!({"state":if matching.is_empty() {json!("none")} else {review["state"].clone()},"exceptions":matching});
     }
-    let quality = aggregate(policy, &results)?;
-    let mut combined = quality.clone();
-    if !array(&review["errors"]).is_empty() {
-        combined["state"] = json!("measurement_error");
-        combined["blockers"].as_array_mut().unwrap().push(json!({"state":"measurement_error","reason":"invalid exception metadata","errors":review["errors"]}));
-    }
-    Ok(
-        json!({"schema":"harness-policy-results/v1","mode":"shadow","aggregate":combined,"quality_aggregate":quality,"exception_review":review,"results":results,"debt_ledger":results.iter().filter(|r| r.record["ratchet"].get("debt").is_some_and(|d| d != "none")).collect::<Vec<_>>(),"violations":results.iter().filter(|r| r.state != GateState::Pass).collect::<Vec<_>>()}),
+}
+
+#[derive(Default)]
+struct SubjectState<'a> {
+    head: Option<&'a Value>,
+    base: Option<&'a Value>,
+    baseline: Option<Value>,
+    assessment: Option<Value>,
+}
+
+struct EvaluationIndices<'a> {
+    head: EvidenceIndex<'a>,
+    base: EvidenceIndex<'a>,
+}
+
+fn evaluate_subject_rule<'a>(
+    rule: &'a Value,
+    subject: &'a Value,
+    indices: &EvaluationIndices<'a>,
+    lineage: Option<&ratchet::Lineage>,
+    options: &EvaluationOptions<'a>,
+    context: &evidence::ValidationContext<'a>,
+) -> GateResult {
+    let mut state = SubjectState::default();
+    let (gate, reason) = evaluate_subject(
+        subject,
+        rule,
+        indices,
+        lineage,
+        options,
+        context.project,
+        &mut state,
     )
+    .unwrap_or_else(|e| (GateState::MeasurementError, e.message));
+    let mut r = result(
+        rule,
+        Some(subject),
+        gate,
+        reason,
+        context,
+        state.head,
+        state.base,
+    );
+    if let Some(info) = state.baseline {
+        r.record["baseline"] = info;
+    }
+    if let Some(info) = state.assessment {
+        r.record["ratchet"] = info;
+    }
+    r
+}
+
+fn evaluate_subject<'a>(
+    subject: &'a Value,
+    rule: &'a Value,
+    indices: &EvaluationIndices<'a>,
+    lineage: Option<&ratchet::Lineage>,
+    options: &EvaluationOptions<'a>,
+    project: &'a Value,
+    state: &mut SubjectState<'a>,
+) -> Result<(GateState, String)> {
+    let key = (string(&subject["id"]), string(&rule["metric"]));
+    let (head, capability, value) = subject_entry(&indices.head, &key, rule)?;
+    state.head = Some(head);
+    resolve_base(rule, &key, head, &indices.base, lineage, options, state)?;
+    if let Some(unavailable) = unavailable_state(capability) {
+        return Ok((unavailable, string(&capability["state"]).into()));
+    }
+    let value = value.expect("validated supported metric");
+    let base = state.base;
+    decide_gate(rule, head, value, base, project, state)
+}
+
+fn subject_entry<'a>(
+    head_index: &EvidenceIndex<'a>,
+    key: &(&'a str, &'a str),
+    rule: &'a Value,
+) -> Result<(&'a Value, &'a Value, Option<&'a Value>)> {
+    let candidates: Vec<_> = head_index
+        .get(key)
+        .into_iter()
+        .flatten()
+        .filter(|entry| {
+            rule["scope"]["kind"] != "relationship"
+                || entry.record["contract"]
+                    .get("relationship")
+                    .unwrap_or(&rule["scope"]["relationship"])
+                    == &rule["scope"]["relationship"]
+        })
+        .collect();
+    require(
+        candidates.len() == 1,
+        "missing or ambiguous subject metric evidence",
+    )?;
+    let entry = candidates[0];
+    Ok((entry.record, entry.capability, entry.value))
+}
+
+fn resolve_base<'a>(
+    rule: &'a Value,
+    key: &(&'a str, &'a str),
+    head: &'a Value,
+    base_index: &EvidenceIndex<'a>,
+    lineage: Option<&ratchet::Lineage>,
+    options: &EvaluationOptions<'a>,
+    state: &mut SubjectState<'a>,
+) -> Result<()> {
+    if rule.get("ratchet").is_some() {
+        let lineage = lineage.ok_or_else(|| error("missing base for incremental policy"))?;
+        let (base, info) = ratchet::baseline(
+            head,
+            &rule["metric"],
+            options.base_records.unwrap(),
+            options.base_context.unwrap(),
+            lineage,
+        )?;
+        state.base = base;
+        state.baseline = Some(info);
+        return Ok(());
+    }
+    if options.base_records.is_none() {
+        return Ok(());
+    }
+    let prior: Vec<_> = base_index
+        .get(key)
+        .into_iter()
+        .flatten()
+        .map(|entry| entry.record)
+        .collect();
+    require(prior.len() <= 1, "ambiguous base evidence")?;
+    state.base = prior.first().copied();
+    if let Some(b) = state.base {
+        evidence::require_compatible_series(Some(&b["series"]), &head["series"])?;
+    }
+    Ok(())
+}
+
+fn unavailable_state(capability: &Value) -> Option<GateState> {
+    match string(&capability["state"]) {
+        "unsupported" => Some(GateState::Unsupported),
+        "not_applicable" => Some(GateState::NotApplicable),
+        "not_configured" => Some(GateState::Blocked),
+        "not_collected" => Some(GateState::Skipped),
+        "measurement_error" => Some(GateState::MeasurementError),
+        _ => None,
+    }
+}
+
+fn decide_gate<'a>(
+    rule: &'a Value,
+    head: &'a Value,
+    value: &'a Value,
+    base: Option<&'a Value>,
+    project: &'a Value,
+    out: &mut SubjectState<'a>,
+) -> Result<(GateState, String)> {
+    if rule["scope"]["kind"] == "relationship" {
+        cross_component::validate(head, rule, project)?;
+    }
+    if rule.get("ratchet").is_some() {
+        ratchet_gate(rule, value, base, out)
+    } else {
+        comparison_gate(rule, value)
+    }
+}
+
+fn ratchet_gate<'a>(
+    rule: &'a Value,
+    value: &'a Value,
+    base: Option<&'a Value>,
+    out: &mut SubjectState<'a>,
+) -> Result<(GateState, String)> {
+    if let Some(b) = base {
+        let cap = array(&b["capabilities"])
+            .iter()
+            .find(|c| c["metric"] == rule["metric"])
+            .unwrap();
+        require(
+            cap["state"] == "supported",
+            format!("base metric unavailable: {}", string(&cap["state"])),
+        )?;
+    }
+    let (s, info) = ratchet::decision(rule, value, metric(base, &rule["metric"]))?;
+    let reason = format!(
+        "ratchet {}; debt {}",
+        string(&info["trend"]),
+        string(&info["debt"])
+    );
+    out.assessment = Some(info);
+    Ok((state(&s)?, reason))
+}
+
+fn comparison_gate(rule: &Value, value: &Value) -> Result<(GateState, String)> {
+    let passed = compare(value, string(&rule["operator"]), &rule["limit"])?;
+    let gate = if passed {
+        GateState::Pass
+    } else {
+        state(string(&rule["on_violation"]))?
+    };
+    Ok((
+        gate,
+        if passed {
+            "comparison satisfied"
+        } else {
+            "policy limit violated"
+        }
+        .into(),
+    ))
 }
 
 #[cfg(test)]
