@@ -115,7 +115,7 @@
       "module": "tools/quality/collector_runner.py",
       "purpose": "Collector transport and validation boundary; never a release evaluator.",
       "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
-      "sha256": "419b247072ff2e8c15f8a60c6924d67fc388d6d78a6972d1e0a61e9421ae0115"
+      "sha256": "9dc0321243e388295572c49c0848310da0ff8bf7ba29f006446ed102b8646dcb"
     },
     {
       "authoritative_status": "Repository Rust required-path helper; authoritative within its existing CI responsibility",
