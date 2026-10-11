@@ -170,6 +170,15 @@ timings, scheduler overhead, and the shareable-service startup/reuse counts.
 A median comparison is under
 `verification.serial`, `verification.parallel`, and `verification.comparison`.
 
+The timed `cargo nextest` samples exclude the `benchmark_fixture_test`
+integration probe (recorded as `tests_seconds.excluded_binaries`). That probe
+launches the product's own parallel benchmark, so running it inside the timed
+sample would nest the benchmark under the same constrained runner and make the
+sample flaky instead of measuring the suite. The probe stays required in the
+`Test` and `Quality Script Tests` jobs. A failed cold/warm sample retains its
+full stdout and stderr under `target/quality/nextest-samples/`, and the failure
+message keeps both the output head (the probe diagnostic) and tail.
+
 `post_remediation_benchmarks.py` is a local evidence generator for the R-16
 wait/backoff and scheduler scenarios and the R-17 validation-allocation
 change. It alternates samples between a pre-change binary (for example the
