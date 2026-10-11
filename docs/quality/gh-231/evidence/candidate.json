@@ -1,0 +1,37 @@
+{
+  "assets": [
+    {
+      "digest": {
+        "sha256": "3143043f3093a97a6aaebcaac964eb27f9db2f41d9e013cad92a514b9ba18bfa"
+      },
+      "name": "collector.tar",
+      "size": 1623490560
+    },
+    {
+      "digest": {
+        "sha256": "ee184213fbf96ccb8781a6fa0eafdd7a3512c40321a80917ba8a85e8bf1158a0"
+      },
+      "name": "manifest.json",
+      "size": 213560
+    },
+    {
+      "digest": {
+        "sha256": "24a9bc4fe35a04197ae8dff96034158de36ab31b0462d792d1c1e51147f89ba9"
+      },
+      "name": "sbom.spdx.json",
+      "size": 482318
+    }
+  ],
+  "missing": [
+    "production provenance",
+    "protected eligibility",
+    "RSA signature",
+    "Sigstore bundle",
+    "reviewed final compatibility",
+    "license approval"
+  ],
+  "schema": "rust-collector-preparation/v1",
+  "source_commit": "48099c48f1fded35af5d71638bf57160cb8e0b31",
+  "status": "unsigned-ineligible",
+  "tag": "rust-collector-v0.1.0-rc.1"
+}

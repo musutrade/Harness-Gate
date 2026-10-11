@@ -1,0 +1,145 @@
+{
+  "total_count": 1,
+  "jobs": [
+    {
+      "id": 102797907379,
+      "run_id": 34454586298,
+      "workflow_name": "Arc-Admin bounded cost trial",
+      "head_branch": "symphony/GH-206",
+      "run_url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/runs/34454586298",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUEcwzc8AAAAX7zuVsw",
+      "head_sha": "19a264e2b1992a5355166ca46e87fba766fa30d8",
+      "url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/jobs/102797907379",
+      "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34454586298/job/102797907379",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-10T08:20:03Z",
+      "started_at": "2026-09-10T08:20:07Z",
+      "completed_at": "2026-09-10T09:10:17Z",
+      "name": "measure",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-09-10T08:20:09Z",
+          "completed_at": "2026-09-10T08:20:17Z"
+        },
+        {
+          "name": "Run actions/checkout@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-09-10T08:20:17Z",
+          "completed_at": "2026-09-10T08:24:43Z"
+        },
+        {
+          "name": "Build measured Harness-Gate revision",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-09-10T08:24:43Z",
+          "completed_at": "2026-09-10T08:25:26Z"
+        },
+        {
+          "name": "Prepare pinned Arc-Admin source and isolated caches",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-09-10T08:25:26Z",
+          "completed_at": "2026-09-10T08:26:35Z"
+        },
+        {
+          "name": "Before sample 1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-09-10T08:26:35Z",
+          "completed_at": "2026-09-10T08:33:15Z"
+        },
+        {
+          "name": "Shadow sample 1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-09-10T08:33:15Z",
+          "completed_at": "2026-09-10T08:42:22Z"
+        },
+        {
+          "name": "Before sample 2",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-09-10T08:42:22Z",
+          "completed_at": "2026-09-10T08:47:15Z"
+        },
+        {
+          "name": "Shadow sample 2",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-09-10T08:47:15Z",
+          "completed_at": "2026-09-10T08:56:15Z"
+        },
+        {
+          "name": "Before sample 3",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-09-10T08:56:15Z",
+          "completed_at": "2026-09-10T09:01:09Z"
+        },
+        {
+          "name": "Shadow sample 3",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-09-10T09:01:09Z",
+          "completed_at": "2026-09-10T09:10:05Z"
+        },
+        {
+          "name": "Summarize actual outcomes without accepting authority transfer",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-09-10T09:10:05Z",
+          "completed_at": "2026-09-10T09:10:05Z"
+        },
+        {
+          "name": "Retain all successful and failed measurement receipts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-09-10T09:10:05Z",
+          "completed_at": "2026-09-10T09:10:12Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24,
+          "started_at": "2026-09-10T09:10:12Z",
+          "completed_at": "2026-09-10T09:10:12Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25,
+          "started_at": "2026-09-10T09:10:12Z",
+          "completed_at": "2026-09-10T09:10:12Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/musutrade/Harness-Gate/check-runs/102797907379",
+      "labels": [
+        "gh206-measure"
+      ],
+      "runner_id": 21,
+      "runner_name": "gh206-cost-temporary",
+      "runner_group_id": 1,
+      "runner_group_name": "Default"
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+{
+  "issue": "GH-150",
+  "scope": "OpenSpec tasks 5.1\u20135.4; non-authoritative retained corpus acceptance only",
+  "base_commit": "4851e3b74605e286bf5e615ccf25be22afe5de57",
+  "dependency": {
+    "issue": 149,
+    "pr": 156,
+    "merged": true,
+    "required_ci": "passed on 1971d89b75c4e3b59e5a2afd054e07954970465e"
+  },
+  "environment": {
+    "CARGO_HOME": "$PWD/target/gh-150/cargo-home",
+    "CARGO_TARGET_DIR": "$PWD/target/gh-150/build"
+  },
+  "checks": [
+    {
+      "command": "python3 tools/quality/fixtures/generic-core/replay.py --output target/gh-150/python-baseline.json",
+      "result": "pass",
+      "evidence": "python-baseline.log",
+      "cases": 33
+    },
+    {
+      "command": "cargo build --manifest-path tools/harness-gate/Cargo.toml --locked -p harness-gate-quality-core --example differential_replay",
+      "result": "pass",
+      "evidence": "replay-build.log"
+    },
+    {
+      "command": "python3 tools/quality/fixtures/generic-core/differential.py --rust-replay target/gh-150/build/debug/examples/differential_replay --output target/gh-150/differential.json",
+      "result": "pass",
+      "evidence": "differential.json",
+      "cases": 33,
+      "unexplained_mismatches": 0,
+      "retained_diagnostic_variations": 227
+    },
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "result": "pass",
+      "evidence": "nextest.log",
+      "tests_passed": 329,
+      "tests_skipped": 0
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "result": "pass",
+      "evidence": "fmt.log"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml --all -- --check",
+      "result": "pass",
+      "evidence": "fmt-all.log"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "result": "pass",
+      "evidence": "clippy.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "result": "pass",
+      "evidence": "python-tests.log",
+      "tests_passed": 289
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "result": "pass",
+      "evidence": "docs-consistency.json"
+    },
+    {
+      "command": "openspec validate consolidate-generic-quality-core-into-rust --strict",
+      "result": "pass",
+      "evidence": "openspec.log"
+    },
+    {
+      "command": "git diff --check",
+      "result": "pass",
+      "evidence": "diff-check.log"
+    },
+    {
+      "command": "Python executable probe: inject expected pass into retained angular-missing-evidence; invoke differential_replay INPUT OUTPUT; then invoke with empty cases",
+      "result": "pass",
+      "evidence": "entrypoint-negative.log",
+      "mismatch_exit": 1,
+      "invalid_transport_exit": 2,
+      "field": "/policy_result/aggregate/state"
+    },
+    {
+      "command": "harness-gate config check",
+      "result": "not_applicable",
+      "evidence": null,
+      "reason": "No project-local .harness-gate/flow.toml or declared ci profile in this checkout; not run."
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "result": "not_applicable",
+      "evidence": null,
+      "reason": "No project-local .harness-gate/flow.toml or declared ci profile in this checkout; not run."
+    }
+  ],
+  "initial_environment_failure": {
+    "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+    "exit_code": 102,
+    "error": "cargo metadata failed (exit 101): failed to open /home/gem/.cargo/registry/cache/index.crates.io-1949cf8c6b5b557f/tinyvec-1.13.2.crate: Read-only file system (os error 30)",
+    "evidence": "nextest-baseline.log",
+    "resolution": "Copied shared Cargo registry into workspace-local CARGO_HOME and used workspace-local CARGO_TARGET_DIR. Subsequent required checks passed."
+  },
+  "acceptance_summary": "acceptance-summary.json",
+  "evidence_archive": "validation.tar.gz",
+  "required_hosted_ci": "pending on submitted SHA; controller owns CI observation and completion",
+  "limitations": [
+    "Retained Rust/Angular/contract corpora only; no native recollection.",
+    "Known OS missing-file wording differences are separately retained with exact original values.",
+    "Released CLI, required CI, thresholds and Python authority unchanged. OpenSpec tasks 6\u20137 remain unaccepted."
+  ]
+}

@@ -1,0 +1,18 @@
+test_changed_source_and_unsafe_destination_reject_before_assembly (test_rust_collector_runtime.BuildInputTests.test_changed_source_and_unsafe_destination_reject_before_assembly) ... ok
+test_actual_core_authenticates_private_collector_and_rejects_replay (test_rust_collector_runtime.StandaloneNativeTests.test_actual_core_authenticates_private_collector_and_rejects_replay)
+A disposable test signer does not establish delivery or capture trust. ... ok
+test_actual_core_configures_installed_collector_once_and_rejects_replay (test_rust_collector_runtime.StandaloneNativeTests.test_actual_core_configures_installed_collector_once_and_rejects_replay) ... ok
+test_actual_core_rejects_malformed_output_once_and_consumes_nonce (test_rust_collector_runtime.StandaloneNativeTests.test_actual_core_rejects_malformed_output_once_and_consumes_nonce) ... ok
+test_complete_fixture_classifies_with_private_reexport (test_rust_collector_runtime.StandaloneNativeTests.test_complete_fixture_classifies_with_private_reexport) ... ok
+test_doctor_and_unknown_collect_never_sample (test_rust_collector_runtime.StandaloneNativeTests.test_doctor_and_unknown_collect_never_sample) ... ok
+test_private_cargo_capture_preserves_incomplete_classification (test_rust_collector_runtime.StandaloneNativeTests.test_private_cargo_capture_preserves_incomplete_classification) ... ok
+test_private_generic_projection_is_decided_by_actual_core (test_rust_collector_runtime.StandaloneNativeTests.test_private_generic_projection_is_decided_by_actual_core)
+Native diagnostic; unsigned preparation does not authorize a delivery tuple. ... ok
+test_real_low_coverage_is_completion_and_legacy_exit_is_preserved (test_rust_collector_runtime.StandaloneNativeTests.test_real_low_coverage_is_completion_and_legacy_exit_is_preserved) ... ok
+test_released_core_evaluates_typed_private_measurements (test_rust_collector_runtime.StandaloneNativeTests.test_released_core_evaluates_typed_private_measurements) ... ok
+test_wrong_anchor_has_no_measurement (test_rust_collector_runtime.StandaloneNativeTests.test_wrong_anchor_has_no_measurement) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 118.749s
+
+OK

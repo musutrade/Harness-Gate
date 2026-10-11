@@ -1,0 +1,59 @@
+test_all_missing_source_owners_are_reported (test_closures.ClosureNativeTests.test_all_missing_source_owners_are_reported) ... ok
+test_async_factory_is_not_poll_execution (test_closures.ClosureNativeTests.test_async_factory_is_not_poll_execution) ... ok
+test_later_tuple_element_is_not_an_entry_anchor (test_closures.ClosureNativeTests.test_later_tuple_element_is_not_an_entry_anchor) ... ok
+test_missing_compiler_counter_remains_an_error (test_closures.ClosureNativeTests.test_missing_compiler_counter_remains_an_error) ... ok
+test_source_shapes_map_and_decisions_stay_owned (test_closures.ClosureNativeTests.test_source_shapes_map_and_decisions_stay_owned) ... ok
+test_uncalled_closure_does_not_borrow_parent_execution (test_closures.ClosureNativeTests.test_uncalled_closure_does_not_borrow_parent_execution) ... ok
+test_full_raw_bytes_and_per_source_bindings_are_retained (test_compressed_artifacts.CompressedArtifacts.test_full_raw_bytes_and_per_source_bindings_are_retained) ... ok
+test_crossing_regions_rejected (test_measure.ArithmeticTests.test_crossing_regions_rejected) ... ok
+test_duplicate_json_and_unsafe_integer (test_measure.ArithmeticTests.test_duplicate_json_and_unsafe_integer) ... ok
+test_exact_threshold (test_measure.ArithmeticTests.test_exact_threshold) ... ok
+test_nested_callable_does_not_borrow_parent_hits (test_measure.ArithmeticTests.test_nested_callable_does_not_borrow_parent_hits) ... ok
+test_nested_zero_region_overrides_covered_parent (test_measure.ArithmeticTests.test_nested_zero_region_overrides_covered_parent) ... ok
+test_duplicate_native_instance_rejected (test_measure.NativeTests.test_duplicate_native_instance_rejected) ... ok
+test_missing_function_rejected (test_measure.NativeTests.test_missing_function_rejected) ... ok
+test_real_native_threshold_and_unpolled_async (test_measure.NativeTests.test_real_native_threshold_and_unpolled_async) ... ok
+test_wrong_anchor_rejected (test_measure.NativeTests.test_wrong_anchor_rejected) ... ok
+test_manifest_matches_protocol_identity (test_protocol.ProtocolTests.test_manifest_matches_protocol_identity) ... ok
+test_relative_paths_and_symlinks_rejected (test_protocol.ProtocolTests.test_relative_paths_and_symlinks_rejected) ... ok
+test_series_binds_method_and_toolchain_not_tool_location (test_protocol.ProtocolTests.test_series_binds_method_and_toolchain_not_tool_location) ... ERROR
+test_signed_binding_and_claims_checked_before_collection (test_protocol.ProtocolTests.test_signed_binding_and_claims_checked_before_collection) ... ERROR
+
+======================================================================
+ERROR: test_series_binds_method_and_toolchain_not_tool_location (test_protocol.ProtocolTests.test_series_binds_method_and_toolchain_not_tool_location)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/gem/Harness-Gate-release-20260922/<CLEAN_INSTALL_ROOT>/harness-gate-rust-source-risk-0.1.0-rc.5-linux-amd64/test_protocol.py", line 26, in test_series_binds_method_and_toolchain_not_tool_location
+    original = series(request)
+  File "/home/gem/Harness-Gate-release-20260922/<CLEAN_INSTALL_ROOT>/harness-gate-rust-source-risk-0.1.0-rc.5-linux-amd64/plugin.py", line 75, in series
+    implementation = {name: sha((HERE / name).read_bytes()) for name in ('plugin.py', 'measure.py', 'inventory', 'ast/Cargo.lock', 'capture.py')}
+                                ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 778, in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/gem/Harness-Gate-release-20260922/<CLEAN_INSTALL_ROOT>/harness-gate-rust-source-risk-0.1.0-rc.5-linux-amd64/ast/Cargo.lock'
+
+======================================================================
+ERROR: test_signed_binding_and_claims_checked_before_collection (test_protocol.ProtocolTests.test_signed_binding_and_claims_checked_before_collection)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/gem/Harness-Gate-release-20260922/<CLEAN_INSTALL_ROOT>/harness-gate-rust-source-risk-0.1.0-rc.5-linux-amd64/test_protocol.py", line 38, in test_signed_binding_and_claims_checked_before_collection
+    identity = series(request)
+  File "/home/gem/Harness-Gate-release-20260922/<CLEAN_INSTALL_ROOT>/harness-gate-rust-source-risk-0.1.0-rc.5-linux-amd64/plugin.py", line 75, in series
+    implementation = {name: sha((HERE / name).read_bytes()) for name in ('plugin.py', 'measure.py', 'inventory', 'ast/Cargo.lock', 'capture.py')}
+                                ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 778, in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/pathlib/__init__.py", line 772, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/gem/Harness-Gate-release-20260922/<CLEAN_INSTALL_ROOT>/harness-gate-rust-source-risk-0.1.0-rc.5-linux-amd64/ast/Cargo.lock'
+
+----------------------------------------------------------------------
+Ran 20 tests in 2.319s
+
+FAILED (errors=2)

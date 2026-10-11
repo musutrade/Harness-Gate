@@ -1,0 +1,21 @@
+{
+  "command": [
+    "cargo",
+    "nextest",
+    "run",
+    "--manifest-path",
+    "tools/harness-gate/Cargo.toml",
+    "--locked",
+    "-E",
+    "test(webhook_accepts_success_response)"
+  ],
+  "unset_environment": [
+    "HTTP_PROXY",
+    "HTTPS_PROXY",
+    "ALL_PROXY",
+    "http_proxy",
+    "https_proxy",
+    "all_proxy"
+  ],
+  "exit_code": 0
+}

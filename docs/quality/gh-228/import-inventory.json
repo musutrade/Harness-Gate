@@ -1,0 +1,179 @@
+{
+  "method": "AST includes conditional imports; runtime-inputs.json independently records observed extension imports and recursive ELF dependencies. Developer-only rust_native_policy is not shipped. Frozen mixed-module imports remain non-authoritative as documented in python-retention.md.",
+  "modules": {
+    "rust_collector_entry": {
+      "source": "tools/quality/rust_collector_entry.py",
+      "sha256": "9923d134ed91ba9ea25cb9234088b7ec306fce6fedc3f0b8541b1ee82376a90f",
+      "local_imports": [
+        "collector_runner",
+        "rust_collector_contract",
+        "rust_native_classify",
+        "rust_native_driver"
+      ],
+      "stdlib_imports": [
+        "__future__",
+        "argparse",
+        "json",
+        "os",
+        "pathlib",
+        "platform",
+        "sys"
+      ],
+      "shipped": true
+    },
+    "rust_native_driver": {
+      "source": "tools/quality/rust_native_driver.py",
+      "sha256": "d543f6796afccce77c902aff5b00de478e5466bf783ab28060d383bb3579a5de",
+      "local_imports": [],
+      "stdlib_imports": [
+        "__future__",
+        "argparse",
+        "bisect",
+        "collections",
+        "fractions",
+        "hashlib",
+        "json",
+        "os",
+        "pathlib",
+        "shutil",
+        "subprocess",
+        "sys",
+        "tempfile"
+      ],
+      "shipped": true
+    },
+    "rust_native_classify": {
+      "source": "tools/quality/rust_native_classify.py",
+      "sha256": "b83b1c799dea5e68b24e4b5aaff3db6947e12cda464e66532804285a9010b6f6",
+      "local_imports": [
+        "rust_native_driver"
+      ],
+      "stdlib_imports": [
+        "__future__",
+        "argparse",
+        "collections",
+        "gzip",
+        "json",
+        "pathlib"
+      ],
+      "shipped": true
+    },
+    "rust_collector_contract": {
+      "source": "tools/quality/rust_collector_contract.py",
+      "sha256": "4e5bf1a7fa874ebec1c900813c627db43d7e61d01721b2abee845b6bfd0757fb",
+      "local_imports": [
+        "collector_runner",
+        "harness_evidence"
+      ],
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "hashlib",
+        "json"
+      ],
+      "shipped": true
+    },
+    "collector_runner": {
+      "source": "tools/quality/collector_runner.py",
+      "sha256": "f79a21dadc950d2cf54a97c0bb7a73d2990f7329e084037d505946db51e057e9",
+      "local_imports": [
+        "harness_evidence",
+        "project_model"
+      ],
+      "stdlib_imports": [
+        "__future__",
+        "copy",
+        "dataclasses",
+        "hashlib",
+        "json",
+        "math",
+        "os",
+        "pathlib",
+        "signal",
+        "subprocess",
+        "typing"
+      ],
+      "shipped": true
+    },
+    "harness_evidence": {
+      "source": "tools/quality/harness_evidence.py",
+      "sha256": "f08736199f6e192b8e3ab3c9269ce2743f5624940561663919f99790545281e2",
+      "local_imports": [
+        "project_model",
+        "quality_evidence"
+      ],
+      "stdlib_imports": [
+        "__future__",
+        "argparse",
+        "hashlib",
+        "json",
+        "pathlib",
+        "sys"
+      ],
+      "shipped": true
+    },
+    "project_model": {
+      "source": "tools/quality/project_model.py",
+      "sha256": "d1d493bbd4566b8aaf469d0f28fdee89a3c3a3e3ebfe3e1068b9d93e90d1b196",
+      "local_imports": [
+        "quality_evidence"
+      ],
+      "stdlib_imports": [
+        "__future__",
+        "argparse",
+        "hashlib",
+        "json",
+        "pathlib",
+        "sys",
+        "unicodedata"
+      ],
+      "shipped": true
+    },
+    "quality_evidence": {
+      "source": "tools/quality/quality_evidence.py",
+      "sha256": "8938ce2fc2d49caf2e3f3dac284fe3d07a13a3da9cbd8e1e729f011e2d5d145e",
+      "local_imports": [],
+      "stdlib_imports": [
+        "__future__",
+        "argparse",
+        "json",
+        "pathlib",
+        "re",
+        "sys",
+        "typing"
+      ],
+      "shipped": true
+    },
+    "native_wrapper": {
+      "source": "tools/quality/rust-collector-runtime/native_wrapper.py",
+      "sha256": "a8ff050292426f9d1a974ce8724c82c6cc1df4700e745f406c6f76ee1ee33c38",
+      "local_imports": [
+        "rust_native_driver"
+      ],
+      "stdlib_imports": [
+        "pathlib",
+        "sys"
+      ],
+      "shipped": true
+    },
+    "rust_native_policy": {
+      "source": "tools/quality/rust_native_policy.py",
+      "sha256": "72872de33986555d44c2ae99beecbf71a7e851352da37db60815ac9eab4b192b",
+      "local_imports": [
+        "harness_evidence",
+        "project_model",
+        "rust_native_driver"
+      ],
+      "stdlib_imports": [
+        "__future__",
+        "argparse",
+        "json",
+        "pathlib",
+        "shutil",
+        "subprocess",
+        "sys"
+      ],
+      "shipped": false
+    }
+  }
+}

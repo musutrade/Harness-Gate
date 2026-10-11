@@ -1,0 +1,147 @@
+{
+  "status": "bounded self-hosted workload measurements and traditional runtime comparison complete; full-quality integration and authority transfer pending",
+  "environment": {
+    "CARGO_TARGET_DIR": "$PWD/target",
+    "TMPDIR": "$PWD/target/quality/gh-206/tmp",
+    "GIT_CEILING_DIRECTORIES": "$PWD/target/quality/gh-206/tmp",
+    "NEXTEST_TEST_THREADS": "2",
+    "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-206/workflow-acceptance",
+    "reason": "Keep build and temporary files inside this workspace, isolate temporary Git fixtures, and limit acceptance-test contention."
+  },
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 0,
+      "result": "388 passed; 0 skipped",
+      "evidence": "validation/nextest.log"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "exit_code": 0,
+      "result": "passed",
+      "evidence": "validation/fmt.log"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 0,
+      "result": "passed",
+      "evidence": "validation/clippy.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 0,
+      "result": "372 tests passed",
+      "evidence": "validation/python.log"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 0,
+      "result": "passed with workspace-local build/temporary directories; zero broken links",
+      "evidence": "validation/docs-consistency-final.log"
+    },
+    {
+      "command": "openspec validate dogfood-harness-gate-on-arc-admin --strict",
+      "exit_code": 0,
+      "result": "passed",
+      "evidence": "validation/openspec.log"
+    },
+    {
+      "command": "python3 docs/dogfood/arc-admin/cost/reproduce.py",
+      "exit_code": 0,
+      "result": "25 command owners and nine declared capabilities reproduced; shadow cost remains NOT_MEASURED",
+      "evidence": "validation/reproduce.log"
+    },
+    {
+      "command": "python3 docs/dogfood/arc-admin/shadow/reproduce.py",
+      "exit_code": 0,
+      "result": "25 gates and two preludes reproduced; zero unexplained differences; runtime parity BLOCKED",
+      "evidence": "validation/shadow-reproduce.log"
+    },
+    {
+      "command": "python3 docs/dogfood/arc-admin/negative/reproduce.py",
+      "exit_code": 0,
+      "result": "six controlled command scenarios and seventeen synthetic quality scenarios reproduced",
+      "evidence": "validation/negative-reproduce.log"
+    },
+    {
+      "command": "python3 docs/dogfood/arc-admin/shadow/run.py --help",
+      "exit_code": 0,
+      "result": "argument-parser smoke check only",
+      "evidence": "validation/runner-help.log"
+    },
+    {
+      "command": "python3 -m py_compile docs/dogfood/arc-admin/shadow/run.py docs/dogfood/arc-admin/cost/reproduce.py tools/quality/tests/test_arc_admin_cost.py",
+      "exit_code": 0,
+      "result": "passed",
+      "evidence": "validation/py-compile.log"
+    },
+    {
+      "command": "python3 tools/quality/ci_acceptance.py --directory target/quality/gh-206/workflow-acceptance",
+      "exit_code": 0,
+      "result": "12 local acceptance cases; not hosted aggregate or Arc-Admin CI timing",
+      "evidence": "validation/ci-acceptance.log"
+    }
+  ],
+  "project_local_commands": {
+    "harness-gate config check": "not applicable: root .harness-gate/flow.toml absent",
+    "harness-gate verify --profile ci --all": "not applicable: root .harness-gate/flow.toml absent; no declared ci profile"
+  },
+  "hosted_required_quality_aggregate": "CI pending at submission; controller owns result",
+  "limitations": [
+    "The measured topology is a bounded sequential full-workload job, not the original Arc-Admin multijob CI.",
+    "All three Harness-Gate full runs retain QUALITY_BLOCKED due to missing runtime/full-state.json; native producers, trusted state/keys and baseline provisioning remain GH-207 prerequisites.",
+    "Complete-quality cost and target savings remain unknown. Required Quality Aggregate must independently pass for the final PR head."
+  ],
+  "initial_failures": [
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "environment": "Without workspace-local Cargo/temporary-directory overrides",
+      "exit_code": 1,
+      "error": "quality gate failed: documentation, examples, or schema synchronization failed",
+      "impact": "Cargo-backed example/migration/schema checks failed; documentation links and policy checks passed. Child stderr is suppressed by the checker. The same command passed with workspace-local build/temporary directories.",
+      "evidence": "validation/docs-consistency.log",
+      "final_evidence": "validation/docs-consistency.json"
+    }
+  ],
+  "artifacts": {
+    "docs_consistency": "validation/docs-consistency.json",
+    "local_ci_acceptance_summary": "validation/ci-acceptance-summary.json",
+    "local_ci_acceptance_receipt": "validation/ci-acceptance-receipt.json"
+  },
+  "delivery_environment": {
+    "command": "git add docs/dogfood/arc-admin/README.md docs/dogfood/arc-admin/shadow/run.py docs/dogfood/arc-admin/cost openspec/changes/dogfood-harness-gate-on-arc-admin/design.md openspec/changes/dogfood-harness-gate-on-arc-admin/specs/project-validation-extension-boundary/spec.md openspec/changes/dogfood-harness-gate-on-arc-admin/tasks.md tools/quality/tests/test_arc_admin_cost.py",
+    "exit_code": 128,
+    "error": "fatal: Unable to create '/mnt/dev-ssd/workspaces/symphony/GH-206/.git/index.lock': Read-only file system",
+    "impact": "Local index, commit and push cannot be updated through this read-only Git directory. Publish the validated workspace files using the GitHub Git API on symphony/GH-206; leave local Git metadata unchanged."
+  },
+  "initial_status": "local validation passed; task 7.1 blocked",
+  "initial_limitations": [
+    "Task 7.1 remains unchecked: no paired self-hosted shadow CI trial or target trial exists in the retained evidence.",
+    "GH-204 Harness runs fail before dispatch with HGCFG-SHARED-SERVICE and have no elapsed-time receipts. Exact command and error are retained in ../shadow/observation.json and its linked logs.",
+    "The timing instrumentation is smoke-checked locally; no new Arc-Admin application run or self-hosted workflow was executed.",
+    "The authority topology is a conditional design. Shared-service compatibility, trusted native collector provisioning, baseline integration and runtime assurance parity remain prerequisites."
+  ],
+  "follow_up": {
+    "source_remediation": "runtime-remediation.md",
+    "architecture": "../../../adr/0050-serial-shared-service-ordering.md",
+    "risk_base": "ba69cd5",
+    "risk_head": "e6de28d",
+    "base_tests": 388,
+    "head_tests": 390,
+    "risk_identities": 973,
+    "risk_failures": 0,
+    "clippy": "passed",
+    "docs_consistency": "passed after final evidence documentation",
+    "openspec_strict": "passed",
+    "selfhosted_report": "selfhosted-report.json",
+    "ci_run": "https://github.com/musutrade/Harness-Gate/actions/runs/34454586298",
+    "paired_trials": 3,
+    "traditional_checks_per_trial": 27,
+    "traditional_checks_all_passed": true,
+    "quality_acceptance": false,
+    "artifact_downloaded_files": 753,
+    "artifact_bytes_match_runner": true,
+    "arc_admin_python_tests": 28,
+    "critical_path_tests": 17
+  }
+}

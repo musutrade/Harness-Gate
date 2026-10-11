@@ -1,0 +1,39 @@
+{
+  "original_archive": "project-evidence.tar.gz",
+  "bytes": 16869226,
+  "sha256": "0a77bd8de73052d0af9ab3b42c88fe0698455bb74be2900c1e967528963cc9c0",
+  "parts": [
+    {
+      "file": "part-0000",
+      "bytes": 2880000,
+      "sha256": "ac5ebc5b2a6ee46486d09c8fa7f6653785ac9bfc63297792d5756765ea526c67"
+    },
+    {
+      "file": "part-0001",
+      "bytes": 2880000,
+      "sha256": "337101bdba5a04fbd1c6afe4803d517f361f236d0a77c4152f05d01965ab8607"
+    },
+    {
+      "file": "part-0002",
+      "bytes": 2880000,
+      "sha256": "5dec8b36ddf7dda58863dd50e1171c9e9786139a53a8cfc05d7790fdd1ea0122"
+    },
+    {
+      "file": "part-0003",
+      "bytes": 2880000,
+      "sha256": "17ba0365015bae9e500e0cd3340e97c37c97736c91221855a0a5168b723e2628"
+    },
+    {
+      "file": "part-0004",
+      "bytes": 2880000,
+      "sha256": "e00beeb3c3b49f12b93bdbf6c50ce60a6d5d369a4090c4c7f0177c1e387011df"
+    },
+    {
+      "file": "part-0005",
+      "bytes": 2469226,
+      "sha256": "38764a033b75b9f233e231793bf6f5381ba80a9f5e7a8d1f3aa273948a195e90"
+    }
+  ],
+  "reconstruct_from_parts_directory": "cat part-* > ../project-evidence.tar.gz",
+  "verify": "Verify original archive SHA-256 before extraction; original per-file inventory remains unchanged."
+}

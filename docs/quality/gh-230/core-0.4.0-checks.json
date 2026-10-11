@@ -1,0 +1,260 @@
+{
+  "inventory": {
+    "command": [
+      "python3",
+      "tools/quality/build_rust_collector.py",
+      "--inventory",
+      "--driver",
+      "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/operator-native-runtime/build/debug/harness-gate-rust-native-driver",
+      "--sysroot",
+      "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu",
+      "--crate-cache",
+      "/home/gem/.cargo/registry/cache/index.crates.io-1949cf8c6b5b557f",
+      "--rustc-dev",
+      "/mnt/dev-ssd/workspaces/symphony/GH-230/target/symphony-inputs/rustc-dev-1.97.1-x86_64-unknown-linux-gnu.tar.xz",
+      "--build-record",
+      "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/operator-native-runtime/bootstrap.json",
+      "--lock",
+      "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/continued/inputs.json"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+      "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "OPENSPEC_TELEMETRY": "0"
+    },
+    "proxy_environment_removed": true,
+    "exit_code": 0,
+    "wall_seconds": 23.6499489970156
+  },
+  "assembly": {
+    "command": [
+      "python3",
+      "tools/quality/build_rust_collector.py",
+      "--lock",
+      "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/continued/inputs.json",
+      "--output",
+      "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/continued/runtime"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+      "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "OPENSPEC_TELEMETRY": "0"
+    },
+    "proxy_environment_removed": true,
+    "exit_code": 0,
+    "wall_seconds": 10.732229960034601
+  },
+  "vendor": {
+    "command": [
+      "cargo",
+      "vendor",
+      "--manifest-path",
+      "tools/quality/fixtures/rust-native/file-classification/Cargo.toml",
+      "--locked",
+      "--offline",
+      "target/gh-230/continued/vendor"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+      "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "OPENSPEC_TELEMETRY": "0"
+    },
+    "proxy_environment_removed": true,
+    "exit_code": 0,
+    "wall_seconds": 0.13499316200613976
+  },
+  "nextest": {
+    "command": [
+      "cargo",
+      "nextest",
+      "run",
+      "--manifest-path",
+      "tools/harness-gate/Cargo.toml",
+      "--locked"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+      "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "OPENSPEC_TELEMETRY": "0"
+    },
+    "proxy_environment_removed": true,
+    "exit_code": 0,
+    "wall_seconds": 205.84408431698103
+  },
+  "fmt": {
+    "command": [
+      "cargo",
+      "fmt",
+      "--manifest-path",
+      "tools/harness-gate/Cargo.toml",
+      "--",
+      "--check"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+      "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "OPENSPEC_TELEMETRY": "0"
+    },
+    "proxy_environment_removed": true,
+    "exit_code": 0,
+    "wall_seconds": 0.7849525310448371
+  },
+  "clippy": {
+    "command": [
+      "cargo",
+      "clippy",
+      "--manifest-path",
+      "tools/harness-gate/Cargo.toml",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+      "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "OPENSPEC_TELEMETRY": "0"
+    },
+    "proxy_environment_removed": true,
+    "exit_code": 0,
+    "wall_seconds": 14.030781928042416
+  },
+  "python": {
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tools/quality/tests",
+      "-v"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+      "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "OPENSPEC_TELEMETRY": "0",
+      "RUST_COLLECTOR_RUNTIME": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/continued/runtime",
+      "HARNESS_GATE_NATIVE_POLICY_BINARY": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/symphony-inputs/core-v0.4.0/harness-gate-linux-amd64",
+      "NATIVE_DRIVER": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/operator-native-runtime/build/debug/harness-gate-rust-native-driver",
+      "NATIVE_DRIVER_SYSROOT": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu",
+      "PYTHONPATH": "/mnt/dev-ssd/workspaces/symphony/GH-230/tools/quality/tests"
+    },
+    "proxy_environment_removed": true,
+    "exit_code": 1,
+    "wall_seconds": 269.6951706960099
+  },
+  "native-cargo": {
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "test_rust_collector_runtime.StandaloneNativeTests.test_private_cargo_capture_preserves_incomplete_classification",
+      "-v"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+      "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "OPENSPEC_TELEMETRY": "0",
+      "RUST_COLLECTOR_RUNTIME": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/continued/runtime",
+      "RUST_COLLECTOR_TEST_VENDOR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/continued/vendor",
+      "HARNESS_GATE_NATIVE_POLICY_BINARY": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/symphony-inputs/core-v0.4.0/harness-gate-linux-amd64",
+      "NATIVE_DRIVER": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/operator-native-runtime/build/debug/harness-gate-rust-native-driver",
+      "NATIVE_DRIVER_SYSROOT": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu",
+      "PYTHONPATH": "/mnt/dev-ssd/workspaces/symphony/GH-230/tools/quality/tests"
+    },
+    "proxy_environment_removed": true,
+    "exit_code": 0,
+    "wall_seconds": 12.286190124985296
+  },
+  "openspec": {
+    "command": [
+      "openspec",
+      "validate",
+      "package-official-rust-collector-for-independent-delivery",
+      "--strict",
+      "--no-interactive"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+      "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "OPENSPEC_TELEMETRY": "0"
+    },
+    "proxy_environment_removed": true,
+    "exit_code": 0,
+    "wall_seconds": 0.5160186350112781
+  },
+  "openspec-final": {
+    "command": [
+      "openspec",
+      "validate",
+      "package-official-rust-collector-for-independent-delivery",
+      "--strict",
+      "--no-interactive"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+      "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "OPENSPEC_TELEMETRY": "0"
+    },
+    "proxy_environment_removed": true,
+    "exit_code": 0,
+    "wall_seconds": 0.5987619169754907
+  },
+  "whitespace": {
+    "command": [
+      "git",
+      "--git-dir=target/gh-230/continued/git-metadata",
+      "--work-tree=.",
+      "diff",
+      "--check"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+      "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "OPENSPEC_TELEMETRY": "0"
+    },
+    "proxy_environment_removed": true,
+    "exit_code": 0,
+    "wall_seconds": 0.011052002024371177
+  },
+  "docs": {
+    "command": [
+      "python3",
+      "tools/quality/docs_consistency.py",
+      "--output",
+      "target/quality/docs-consistency.json"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+      "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "OPENSPEC_TELEMETRY": "0"
+    },
+    "proxy_environment_removed": true,
+    "exit_code": 0,
+    "wall_seconds": 3.41026780300308
+  }
+}

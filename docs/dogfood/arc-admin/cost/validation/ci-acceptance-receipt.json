@@ -1,0 +1,11 @@
+# Archived quality evidence
+
+This file was externalized from Git history to keep `main` small. The raw bytes remain available in the repository evidence archive.
+
+- Archive: https://github.com/musutrade/Harness-Gate/releases/download/evidence-archive-20261010/quality-evidence-current.tar.zst
+- Path inside archive: `docs/dogfood/arc-admin/cost/validation/ci-acceptance-receipt.json`
+- Original size: 1667374 bytes
+- Original SHA-256: `859841323c207f1ce8f884dfaa9d9adf5217bad93dc82a07fa25508c9b2e2ba9`
+- Original Git blob: `7712f99e0c0167aa1ec9a9b722310f3dc5deb118`
+
+Download the archive, extract `docs/dogfood/arc-admin/cost/validation/ci-acceptance-receipt.json`, and verify the SHA-256 before use.

@@ -1,0 +1,15 @@
+✔ previews and applies a release while preserving non-conflicting business changes (193.289147ms)
+✔ reports same-line conflicts before writing any file (151.126606ms)
+✔ allows an explicitly reviewed conflict to keep the business version (134.56154ms)
+✔ preserves files that still exist after leaving the managed manifest (137.390362ms)
+✔ rejects dirty targets and framework downgrades (88.624606ms)
+✔ requires the template checkout to point exactly at the target release tag (92.767339ms)
+✔ shell entrypoint has valid syntax and Chinese help (66.573565ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 961.668497

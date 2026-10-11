@@ -1,0 +1,29 @@
+   Compiling harness-gate v0.3.7 (/mnt/dev-ssd/workspaces/symphony/GH-207/tools/harness-gate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.78s
+────────────
+ Nextest run ID e437c4db-6959-43b7-9101-91347f4aba5c with nextest profile: default
+    Starting 1 test across 10 binaries (391 tests skipped)
+        FAIL [   0.008s] (1/1) harness-gate::bin/harness-gate config::import::tests::import_checks_generic_resource_conflicts_without_changing_serial_flows
+  stdout ───
+
+    running 1 test
+    test config::import::tests::import_checks_generic_resource_conflicts_without_changing_serial_flows ... FAILED
+
+    failures:
+
+    failures:
+        config::import::tests::import_checks_generic_resource_conflicts_without_changing_serial_flows
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 323 filtered out; finished in 0.00s
+
+  stderr ───
+
+    thread 'config::import::tests::import_checks_generic_resource_conflicts_without_changing_serial_flows' (630) panicked at src/config/import.rs:284:52:
+    called `Option::unwrap()` on a `None` value
+    note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+  Cancelling due to test failure: 
+────────────
+     Summary [   0.011s] 1 test run: 0 passed, 1 failed, 391 skipped
+        FAIL [   0.008s] (1/1) harness-gate::bin/harness-gate config::import::tests::import_checks_generic_resource_conflicts_without_changing_serial_flows
+error: test run failed

@@ -1,0 +1,18 @@
+{
+  "wrong-identity": {
+    "exit_code": 1,
+    "expected": "reject"
+  },
+  "missing-bundle": {
+    "exit_code": 1,
+    "expected": "reject"
+  },
+  "tampered-signature": {
+    "exit_code": 1,
+    "expected": "reject"
+  },
+  "missing-inclusion": {
+    "exit_code": 1,
+    "expected": "reject"
+  }
+}

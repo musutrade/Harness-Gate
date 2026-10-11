@@ -1,0 +1,153 @@
+{
+  "schema": "gh292-performance-evidence-index/v1",
+  "state": "PAIRED, SEMANTIC AND ACTUAL PUBLICATION INDEPENDENT AUDIT PASS; GIT PUBLICATION PENDING",
+  "base_source_commit": "e4a084be19de454cdaeebb44c41715fecf1f2b49",
+  "candidate_identity": "base plus exact four-source freeze; no candidate commit assigned",
+  "paired_medians": {
+    "small": {
+      "before": {
+        "wall_seconds": 0.022603202,
+        "cpu_seconds": 0.022307,
+        "peak_rss_kib": 7832,
+        "report_bytes": 119801,
+        "report_sha256": "ac7143e070bdb72cf6b6c9fe282877160b5c39c3f047302f1f716ffd63f4a891"
+      },
+      "after": {
+        "wall_seconds": 0.021351519,
+        "cpu_seconds": 0.0211,
+        "peak_rss_kib": 7936,
+        "report_bytes": 119801,
+        "report_sha256": "ac7143e070bdb72cf6b6c9fe282877160b5c39c3f047302f1f716ffd63f4a891"
+      }
+    },
+    "large": {
+      "before": {
+        "wall_seconds": 2.006410478,
+        "cpu_seconds": 1.969364,
+        "peak_rss_kib": 140308,
+        "report_bytes": 6814167,
+        "report_sha256": "a014d85577735b2340b9804072fbab29d661f248b1ca9f7854036c45178ffe48"
+      },
+      "after": {
+        "wall_seconds": 1.462108975,
+        "cpu_seconds": 1.426544,
+        "peak_rss_kib": 140540,
+        "report_bytes": 6814167,
+        "report_sha256": "a014d85577735b2340b9804072fbab29d661f248b1ca9f7854036c45178ffe48"
+      }
+    },
+    "boundaries": [
+      "diagnostic synthetic delivery envelopes do not certify real publication",
+      "RSS cumulative image highwater; no memory improvement inferred",
+      "standalone evidence nested in policy not additive",
+      "uncold OS cache; 3fresh samples each cohort",
+      "original before-v2 historical identity untouched"
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "/mnt/dev-ssd/dev-tmp/gh292-push-20261008/semantic-20261008T085145955925Z/paired-handoff.json",
+      "sha256": "311ef1c0c2860120be9e5f0211d8cf4115925764939ceff0fdb3eba151c0dd20"
+    },
+    {
+      "path": "/mnt/dev-ssd/dev-tmp/gh292-push-20261008/semantic-20261008T085145955925Z/same-tool-proof.json",
+      "sha256": "a833cfbc5e4c0f281a1bba0daea906d345eefad13f003c2b12ba6d550546e649"
+    },
+    {
+      "path": "/mnt/dev-ssd/dev-tmp/gh292-push-20261008/semantic-20261008T085145955925Z/paired-before/summary.json",
+      "sha256": "87f79aa6396fde87bf4c600d5cc6e29fbfefc8d0d4ac54374e2941c49d4f91aa"
+    },
+    {
+      "path": "/mnt/dev-ssd/dev-tmp/gh292-push-20261008/semantic-20261008T085145955925Z/paired-after/summary.json",
+      "sha256": "bf435e56f6449a976abdb51a74fd3be289c6b8becfd8e7e3911a29ce433834dd"
+    },
+    {
+      "path": "/mnt/dev-ssd/dev-tmp/gh292-push-20261008/semantic-20261008T085145955925Z/profile-build-before/build-record.json",
+      "sha256": "5aa84c6574b38f188961044bfac9d29d9dd5c85bc3bf00ef0ab498906958f0a5"
+    },
+    {
+      "path": "/mnt/dev-ssd/dev-tmp/gh292-push-20261008/semantic-20261008T085145955925Z/profile-build-after/build-record.json",
+      "sha256": "ba611fdc7286e0093ebc079b6b915f9aa49a356a92d5850ddd8d74eb0bd1df2a"
+    },
+    {
+      "path": "/mnt/dev-ssd/dev-tmp/gh292-push-20261008/semantic-20261008T085145955925Z/inputs/fixture-input-manifest.json",
+      "sha256": "609940c699fc06a578d1ea5c45e6bd21d58cf4ddfb8da10606016c977c782452"
+    },
+    {
+      "path": "/mnt/dev-ssd/dev-tmp/gh292-push-20261008/semantic-20261008T085145955925Z/raw/public-parity-correct-root/stdout",
+      "sha256": "6e356cfd8d939c343d6d171ef632dc5033f483c8996ec1e1a60f80c53697361e"
+    },
+    {
+      "path": "/mnt/dev-ssd/dev-tmp/gh292-audit-20261008/paired-085145-review/review-v2.json",
+      "sha256": "f749f275cbcc875a46b9135fea8889c124ad1c2618feb3e50928a284bf44209d"
+    },
+    {
+      "path": "/mnt/dev-ssd/dev-tmp/gh292-dev-20261008/source-freeze-20261008T084604158009Z/freeze.json",
+      "sha256": "3b24b339bb72bb37bacc53ff645307b9f0cd982bc163b1633892601baeee0184"
+    },
+    {
+      "path": "/mnt/dev-ssd/dev-tmp/gh292-push-20261008/publication-20261008T091500859546Z/final-20261008T092241981522Z/summary.json",
+      "sha256": "cbc7221f2bdf8e83aaba09b3e36d0f768f0142b465580b27a3782b980fa78060"
+    },
+    {
+      "path": "/mnt/dev-ssd/dev-tmp/gh292-audit-20261008/publication-091500-review/final.json",
+      "sha256": "d572f81ca4f27171edaf5e09d80164507fb2d4a063ebd0856753f00a7d21c7f1"
+    }
+  ],
+  "tested_package": {
+    "path": "/mnt/dev-ssd/dev-tmp/gh292-root-20261008/portable-profile-v2",
+    "sha256": {
+      "Cargo.toml": "89adda431b57fee82038292f5262970f152ee14e25bb2f38c61797f8c1e1cfb2",
+      "Cargo.lock": "59355fe0143ed6c275a771d51ad1aa01d5ebca7c31187d46feb07b704d41f571",
+      "build.rs": "27efca98224cbfc14f946079be72c8532df5023d085d12d7ca5e0a37076090a4",
+      "src/main.rs": "7cf4ffd78485eb146ed53b85191737f526312ccd39c6c7475f2fc6704812249c",
+      "prepare-fixtures.py": "615541f7e800019a3f9441545e221f4b4508b8447c77609cc5204ab6767f1a6e",
+      "run-profile.py": "d49d9f80620e5e3eb8771f0e367ef2c9696b3790843cda7221ff0906cf0790a1",
+      "build-profile.py": "a38a0c377f211105f877ac5d088e9f151029df0cdb49dce6ff603250bb9b977a",
+      "instrument-publication.py": "c56242147fbf0c0c72c793e4d12ae8c9e45b035c5fd545d75ff4fa588bebc1bd",
+      "README.md": "46b1a768ce3bb96b131dd081caa2895053eb1aeab7da6feb759b065159b0d132"
+    }
+  },
+  "delivery_package": {
+    "prefix": "tools/quality/gh292-phase-profile",
+    "sha256": {
+      "Cargo.toml": "89adda431b57fee82038292f5262970f152ee14e25bb2f38c61797f8c1e1cfb2",
+      "Cargo.lock": "59355fe0143ed6c275a771d51ad1aa01d5ebca7c31187d46feb07b704d41f571",
+      "build.rs": "27efca98224cbfc14f946079be72c8532df5023d085d12d7ca5e0a37076090a4",
+      "src/main.rs": "7cf4ffd78485eb146ed53b85191737f526312ccd39c6c7475f2fc6704812249c",
+      "prepare-fixtures.py": "615541f7e800019a3f9441545e221f4b4508b8447c77609cc5204ab6767f1a6e",
+      "run-profile.py": "d49d9f80620e5e3eb8771f0e367ef2c9696b3790843cda7221ff0906cf0790a1",
+      "build-profile.py": "a38a0c377f211105f877ac5d088e9f151029df0cdb49dce6ff603250bb9b977a",
+      "instrument-publication.py": "c56242147fbf0c0c72c793e4d12ae8c9e45b035c5fd545d75ff4fa588bebc1bd",
+      "README.md": "f0635e32d8d9a5ae34468b1185f85e18d929516686a921a5ca86b21979d0defd"
+    },
+    "eight_code_config_script_files_byte_equal": true,
+    "README_only_documentation_delta": true
+  },
+  "publication": {
+    "base_source_commit": "e4a084be19de454cdaeebb44c41715fecf1f2b49",
+    "candidate_identity": "base plus exact four-source freeze; no candidate commit assigned",
+    "compiler": "Rust 1.99.0 / LLVM 23.1.1",
+    "build": "locked all-features test profile; same external instrumentation",
+    "large_samples_per_variant": 3,
+    "total_exact_test_invocations": 28,
+    "unique_test_names": 12,
+    "outer_write_medians": {
+      "before": {
+        "wall_seconds": 14.847438215,
+        "cpu_seconds": 14.657225,
+        "peak_rss_kib_cumulative": 134712
+      },
+      "after": {
+        "wall_seconds": 15.031852308,
+        "cpu_seconds": 14.808812,
+        "peak_rss_kib_cumulative": 134508
+      }
+    },
+    "benefit": "No actual product publication speedup observed. Do not combine with the standalone release diagnostic cohort.",
+    "raw_output_boundary": "Original TempDir assertions verify MachineResult/manifest/output; full MachineResult files are not independently archived after TempDir deletion.",
+    "trace_boundary": "written_output is attempted payload at entry, not successful writes on failures; nested timings overlap.",
+    "private_records": "Full-environment records remain private and are not copied."
+  },
+  "private_records": "Historical full-environment records remain private and are not copied or publicly indexed."
+}

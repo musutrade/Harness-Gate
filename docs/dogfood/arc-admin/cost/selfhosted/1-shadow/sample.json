@@ -1,0 +1,41 @@
+{
+  "mode": "shadow",
+  "sample": 1,
+  "elapsed_seconds": 546.235786931,
+  "commands": [
+    {
+      "name": "arc-full",
+      "argv": [
+        "cargo",
+        "flow",
+        "verify",
+        "--profile",
+        "full",
+        "--all"
+      ],
+      "started_at": "2026-09-10T08:33:15.825261+00:00",
+      "completed_at": "2026-09-10T08:37:24.090578+00:00",
+      "elapsed_seconds": 248.26531245,
+      "exit_code": 0
+    },
+    {
+      "name": "harness-full",
+      "argv": [
+        "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/harness-build/debug/harness-gate",
+        "--project-root",
+        "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source",
+        "--config",
+        ".harness-gate/flow.toml",
+        "verify",
+        "--profile",
+        "full",
+        "--all"
+      ],
+      "started_at": "2026-09-10T08:37:24.096337+00:00",
+      "completed_at": "2026-09-10T08:42:22.048601+00:00",
+      "elapsed_seconds": 297.952295888,
+      "exit_code": 1
+    }
+  ],
+  "passed": false
+}

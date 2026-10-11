@@ -1,0 +1,39 @@
+
+> arc-admin@0.0.0 e2e
+> playwright test
+
+[WebServer] (node:8791) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 
+[WebServer] Warning: This is a simple server for use in testing or debugging Angular applications
+[WebServer] locally. It hasn't been reviewed for security issues.
+[WebServer] 
+[WebServer] Binding this server to an open connection can result in compromising your application or
+[WebServer] computer. Using a different host than the one passed to the "--host" flag might result in
+[WebServer] websocket connection issues.
+[WebServer]     
+[WebServer] (node:8791) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 6 tests using 4 workers
+
+(node:8826) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:8833) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:8839) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:8827) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  4 [chromium] › e2e/authenticated-user-flow.spec.ts:730:5 › redirects an unauthenticated deep link to login (2.5s)
+  ✓  1 [chromium] › e2e/authenticated-user-flow.spec.ts:736:5 › renders the public error page with one main landmark (2.8s)
+(node:9143) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:9150) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  5 [mobile-chromium] › e2e/authenticated-user-flow.spec.ts:730:5 › redirects an unauthenticated deep link to login (776ms)
+  ✓  6 [mobile-chromium] › e2e/authenticated-user-flow.spec.ts:736:5 › renders the public error page with one main landmark (798ms)
+  ✓  2 [chromium] › e2e/authenticated-user-flow.spec.ts:69:5 › logs in, uses permission-aware navigation, and creates a user (13.4s)
+  ✓  3 [mobile-chromium] › e2e/authenticated-user-flow.spec.ts:69:5 › logs in, uses permission-aware navigation, and creates a user (14.8s)
+
+  6 passed (23.3s)

@@ -1,0 +1,7 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.14s
+────────────
+ Nextest run ID 84a7102c-43de-4dd9-b7ac-c44010cd5586 with nextest profile: default
+    Starting 1 test across 10 binaries (391 tests skipped)
+        PASS [   7.623s] (1/1) harness-gate::bin/harness-gate config::quality::collectors::tests::dogfood_acceptance::arc_admin_controlled_quality_negatives_retain_truthful_outcomes
+────────────
+     Summary [   7.625s] 1 test run: 1 passed, 391 skipped

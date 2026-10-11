@@ -1,0 +1,440 @@
+{
+  "schema": "gh-220-production-validation/1",
+  "status": "local implementation checks passed; controller CI and acceptance pending",
+  "checks": [
+    {
+      "name": "nextest",
+      "command": [
+        "cargo",
+        "nextest",
+        "run",
+        "--manifest-path",
+        "tools/harness-gate/Cargo.toml",
+        "--locked"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/harness",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "HARNESS_GATE_CI_ACCEPTANCE": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/quality/workflow-acceptance"
+      },
+      "started": "2026-09-10T15:52:43.200561+00:00",
+      "seconds": 217.26,
+      "exit_code": 0,
+      "log": "target/gh-220/validation-native/nextest.log"
+    },
+    {
+      "name": "harness-fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--manifest-path",
+        "tools/harness-gate/Cargo.toml",
+        "--",
+        "--check"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/harness",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "HARNESS_GATE_CI_ACCEPTANCE": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/quality/workflow-acceptance"
+      },
+      "started": "2026-09-10T15:56:20.502325+00:00",
+      "seconds": 0.91,
+      "exit_code": 0,
+      "log": "target/gh-220/validation-native/harness-fmt.log"
+    },
+    {
+      "name": "harness-clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--manifest-path",
+        "tools/harness-gate/Cargo.toml",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/harness",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "HARNESS_GATE_CI_ACCEPTANCE": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/quality/workflow-acceptance"
+      },
+      "started": "2026-09-10T15:56:21.413257+00:00",
+      "seconds": 27.48,
+      "exit_code": 0,
+      "log": "target/gh-220/validation-native/harness-clippy.log"
+    },
+    {
+      "name": "ci-acceptance",
+      "command": [
+        "python3",
+        "tools/quality/ci_acceptance.py",
+        "--directory",
+        "target/quality/workflow-acceptance"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/harness",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "HARNESS_GATE_CI_ACCEPTANCE": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/quality/workflow-acceptance"
+      },
+      "started": "2026-09-10T15:56:48.893073+00:00",
+      "seconds": 0.09,
+      "exit_code": 0,
+      "log": "target/gh-220/validation-native/ci-acceptance.log"
+    },
+    {
+      "name": "analyzer-test",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "tools/quality/rust-measure/Cargo.toml",
+        "--locked"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/analyzer",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "HARNESS_GATE_CI_ACCEPTANCE": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/quality/workflow-acceptance"
+      },
+      "started": "2026-09-10T15:52:44.421582+00:00",
+      "seconds": 6.86,
+      "exit_code": 0,
+      "log": "target/gh-220/validation-native/analyzer-test.log"
+    },
+    {
+      "name": "analyzer-fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--manifest-path",
+        "tools/quality/rust-measure/Cargo.toml",
+        "--",
+        "--check"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/analyzer",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "HARNESS_GATE_CI_ACCEPTANCE": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/quality/workflow-acceptance"
+      },
+      "started": "2026-09-10T15:52:51.277355+00:00",
+      "seconds": 0.06,
+      "exit_code": 0,
+      "log": "target/gh-220/validation-native/analyzer-fmt.log"
+    },
+    {
+      "name": "analyzer-clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--manifest-path",
+        "tools/quality/rust-measure/Cargo.toml",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/analyzer",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "HARNESS_GATE_CI_ACCEPTANCE": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/quality/workflow-acceptance"
+      },
+      "started": "2026-09-10T15:52:51.341518+00:00",
+      "seconds": 3.11,
+      "exit_code": 0,
+      "log": "target/gh-220/validation-native/analyzer-clippy.log"
+    },
+    {
+      "name": "driver-test",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "tools/quality/rust-native-driver/Cargo.toml",
+        "--locked"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/bootstrap-replay/build",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "HARNESS_GATE_CI_ACCEPTANCE": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/quality/workflow-acceptance",
+        "RUSTC_BOOTSTRAP": "1",
+        "RUSTFLAGS": "--sysroot /mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/bootstrap-replay/sysroot",
+        "LD_LIBRARY_PATH": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib"
+      },
+      "started": "2026-09-10T15:52:45.717407+00:00",
+      "seconds": 3.04,
+      "exit_code": 0,
+      "log": "target/gh-220/validation-native/driver-test.log"
+    },
+    {
+      "name": "driver-fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--manifest-path",
+        "tools/quality/rust-native-driver/Cargo.toml",
+        "--",
+        "--check"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/bootstrap-replay/build",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "HARNESS_GATE_CI_ACCEPTANCE": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/quality/workflow-acceptance",
+        "RUSTC_BOOTSTRAP": "1",
+        "RUSTFLAGS": "--sysroot /mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/bootstrap-replay/sysroot",
+        "LD_LIBRARY_PATH": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib"
+      },
+      "started": "2026-09-10T15:52:48.757853+00:00",
+      "seconds": 0.09,
+      "exit_code": 0,
+      "log": "target/gh-220/validation-native/driver-fmt.log"
+    },
+    {
+      "name": "driver-clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--manifest-path",
+        "tools/quality/rust-native-driver/Cargo.toml",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/bootstrap-replay/build",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "HARNESS_GATE_CI_ACCEPTANCE": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/quality/workflow-acceptance",
+        "RUSTC_BOOTSTRAP": "1",
+        "RUSTFLAGS": "--sysroot /mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/bootstrap-replay/sysroot",
+        "LD_LIBRARY_PATH": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib"
+      },
+      "started": "2026-09-10T15:52:48.845263+00:00",
+      "seconds": 3.81,
+      "exit_code": 0,
+      "log": "target/gh-220/validation-native/driver-clippy.log"
+    },
+    {
+      "name": "python",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/quality/tests",
+        "-v"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/harness",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "NATIVE_DRIVER": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/compiler-driver-probe/build/debug/harness-gate-rust-native-driver",
+        "NATIVE_DRIVER_SYSROOT": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu",
+        "HARNESS_GATE_NATIVE_POLICY_BINARY": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/harness/debug/harness-gate"
+      },
+      "exit_code": 0,
+      "seconds": 197.7062156200409,
+      "log": "target/gh-220/validation-native/python.log"
+    },
+    {
+      "name": "docs-unit",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/quality/tests",
+        "-p",
+        "test_docs_consistency.py",
+        "-v"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/harness",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp"
+      },
+      "exit_code": 0,
+      "seconds": 10.507652521133423,
+      "log": "target/gh-220/validation-native/docs-unit.log"
+    },
+    {
+      "name": "docs-consistency",
+      "command": [
+        "python3",
+        "tools/quality/docs_consistency.py",
+        "--output",
+        "target/quality/docs-consistency.json"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/harness",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp"
+      },
+      "exit_code": 0,
+      "seconds": 3.3480939865112305,
+      "log": "target/gh-220/validation-native/docs-consistency.log"
+    },
+    {
+      "name": "openspec",
+      "command": [
+        "openspec",
+        "validate",
+        "--all",
+        "--strict",
+        "--no-interactive"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/harness",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp"
+      },
+      "exit_code": 0,
+      "seconds": 1.388169765472412,
+      "log": "target/gh-220/validation-native/openspec.log"
+    },
+    {
+      "name": "critical-paths",
+      "command": [
+        "python3",
+        "-c",
+        "import sys,json,tomllib;sys.path.insert(0,'tools/quality');import critical_paths as c;c.validate_inventory(tomllib.loads(c.INVENTORY.read_text()),json.loads(c.POLICY.read_text()));print('Complete critical_paths inventory valid')"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/harness",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp"
+      },
+      "exit_code": 0,
+      "seconds": 1.632145643234253,
+      "log": "target/gh-220/validation-native/critical-paths.log"
+    }
+  ],
+  "test_counts": {
+    "nextest_passed": 392,
+    "python_passed": 399,
+    "python_real_native_tests_included": 9,
+    "analyzer_passed": 7,
+    "driver_unit_tests": 0,
+    "lifecycle_acceptance_cases": 12,
+    "strict_openspec_items": 56
+  },
+  "backend_certification": {
+    "command": [
+      "python3",
+      "tools/quality/rust_native_driver.py",
+      "certify",
+      "--evidence",
+      "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/compiler-driver-probe/backend-trial-5",
+      "--anchor",
+      "e4481cad305bd0be28bcdfc37f20f018b3927d5a40d36d0f5c80d49594f1d133",
+      "--output",
+      "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/compiler-driver-probe/backend-production-report.json"
+    ],
+    "exit_code": 1,
+    "seconds": 114.41797304153442,
+    "expected_exit": 1,
+    "reason": "Complete measurement; unchanged 80/80/30 thresholds fail"
+  },
+  "bootstrap": {
+    "url": "https://static.rust-lang.org/dist/2026-07-16/rustc-dev-1.97.1-x86_64-unknown-linux-gnu.tar.xz",
+    "sha256": "0109304e1995cce9e3362208f5d4ec0944e52a2ddfbc0a85d4ce5bea5d3081ab",
+    "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+    "sysroot": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu",
+    "command": [
+      "cargo",
+      "build",
+      "--locked",
+      "--manifest-path",
+      "/mnt/dev-ssd/workspaces/symphony/GH-220/tools/quality/rust-native-driver/Cargo.toml"
+    ],
+    "environment": {
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/bootstrap-replay/build",
+      "RUSTC_BOOTSTRAP": "1",
+      "RUSTFLAGS": "--sysroot /mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/bootstrap-replay/sysroot"
+    },
+    "exit_code": 0
+  },
+  "bootstrap_invocation": [
+    "python3",
+    "tools/quality/rust-native-driver/bootstrap.py",
+    "--sysroot",
+    "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu",
+    "--archive",
+    "target/gh-220/compiler-driver-probe/rustc-dev.tar.xz",
+    "--output",
+    "target/gh-220/bootstrap-replay"
+  ],
+  "preserved_initial_checks": [
+    {
+      "name": "python",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/quality/tests",
+        "-v"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/harness",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+        "NATIVE_DRIVER": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/compiler-driver-probe/build/debug/harness-gate-rust-native-driver",
+        "NATIVE_DRIVER_SYSROOT": "/home/gem/.rustup/toolchains/stable-x86_64-unknown-linux-gnu",
+        "HARNESS_GATE_NATIVE_POLICY_BINARY": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/harness/debug/harness-gate"
+      },
+      "exit_code": 1,
+      "seconds": 202.769513130188,
+      "log": "target/gh-220/validation-native/python-initial.log"
+    }
+  ],
+  "initial_failure_resolution": "Initial 399-test run had one documentation-link error while production artifacts were being packaged. Created the linked artifacts, passed targeted documentation tests, then reran all 399 tests successfully. All nine native regressions passed in both full runs. Earlier compiler failures remain indexed in production-history.json.",
+  "not_applicable": [
+    {
+      "command": "harness-gate config check",
+      "reason": "No .harness-gate/flow.toml in this checkout (ls: No such file or directory); no declared ci profile."
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "reason": "No .harness-gate/flow.toml in this checkout; project-local ci profile is absent."
+    }
+  ],
+  "cleanup": {
+    "activity_confirmation": "Backend compile/sample, final backend certification, full Python/native tests, harness/analyzer/driver checks and archive jobs completed before cleanup. Only the three task-owned backend Cargo caches were removed; sealed raw binaries/profiles/inventories, failed attempts, pinned source and tool binaries retained.",
+    "directories": [
+      {
+        "path": "target/gh-220/compiler-driver-probe/backend-trial-1/build",
+        "removed": true,
+        "seconds": 0.1730356216430664
+      },
+      {
+        "path": "target/gh-220/compiler-driver-probe/backend-trial-2/build",
+        "removed": true,
+        "seconds": 0.18805480003356934
+      },
+      {
+        "path": "target/gh-220/compiler-driver-probe/backend-trial-3/build",
+        "removed": true,
+        "seconds": 0.17116904258728027
+      }
+    ]
+  },
+  "limitations": [
+    "Native test success requires the recorded NATIVE_DRIVER, NATIVE_DRIVER_SYSROOT and HARNESS_GATE_NATIVE_POLICY_BINARY environment; default unconfigured runs explicitly skip the native class.",
+    "Backend certification succeeds in producing a complete mapping but exits 1 for genuine 80/80/30 threshold failures.",
+    "Only the pinned backend default Linux configuration and existing seven contract test cases were sampled; no backend baseline acceptance, database/frontend/API/full-workflow or GH-215 completion is claimed.",
+    "Full backend raw binaries remain hash-indexed in this workspace; committed raw archive omits their 2.8GB. Raw profiles, compiler inventories, LLVM export and fixture binaries are committed."
+  ]
+}

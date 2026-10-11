@@ -1,0 +1,11 @@
+# Archived quality evidence
+
+This file was externalized from Git history to keep `main` small. The raw bytes remain available in the repository evidence archive.
+
+- Archive: https://github.com/musutrade/Harness-Gate/releases/download/evidence-archive-20261010/quality-evidence-current.tar.zst
+- Path inside archive: `docs/quality/gh-221/native-fixtures.tar.xz`
+- Original size: 5875400 bytes
+- Original SHA-256: `b931e8da90565f222d85ab40323cb890d7b019db97df06e27620eed29906c000`
+- Original Git blob: `b87f0aa02193e5c7c12dcd5e6d5432e22da7ac09`
+
+Download the archive, extract `docs/quality/gh-221/native-fixtures.tar.xz`, and verify the SHA-256 before use.

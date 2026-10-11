@@ -1,0 +1,404 @@
+{
+  "issue": "GH-220",
+  "acceptance": "incomplete",
+  "commands": {
+    "archive-replay.json": [
+      {
+        "name": "native-archive-replay",
+        "command": [
+          "python3",
+          "tools/quality/rust_native.py",
+          "certify",
+          "--evidence",
+          "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/archive-replay/complete",
+          "--expected-sha256",
+          "8ddb8b0fd9f5bd5c402e0754ec0846a54b6e5da8c13876462d1b28bb4479e683",
+          "--output",
+          "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/archive-replay/report.json"
+        ],
+        "exit_code": 1,
+        "expected_exit_code": 1,
+        "reason": "Real region/closure/async threshold failures remain unchanged.",
+        "seconds": 0.28,
+        "log": "target/gh-220/validation/archive-replay.log"
+      }
+    ],
+    "docs-final.json": [
+      {
+        "name": "openspec-final",
+        "command": [
+          "openspec",
+          "validate",
+          "--all",
+          "--strict",
+          "--no-interactive"
+        ],
+        "exit_code": 0,
+        "seconds": 1.42,
+        "log": "target/gh-220/validation/openspec-final.log"
+      },
+      {
+        "name": "docs-consistency-final",
+        "command": [
+          "python3",
+          "tools/quality/docs_consistency.py",
+          "--output",
+          "target/quality/docs-consistency.json"
+        ],
+        "exit_code": 1,
+        "seconds": 1.68,
+        "log": "target/gh-220/validation/docs-consistency-final.log"
+      }
+    ],
+    "docs-retry.json": [
+      {
+        "name": "docs-consistency-retry",
+        "command": [
+          "python3",
+          "tools/quality/docs_consistency.py",
+          "--output",
+          "target/quality/docs-consistency.json"
+        ],
+        "exit_code": 0,
+        "seconds": 3.34,
+        "environment": {
+          "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/harness",
+          "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+          "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp"
+        },
+        "log": "target/gh-220/validation/docs-consistency-retry.log"
+      }
+    ],
+    "harness-retry.json": [
+      {
+        "name": "nextest-retry",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "--manifest-path",
+          "tools/harness-gate/Cargo.toml",
+          "--locked"
+        ],
+        "exit_code": 0,
+        "seconds": 199.22,
+        "log": "target/gh-220/validation/nextest-retry.log",
+        "environment": {
+          "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/harness",
+          "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+          "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+          "HARNESS_GATE_CI_ACCEPTANCE": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/quality/workflow-acceptance"
+        }
+      },
+      {
+        "name": "ci-acceptance-retry",
+        "command": [
+          "python3",
+          "tools/quality/ci_acceptance.py",
+          "--directory",
+          "target/quality/workflow-acceptance"
+        ],
+        "exit_code": 0,
+        "seconds": 0.1,
+        "log": "target/gh-220/validation/ci-acceptance-retry.log",
+        "environment": {
+          "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/harness",
+          "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+          "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/gh-220/tmp",
+          "HARNESS_GATE_CI_ACCEPTANCE": "/mnt/dev-ssd/workspaces/symphony/GH-220/target/quality/workflow-acceptance"
+        }
+      }
+    ],
+    "harness.json": [
+      {
+        "name": "nextest",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "--manifest-path",
+          "tools/harness-gate/Cargo.toml",
+          "--locked"
+        ],
+        "exit_code": 100,
+        "seconds": 227.31,
+        "log": "target/gh-220/validation/nextest.log"
+      },
+      {
+        "name": "harness-fmt",
+        "command": [
+          "cargo",
+          "fmt",
+          "--manifest-path",
+          "tools/harness-gate/Cargo.toml",
+          "--",
+          "--check"
+        ],
+        "exit_code": 0,
+        "seconds": 0.67,
+        "log": "target/gh-220/validation/harness-fmt.log"
+      },
+      {
+        "name": "harness-clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "--manifest-path",
+          "tools/harness-gate/Cargo.toml",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "exit_code": 0,
+        "seconds": 45.48,
+        "log": "target/gh-220/validation/harness-clippy.log"
+      },
+      {
+        "name": "ci-acceptance",
+        "command": [
+          "python3",
+          "tools/quality/ci_acceptance.py",
+          "--directory",
+          "target/quality/workflow-acceptance"
+        ],
+        "exit_code": 1,
+        "seconds": 0.06,
+        "log": "target/gh-220/validation/ci-acceptance.log"
+      },
+      {
+        "name": "schema-flow",
+        "command": [
+          "cargo",
+          "run",
+          "--manifest-path",
+          "tools/harness-gate/Cargo.toml",
+          "--locked",
+          "--",
+          "schema",
+          "export"
+        ],
+        "exit_code": 0,
+        "seconds": 0.23,
+        "log": "target/gh-220/validation/schema-flow.log"
+      },
+      {
+        "name": "schema-quality",
+        "command": [
+          "cargo",
+          "run",
+          "--manifest-path",
+          "tools/harness-gate/Cargo.toml",
+          "--locked",
+          "--",
+          "schema",
+          "export",
+          "--quality"
+        ],
+        "exit_code": 0,
+        "seconds": 0.16,
+        "log": "target/gh-220/validation/schema-quality.log"
+      },
+      {
+        "name": "schema-diff",
+        "command": [
+          "git",
+          "diff",
+          "--exit-code",
+          "--",
+          "schema/flow.schema.json",
+          "schema/quality.schema.json"
+        ],
+        "exit_code": 0,
+        "seconds": 0.01,
+        "log": "target/gh-220/validation/schema-diff.log"
+      }
+    ],
+    "quality-retry.json": [
+      {
+        "name": "python-tests-retry",
+        "command": [
+          "python3",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tools/quality/tests",
+          "-v"
+        ],
+        "exit_code": 0,
+        "seconds": 226.22,
+        "log": "target/gh-220/validation/python-tests-retry.log"
+      }
+    ],
+    "quality.json": [
+      {
+        "name": "analyzer-tests",
+        "command": [
+          "cargo",
+          "test",
+          "--manifest-path",
+          "tools/quality/rust-measure/Cargo.toml",
+          "--locked"
+        ],
+        "exit_code": 0,
+        "seconds": 0.86,
+        "log": "target/gh-220/validation/analyzer-tests.log"
+      },
+      {
+        "name": "analyzer-fmt",
+        "command": [
+          "cargo",
+          "fmt",
+          "--manifest-path",
+          "tools/quality/rust-measure/Cargo.toml",
+          "--",
+          "--check"
+        ],
+        "exit_code": 0,
+        "seconds": 0.17,
+        "log": "target/gh-220/validation/analyzer-fmt.log"
+      },
+      {
+        "name": "analyzer-clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "--manifest-path",
+          "tools/quality/rust-measure/Cargo.toml",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "exit_code": 0,
+        "seconds": 5.69,
+        "log": "target/gh-220/validation/analyzer-clippy.log"
+      },
+      {
+        "name": "python-tests",
+        "command": [
+          "python3",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tools/quality/tests",
+          "-v"
+        ],
+        "exit_code": 1,
+        "seconds": 219.34,
+        "log": "target/gh-220/validation/python-tests.log"
+      },
+      {
+        "name": "docs-consistency",
+        "command": [
+          "python3",
+          "tools/quality/docs_consistency.py",
+          "--output",
+          "target/quality/docs-consistency.json"
+        ],
+        "exit_code": 0,
+        "seconds": 59.82,
+        "log": "target/gh-220/validation/docs-consistency.log"
+      },
+      {
+        "name": "openspec",
+        "command": [
+          "openspec",
+          "validate",
+          "--all",
+          "--strict",
+          "--no-interactive"
+        ],
+        "exit_code": 0,
+        "seconds": 2.01,
+        "log": "target/gh-220/validation/openspec.log"
+      },
+      {
+        "name": "critical-paths",
+        "command": [
+          "python3",
+          "-c",
+          "import sys,json,tomllib;sys.path.insert(0,'tools/quality');import critical_paths as c;c.validate_inventory(tomllib.loads(c.INVENTORY.read_text()),json.loads(c.POLICY.read_text()));print('Complete critical_paths inventory valid')"
+        ],
+        "exit_code": 0,
+        "seconds": 1.64,
+        "log": "target/gh-220/validation/critical-paths.log"
+      }
+    ],
+    "openspec-indexed.json": [
+      {
+        "name": "openspec-indexed",
+        "command": [
+          "openspec",
+          "validate",
+          "--all",
+          "--strict",
+          "--no-interactive"
+        ],
+        "exit_code": 0,
+        "seconds": 1.22,
+        "log": "target/gh-220/validation/openspec-indexed.log"
+      }
+    ]
+  },
+  "final_results": {
+    "nextest": "392 passed",
+    "python_unittest": "390 passed, including 8 real native tests",
+    "analyzer": "7 tests passed; fmt and Clippy passed",
+    "harness": "fmt and Clippy passed",
+    "workflow_acceptance": "12 acceptance cases passed",
+    "openspec": "strict --all passed",
+    "critical_paths": "complete inventory validated",
+    "docs_consistency": "passed with explicit workspace target directory",
+    "native_archive_replay": "exit 1 expected: genuine threshold failures"
+  },
+  "not_applicable": [
+    {
+      "command": "harness-gate config check",
+      "reason": "No project-local .harness-gate/flow.toml in this repository"
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "reason": "No project-local configuration or declared ci profile"
+    }
+  ],
+  "original_failures": [
+    {
+      "command": "nextest",
+      "exit_code": 100,
+      "cause": "Workspace TMPDIR permitted no-Git fixture to discover parent repository",
+      "correction": "Set GIT_CEILING_DIRECTORIES to workspace TMPDIR; unchanged tests passed"
+    },
+    {
+      "command": "ci_acceptance.py",
+      "exit_code": 1,
+      "cause": "Receipt absent after initial nextest failure",
+      "correction": "Full nextest retry generated receipt; acceptance passed"
+    },
+    {
+      "command": "Python unittest",
+      "exit_code": 1,
+      "cause": "Missing new-module architecture inventory entries",
+      "correction": "Added both experimental modules to python-boundary.json; 390 tests passed"
+    },
+    {
+      "command": "docs_consistency.py final",
+      "exit_code": 1,
+      "cause": "CARGO_TARGET_DIR omitted; Cargo global build lock read-only",
+      "correction": "Explicit workspace CARGO_TARGET_DIR; retry passed",
+      "diagnostic_command": "cargo run --quiet --locked --manifest-path tools/harness-gate/Cargo.toml -- schema export --check",
+      "diagnostic_exit_code": 101,
+      "diagnostic_error": "failed to open: /home/gem/cargo-target/debug/.cargo-build-lock: Read-only file system (os error 30)"
+    }
+  ],
+  "limitations": [
+    "N2-N6 parent acceptance remains open",
+    "No complete backend production/expansion/generated owner mapping",
+    "Backend sample covers two existing no-database test binaries only",
+    "No production/test exclusion certificate or historical debt/delta adapter",
+    "Fixture measurement uses pinned unstable MIR; other compilers reject/skip explicitly",
+    "No completion handoff; GH-221 remains blocked; GH-215 untouched"
+  ]
+}

@@ -1,0 +1,117 @@
+
+> arc-admin@0.0.0 test
+> ng test --watch=false --runner=vitest
+
+❯ Building...
+✔ Building...
+Initial chunk files                                                 | Names                                                            |  Raw size
+chunk-M5EFY6OH.js                                                   | -                                                                | 117.02 kB | 
+chunk-GQXTKIV7.js                                                   | -                                                                | 103.47 kB | 
+chunk-2ZGUNKMP.js                                                   | -                                                                |  44.63 kB | 
+chunk-YM4RSKK6.js                                                   | -                                                                |  41.59 kB | 
+chunk-6CWBIUGA.js                                                   | -                                                                |  41.10 kB | 
+chunk-RJNMIFDI.js                                                   | -                                                                |  33.71 kB | 
+chunk-WXD4MUVU.js                                                   | -                                                                |  28.01 kB | 
+styles.css                                                          | styles                                                           |  27.40 kB | 
+chunk-JWWNC6ZD.js                                                   | -                                                                |  24.67 kB | 
+chunk-HNCJID4I.js                                                   | -                                                                |  23.96 kB | 
+chunk-LTRH4HVM.js                                                   | -                                                                |  21.82 kB | 
+chunk-FNLPP566.js                                                   | -                                                                |  20.24 kB | 
+chunk-XE54LUXW.js                                                   | -                                                                |  19.02 kB | 
+chunk-QBVFDRJH.js                                                   | -                                                                |  11.98 kB | 
+chunk-V36VFIRQ.js                                                   | -                                                                |  11.77 kB | 
+chunk-SOEE4L6Q.js                                                   | -                                                                |  11.40 kB | 
+chunk-VN2Q5Q2G.js                                                   | -                                                                |   7.88 kB | 
+chunk-VBMWC2XZ.js                                                   | -                                                                |   6.69 kB | 
+spec-app-pages-users-users.js                                       | spec-app-pages-users-users                                       |   6.42 kB | 
+spec-app-core-auth.service.js                                       | spec-app-core-auth.service                                       |   5.64 kB | 
+spec-app-core-change-password.dialog.js                             | spec-app-core-change-password.dialog                             |   4.84 kB | 
+chunk-RSTWSNOR.js                                                   | -                                                                |   4.80 kB | 
+chunk-EUJSTA26.js                                                   | -                                                                |   4.51 kB | 
+spec-app-core-auth.interceptor.js                                   | spec-app-core-auth.interceptor                                   |   4.30 kB | 
+spec-app-app.routes.js                                              | spec-app-app.routes                                              |   3.99 kB | 
+spec-app-pages-audit-logs-audit-logs.js                             | spec-app-pages-audit-logs-audit-logs                             |   3.81 kB | 
+spec-app-core-api-user-api.service.js                               | spec-app-core-api-user-api.service                               |   3.45 kB | 
+spec-app-pages-departments-departments.js                           | spec-app-pages-departments-departments                           |   3.37 kB | 
+spec-app-core-authenticator-code-field.js                           | spec-app-core-authenticator-code-field                           |   3.10 kB | 
+chunk-KZJADNRR.js                                                   | -                                                                |   3.04 kB | 
+spec-app-pages-errors-error-page.js                                 | spec-app-pages-errors-error-page                                 |   2.97 kB | 
+spec-app-core-api-role-api.service.js                               | spec-app-core-api-role-api.service                               |   2.74 kB | 
+spec-app-pages-users-user-editor.dialog.js                          | spec-app-pages-users-user-editor.dialog                          |   2.71 kB | 
+spec-app-core-module-unlock.service.js                              | spec-app-core-module-unlock.service                              |   2.51 kB | 
+spec-app-pages-roles-role-editor.dialog.js                          | spec-app-pages-roles-role-editor.dialog                          |   2.41 kB | 
+spec-app-pages-departments-department-editor.dialog.js              | spec-app-pages-departments-department-editor.dialog              |   2.35 kB | 
+init-testbed.js                                                     | init-testbed                                                     |   2.27 kB | 
+chunk-46HBIWUC.js                                                   | -                                                                |   2.12 kB | 
+spec-app-core-api-error.js                                          | spec-app-core-api-error                                          |   2.10 kB | 
+spec-app-app.navigation.js                                          | spec-app-app.navigation                                          |   2.09 kB | 
+spec-app-features-departments-data-access-department-api.service.js | spec-app-features-departments-data-access-department-api.service |   2.09 kB | 
+chunk-Y44ND4YX.js                                                   | -                                                                |   2.06 kB | 
+chunk-4KQCJKYC.js                                                   | -                                                                |   2.03 kB | 
+spec-app-pages-security-security.js                                 | spec-app-pages-security-security                                 |   1.85 kB | 
+spec-app-core-api-permission-api.service.js                         | spec-app-core-api-permission-api.service                         |   1.75 kB | 
+spec-app-core-theme.service.js                                      | spec-app-core-theme.service                                      |   1.73 kB | 
+chunk-IMFSIBDU.js                                                   | -                                                                |   1.70 kB | 
+spec-app-core-api-dashboard-api.service.js                          | spec-app-core-api-dashboard-api.service                          |   1.64 kB | 
+spec-app-core-runtime-config.js                                     | spec-app-core-runtime-config                                     |   1.64 kB | 
+spec-app-core-api-audit-log-api.service.js                          | spec-app-core-api-audit-log-api.service                          |   1.59 kB | 
+chunk-L2JODFPT.js                                                   | -                                                                |   1.48 kB | 
+vitest-mock-patch.js                                                | vitest-mock-patch                                                |   1.02 kB | 
+chunk-NAVJ3AGU.js                                                   | -                                                                |   1.00 kB | 
+chunk-Z2BY6HYM.js                                                   | -                                                                | 392 bytes | 
+
+                                                                    | Initial total                                                    | 693.86 kB
+
+Lazy chunk files                                                    | Names                                                            |  Raw size
+chunk-DUMZ2QGR.js                                                   | roles                                                            |  61.93 kB | 
+chunk-FXU4EZW6.js                                                   | permissions                                                      |  28.92 kB | 
+chunk-RU7CULOR.js                                                   | -                                                                |  26.03 kB | 
+chunk-ECEBSFFK.js                                                   | role-permissions                                                 |  22.62 kB | 
+chunk-OWYTVAL2.js                                                   | users                                                            | 587 bytes | 
+chunk-V7CJUIKP.js                                                   | departments                                                      | 479 bytes | 
+chunk-MTMV7Q5H.js                                                   | security                                                         | 353 bytes | 
+chunk-4LR7X44J.js                                                   | audit-logs                                                       | 287 bytes | 
+chunk-4SCSLSRO.js                                                   | error-page                                                       | 197 bytes | 
+
+Application bundle generation complete. [5.664 seconds] - 2026-09-10T08:55:05.283Z
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90m/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source/frontend[39m
+
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/core/api/user-api.service.spec.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 94[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/core/api/role-api.service.spec.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 37[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/core/auth.service.spec.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 305[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/app.routes.spec.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 137[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/core/module-unlock.service.spec.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/pages/audit-logs/audit-logs.spec.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 729[2mms[22m[39m
+     [33m[2m✓[22m[39m should create [33m 349[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/pages/users/user-editor.dialog.spec.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 513[2mms[22m[39m
+     [33m[2m✓[22m[39m hides privileged controls when the operator lacks their permissions [33m 406[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/core/auth.interceptor.spec.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 31[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/features/departments/data-access/department-api.service.spec.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 30[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/core/change-password.dialog.spec.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 862[2mms[22m[39m
+     [33m[2m✓[22m[39m rejects a confirmation that does not match the new password [33m 481[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/pages/departments/departments.spec.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 762[2mms[22m[39m
+     [33m[2m✓[22m[39m loads the hierarchy and calculates summary data [33m 514[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/core/authenticator-code-field.spec.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 87[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/pages/departments/department-editor.dialog.spec.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 480[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps an inactive current parent while excluding the current department and descendants [33m 423[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/pages/errors/error-page.spec.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 230[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/core/api-error.spec.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/core/api/audit-log-api.service.spec.ts [2m([22m[2m1 test[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/core/api/permission-api.service.spec.ts [2m([22m[2m1 test[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/core/theme.service.spec.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/core/api/dashboard-api.service.spec.ts [2m([22m[2m1 test[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/core/runtime-config.spec.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/app.navigation.spec.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/pages/security/security.spec.ts [2m([22m[2m1 test[22m[2m)[22m[32m 114[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/pages/roles/role-editor.dialog.spec.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 856[2mms[22m[39m
+     [33m[2m✓[22m[39m shows a friendly label and preview for the default icon [33m 568[2mms[22m[39m
+ [32m✓[39m [30m[43m arc-admin [49m[39m src/app/pages/users/users.spec.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 1591[2mms[22m[39m
+     [33m[2m✓[22m[39m loads users and finishes loading on init [33m 669[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m24 passed[39m[22m[90m (24)[39m
+[2m      Tests [22m [1m[32m85 passed[39m[22m[90m (85)[39m
+[2m   Start at [22m 08:55:05
+[2m   Duration [22m 5.01s[2m (transform 2.05s, setup 4.49s, import 7.09s, tests 6.93s, environment 34.33s)[22m
+

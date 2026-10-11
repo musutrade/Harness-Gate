@@ -1,0 +1,13 @@
+{
+  "name": "docker",
+  "argv": [
+    "docker",
+    "version",
+    "--format",
+    "{{.Server.Version}}"
+  ],
+  "started_at": "2026-09-10T09:39:49.246150+00:00",
+  "completed_at": "2026-09-10T09:39:49.266691+00:00",
+  "elapsed_seconds": 0.02056044,
+  "exit_code": 0
+}

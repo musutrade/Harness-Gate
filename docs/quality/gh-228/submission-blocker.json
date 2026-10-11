@@ -1,0 +1,18 @@
+{
+  "status": "blocked-before-push",
+  "branch": "symphony/GH-228",
+  "implementation_commit": "7800aaf74693e2af7b963f61ad8a772f3c71f2be",
+  "commands": [
+    {
+      "command": "git --git-dir=target/gh-228/publish.git push origin refs/heads/symphony/GH-228:refs/heads/symphony/GH-228",
+      "exit_code": 128,
+      "stderr": "fatal: unable to access 'https://github.com/musutrade/Harness-Gate.git/': Failed to connect to github.com port 443 via 192.168.0.34 after 2 ms: Could not connect to server"
+    },
+    {
+      "command": "git -c http.proxy= --git-dir=target/gh-228/publish.git push origin refs/heads/symphony/GH-228:refs/heads/symphony/GH-228",
+      "exit_code": 128,
+      "stderr": "fatal: unable to access 'https://github.com/musutrade/Harness-Gate.git/': Could not resolve host: github.com"
+    }
+  ],
+  "impact": "No branch push, PR or completion declaration. Existing implementation, original captures and build artifacts remain in this assigned workspace. GitHub REST reads work, but no supported local-file upload path was available for the retained native archive."
+}

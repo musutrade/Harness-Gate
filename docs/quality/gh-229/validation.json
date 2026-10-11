@@ -1,0 +1,370 @@
+{
+  "baseline": "9bdc203c21a75cc769fdb2adbafb897e4b96a30e",
+  "commands": [
+    {
+      "argv": [
+        "cargo",
+        "nextest",
+        "run",
+        "--manifest-path",
+        "tools/harness-gate/Cargo.toml",
+        "--locked"
+      ],
+      "environment_overrides": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-229/target/gh-229/cargo",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-229/target/gh-229/tmp"
+      },
+      "environment_removed": [],
+      "log": "logs/nextest.log",
+      "log_sha256": "38e5ee4bff5408603e22ef488aead806907403dbdf83a21f32c34f0e7c97d743",
+      "note": null,
+      "result": {
+        "exit_code": 100,
+        "failed": 1,
+        "not_run": 352,
+        "passed": 39
+      }
+    },
+    {
+      "argv": [
+        "cargo",
+        "nextest",
+        "run",
+        "--manifest-path",
+        "tools/harness-gate/Cargo.toml",
+        "--locked"
+      ],
+      "environment_overrides": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-229/target/gh-229/cargo",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-229/target/gh-229/tmp",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-229/target/gh-229/tmp"
+      },
+      "environment_removed": [],
+      "log": "logs/nextest-isolated.log",
+      "log_sha256": "f3c760625c632d98e791e53d0d0725832b6e340d8ee359a923e1620c77cd3bf3",
+      "note": null,
+      "result": {
+        "exit_code": 100,
+        "failed": 1,
+        "not_run": 37,
+        "passed": 354
+      }
+    },
+    {
+      "argv": [
+        "cargo",
+        "nextest",
+        "run",
+        "--manifest-path",
+        "tools/harness-gate/Cargo.toml",
+        "--locked"
+      ],
+      "environment_overrides": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-229/target/gh-229/cargo",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-229/target/gh-229/tmp",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-229/target/gh-229/tmp"
+      },
+      "environment_removed": [
+        "HTTP_PROXY",
+        "HTTPS_PROXY",
+        "ALL_PROXY",
+        "http_proxy",
+        "https_proxy",
+        "all_proxy"
+      ],
+      "log": "logs/nextest-final.log",
+      "log_sha256": "fa58e23891afddcc21c484634c63cd846c429f18fef14de4b01f095cd7e045d8",
+      "note": null,
+      "result": {
+        "exit_code": 0,
+        "passed": 392,
+        "skipped": 0
+      }
+    },
+    {
+      "argv": [
+        "cargo",
+        "fmt",
+        "--manifest-path",
+        "tools/harness-gate/Cargo.toml",
+        "--",
+        "--check"
+      ],
+      "environment_overrides": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-229/target/gh-229/cargo"
+      },
+      "environment_removed": [],
+      "log": "logs/fmt.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "note": null,
+      "result": {
+        "exit_code": 0
+      }
+    },
+    {
+      "argv": [
+        "cargo",
+        "clippy",
+        "--manifest-path",
+        "tools/harness-gate/Cargo.toml",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "environment_overrides": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-229/target/gh-229/cargo",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-229/target/gh-229/tmp"
+      },
+      "environment_removed": [],
+      "log": "logs/clippy.log",
+      "log_sha256": "c7ee1187d59fcfeac8676de46e4a3529ab5cdce619d53e9129ec69f0ee8e206b",
+      "note": null,
+      "result": {
+        "exit_code": 0
+      }
+    },
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/quality/tests",
+        "-v"
+      ],
+      "environment_overrides": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-229/target/gh-229/cargo",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-229/target/gh-229/tmp",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-229/target/gh-229/tmp"
+      },
+      "environment_removed": [],
+      "log": "logs/quality-tests.log",
+      "log_sha256": "44c02e05c734eab247bfd02989f38cc1814454e351941ad802e5e888770620da",
+      "note": null,
+      "result": {
+        "exit_code": 0,
+        "skipped_classes": 3,
+        "tests": 402
+      }
+    },
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/release/tests",
+        "-v"
+      ],
+      "environment_overrides": {},
+      "environment_removed": [],
+      "log": "logs/release-tests.log",
+      "log_sha256": "6e073be32da61f206d9eab30c7bec6b638ac31ce4ceb4544143b84ea5840fa54",
+      "note": null,
+      "result": {
+        "exit_code": 0,
+        "tests": 41
+      }
+    },
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/release/tests",
+        "-v"
+      ],
+      "environment_overrides": {
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-229/target/gh-229/tmp"
+      },
+      "environment_removed": [],
+      "log": "logs/release-tests-final.log",
+      "log_sha256": "915d0f460d0662c7607cc8af490ef743130c7ce87e890521a3b18710474b76be",
+      "note": null,
+      "result": {
+        "exit_code": 0,
+        "tests": 42
+      }
+    },
+    {
+      "argv": null,
+      "environment_overrides": {},
+      "environment_removed": [],
+      "log": "logs/delivery-initial.log",
+      "log_sha256": "93df8257b2243a59b4a9d75316f52cd0e8d8a7cab55745e6e580c4170c9f53f8",
+      "note": "Intermediate unittest invocation; exact filter/wrapper not retained. Log is failed evidence, not a passed command.",
+      "result": {
+        "failed_subtests": 2,
+        "shell_wrapper_exit_code": 0,
+        "unittest_status": "failed"
+      }
+    },
+    {
+      "argv": null,
+      "environment_overrides": {},
+      "environment_removed": [],
+      "log": "logs/delivery-signature-fix.log",
+      "log_sha256": "624d989ce252c185eac950dc354cf277e03377e358fd7b8c075f7a873bfe91f7",
+      "note": "Intermediate focused delivery rerun; exact filter not retained. Complete final release invocation above is authoritative.",
+      "result": {
+        "exit_code": 0,
+        "tests": 12
+      }
+    },
+    {
+      "argv": [
+        "bash",
+        "tools/release/tests/test_install.sh"
+      ],
+      "environment_overrides": {
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-229/target/gh-229/tmp"
+      },
+      "environment_removed": [],
+      "log": "logs/core-install.log",
+      "log_sha256": "9ded19064fc7914af9a3a0dc4586054cd709862cf0117677fbea335b5a653a7c",
+      "note": null,
+      "result": {
+        "exit_code": 0
+      }
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/release/collector_dry_run.py",
+        "--output",
+        "target/gh-229/dry-run"
+      ],
+      "environment_overrides": {},
+      "environment_removed": [],
+      "log": "logs/dry-run.log",
+      "log_sha256": "169f7f7f224acc33e219b14b4b2bda87dafe3b028e72887b2649469504b4a9a9",
+      "note": null,
+      "result": {
+        "exit_code": 0,
+        "native_measurement": "not_performed",
+        "publication": "not_attempted",
+        "synthetic": true
+      }
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/release/collector_dry_run.py",
+        "--output",
+        "target/gh-229/dry-run-final"
+      ],
+      "environment_overrides": {
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-229/target/gh-229/tmp"
+      },
+      "environment_removed": [],
+      "log": "logs/dry-run-final.log",
+      "log_sha256": "f0eca16315979039a77678e4c6e38d9407de05883271ed0514a2ca78022b9208",
+      "note": null,
+      "result": {
+        "exit_code": 0,
+        "native_measurement": "not_performed",
+        "publication": "not_attempted",
+        "synthetic": true
+      }
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/quality/docs_consistency.py",
+        "--output",
+        "target/quality/docs-consistency.json"
+      ],
+      "environment_overrides": {},
+      "environment_removed": [],
+      "log": "logs/docs.log",
+      "log_sha256": "6fdde67acd13145abd556580c3ab8d9ea34bad99a09db00ccf28a3fbeabecb76",
+      "note": null,
+      "result": {
+        "exit_code": 1
+      }
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/quality/docs_consistency.py",
+        "--output",
+        "target/quality/docs-consistency.json"
+      ],
+      "environment_overrides": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-229/target/gh-229/cargo",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-229/target/gh-229/tmp",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-229/target/gh-229/tmp"
+      },
+      "environment_removed": [],
+      "log": "logs/docs-final.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "note": null,
+      "result": {
+        "exit_code": 0
+      }
+    },
+    {
+      "argv": [
+        "openspec",
+        "validate",
+        "package-official-rust-collector-for-independent-delivery",
+        "--strict",
+        "--no-interactive"
+      ],
+      "environment_overrides": {},
+      "environment_removed": [],
+      "log": "logs/openspec.log",
+      "log_sha256": "870eee9fc1789e7071418a7ad67af1f541507853598cc27efde127f090653be1",
+      "note": "Tool rejected telemetry access to https://edge.openspec.dev:443 after validation message; not passed.",
+      "result": {
+        "exit_code": null,
+        "status": "tool_rejected"
+      }
+    },
+    {
+      "argv": [
+        "openspec",
+        "validate",
+        "package-official-rust-collector-for-independent-delivery",
+        "--strict",
+        "--no-interactive"
+      ],
+      "environment_overrides": {
+        "OPENSPEC_TELEMETRY": "0"
+      },
+      "environment_removed": [],
+      "log": "logs/openspec-final.log",
+      "log_sha256": "870eee9fc1789e7071418a7ad67af1f541507853598cc27efde127f090653be1",
+      "note": null,
+      "result": {
+        "exit_code": 0
+      }
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "environment_overrides": {},
+      "environment_removed": [],
+      "log": "logs/diff.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "note": null,
+      "result": {
+        "exit_code": 0
+      }
+    }
+  ],
+  "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-229",
+  "hosted_required_ci": "controller_pending",
+  "issue": 229,
+  "native_positive": "not_performed",
+  "project_ci_verify": "not_applicable: no declared ci profile",
+  "project_config_check": "not_applicable: no .harness-gate/flow.toml"
+}

@@ -1,0 +1,1220 @@
+{
+  "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+  "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+  "identity": {
+    "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+    "rule": "critical-path-source-v2",
+    "target": "x86_64-unknown-linux-gnu"
+  },
+  "logical_cpus": 8,
+  "machine": "x86_64",
+  "os": "Linux-7.0.0-31-generic-x86_64-with-glibc2.43",
+  "processor": "",
+  "python": "3.14.4",
+  "rows": [
+    {
+      "applicable": true,
+      "assertions": [
+        "assert!(!result.passed);",
+        "assert!(result.timed_out);",
+        "assert!(log.is_file());"
+      ],
+      "binary": "harness-gate",
+      "coverage": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "390e84ae-4daf-4984-ae1d-b3a3af0b71f4/coverage.json",
+        "run_id": "390e84ae-4daf-4984-ae1d-b3a3af0b71f4",
+        "sha256": "4a5fdd0aa719f768cd495ba3840ea4c4f40fb0d801489a53d8f0474ff083a143"
+      },
+      "hits": [
+        {
+          "count": 1,
+          "probe": {
+            "column": 24,
+            "line": 253,
+            "text": "break (terminate(&mut child)?, true, false);"
+          },
+          "regions": [
+            [
+              253,
+              24,
+              253,
+              33,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              253,
+              24,
+              253,
+              33,
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      ],
+      "id": "process.timeout",
+      "module": "process",
+      "nextest": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "390e84ae-4daf-4984-ae1d-b3a3af0b71f4/nextest.jsonl",
+        "run_id": "390e84ae-4daf-4984-ae1d-b3a3af0b71f4",
+        "sha256": "9a543e64d5dd9037f259ab323c4cb8b0d9821756980022a5b0464369b205fa5a"
+      },
+      "observable": "TaskResult.timed_out=true, passed=false, and the log exists",
+      "owner": "Harness-Gate maintainers",
+      "platform_note": "Unix fixture uses POSIX commands/signals; Windows is excluded by the reviewed policy, not by tool availability.",
+      "platforms": [
+        "linux",
+        "macos"
+      ],
+      "probes": [
+        {
+          "column": 24,
+          "line": 253,
+          "text": "break (terminate(&mut child)?, true, false);"
+        }
+      ],
+      "review_date": "2026-09-07",
+      "rule": "critical-path-source-v2",
+      "run_id": "390e84ae-4daf-4984-ae1d-b3a3af0b71f4",
+      "source": {
+        "end": 380,
+        "path": "src/process/task.rs",
+        "sha256": "bbb7f1d90d741f41c6cb761f1433f4cb7c8ca168fac0082bd366a9377ae149a8",
+        "start": 192,
+        "symbol": "run"
+      },
+      "status": "pass",
+      "test": "process::tests::timeout_terminates_the_task",
+      "test_source": {
+        "end": 23,
+        "path": "src/process/tests.rs",
+        "sha256": "ecd32ead844928fb04998e51140ebbc8b82c79396c9a2c0f8b0fce552ecf4007",
+        "start": 11,
+        "symbol": "timeout_terminates_the_task"
+      },
+      "traceable": true
+    },
+    {
+      "applicable": true,
+      "assertions": [
+        "\"cancelled child still alive\"",
+        "assert_eq!(json[\"passed\"], false);",
+        "assert_sealed_evidence(&json);"
+      ],
+      "binary": "failure_paths_test",
+      "coverage": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "d894d3fd-de77-48a7-b865-78a77460a548/coverage.json",
+        "run_id": "d894d3fd-de77-48a7-b865-78a77460a548",
+        "sha256": "1b05d9dece224ad23993470ab4c5131741959bd8ff5d6fc9d24303d4a91d1e27"
+      },
+      "hits": [
+        {
+          "count": 2,
+          "probe": {
+            "column": 24,
+            "line": 250,
+            "text": "break (terminate(&mut child)?, false, true);"
+          },
+          "regions": [
+            [
+              250,
+              24,
+              250,
+              33,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              250,
+              24,
+              250,
+              33,
+              2,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      ],
+      "id": "process.cancellation",
+      "module": "process",
+      "nextest": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "d894d3fd-de77-48a7-b865-78a77460a548/nextest.jsonl",
+        "run_id": "d894d3fd-de77-48a7-b865-78a77460a548",
+        "sha256": "47a7fc95f3bdd4470dee19c979347a3b1b0e8c73006d4f9e4ef3a82becb5e3e5"
+      },
+      "observable": "Cancelled CLI exits 1, report passed=false, child PID is gone, and sealed invocation evidence is retained; fake cleanup runtime failure remains visible.",
+      "owner": "Harness-Gate maintainers",
+      "platform_note": "Unix fixture uses POSIX commands/signals; Windows is excluded by the reviewed policy, not by tool availability.",
+      "platforms": [
+        "linux",
+        "macos"
+      ],
+      "probes": [
+        {
+          "column": 24,
+          "line": 250,
+          "text": "break (terminate(&mut child)?, false, true);"
+        }
+      ],
+      "review_date": "2026-09-07",
+      "rule": "critical-path-source-v2",
+      "run_id": "d894d3fd-de77-48a7-b865-78a77460a548",
+      "source": {
+        "end": 380,
+        "path": "src/process/task.rs",
+        "sha256": "bbb7f1d90d741f41c6cb761f1433f4cb7c8ca168fac0082bd366a9377ae149a8",
+        "start": 192,
+        "symbol": "run"
+      },
+      "status": "pass",
+      "test": "verification_cleanup_cancel_and_report_precedence_retains_resource_evidence",
+      "test_source": {
+        "end": 640,
+        "path": "tests/failure_paths_test.rs",
+        "sha256": "822a25b6b3c68384c110bbfb83dfb9ef6189e76e9417ea5c5576a61e2577c300",
+        "start": 493,
+        "symbol": "verification_cleanup_cancel_and_report_precedence_retains_resource_evidence"
+      },
+      "traceable": true
+    },
+    {
+      "applicable": true,
+      "assertions": [
+        "assert!(!result.passed);",
+        "assert!(!marker.exists(), \"timed-out task left a descendant process\");"
+      ],
+      "binary": "harness-gate",
+      "coverage": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "bd28b504-631b-4244-a1f3-b1007fc52d58/coverage.json",
+        "run_id": "bd28b504-631b-4244-a1f3-b1007fc52d58",
+        "sha256": "9d5943a2622dced68f8efaa5e54b15af521d50882f908391ae5f3c17de2d4894"
+      },
+      "hits": [
+        {
+          "count": 1,
+          "probe": {
+            "column": 24,
+            "line": 253,
+            "text": "break (terminate(&mut child)?, true, false);"
+          },
+          "regions": [
+            [
+              253,
+              24,
+              253,
+              33,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              253,
+              24,
+              253,
+              33,
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      ],
+      "id": "process.tree_cleanup",
+      "module": "process",
+      "nextest": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "bd28b504-631b-4244-a1f3-b1007fc52d58/nextest.jsonl",
+        "run_id": "bd28b504-631b-4244-a1f3-b1007fc52d58",
+        "sha256": "078a891ab14b902413e9f831b316a34149fd37b4b26e2cf073e5ad79417700d9"
+      },
+      "observable": "Timeout result fails and the descendant marker is absent after its deadline.",
+      "owner": "Harness-Gate maintainers",
+      "platform_note": "Runs on all supported host platforms; no external daemon required.",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "probes": [
+        {
+          "column": 24,
+          "line": 253,
+          "text": "break (terminate(&mut child)?, true, false);"
+        }
+      ],
+      "review_date": "2026-09-07",
+      "rule": "critical-path-source-v2",
+      "run_id": "bd28b504-631b-4244-a1f3-b1007fc52d58",
+      "source": {
+        "end": 380,
+        "path": "src/process/task.rs",
+        "sha256": "bbb7f1d90d741f41c6cb761f1433f4cb7c8ca168fac0082bd366a9377ae149a8",
+        "start": 192,
+        "symbol": "run"
+      },
+      "status": "pass",
+      "test": "process::tests::timeout_terminates_process_tree_without_a_descendant_leak",
+      "test_source": {
+        "end": 161,
+        "path": "src/process/tests.rs",
+        "sha256": "ecd32ead844928fb04998e51140ebbc8b82c79396c9a2c0f8b0fce552ecf4007",
+        "start": 127,
+        "symbol": "timeout_terminates_process_tree_without_a_descendant_leak"
+      },
+      "traceable": true
+    },
+    {
+      "applicable": true,
+      "assertions": [
+        "assert!(!step.passed);",
+        "assert_eq!(step.detail.as_deref(), Some(\"exit code 7\"));",
+        "assert!(PathBuf::from(&step.log).is_file());"
+      ],
+      "binary": "harness-gate",
+      "coverage": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "5c410d72-46c4-4103-8015-bef99221bbf0/coverage.json",
+        "run_id": "5c410d72-46c4-4103-8015-bef99221bbf0",
+        "sha256": "ff6258c0d36132ee1704c4d0582dd67f5f2e66ee525f88fc4a27e4fb7d12a367"
+      },
+      "hits": [
+        {
+          "count": 1,
+          "probe": {
+            "column": 5,
+            "line": 456,
+            "text": "Ok(result)"
+          },
+          "regions": [
+            [
+              456,
+              5,
+              456,
+              15,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              456,
+              5,
+              456,
+              15,
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      ],
+      "id": "step.non_zero",
+      "module": "verify",
+      "nextest": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "5c410d72-46c4-4103-8015-bef99221bbf0/nextest.jsonl",
+        "run_id": "5c410d72-46c4-4103-8015-bef99221bbf0",
+        "sha256": "a2574558fd9ff1b0ee5e0356ac449a3e5d66489e8de72f9ff8d7e9fed998b50d"
+      },
+      "observable": "Failure result retains exit-code detail and log path",
+      "owner": "Harness-Gate maintainers",
+      "platform_note": "Unix fixture uses POSIX commands/signals; Windows is excluded by the reviewed policy, not by tool availability.",
+      "platforms": [
+        "linux",
+        "macos"
+      ],
+      "probes": [
+        {
+          "column": 5,
+          "line": 456,
+          "text": "Ok(result)"
+        }
+      ],
+      "review_date": "2026-09-07",
+      "rule": "critical-path-source-v2",
+      "run_id": "5c410d72-46c4-4103-8015-bef99221bbf0",
+      "source": {
+        "end": 457,
+        "path": "src/verify/steps.rs",
+        "sha256": "7d97f5fc813e6e77253a32c0374446f64b520096bd28425f3ef45f31bc3320f4",
+        "start": 392,
+        "symbol": "execute"
+      },
+      "status": "pass",
+      "test": "verify::tests::non_zero_step_retains_exit_detail_and_log",
+      "test_source": {
+        "end": 318,
+        "path": "src/verify/tests.rs",
+        "sha256": "edeed13483430222bd9b95eca498d38e739c96896f15c8f14a87c040e9382f29",
+        "start": 301,
+        "symbol": "non_zero_step_retains_exit_detail_and_log"
+      },
+      "traceable": true
+    },
+    {
+      "applicable": true,
+      "assertions": [
+        "assert!(!report.passed);"
+      ],
+      "binary": "harness-gate",
+      "coverage": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "bb7a934a-ca4f-4b33-adc1-10c1a3c1d9e9/coverage.json",
+        "run_id": "bb7a934a-ca4f-4b33-adc1-10c1a3c1d9e9",
+        "sha256": "75182349143a01673267de24dba7213768d02939545ceecb0fdbc1b602ac956d"
+      },
+      "hits": [
+        {
+          "count": 1,
+          "probe": {
+            "column": 21,
+            "line": 70,
+            "text": "failure_code: Some(FailureCode::ServiceLeaseFailure),"
+          },
+          "regions": [
+            [
+              57,
+              24,
+              78,
+              19,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              57,
+              24,
+              78,
+              19,
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      ],
+      "id": "service.environment_failure",
+      "module": "service",
+      "nextest": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "bb7a934a-ca4f-4b33-adc1-10c1a3c1d9e9/nextest.jsonl",
+        "run_id": "bb7a934a-ca4f-4b33-adc1-10c1a3c1d9e9",
+        "sha256": "ef46006cbcd44247f444dea706c3f190744bc867cc7ae700e39882d6292a8f14"
+      },
+      "observable": "Requesting step fails with service detail and unrelated step is represented",
+      "owner": "Harness-Gate maintainers",
+      "platform_note": "Runs on all supported host platforms; no external daemon required.",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "probes": [
+        {
+          "column": 21,
+          "line": 70,
+          "text": "failure_code: Some(FailureCode::ServiceLeaseFailure),"
+        }
+      ],
+      "review_date": "2026-09-07",
+      "rule": "critical-path-source-v2",
+      "run_id": "bb7a934a-ca4f-4b33-adc1-10c1a3c1d9e9",
+      "source": {
+        "end": 131,
+        "path": "src/verify/steps.rs",
+        "sha256": "7d97f5fc813e6e77253a32c0374446f64b520096bd28425f3ef45f31bc3320f4",
+        "start": 18,
+        "symbol": "run_configured_step"
+      },
+      "status": "pass",
+      "test": "verify::tests::service_failure_does_not_skip_unrelated_steps",
+      "test_source": {
+        "end": 88,
+        "path": "src/verify/tests.rs",
+        "sha256": "edeed13483430222bd9b95eca498d38e739c96896f15c8f14a87c040e9382f29",
+        "start": 45,
+        "symbol": "service_failure_does_not_skip_unrelated_steps"
+      },
+      "traceable": true
+    },
+    {
+      "applicable": true,
+      "assertions": [
+        "assert!(!report.passed);",
+        "step.label == \"secret scan\" && !step.passed",
+        ".join(\".harness-gate/reports/test_result.json\")"
+      ],
+      "binary": "harness-gate",
+      "coverage": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "24568e9f-4adc-4ce8-ad39-7f893f676a81/coverage.json",
+        "run_id": "24568e9f-4adc-4ce8-ad39-7f893f676a81",
+        "sha256": "10baf10db119f84d547a2fc9c3b8fe3ff3427dd53d5adc55065fb1482996139b"
+      },
+      "hits": [
+        {
+          "count": 1,
+          "probe": {
+            "column": 5,
+            "line": 307,
+            "text": "publish_report(&report, &invocation_project, project, &mut progress)?;"
+          },
+          "regions": [
+            [
+              307,
+              5,
+              307,
+              19,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              307,
+              5,
+              307,
+              19,
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      ],
+      "id": "gate.failure_report",
+      "module": "verify",
+      "nextest": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "24568e9f-4adc-4ce8-ad39-7f893f676a81/nextest.jsonl",
+        "run_id": "24568e9f-4adc-4ce8-ad39-7f893f676a81",
+        "sha256": "821e212aa138893905e1a42766333d744327044d01f500a151b2f786f6f0fbb9"
+      },
+      "observable": "Built-in gate failure stops configured steps and writes test_result report",
+      "owner": "Harness-Gate maintainers",
+      "platform_note": "Runs on all supported host platforms; no external daemon required.",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "probes": [
+        {
+          "column": 5,
+          "line": 307,
+          "text": "publish_report(&report, &invocation_project, project, &mut progress)?;"
+        }
+      ],
+      "review_date": "2026-09-07",
+      "rule": "critical-path-source-v2",
+      "run_id": "24568e9f-4adc-4ce8-ad39-7f893f676a81",
+      "source": {
+        "end": 325,
+        "path": "src/verify/mod.rs",
+        "sha256": "eaa204963ef62a0eb8029dbc5141ce4cadd337f3218069b3ac53c7c9d00af29b",
+        "start": 180,
+        "symbol": "run_selected"
+      },
+      "status": "pass",
+      "test": "verify::tests::gate_failure_writes_compatible_report",
+      "test_source": {
+        "end": 574,
+        "path": "src/verify/tests.rs",
+        "sha256": "edeed13483430222bd9b95eca498d38e739c96896f15c8f14a87c040e9382f29",
+        "start": 552,
+        "symbol": "gate_failure_writes_compatible_report"
+      },
+      "traceable": true
+    },
+    {
+      "applicable": true,
+      "assertions": [
+        "assert_failure(&output);"
+      ],
+      "binary": "integration_test",
+      "coverage": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "060a45b4-8c86-4fb0-9045-890945c4a574/coverage.json",
+        "run_id": "060a45b4-8c86-4fb0-9045-890945c4a574",
+        "sha256": "db66a3db8bb249cb9879e5f75a641d07d643ed5dcc15a825d4ec9bfd452cf4a1"
+      },
+      "hits": [
+        {
+          "count": 1,
+          "probe": {
+            "column": 32,
+            "line": 48,
+            "text": "let mut config: Self = toml::from_str(&source)"
+          },
+          "regions": [
+            [
+              48,
+              32,
+              48,
+              46,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              48,
+              32,
+              48,
+              46,
+              1,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      ],
+      "id": "config.invalid",
+      "module": "config",
+      "nextest": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "060a45b4-8c86-4fb0-9045-890945c4a574/nextest.jsonl",
+        "run_id": "060a45b4-8c86-4fb0-9045-890945c4a574",
+        "sha256": "fa4ad004250a3eeacdf9e1e26543b5097424f8ba53df6efa9873a451a40c6a60"
+      },
+      "observable": "Invalid configuration fails before execution",
+      "owner": "Harness-Gate maintainers",
+      "platform_note": "Runs on all supported host platforms; no external daemon required.",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "probes": [
+        {
+          "column": 32,
+          "line": 48,
+          "text": "let mut config: Self = toml::from_str(&source)"
+        }
+      ],
+      "review_date": "2026-09-07",
+      "rule": "critical-path-source-v2",
+      "run_id": "060a45b4-8c86-4fb0-9045-890945c4a574",
+      "source": {
+        "end": 62,
+        "path": "src/config/loader.rs",
+        "sha256": "3f733ab8a6ffc1e5cb1fdfa8f65b3f10d3029f57eb59bfe60403844a6729af26",
+        "start": 40,
+        "symbol": "from_source_with_diagnostics"
+      },
+      "status": "pass",
+      "test": "test_config_check_invalid",
+      "test_source": {
+        "end": 125,
+        "path": "tests/integration_test.rs",
+        "sha256": "d784995f60b780c2f5b971b975c19645ffee1fd02d2e19518595d3c8f9350085",
+        "start": 114,
+        "symbol": "test_config_check_invalid"
+      },
+      "traceable": true
+    },
+    {
+      "applicable": true,
+      "assertions": [
+        "assert!(!step.passed);",
+        "Some(\"RESULT_ZERO\")"
+      ],
+      "binary": "harness-gate",
+      "coverage": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "37c6463d-e3d6-424d-acf2-d814f028b96d/coverage.json",
+        "run_id": "37c6463d-e3d6-424d-acf2-d814f028b96d",
+        "sha256": "4c6b4ecdb7a28492ea9bafb4966ec6b4254ae43bd3c22e6be15fb2f5890fa71a"
+      },
+      "hits": [
+        {
+          "count": 1,
+          "probe": {
+            "column": 21,
+            "line": 439,
+            "text": "FailureCode::ResultZero"
+          },
+          "regions": [
+            [
+              439,
+              21,
+              439,
+              44,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              439,
+              21,
+              439,
+              44,
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      ],
+      "id": "parser.failure",
+      "module": "verify",
+      "nextest": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "37c6463d-e3d6-424d-acf2-d814f028b96d/nextest.jsonl",
+        "run_id": "37c6463d-e3d6-424d-acf2-d814f028b96d",
+        "sha256": "653d99956a083642f10e72ece55b6d773af53ed19aeb93aa49c470bcd4cf7abd"
+      },
+      "observable": "Parser failure produces a failed task result",
+      "owner": "Harness-Gate maintainers",
+      "platform_note": "Unix fixture uses POSIX commands/signals; Windows is excluded by the reviewed policy, not by tool availability.",
+      "platforms": [
+        "linux",
+        "macos"
+      ],
+      "probes": [
+        {
+          "column": 21,
+          "line": 439,
+          "text": "FailureCode::ResultZero"
+        }
+      ],
+      "review_date": "2026-09-07",
+      "rule": "critical-path-source-v2",
+      "run_id": "37c6463d-e3d6-424d-acf2-d814f028b96d",
+      "source": {
+        "end": 457,
+        "path": "src/verify/steps.rs",
+        "sha256": "7d97f5fc813e6e77253a32c0374446f64b520096bd28425f3ef45f31bc3320f4",
+        "start": 392,
+        "symbol": "execute"
+      },
+      "status": "pass",
+      "test": "verify::tests::parser_failure_marks_step_failed",
+      "test_source": {
+        "end": 380,
+        "path": "src/verify/tests.rs",
+        "sha256": "edeed13483430222bd9b95eca498d38e739c96896f15c8f14a87c040e9382f29",
+        "start": 347,
+        "symbol": "parser_failure_marks_step_failed"
+      },
+      "traceable": true
+    },
+    {
+      "applicable": true,
+      "assertions": [
+        "assert!(matches!(error, VerifyError::Report { .. }));"
+      ],
+      "binary": "harness-gate",
+      "coverage": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "a927a81e-4e02-4eb1-a0a6-e331f6906c2a/coverage.json",
+        "run_id": "a927a81e-4e02-4eb1-a0a6-e331f6906c2a",
+        "sha256": "84c1d10d6f48d5dd43608121612a9e2d8dc0de9c6136ee3c2e320df5906e8c40"
+      },
+      "hits": [
+        {
+          "count": 3,
+          "probe": {
+            "column": 5,
+            "line": 1135,
+            "text": "report_target(project, relative)?;"
+          },
+          "regions": [
+            [
+              1135,
+              5,
+              1135,
+              18,
+              3,
+              0,
+              0,
+              0
+            ],
+            [
+              1135,
+              5,
+              1135,
+              18,
+              2,
+              0,
+              0,
+              0
+            ],
+            [
+              1135,
+              5,
+              1135,
+              18,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              1135,
+              5,
+              1135,
+              18,
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      ],
+      "id": "report.write_failure",
+      "module": "verify",
+      "nextest": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "a927a81e-4e02-4eb1-a0a6-e331f6906c2a/nextest.jsonl",
+        "run_id": "a927a81e-4e02-4eb1-a0a6-e331f6906c2a",
+        "sha256": "dd81aea88e18038c20b318c6582ac819a00a3d48efc2889d55214dee8b49955f"
+      },
+      "observable": "Report write failure returns the report error boundary",
+      "owner": "Harness-Gate maintainers",
+      "platform_note": "Runs on all supported host platforms; no external daemon required.",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "probes": [
+        {
+          "column": 5,
+          "line": 1135,
+          "text": "report_target(project, relative)?;"
+        }
+      ],
+      "review_date": "2026-09-07",
+      "rule": "critical-path-source-v2",
+      "run_id": "a927a81e-4e02-4eb1-a0a6-e331f6906c2a",
+      "source": {
+        "end": 1144,
+        "path": "src/verify/report.rs",
+        "sha256": "294f00ea6a36825fa1df8cd73ee53b80afd3d11032abac943f4a7ef093af6ccb",
+        "start": 1134,
+        "symbol": "write_report_file"
+      },
+      "status": "pass",
+      "test": "verify::tests::report_write_failure_returns_error",
+      "test_source": {
+        "end": 613,
+        "path": "src/verify/tests.rs",
+        "sha256": "edeed13483430222bd9b95eca498d38e739c96896f15c8f14a87c040e9382f29",
+        "start": 604,
+        "symbol": "report_write_failure_returns_error"
+      },
+      "traceable": true
+    },
+    {
+      "applicable": true,
+      "assertions": [
+        "assert!(verify_manifest(&invocation_project).is_err());"
+      ],
+      "binary": "harness-gate",
+      "coverage": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "9257d88c-628c-4f23-bc3f-81c10d39a16c/coverage.json",
+        "run_id": "9257d88c-628c-4f23-bc3f-81c10d39a16c",
+        "sha256": "c58f70d03ea98feea5bd2d5a3229d4b5a298ab50cacc072161ece117dc24b68a"
+      },
+      "hits": [
+        {
+          "count": 1,
+          "probe": {
+            "column": 13,
+            "line": 1771,
+            "text": "bail!(\"artifact digest or size changed: {}\", artifact.path);"
+          },
+          "regions": [
+            [
+              1771,
+              13,
+              1771,
+              18,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              1771,
+              13,
+              1771,
+              18,
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      ],
+      "id": "report.integrity",
+      "module": "verify",
+      "nextest": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "9257d88c-628c-4f23-bc3f-81c10d39a16c/nextest.jsonl",
+        "run_id": "9257d88c-628c-4f23-bc3f-81c10d39a16c",
+        "sha256": "f6da062c7e5d31175560917aefaf6eb1447374beca6e3ec7df2b8e4b346a0ace"
+      },
+      "observable": "A real invocation manifest verifies before log tampering and rejects changed bytes afterward.",
+      "owner": "Harness-Gate maintainers",
+      "platform_note": "Runs on all supported host platforms; no external daemon required.",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "probes": [
+        {
+          "column": 13,
+          "line": 1771,
+          "text": "bail!(\"artifact digest or size changed: {}\", artifact.path);"
+        }
+      ],
+      "review_date": "2026-09-07",
+      "rule": "critical-path-source-v2",
+      "run_id": "9257d88c-628c-4f23-bc3f-81c10d39a16c",
+      "source": {
+        "end": 1775,
+        "path": "src/verify/report.rs",
+        "sha256": "294f00ea6a36825fa1df8cd73ee53b80afd3d11032abac943f4a7ef093af6ccb",
+        "start": 1688,
+        "symbol": "verify_manifest_without_result"
+      },
+      "status": "pass",
+      "test": "verify::report::tests::manifest_records_digests_and_detects_tampering",
+      "test_source": {
+        "end": 2693,
+        "path": "src/verify/report.rs",
+        "sha256": "294f00ea6a36825fa1df8cd73ee53b80afd3d11032abac943f4a7ef093af6ccb",
+        "start": 2640,
+        "symbol": "manifest_records_digests_and_detects_tampering"
+      },
+      "traceable": true
+    },
+    {
+      "applicable": true,
+      "assertions": [
+        "assert_eq!(output.status.code(), Some(1), \"{payload}\");",
+        "assert_eq!(report[\"passed\"], false, \"{payload}\");",
+        "assert_eq!(step[\"failure_code\"], \"RESULT_PARSE_FAILURE\");",
+        "assert_eq!(step[\"parser\"][\"complete\"], false);"
+      ],
+      "binary": "critical_paths_test",
+      "coverage": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "a4411bd2-6f36-40eb-b157-78e0279d1c5f/coverage.json",
+        "run_id": "a4411bd2-6f36-40eb-b157-78e0279d1c5f",
+        "sha256": "688c1b7936bc866db5d0a29fbd3c3e085df1fb79f984482d25ab455505a226f1"
+      },
+      "hits": [
+        {
+          "count": 3,
+          "probe": {
+            "column": 13,
+            "line": 315,
+            "text": "\"JSON test results contain no supported result array\""
+          },
+          "regions": [
+            [
+              314,
+              15,
+              316,
+              11,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              314,
+              15,
+              316,
+              11,
+              3,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      ],
+      "id": "parser.json_false_positive",
+      "module": "verify",
+      "nextest": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "a4411bd2-6f36-40eb-b157-78e0279d1c5f/nextest.jsonl",
+        "run_id": "a4411bd2-6f36-40eb-b157-78e0279d1c5f",
+        "sha256": "c9dc31954448c2291d3cee4c66ecf47544c0b70ef2a30a49bfa54bd727d4512b"
+      },
+      "observable": "Error/numeric/unrelated/ambiguous JSON causes CLI exit 1, RESULT_PARSE_FAILURE, failed report and incomplete parser.",
+      "owner": "Harness-Gate maintainers",
+      "platform_note": "Unix fixture uses POSIX commands/signals; Windows is excluded by the reviewed policy, not by tool availability.",
+      "platforms": [
+        "linux",
+        "macos"
+      ],
+      "probes": [
+        {
+          "column": 13,
+          "line": 315,
+          "text": "\"JSON test results contain no supported result array\""
+        }
+      ],
+      "review_date": "2026-09-07",
+      "rule": "critical-path-source-v2",
+      "run_id": "a4411bd2-6f36-40eb-b157-78e0279d1c5f",
+      "source": {
+        "end": 332,
+        "path": "src/verify/parser.rs",
+        "sha256": "75ae046db0b72a7c2d984283c5145e5e8a6e323412745046065de75ed3c2dc9b",
+        "start": 302,
+        "symbol": "count_json_results"
+      },
+      "status": "pass",
+      "test": "json_false_positive_cli_fails_with_incomplete_parser_report",
+      "test_source": {
+        "end": 92,
+        "path": "tests/critical_paths_test.rs",
+        "sha256": "9969ff4f735d5a1fb65bf699fc6854ab436c2cf9a25756465f679f9342a9da4e",
+        "start": 7,
+        "symbol": "json_false_positive_cli_fails_with_incomplete_parser_report"
+      },
+      "traceable": true
+    },
+    {
+      "applicable": true,
+      "assertions": [
+        "assert_failed_without_remove(&project, &path, &fake, \"runtime object identity changed\");",
+        "assert_failed_without_remove(&project, &path, &fake, \"ownership label\");"
+      ],
+      "binary": "harness-gate",
+      "coverage": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "fa7e45f3-6bb8-46f2-980a-6400ac7d3e4d/coverage.json",
+        "run_id": "fa7e45f3-6bb8-46f2-980a-6400ac7d3e4d",
+        "sha256": "7ddd82dccac197b63b042e1be2daaa9dc6c90d087c379f0c92a717e3b84eca2f"
+      },
+      "hits": [
+        {
+          "count": 2,
+          "probe": {
+            "column": 9,
+            "line": 797,
+            "text": "bail!(\"runtime object identity changed since the lease was recorded\");"
+          },
+          "regions": [
+            [
+              797,
+              9,
+              797,
+              14,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              797,
+              9,
+              797,
+              14,
+              2,
+              0,
+              0,
+              0
+            ],
+            [
+              797,
+              9,
+              797,
+              14,
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      ],
+      "id": "service.lease_ownership",
+      "module": "service",
+      "nextest": {
+        "identity": {
+          "commit": "41e23761e0caa06cab1f6d5ebca1a79648fbb301",
+          "rule": "critical-path-source-v2",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "path": "fa7e45f3-6bb8-46f2-980a-6400ac7d3e4d/nextest.jsonl",
+        "run_id": "fa7e45f3-6bb8-46f2-980a-6400ac7d3e4d",
+        "sha256": "c931b1e6d3c300687bf460ed2e46d123d4aace1ec6563e551d910528622acf5f"
+      },
+      "observable": "Fake Docker/Podman ownership uncertainty retains the lease marker and performs zero removals; no real container claim.",
+      "owner": "Harness-Gate maintainers",
+      "platform_note": "Runs on all supported host platforms; no external daemon required.",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "probes": [
+        {
+          "column": 9,
+          "line": 797,
+          "text": "bail!(\"runtime object identity changed since the lease was recorded\");"
+        }
+      ],
+      "review_date": "2026-09-07",
+      "rule": "critical-path-source-v2",
+      "run_id": "fa7e45f3-6bb8-46f2-980a-6400ac7d3e4d",
+      "source": {
+        "end": 805,
+        "path": "src/service/lease.rs",
+        "sha256": "21192d57f52741f9eb8fd5477b595c960cb8e21881cbedecdd742b7b9ecff021",
+        "start": 773,
+        "symbol": "verify_runtime_record"
+      },
+      "status": "pass",
+      "test": "service::lease::tests::fake_docker_and_podman_cleanup_requires_fresh_complete_ownership",
+      "test_source": {
+        "end": 1458,
+        "path": "src/service/lease.rs",
+        "sha256": "21192d57f52741f9eb8fd5477b595c960cb8e21881cbedecdd742b7b9ecff021",
+        "start": 1371,
+        "symbol": "fake_docker_and_podman_cleanup_requires_fresh_complete_ownership"
+      },
+      "traceable": true
+    }
+  ],
+  "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+  "summary": {
+    "failures": [],
+    "passed": 12,
+    "percent": 100.0,
+    "platform": "linux",
+    "status": "pass",
+    "total": 12
+  },
+  "target": "x86_64-unknown-linux-gnu",
+  "threshold": 95,
+  "timestamp_utc": "2026-09-07T10:34:47.441805+00:00",
+  "tool": "critical-path-matrix"
+}

@@ -1,0 +1,10 @@
+{
+  "mode": "all",
+  "changed_files": [],
+  "components": [
+    "backend",
+    "frontend",
+    "workflow"
+  ],
+  "unmatched_files": []
+}

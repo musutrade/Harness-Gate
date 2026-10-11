@@ -1,0 +1,113 @@
+{
+  "schema": "quality-ci-acceptance-summary/v1",
+  "status": "pass",
+  "identity": {
+    "GITHUB_SHA": "",
+    "GITHUB_RUN_ID": "",
+    "GITHUB_RUN_ATTEMPT": "",
+    "RUNNER_OS": "",
+    "RUNNER_ARCH": ""
+  },
+  "matrix_sha256": "c3d201c43c67c6e4ec6cd0889402d655c55935f450fd34b2233566d0675911af",
+  "acceptance_test_elapsed_seconds": 51.318529718,
+  "cases": [
+    {
+      "shape": "rust",
+      "mode": "pass",
+      "profile": "ci",
+      "seconds": 12.362612573,
+      "producer_launches": 1,
+      "reuse_launches": 0
+    },
+    {
+      "shape": "rust",
+      "mode": "policy-failure",
+      "profile": "ci",
+      "seconds": 1.617732596,
+      "producer_launches": 1,
+      "reuse_launches": 0
+    },
+    {
+      "shape": "rust",
+      "mode": "required-unavailable",
+      "profile": "ci",
+      "seconds": 1.344789541,
+      "producer_launches": 1,
+      "reuse_launches": 0
+    },
+    {
+      "shape": "angular-reference",
+      "mode": "pass",
+      "profile": "ci",
+      "seconds": 8.490176146,
+      "producer_launches": 1,
+      "reuse_launches": 0
+    },
+    {
+      "shape": "angular-reference",
+      "mode": "policy-failure",
+      "profile": "ci",
+      "seconds": 1.500588616,
+      "producer_launches": 1,
+      "reuse_launches": 0
+    },
+    {
+      "shape": "angular-reference",
+      "mode": "required-unavailable",
+      "profile": "ci",
+      "seconds": 1.58791122,
+      "producer_launches": 1,
+      "reuse_launches": 0
+    },
+    {
+      "shape": "mixed",
+      "mode": "pass",
+      "profile": "ci",
+      "seconds": 9.75385205,
+      "producer_launches": 1,
+      "reuse_launches": 0
+    },
+    {
+      "shape": "mixed",
+      "mode": "policy-failure",
+      "profile": "ci",
+      "seconds": 1.734497621,
+      "producer_launches": 1,
+      "reuse_launches": 0
+    },
+    {
+      "shape": "mixed",
+      "mode": "required-unavailable",
+      "profile": "ci",
+      "seconds": 1.56302534,
+      "producer_launches": 1,
+      "reuse_launches": 0
+    },
+    {
+      "shape": "unknown",
+      "mode": "pass",
+      "profile": "ci",
+      "seconds": 9.035447518,
+      "producer_launches": 1,
+      "reuse_launches": 0
+    },
+    {
+      "shape": "unknown",
+      "mode": "policy-failure",
+      "profile": "ci",
+      "seconds": 1.139916345,
+      "producer_launches": 1,
+      "reuse_launches": 0
+    },
+    {
+      "shape": "unknown",
+      "mode": "required-unavailable",
+      "profile": "ci",
+      "seconds": 1.011981294,
+      "producer_launches": 1,
+      "reuse_launches": 0
+    }
+  ],
+  "timing_scope": "One test within the existing Test job; not total job duration or billed runner work.",
+  "receipt_sha256": "9953e1f72fbd0959379fdab51d48a32372691e985a48b9b0822ec05e8bd975c5"
+}

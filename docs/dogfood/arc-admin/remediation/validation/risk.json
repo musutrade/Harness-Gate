@@ -1,0 +1,11 @@
+# Archived quality evidence
+
+This file was externalized from Git history to keep `main` small. The raw bytes remain available in the repository evidence archive.
+
+- Archive: https://github.com/musutrade/Harness-Gate/releases/download/evidence-archive-20261010/quality-evidence-current.tar.zst
+- Path inside archive: `docs/dogfood/arc-admin/remediation/validation/risk.json`
+- Original size: 714716 bytes
+- Original SHA-256: `0ef98bcdb300eebe9d1f68b37d6f8a692bfa6893c51964dc81b0a5f6073f51b1`
+- Original Git blob: `b0378fff9a045554a3d5a785e296a1c1a9f1f71d`
+
+Download the archive, extract `docs/dogfood/arc-admin/remediation/validation/risk.json`, and verify the SHA-256 before use.

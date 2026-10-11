@@ -1,0 +1,79 @@
+{
+  "check": {
+    "command": [
+      "python3",
+      "tools/quality/docs_consistency.py",
+      "--output",
+      "target/quality/docs-consistency.json"
+    ],
+    "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+    "environment": {
+      "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+      "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+      "OPENSPEC_TELEMETRY": "0"
+    },
+    "proxy_environment_removed": true,
+    "exit_code": 0,
+    "wall_seconds": 3.41026780300308
+  },
+  "stdout": "",
+  "stderr": "",
+  "report": {
+    "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+    "commit": "e24aeb351168610c00c14032a473fad61659ec2b",
+    "engineering_policy": {
+      "failures": [],
+      "status": "pass"
+    },
+    "examples": [
+      {
+        "path": "tools/harness-gate/presets/angular-only.flow.toml",
+        "quality_generated": true,
+        "status": "pass"
+      },
+      {
+        "path": "tools/harness-gate/presets/angular-rust-postgres.flow.toml",
+        "quality_generated": true,
+        "status": "pass"
+      },
+      {
+        "path": "tools/harness-gate/presets/generic.flow.toml",
+        "quality_generated": false,
+        "status": "pass"
+      },
+      {
+        "path": "tools/harness-gate/presets/rust-api.flow.toml",
+        "quality_generated": true,
+        "status": "pass"
+      }
+    ],
+    "language_docs_valid": true,
+    "link_failures": [],
+    "logical_cpus": 8,
+    "machine": "x86_64",
+    "machine_schema_valid": true,
+    "manifest_schema_valid": true,
+    "migration": {
+      "path": "tools/quality/fixtures/v1-flow.toml",
+      "status": "pass"
+    },
+    "os": "Linux-7.0.0-31-generic-x86_64-with-glibc2.43",
+    "processor": "",
+    "python": "3.14.4",
+    "quality_example_valid": true,
+    "quality_schema_synced": true,
+    "registry_schema_valid": true,
+    "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+    "sandbox_wording": {
+      "failures": [],
+      "status": "pass"
+    },
+    "schema_synced": true,
+    "status": "pass",
+    "target": "x86_64-unknown-linux-gnu",
+    "timestamp_utc": "2026-09-11T10:25:51.972712+00:00",
+    "tool": "docs-consistency"
+  },
+  "commit_field_note": "Report reads original read-only .git at e24aeb3; working files and workspace-local metadata include ee54469. This is an uncommitted diagnostic."
+}

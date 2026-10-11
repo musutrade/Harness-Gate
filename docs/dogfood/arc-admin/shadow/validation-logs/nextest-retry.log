@@ -1,0 +1,73 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.22s
+────────────
+ Nextest run ID cf0e8b24-6ebe-48bc-834f-2afde2200617 with nextest profile: default
+    Starting 386 tests across 10 binaries
+        SLOW [> 60.000s] (───────) harness-gate quality::policy_tests::frozen_policy_and_reference_acceptance_match_python
+        SLOW [> 60.000s] (───────) harness-gate quality::policy_tests::green_local_gates_and_breaking_contract_block_project_with_provenance
+        PASS [  80.137s] (  1/386) harness-gate quality::policy_tests::green_local_gates_and_breaking_contract_block_project_with_provenance
+        SLOW [>120.000s] (───────) harness-gate quality::policy_tests::frozen_policy_and_reference_acceptance_match_python
+        PASS [ 138.889s] (  2/386) harness-gate quality::policy_tests::frozen_policy_and_reference_acceptance_match_python
+        PASS [   0.006s] (  3/386) harness-gate quality::replay::tests::differences_preserve_all_fields_and_exact_values
+        PASS [   0.005s] (  4/386) harness-gate quality::replay::tests::only_known_missing_file_wording_is_classified
+        PASS [   0.005s] (  5/386) harness-gate quality::replay::tests::transport_rejects_missing_context_and_empty_batches
+        SLOW [> 60.000s] (───────) harness-gate quality::replay::acceptance::retained_corpora_and_consolidated_negative_matrix
+        PASS [  17.751s] (  6/386) harness-gate quality::tests::capability_availability_matches_python
+        PASS [   0.014s] (  7/386) harness-gate quality::tests::embedded_contracts_match_frozen_reference
+        SLOW [>120.000s] (───────) harness-gate quality::replay::acceptance::retained_corpora_and_consolidated_negative_matrix
+        SLOW [> 60.000s] (───────) harness-gate quality::tests::frozen_evidence_and_integrity_matrix_matches_python
+        PASS [ 143.655s] (  8/386) harness-gate quality::replay::acceptance::retained_corpora_and_consolidated_negative_matrix
+        PASS [   0.006s] (  9/386) harness-gate quality::tests::json_boundary_rejects_duplicate_keys_and_malformed_values
+        PASS [  70.463s] ( 10/386) harness-gate quality::tests::frozen_evidence_and_integrity_matrix_matches_python
+        PASS [   0.010s] ( 11/386) harness-gate quality::tests::oracle_cache_releases_files_after_last_owner_and_unwind
+        PASS [  17.322s] ( 12/386) harness-gate quality::tests::measurement_series_compatibility_matches_python
+        PASS [  17.295s] ( 13/386) harness-gate quality::tests::project_identity_ownership_and_relationships_match_python
+        PASS [   0.006s] ( 14/386) harness-gate quality::tests::typed_values_preserve_arbitrary_precision
+        PASS [   0.040s] ( 15/386) harness-gate::ci_adoption_test compatibility_cli_preserves_comparison_and_rollback_evidence
+        PASS [   0.144s] ( 16/386) harness-gate::ci_adoption_test config_cli_discovers_nested_project_and_rejects_file_root
+        PASS [   0.083s] ( 17/386) harness-gate::ci_adoption_test migration_cli_preserves_source_and_refuses_overwrite
+        PASS [   0.936s] ( 18/386) harness-gate::cli_test quality_config_commands_cross_validate_both_planes
+        PASS [   0.160s] ( 19/386) harness-gate::cli_test quality_schema_exports_without_project_or_enabling_quality
+        PASS [   0.094s] ( 20/386) harness-gate::cli_test test_audit_reports_a_typed_configuration_error
+        PASS [   0.081s] ( 21/386) harness-gate::cli_test test_cleanup_dry_run_writes_machine_readable_evidence
+        PASS [   0.061s] ( 22/386) harness-gate::cli_test test_color_always_styles_human_readable_output
+        PASS [   0.061s] ( 23/386) harness-gate::cli_test test_color_never_keeps_human_readable_output_plain
+        PASS [   0.009s] ( 24/386) harness-gate::cli_test test_config_check_without_config
+        PASS [   0.061s] ( 25/386) harness-gate::cli_test test_doctor_basic
+        PASS [   0.009s] ( 26/386) harness-gate::cli_test test_help_command
+        PASS [   0.009s] ( 27/386) harness-gate::cli_test test_init_with_invalid_preset
+        PASS [   0.009s] ( 28/386) harness-gate::cli_test test_invalid_subcommand
+        PASS [   0.137s] ( 29/386) harness-gate::cli_test test_legacy_report_dir_alias_warns_and_new_namespace_wins
+        PASS [   0.009s] ( 30/386) harness-gate::cli_test test_presets_command
+        PASS [   0.204s] ( 31/386) harness-gate::cli_test test_rust_and_python_projects_use_their_own_audit_configuration
+        PASS [   0.015s] ( 32/386) harness-gate::cli_test test_schema_export_writes_the_flow_schema_without_a_project_config
+        FAIL [   0.285s] ( 33/386) harness-gate::cli_test test_scope_without_git
+  stdout ───
+
+    running 1 test
+    test test_scope_without_git ... FAILED
+
+    failures:
+
+    failures:
+        test_scope_without_git
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 19 filtered out; finished in 0.28s
+
+  stderr ───
+    Command unexpectedly succeeded!
+    stdout: Scope: working-tree
+    Changed files: 0
+    Components: project
+
+
+    thread 'test_scope_without_git' (335) panicked at tests/common/mod.rs:95:9:
+    Expected command to fail
+    note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+  Cancelling due to test failure: 1 test still running
+        PASS [  17.839s] ( 34/386) harness-gate quality::tests::source_and_artifact_bytes_are_verified_at_the_boundary
+────────────
+     Summary [ 258.960s] 34/386 tests run: 33 passed (4 slow), 1 failed, 0 skipped
+        FAIL [   0.285s] ( 33/386) harness-gate::cli_test test_scope_without_git
+warning: 352/386 tests were not run due to test failure (run with --no-fail-fast to run all tests, or run with --max-fail)
+error: test run failed

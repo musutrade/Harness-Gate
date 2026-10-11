@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-09-11T10:38:25.959656+00:00",
+  "command": [
+    "bash",
+    "target/gh-230/operator-acceptance/run-container.sh",
+    "target/gh-230/operator-native-runtime",
+    "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/resume-probe",
+    "/released-core/harness-gate-linux-amd64",
+    "--version"
+  ],
+  "cwd": "/mnt/dev-ssd/workspaces/symphony/GH-230",
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "permission denied while trying to connect to the docker API at unix:///var/run/docker.sock\n",
+  "core_sha256": "8e3df8303ca8f650d4ef768b29cfefb60ca115122a47b116245cc19e4649bbdd"
+}

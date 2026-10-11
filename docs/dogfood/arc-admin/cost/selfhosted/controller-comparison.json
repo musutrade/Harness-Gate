@@ -1,0 +1,10 @@
+{
+  "artifact_id": 10144745598,
+  "artifact_name": "arc-admin-cost-34454586298-1",
+  "downloaded_files": 753,
+  "all_downloaded_bytes_match_runner": true,
+  "configuration_hashes_unchanged": true,
+  "tracked_source_unchanged": true,
+  "harness_binary_sha256": "7349c82b4b5e7561c81758796c5a507d5c80c9d9ecba72be63c64f49cd5888b5",
+  "source": "GitHub Actions artifact downloaded after runner completion; compared with local runner receipts."
+}

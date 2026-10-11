@@ -1,0 +1,13 @@
+{
+  "name": "npm-ci",
+  "argv": [
+    "npm",
+    "ci",
+    "--prefix",
+    "frontend"
+  ],
+  "started_at": "2026-09-10T08:25:36.769488+00:00",
+  "completed_at": "2026-09-10T08:26:15.946831+00:00",
+  "elapsed_seconds": 39.177370696,
+  "exit_code": 0
+}

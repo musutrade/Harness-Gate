@@ -1,0 +1,14 @@
+✔ production template catalog passes the quality gate (346.902146ms)
+✔ renderer requires an exact placeholder value set (1.188407ms)
+✔ SQL validator rejects broken quotes, parentheses and terminators (0.724177ms)
+✔ catalog rejects templates that are not registered (1.402119ms)
+✔ catalog rejects malformed rendered TypeScript (4.988363ms)
+✔ catalog rejects malformed rendered Rust (24.313108ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 479.432234

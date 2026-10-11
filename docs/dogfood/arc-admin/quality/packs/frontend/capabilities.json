@@ -1,0 +1,62 @@
+{
+  "series": {
+    "collector": {
+      "name": "typescript-reference",
+      "version": "1"
+    },
+    "id": "measurement-series/v1:aafce3307210d37f5a1a09f98a7b33b04dfb34e4a269a4d2b78feadf349ff6f1",
+    "metrics": [
+      {
+        "name": "complexity.cognitive",
+        "type": "count"
+      },
+      {
+        "name": "complexity.cyclomatic",
+        "type": "count"
+      },
+      {
+        "name": "coverage.branch",
+        "type": "ratio"
+      },
+      {
+        "name": "coverage.function",
+        "type": "ratio"
+      },
+      {
+        "name": "coverage.line",
+        "type": "ratio"
+      },
+      {
+        "name": "risk.crap",
+        "type": "decimal"
+      }
+    ],
+    "name": "typescript-source-coverage",
+    "normalization": {
+      "name": "istanbul-start-line-max-innermost/v1",
+      "version": "1"
+    },
+    "rule": {
+      "name": "typescript-source-coverage",
+      "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+    },
+    "runtime": {
+      "name": "node-jsdom",
+      "version": "24.18.0/jsdom@28.0.0"
+    },
+    "source_identity": {
+      "name": "typescript-original-source/v1",
+      "version": "1"
+    },
+    "target": "node-jsdom",
+    "tool": {
+      "name": "typescript-toolchain",
+      "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+    }
+  },
+  "states": {
+    "coverage.function": "supported",
+    "coverage.line": "supported",
+    "risk.crap": "unsupported"
+  }
+}

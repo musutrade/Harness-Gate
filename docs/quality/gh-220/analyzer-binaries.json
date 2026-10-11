@@ -1,0 +1,14 @@
+[
+  {
+    "name": "baseline",
+    "retained_path": "target/gh-220/analyzer-evidence/baseline",
+    "bytes": 18744144,
+    "sha256": "878ed2cb3b8c3bbbc763f133b09fddc119a85dee64b78537537a4cf947c913a7"
+  },
+  {
+    "name": "current",
+    "retained_path": "target/gh-220/analyzer-evidence/current",
+    "bytes": 18776144,
+    "sha256": "caf915f8b89fd4dbc88bd5037b5b76d3fa9de0c1a431654e1977a8feed300201"
+  }
+]

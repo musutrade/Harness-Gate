@@ -1,0 +1,225 @@
+{
+  "pairs": [
+    {
+      "sample": 1,
+      "before_seconds": 399.286983389,
+      "shadow_seconds": 546.235786931,
+      "added_seconds": 146.948803542,
+      "before_passed": true,
+      "shadow_passed": false
+    },
+    {
+      "sample": 2,
+      "before_seconds": 293.076245632,
+      "shadow_seconds": 539.664262003,
+      "added_seconds": 246.58801637099998,
+      "before_passed": true,
+      "shadow_passed": false
+    },
+    {
+      "sample": 3,
+      "before_seconds": 293.653608518,
+      "shadow_seconds": 536.45883798,
+      "added_seconds": 242.805229462,
+      "before_passed": true,
+      "shadow_passed": false
+    }
+  ],
+  "samples": [
+    {
+      "mode": "before",
+      "sample": 1,
+      "elapsed_seconds": 399.286983389,
+      "commands": [
+        {
+          "name": "arc-full",
+          "argv": [
+            "cargo",
+            "flow",
+            "verify",
+            "--profile",
+            "full",
+            "--all"
+          ],
+          "started_at": "2026-09-10T08:26:36.016506+00:00",
+          "completed_at": "2026-09-10T08:33:15.234824+00:00",
+          "elapsed_seconds": 399.220900035,
+          "exit_code": 0
+        }
+      ],
+      "passed": true
+    },
+    {
+      "mode": "shadow",
+      "sample": 1,
+      "elapsed_seconds": 546.235786931,
+      "commands": [
+        {
+          "name": "arc-full",
+          "argv": [
+            "cargo",
+            "flow",
+            "verify",
+            "--profile",
+            "full",
+            "--all"
+          ],
+          "started_at": "2026-09-10T08:33:15.825261+00:00",
+          "completed_at": "2026-09-10T08:37:24.090578+00:00",
+          "elapsed_seconds": 248.26531245,
+          "exit_code": 0
+        },
+        {
+          "name": "harness-full",
+          "argv": [
+            "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/harness-build/debug/harness-gate",
+            "--project-root",
+            "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source",
+            "--config",
+            ".harness-gate/flow.toml",
+            "verify",
+            "--profile",
+            "full",
+            "--all"
+          ],
+          "started_at": "2026-09-10T08:37:24.096337+00:00",
+          "completed_at": "2026-09-10T08:42:22.048601+00:00",
+          "elapsed_seconds": 297.952295888,
+          "exit_code": 1
+        }
+      ],
+      "passed": false
+    },
+    {
+      "mode": "before",
+      "sample": 2,
+      "elapsed_seconds": 293.076245632,
+      "commands": [
+        {
+          "name": "arc-full",
+          "argv": [
+            "cargo",
+            "flow",
+            "verify",
+            "--profile",
+            "full",
+            "--all"
+          ],
+          "started_at": "2026-09-10T08:42:22.310141+00:00",
+          "completed_at": "2026-09-10T08:47:15.364044+00:00",
+          "elapsed_seconds": 293.053234701,
+          "exit_code": 0
+        }
+      ],
+      "passed": true
+    },
+    {
+      "mode": "shadow",
+      "sample": 2,
+      "elapsed_seconds": 539.664262003,
+      "commands": [
+        {
+          "name": "arc-full",
+          "argv": [
+            "cargo",
+            "flow",
+            "verify",
+            "--profile",
+            "full",
+            "--all"
+          ],
+          "started_at": "2026-09-10T08:47:15.551846+00:00",
+          "completed_at": "2026-09-10T08:51:23.830683+00:00",
+          "elapsed_seconds": 248.278828345,
+          "exit_code": 0
+        },
+        {
+          "name": "harness-full",
+          "argv": [
+            "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/harness-build/debug/harness-gate",
+            "--project-root",
+            "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source",
+            "--config",
+            ".harness-gate/flow.toml",
+            "verify",
+            "--profile",
+            "full",
+            "--all"
+          ],
+          "started_at": "2026-09-10T08:51:23.842191+00:00",
+          "completed_at": "2026-09-10T08:56:15.192255+00:00",
+          "elapsed_seconds": 291.350079593,
+          "exit_code": 1
+        }
+      ],
+      "passed": false
+    },
+    {
+      "mode": "before",
+      "sample": 3,
+      "elapsed_seconds": 293.653608518,
+      "commands": [
+        {
+          "name": "arc-full",
+          "argv": [
+            "cargo",
+            "flow",
+            "verify",
+            "--profile",
+            "full",
+            "--all"
+          ],
+          "started_at": "2026-09-10T08:56:15.395679+00:00",
+          "completed_at": "2026-09-10T09:01:09.025347+00:00",
+          "elapsed_seconds": 293.62965879,
+          "exit_code": 0
+        }
+      ],
+      "passed": true
+    },
+    {
+      "mode": "shadow",
+      "sample": 3,
+      "elapsed_seconds": 536.45883798,
+      "commands": [
+        {
+          "name": "arc-full",
+          "argv": [
+            "cargo",
+            "flow",
+            "verify",
+            "--profile",
+            "full",
+            "--all"
+          ],
+          "started_at": "2026-09-10T09:01:09.217739+00:00",
+          "completed_at": "2026-09-10T09:05:17.702732+00:00",
+          "elapsed_seconds": 248.484981496,
+          "exit_code": 0
+        },
+        {
+          "name": "harness-full",
+          "argv": [
+            "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/harness-build/debug/harness-gate",
+            "--project-root",
+            "/mnt/dev-ssd/gh206-runner/_work/Harness-Gate/Harness-Gate/target/arc-admin-ci-trial/source",
+            "--config",
+            ".harness-gate/flow.toml",
+            "verify",
+            "--profile",
+            "full",
+            "--all"
+          ],
+          "started_at": "2026-09-10T09:05:17.720882+00:00",
+          "completed_at": "2026-09-10T09:10:05.636806+00:00",
+          "elapsed_seconds": 287.915946572,
+          "exit_code": 1
+        }
+      ],
+      "passed": false
+    }
+  ],
+  "authority_transfer_permitted": false,
+  "scope": "Sequential full-command workloads, excludes setup and job overhead. Same runner, source, scope and configurations; shared warm caches introduce order effects. Failed trials are not complete-quality cost or runtime assurance parity.",
+  "runner_work": "One job without overlapping samples: each sample elapsed time is occupied runner time for that segment. Obtain full job/step timing separately from Actions API; do not substitute these segments for the original multijob topology."
+}

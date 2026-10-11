@@ -1,0 +1,11 @@
+{
+  "issue": 132,
+  "scope": "typescript-angular-reference-adapter task 3.2",
+  "files": {
+    "docs/quality/gh-132/validation.tar.gz": "ab54e5f727c95d8130f1ffdc2b2cbf3f06421e34bd5932bd5a17301756ec9059",
+    "tools/quality/tests/test_typescript_policy.py": "7423806a734d74c139fcb8f598b6c87c4481490ce85d839f8e7aa7ff574fdba3",
+    "tools/quality/fixtures/typescript-angular/evidence/native.tar.gz": "b4d83c5f3f2465976781a8bbbe6c1fb30613cae6dbaad8309cb1952ff01050b3",
+    "tools/quality/fixtures/typescript-angular/semantics/source-index.json": "026a7a319d417d4168eabe57fcdf3ece6f1dd313f9ae90c5619f617920ad39ac",
+    "tools/quality/fixtures/rust-reference/history.json": "fe449aceb02a62ab1d8c998af6fdefb7777d3230cc3a30e01e61e5e32185026f"
+  }
+}

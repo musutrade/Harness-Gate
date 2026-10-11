@@ -1,0 +1,101 @@
+{
+  "status": "incomplete; diagnostic evidence only",
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "tools/quality/docs_consistency.py",
+        "--output",
+        "target/quality/docs-consistency.json"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp"
+      },
+      "exit_code": 0,
+      "wall_seconds": 3.338812212983612
+    },
+    {
+      "command": [
+        "python3",
+        "tools/quality/docs_consistency.py",
+        "--output",
+        "target/quality/docs-consistency.json"
+      ],
+      "exit_code": 1,
+      "wall_seconds": 1.8239724290324375,
+      "environment": {}
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "test_rust_collector_runtime.StandaloneNativeTests.test_private_generic_projection_is_decided_by_actual_core",
+        "-v"
+      ],
+      "environment": {
+        "RUST_COLLECTOR_RUNTIME": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/trusted-invocation-progress/runtime",
+        "HARNESS_GATE_NATIVE_POLICY_BINARY": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo/debug/harness-gate",
+        "PYTHONPATH": "/mnt/dev-ssd/workspaces/symphony/GH-230/tools/quality/tests",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo"
+      },
+      "exit_code": 0,
+      "wall_seconds": 28.418693024024833
+    },
+    {
+      "command": [
+        "openspec",
+        "validate",
+        "package-official-rust-collector-for-independent-delivery",
+        "--strict",
+        "--no-interactive"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.5459420160041191,
+      "environment": {
+        "OPENSPEC_TELEMETRY": "0"
+      }
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.011070011998526752,
+      "environment": {}
+    }
+  ],
+  "summary": {
+    "status": "diagnostic; not acceptance",
+    "native_work": "target/gh-228/runtime-tests/tmpyfwm29to",
+    "artifacts": [
+      {
+        "path": "target/gh-230/trusted-invocation-progress/runtime.tar",
+        "bytes": 1623480320,
+        "sha256": "04d2b2a05a11f30c20b7a3d19ea5784c1471c1dc0a39ab50db634c68a7ac8011"
+      },
+      {
+        "path": "target/gh-230/trusted-invocation-progress/runtime/runtime.json",
+        "bytes": 187678,
+        "sha256": "31622eb6c532a681f6b63acc3c2fff4b0272b882382dee167c4eb9b7f6dd6173"
+      },
+      {
+        "path": "target/gh-230/cargo/debug/harness-gate",
+        "bytes": 128122568,
+        "sha256": "63607e8f9d3b0243b3d42ac574d27d531dd5e0630195fa632f748c7324a4b88d"
+      }
+    ],
+    "producer_counts": "Not observed; existing tracing denial remains unresolved."
+  },
+  "unchanged_validation": "recovery-checks.json: Rust nextest/fmt/clippy; invocation-error-checks.json: Python discovery 408 tests, three opt-in skips. Only native opt-in test/docs changed.",
+  "not_applicable": [
+    "harness-gate config check",
+    "harness-gate verify --profile ci --all"
+  ],
+  "limitations": "Checkout-built Core on existing host; synthetic capability injection over fresh native captures; unsigned private projection. No released Core, successful public generic collect, observed launch counts, clean-host costs or complete durable runtime package."
+}

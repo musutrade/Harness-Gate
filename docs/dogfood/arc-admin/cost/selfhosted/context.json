@@ -1,0 +1,23 @@
+{
+  "source_sha": "9982ed556eaf997910824d7b682946147c81a16a",
+  "harness_sha": "19a264e2b1992a5355166ca46e87fba766fa30d8",
+  "ci_identity": {
+    "GITHUB_REPOSITORY": "musutrade/Harness-Gate",
+    "GITHUB_RUN_ID": "34454586298",
+    "GITHUB_RUN_ATTEMPT": "1",
+    "GITHUB_JOB": "measure",
+    "GITHUB_SHA": "19a264e2b1992a5355166ca46e87fba766fa30d8",
+    "RUNNER_NAME": "gh206-cost-temporary",
+    "RUNNER_OS": "Linux",
+    "RUNNER_ARCH": "X64"
+  },
+  "host": {
+    "machine": "x86_64",
+    "kernel": "7.0.0-31-generic",
+    "logical_cpus": 8
+  },
+  "cache_protocol": "Fresh workspace-local Cargo and npm caches at setup. All six sequential samples reuse those caches; sample 1 is initial-use, samples 2/3 are warm. No cold-cache or steady-state savings claim.",
+  "quality_limit": "Missing trusted native producers/state/baseline must remain failed. No synthetic inputs or baseline substitution.",
+  "setup_excluded_from_samples": true,
+  "workflow_host": "Harness-Gate measurement workflow; workload is the pinned Arc-Admin source, not its original multijob CI topology."
+}

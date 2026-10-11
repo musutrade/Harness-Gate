@@ -1,0 +1,25 @@
+{
+  "status": "operator-inputs-partial-personal-policy-proposed",
+  "production_environment_applied": false,
+  "publication_authorized": false,
+  "final_rc_certified": false,
+  "files": {
+    "bootstrap-container-help.log": "5679d8aeb5f19123b7df4f9b13de966d0442f6c03cce5d3454ee41f1e5bbaee2",
+    "cosign-provisioning.json": "9dd0d8197f6fd7bb892aea3fe3db9a4e0970c2d447c3299400a0b32ea759376f",
+    "cosign-real-missing-bundle.log": "56e7d5e93b9b9da1c6781b7e14dff99144e00aee0e9688a6ced0bf8d07be5764",
+    "cosign-real-missing-inclusion.log": "56e7d5e93b9b9da1c6781b7e14dff99144e00aee0e9688a6ced0bf8d07be5764",
+    "cosign-real-negatives.json": "8e543db033cc23b0785195185bc84ed92f2b2e7d2b307723e77ed2342d2d1021",
+    "cosign-real-positive.log": "9d25d6c1808feeb45965a458d4eb657547adab11c8f209d12ccadc6b9494282e",
+    "cosign-real-tampered-signature.log": "aa9ef143617f6ddadc0c8ec9b8460dd1ba747f6b87387b554418d7de3f641f14",
+    "cosign-real-wrong-identity.log": "cd1a116609a48a606c0168e7b14decfa45d5e7d5942cd4437dff3b060030e49d",
+    "cosign-version.log": "fd9336d1f2ee455bcf7b4463328f7e0773e33b4f43fe88f64cdb9a888c64875f",
+    "personal-policy-docs.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "personal-policy-openspec.log": "870eee9fc1789e7071418a7ad67af1f541507853598cc27efde127f090653be1",
+    "personal-policy-tests-corrected.log": "cc22479ca6b3f99c3bebe9bc0103caa747bdd3b7d6c5694d709a2a5dda076046",
+    "personal-policy-tests.log": "5e6539b20a9936aab804a2351d927003707d03b29c8f63ac7bf46879e8ba2c4c",
+    "proposed-main-branch-rule.json": "8299c77e1e86d9e14ed19c6a7e7bc8df964a19eabf04f1f70c8840c21690c138",
+    "proposed-personal-environment.json": "1de38e2192d7cfecbb4d4e1799f482e5f3d1b72827a99efff1d39abc43878310",
+    "sandbox-preflight.json": "1a1d23318fe4f62f947de674d9682c5f5266fecd0a5e4947d3891ee132c78d4a",
+    "tuf-refresh.log": "bc690501dc9a8a311ba8b3e4a88eb5a26dd20583e809bd2608808c8c04fb2bbb"
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "issue": "GH-114",
+  "scope": [
+    "5.1",
+    "5.2",
+    "5.3",
+    "5.4",
+    "5.5"
+  ],
+  "environment_override": {
+    "CARGO_TARGET_DIR": "/home/gem/symphony-workspaces/GH-114/target/gh-114-cargo"
+  },
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 0,
+      "duration_seconds": 49.31,
+      "log": "nextest.log",
+      "tests": 315
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "exit_code": 0,
+      "duration_seconds": 0.52,
+      "log": "fmt.log"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 0,
+      "duration_seconds": 20.07,
+      "log": "clippy.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 0,
+      "duration_seconds": 11.46,
+      "log": "python.log"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 0,
+      "duration_seconds": 16.58,
+      "log": "docs.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 0,
+      "tests": 167,
+      "log": "python-final.log",
+      "reason": "Final added negative test and policy aggregate validation."
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 0,
+      "log": "docs-final.log",
+      "reason": "Final OpenSpec and contract edits."
+    }
+  ],
+  "not_applicable": [
+    {
+      "command": "harness-gate config check",
+      "reason": "No .harness-gate/flow.toml; no declared ci profile."
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "reason": "No .harness-gate/flow.toml; no declared ci profile."
+    }
+  ],
+  "required_ci": "pending; controller owns merge and closure",
+  "checkout_base": "fb70a5d34353393ff0b9f3300590b72265c99351",
+  "dependency": {
+    "issue": 113,
+    "state": "closed",
+    "pr": 122,
+    "merged": true,
+    "merge_commit": "fb70a5d34353393ff0b9f3300590b72265c99351"
+  },
+  "baseline": {
+    "command": "python3 -m unittest discover -s tools/quality/tests -p test_harness_evidence.py -v",
+    "exit_code": 0,
+    "tests": 18,
+    "log": "baseline-evidence.log"
+  },
+  "focused": {
+    "command": "python3 -m unittest discover -s tools/quality/tests -p test_policy_engine.py -v",
+    "exit_code": 0,
+    "tests": 9,
+    "log": "policy-tests.log"
+  },
+  "example": {
+    "command": "python3 tools/quality/policy_engine.py --policy tools/quality/fixtures/policy/policy.json --evidence tools/quality/fixtures/harness-evidence/polyglot.json --project tools/quality/fixtures/project-model/base.json --source-root tools/quality/fixtures/project-model/sources --artifact-root tools/quality/fixtures/harness-evidence --expected tools/quality/fixtures/harness-evidence/expected.json --output target/quality/gh-114/policy-example.json",
+    "exit_code": 1,
+    "expected": "coverage pass; CRAP fail",
+    "artifact": "policy-example.json"
+  },
+  "delivery_limitation": {
+    "command": "git add tools/quality/policy_engine.py tools/quality/schema/policy.schema.json tools/quality/tests/test_policy_engine.py tools/quality/fixtures/policy docs/quality/policy-engine.md docs/quality/gh-114 openspec/changes/language-agnostic-evidence-policy-architecture",
+    "exit_code": 128,
+    "error": "fatal: Unable to create '/home/gem/symphony-workspaces/GH-114/.git/index.lock': Read-only file system",
+    "workaround": "Copied current workspace .git to target/gh-114-git; use --git-dir=target/gh-114-git --work-tree=. for commit and push on symphony/GH-114."
+  },
+  "input_sha256": {
+    "tools/quality/policy_engine.py": "e2c62bab62db964e49c93a09b132926915690c5683ff92a518b864a04947def2",
+    "tools/quality/schema/policy.schema.json": "b1ea3db4cd3b3e4efc1face3d9bc56ce57729f9b1be649c26850f782fb6bac9c",
+    "tools/quality/tests/test_policy_engine.py": "0242fc5122f705c13410214d9893db6ab17cc93caa91af0c1ac8b97d87365c31",
+    "tools/quality/fixtures/policy/policy.json": "8b01b11714786f8747c47c987d8caf40acfc3a31969d426342e6e96751e21b31",
+    "docs/quality/policy-engine.md": "4a2972f6953fc0eb0bce4f905fbb614b7c3ac045b7b78761b9667d86271992c2"
+  },
+  "evidence_archive": "local-evidence.tar.gz"
+}

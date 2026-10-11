@@ -1,0 +1,19 @@
+{
+  "original_archive": "capability-evidence.tar.gz",
+  "bytes": 5718365,
+  "sha256": "1af2a4047e48d7a2f80863b19e9a2f2b1e31be3a4526c2a077420a87977a11a2",
+  "parts": [
+    {
+      "file": "part-0000",
+      "bytes": 2880000,
+      "sha256": "71aa6be5e23b7f1c0cc37dbfecc6530d591d3e6165ae0afb7c91d7af331ccc12"
+    },
+    {
+      "file": "part-0001",
+      "bytes": 2838365,
+      "sha256": "e22ab8b5db3e0b64bb555be8ada8ab2d39a57cefa0a57a0134cab1a789c14c60"
+    }
+  ],
+  "reconstruct_from_parts_directory": "cat part-* > ../capability-evidence.tar.gz",
+  "verify": "Verify original archive SHA-256 before extraction; original per-file inventory remains unchanged."
+}

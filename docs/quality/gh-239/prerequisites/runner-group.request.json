@@ -1,0 +1,10 @@
+{
+  "name": "harness-gate-rust-collector-release",
+  "visibility": "selected",
+  "selected_repository_ids": [1346842829],
+  "allows_public_repositories": true,
+  "restricted_to_workflows": true,
+  "selected_workflows": [
+    "musutrade/Harness-Gate/.github/workflows/rust-collector-release.yml@refs/heads/main"
+  ]
+}

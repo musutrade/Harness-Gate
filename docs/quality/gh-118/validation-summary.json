@@ -1,0 +1,112 @@
+{
+  "issue": "GH-118",
+  "scope": [
+    "10.1",
+    "10.2",
+    "10.3",
+    "10.4"
+  ],
+  "baseline": "0eca68ea1d2d8f8998fbca715a51a18cc72e6367",
+  "environment": {
+    "CARGO_TARGET_DIR": "$PWD/target/gh-118-cargo",
+    "TMPDIR": "/home/gem/dev-tmp"
+  },
+  "checks": [
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -p test_rust_reference.py -v",
+      "status": "pass",
+      "exit_code": 0,
+      "detail": "13 tests before implementation",
+      "artifact": "before-shadow.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -p test_rust_equivalence.py -v",
+      "status": "pass",
+      "exit_code": 0,
+      "detail": "3 tests",
+      "artifact": "window-tests.log"
+    },
+    {
+      "command": "python3 tools/quality/rust_equivalence.py --output target/quality/gh-118/acceptance",
+      "status": "pass",
+      "exit_code": 0,
+      "detail": "2 distinct pinned runs, 15 fixtures; no mismatches/skips",
+      "artifact": "acceptance.log"
+    },
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "status": "pass",
+      "exit_code": 0,
+      "detail": "315 passed; 0 skipped",
+      "artifact": "nextest.log"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "status": "pass",
+      "exit_code": 0,
+      "detail": "",
+      "artifact": "fmt.log"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "status": "pass",
+      "exit_code": 0,
+      "detail": "",
+      "artifact": "clippy.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "status": "pass",
+      "exit_code": 0,
+      "detail": "207 tests",
+      "artifact": "python-tests.log"
+    },
+    {
+      "command": "openspec validate language-agnostic-evidence-policy-architecture --strict",
+      "status": "pass",
+      "exit_code": 0,
+      "detail": "",
+      "artifact": "openspec.log"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "status": "pass",
+      "detail": "Passed with workspace-local CARGO_TARGET_DIR after retaining evidence links.",
+      "exit_code": 0,
+      "artifact": "docs-consistency.log"
+    },
+    {
+      "command": "harness-gate config check",
+      "status": "not_applicable",
+      "detail": ".harness-gate/flow.toml absent; no project-local ci profile"
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "status": "not_applicable",
+      "detail": ".harness-gate/flow.toml absent; no project-local ci profile"
+    }
+  ],
+  "limitations": [
+    "Hosted shadow and required CI pending; required CI must pass before merge.",
+    "Retrospective equivalence is limited to two retained Linux Rust runs; no authority or baseline switch."
+  ],
+  "initial_failure": {
+    "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+    "exit_code": 1,
+    "detail": "Evidence links were not created yet; Cargo subprocesses failed with the default read-only build directory.",
+    "diagnostic_command": "cargo run --manifest-path tools/harness-gate/Cargo.toml --locked -- config schema",
+    "diagnostic_exit_code": 101,
+    "error": "error: failed to open: /home/gem/cargo-target/debug/.cargo-build-lock\n\nCaused by:\n  Read-only file system (os error 30)",
+    "impact": "Resolved by workspace-local CARGO_TARGET_DIR and retained evidence creation."
+  },
+  "delivery_environment": {
+    "command": "git add .github/workflows/ci.yml tools/quality/rust_reference.py",
+    "exit_code": 128,
+    "error": "fatal: Unable to create '/home/gem/symphony-workspaces/GH-118/.git/index.lock': Read-only file system",
+    "workaround": "Copy current workspace Git metadata to target/gh-118-git; use --git-dir=target/gh-118-git --work-tree=. on the same branch."
+  },
+  "evidence_archive": {
+    "path": "local-evidence.tar.gz",
+    "sha256": "bc37517abb4748645db6d8444887f3412390ec1162d0b0a38324b4754b2a20e8"
+  }
+}

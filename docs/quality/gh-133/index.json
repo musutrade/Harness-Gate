@@ -1,0 +1,41 @@
+{
+  "files": {
+    "tools/quality/collect_typescript_contracts.py": "7bcc45f52f5a2d8fdebc6294523ed9101f33f10a9e3eaec8a87bcf31e75f82c0",
+    "tools/quality/tests/test_typescript_contracts.py": "4cc116aeaedd251cd0901cc44dd59e1198bca1c8f6780d05ec1ac5c754bde02d",
+    "tools/quality/typescript_contracts.py": "be30cd166091ab263cf344620fdaaedd3cfaa7a4ff61c0f3cdd971606b3637e9"
+  },
+  "issue": 133,
+  "native": {
+    "breaking": {
+      "context": {
+        "base_commit": "9dbb950e57f0985976cc0f5db04c47d6cb401d23",
+        "commit": "9dbb950e57f0985976cc0f5db04c47d6cb401d23",
+        "run": "gh133-breaking",
+        "target": "native-contract"
+      },
+      "path": "breaking-native.tar.gz",
+      "receipt_sha256": "b1c60088cfa3bf918912dade493f8fd16e968f8bc6c4969a08316915512e4b3b",
+      "sha256": "4737984f683bdc30d53fae29207248e3425d4711649e334e1cedcdaa4bc752d2"
+    },
+    "compatible": {
+      "context": {
+        "base_commit": "9dbb950e57f0985976cc0f5db04c47d6cb401d23",
+        "commit": "9dbb950e57f0985976cc0f5db04c47d6cb401d23",
+        "run": "gh133-compatible",
+        "target": "native-contract"
+      },
+      "path": "compatible-native.tar.gz",
+      "receipt_sha256": "185abfd0894bd4f16603bf2eac5e03ec8f9dad8c83bdec71d1695fe0edf86dcc",
+      "sha256": "014466ec14f6f3362a6325368151aab0d685c3d4d2b95ccdb87d8fd4582db96e"
+    }
+  },
+  "reports": {
+    "path": "reports.tar.gz",
+    "sha256": "3b9f1df6bae7f1b4dc24d32bffc196479cd1763d4952bb9adb7940fe29e0d1be"
+  },
+  "scope": "typescript-angular-reference-adapter task 3.3",
+  "validation": {
+    "path": "validation.tar.gz",
+    "sha256": "5a7b5edc119ad9bab1ff868b18d4a9a44c59c30f300a5b8bda763572ba8e2359"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "all_release_bytes": 1624188998,
+  "checkpoints": [
+    {
+      "logical_bytes": 1624249058,
+      "name": "verified",
+      "seconds": 22.38322145299753
+    },
+    {
+      "logical_bytes": 3246839537,
+      "name": "extracted",
+      "seconds": 38.242563165025786
+    },
+    {
+      "logical_bytes": 3246839537,
+      "name": "committed",
+      "seconds": 38.301882945001125
+    },
+    {
+      "logical_bytes": 3246839564,
+      "name": "activated",
+      "seconds": 38.36538805899909
+    }
+  ],
+  "cold_seconds": 38.40165409701876,
+  "installed_logical_bytes": 3246779504,
+  "launcher": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/final-acceptance-v3/installed-measured/versions/0.0.0-rc.230/bin/harness-gate-rust-collector",
+  "package_bytes": 1623490560,
+  "package_sha256": "24ba89a7bdf43cc84237221461ef8df1875a0ae19e4530c05a1d97c27adabdc2",
+  "peak_sampled_20ms": {
+    "allocated_bytes": 3249242112,
+    "logical_bytes": 3246839564,
+    "samples": 1758
+  },
+  "scope": "native candidate, disposable test signatures, host trusted installer; clean container invocation recorded separately",
+  "warm_seconds": 16.716136917995755
+}

@@ -1,0 +1,382 @@
+{
+  "bootstrap": {
+    "file_count": 687,
+    "launcher_sha256": "0970a1222920198b6c6cdce253effdb2e71fda09534d45c08310aee1b0dc3195",
+    "path": "target/gh-231/installer-bootstrap.tar",
+    "sha256": "e5e2029ec7b33493ca2ef05e89eba3630c40a4b4c4dd9ed53958d0fbf1a72408",
+    "size": 53780480,
+    "trust_distribution": "unprovisioned"
+  },
+  "candidate": {
+    "assets": [
+      {
+        "digest": {
+          "sha256": "3143043f3093a97a6aaebcaac964eb27f9db2f41d9e013cad92a514b9ba18bfa"
+        },
+        "name": "collector.tar",
+        "size": 1623490560
+      },
+      {
+        "digest": {
+          "sha256": "ee184213fbf96ccb8781a6fa0eafdd7a3512c40321a80917ba8a85e8bf1158a0"
+        },
+        "name": "manifest.json",
+        "size": 213560
+      },
+      {
+        "digest": {
+          "sha256": "24a9bc4fe35a04197ae8dff96034158de36ab31b0462d792d1c1e51147f89ba9"
+        },
+        "name": "sbom.spdx.json",
+        "size": 482318
+      }
+    ],
+    "missing": [
+      "production provenance",
+      "protected eligibility",
+      "RSA signature",
+      "Sigstore bundle",
+      "reviewed final compatibility",
+      "license approval"
+    ],
+    "schema": "rust-collector-preparation/v1",
+    "source_commit": "48099c48f1fded35af5d71638bf57160cb8e0b31",
+    "status": "unsigned-ineligible",
+    "tag": "rust-collector-v0.1.0-rc.1"
+  },
+  "dependency_audit": {
+    "build_lock_sha256": "72d3f515488f584f5250309d26d5da4a12175941366964453ab5ca723499954d",
+    "crates": [
+      {
+        "license": "MIT OR Apache-2.0",
+        "name": "block-buffer-0.10.4",
+        "notices": [
+          "block-buffer-0.10.4/LICENSE-APACHE",
+          "block-buffer-0.10.4/LICENSE-MIT"
+        ],
+        "sha256": "3078c7629b62d3f0439517fa394996acacc5cbc91c5a20d8c658e77abd503a71"
+      },
+      {
+        "license": "MIT OR Apache-2.0",
+        "name": "cfg-if-1.0.4",
+        "notices": [
+          "cfg-if-1.0.4/LICENSE-APACHE",
+          "cfg-if-1.0.4/LICENSE-MIT"
+        ],
+        "sha256": "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801"
+      },
+      {
+        "license": "MIT OR Apache-2.0",
+        "name": "cpufeatures-0.2.17",
+        "notices": [
+          "cpufeatures-0.2.17/LICENSE-APACHE",
+          "cpufeatures-0.2.17/LICENSE-MIT"
+        ],
+        "sha256": "59ed5838eebb26a2bb2e58f6d5b5316989ae9d08bab10e0e6d103e656d1b0280"
+      },
+      {
+        "license": "MIT OR Apache-2.0",
+        "name": "crypto-common-0.1.7",
+        "notices": [
+          "crypto-common-0.1.7/LICENSE-APACHE",
+          "crypto-common-0.1.7/LICENSE-MIT"
+        ],
+        "sha256": "78c8292055d1c1df0cce5d180393dc8cce0abec0a7102adb6c7b1eef6016d60a"
+      },
+      {
+        "license": "MIT OR Apache-2.0",
+        "name": "digest-0.10.7",
+        "notices": [
+          "digest-0.10.7/LICENSE-APACHE",
+          "digest-0.10.7/LICENSE-MIT"
+        ],
+        "sha256": "9ed9a281f7bc9b7576e61468ba615a66a5c8cfdff42420a70aa82701a3b1e292"
+      },
+      {
+        "license": "MIT",
+        "name": "generic-array-0.14.7",
+        "notices": [
+          "generic-array-0.14.7/LICENSE"
+        ],
+        "sha256": "85649ca51fd72272d7821adaf274ad91c288277713d9c18820d8499a7ff69e9a"
+      },
+      {
+        "license": "MIT OR Apache-2.0",
+        "name": "itoa-1.0.18",
+        "notices": [
+          "itoa-1.0.18/LICENSE-APACHE",
+          "itoa-1.0.18/LICENSE-MIT"
+        ],
+        "sha256": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
+      },
+      {
+        "license": "MIT OR Apache-2.0",
+        "name": "libc-0.2.189",
+        "notices": [
+          "libc-0.2.189/LICENSE-APACHE",
+          "libc-0.2.189/LICENSE-MIT"
+        ],
+        "sha256": "3eaf3ede3fee6db1a4c2ee091bf8a8b4dccdc6d17f656fb07896ee72867612f2"
+      },
+      {
+        "license": "Unlicense OR MIT",
+        "name": "memchr-2.8.3",
+        "notices": [
+          "memchr-2.8.3/COPYING",
+          "memchr-2.8.3/LICENSE-MIT",
+          "memchr-2.8.3/UNLICENSE"
+        ],
+        "sha256": "cf8baf1c55e62ffcace7a9f06f4bd9cd3f0c4beb022d3b367256b91b87513d98"
+      },
+      {
+        "license": "MIT OR Apache-2.0",
+        "name": "proc-macro2-1.0.107",
+        "notices": [
+          "proc-macro2-1.0.107/LICENSE-APACHE",
+          "proc-macro2-1.0.107/LICENSE-MIT"
+        ],
+        "sha256": "985e7ec9bb745e6ce6535b544d84d6cd6f7ad8bd711c398938ae983b91a766d9"
+      },
+      {
+        "license": "MIT OR Apache-2.0",
+        "name": "quote-1.0.47",
+        "notices": [
+          "quote-1.0.47/LICENSE-APACHE",
+          "quote-1.0.47/LICENSE-MIT"
+        ],
+        "sha256": "1fbf4db142a473a8d80c26bbf18454ed458bf8d26c8219c331daecfdbd079001"
+      },
+      {
+        "license": "MIT OR Apache-2.0",
+        "name": "serde-1.0.229",
+        "notices": [
+          "serde-1.0.229/LICENSE-APACHE",
+          "serde-1.0.229/LICENSE-MIT"
+        ],
+        "sha256": "4148590afebada386688f18773da617792bf2ef03ffc1e4cbd2b1d45b023e0ba"
+      },
+      {
+        "license": "MIT OR Apache-2.0",
+        "name": "serde_core-1.0.229",
+        "notices": [
+          "serde_core-1.0.229/LICENSE-APACHE",
+          "serde_core-1.0.229/LICENSE-MIT"
+        ],
+        "sha256": "67dca2c9c51e58a4791a4b1ed58308b39c64224d349a935ab5039aa360942a48"
+      },
+      {
+        "license": "MIT OR Apache-2.0",
+        "name": "serde_derive-1.0.229",
+        "notices": [
+          "serde_derive-1.0.229/LICENSE-APACHE",
+          "serde_derive-1.0.229/LICENSE-MIT"
+        ],
+        "sha256": "e7a5d71263a5a7d47b41f6b3f06ba276f10cc18b0931f1799f710578e2309348"
+      },
+      {
+        "license": "MIT OR Apache-2.0",
+        "name": "serde_json-1.0.151",
+        "notices": [
+          "serde_json-1.0.151/LICENSE-APACHE",
+          "serde_json-1.0.151/LICENSE-MIT"
+        ],
+        "sha256": "c841b55ecdae098c80dcae9cf767f6f8a0c2cdb3416bbef72181df4d0fe73f14"
+      },
+      {
+        "license": "MIT OR Apache-2.0",
+        "name": "sha2-0.10.9",
+        "notices": [
+          "sha2-0.10.9/LICENSE-APACHE",
+          "sha2-0.10.9/LICENSE-MIT"
+        ],
+        "sha256": "a7507d819769d01a365ab707794a4084392c824f54a7a6a7862f8c3d0892b283"
+      },
+      {
+        "license": "MIT OR Apache-2.0",
+        "name": "syn-3.0.5",
+        "notices": [
+          "syn-3.0.5/LICENSE-APACHE",
+          "syn-3.0.5/LICENSE-MIT"
+        ],
+        "sha256": "12df2e0110f65b775f769bb17ef989067a1d931b2eb822bd4346631eeada89f9"
+      },
+      {
+        "license": "MIT OR Apache-2.0",
+        "name": "typenum-1.20.1",
+        "notices": [
+          "typenum-1.20.1/LICENSE",
+          "typenum-1.20.1/LICENSE-APACHE",
+          "typenum-1.20.1/LICENSE-MIT"
+        ],
+        "sha256": "b6f5e870be6c3b371b77fe0ee0bafb859fa4964b4404c27de1d380043c4dda20"
+      },
+      {
+        "license": "(MIT OR Apache-2.0) AND Unicode-3.0",
+        "name": "unicode-ident-1.0.24",
+        "notices": [
+          "unicode-ident-1.0.24/LICENSE-APACHE",
+          "unicode-ident-1.0.24/LICENSE-MIT",
+          "unicode-ident-1.0.24/LICENSE-UNICODE"
+        ],
+        "sha256": "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75"
+      },
+      {
+        "license": "MIT/Apache-2.0",
+        "name": "version_check-0.9.5",
+        "notices": [
+          "version_check-0.9.5/LICENSE-APACHE",
+          "version_check-0.9.5/LICENSE-MIT"
+        ],
+        "sha256": "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
+      },
+      {
+        "license": "MIT",
+        "name": "zmij-1.0.23",
+        "notices": [
+          "zmij-1.0.23/LICENSE-MIT"
+        ],
+        "sha256": "29666d0abbfad1e3dc4dcf6144730dd3a3ab225bbbdac83319345b1b44ccfc1b"
+      }
+    ],
+    "host": {
+      "glibc": "glibc 2.43",
+      "kernel": "7.0.0-31-generic",
+      "libraries": {
+        "launcher-shell": {
+          "sha256": "c626229526bb58ec2d0f585f3c3ae1412e6f973b4353385042d11c38d8426917",
+          "source": "/usr/bin/dash"
+        },
+        "ld-linux-x86-64.so.2": {
+          "sha256": "bda779ea9e9ad234f60315477d7cfd0bdde861cd8ddd9df8cdaf62f18c4cec14",
+          "source": "/lib64/ld-linux-x86-64.so.2"
+        },
+        "libc.so.6": {
+          "sha256": "85e64f97e348786a8fb4d9f3d52fec289e2fb86bba20f0731dfe61990525e0f7",
+          "source": "/usr/lib/x86_64-linux-gnu/libc.so.6"
+        },
+        "libdl.so.2": {
+          "sha256": "59d725ca30596a9863f4fa2552a7125f834842abc86b40890231c129358965d2",
+          "source": "/usr/lib/x86_64-linux-gnu/libdl.so.2"
+        },
+        "libm.so.6": {
+          "sha256": "1c488db6f4fe8cecb72456bc018de000b7a9b539c2994864b0416b5e8371b3d8",
+          "source": "/usr/lib/x86_64-linux-gnu/libm.so.6"
+        },
+        "libpthread.so.0": {
+          "sha256": "1327fc40710691dbd94e88b6cf4efce27fefe8fbb93f7d1164a75b4dccaea696",
+          "source": "/usr/lib/x86_64-linux-gnu/libpthread.so.0"
+        },
+        "librt.so.1": {
+          "sha256": "9f3cc59207bcaaac74aaf7aca961f4816f0f4d945e4bd1c3cb98ec516becf161",
+          "source": "/usr/lib/x86_64-linux-gnu/librt.so.1"
+        }
+      },
+      "machine": "x86_64",
+      "system": "Linux"
+    },
+    "license_payload_count": 82,
+    "packages": {
+      "binutils-x86-64-linux-gnu": "2.46-3ubuntu2",
+      "gcc-15-base": "15.2.0-16ubuntu1",
+      "gcc-15-x86-64-linux-gnu": "15.2.0-16ubuntu1",
+      "libbinutils": "2.46-3ubuntu2",
+      "libbz2-1.0": "1.0.8-6ubuntu0.1",
+      "libc6": "2.43-2ubuntu2.4",
+      "libc6-dev": "2.43-2ubuntu2.4",
+      "libctf0": "2.46-3ubuntu2",
+      "libexpat1": "2.7.4-1",
+      "libgcc-15-dev": "15.2.0-16ubuntu1",
+      "libgcc-s1": "16-20260322-1ubuntu1",
+      "libgmp10": "2:6.3.0+dfsg-5ubuntu2",
+      "libisl23": "0.27-1build1",
+      "libjansson4": "2.14-2build4",
+      "liblzma5": "5.8.3-1",
+      "libmpc3": "1.3.1-3",
+      "libmpfr6": "4.2.2-3",
+      "libsframe3": "2.46-3ubuntu2",
+      "libssl3t64": "3.5.5-1ubuntu3.5",
+      "libstdc++6": "16-20260322-1ubuntu1",
+      "libzstd1": "1.5.7+dfsg-3",
+      "python3.14": "3.14.4-1ubuntu0.2",
+      "python3.14-minimal": "3.14.4-1ubuntu0.2",
+      "zlib1g": "1:1.3.dfsg+really1.3.1-1ubuntu3.1"
+    },
+    "payload_count": 1102,
+    "runtime_inventory_sha256": "d2b016bc78cf396f136341e95e0b63c80cc2287821b2c60338834e369b3a607d",
+    "sbom_license_concluded": "NOASSERTION for all files",
+    "status": "inventory-only-redistribution-review-pending"
+  },
+  "not_approved": [
+    "compatibility matrix",
+    "production licenses",
+    "bootstrap trust distribution",
+    "real Sigstore verification",
+    "fresh-host signed installation",
+    "protected environment",
+    "exact-source successful main CI",
+    "tag/publication",
+    "GH-215 integration"
+  ],
+  "observed_environment": {
+    "core": {
+      "commit": "ee544690662645806cda7dd4cd2c9192566f7929",
+      "sha256": "8e3df8303ca8f650d4ef768b29cfefb60ca115122a47b116245cc19e4649bbdd",
+      "version": "0.4.0"
+    },
+    "host_abi": {
+      "glibc": "glibc 2.43",
+      "kernel": "7.0.0-31-generic",
+      "runtime_dependencies_sha256": "f9b213877a2ea9aa44e6119e6fe2e1361f84f9a8084abd410ab8ef34b74e2872",
+      "target": "x86_64-unknown-linux-gnu"
+    },
+    "protocol": {
+      "adapter_result_schema_version": "1",
+      "evidence": "harness-evidence/v1",
+      "project_request": "harness-project-collector-request/v1",
+      "project_response": "harness-project-collector-response/v1",
+      "request": "harness-collector-request/v1",
+      "response": "harness-collector-response/v1"
+    },
+    "tools": [
+      {
+        "name": "driver",
+        "sha256": "aeb9039b1bcdb0cf17904a84e282c863949b5bdde5646dc87390943fc842253b",
+        "version": "sha256:aeb9039b1bcdb0cf17904a84e282c863949b5bdde5646dc87390943fc842253b"
+      },
+      {
+        "name": "rustc",
+        "sha256": "d3a664c970a9fd8361b64194861bebc1ae37b9054e5ee3400dc1c9e691797eea",
+        "version": "rustc 1.97.1 (8bab26f4f 2026-07-14) | binary: rustc | commit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452 | commit-date: 2026-07-14 | host: x86_64-unknown-linux-gnu | release: 1.97.1 | LLVM version: 22.1.6"
+      },
+      {
+        "name": "rustc-driver-library",
+        "sha256": "b0726217c199be52842c1318a340f0fc68a2c2ca0e3fa4886191dbf6ee192a58",
+        "version": "sha256:b0726217c199be52842c1318a340f0fc68a2c2ca0e3fa4886191dbf6ee192a58"
+      },
+      {
+        "name": "llvm-cov",
+        "sha256": "bb415d8767d2ad73d72c01941f409ffc8f9478747ec7c18a7a69356735551ed9",
+        "version": "LLVM (http://llvm.org/): |   LLVM version 22.1.6-rust-1.97.1-stable |   Optimized build."
+      },
+      {
+        "name": "llvm-profdata",
+        "sha256": "1465f86d90a101aec15998c83e0466b960c5ab8130cccbd175db4f9c790ae230",
+        "version": "LLVM (http://llvm.org/): |   LLVM version 22.1.6-rust-1.97.1-stable |   Optimized build."
+      },
+      {
+        "name": "python",
+        "sha256": "52e0a13e60a981d8c4b6478be2ba5176f69da07948a056bf49cf6f077e30cb41",
+        "version": "Python 3.14.4"
+      }
+    ]
+  },
+  "retention": {
+    "durable_url": null,
+    "local_directory": "target/gh-231",
+    "owner": null,
+    "policy": null
+  },
+  "schema": "rust-collector-preparation-audit/v1",
+  "source_commit": "48099c48f1fded35af5d71638bf57160cb8e0b31",
+  "status": "blocked-not-publication-approval"
+}

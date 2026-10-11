@@ -1,0 +1,366 @@
+{
+  "schema_version": 1,
+  "mode": "shadow",
+  "merge_authority": "unchanged: Arc-Admin cargo flow and existing CI",
+  "source": {
+    "repository": "musutrade/arc-admin",
+    "commit": "9982ed556eaf997910824d7b682946147c81a16a",
+    "current_main_observed": "9982ed556eaf997910824d7b682946147c81a16a",
+    "harness_gate_commit": "4c787da3b0075de511f84eda3093f721845f7443",
+    "source_location": "${WORKSPACE}/target/quality/gh-204/source",
+    "tracked_diff_before": "",
+    "tracked_diff_after": "",
+    "equivalence": "Same pinned tracked tree and exact imported overlays for both engines; generated dependencies/reports do not change tracked source. Post-Arc Harness-Gate reruns verify report hashes remain unchanged.",
+    "configuration_sha256": {
+      ".arc-flow/flow.toml": "6e254663c4a47b94ac8e85c263d34d24eb58f3afe5a14b02c7ef257b08f3ed5d",
+      ".shadow-execution/flow.toml": "5096719c1c5ecea970411f0df823eb81af92dd39add56c1764f8059cb602ea5e",
+      ".harness-gate/flow.toml": "5096719c1c5ecea970411f0df823eb81af92dd39add56c1764f8059cb602ea5e",
+      ".harness-gate/quality.toml": "e6c69e54df8bcd64ebf0514462a98cd69664fb0f09c37de47a20cd949b6fbc47"
+    }
+  },
+  "environment": {
+    "removed": [
+      "DATABASE_URL",
+      "TEST_DATABASE_URL",
+      "ARC_FLOW_CONFIG",
+      "ARC_FLOW_REPORTS",
+      "ARC_FLOW_AUDIT_CONFIG",
+      "ARC_FLOW_SECRETS_CONFIG",
+      "AUDITOR_CONFIG",
+      "REPORT_DIR",
+      "PROJECT_ROOT"
+    ],
+    "set": {
+      "CARGO_TARGET_DIR": "${WORKSPACE}/target/arc-flow",
+      "npm_config_cache": "${WORKSPACE}/target/quality/gh-204/npm-cache"
+    },
+    "limits": "No environment-variable values were captured. Successful native removal/isolation tests are evidence of Arc-Admin behavior, not a Harness-Gate runtime probe."
+  },
+  "arc_command": {
+    "cwd": "${ARC_SOURCE}",
+    "argv": [
+      "cargo",
+      "flow",
+      "verify",
+      "--profile",
+      "full",
+      "--all"
+    ],
+    "log": "evidence/arc-full.log"
+  },
+  "arc_exit_code": 0,
+  "arc_scope": {
+    "argv": [
+      "cargo",
+      "flow",
+      "scope",
+      "--all"
+    ],
+    "exit_code": 0,
+    "log": "evidence/arc-scope-initial.log"
+  },
+  "harness_runs": [
+    {
+      "variant": "execution",
+      "command": [
+        "${WORKSPACE}/target/debug/harness-gate",
+        "--project-root",
+        "${ARC_SOURCE}",
+        "--config",
+        ".shadow-execution/flow.toml",
+        "verify",
+        "--profile",
+        "full",
+        "--all"
+      ],
+      "exit_code": 1,
+      "validation_result": "ERROR",
+      "dispatched_steps": [],
+      "emitted_reports": [],
+      "log": "evidence/harness-execution-full.log"
+    },
+    {
+      "variant": "quality",
+      "command": [
+        "${WORKSPACE}/target/debug/harness-gate",
+        "--project-root",
+        "${ARC_SOURCE}",
+        "--config",
+        ".harness-gate/flow.toml",
+        "verify",
+        "--profile",
+        "full",
+        "--all"
+      ],
+      "exit_code": 1,
+      "validation_result": "ERROR",
+      "dispatched_steps": [],
+      "emitted_reports": [],
+      "log": "evidence/harness-quality-full.log"
+    }
+  ],
+  "discrepancies": [
+    {
+      "id": "HG-CAP-001",
+      "category": "Harness-Gate capability gap",
+      "explanation": "The unchanged import preserves Arc-Admin implicit sequential steps with a shared test-postgres resource and no explicit dependencies. Harness-Gate production loading rejects backend.tests and frontend.fullstack-smoke as unordered shared-service users (HGCFG-SHARED-SERVICE). Both execution-only and quality-composed scope/verify exit 1 before dispatch. All traditional, service, isolation and generic quality runtime comparisons are unavailable for this classified reason. No imported dependencies or Arc-Admin blockers were changed.",
+      "evidence": [
+        "evidence/harness-execution-full.log",
+        "evidence/harness-quality-full.log"
+      ],
+      "follow_up": "Task 8: reconcile sequential import semantics with generic shared-resource ordering, retain fail-closed validation and rerun shadow parity before considering authority."
+    },
+    {
+      "id": "HG-UX-001",
+      "category": "Harness-Gate UX gap",
+      "explanation": "GH-202 structural import and GH-203 quality-binding validation pass without exercising the complete production configuration loader. This gives a narrower success signal than operators need: the shipped scope/verify commands reject the composed configuration. The existing diagnostic correctly names both conflicting service users; the gap is migration readiness/validation coverage, not the diagnostic correctness.",
+      "evidence": [
+        "../import/flow.import.json",
+        "../quality/validation.json",
+        "evidence/harness-quality-scope.log"
+      ],
+      "follow_up": "Task 8: expose complete production preflight/readiness separately from structural import and quality binding checks."
+    }
+  ],
+  "gate_discrepancies": {
+    "backend.format": [
+      "HG-CAP-001"
+    ],
+    "backend.clippy": [
+      "HG-CAP-001"
+    ],
+    "backend.compile": [
+      "HG-CAP-001"
+    ],
+    "backend.tests": [
+      "HG-CAP-001"
+    ],
+    "frontend.lint": [
+      "HG-CAP-001"
+    ],
+    "frontend.format": [
+      "HG-CAP-001"
+    ],
+    "frontend.tests": [
+      "HG-CAP-001"
+    ],
+    "frontend.e2e": [
+      "HG-CAP-001"
+    ],
+    "frontend.fullstack-smoke": [
+      "HG-CAP-001"
+    ],
+    "frontend.build": [
+      "HG-CAP-001"
+    ],
+    "workflow.hook-syntax": [
+      "HG-CAP-001"
+    ],
+    "workflow.project-init-tests": [
+      "HG-CAP-001"
+    ],
+    "workflow.framework-release-config": [
+      "HG-CAP-001"
+    ],
+    "workflow.framework-upgrade-tests": [
+      "HG-CAP-001"
+    ],
+    "workflow.template-quality": [
+      "HG-CAP-001"
+    ],
+    "workflow.template-quality-tests": [
+      "HG-CAP-001"
+    ],
+    "workflow.observability-config": [
+      "HG-CAP-001"
+    ],
+    "workflow.tracing-config": [
+      "HG-CAP-001"
+    ],
+    "workflow.production-deployment-config": [
+      "HG-CAP-001"
+    ],
+    "workflow.audit-retention-config": [
+      "HG-CAP-001"
+    ],
+    "workflow.api-generation": [
+      "HG-CAP-001"
+    ],
+    "workflow.supply-chain-config": [
+      "HG-CAP-001"
+    ],
+    "workflow.format": [
+      "HG-CAP-001"
+    ],
+    "workflow.clippy": [
+      "HG-CAP-001"
+    ],
+    "workflow.tests": [
+      "HG-CAP-001"
+    ]
+  },
+  "dimensions": [
+    {
+      "dimension": "component selection",
+      "arc_admin": "Observed scope --all and full report select backend, frontend, workflow.",
+      "harness_gate": "NOT_COMPUTED: production config rejection precedes scope; declaration parity is not observed selection.",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "dimension": "PostgreSQL service",
+      "arc_admin": "Observed postgres:16-alpine, loopback 127.0.0.1:32768, successful pg_isready and TCP connection; backend tests and real full-stack smoke PASS. The specific owned container is absent after verify. Source service manager caches the shared service during sequential execution.",
+      "harness_gate": "NOT_RUN: no service dispatch or cleanup observed. No runtime equivalence claim.",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "dimension": "environment isolation",
+      "arc_admin": "DATABASE_URL and TEST_DATABASE_URL unset at invocation. Original service injects TEST_DATABASE_URL; both database-consuming steps declare DATABASE_URL removal. Native task_can_remove_an_inherited_environment_variable and task_runs_in_an_isolated_session tests PASS; backend API and smoke PASS. Ambient database rejection unit tests PASS. No adversarial environment run was added (task 6).",
+      "harness_gate": "NOT_RUN: preserved declarations are not runtime evidence.",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "dimension": "diagnostics and validation readiness",
+      "arc_admin": "Per-gate PASS, parsed result counts and overall TEST_SUMMARY: PASS; intentional panic/failure output belongs to passing negative unit tests, not a failed gate.",
+      "harness_gate": "E1000 wraps HGCFG-SHARED-SERVICE with source locations, shared resource, conflicting step and dependency/separate-resource help. No gate result. Structural/binding validation success did not establish production readiness.",
+      "discrepancies": [
+        "HG-CAP-001",
+        "HG-UX-001"
+      ]
+    },
+    {
+      "dimension": "reports and artifacts",
+      "arc_admin": "Retained scope.json, secret_scan.json, review_context JSON/Markdown, test_result JSON/Markdown and all 25 native command logs. Generated Playwright/build file hashes and sizes are inventoried separately; reproducible outputs are not all bundled.",
+      "harness_gate": "No reports emitted. Post-Arc scope/verify in both variants left all Arc report hashes unchanged; existing reports must not be attributed to Harness-Gate.",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    },
+    {
+      "dimension": "generic quality",
+      "arc_admin": "Traditional gate PASS is not generic coverage/CRAP/contract evidence.",
+      "harness_gate": "NOT_RUN before quality collection. No stricter-quality discrepancy observed. GH-203 authenticated baseline/collector prerequisites remain unprovisioned; not reached and not claimed passed.",
+      "discrepancies": [
+        "HG-CAP-001"
+      ]
+    }
+  ],
+  "setup_events": [
+    {
+      "command": "npm ci --prefix frontend",
+      "exit_code": 254,
+      "error": "ENOENT: no such file or directory, mkdir '/home/gem/.npm/_cacache'",
+      "impact": "Initial dependency setup failed in the restricted environment. Recovered with workspace-local npm cache; all subsequent Arc gates ran. Not a discrepancy between engines.",
+      "retry_command": "npm ci --prefix frontend --cache ${WORKSPACE}/target/quality/gh-204/npm-cache",
+      "retry_exit_code": 0
+    }
+  ],
+  "normalization": {
+    "rule": "Only workspace/source absolute prefixes replaced by ${WORKSPACE}/${ARC_SOURCE}; no result content removed.",
+    "raw_sha256": {
+      "evidence/arc/changed_files.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "evidence/arc/review_context.json": "b51112720a79f9c4e1e5f04040b52319a521fdf41c80862b82d0b7c48cd9fa26",
+      "evidence/arc/secret_scan.json": "a96a2392a3ffd4322838e50a6c5406a97fb4db894675aa214d1185a9de83c53b",
+      "evidence/arc/scope.json": "392e0ac4200cbd3678df793197c30fc2ee6eca5049b2582c50f3cfd1f88f89fc",
+      "evidence/arc/test_result.json": "5d50f76d3c3f2a2e88db73ef467fc784bd651afe39c0f3e72dd8266dbb327a4e",
+      "evidence/arc/test_result.md": "c9f886eefd7436fc46ac400434ae9d0b3949ec85dd5927eac359ee46708ab72d",
+      "evidence/arc/review_context.md": "e568d1b9876c943e924bbd7e79e0110068b55dbc58ef2344b1b463f287714709",
+      "evidence/arc/logs/supply_chain_config.log": "6150a76f1a143bf92bb1e3b15be7231da150a9e1504ed91bbfc50e46a963a823",
+      "evidence/arc/logs/backend_check.log": "00bf0041cee12cf8b22c9c0840fbd2b9b6ac8cdc9d900d532db455beb24bc371",
+      "evidence/arc/logs/backend_fmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "evidence/arc/logs/git_hook_syntax.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "evidence/arc/logs/framework_upgrade_tests.log": "4176f8f4521f728a4f393b88d4b7a850fc356ab0842e01f80f6fcbe7d8d51aaa",
+      "evidence/arc/logs/backend_tests.log": "c3c3a34484ce264bbed24fe11ea4a2438acb7a9f073a0e0dfa080f93062ff255",
+      "evidence/arc/logs/arc_flow_fmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "evidence/arc/logs/template_quality.log": "3c085d8eed8e9bbb140af81959acff5983cd819355a6503b8b5c4c48e330d902",
+      "evidence/arc/logs/project_init_tests.log": "16593b7bc5d000a5fbd79a21f334a52683dbeaee737b1af583f4b8fbdbd758c4",
+      "evidence/arc/logs/arc_flow_clippy.log": "957521909b14574fbeb8dba411eb78365d63c8b0f787b3902004865eaf8789e2",
+      "evidence/arc/logs/framework_release_config.log": "5fbe2bdd0f06dbfd25bb64209ce0b103d147b8d78cb6bdc750eb03715a71809f",
+      "evidence/arc/logs/audit_retention_config.log": "a03fd67491bb40b9ed25b1b741316ce69ff28bdeb53af3e167da7a85ea966ef4",
+      "evidence/arc/logs/frontend_e2e.log": "a40089b5273c0d3f3ad3111771872f1197499329be418a1ff04f5567e830770b",
+      "evidence/arc/logs/frontend_format.log": "572030ab498ed6707869f472eefa9dd5d80b6da7108de24d53c0c712ee25c8da",
+      "evidence/arc/logs/tracing_config.log": "ad0c4492ac4327d5d6ec4686628748a0566bc10d553c93311414919f81e089e3",
+      "evidence/arc/logs/frontend_lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "evidence/arc/logs/frontend_build.log": "4ff50d90e36c2f7e6563bce536d5044a3d8f189ddf71c703e29627844609a407",
+      "evidence/arc/logs/frontend_tests.log": "1e382db70957092e48a175ff71112b22c38d544ca62db85da7fc1a8a82b4b066",
+      "evidence/arc/logs/api_generation.log": "121508a10d21348d1ed2a1846def6077810a5470397bd0213b78952ea8104097",
+      "evidence/arc/logs/arc_flow_tests.log": "35ca84c6794b82258537b87f622e1cdb4ac393d5d0d7e965289c382562ba9d04",
+      "evidence/arc/logs/frontend_fullstack_smoke.log": "0caf0f5ea3048983feb706ce68fa54956b233e4fe8408ee20838a6c8fe8e6756",
+      "evidence/arc/logs/template_quality_tests.log": "b0597ca8baae453621ce41f34db0b63d1460c3bb7f47584ac58a10dc2a27c40b",
+      "evidence/arc/logs/backend_clippy.log": "723aa5e0c5380973268e0d02aec78325547badf6cdb8faafb5bb3cad6c78e564",
+      "evidence/arc/logs/production_deployment_config.log": "3278d12e74187d2050167583f815a693333906425911d1ea88323ff7e831ad5b",
+      "evidence/arc/logs/observability_config.log": "c2496d8287bc4b621eb370b876d852e40d6cc12bb81ea78fdab2b55e7f8c026f",
+      "evidence/arc-full.log": "c6ea6aece18e5ec963ddbaeb82c97c97dceed0c33721e015f09e2e42ea9e5481",
+      "evidence/arc-scope-initial.log": "e1b8adea3884d42fab120d2b45de2f12ffbbeebb1e242ec9b0584f453a59b679",
+      "evidence/harness-execution-full.log": "9b7e8408b4fdfcd907c5da3c315b5a3d09dab5ca3b0976818563b705eb2919ca",
+      "evidence/harness-quality-full.log": "fb93fbf62a869c465f350ec06efd227448e6b968f4eb6279d267aeaa46e1082b",
+      "evidence/harness-execution-scope.log": "9b7e8408b4fdfcd907c5da3c315b5a3d09dab5ca3b0976818563b705eb2919ca",
+      "evidence/harness-quality-scope.log": "fb93fbf62a869c465f350ec06efd227448e6b968f4eb6279d267aeaa46e1082b",
+      "evidence/harness-commands.json": "d431a506ffda8879f3f1739daaf87e9c9a7bc233847074436c45a82c917ed4fa",
+      "evidence/postgres-during.txt": "e914d740da7636dbf88f2e9e45fc24c5129c090b56344a69303d4db843c9f46d",
+      "evidence/postgres-health.txt": "6e168fc3b5a0662104b5e5da92e87b870e8b7c65fec827d267115b5123d18614",
+      "evidence/postgres-connectivity.json": "10354e5515b51d7ee6eb460581b6aea3329e00c20be78bd7989c7c347edb5661",
+      "evidence/postgres-after.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "evidence/current-main.txt": "3dc35bf81650d4515ea56c022fb61cb3de3bcc862deb62065543492128590820",
+      "evidence/source-after.diff": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "evidence/npm-ci.log": "02473825487b89f075d52870767fb7c0df77d2f8202701bed771f1c0570acadc",
+      "evidence/npm-ci-workspace-cache.log": "82518f6ab342c1cdea00aa5928906b5502c57ac8ca702acff59b489ef5815787"
+    }
+  },
+  "artifacts": {
+    "evidence/arc/changed_files.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/arc/logs/api_generation.log": "121508a10d21348d1ed2a1846def6077810a5470397bd0213b78952ea8104097",
+    "evidence/arc/logs/arc_flow_clippy.log": "b478ffcf751796fd30739665d9bf118df7f440c964feb57ef595ffe108cb04ae",
+    "evidence/arc/logs/arc_flow_fmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/arc/logs/arc_flow_tests.log": "e26e4b9219d026ee55db13689b09a1ead1aa44cb5c40e58579b4eb0fb0fe76cc",
+    "evidence/arc/logs/audit_retention_config.log": "a03fd67491bb40b9ed25b1b741316ce69ff28bdeb53af3e167da7a85ea966ef4",
+    "evidence/arc/logs/backend_check.log": "ae3bee094337d05c1ff1ce10becceaa42b755357a3af3b11c06935aab762216f",
+    "evidence/arc/logs/backend_clippy.log": "1605cbf9ae34c812d5d99635f8867bb4518487b5622dc081ddee2b6193294841",
+    "evidence/arc/logs/backend_fmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/arc/logs/backend_tests.log": "235cc978e6db4cdf21492d7b42b8f86878fd9e0d354420376ed82d3438763191",
+    "evidence/arc/logs/framework_release_config.log": "5fbe2bdd0f06dbfd25bb64209ce0b103d147b8d78cb6bdc750eb03715a71809f",
+    "evidence/arc/logs/framework_upgrade_tests.log": "4176f8f4521f728a4f393b88d4b7a850fc356ab0842e01f80f6fcbe7d8d51aaa",
+    "evidence/arc/logs/frontend_build.log": "f3af5294f4a8b332dad10a3097de46013e4e1afecb00a323fcab0bdcdeda95b2",
+    "evidence/arc/logs/frontend_e2e.log": "a40089b5273c0d3f3ad3111771872f1197499329be418a1ff04f5567e830770b",
+    "evidence/arc/logs/frontend_format.log": "572030ab498ed6707869f472eefa9dd5d80b6da7108de24d53c0c712ee25c8da",
+    "evidence/arc/logs/frontend_fullstack_smoke.log": "0caf0f5ea3048983feb706ce68fa54956b233e4fe8408ee20838a6c8fe8e6756",
+    "evidence/arc/logs/frontend_lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/arc/logs/frontend_tests.log": "7b18b1a9ee30e3b547389a016483e15b53491b0b185d8f7dc6e1d14edcf170d6",
+    "evidence/arc/logs/git_hook_syntax.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/arc/logs/observability_config.log": "c2496d8287bc4b621eb370b876d852e40d6cc12bb81ea78fdab2b55e7f8c026f",
+    "evidence/arc/logs/production_deployment_config.log": "3278d12e74187d2050167583f815a693333906425911d1ea88323ff7e831ad5b",
+    "evidence/arc/logs/project_init_tests.log": "16593b7bc5d000a5fbd79a21f334a52683dbeaee737b1af583f4b8fbdbd758c4",
+    "evidence/arc/logs/supply_chain_config.log": "6150a76f1a143bf92bb1e3b15be7231da150a9e1504ed91bbfc50e46a963a823",
+    "evidence/arc/logs/template_quality.log": "3c085d8eed8e9bbb140af81959acff5983cd819355a6503b8b5c4c48e330d902",
+    "evidence/arc/logs/template_quality_tests.log": "b0597ca8baae453621ce41f34db0b63d1460c3bb7f47584ac58a10dc2a27c40b",
+    "evidence/arc/logs/tracing_config.log": "ad0c4492ac4327d5d6ec4686628748a0566bc10d553c93311414919f81e089e3",
+    "evidence/arc/review_context.json": "b51112720a79f9c4e1e5f04040b52319a521fdf41c80862b82d0b7c48cd9fa26",
+    "evidence/arc/review_context.md": "e568d1b9876c943e924bbd7e79e0110068b55dbc58ef2344b1b463f287714709",
+    "evidence/arc/scope.json": "392e0ac4200cbd3678df793197c30fc2ee6eca5049b2582c50f3cfd1f88f89fc",
+    "evidence/arc/secret_scan.json": "a96a2392a3ffd4322838e50a6c5406a97fb4db894675aa214d1185a9de83c53b",
+    "evidence/arc/test_result.json": "66b89c956dd0be9988e006bfdfea3a226514b3bdd263215d551bfe1c2a862050",
+    "evidence/arc/test_result.md": "c9f886eefd7436fc46ac400434ae9d0b3949ec85dd5927eac359ee46708ab72d",
+    "evidence/arc-full.log": "c1d146d70249b2e55103f7c64b962fd763ec53b734522500ee059c5289962f2b",
+    "evidence/arc-scope-initial.log": "e1b8adea3884d42fab120d2b45de2f12ffbbeebb1e242ec9b0584f453a59b679",
+    "evidence/current-main.txt": "3dc35bf81650d4515ea56c022fb61cb3de3bcc862deb62065543492128590820",
+    "evidence/generated-artifacts.json": "c76ad36f52151524a890f33a45f8a51864d0800c2c0b0b9e17758bce06fe3ff9",
+    "evidence/harness-commands.json": "c7782d4c61e4b0026aefd3586cbf7c030e9de56afeb5474840c70f04baaecae6",
+    "evidence/harness-execution-full.log": "25c127034b8b32df2f4f339124a871ba13c34b630734f4c328a58ca4e15b9617",
+    "evidence/harness-execution-scope.log": "25c127034b8b32df2f4f339124a871ba13c34b630734f4c328a58ca4e15b9617",
+    "evidence/harness-quality-full.log": "4bac96118ca54b67e55f1dc6a0496c2880afc5da16953043805baf2a9f29b39a",
+    "evidence/harness-quality-scope.log": "4bac96118ca54b67e55f1dc6a0496c2880afc5da16953043805baf2a9f29b39a",
+    "evidence/npm-ci-workspace-cache.log": "82518f6ab342c1cdea00aa5928906b5502c57ac8ca702acff59b489ef5815787",
+    "evidence/npm-ci.log": "127b38306849f70cc80d28fd39b6db550d143604e2bb6aeda15afde7e6f0edef",
+    "evidence/postgres-after.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/postgres-connectivity.json": "10354e5515b51d7ee6eb460581b6aea3329e00c20be78bd7989c7c347edb5661",
+    "evidence/postgres-during.txt": "e914d740da7636dbf88f2e9e45fc24c5129c090b56344a69303d4db843c9f46d",
+    "evidence/postgres-health.txt": "6e168fc3b5a0662104b5e5da92e87b870e8b7c65fec827d267115b5123d18614",
+    "evidence/source-after.diff": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/tool-versions.json": "6a894745c0add87ab30a2b80d1060c5a090358c3b8b88739ff6238ed0c35ff13"
+  }
+}

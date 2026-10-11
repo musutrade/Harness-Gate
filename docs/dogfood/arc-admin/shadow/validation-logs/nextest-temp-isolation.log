@@ -1,0 +1,7 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.20s
+────────────
+ Nextest run ID c6d614bd-b5a2-4253-ac2b-9cd82f82d45d with nextest profile: default
+    Starting 1 test across 10 binaries (385 tests skipped)
+        PASS [   0.133s] (1/1) harness-gate::cli_test test_scope_without_git
+────────────
+     Summary [   0.135s] 1 test run: 1 passed, 385 skipped

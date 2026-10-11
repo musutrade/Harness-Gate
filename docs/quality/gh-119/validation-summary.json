@@ -1,0 +1,71 @@
+{
+  "issue": 119,
+  "baseline_commit": "ee1a5ab50ef2e1a77636e8a554326bd7d43dbc85",
+  "status": "local validation passed; required hosted CI pending",
+  "build_environment": {
+    "CARGO_TARGET_DIR": "$PWD/target/gh-119-cargo"
+  },
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "exit_code": 0,
+      "result": "315 passed; 0 skipped",
+      "log": "target/quality/gh-119/nextest.log",
+      "log_sha256": "c7a2fee67cbc39eb7805bf928c7472123ac22a132204372f000a12761e816439"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "target/quality/gh-119/fmt.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "target/quality/gh-119/clippy.log",
+      "log_sha256": "d94b10b221746028e9fa619dbc18b3851c96fb0c4a7c007eb0b0ab040826975c"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "exit_code": 0,
+      "result": "207 passed",
+      "log": "target/quality/gh-119/python.log",
+      "log_sha256": "1417e1da0e31a7efe1b2af0d6572ba5272e2307b08af53087521938cc70c89bf"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "target/quality/gh-119/docs-consistency.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "openspec validate language-agnostic-evidence-policy-architecture --strict",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "target/quality/gh-119/openspec-final.log",
+      "log_sha256": "f5dc453e8650eaceb1e49de8d1a57c575d17ec5662e26d8b0b78cf404eb20f28"
+    },
+    {
+      "command": "openspec validate typescript-angular-reference-adapter --strict",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "target/quality/gh-119/openspec-followup.log",
+      "log_sha256": "5f7ac2bad67a5129f59f5af44ebde3ae6c62b23c06718146e85b3f407b30a74e"
+    }
+  ],
+  "docs_consistency_report": "docs-consistency.json",
+  "not_applicable": [
+    {
+      "command": "harness-gate config check",
+      "reason": "No .harness-gate/flow.toml in this checkout"
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "reason": "No project-local configuration or declared ci profile"
+    }
+  ],
+  "delivery_limitation": "Workspace .git is read-only; use a writable copy of current workspace metadata in target/gh-119-git for staging, committing and pushing."
+}

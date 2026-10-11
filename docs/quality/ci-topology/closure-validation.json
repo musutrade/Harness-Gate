@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "issue": "GH-170",
+  "date": "2026-09-09",
+  "scope": "OpenSpec optimize-ci-execution-topology tasks 7.1\u20137.4 documentation and closure evidence",
+  "baseline_sha": "7777511ec62c609aa664789a05d6dc376df30aa7",
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "environment": {
+        "CARGO_TARGET_DIR": "/home/gem/symphony-workspaces/GH-170/target/gh170-cargo"
+      },
+      "exit_code": 0,
+      "seconds": 240.7,
+      "local_log": "target/quality/gh170/nextest.log",
+      "log_sha256": "c6cc7f052bdfdb214d756936a2bb1f60dbbb327c683309ac679dda9905e8ba4d",
+      "result": "332 tests passed, 0 skipped"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "environment": {
+        "CARGO_TARGET_DIR": "/home/gem/symphony-workspaces/GH-170/target/gh170-cargo"
+      },
+      "exit_code": 0,
+      "seconds": 0.584,
+      "local_log": "target/quality/gh170/fmt.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "Formatting check passed"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "environment": {
+        "CARGO_TARGET_DIR": "/home/gem/symphony-workspaces/GH-170/target/gh170-cargo"
+      },
+      "exit_code": 0,
+      "seconds": 22.365,
+      "local_log": "target/quality/gh170/clippy.log",
+      "log_sha256": "44f83f2f6aa6a8f0b3bb41c7bd9d189886fd9fc351385976c19511c8728ce124",
+      "result": "Clippy passed with warnings denied"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "environment": {
+        "CARGO_TARGET_DIR": "/home/gem/symphony-workspaces/GH-170/target/gh170-cargo"
+      },
+      "exit_code": 0,
+      "seconds": 159.816,
+      "local_log": "target/quality/gh170/python-tests.log",
+      "log_sha256": "5cb54c1eed31bfc5cdcaf05d2158a2ac7602d741ffb0ada2367ae249e006c0f1",
+      "result": "328 Python tests passed"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "environment": {
+        "CARGO_TARGET_DIR": "/home/gem/symphony-workspaces/GH-170/target/gh170-cargo"
+      },
+      "exit_code": 0,
+      "local_log": "target/quality/gh170/docs-consistency.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "git diff --check",
+      "environment": {
+        "CARGO_TARGET_DIR": "/home/gem/symphony-workspaces/GH-170/target/gh170-cargo"
+      },
+      "exit_code": 0,
+      "local_log": "target/quality/gh170/diff-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "openspec validate optimize-ci-execution-topology --strict",
+      "environment": {},
+      "exit_code": 0,
+      "result": "Change 'optimize-ci-execution-topology' is valid",
+      "local_log": "target/quality/gh170/openspec.log",
+      "log_sha256": "ee3f7dcabd71c1c486f8cec42ed1b962a3d3237e4a1845dcdbb9e1f1d7b3e278"
+    }
+  ],
+  "project_local_checks": [
+    {
+      "command": "harness-gate config check",
+      "status": "not_applicable",
+      "reason": "No .harness-gate/flow.toml exists; no declared ci profile. No synthetic config created."
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "status": "not_applicable",
+      "reason": "No .harness-gate/flow.toml exists; no declared ci profile. No synthetic config created."
+    }
+  ],
+  "hosted": {
+    "dependency_evidence": "closure-hosted.json",
+    "dependency_required_quality_aggregate": "success",
+    "submitted_sha": "pending controller-owned hosted CI; historical green CI does not certify GH-170"
+  },
+  "limitations": [
+    "Local validation is Linux-only, not hosted native macOS/Windows or push-only assurance.",
+    "CARGO_TARGET_DIR explicitly selects this workspace; no builds were attempted in the shared default target.",
+    "Task 7.4 and overall OpenSpec acceptance remain open until final submitted-SHA required CI succeeds."
+  ],
+  "docs_consistency_report": {
+    "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+    "commit": "7777511ec62c609aa664789a05d6dc376df30aa7",
+    "engineering_policy": {
+      "failures": [],
+      "status": "pass"
+    },
+    "examples": [
+      {
+        "path": "tools/harness-gate/presets/angular-only.flow.toml",
+        "status": "pass"
+      },
+      {
+        "path": "tools/harness-gate/presets/angular-rust-postgres.flow.toml",
+        "status": "pass"
+      },
+      {
+        "path": "tools/harness-gate/presets/generic.flow.toml",
+        "status": "pass"
+      },
+      {
+        "path": "tools/harness-gate/presets/rust-api.flow.toml",
+        "status": "pass"
+      }
+    ],
+    "language_docs_valid": true,
+    "link_failures": [],
+    "logical_cpus": 8,
+    "machine": "x86_64",
+    "machine_schema_valid": true,
+    "manifest_schema_valid": true,
+    "migration": {
+      "path": "tools/quality/fixtures/v1-flow.toml",
+      "status": "pass"
+    },
+    "os": "Linux-7.0.0-31-generic-x86_64-with-glibc2.43",
+    "processor": "",
+    "python": "3.14.4",
+    "registry_schema_valid": true,
+    "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+    "sandbox_wording": {
+      "failures": [],
+      "status": "pass"
+    },
+    "schema_synced": true,
+    "status": "pass",
+    "target": "x86_64-unknown-linux-gnu",
+    "timestamp_utc": "2026-09-09T05:55:50.962053+00:00",
+    "tool": "docs-consistency"
+  },
+  "local_tool_versions": {
+    "rustc --version": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+    "cargo --version": "cargo 1.97.1 (c980f4866 2026-06-30)",
+    "cargo nextest --version": "cargo-nextest 0.9.143 (60fa45f63 2026-08-04)\nrelease: 0.9.143\ncommit-hash: 60fa45f638ffc3f35e74afa65737f45fcd32db2a\ncommit-date: 2026-08-04\nhost: x86_64-unknown-linux-gnu",
+    "python3 --version": "Python 3.14.4",
+    "openspec --version": "1.10.0"
+  },
+  "delivery_limitation": {
+    "commands": [
+      "git add CONTRIBUTING.md docs/quality/ci-topology/README.md docs/quality/ci-topology/after-state.md docs/quality/ci-topology/closure.md docs/quality/ci-topology/closure-hosted.json docs/quality/ci-topology/closure-validation.json openspec/changes/optimize-ci-execution-topology/design.md openspec/changes/optimize-ci-execution-topology/tasks.md",
+      "git commit -m 'docs(ci): document optimized topology and retain closure evidence'"
+    ],
+    "exit_code": 128,
+    "error": "fatal: Unable to create '/home/gem/symphony-workspaces/GH-170/.git/index.lock': Read-only file system",
+    "impact": "Local staging/commit and ref updates unavailable. Publish exact workspace file contents through GitHub Git Data API, parented to the prepared baseline, on symphony/GH-170. Local HEAD remains the baseline; the runtime handoff records the actual published commit SHA."
+  }
+}

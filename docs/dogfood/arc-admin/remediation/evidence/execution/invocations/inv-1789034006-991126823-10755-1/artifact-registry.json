@@ -1,0 +1,257 @@
+{
+  "schema_version": "1",
+  "invocation_id": "inv-1789034006-991126823-10755-1",
+  "artifacts": [
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "kind": "artifact",
+      "path": "changed_files.txt",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "kind": "invocation-metadata",
+      "path": "invocation.json",
+      "size_bytes": 747,
+      "sha256": "9de6d80dc5b7853b4404b9f0a9246a97d2ee468742cf984eab8da14fbc4818ef"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "workflow.api-generation",
+      "kind": "step-log",
+      "path": "logs/api_generation.log",
+      "size_bytes": 69,
+      "sha256": "121508a10d21348d1ed2a1846def6077810a5470397bd0213b78952ea8104097"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "workflow.clippy",
+      "kind": "step-log",
+      "path": "logs/arc_flow_clippy.log",
+      "size_bytes": 72,
+      "sha256": "4f27ac380b22e1d975eee20ce727fa8cbc09061177f6253af0777fd4de7b7506"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "workflow.format",
+      "kind": "step-log",
+      "path": "logs/arc_flow_fmt.log",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "workflow.tests",
+      "kind": "step-log",
+      "path": "logs/arc_flow_tests.log",
+      "size_bytes": 6682,
+      "sha256": "e727d6ec0e0b37d388388884fdde451fd4afab0f2620d900799a202f459a7407"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "workflow.audit-retention-config",
+      "kind": "step-log",
+      "path": "logs/audit_retention_config.log",
+      "size_bytes": 46,
+      "sha256": "a03fd67491bb40b9ed25b1b741316ce69ff28bdeb53af3e167da7a85ea966ef4"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "backend.compile",
+      "kind": "step-log",
+      "path": "logs/backend_check.log",
+      "size_bytes": 196,
+      "sha256": "e9755187d9e58e8c58c2f95dd65e8292c58b223eec17dacd3f9f6d5d49ada9e0"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "backend.clippy",
+      "kind": "step-log",
+      "path": "logs/backend_clippy.log",
+      "size_bytes": 448,
+      "sha256": "694a6040a18aa7d536cf57ed76d2fe1b9d5399c18adaa9d62fd4bb47264a5032"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "backend.format",
+      "kind": "step-log",
+      "path": "logs/backend_fmt.log",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "backend.tests",
+      "kind": "step-log",
+      "path": "logs/backend_tests.log",
+      "size_bytes": 5490,
+      "sha256": "a224ac3fe117347c6c0b0165583b1644b26b3ea5b5d0710268848526c7665de7"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "workflow.framework-release-config",
+      "kind": "step-log",
+      "path": "logs/framework_release_config.log",
+      "size_bytes": 72,
+      "sha256": "5fbe2bdd0f06dbfd25bb64209ce0b103d147b8d78cb6bdc750eb03715a71809f"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "workflow.framework-upgrade-tests",
+      "kind": "step-log",
+      "path": "logs/framework_upgrade_tests.log",
+      "size_bytes": 686,
+      "sha256": "de640e1ac1ae8059a199e08f2d4139ca79a93989a3cebe3760e93870765fef7a"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "frontend.build",
+      "kind": "step-log",
+      "path": "logs/frontend_build.log",
+      "size_bytes": 1886,
+      "sha256": "660974bc64f867208bdc9db828aeb1441d0c59e8fc39e27a6e54d93b34804020"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "frontend.e2e",
+      "kind": "step-log",
+      "path": "logs/frontend_e2e.log",
+      "size_bytes": 2717,
+      "sha256": "a269ee2e8516a9684a7ecda09b01416fbd05ed34fe32b928e3ba239084d3c421"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "frontend.format",
+      "kind": "step-log",
+      "path": "logs/frontend_format.log",
+      "size_bytes": 182,
+      "sha256": "572030ab498ed6707869f472eefa9dd5d80b6da7108de24d53c0c712ee25c8da"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "frontend.fullstack-smoke",
+      "kind": "step-log",
+      "path": "logs/frontend_fullstack_smoke.log",
+      "size_bytes": 3252,
+      "sha256": "a84c1a3a1ed82156a9d65ffde2a8264488189ae2e558a7514d7610a0130fba08"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "frontend.lint",
+      "kind": "step-log",
+      "path": "logs/frontend_lint.log",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "frontend.tests",
+      "kind": "step-log",
+      "path": "logs/frontend_tests.log",
+      "size_bytes": 459,
+      "sha256": "7f2130dbf512bf598d8c5030c39ec1aded78ec195a63e5b8db181768c81678b9"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "workflow.hook-syntax",
+      "kind": "step-log",
+      "path": "logs/git_hook_syntax.log",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "workflow.observability-config",
+      "kind": "step-log",
+      "path": "logs/observability_config.log",
+      "size_bytes": 37,
+      "sha256": "c2496d8287bc4b621eb370b876d852e40d6cc12bb81ea78fdab2b55e7f8c026f"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "workflow.production-deployment-config",
+      "kind": "step-log",
+      "path": "logs/production_deployment_config.log",
+      "size_bytes": 37,
+      "sha256": "3278d12e74187d2050167583f815a693333906425911d1ea88323ff7e831ad5b"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "workflow.project-init-tests",
+      "kind": "step-log",
+      "path": "logs/project_init_tests.log",
+      "size_bytes": 674,
+      "sha256": "95ff2eebf3f8e4c104fb5d4b8d16b719f8105cf09d763946aa9c3d00e4d493ac"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "workflow.supply-chain-config",
+      "kind": "step-log",
+      "path": "logs/supply_chain_config.log",
+      "size_bytes": 34,
+      "sha256": "6150a76f1a143bf92bb1e3b15be7231da150a9e1504ed91bbfc50e46a963a823"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "workflow.template-quality",
+      "kind": "step-log",
+      "path": "logs/template_quality.log",
+      "size_bytes": 68,
+      "sha256": "3c085d8eed8e9bbb140af81959acff5983cd819355a6503b8b5c4c48e330d902"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "workflow.template-quality-tests",
+      "kind": "step-log",
+      "path": "logs/template_quality_tests.log",
+      "size_bytes": 522,
+      "sha256": "de26c8fb45a9bb2e869bdb7bd99d5a3fa2929c66e8490f08086b9281a46dfd6d"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "workflow.tracing-config",
+      "kind": "step-log",
+      "path": "logs/tracing_config.log",
+      "size_bytes": 49,
+      "sha256": "ad0c4492ac4327d5d6ec4686628748a0566bc10d553c93311414919f81e089e3"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "builtin.architecture-audit",
+      "kind": "step-log",
+      "path": "review_context.json",
+      "size_bytes": 2444,
+      "sha256": "5ceda5dc6d20addadbcf81e8d901c3b10956cc030ee654e7c9a4e0449dc29823"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "kind": "report",
+      "path": "review_context.md",
+      "size_bytes": 1002,
+      "sha256": "e568d1b9876c943e924bbd7e79e0110068b55dbc58ef2344b1b463f287714709"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "kind": "report",
+      "path": "scope.json",
+      "size_bytes": 136,
+      "sha256": "392e0ac4200cbd3678df793197c30fc2ee6eca5049b2582c50f3cfd1f88f89fc"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "step_id": "builtin.secret-scan",
+      "kind": "step-log",
+      "path": "secret_scan.json",
+      "size_bytes": 100,
+      "sha256": "809072a6801abd2a42a633493e47b886a7b6877cdb50d50ba61e033bd12b462e"
+    },
+    {
+      "invocation_id": "inv-1789034006-991126823-10755-1",
+      "kind": "report",
+      "path": "test_result.md",
+      "size_bytes": 1623,
+      "sha256": "b26b828f59568221731a9e202d9a47db8d92e3756d156ef08b187dfa4f665baf"
+    }
+  ]
+}

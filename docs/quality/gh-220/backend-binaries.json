@@ -1,0 +1,16 @@
+[
+  {
+    "original_path": "target/gh-220/backend/debug/deps/openapi_contract-2901dbf01a1e3118",
+    "retained_path": "target/gh-220/backend-evidence/binaries/openapi_contract-2901dbf01a1e3118",
+    "bytes": 418612336,
+    "sha256": "b499e8f08174dcd88590a0c3d32755f0fd566fc2b18d6888291bf9d5ddd1930c",
+    "retention": "workspace-only; too large for Git; required for backend export replay"
+  },
+  {
+    "original_path": "target/gh-220/backend/debug/deps/permission_template_contract-debbbdaece9909c0",
+    "retained_path": "target/gh-220/backend-evidence/binaries/permission_template_contract-debbbdaece9909c0",
+    "bytes": 416261648,
+    "sha256": "872664ebb07c1a0a02820d3f6e4cccfe3c93557956582ac1552519bdd1e2905e",
+    "retention": "workspace-only; too large for Git; required for backend export replay"
+  }
+]

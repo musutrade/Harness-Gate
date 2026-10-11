@@ -1,0 +1,1225 @@
+{
+  "schema_version": "1",
+  "invocation_id": "inv-1789034326-920721777-15059-1",
+  "executor_version": "0.3.7",
+  "report_directory": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1",
+  "timestamp": "2026-09-10T10:03:08.609794879+00:00",
+  "profile": "full",
+  "input_mode": "all",
+  "project_identity": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source",
+  "source_identity": "working-tree:9982ed556eaf997910824d7b682946147c81a16a",
+  "execution_root": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source",
+  "configuration_digest": "sha256:cf7d181395a2a71827cc50fccfd5cba93ebe9c103cd9ae488ff491335cb393dc",
+  "scope": {
+    "mode": "all",
+    "changed_files": [],
+    "components": [
+      "backend",
+      "frontend",
+      "workflow"
+    ],
+    "unmatched_files": []
+  },
+  "services": [
+    {
+      "id": "test-postgres",
+      "status": "CLEANED"
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "builtin.secret-scan",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "secret scan",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 14466,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/secret_scan.json",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": null,
+          "finished_at": null,
+          "duration_ms": 14466,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/secret_scan.json",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "builtin.architecture-audit",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "architecture audit",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 479,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/review_context.json",
+      "detail": "0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)",
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": null,
+          "finished_at": null,
+          "duration_ms": 479,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/review_context.json",
+          "detail": "0 violation(s), 0 blocker(s), 0 error(s), 0 warning(s)"
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "backend.format",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "backend format",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 237,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/backend_fmt.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T09:59:01.927129130+00:00",
+          "finished_at": "2026-09-10T09:59:02.165094373+00:00",
+          "duration_ms": 237,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/backend_fmt.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "backend.clippy",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "backend Clippy",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 559,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/backend_clippy.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T09:59:02.165686901+00:00",
+          "finished_at": "2026-09-10T09:59:02.725098677+00:00",
+          "duration_ms": 559,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/backend_clippy.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "backend.compile",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "backend compile",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 399,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/backend_check.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T09:59:02.725639663+00:00",
+          "finished_at": "2026-09-10T09:59:03.124835250+00:00",
+          "duration_ms": 399,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/backend_check.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "backend.tests",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "backend tests",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 165743,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/backend_tests.log",
+      "detail": "31 result(s)",
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T09:59:03.125481485+00:00",
+          "finished_at": "2026-09-10T10:01:48.868704321+00:00",
+          "duration_ms": 165743,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/backend_tests.log",
+          "detail": "31 result(s)"
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": {
+        "mode": "regex",
+        "version": 1,
+        "observed": 31,
+        "minimum": 1,
+        "complete": true
+      }
+    },
+    {
+      "step_id": "frontend.lint",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "frontend lint",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 3602,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/frontend_lint.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T10:01:49.224738775+00:00",
+          "finished_at": "2026-09-10T10:01:52.827474532+00:00",
+          "duration_ms": 3602,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/frontend_lint.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "frontend.format",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "frontend format",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 3442,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/frontend_format.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T10:01:52.828061682+00:00",
+          "finished_at": "2026-09-10T10:01:56.270700817+00:00",
+          "duration_ms": 3442,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/frontend_format.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "frontend.tests",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "frontend tests",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 13714,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/frontend_tests.log",
+      "detail": "85 result(s)",
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T10:01:56.271240475+00:00",
+          "finished_at": "2026-09-10T10:02:09.985587147+00:00",
+          "duration_ms": 13714,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/frontend_tests.log",
+          "detail": "85 result(s)"
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": {
+        "mode": "regex",
+        "version": 1,
+        "observed": 85,
+        "minimum": 1,
+        "complete": true
+      }
+    },
+    {
+      "step_id": "frontend.e2e",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "frontend end-to-end tests",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 23265,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/frontend_e2e.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T10:02:09.987896426+00:00",
+          "finished_at": "2026-09-10T10:02:33.253250337+00:00",
+          "duration_ms": 23265,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/frontend_e2e.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "frontend.fullstack-smoke",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "frontend real full-stack smoke test",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 20031,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/frontend_fullstack_smoke.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T10:02:36.232059775+00:00",
+          "finished_at": "2026-09-10T10:02:56.263733811+00:00",
+          "duration_ms": 20031,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/frontend_fullstack_smoke.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "frontend.build",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "frontend production build",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 6808,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/frontend_build.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T10:02:56.620382444+00:00",
+          "finished_at": "2026-09-10T10:03:03.429098391+00:00",
+          "duration_ms": 6808,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/frontend_build.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.hook-syntax",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "Git hook syntax",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 8,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/git_hook_syntax.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T10:03:03.430000033+00:00",
+          "finished_at": "2026-09-10T10:03:03.438765655+00:00",
+          "duration_ms": 8,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/git_hook_syntax.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.project-init-tests",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "project initializer tests",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 481,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/project_init_tests.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T10:03:03.439165912+00:00",
+          "finished_at": "2026-09-10T10:03:03.920425863+00:00",
+          "duration_ms": 481,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/project_init_tests.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.framework-release-config",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "framework release configuration gate",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 80,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/framework_release_config.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T10:03:03.921646956+00:00",
+          "finished_at": "2026-09-10T10:03:04.001817104+00:00",
+          "duration_ms": 80,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/framework_release_config.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.framework-upgrade-tests",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "framework upgrade tests",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 1122,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/framework_upgrade_tests.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T10:03:04.002818199+00:00",
+          "finished_at": "2026-09-10T10:03:05.125639776+00:00",
+          "duration_ms": 1122,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/framework_upgrade_tests.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.template-quality",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "template quality gate",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 481,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/template_quality.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T10:03:05.126913808+00:00",
+          "finished_at": "2026-09-10T10:03:05.607962422+00:00",
+          "duration_ms": 481,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/template_quality.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.template-quality-tests",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "template quality gate tests",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 646,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/template_quality_tests.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T10:03:05.609019250+00:00",
+          "finished_at": "2026-09-10T10:03:06.255118768+00:00",
+          "duration_ms": 646,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/template_quality_tests.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.observability-config",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "observability configuration gate",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 79,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/observability_config.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T10:03:06.256288807+00:00",
+          "finished_at": "2026-09-10T10:03:06.335906097+00:00",
+          "duration_ms": 79,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/observability_config.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.tracing-config",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "optional tracing and compliance configuration gate",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 79,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/tracing_config.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T10:03:06.336829738+00:00",
+          "finished_at": "2026-09-10T10:03:06.416620792+00:00",
+          "duration_ms": 79,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/tracing_config.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.production-deployment-config",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "production deployment configuration gate",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 81,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/production_deployment_config.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T10:03:06.417598630+00:00",
+          "finished_at": "2026-09-10T10:03:06.499509694+00:00",
+          "duration_ms": 81,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/production_deployment_config.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.audit-retention-config",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "audit retention and archive configuration gate",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 82,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/audit_retention_config.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T10:03:06.500572458+00:00",
+          "finished_at": "2026-09-10T10:03:06.582874420+00:00",
+          "duration_ms": 82,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/audit_retention_config.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.api-generation",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "Rust OpenAPI and Angular client generation gate",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 721,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/api_generation.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T10:03:06.583911972+00:00",
+          "finished_at": "2026-09-10T10:03:07.305830010+00:00",
+          "duration_ms": 721,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/api_generation.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.supply-chain-config",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "supply chain security configuration gate",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 79,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/supply_chain_config.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T10:03:07.306621583+00:00",
+          "finished_at": "2026-09-10T10:03:07.386567124+00:00",
+          "duration_ms": 79,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/supply_chain_config.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.format",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "arc-flow format",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 243,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/arc_flow_fmt.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T10:03:07.387581907+00:00",
+          "finished_at": "2026-09-10T10:03:07.630748249+00:00",
+          "duration_ms": 243,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/arc_flow_fmt.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.clippy",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "arc-flow Clippy",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 320,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/arc_flow_clippy.log",
+      "detail": null,
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T10:03:07.631987081+00:00",
+          "finished_at": "2026-09-10T10:03:07.952365682+00:00",
+          "duration_ms": 320,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/arc_flow_clippy.log",
+          "detail": null
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": null
+    },
+    {
+      "step_id": "workflow.tests",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "label": "arc-flow tests",
+      "passed": true,
+      "status": "PASS",
+      "timed_out": false,
+      "cancelled": false,
+      "duration_ms": 645,
+      "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/arc_flow_tests.log",
+      "detail": "58 result(s)",
+      "failure_code": null,
+      "waived": false,
+      "waiver": null,
+      "runner": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "started_at": "2026-09-10T10:03:07.953693840+00:00",
+          "finished_at": "2026-09-10T10:03:08.599254049+00:00",
+          "duration_ms": 645,
+          "timed_out": false,
+          "cancelled": false,
+          "log": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/codex-audit-pipeline/.codex/reports/invocations/inv-1789034326-920721777-15059-1/logs/arc_flow_tests.log",
+          "detail": "58 result(s)"
+        }
+      ],
+      "retry_count": 0,
+      "flaky": false,
+      "retry_class": null,
+      "parser": {
+        "mode": "regex",
+        "version": 1,
+        "observed": 58,
+        "minimum": 1,
+        "complete": true
+      }
+    }
+  ],
+  "skipped_steps": [],
+  "warnings": [],
+  "failures": [
+    {
+      "step_id": null,
+      "code": "QUALITY_BLOCKED",
+      "message": "Quality profile \"full\": blocked (configuration); full quality: blocked\nquality workflow input is missing: /mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/.harness-gate/runtime/full-state.json\n"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "changed_files.txt",
+      "kind": "artifact",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "invocation.json",
+      "kind": "invocation-metadata",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "size_bytes": 747,
+      "sha256": "21c1b5718a9e68c9f619fb95eb08df32c946a2f4fa92219bca798e52461f7794"
+    },
+    {
+      "path": "logs/api_generation.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "workflow.api-generation",
+      "size_bytes": 69,
+      "sha256": "121508a10d21348d1ed2a1846def6077810a5470397bd0213b78952ea8104097"
+    },
+    {
+      "path": "logs/arc_flow_clippy.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "workflow.clippy",
+      "size_bytes": 72,
+      "sha256": "2b34696728dc82b03cbf6311d7e3a6a41658bbde097834c3010a78bc82842c1a"
+    },
+    {
+      "path": "logs/arc_flow_fmt.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "workflow.format",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/arc_flow_tests.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "workflow.tests",
+      "size_bytes": 6683,
+      "sha256": "4b55316761d5b73b02f8e58a9b4d68046b460a9cccf8f745d7a890f361efc6d5"
+    },
+    {
+      "path": "logs/audit_retention_config.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "workflow.audit-retention-config",
+      "size_bytes": 46,
+      "sha256": "a03fd67491bb40b9ed25b1b741316ce69ff28bdeb53af3e167da7a85ea966ef4"
+    },
+    {
+      "path": "logs/backend_check.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "backend.compile",
+      "size_bytes": 72,
+      "sha256": "8b1fd2394f7b6f177ede882431154a419bd9f404f00add314c912e91a7fc0ec0"
+    },
+    {
+      "path": "logs/backend_clippy.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "backend.clippy",
+      "size_bytes": 72,
+      "sha256": "29162d76fb109d9c6005d8544d63a4a438d15235d4f9b8e73d51adc9ba6e95d7"
+    },
+    {
+      "path": "logs/backend_fmt.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "backend.format",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/backend_tests.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "backend.tests",
+      "size_bytes": 5114,
+      "sha256": "21414411b6c6faa295890816d544048de818a36f0e434662a29105195bc3ea83"
+    },
+    {
+      "path": "logs/framework_release_config.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "workflow.framework-release-config",
+      "size_bytes": 72,
+      "sha256": "5fbe2bdd0f06dbfd25bb64209ce0b103d147b8d78cb6bdc750eb03715a71809f"
+    },
+    {
+      "path": "logs/framework_upgrade_tests.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "workflow.framework-upgrade-tests",
+      "size_bytes": 688,
+      "sha256": "aebe2258d333bcd8b5122d77eaef0a4251adc0f60dfb51a83d1a27be401247de"
+    },
+    {
+      "path": "logs/frontend_build.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "frontend.build",
+      "size_bytes": 1886,
+      "sha256": "38ffccdeb0b35bd335f24962a6b9fbd97bfec2bf01e3562217b157107fc295f1"
+    },
+    {
+      "path": "logs/frontend_e2e.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "frontend.e2e",
+      "size_bytes": 2718,
+      "sha256": "8a270e1f139cd2ce8816fc0687229ebe5b6cb36f30325cd6f6e8015df7df13db"
+    },
+    {
+      "path": "logs/frontend_format.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "frontend.format",
+      "size_bytes": 182,
+      "sha256": "572030ab498ed6707869f472eefa9dd5d80b6da7108de24d53c0c712ee25c8da"
+    },
+    {
+      "path": "logs/frontend_fullstack_smoke.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "frontend.fullstack-smoke",
+      "size_bytes": 3252,
+      "sha256": "4891b11a4a2391ff657c66284a3751bca025966eea28654acf44ea6c1643bf1d"
+    },
+    {
+      "path": "logs/frontend_lint.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "frontend.lint",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/frontend_tests.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "frontend.tests",
+      "size_bytes": 459,
+      "sha256": "68b1126873bc07e98663aefdb32fc18b3384bee22e3dae9b1790397fbdc87b17"
+    },
+    {
+      "path": "logs/git_hook_syntax.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "workflow.hook-syntax",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/observability_config.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "workflow.observability-config",
+      "size_bytes": 37,
+      "sha256": "c2496d8287bc4b621eb370b876d852e40d6cc12bb81ea78fdab2b55e7f8c026f"
+    },
+    {
+      "path": "logs/production_deployment_config.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "workflow.production-deployment-config",
+      "size_bytes": 37,
+      "sha256": "3278d12e74187d2050167583f815a693333906425911d1ea88323ff7e831ad5b"
+    },
+    {
+      "path": "logs/project_init_tests.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "workflow.project-init-tests",
+      "size_bytes": 674,
+      "sha256": "8b0331de326e57f71b6e0afde9661d55ffc89b23eefa3d373c7e36155e28a547"
+    },
+    {
+      "path": "logs/supply_chain_config.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "workflow.supply-chain-config",
+      "size_bytes": 34,
+      "sha256": "6150a76f1a143bf92bb1e3b15be7231da150a9e1504ed91bbfc50e46a963a823"
+    },
+    {
+      "path": "logs/template_quality.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "workflow.template-quality",
+      "size_bytes": 68,
+      "sha256": "3c085d8eed8e9bbb140af81959acff5983cd819355a6503b8b5c4c48e330d902"
+    },
+    {
+      "path": "logs/template_quality_tests.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "workflow.template-quality-tests",
+      "size_bytes": 522,
+      "sha256": "d95fa84b9bd5493858f2171afd823a26246bffbc977156662b28477b6e9ee59e"
+    },
+    {
+      "path": "logs/tracing_config.log",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "workflow.tracing-config",
+      "size_bytes": 49,
+      "sha256": "ad0c4492ac4327d5d6ec4686628748a0566bc10d553c93311414919f81e089e3"
+    },
+    {
+      "path": "review_context.json",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "builtin.architecture-audit",
+      "size_bytes": 2444,
+      "sha256": "309aaccb416e5148474c0508cfd3c9c355328d5aa3b9d375d27173ba2431549b"
+    },
+    {
+      "path": "review_context.md",
+      "kind": "report",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "size_bytes": 1002,
+      "sha256": "e568d1b9876c943e924bbd7e79e0110068b55dbc58ef2344b1b463f287714709"
+    },
+    {
+      "path": "scope.json",
+      "kind": "report",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "size_bytes": 136,
+      "sha256": "392e0ac4200cbd3678df793197c30fc2ee6eca5049b2582c50f3cfd1f88f89fc"
+    },
+    {
+      "path": "secret_scan.json",
+      "kind": "step-log",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "step_id": "builtin.secret-scan",
+      "size_bytes": 100,
+      "sha256": "dc1ea55f02828a34ade92c2fb48047c6ad57c86b1898a4a55cfe299bde5122ca"
+    },
+    {
+      "path": "test_result.md",
+      "kind": "report",
+      "invocation_id": "inv-1789034326-920721777-15059-1",
+      "size_bytes": 1621,
+      "sha256": "ce62834ef421b4393231a0fdea1b7d11db67b0c491705c7529cd0cd885ad1f35"
+    }
+  ],
+  "evidence_complete": true,
+  "quality": {
+    "baseline": null,
+    "error": "quality workflow input is missing: /mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source/.harness-gate/runtime/full-state.json",
+    "evaluation_time": null,
+    "evidence": null,
+    "formats": [],
+    "full_quality_status": "blocked",
+    "inputs": null,
+    "output": null,
+    "participation": {
+      "profile": "full"
+    },
+    "phase": "configuration",
+    "producers": null,
+    "project_report": null,
+    "project_report_path": null,
+    "schema": "quality-verification/v1",
+    "selection": null,
+    "status": "blocked"
+  },
+  "passed": false,
+  "status": "FAIL"
+}

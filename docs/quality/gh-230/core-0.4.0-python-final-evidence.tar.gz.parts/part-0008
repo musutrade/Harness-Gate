@@ -1,0 +1,11 @@
+# Archived quality evidence
+
+This file was externalized from Git history to keep `main` small. The raw bytes remain available in the repository evidence archive.
+
+- Archive: https://github.com/musutrade/Harness-Gate/releases/download/evidence-archive-20261010/quality-evidence-current.tar.zst
+- Path inside archive: `docs/quality/gh-230/core-0.4.0-python-final-evidence.tar.gz.parts/part-0008`
+- Original size: 2880000 bytes
+- Original SHA-256: `2b499ccf374f8ccb66fe48aff5a7e9be5ade6f39a1ecc46b9f1722d4ed6f13fb`
+- Original Git blob: `e47c25828c872a123e7e67e2a04a2340ebf26e3d`
+
+Download the archive, extract `docs/quality/gh-230/core-0.4.0-python-final-evidence.tar.gz.parts/part-0008`, and verify the SHA-256 before use.

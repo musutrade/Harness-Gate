@@ -1,0 +1,132 @@
+{
+  "schema": "gh-220-partial-evidence/1",
+  "acceptance": "incomplete",
+  "source_commit": "e5a1ee5f7ec6dbae461355106d469384581d4607",
+  "repository_base": "bfceab076ad3a1760c75ab412337ddc93959ec4d",
+  "committed_files": [
+    {
+      "path": "docs/quality/gh-220/README.md",
+      "bytes": 9796,
+      "sha256": "9f81300821338187404dd6652551e8574bb972d2600f3690d0d50fc1ac86c843"
+    },
+    {
+      "path": "docs/quality/gh-220/analyzer-binaries.json",
+      "bytes": 405,
+      "sha256": "219243d4ee893ebf9d004ac5ac700a23da9a5feb1f37823ba853854ee460be7a"
+    },
+    {
+      "path": "docs/quality/gh-220/arc-admin-e5a1ee5.tar.gz",
+      "bytes": 4033463,
+      "sha256": "b913a6028dafe8f98b9baac6a3c72806622aae5caf2c0785680fbdbae3fc61c6"
+    },
+    {
+      "path": "docs/quality/gh-220/backend-artifacts.json",
+      "bytes": 902272,
+      "sha256": "a5f7fde84f74c2b89b5914bf890552fedb771eb4a044269ee9107c0ced9812fa"
+    },
+    {
+      "path": "docs/quality/gh-220/backend-binaries.json",
+      "bytes": 813,
+      "sha256": "3de3e1c76036f7e2889db67ac71cd0fea74432d23b1113f8db53da39b8d1290b"
+    },
+    {
+      "path": "docs/quality/gh-220/backend-diagnostics.tar.xz",
+      "bytes": 45447428,
+      "sha256": "888fa5e09f8fbcf0aafe9b8dccb69ebc29527bb72514ddf2115e4041e1fe48e0"
+    },
+    {
+      "path": "docs/quality/gh-220/cache-cleanup.json",
+      "bytes": 319,
+      "sha256": "06c1b37dcc063892099ce86739a0e097f60e37776d8ff085511d008e218ad98f"
+    },
+    {
+      "path": "docs/quality/gh-220/native-fixtures.json",
+      "bytes": 1633,
+      "sha256": "bd80aebeab4ff318b40eb6beffa789743784fd41c35368e0d4f4235e44b2c7f9"
+    },
+    {
+      "path": "docs/quality/gh-220/native-fixtures.tar.gz",
+      "bytes": 20043804,
+      "sha256": "0ceb9051ec35c0047bb2c083fab25fb1ba0f72a120b147d1ad3307889ef10391"
+    },
+    {
+      "path": "docs/quality/gh-220/pr-222.json",
+      "bytes": 4216,
+      "sha256": "e1948b858c6a61f29688741148f0cc7405072001cb119c81f518c54c3b2b0a86"
+    },
+    {
+      "path": "docs/quality/gh-220/source-replay-after.json",
+      "bytes": 792989,
+      "sha256": "458db46fb7e59da6c46ce3e905e6f103f3c31ea3ce7c5797e516c90e42017d07"
+    },
+    {
+      "path": "docs/quality/gh-220/source-replay-baseline.json",
+      "bytes": 646588,
+      "sha256": "c4f39b7dd937b89e7213458700a32daf4eb9ae836ed380ce78a18c1b18ebb135"
+    },
+    {
+      "path": "docs/quality/gh-220/source-replay-before.json",
+      "bytes": 646588,
+      "sha256": "1a092f08ff252f69b1b5fcbdd075f53dfaf379046373a7c6226594042f6443b4"
+    },
+    {
+      "path": "docs/quality/gh-220/source-replay-final.json",
+      "bytes": 836350,
+      "sha256": "1857c988e87e224930c79543168b70d8efcab148334e86ac9e813846753fb432"
+    },
+    {
+      "path": "docs/quality/gh-220/validation-logs.tar.gz",
+      "bytes": 243102,
+      "sha256": "08cd132552065da8ff450b99d10a6f9a92051731944b5ae40f5110d66d2d2734"
+    },
+    {
+      "path": "docs/quality/gh-220/validation.json",
+      "bytes": 12106,
+      "sha256": "6dcbcbc2cf5ff675d4a31ab3dcd2ac40f98b81c48b7a6386630580e2ee748dba"
+    }
+  ],
+  "implementation_sources": [
+    {
+      "path": "tools/quality/rust_native.py",
+      "bytes": 22533,
+      "sha256": "cafd5670a7d040f2beb7dbc5f5880825391bc19a6ccafece30e7bcd6b0ea5767"
+    },
+    {
+      "path": "tools/quality/rust_native_replay.py",
+      "bytes": 2836,
+      "sha256": "a09d13ec1ae36919a9622e518d21c3fa37ac693f031b2a6bfc3ae9425d03bee9"
+    },
+    {
+      "path": "tools/quality/tests/test_rust_native.py",
+      "bytes": 8253,
+      "sha256": "0528d2884bc6d85f52cd2de54ad11d920482e493f8bead0aa4e93fd4c5706aa1"
+    },
+    {
+      "path": "tools/quality/rust-measure/src/main.rs",
+      "bytes": 11750,
+      "sha256": "876b500c9410c8c559dddfe843ebbe761f4adc4d512b013b177c2d4becc752ac"
+    },
+    {
+      "path": "tools/quality/rust-measure/src/native.rs",
+      "bytes": 12432,
+      "sha256": "25253d0c21200bff991460e1bd64eec4b5b9a776cb759d6f0b4fe2fa3e7f681d"
+    },
+    {
+      "path": "tools/quality/fixtures/rust-native/complete.rs",
+      "bytes": 758,
+      "sha256": "5848ae7e66cdec35029a945b55d6f4b972c4f1b51256d1e050bba5cb45f0722d"
+    },
+    {
+      "path": "tools/quality/fixtures/rust-native/derived-gap.rs",
+      "bytes": 127,
+      "sha256": "4a5fa6094a61e2db4e8f58a8112270a3560a08585181e571c4f05a633e285cd1"
+    }
+  ],
+  "retention_limits": [
+    "Backend binary bytes are workspace-only; backend-binaries.json provides paths/hashes. Committed backend diagnostics alone cannot reproduce export.",
+    "Analyzer binaries retained workspace-only; the native fixture bundle also retains its analyzer.",
+    "Backend diagnostics are unfiltered and incomplete production evidence.",
+    "Native fixture certification is bounded; source provenance and backend completeness flags remain false.",
+    "Original reference series and baseline have not been altered."
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "issue": 151,
+  "pr": 158,
+  "merged": true,
+  "merged_at": "2026-09-08T16:00:22Z",
+  "head_sha": "8059d70d488fb5b3755cde248b43dee4d9f29d92",
+  "merge_sha": "63a7f9538b13d4f8888eff6b35663cda40270e70",
+  "checks": [
+    {
+      "name": "Required Quality Aggregate",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34246083889/job/102135110034"
+    },
+    {
+      "name": "Generic Quality Shadow",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34246083889/job/102135109937"
+    },
+    {
+      "name": "Build (${{ matrix.os }})",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34246083889/job/102128305460"
+    },
+    {
+      "name": "Quality CLI Contracts (${{ matrix.os }})",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34246083889/job/102128305444"
+    },
+    {
+      "name": "Test (${{ matrix.os }})",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34246083889/job/102128305419"
+    },
+    {
+      "name": "Code Coverage",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34246083889/job/102128305382"
+    },
+    {
+      "name": "Quality Performance Baseline",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34246083889/job/102128304982"
+    },
+    {
+      "name": "Test",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34246083889/job/102128304213"
+    },
+    {
+      "name": "Clippy",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34246083889/job/102128304212"
+    },
+    {
+      "name": "Quality Coverage and Critical Paths",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34246083889/job/102128304144"
+    },
+    {
+      "name": "Documentation Consistency",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34246083889/job/102128304119"
+    },
+    {
+      "name": "Security Audit",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34246083889/job/102128304108"
+    },
+    {
+      "name": "Format",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34246083889/job/102128304068"
+    },
+    {
+      "name": "Quality Script Tests",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34246083889/job/102128304057"
+    },
+    {
+      "name": "Quality CLI Contracts",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34246083889/job/102128303990"
+    },
+    {
+      "name": "Build",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34246083889/job/102128303897"
+    },
+    {
+      "name": "Release Governance Contracts",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34246083889/job/102128303803"
+    },
+    {
+      "name": "differential",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34246083821/job/102128301239"
+    }
+  ]
+}

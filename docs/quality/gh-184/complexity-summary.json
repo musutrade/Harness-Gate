@@ -1,0 +1,25 @@
+{
+  "metric": "cyclomatic-complexity",
+  "modules": {
+    "config/quality/collectors.rs": {
+      "symbols": 17,
+      "maximum": 22
+    },
+    "config/quality/compiler.rs": {
+      "symbols": 33,
+      "maximum": 16
+    },
+    "config/quality/mod.rs": {
+      "symbols": 6,
+      "maximum": 6
+    },
+    "config/quality/validation.rs": {
+      "symbols": 21,
+      "maximum": 23
+    },
+    "verify/quality.rs": {
+      "symbols": 18,
+      "maximum": 19
+    }
+  }
+}

@@ -1,0 +1,274 @@
+{
+  "status": "incomplete; diagnostic evidence only",
+  "checks": [
+    {
+      "record": "target/gh-230/project-progress/logs/assembly.command.json",
+      "command": [
+        "python3",
+        "tools/quality/build_rust_collector.py",
+        "--lock",
+        "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/project-progress/inputs.json",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/project-progress/runtime"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 11.10481896798592
+    },
+    {
+      "record": "target/gh-230/project-progress/logs/inventory.command.json",
+      "command": [
+        "python3",
+        "tools/quality/build_rust_collector.py",
+        "--inventory",
+        "--driver",
+        "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/operator-native-runtime/build/debug/harness-gate-rust-native-driver",
+        "--sysroot",
+        "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/operator-native-runtime/sysroot",
+        "--crate-cache",
+        "/home/gem/.cargo/registry/cache/index.crates.io-1949cf8c6b5b557f",
+        "--rustc-dev",
+        "/mnt/dev-ssd/workspaces/symphony/GH-230/target/symphony-inputs/rustc-dev-1.97.1-x86_64-unknown-linux-gnu.tar.xz",
+        "--build-record",
+        "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/operator-native-runtime/bootstrap.json",
+        "--lock",
+        "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/project-progress/inputs.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 32.95893362298375
+    },
+    {
+      "record": "target/gh-230/project-progress/logs/native.command.json",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "test_rust_collector_runtime.StandaloneNativeTests.test_private_generic_projection_is_decided_by_actual_core",
+        "-v"
+      ],
+      "environment": {
+        "RUST_COLLECTOR_RUNTIME": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/project-progress/runtime",
+        "HARNESS_GATE_NATIVE_POLICY_BINARY": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo/debug/harness-gate",
+        "PYTHONPATH": "/mnt/dev-ssd/workspaces/symphony/GH-230/tools/quality/tests",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo"
+      },
+      "exit_code": 1,
+      "wall_seconds": 15.431697043997701
+    },
+    {
+      "record": "target/gh-230/project-progress/logs/python.command.json",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/quality/tests",
+        "-v"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+        "OPENSPEC_TELEMETRY": "0"
+      },
+      "proxy_variables_removed": true,
+      "exit_code": 1,
+      "wall_seconds": 179.7139953149599
+    },
+    {
+      "record": "target/gh-230/project-progress-v2/logs/assembly.command.json",
+      "command": [
+        "python3",
+        "tools/quality/build_rust_collector.py",
+        "--lock",
+        "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/project-progress-v2/inputs.json",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/project-progress-v2/runtime"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 18.6520071880077
+    },
+    {
+      "record": "target/gh-230/project-progress-v2/logs/inventory.command.json",
+      "command": [
+        "python3",
+        "tools/quality/build_rust_collector.py",
+        "--inventory",
+        "--driver",
+        "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/operator-native-runtime/build/debug/harness-gate-rust-native-driver",
+        "--sysroot",
+        "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/operator-native-runtime/sysroot",
+        "--crate-cache",
+        "/home/gem/.cargo/registry/cache/index.crates.io-1949cf8c6b5b557f",
+        "--rustc-dev",
+        "/mnt/dev-ssd/workspaces/symphony/GH-230/target/symphony-inputs/rustc-dev-1.97.1-x86_64-unknown-linux-gnu.tar.xz",
+        "--build-record",
+        "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/operator-native-runtime/bootstrap.json",
+        "--lock",
+        "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/project-progress-v2/inputs.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 22.1446094919811
+    },
+    {
+      "record": "target/gh-230/project-progress-v2/logs/native-entry.command.json",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "test_rust_collector_runtime.StandaloneNativeTests.test_private_generic_projection_is_decided_by_actual_core",
+        "-v"
+      ],
+      "environment": {
+        "RUST_COLLECTOR_RUNTIME": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/project-progress-v2/runtime",
+        "HARNESS_GATE_NATIVE_POLICY_BINARY": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo/debug/harness-gate",
+        "PYTHONPATH": "/mnt/dev-ssd/workspaces/symphony/GH-230/tools/quality/tests",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo"
+      },
+      "exit_code": 0,
+      "wall_seconds": 21.95177894999506
+    },
+    {
+      "record": "target/gh-230/project-progress-v2/logs/native.command.json",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "test_rust_collector_runtime.StandaloneNativeTests.test_private_generic_projection_is_decided_by_actual_core",
+        "-v"
+      ],
+      "environment": {
+        "RUST_COLLECTOR_RUNTIME": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/project-progress-v2/runtime",
+        "HARNESS_GATE_NATIVE_POLICY_BINARY": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo/debug/harness-gate",
+        "PYTHONPATH": "/mnt/dev-ssd/workspaces/symphony/GH-230/tools/quality/tests",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo"
+      },
+      "exit_code": 0,
+      "wall_seconds": 17.374618699017446
+    },
+    {
+      "record": "target/gh-230/project-progress-v2/logs/python.command.json",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/quality/tests",
+        "-v"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+        "OPENSPEC_TELEMETRY": "0"
+      },
+      "proxy_variables_removed": true,
+      "exit_code": 1,
+      "wall_seconds": 177.05127383599756
+    },
+    {
+      "record": "target/gh-230/project-final-checks/logs/diff-check-final.command.json",
+      "name": "diff-check-final",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.010909239004831761
+    },
+    {
+      "record": "target/gh-230/project-final-checks/logs/diff-check.command.json",
+      "name": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.012757499003782868
+    },
+    {
+      "record": "target/gh-230/project-final-checks/logs/docs-consistency-final.command.json",
+      "name": "docs-consistency-final",
+      "command": [
+        "python3",
+        "tools/quality/docs_consistency.py",
+        "--output",
+        "target/quality/docs-consistency.json"
+      ],
+      "exit_code": 0,
+      "seconds": 3.3781246530124918
+    },
+    {
+      "record": "target/gh-230/project-final-checks/logs/docs-consistency.command.json",
+      "name": "docs-consistency",
+      "command": [
+        "python3",
+        "tools/quality/docs_consistency.py",
+        "--output",
+        "target/quality/docs-consistency.json"
+      ],
+      "exit_code": 0,
+      "seconds": 3.315095203986857
+    },
+    {
+      "record": "target/gh-230/project-final-checks/logs/openspec-final.command.json",
+      "name": "openspec-final",
+      "command": [
+        "openspec",
+        "validate",
+        "package-official-rust-collector-for-independent-delivery",
+        "--strict",
+        "--no-interactive"
+      ],
+      "exit_code": 0,
+      "seconds": 0.5564052420086227
+    },
+    {
+      "record": "target/gh-230/project-final-checks/logs/openspec.command.json",
+      "name": "openspec",
+      "command": [
+        "openspec",
+        "validate",
+        "package-official-rust-collector-for-independent-delivery",
+        "--strict",
+        "--no-interactive"
+      ],
+      "exit_code": 0,
+      "seconds": 0.5436364299966954
+    },
+    {
+      "record": "target/gh-230/project-final-checks/logs/python.command.json",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/quality/tests",
+        "-v"
+      ],
+      "environment": {
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+        "GIT_CEILING_DIRECTORIES": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+        "OPENSPEC_TELEMETRY": "0"
+      },
+      "proxy_variables_removed": true,
+      "exit_code": 0,
+      "wall_seconds": 179.87676135502988
+    }
+  ],
+  "unchanged_rust_validation": "recovery-checks.json: nextest, fmt and clippy passed; no Rust source or Cargo input changed",
+  "not_applicable": [
+    "harness-gate config check",
+    "harness-gate verify --profile ci --all"
+  ],
+  "reason": ".harness-gate/flow.toml absent; no invented project configuration",
+  "limitations": "Unsigned test preparation, checkout-built Core, existing host; no accepted supported combination or full runtime retention in this archive."
+}

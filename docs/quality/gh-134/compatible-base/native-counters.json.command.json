@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "node",
+    "/home/gem/symphony-workspaces/GH-134/target/quality/gh134/native-v2/compatible/repo/fixture/coverage-oracle.cjs",
+    "/home/gem/symphony-workspaces/GH-134/docs/quality/gh-134/compatible-base/source-index.json",
+    "/home/gem/symphony-workspaces/GH-134/target/quality/gh134/native-v2/compatible/base/coverage/reference-app/coverage-final.json",
+    "/home/gem/symphony-workspaces/GH-134/target/quality/gh134/native-v2/compatible/repo/fixture/app"
+  ],
+  "exit_status": 0,
+  "stderr": ""
+}

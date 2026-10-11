@@ -1,0 +1,11 @@
+# Archived quality evidence
+
+This file was externalized from Git history to keep `main` small. The raw bytes remain available in the repository evidence archive.
+
+- Archive: https://github.com/musutrade/Harness-Gate/releases/download/evidence-archive-20261010/quality-evidence-current.tar.zst
+- Path inside archive: `docs/quality/gh-221/backend-classification.json.gz`
+- Original size: 599796 bytes
+- Original SHA-256: `043f8dd2c0bacbbcc624abb5c1c4c88e03e6f65edc8479373d89150210c4b560`
+- Original Git blob: `56d64bf733591bd27c2117d2d038033c19d7e98c`
+
+Download the archive, extract `docs/quality/gh-221/backend-classification.json.gz`, and verify the SHA-256 before use.

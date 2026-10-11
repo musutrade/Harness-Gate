@@ -1,0 +1,4614 @@
+[
+  {
+    "artifacts": [
+      {
+        "bytes": 721522,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+        "kind": "raw",
+        "media_type": "application/gzip",
+        "path": "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e/native.tar.gz",
+        "sha256": "98592277e40d9cd68f27a3a4f538e1e54d149c87a9b83395251534726f754716",
+        "source": {
+          "path": "app/src/app/pricing.ts",
+          "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+        }
+      },
+      {
+        "bytes": 25954,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+        "kind": "raw",
+        "media_type": "application/json",
+        "path": "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e/source-index.json",
+        "sha256": "026a7a319d417d4168eabe57fcdf3ece6f1dd313f9ae90c5619f617920ad39ac",
+        "source": {
+          "path": "app/src/app/pricing.ts",
+          "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+        }
+      },
+      {
+        "bytes": 6239,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json",
+        "kind": "raw",
+        "media_type": "application/json",
+        "path": "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e/receipt.json",
+        "sha256": "6d094b927c8ce01a630f2cff1fde87e74e94750b7f806bdf53aec6b8317b5136",
+        "source": {
+          "path": "app/src/app/pricing.ts",
+          "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+        }
+      }
+    ],
+    "capabilities": [
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "accessibility.violations",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "bundle.size",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "complexity.cognitive",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "complexity.cyclomatic",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "contract.breaking_changes",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "contract.client_drift",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "contract.compatible",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "contract.schema_valid",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "coverage.branch",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "coverage.function",
+        "reason": "native Istanbul original-source counters",
+        "state": "supported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "coverage.line",
+        "reason": "native Istanbul original-source counters",
+        "state": "supported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "coverage.region",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "mutation.killed",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "mutation.score",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "mutation.survived",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "performance.duration",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "performance.regression",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "risk.crap",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "security.findings",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      }
+    ],
+    "collector": {
+      "name": "typescript-reference",
+      "version": "1"
+    },
+    "component": "typescript",
+    "context": {
+      "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+      "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+      "run": "compatible-base",
+      "target": "node-jsdom"
+    },
+    "id": "typescript-b627bf1d0b36ee3c128cd6cc5e3119b62c355c621e458a6475ca05f302cd2685",
+    "metrics": [
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "name": "coverage.function",
+        "value": {
+          "covered": 1,
+          "total": 1,
+          "type": "ratio"
+        }
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "name": "coverage.line",
+        "value": {
+          "covered": 5,
+          "total": 6,
+          "type": "ratio"
+        }
+      }
+    ],
+    "project": "typescript-reference",
+    "schema": "harness-evidence/v1",
+    "series": {
+      "collector": {
+        "name": "typescript-reference",
+        "version": "1"
+      },
+      "id": "measurement-series/v1:b680df6dc529cafbbadf4ebba23627d2f34c6c16d30d22dcf5210b29c727a408",
+      "metrics": [
+        {
+          "name": "accessibility.violations",
+          "type": "count"
+        },
+        {
+          "name": "bundle.size",
+          "type": "size"
+        },
+        {
+          "name": "complexity.cognitive",
+          "type": "count"
+        },
+        {
+          "name": "complexity.cyclomatic",
+          "type": "count"
+        },
+        {
+          "name": "contract.breaking_changes",
+          "type": "count"
+        },
+        {
+          "name": "contract.client_drift",
+          "type": "boolean"
+        },
+        {
+          "name": "contract.compatible",
+          "type": "boolean"
+        },
+        {
+          "name": "contract.schema_valid",
+          "type": "boolean"
+        },
+        {
+          "name": "coverage.branch",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.function",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.line",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.region",
+          "type": "ratio"
+        },
+        {
+          "name": "mutation.killed",
+          "type": "count"
+        },
+        {
+          "name": "mutation.score",
+          "type": "ratio"
+        },
+        {
+          "name": "mutation.survived",
+          "type": "count"
+        },
+        {
+          "name": "performance.duration",
+          "type": "duration"
+        },
+        {
+          "name": "performance.regression",
+          "type": "boolean"
+        },
+        {
+          "name": "risk.crap",
+          "type": "decimal"
+        },
+        {
+          "name": "security.findings",
+          "type": "count"
+        }
+      ],
+      "name": "typescript-source-coverage",
+      "normalization": {
+        "name": "istanbul-start-line-max-innermost/v1",
+        "version": "1"
+      },
+      "rule": {
+        "name": "typescript-source-coverage",
+        "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+      },
+      "runtime": {
+        "name": "node-jsdom",
+        "version": "24.18.0/jsdom@28.0.0"
+      },
+      "source_identity": {
+        "name": "typescript-original-source/v1",
+        "version": "1"
+      },
+      "target": "node-jsdom",
+      "tool": {
+        "name": "typescript-toolchain",
+        "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+      }
+    },
+    "source": {
+      "path": "app/src/app/pricing.ts",
+      "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+    },
+    "status": "measured",
+    "subject": {
+      "boundary": "production-ts",
+      "component": "typescript",
+      "discriminator": "typescript-original-source/v1:file",
+      "id": "subject-identity/v1:b627bf1d0b36ee3c128cd6cc5e3119b62c355c621e458a6475ca05f302cd2685",
+      "identity_version": "subject-identity/v1",
+      "kind": "file/v1",
+      "metadata": {},
+      "path": "app/src/app/pricing.ts",
+      "source_sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b",
+      "target": "node-jsdom"
+    }
+  },
+  {
+    "artifacts": [
+      {
+        "bytes": 721522,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+        "kind": "raw",
+        "media_type": "application/gzip",
+        "path": "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e/native.tar.gz",
+        "sha256": "98592277e40d9cd68f27a3a4f538e1e54d149c87a9b83395251534726f754716",
+        "source": {
+          "path": "app/src/app/pricing.ts",
+          "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+        }
+      },
+      {
+        "bytes": 25954,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+        "kind": "raw",
+        "media_type": "application/json",
+        "path": "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e/source-index.json",
+        "sha256": "026a7a319d417d4168eabe57fcdf3ece6f1dd313f9ae90c5619f617920ad39ac",
+        "source": {
+          "path": "app/src/app/pricing.ts",
+          "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+        }
+      },
+      {
+        "bytes": 6239,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json",
+        "kind": "raw",
+        "media_type": "application/json",
+        "path": "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e/receipt.json",
+        "sha256": "6d094b927c8ce01a630f2cff1fde87e74e94750b7f806bdf53aec6b8317b5136",
+        "source": {
+          "path": "app/src/app/pricing.ts",
+          "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+        }
+      }
+    ],
+    "capabilities": [
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "accessibility.violations",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "bundle.size",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "complexity.cognitive",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "complexity.cyclomatic",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "contract.breaking_changes",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "contract.client_drift",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "contract.compatible",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "contract.schema_valid",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "coverage.branch",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "coverage.function",
+        "reason": "native Istanbul original-source counters",
+        "state": "supported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "coverage.line",
+        "reason": "native Istanbul original-source counters",
+        "state": "supported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "coverage.region",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "mutation.killed",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "mutation.score",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "mutation.survived",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "performance.duration",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "performance.regression",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "risk.crap",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "metric": "security.findings",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      }
+    ],
+    "collector": {
+      "name": "typescript-reference",
+      "version": "1"
+    },
+    "component": "typescript",
+    "context": {
+      "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+      "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+      "run": "compatible-base",
+      "target": "node-jsdom"
+    },
+    "id": "typescript-8ed4fb9f7bbf40212c16c3f3d6f23e2350482aa6c67cacf7a12d7bfb27963460",
+    "metrics": [
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "name": "coverage.function",
+        "value": {
+          "covered": 1,
+          "total": 1,
+          "type": "ratio"
+        }
+      },
+      {
+        "artifacts": [
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.native.tar.gz",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.source-index.json",
+          "source-f1a9c924e0a09df0da5d9edde09fe58457e77653744a1f69aac078aec4d3548e.receipt.json"
+        ],
+        "name": "coverage.line",
+        "value": {
+          "covered": 4,
+          "total": 5,
+          "type": "ratio"
+        }
+      }
+    ],
+    "project": "typescript-reference",
+    "schema": "harness-evidence/v1",
+    "series": {
+      "collector": {
+        "name": "typescript-reference",
+        "version": "1"
+      },
+      "id": "measurement-series/v1:b680df6dc529cafbbadf4ebba23627d2f34c6c16d30d22dcf5210b29c727a408",
+      "metrics": [
+        {
+          "name": "accessibility.violations",
+          "type": "count"
+        },
+        {
+          "name": "bundle.size",
+          "type": "size"
+        },
+        {
+          "name": "complexity.cognitive",
+          "type": "count"
+        },
+        {
+          "name": "complexity.cyclomatic",
+          "type": "count"
+        },
+        {
+          "name": "contract.breaking_changes",
+          "type": "count"
+        },
+        {
+          "name": "contract.client_drift",
+          "type": "boolean"
+        },
+        {
+          "name": "contract.compatible",
+          "type": "boolean"
+        },
+        {
+          "name": "contract.schema_valid",
+          "type": "boolean"
+        },
+        {
+          "name": "coverage.branch",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.function",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.line",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.region",
+          "type": "ratio"
+        },
+        {
+          "name": "mutation.killed",
+          "type": "count"
+        },
+        {
+          "name": "mutation.score",
+          "type": "ratio"
+        },
+        {
+          "name": "mutation.survived",
+          "type": "count"
+        },
+        {
+          "name": "performance.duration",
+          "type": "duration"
+        },
+        {
+          "name": "performance.regression",
+          "type": "boolean"
+        },
+        {
+          "name": "risk.crap",
+          "type": "decimal"
+        },
+        {
+          "name": "security.findings",
+          "type": "count"
+        }
+      ],
+      "name": "typescript-source-coverage",
+      "normalization": {
+        "name": "istanbul-start-line-max-innermost/v1",
+        "version": "1"
+      },
+      "rule": {
+        "name": "typescript-source-coverage",
+        "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+      },
+      "runtime": {
+        "name": "node-jsdom",
+        "version": "24.18.0/jsdom@28.0.0"
+      },
+      "source_identity": {
+        "name": "typescript-original-source/v1",
+        "version": "1"
+      },
+      "target": "node-jsdom",
+      "tool": {
+        "name": "typescript-toolchain",
+        "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+      }
+    },
+    "source": {
+      "path": "app/src/app/pricing.ts",
+      "sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b"
+    },
+    "status": "measured",
+    "subject": {
+      "boundary": "production-ts",
+      "component": "typescript",
+      "discriminator": "typescript-original-source/v1:Pricing.quote:(5, 2):(13, 3)",
+      "id": "subject-identity/v1:8ed4fb9f7bbf40212c16c3f3d6f23e2350482aa6c67cacf7a12d7bfb27963460",
+      "identity_version": "subject-identity/v1",
+      "kind": "method/v1",
+      "metadata": {},
+      "path": "app/src/app/pricing.ts",
+      "source_sha256": "099555b8ae2cc9d231231912b2ea586a8e9de27198569d57c4719b77c249a42b",
+      "span": {
+        "end_column": 4,
+        "end_line": 13,
+        "start_column": 3,
+        "start_line": 5
+      },
+      "target": "node-jsdom"
+    }
+  },
+  {
+    "artifacts": [
+      {
+        "bytes": 721522,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+        "kind": "raw",
+        "media_type": "application/gzip",
+        "path": "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842/native.tar.gz",
+        "sha256": "98592277e40d9cd68f27a3a4f538e1e54d149c87a9b83395251534726f754716",
+        "source": {
+          "path": "app/src/app/standard-quote.ts",
+          "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+        }
+      },
+      {
+        "bytes": 25954,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+        "kind": "raw",
+        "media_type": "application/json",
+        "path": "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842/source-index.json",
+        "sha256": "026a7a319d417d4168eabe57fcdf3ece6f1dd313f9ae90c5619f617920ad39ac",
+        "source": {
+          "path": "app/src/app/standard-quote.ts",
+          "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+        }
+      },
+      {
+        "bytes": 6239,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json",
+        "kind": "raw",
+        "media_type": "application/json",
+        "path": "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842/receipt.json",
+        "sha256": "6d094b927c8ce01a630f2cff1fde87e74e94750b7f806bdf53aec6b8317b5136",
+        "source": {
+          "path": "app/src/app/standard-quote.ts",
+          "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+        }
+      }
+    ],
+    "capabilities": [
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "accessibility.violations",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "bundle.size",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "complexity.cognitive",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "complexity.cyclomatic",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "contract.breaking_changes",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "contract.client_drift",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "contract.compatible",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "contract.schema_valid",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "coverage.branch",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "coverage.function",
+        "reason": "native Istanbul original-source counters",
+        "state": "supported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "coverage.line",
+        "reason": "native Istanbul original-source counters",
+        "state": "supported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "coverage.region",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "mutation.killed",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "mutation.score",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "mutation.survived",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "performance.duration",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "performance.regression",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "risk.crap",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "security.findings",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      }
+    ],
+    "collector": {
+      "name": "typescript-reference",
+      "version": "1"
+    },
+    "component": "typescript",
+    "context": {
+      "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+      "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+      "run": "compatible-base",
+      "target": "node-jsdom"
+    },
+    "id": "typescript-7bc9fd560b8177b3a996390b744019f53ac0be4efbe9d2ae1b8dd14e97dae8e2",
+    "metrics": [
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "name": "coverage.function",
+        "value": {
+          "covered": 1,
+          "total": 1,
+          "type": "ratio"
+        }
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "name": "coverage.line",
+        "value": {
+          "covered": 1,
+          "total": 1,
+          "type": "ratio"
+        }
+      }
+    ],
+    "project": "typescript-reference",
+    "schema": "harness-evidence/v1",
+    "series": {
+      "collector": {
+        "name": "typescript-reference",
+        "version": "1"
+      },
+      "id": "measurement-series/v1:b680df6dc529cafbbadf4ebba23627d2f34c6c16d30d22dcf5210b29c727a408",
+      "metrics": [
+        {
+          "name": "accessibility.violations",
+          "type": "count"
+        },
+        {
+          "name": "bundle.size",
+          "type": "size"
+        },
+        {
+          "name": "complexity.cognitive",
+          "type": "count"
+        },
+        {
+          "name": "complexity.cyclomatic",
+          "type": "count"
+        },
+        {
+          "name": "contract.breaking_changes",
+          "type": "count"
+        },
+        {
+          "name": "contract.client_drift",
+          "type": "boolean"
+        },
+        {
+          "name": "contract.compatible",
+          "type": "boolean"
+        },
+        {
+          "name": "contract.schema_valid",
+          "type": "boolean"
+        },
+        {
+          "name": "coverage.branch",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.function",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.line",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.region",
+          "type": "ratio"
+        },
+        {
+          "name": "mutation.killed",
+          "type": "count"
+        },
+        {
+          "name": "mutation.score",
+          "type": "ratio"
+        },
+        {
+          "name": "mutation.survived",
+          "type": "count"
+        },
+        {
+          "name": "performance.duration",
+          "type": "duration"
+        },
+        {
+          "name": "performance.regression",
+          "type": "boolean"
+        },
+        {
+          "name": "risk.crap",
+          "type": "decimal"
+        },
+        {
+          "name": "security.findings",
+          "type": "count"
+        }
+      ],
+      "name": "typescript-source-coverage",
+      "normalization": {
+        "name": "istanbul-start-line-max-innermost/v1",
+        "version": "1"
+      },
+      "rule": {
+        "name": "typescript-source-coverage",
+        "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+      },
+      "runtime": {
+        "name": "node-jsdom",
+        "version": "24.18.0/jsdom@28.0.0"
+      },
+      "source_identity": {
+        "name": "typescript-original-source/v1",
+        "version": "1"
+      },
+      "target": "node-jsdom",
+      "tool": {
+        "name": "typescript-toolchain",
+        "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+      }
+    },
+    "source": {
+      "path": "app/src/app/standard-quote.ts",
+      "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+    },
+    "status": "measured",
+    "subject": {
+      "boundary": "production-ts",
+      "component": "typescript",
+      "discriminator": "typescript-original-source/v1:file",
+      "id": "subject-identity/v1:7bc9fd560b8177b3a996390b744019f53ac0be4efbe9d2ae1b8dd14e97dae8e2",
+      "identity_version": "subject-identity/v1",
+      "kind": "file/v1",
+      "metadata": {},
+      "path": "app/src/app/standard-quote.ts",
+      "source_sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae",
+      "target": "node-jsdom"
+    }
+  },
+  {
+    "artifacts": [
+      {
+        "bytes": 721522,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+        "kind": "raw",
+        "media_type": "application/gzip",
+        "path": "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842/native.tar.gz",
+        "sha256": "98592277e40d9cd68f27a3a4f538e1e54d149c87a9b83395251534726f754716",
+        "source": {
+          "path": "app/src/app/standard-quote.ts",
+          "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+        }
+      },
+      {
+        "bytes": 25954,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+        "kind": "raw",
+        "media_type": "application/json",
+        "path": "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842/source-index.json",
+        "sha256": "026a7a319d417d4168eabe57fcdf3ece6f1dd313f9ae90c5619f617920ad39ac",
+        "source": {
+          "path": "app/src/app/standard-quote.ts",
+          "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+        }
+      },
+      {
+        "bytes": 6239,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json",
+        "kind": "raw",
+        "media_type": "application/json",
+        "path": "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842/receipt.json",
+        "sha256": "6d094b927c8ce01a630f2cff1fde87e74e94750b7f806bdf53aec6b8317b5136",
+        "source": {
+          "path": "app/src/app/standard-quote.ts",
+          "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+        }
+      }
+    ],
+    "capabilities": [
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "accessibility.violations",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "bundle.size",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "complexity.cognitive",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "complexity.cyclomatic",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "contract.breaking_changes",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "contract.client_drift",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "contract.compatible",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "contract.schema_valid",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "coverage.branch",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "coverage.function",
+        "reason": "native Istanbul original-source counters",
+        "state": "supported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "coverage.line",
+        "reason": "native Istanbul original-source counters",
+        "state": "supported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "coverage.region",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "mutation.killed",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "mutation.score",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "mutation.survived",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "performance.duration",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "performance.regression",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "risk.crap",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "metric": "security.findings",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      }
+    ],
+    "collector": {
+      "name": "typescript-reference",
+      "version": "1"
+    },
+    "component": "typescript",
+    "context": {
+      "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+      "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+      "run": "compatible-base",
+      "target": "node-jsdom"
+    },
+    "id": "typescript-22c11626d4bb53b0e6fd7971740932b7630c00a8f0d02c9c3931085c6a3ed562",
+    "metrics": [
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "name": "coverage.function",
+        "value": {
+          "covered": 1,
+          "total": 1,
+          "type": "ratio"
+        }
+      },
+      {
+        "artifacts": [
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.native.tar.gz",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.source-index.json",
+          "source-65ec30c9c9ad5b4934c40848ab58402bb909f6caf16891bc927484643730c842.receipt.json"
+        ],
+        "name": "coverage.line",
+        "value": {
+          "covered": 1,
+          "total": 1,
+          "type": "ratio"
+        }
+      }
+    ],
+    "project": "typescript-reference",
+    "schema": "harness-evidence/v1",
+    "series": {
+      "collector": {
+        "name": "typescript-reference",
+        "version": "1"
+      },
+      "id": "measurement-series/v1:b680df6dc529cafbbadf4ebba23627d2f34c6c16d30d22dcf5210b29c727a408",
+      "metrics": [
+        {
+          "name": "accessibility.violations",
+          "type": "count"
+        },
+        {
+          "name": "bundle.size",
+          "type": "size"
+        },
+        {
+          "name": "complexity.cognitive",
+          "type": "count"
+        },
+        {
+          "name": "complexity.cyclomatic",
+          "type": "count"
+        },
+        {
+          "name": "contract.breaking_changes",
+          "type": "count"
+        },
+        {
+          "name": "contract.client_drift",
+          "type": "boolean"
+        },
+        {
+          "name": "contract.compatible",
+          "type": "boolean"
+        },
+        {
+          "name": "contract.schema_valid",
+          "type": "boolean"
+        },
+        {
+          "name": "coverage.branch",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.function",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.line",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.region",
+          "type": "ratio"
+        },
+        {
+          "name": "mutation.killed",
+          "type": "count"
+        },
+        {
+          "name": "mutation.score",
+          "type": "ratio"
+        },
+        {
+          "name": "mutation.survived",
+          "type": "count"
+        },
+        {
+          "name": "performance.duration",
+          "type": "duration"
+        },
+        {
+          "name": "performance.regression",
+          "type": "boolean"
+        },
+        {
+          "name": "risk.crap",
+          "type": "decimal"
+        },
+        {
+          "name": "security.findings",
+          "type": "count"
+        }
+      ],
+      "name": "typescript-source-coverage",
+      "normalization": {
+        "name": "istanbul-start-line-max-innermost/v1",
+        "version": "1"
+      },
+      "rule": {
+        "name": "typescript-source-coverage",
+        "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+      },
+      "runtime": {
+        "name": "node-jsdom",
+        "version": "24.18.0/jsdom@28.0.0"
+      },
+      "source_identity": {
+        "name": "typescript-original-source/v1",
+        "version": "1"
+      },
+      "target": "node-jsdom",
+      "tool": {
+        "name": "typescript-toolchain",
+        "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+      }
+    },
+    "source": {
+      "path": "app/src/app/standard-quote.ts",
+      "sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae"
+    },
+    "status": "measured",
+    "subject": {
+      "boundary": "production-ts",
+      "component": "typescript",
+      "discriminator": "typescript-original-source/v1:StandardQuote.quote:(2, 2):(2, 32)",
+      "id": "subject-identity/v1:22c11626d4bb53b0e6fd7971740932b7630c00a8f0d02c9c3931085c6a3ed562",
+      "identity_version": "subject-identity/v1",
+      "kind": "method/v1",
+      "metadata": {},
+      "path": "app/src/app/standard-quote.ts",
+      "source_sha256": "2a119c679b573b52192ee99fb1e195f95683058d539d173ccf926a909d0fe9ae",
+      "span": {
+        "end_column": 33,
+        "end_line": 2,
+        "start_column": 3,
+        "start_line": 2
+      },
+      "target": "node-jsdom"
+    }
+  },
+  {
+    "artifacts": [
+      {
+        "bytes": 721522,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+        "kind": "raw",
+        "media_type": "application/gzip",
+        "path": "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2/native.tar.gz",
+        "sha256": "98592277e40d9cd68f27a3a4f538e1e54d149c87a9b83395251534726f754716",
+        "source": {
+          "path": "app/src/app/priority-quote.ts",
+          "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+        }
+      },
+      {
+        "bytes": 25954,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+        "kind": "raw",
+        "media_type": "application/json",
+        "path": "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2/source-index.json",
+        "sha256": "026a7a319d417d4168eabe57fcdf3ece6f1dd313f9ae90c5619f617920ad39ac",
+        "source": {
+          "path": "app/src/app/priority-quote.ts",
+          "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+        }
+      },
+      {
+        "bytes": 6239,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json",
+        "kind": "raw",
+        "media_type": "application/json",
+        "path": "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2/receipt.json",
+        "sha256": "6d094b927c8ce01a630f2cff1fde87e74e94750b7f806bdf53aec6b8317b5136",
+        "source": {
+          "path": "app/src/app/priority-quote.ts",
+          "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+        }
+      }
+    ],
+    "capabilities": [
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "accessibility.violations",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "bundle.size",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "complexity.cognitive",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "complexity.cyclomatic",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "contract.breaking_changes",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "contract.client_drift",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "contract.compatible",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "contract.schema_valid",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "coverage.branch",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "coverage.function",
+        "reason": "native Istanbul original-source counters",
+        "state": "supported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "coverage.line",
+        "reason": "native Istanbul original-source counters",
+        "state": "supported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "coverage.region",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "mutation.killed",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "mutation.score",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "mutation.survived",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "performance.duration",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "performance.regression",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "risk.crap",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "security.findings",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      }
+    ],
+    "collector": {
+      "name": "typescript-reference",
+      "version": "1"
+    },
+    "component": "typescript",
+    "context": {
+      "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+      "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+      "run": "compatible-base",
+      "target": "node-jsdom"
+    },
+    "id": "typescript-447ba049056bd90a3cfdc2050b515629fcb4e4dc9034eff001f440957006d8e8",
+    "metrics": [
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "name": "coverage.function",
+        "value": {
+          "covered": 1,
+          "total": 1,
+          "type": "ratio"
+        }
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "name": "coverage.line",
+        "value": {
+          "covered": 1,
+          "total": 1,
+          "type": "ratio"
+        }
+      }
+    ],
+    "project": "typescript-reference",
+    "schema": "harness-evidence/v1",
+    "series": {
+      "collector": {
+        "name": "typescript-reference",
+        "version": "1"
+      },
+      "id": "measurement-series/v1:b680df6dc529cafbbadf4ebba23627d2f34c6c16d30d22dcf5210b29c727a408",
+      "metrics": [
+        {
+          "name": "accessibility.violations",
+          "type": "count"
+        },
+        {
+          "name": "bundle.size",
+          "type": "size"
+        },
+        {
+          "name": "complexity.cognitive",
+          "type": "count"
+        },
+        {
+          "name": "complexity.cyclomatic",
+          "type": "count"
+        },
+        {
+          "name": "contract.breaking_changes",
+          "type": "count"
+        },
+        {
+          "name": "contract.client_drift",
+          "type": "boolean"
+        },
+        {
+          "name": "contract.compatible",
+          "type": "boolean"
+        },
+        {
+          "name": "contract.schema_valid",
+          "type": "boolean"
+        },
+        {
+          "name": "coverage.branch",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.function",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.line",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.region",
+          "type": "ratio"
+        },
+        {
+          "name": "mutation.killed",
+          "type": "count"
+        },
+        {
+          "name": "mutation.score",
+          "type": "ratio"
+        },
+        {
+          "name": "mutation.survived",
+          "type": "count"
+        },
+        {
+          "name": "performance.duration",
+          "type": "duration"
+        },
+        {
+          "name": "performance.regression",
+          "type": "boolean"
+        },
+        {
+          "name": "risk.crap",
+          "type": "decimal"
+        },
+        {
+          "name": "security.findings",
+          "type": "count"
+        }
+      ],
+      "name": "typescript-source-coverage",
+      "normalization": {
+        "name": "istanbul-start-line-max-innermost/v1",
+        "version": "1"
+      },
+      "rule": {
+        "name": "typescript-source-coverage",
+        "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+      },
+      "runtime": {
+        "name": "node-jsdom",
+        "version": "24.18.0/jsdom@28.0.0"
+      },
+      "source_identity": {
+        "name": "typescript-original-source/v1",
+        "version": "1"
+      },
+      "target": "node-jsdom",
+      "tool": {
+        "name": "typescript-toolchain",
+        "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+      }
+    },
+    "source": {
+      "path": "app/src/app/priority-quote.ts",
+      "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+    },
+    "status": "measured",
+    "subject": {
+      "boundary": "production-ts",
+      "component": "typescript",
+      "discriminator": "typescript-original-source/v1:file",
+      "id": "subject-identity/v1:447ba049056bd90a3cfdc2050b515629fcb4e4dc9034eff001f440957006d8e8",
+      "identity_version": "subject-identity/v1",
+      "kind": "file/v1",
+      "metadata": {},
+      "path": "app/src/app/priority-quote.ts",
+      "source_sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc",
+      "target": "node-jsdom"
+    }
+  },
+  {
+    "artifacts": [
+      {
+        "bytes": 721522,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+        "kind": "raw",
+        "media_type": "application/gzip",
+        "path": "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2/native.tar.gz",
+        "sha256": "98592277e40d9cd68f27a3a4f538e1e54d149c87a9b83395251534726f754716",
+        "source": {
+          "path": "app/src/app/priority-quote.ts",
+          "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+        }
+      },
+      {
+        "bytes": 25954,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+        "kind": "raw",
+        "media_type": "application/json",
+        "path": "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2/source-index.json",
+        "sha256": "026a7a319d417d4168eabe57fcdf3ece6f1dd313f9ae90c5619f617920ad39ac",
+        "source": {
+          "path": "app/src/app/priority-quote.ts",
+          "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+        }
+      },
+      {
+        "bytes": 6239,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json",
+        "kind": "raw",
+        "media_type": "application/json",
+        "path": "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2/receipt.json",
+        "sha256": "6d094b927c8ce01a630f2cff1fde87e74e94750b7f806bdf53aec6b8317b5136",
+        "source": {
+          "path": "app/src/app/priority-quote.ts",
+          "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+        }
+      }
+    ],
+    "capabilities": [
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "accessibility.violations",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "bundle.size",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "complexity.cognitive",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "complexity.cyclomatic",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "contract.breaking_changes",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "contract.client_drift",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "contract.compatible",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "contract.schema_valid",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "coverage.branch",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "coverage.function",
+        "reason": "native Istanbul original-source counters",
+        "state": "supported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "coverage.line",
+        "reason": "native Istanbul original-source counters",
+        "state": "supported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "coverage.region",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "mutation.killed",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "mutation.score",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "mutation.survived",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "performance.duration",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "performance.regression",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "risk.crap",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "metric": "security.findings",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      }
+    ],
+    "collector": {
+      "name": "typescript-reference",
+      "version": "1"
+    },
+    "component": "typescript",
+    "context": {
+      "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+      "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+      "run": "compatible-base",
+      "target": "node-jsdom"
+    },
+    "id": "typescript-63c938ba2a43fa9d2f4b32f9f84dea164d3ff13d312ba12fa3be7b5f11952eba",
+    "metrics": [
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "name": "coverage.function",
+        "value": {
+          "covered": 1,
+          "total": 1,
+          "type": "ratio"
+        }
+      },
+      {
+        "artifacts": [
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.native.tar.gz",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.source-index.json",
+          "source-1625012469755a9650d2ba3306439270b88ef3ecc299f359f6f70b2efac7b6d2.receipt.json"
+        ],
+        "name": "coverage.line",
+        "value": {
+          "covered": 1,
+          "total": 1,
+          "type": "ratio"
+        }
+      }
+    ],
+    "project": "typescript-reference",
+    "schema": "harness-evidence/v1",
+    "series": {
+      "collector": {
+        "name": "typescript-reference",
+        "version": "1"
+      },
+      "id": "measurement-series/v1:b680df6dc529cafbbadf4ebba23627d2f34c6c16d30d22dcf5210b29c727a408",
+      "metrics": [
+        {
+          "name": "accessibility.violations",
+          "type": "count"
+        },
+        {
+          "name": "bundle.size",
+          "type": "size"
+        },
+        {
+          "name": "complexity.cognitive",
+          "type": "count"
+        },
+        {
+          "name": "complexity.cyclomatic",
+          "type": "count"
+        },
+        {
+          "name": "contract.breaking_changes",
+          "type": "count"
+        },
+        {
+          "name": "contract.client_drift",
+          "type": "boolean"
+        },
+        {
+          "name": "contract.compatible",
+          "type": "boolean"
+        },
+        {
+          "name": "contract.schema_valid",
+          "type": "boolean"
+        },
+        {
+          "name": "coverage.branch",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.function",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.line",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.region",
+          "type": "ratio"
+        },
+        {
+          "name": "mutation.killed",
+          "type": "count"
+        },
+        {
+          "name": "mutation.score",
+          "type": "ratio"
+        },
+        {
+          "name": "mutation.survived",
+          "type": "count"
+        },
+        {
+          "name": "performance.duration",
+          "type": "duration"
+        },
+        {
+          "name": "performance.regression",
+          "type": "boolean"
+        },
+        {
+          "name": "risk.crap",
+          "type": "decimal"
+        },
+        {
+          "name": "security.findings",
+          "type": "count"
+        }
+      ],
+      "name": "typescript-source-coverage",
+      "normalization": {
+        "name": "istanbul-start-line-max-innermost/v1",
+        "version": "1"
+      },
+      "rule": {
+        "name": "typescript-source-coverage",
+        "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+      },
+      "runtime": {
+        "name": "node-jsdom",
+        "version": "24.18.0/jsdom@28.0.0"
+      },
+      "source_identity": {
+        "name": "typescript-original-source/v1",
+        "version": "1"
+      },
+      "target": "node-jsdom",
+      "tool": {
+        "name": "typescript-toolchain",
+        "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+      }
+    },
+    "source": {
+      "path": "app/src/app/priority-quote.ts",
+      "sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc"
+    },
+    "status": "measured",
+    "subject": {
+      "boundary": "production-ts",
+      "component": "typescript",
+      "discriminator": "typescript-original-source/v1:PriorityQuote.quote:(2, 2):(2, 32)",
+      "id": "subject-identity/v1:63c938ba2a43fa9d2f4b32f9f84dea164d3ff13d312ba12fa3be7b5f11952eba",
+      "identity_version": "subject-identity/v1",
+      "kind": "method/v1",
+      "metadata": {},
+      "path": "app/src/app/priority-quote.ts",
+      "source_sha256": "ed21f8293a612db7502354c84c6f807ff3b27550dcc9aa7568514f7fabdd57fc",
+      "span": {
+        "end_column": 33,
+        "end_line": 2,
+        "start_column": 3,
+        "start_line": 2
+      },
+      "target": "node-jsdom"
+    }
+  },
+  {
+    "artifacts": [
+      {
+        "bytes": 721522,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+        "kind": "raw",
+        "media_type": "application/gzip",
+        "path": "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e/native.tar.gz",
+        "sha256": "98592277e40d9cd68f27a3a4f538e1e54d149c87a9b83395251534726f754716",
+        "source": {
+          "path": "app/src/app/app.routes.ts",
+          "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+        }
+      },
+      {
+        "bytes": 25954,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+        "kind": "raw",
+        "media_type": "application/json",
+        "path": "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e/source-index.json",
+        "sha256": "026a7a319d417d4168eabe57fcdf3ece6f1dd313f9ae90c5619f617920ad39ac",
+        "source": {
+          "path": "app/src/app/app.routes.ts",
+          "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+        }
+      },
+      {
+        "bytes": 6239,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json",
+        "kind": "raw",
+        "media_type": "application/json",
+        "path": "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e/receipt.json",
+        "sha256": "6d094b927c8ce01a630f2cff1fde87e74e94750b7f806bdf53aec6b8317b5136",
+        "source": {
+          "path": "app/src/app/app.routes.ts",
+          "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+        }
+      }
+    ],
+    "capabilities": [
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "accessibility.violations",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "bundle.size",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "complexity.cognitive",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "complexity.cyclomatic",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "contract.breaking_changes",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "contract.client_drift",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "contract.compatible",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "contract.schema_valid",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "coverage.branch",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "coverage.function",
+        "reason": "native Istanbul original-source counters",
+        "state": "supported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "coverage.line",
+        "reason": "native Istanbul original-source counters",
+        "state": "supported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "coverage.region",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "mutation.killed",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "mutation.score",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "mutation.survived",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "performance.duration",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "performance.regression",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "risk.crap",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "security.findings",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      }
+    ],
+    "collector": {
+      "name": "typescript-reference",
+      "version": "1"
+    },
+    "component": "typescript",
+    "context": {
+      "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+      "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+      "run": "compatible-base",
+      "target": "node-jsdom"
+    },
+    "id": "typescript-60a5aad72b38c3ce83df9bc13f826bb48791fbff3d2c5fbcf7a526cc5316e58a",
+    "metrics": [
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "name": "coverage.function",
+        "value": {
+          "covered": 2,
+          "total": 2,
+          "type": "ratio"
+        }
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "name": "coverage.line",
+        "value": {
+          "covered": 1,
+          "total": 1,
+          "type": "ratio"
+        }
+      }
+    ],
+    "project": "typescript-reference",
+    "schema": "harness-evidence/v1",
+    "series": {
+      "collector": {
+        "name": "typescript-reference",
+        "version": "1"
+      },
+      "id": "measurement-series/v1:b680df6dc529cafbbadf4ebba23627d2f34c6c16d30d22dcf5210b29c727a408",
+      "metrics": [
+        {
+          "name": "accessibility.violations",
+          "type": "count"
+        },
+        {
+          "name": "bundle.size",
+          "type": "size"
+        },
+        {
+          "name": "complexity.cognitive",
+          "type": "count"
+        },
+        {
+          "name": "complexity.cyclomatic",
+          "type": "count"
+        },
+        {
+          "name": "contract.breaking_changes",
+          "type": "count"
+        },
+        {
+          "name": "contract.client_drift",
+          "type": "boolean"
+        },
+        {
+          "name": "contract.compatible",
+          "type": "boolean"
+        },
+        {
+          "name": "contract.schema_valid",
+          "type": "boolean"
+        },
+        {
+          "name": "coverage.branch",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.function",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.line",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.region",
+          "type": "ratio"
+        },
+        {
+          "name": "mutation.killed",
+          "type": "count"
+        },
+        {
+          "name": "mutation.score",
+          "type": "ratio"
+        },
+        {
+          "name": "mutation.survived",
+          "type": "count"
+        },
+        {
+          "name": "performance.duration",
+          "type": "duration"
+        },
+        {
+          "name": "performance.regression",
+          "type": "boolean"
+        },
+        {
+          "name": "risk.crap",
+          "type": "decimal"
+        },
+        {
+          "name": "security.findings",
+          "type": "count"
+        }
+      ],
+      "name": "typescript-source-coverage",
+      "normalization": {
+        "name": "istanbul-start-line-max-innermost/v1",
+        "version": "1"
+      },
+      "rule": {
+        "name": "typescript-source-coverage",
+        "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+      },
+      "runtime": {
+        "name": "node-jsdom",
+        "version": "24.18.0/jsdom@28.0.0"
+      },
+      "source_identity": {
+        "name": "typescript-original-source/v1",
+        "version": "1"
+      },
+      "target": "node-jsdom",
+      "tool": {
+        "name": "typescript-toolchain",
+        "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+      }
+    },
+    "source": {
+      "path": "app/src/app/app.routes.ts",
+      "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+    },
+    "status": "measured",
+    "subject": {
+      "boundary": "production-ts",
+      "component": "typescript",
+      "discriminator": "typescript-original-source/v1:file",
+      "id": "subject-identity/v1:60a5aad72b38c3ce83df9bc13f826bb48791fbff3d2c5fbcf7a526cc5316e58a",
+      "identity_version": "subject-identity/v1",
+      "kind": "file/v1",
+      "metadata": {},
+      "path": "app/src/app/app.routes.ts",
+      "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+      "target": "node-jsdom"
+    }
+  },
+  {
+    "artifacts": [
+      {
+        "bytes": 721522,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+        "kind": "raw",
+        "media_type": "application/gzip",
+        "path": "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e/native.tar.gz",
+        "sha256": "98592277e40d9cd68f27a3a4f538e1e54d149c87a9b83395251534726f754716",
+        "source": {
+          "path": "app/src/app/app.routes.ts",
+          "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+        }
+      },
+      {
+        "bytes": 25954,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+        "kind": "raw",
+        "media_type": "application/json",
+        "path": "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e/source-index.json",
+        "sha256": "026a7a319d417d4168eabe57fcdf3ece6f1dd313f9ae90c5619f617920ad39ac",
+        "source": {
+          "path": "app/src/app/app.routes.ts",
+          "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+        }
+      },
+      {
+        "bytes": 6239,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json",
+        "kind": "raw",
+        "media_type": "application/json",
+        "path": "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e/receipt.json",
+        "sha256": "6d094b927c8ce01a630f2cff1fde87e74e94750b7f806bdf53aec6b8317b5136",
+        "source": {
+          "path": "app/src/app/app.routes.ts",
+          "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+        }
+      }
+    ],
+    "capabilities": [
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "accessibility.violations",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "bundle.size",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "complexity.cognitive",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "complexity.cyclomatic",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "contract.breaking_changes",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "contract.client_drift",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "contract.compatible",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "contract.schema_valid",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "coverage.branch",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "coverage.function",
+        "reason": "native Istanbul original-source counters",
+        "state": "supported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "coverage.line",
+        "reason": "native Istanbul original-source counters",
+        "state": "supported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "coverage.region",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "mutation.killed",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "mutation.score",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "mutation.survived",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "performance.duration",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "performance.regression",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "risk.crap",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "security.findings",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      }
+    ],
+    "collector": {
+      "name": "typescript-reference",
+      "version": "1"
+    },
+    "component": "typescript",
+    "context": {
+      "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+      "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+      "run": "compatible-base",
+      "target": "node-jsdom"
+    },
+    "id": "typescript-fca79a0d70984b39747ad818571113c158f9f555a7b03d2b60ba5abb5ba287e2",
+    "metrics": [
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "name": "coverage.function",
+        "value": {
+          "covered": 1,
+          "total": 1,
+          "type": "ratio"
+        }
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "name": "coverage.line",
+        "value": {
+          "covered": 1,
+          "total": 1,
+          "type": "ratio"
+        }
+      }
+    ],
+    "project": "typescript-reference",
+    "schema": "harness-evidence/v1",
+    "series": {
+      "collector": {
+        "name": "typescript-reference",
+        "version": "1"
+      },
+      "id": "measurement-series/v1:b680df6dc529cafbbadf4ebba23627d2f34c6c16d30d22dcf5210b29c727a408",
+      "metrics": [
+        {
+          "name": "accessibility.violations",
+          "type": "count"
+        },
+        {
+          "name": "bundle.size",
+          "type": "size"
+        },
+        {
+          "name": "complexity.cognitive",
+          "type": "count"
+        },
+        {
+          "name": "complexity.cyclomatic",
+          "type": "count"
+        },
+        {
+          "name": "contract.breaking_changes",
+          "type": "count"
+        },
+        {
+          "name": "contract.client_drift",
+          "type": "boolean"
+        },
+        {
+          "name": "contract.compatible",
+          "type": "boolean"
+        },
+        {
+          "name": "contract.schema_valid",
+          "type": "boolean"
+        },
+        {
+          "name": "coverage.branch",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.function",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.line",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.region",
+          "type": "ratio"
+        },
+        {
+          "name": "mutation.killed",
+          "type": "count"
+        },
+        {
+          "name": "mutation.score",
+          "type": "ratio"
+        },
+        {
+          "name": "mutation.survived",
+          "type": "count"
+        },
+        {
+          "name": "performance.duration",
+          "type": "duration"
+        },
+        {
+          "name": "performance.regression",
+          "type": "boolean"
+        },
+        {
+          "name": "risk.crap",
+          "type": "decimal"
+        },
+        {
+          "name": "security.findings",
+          "type": "count"
+        }
+      ],
+      "name": "typescript-source-coverage",
+      "normalization": {
+        "name": "istanbul-start-line-max-innermost/v1",
+        "version": "1"
+      },
+      "rule": {
+        "name": "typescript-source-coverage",
+        "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+      },
+      "runtime": {
+        "name": "node-jsdom",
+        "version": "24.18.0/jsdom@28.0.0"
+      },
+      "source_identity": {
+        "name": "typescript-original-source/v1",
+        "version": "1"
+      },
+      "target": "node-jsdom",
+      "tool": {
+        "name": "typescript-toolchain",
+        "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+      }
+    },
+    "source": {
+      "path": "app/src/app/app.routes.ts",
+      "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+    },
+    "status": "measured",
+    "subject": {
+      "boundary": "production-ts",
+      "component": "typescript",
+      "discriminator": "typescript-original-source/v1:ArrowFunction:(4, 36):(4, 90)",
+      "id": "subject-identity/v1:fca79a0d70984b39747ad818571113c158f9f555a7b03d2b60ba5abb5ba287e2",
+      "identity_version": "subject-identity/v1",
+      "kind": "function/v1",
+      "metadata": {},
+      "path": "app/src/app/app.routes.ts",
+      "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+      "span": {
+        "end_column": 91,
+        "end_line": 4,
+        "start_column": 37,
+        "start_line": 4
+      },
+      "target": "node-jsdom"
+    }
+  },
+  {
+    "artifacts": [
+      {
+        "bytes": 721522,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+        "kind": "raw",
+        "media_type": "application/gzip",
+        "path": "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e/native.tar.gz",
+        "sha256": "98592277e40d9cd68f27a3a4f538e1e54d149c87a9b83395251534726f754716",
+        "source": {
+          "path": "app/src/app/app.routes.ts",
+          "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+        }
+      },
+      {
+        "bytes": 25954,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+        "kind": "raw",
+        "media_type": "application/json",
+        "path": "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e/source-index.json",
+        "sha256": "026a7a319d417d4168eabe57fcdf3ece6f1dd313f9ae90c5619f617920ad39ac",
+        "source": {
+          "path": "app/src/app/app.routes.ts",
+          "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+        }
+      },
+      {
+        "bytes": 6239,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json",
+        "kind": "raw",
+        "media_type": "application/json",
+        "path": "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e/receipt.json",
+        "sha256": "6d094b927c8ce01a630f2cff1fde87e74e94750b7f806bdf53aec6b8317b5136",
+        "source": {
+          "path": "app/src/app/app.routes.ts",
+          "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+        }
+      }
+    ],
+    "capabilities": [
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "accessibility.violations",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "bundle.size",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "complexity.cognitive",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "complexity.cyclomatic",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "contract.breaking_changes",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "contract.client_drift",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "contract.compatible",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "contract.schema_valid",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "coverage.branch",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "coverage.function",
+        "reason": "native Istanbul original-source counters",
+        "state": "supported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "coverage.line",
+        "reason": "native Istanbul original-source counters",
+        "state": "supported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "coverage.region",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "mutation.killed",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "mutation.score",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "mutation.survived",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "performance.duration",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "performance.regression",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "risk.crap",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "metric": "security.findings",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      }
+    ],
+    "collector": {
+      "name": "typescript-reference",
+      "version": "1"
+    },
+    "component": "typescript",
+    "context": {
+      "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+      "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+      "run": "compatible-base",
+      "target": "node-jsdom"
+    },
+    "id": "typescript-8ca55d581bdee7a094513d930ff797353c93c486eac6554c907dd2d60b786c52",
+    "metrics": [
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "name": "coverage.function",
+        "value": {
+          "covered": 1,
+          "total": 1,
+          "type": "ratio"
+        }
+      },
+      {
+        "artifacts": [
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.native.tar.gz",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.source-index.json",
+          "source-48d5e5db6eb0fd390c488c71c62bab091345b0b1fadaa84cf004aa543b9be80e.receipt.json"
+        ],
+        "name": "coverage.line",
+        "value": {
+          "covered": 1,
+          "total": 1,
+          "type": "ratio"
+        }
+      }
+    ],
+    "project": "typescript-reference",
+    "schema": "harness-evidence/v1",
+    "series": {
+      "collector": {
+        "name": "typescript-reference",
+        "version": "1"
+      },
+      "id": "measurement-series/v1:b680df6dc529cafbbadf4ebba23627d2f34c6c16d30d22dcf5210b29c727a408",
+      "metrics": [
+        {
+          "name": "accessibility.violations",
+          "type": "count"
+        },
+        {
+          "name": "bundle.size",
+          "type": "size"
+        },
+        {
+          "name": "complexity.cognitive",
+          "type": "count"
+        },
+        {
+          "name": "complexity.cyclomatic",
+          "type": "count"
+        },
+        {
+          "name": "contract.breaking_changes",
+          "type": "count"
+        },
+        {
+          "name": "contract.client_drift",
+          "type": "boolean"
+        },
+        {
+          "name": "contract.compatible",
+          "type": "boolean"
+        },
+        {
+          "name": "contract.schema_valid",
+          "type": "boolean"
+        },
+        {
+          "name": "coverage.branch",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.function",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.line",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.region",
+          "type": "ratio"
+        },
+        {
+          "name": "mutation.killed",
+          "type": "count"
+        },
+        {
+          "name": "mutation.score",
+          "type": "ratio"
+        },
+        {
+          "name": "mutation.survived",
+          "type": "count"
+        },
+        {
+          "name": "performance.duration",
+          "type": "duration"
+        },
+        {
+          "name": "performance.regression",
+          "type": "boolean"
+        },
+        {
+          "name": "risk.crap",
+          "type": "decimal"
+        },
+        {
+          "name": "security.findings",
+          "type": "count"
+        }
+      ],
+      "name": "typescript-source-coverage",
+      "normalization": {
+        "name": "istanbul-start-line-max-innermost/v1",
+        "version": "1"
+      },
+      "rule": {
+        "name": "typescript-source-coverage",
+        "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+      },
+      "runtime": {
+        "name": "node-jsdom",
+        "version": "24.18.0/jsdom@28.0.0"
+      },
+      "source_identity": {
+        "name": "typescript-original-source/v1",
+        "version": "1"
+      },
+      "target": "node-jsdom",
+      "tool": {
+        "name": "typescript-toolchain",
+        "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+      }
+    },
+    "source": {
+      "path": "app/src/app/app.routes.ts",
+      "sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0"
+    },
+    "status": "measured",
+    "subject": {
+      "boundary": "production-ts",
+      "component": "typescript",
+      "discriminator": "typescript-original-source/v1:ArrowFunction:(4, 75):(4, 89)",
+      "id": "subject-identity/v1:8ca55d581bdee7a094513d930ff797353c93c486eac6554c907dd2d60b786c52",
+      "identity_version": "subject-identity/v1",
+      "kind": "function/v1",
+      "metadata": {},
+      "path": "app/src/app/app.routes.ts",
+      "source_sha256": "3126fe24248fb5777c124b87d4803e4f8672e9ec13b804b027659d2bec4165e0",
+      "span": {
+        "end_column": 90,
+        "end_line": 4,
+        "start_column": 76,
+        "start_line": 4
+      },
+      "target": "node-jsdom"
+    }
+  },
+  {
+    "artifacts": [
+      {
+        "bytes": 721522,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+        "kind": "raw",
+        "media_type": "application/gzip",
+        "path": "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c/native.tar.gz",
+        "sha256": "98592277e40d9cd68f27a3a4f538e1e54d149c87a9b83395251534726f754716",
+        "source": {
+          "path": "app/src/app/quote-client.ts",
+          "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+        }
+      },
+      {
+        "bytes": 25954,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+        "kind": "raw",
+        "media_type": "application/json",
+        "path": "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c/source-index.json",
+        "sha256": "026a7a319d417d4168eabe57fcdf3ece6f1dd313f9ae90c5619f617920ad39ac",
+        "source": {
+          "path": "app/src/app/quote-client.ts",
+          "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+        }
+      },
+      {
+        "bytes": 6239,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json",
+        "kind": "raw",
+        "media_type": "application/json",
+        "path": "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c/receipt.json",
+        "sha256": "6d094b927c8ce01a630f2cff1fde87e74e94750b7f806bdf53aec6b8317b5136",
+        "source": {
+          "path": "app/src/app/quote-client.ts",
+          "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+        }
+      }
+    ],
+    "capabilities": [
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "accessibility.violations",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "bundle.size",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "complexity.cognitive",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "complexity.cyclomatic",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "contract.breaking_changes",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "contract.client_drift",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "contract.compatible",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "contract.schema_valid",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "coverage.branch",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "coverage.function",
+        "reason": "native Istanbul original-source counters",
+        "state": "supported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "coverage.line",
+        "reason": "native Istanbul original-source counters",
+        "state": "supported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "coverage.region",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "mutation.killed",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "mutation.score",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "mutation.survived",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "performance.duration",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "performance.regression",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "risk.crap",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "security.findings",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      }
+    ],
+    "collector": {
+      "name": "typescript-reference",
+      "version": "1"
+    },
+    "component": "typescript",
+    "context": {
+      "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+      "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+      "run": "compatible-base",
+      "target": "node-jsdom"
+    },
+    "id": "typescript-c189d6060d38ba20dfa5ec68d65a34ff0b1cdc55eb40acbeae06800cfc54d7b3",
+    "metrics": [
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "name": "coverage.function",
+        "value": {
+          "covered": 1,
+          "total": 1,
+          "type": "ratio"
+        }
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "name": "coverage.line",
+        "value": {
+          "covered": 2,
+          "total": 2,
+          "type": "ratio"
+        }
+      }
+    ],
+    "project": "typescript-reference",
+    "schema": "harness-evidence/v1",
+    "series": {
+      "collector": {
+        "name": "typescript-reference",
+        "version": "1"
+      },
+      "id": "measurement-series/v1:b680df6dc529cafbbadf4ebba23627d2f34c6c16d30d22dcf5210b29c727a408",
+      "metrics": [
+        {
+          "name": "accessibility.violations",
+          "type": "count"
+        },
+        {
+          "name": "bundle.size",
+          "type": "size"
+        },
+        {
+          "name": "complexity.cognitive",
+          "type": "count"
+        },
+        {
+          "name": "complexity.cyclomatic",
+          "type": "count"
+        },
+        {
+          "name": "contract.breaking_changes",
+          "type": "count"
+        },
+        {
+          "name": "contract.client_drift",
+          "type": "boolean"
+        },
+        {
+          "name": "contract.compatible",
+          "type": "boolean"
+        },
+        {
+          "name": "contract.schema_valid",
+          "type": "boolean"
+        },
+        {
+          "name": "coverage.branch",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.function",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.line",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.region",
+          "type": "ratio"
+        },
+        {
+          "name": "mutation.killed",
+          "type": "count"
+        },
+        {
+          "name": "mutation.score",
+          "type": "ratio"
+        },
+        {
+          "name": "mutation.survived",
+          "type": "count"
+        },
+        {
+          "name": "performance.duration",
+          "type": "duration"
+        },
+        {
+          "name": "performance.regression",
+          "type": "boolean"
+        },
+        {
+          "name": "risk.crap",
+          "type": "decimal"
+        },
+        {
+          "name": "security.findings",
+          "type": "count"
+        }
+      ],
+      "name": "typescript-source-coverage",
+      "normalization": {
+        "name": "istanbul-start-line-max-innermost/v1",
+        "version": "1"
+      },
+      "rule": {
+        "name": "typescript-source-coverage",
+        "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+      },
+      "runtime": {
+        "name": "node-jsdom",
+        "version": "24.18.0/jsdom@28.0.0"
+      },
+      "source_identity": {
+        "name": "typescript-original-source/v1",
+        "version": "1"
+      },
+      "target": "node-jsdom",
+      "tool": {
+        "name": "typescript-toolchain",
+        "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+      }
+    },
+    "source": {
+      "path": "app/src/app/quote-client.ts",
+      "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+    },
+    "status": "measured",
+    "subject": {
+      "boundary": "production-ts",
+      "component": "typescript",
+      "discriminator": "typescript-original-source/v1:file",
+      "id": "subject-identity/v1:c189d6060d38ba20dfa5ec68d65a34ff0b1cdc55eb40acbeae06800cfc54d7b3",
+      "identity_version": "subject-identity/v1",
+      "kind": "file/v1",
+      "metadata": {},
+      "path": "app/src/app/quote-client.ts",
+      "source_sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc",
+      "target": "node-jsdom"
+    }
+  },
+  {
+    "artifacts": [
+      {
+        "bytes": 721522,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+        "kind": "raw",
+        "media_type": "application/gzip",
+        "path": "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c/native.tar.gz",
+        "sha256": "98592277e40d9cd68f27a3a4f538e1e54d149c87a9b83395251534726f754716",
+        "source": {
+          "path": "app/src/app/quote-client.ts",
+          "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+        }
+      },
+      {
+        "bytes": 25954,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+        "kind": "raw",
+        "media_type": "application/json",
+        "path": "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c/source-index.json",
+        "sha256": "026a7a319d417d4168eabe57fcdf3ece6f1dd313f9ae90c5619f617920ad39ac",
+        "source": {
+          "path": "app/src/app/quote-client.ts",
+          "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+        }
+      },
+      {
+        "bytes": 6239,
+        "context": {
+          "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+          "run": "compatible-base",
+          "target": "node-jsdom"
+        },
+        "id": "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json",
+        "kind": "raw",
+        "media_type": "application/json",
+        "path": "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c/receipt.json",
+        "sha256": "6d094b927c8ce01a630f2cff1fde87e74e94750b7f806bdf53aec6b8317b5136",
+        "source": {
+          "path": "app/src/app/quote-client.ts",
+          "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+        }
+      }
+    ],
+    "capabilities": [
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "accessibility.violations",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "bundle.size",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "complexity.cognitive",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "complexity.cyclomatic",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "contract.breaking_changes",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "contract.client_drift",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "contract.compatible",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "contract.schema_valid",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "coverage.branch",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "coverage.function",
+        "reason": "native Istanbul original-source counters",
+        "state": "supported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "coverage.line",
+        "reason": "native Istanbul original-source counters",
+        "state": "supported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "coverage.region",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "mutation.killed",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "mutation.score",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "mutation.survived",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "performance.duration",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "performance.regression",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "risk.crap",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "metric": "security.findings",
+        "reason": "outside measured TypeScript capability matrix",
+        "state": "unsupported"
+      }
+    ],
+    "collector": {
+      "name": "typescript-reference",
+      "version": "1"
+    },
+    "component": "typescript",
+    "context": {
+      "base_commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+      "commit": "c549ccc9994d63c28fc979a1d4d34203816adbd6",
+      "run": "compatible-base",
+      "target": "node-jsdom"
+    },
+    "id": "typescript-33ed5e344ee9a8b9407664aa74f4fcbdddf90056f8e493ad5611a12d803f834c",
+    "metrics": [
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "name": "coverage.function",
+        "value": {
+          "covered": 1,
+          "total": 1,
+          "type": "ratio"
+        }
+      },
+      {
+        "artifacts": [
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.native.tar.gz",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.source-index.json",
+          "source-ec74d59e7b00d9b5aabb7487cc354470ce082d1fb8b2cd765c932a87c21ce60c.receipt.json"
+        ],
+        "name": "coverage.line",
+        "value": {
+          "covered": 2,
+          "total": 2,
+          "type": "ratio"
+        }
+      }
+    ],
+    "project": "typescript-reference",
+    "schema": "harness-evidence/v1",
+    "series": {
+      "collector": {
+        "name": "typescript-reference",
+        "version": "1"
+      },
+      "id": "measurement-series/v1:b680df6dc529cafbbadf4ebba23627d2f34c6c16d30d22dcf5210b29c727a408",
+      "metrics": [
+        {
+          "name": "accessibility.violations",
+          "type": "count"
+        },
+        {
+          "name": "bundle.size",
+          "type": "size"
+        },
+        {
+          "name": "complexity.cognitive",
+          "type": "count"
+        },
+        {
+          "name": "complexity.cyclomatic",
+          "type": "count"
+        },
+        {
+          "name": "contract.breaking_changes",
+          "type": "count"
+        },
+        {
+          "name": "contract.client_drift",
+          "type": "boolean"
+        },
+        {
+          "name": "contract.compatible",
+          "type": "boolean"
+        },
+        {
+          "name": "contract.schema_valid",
+          "type": "boolean"
+        },
+        {
+          "name": "coverage.branch",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.function",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.line",
+          "type": "ratio"
+        },
+        {
+          "name": "coverage.region",
+          "type": "ratio"
+        },
+        {
+          "name": "mutation.killed",
+          "type": "count"
+        },
+        {
+          "name": "mutation.score",
+          "type": "ratio"
+        },
+        {
+          "name": "mutation.survived",
+          "type": "count"
+        },
+        {
+          "name": "performance.duration",
+          "type": "duration"
+        },
+        {
+          "name": "performance.regression",
+          "type": "boolean"
+        },
+        {
+          "name": "risk.crap",
+          "type": "decimal"
+        },
+        {
+          "name": "security.findings",
+          "type": "count"
+        }
+      ],
+      "name": "typescript-source-coverage",
+      "normalization": {
+        "name": "istanbul-start-line-max-innermost/v1",
+        "version": "1"
+      },
+      "rule": {
+        "name": "typescript-source-coverage",
+        "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+      },
+      "runtime": {
+        "name": "node-jsdom",
+        "version": "24.18.0/jsdom@28.0.0"
+      },
+      "source_identity": {
+        "name": "typescript-original-source/v1",
+        "version": "1"
+      },
+      "target": "node-jsdom",
+      "tool": {
+        "name": "typescript-toolchain",
+        "version": "50d0b22c1c80eb5b71f66afb2535e7f090999c6edb15a35cd8ae4ff398c195e4"
+      }
+    },
+    "source": {
+      "path": "app/src/app/quote-client.ts",
+      "sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc"
+    },
+    "status": "measured",
+    "subject": {
+      "boundary": "production-ts",
+      "component": "typescript",
+      "discriminator": "typescript-original-source/v1:fetchQuote:(3, 0):(6, 1)",
+      "id": "subject-identity/v1:33ed5e344ee9a8b9407664aa74f4fcbdddf90056f8e493ad5611a12d803f834c",
+      "identity_version": "subject-identity/v1",
+      "kind": "function/v1",
+      "metadata": {},
+      "path": "app/src/app/quote-client.ts",
+      "source_sha256": "17dbdb262940a003f023ea8bde41811c769dc9913ec17e59b0e11a6ba3953fbc",
+      "span": {
+        "end_column": 2,
+        "end_line": 6,
+        "start_column": 1,
+        "start_line": 3
+      },
+      "target": "node-jsdom"
+    }
+  }
+]

@@ -1,0 +1,28 @@
+test_configuration_changed_during_core_validation_blocks (__main__.ExternalPluginTests.test_configuration_changed_during_core_validation_blocks) ... ok
+test_configured_ceiling_above_thirty_is_not_clamped (__main__.ExternalPluginTests.test_configured_ceiling_above_thirty_is_not_clamped) ... ok
+test_configured_crap_limit_changes_core_decision (__main__.ExternalPluginTests.test_configured_crap_limit_changes_core_decision) ... ok
+test_core_authenticates_collect_and_rejects_tamper_and_replay (__main__.ExternalPluginTests.test_core_authenticates_collect_and_rejects_tamper_and_replay) ... ok
+test_invalid_policy_never_falls_back_to_thirty (__main__.ExternalPluginTests.test_invalid_policy_never_falls_back_to_thirty) ... ok
+test_metadata_needs_no_python_or_cache (__main__.ExternalPluginTests.test_metadata_needs_no_python_or_cache) ... ok
+test_missing_corrupt_evidence_and_wrong_anchor_block (__main__.ExternalPluginTests.test_missing_corrupt_evidence_and_wrong_anchor_block) ... ok
+test_modified_cache_is_never_used_or_repaired (__main__.ExternalPluginTests.test_modified_cache_is_never_used_or_repaired) ... ok
+test_old_engine_equivalence_and_generated_owners (__main__.ExternalPluginTests.test_old_engine_equivalence_and_generated_owners) ... ok
+test_packaged_evaluate_retains_core_debt_rules (__main__.ExternalPluginTests.test_packaged_evaluate_retains_core_debt_rules) ... ok
+test_policy_can_forbid_unchanged_legacy_debt (__main__.ExternalPluginTests.test_policy_can_forbid_unchanged_legacy_debt) ... ok
+test_real_cargo_capture_and_features (__main__.ExternalPluginTests.test_real_cargo_capture_and_features) ... ok
+test_wrong_missing_tools_and_overrides_block (__main__.ExternalPluginTests.test_wrong_missing_tools_and_overrides_block) ... ok
+test_cfg_changes_actual_compiled_inventory_and_history (test_rust_native_driver.NativeDriverTests.test_cfg_changes_actual_compiled_inventory_and_history) ... ok
+test_definition_and_constant_inventory_cannot_be_omitted (test_rust_native_driver.NativeDriverTests.test_definition_and_constant_inventory_cannot_be_omitted) ... ok
+test_history_missing_or_incompatible_cannot_reset_debt (test_rust_native_driver.NativeDriverTests.test_history_missing_or_incompatible_cannot_reset_debt) ... ok
+test_manifest_and_native_reexport_reject_mutated_json (test_rust_native_driver.NativeDriverTests.test_manifest_and_native_reexport_reject_mutated_json) ... ok
+test_missing_duplicate_ambiguous_and_unattributed_native_regions (test_rust_native_driver.NativeDriverTests.test_missing_duplicate_ambiguous_and_unattributed_native_regions) ... ok
+test_real_cargo_production_test_exclusion_and_inactive_source_inventory (test_rust_native_driver.NativeDriverTests.test_real_cargo_production_test_exclusion_and_inactive_source_inventory) ... ok
+test_real_generated_constructor_closure_async_and_instances (test_rust_native_driver.NativeDriverTests.test_real_generated_constructor_closure_async_and_instances) ... ok
+test_released_rust_core_receives_real_native_debt (test_rust_native_driver.NativeDriverTests.test_released_rust_core_receives_real_native_debt) ... ok
+test_source_expansion_cfg_and_compiler_tampering (test_rust_native_driver.NativeDriverTests.test_source_expansion_cfg_and_compiler_tampering) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 147.222s
+
+OK
+Retained acceptance artifacts: /mnt/dev-ssd/workspaces/native-policy-config/target/native-acceptance/tmpueu00bo8

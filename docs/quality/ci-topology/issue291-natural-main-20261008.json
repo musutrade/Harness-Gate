@@ -1,0 +1,2675 @@
+{
+  "schema": "issue291-natural-main-observations/v3",
+  "purpose": "Read-only hosted evidence analysis. Original successful push and PR baselines remain fixed. Current three successful natural main pushes and full-green implementation-after PR298/299/300 are separate cohorts. No causal speedup or issue closure claim.",
+  "cohort_definition": {
+    "primary_successful_main_push_before": [
+      36023836720,
+      35716265337,
+      37250306480
+    ],
+    "primary_successful_main_push_after": [
+      37429831983,
+      37722931483,
+      37725407263
+    ],
+    "recent_diagnostic_cohort_not_the_original_before": [
+      37411168218,
+      37421759343,
+      37426739465
+    ],
+    "successful_hosted_pr_after_records": [
+      {
+        "pr": 298,
+        "run_id": 37721721679,
+        "head_sha": "a5db1f099f8d982adaa9be5e5781f1d2b6e853f3"
+      },
+      {
+        "pr": 299,
+        "run_id": 37724107517,
+        "head_sha": "3306b2aba5da9cbf4ff3e7c4a4a4bd9c2a4d9f2f"
+      },
+      {
+        "pr": 300,
+        "run_id": 37726571334,
+        "head_sha": "bb813b8b82e8b5636f82cde941354f9c8eea9948"
+      }
+    ],
+    "sources": {
+      "historical_before": "docs/quality/ci-topology/issue291-hosted-before.json (API-derived original acceptance cohort)",
+      "current_after": "/mnt/dev-ssd/dev-tmp/gh291-3before-3after/api plus retained QPB logs/artifacts",
+      "pr_after": [
+        "/mnt/dev-ssd/dev-tmp/gh291-natural-main-analysis-20261008/pr-after-api",
+        "/mnt/dev-ssd/dev-tmp/gh291-natural-main-analysis-20261008/pr-after-api/logs",
+        "/mnt/dev-ssd/dev-tmp/gh291-audit-20261008/recompute-v2.json"
+      ]
+    },
+    "supplementary_pr_after": {
+      "pr": 301,
+      "run_id": 37728180823,
+      "head_sha": "3d887a460bb72064b29a6f9ea71293e2949a16d7"
+    },
+    "rejected_as_wrong_period_pr_runs": [
+      34309500125,
+      34311132169,
+      34312685548
+    ],
+    "rejected_pr_after_reason": "These GH-165 runs are dated 2026-09-09, before GH-291 commit 62c3d30ae3bb9d9afee312891c7a2ecf20b6af28 (2026-10-06)."
+  },
+  "tool_and_workload_observation": {
+    "rustc": "rustc 1.99.0 (b940084d7 2026-09-28) across retained benchmark records",
+    "cargo": "cargo 1.99.0 (5f94df478 2026-08-27) across retained benchmark records",
+    "workload_shape": "fixture_version=1, harness_version=1, 601 scope paths, 100 scope matcher iterations, five warm test samples where successful; metrics and binary hashes are retained per platform",
+    "cargo_lock_sha256": "868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959",
+    "configuration_sha256_changes_by_run": true,
+    "cache_identity_changes_by_run_platform": true,
+    "cargo_source_cache": "Existing logs show cargo-sources cache restoration for all sampled QPB jobs; this does not mean the per-run target build was warm. Each benchmark record labels cold-and-warm and has one cold plus five warm samples.",
+    "known_tool_change": "Linux Python is 3.14.7 in five records and 3.14.8 in run 37722931483; full per-platform versions are recorded per sample.",
+    "runner_image_version_extraction": "For all 18 retained job logs, image version was parsed only from the exact ##[group]Runner Image ... ##[endgroup] block (not Runner Image Provisioner); raw log SHA-256 values and paths are retained per job.",
+    "runner_image_versions_by_current_run": {
+      "37411168218": {
+        "windows": "20260925.250.1",
+        "linux": "20260927.320.1",
+        "macos": "20260907.0351.1"
+      },
+      "37421759343": {
+        "linux": "20260927.320.1",
+        "macos": "20260907.0351.1",
+        "windows": "20260925.250.1"
+      },
+      "37426739465": {
+        "macos": "20260907.0351.1",
+        "windows": "20260925.250.1",
+        "linux": "20260927.320.1"
+      },
+      "37429831983": {
+        "macos": "20260907.0351.1",
+        "windows": "20260925.250.1",
+        "linux": "20260927.320.1"
+      },
+      "37722931483": {
+        "windows": "20260925.250.1",
+        "macos": "20260907.0351.1",
+        "linux": "20261004.327.1"
+      },
+      "37725407263": {
+        "macos": "20260907.0351.1",
+        "windows": "20260925.250.1",
+        "linux": "20260927.320.1"
+      }
+    }
+  },
+  "samples": [
+    {
+      "ci_run_id": 37411168218,
+      "native_run_id": 37411168215,
+      "head_sha": "64c6c59c30bbb76884cd767b8ae0ea35ed91d747",
+      "event": "push",
+      "branch": "main",
+      "conclusion": "failure",
+      "workflow_run_number": 592,
+      "created_at": "2026-10-06T03:54:14Z",
+      "run_started_at": "2026-10-06T03:54:14Z",
+      "completed_at": "2026-10-06T04:17:10Z",
+      "ci_end_to_end_seconds": 1376.0,
+      "non_skipped_ci_runner_work_seconds": 6482.0,
+      "ci_job_created_to_runner_start_median_seconds": 2.0,
+      "qpb_job_created_to_runner_start_median_seconds": 2.0,
+      "qpb_runner_elapsed_median_seconds": 876.0,
+      "platforms": {
+        "windows": {
+          "job_id": 112099699677,
+          "status": "failure",
+          "runner": {
+            "label": "windows-latest",
+            "name": "GitHub Actions 1000013017",
+            "id": 1000013017,
+            "group": "GitHub Actions",
+            "image": "windows-2025-vs2026",
+            "image_version": "20260925.250.1",
+            "image_group": "Runner Image"
+          },
+          "timestamps": {
+            "created_at": "2026-10-06T03:54:15Z",
+            "started_at": "2026-10-06T03:54:17Z",
+            "completed_at": "2026-10-06T04:03:29Z",
+            "created_to_runner_start_seconds": 2.0,
+            "runner_elapsed_seconds": 552.0
+          },
+          "capture_step_seconds": 474.0,
+          "release_small_build_seconds_from_cargo_finished_log": 202.0,
+          "toolchain": {
+            "rustc": null,
+            "cargo": null,
+            "python": null,
+            "target": null
+          },
+          "benchmark": null,
+          "cache": {
+            "cache_identity": "be10fc72229f98a2fe8b9faca95225c1102df13306d9a64f203c9ed73325699e",
+            "configuration_sha256": "e1f61912f61204a4fae784f1ef2983961377083733e7a1b8234c2d0834e70316",
+            "lock_sha256": "868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959",
+            "profiles": "release-small,test;default;cold",
+            "source_cache_restored": true,
+            "source_cache_key": "cargo-sources-v1-Windows-X64-868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959"
+          },
+          "artifact": {
+            "id": 11389287880,
+            "name": "quality-baseline-windows-latest-37411168218",
+            "size_bytes": 756,
+            "digest": "sha256:e1a5ee72d073cb719b8ae089f26d6d3dd2100ebc4436e291242f610c991e3031",
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37411168218/artifacts/11389287880"
+          },
+          "retained_log": {
+            "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37411168218/job/112099699677",
+            "sha256": "e8a69bf0bee211d4963ae0132920db1fb59a4959ecd81436df2cb78c97379ee4"
+          },
+          "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37411168218/job/112099699677",
+          "retained_log_sha256": "e8a69bf0bee211d4963ae0132920db1fb59a4959ecd81436df2cb78c97379ee4",
+          "retained_log_path": "/mnt/dev-ssd/dev-tmp/gh291-3before-3after/logs/37411168218-job-112099699677.log"
+        },
+        "linux": {
+          "job_id": 112099699785,
+          "status": "success",
+          "runner": {
+            "label": "ubuntu-latest",
+            "name": "GitHub Actions 1000013026",
+            "id": 1000013026,
+            "group": "GitHub Actions",
+            "image": "ubuntu-24.04",
+            "image_version": "20260927.320.1",
+            "image_group": "Runner Image"
+          },
+          "timestamps": {
+            "created_at": "2026-10-06T03:54:15Z",
+            "started_at": "2026-10-06T03:54:17Z",
+            "completed_at": "2026-10-06T04:08:53Z",
+            "created_to_runner_start_seconds": 2.0,
+            "runner_elapsed_seconds": 876.0
+          },
+          "capture_step_seconds": 842.0,
+          "release_small_build_seconds_from_cargo_finished_log": 91.0,
+          "toolchain": {
+            "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+            "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+            "python": "3.14.7",
+            "target": "x86_64-unknown-linux-gnu"
+          },
+          "benchmark": {
+            "fixture_version": 1,
+            "harness_version": 1,
+            "cache_state": "cold-and-warm",
+            "cold_seconds": 154.355,
+            "warm_samples_seconds": [
+              116.845,
+              115.37,
+              115.465,
+              116.45,
+              115.834
+            ],
+            "warm_sample_count": 5,
+            "warm_median_seconds": 115.834,
+            "scope_paths": 601,
+            "scope_iterations": 100,
+            "binary_sha256": "dccfe571ba08893ad663762fb6ec34a54a9645403c12927576f72518ba41c898",
+            "binary_bytes": 10249608,
+            "scope_matcher_cached_median_us": 5120.43,
+            "scope_matcher_uncached_median_us": 9811.52
+          },
+          "cache": {
+            "cache_identity": "4d4d9e7238c704df370828dafe51dfe5e8fb84103c6a2855e8571afb8b897579",
+            "configuration_sha256": "e1f61912f61204a4fae784f1ef2983961377083733e7a1b8234c2d0834e70316",
+            "lock_sha256": "868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959",
+            "profiles": "release-small,test;default;cold",
+            "source_cache_restored": true,
+            "source_cache_key": "cargo-sources-v1-Linux-X64-868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959"
+          },
+          "artifact": {
+            "id": 11389925320,
+            "name": "quality-baseline-ubuntu-latest-37411168218",
+            "size_bytes": 102856,
+            "digest": "sha256:9d9c89522dd3b7075b9b2009b23140e72bb2c7f3d8fba06e649926d7a674354e",
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37411168218/artifacts/11389925320"
+          },
+          "retained_log": {
+            "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37411168218/job/112099699785",
+            "sha256": "5e6ddc8b86d79d7f9ec833c488612df34d84c1cec3ae9c3c5c1ce8774025714e"
+          },
+          "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37411168218/job/112099699785",
+          "retained_log_sha256": "5e6ddc8b86d79d7f9ec833c488612df34d84c1cec3ae9c3c5c1ce8774025714e",
+          "retained_log_path": "/mnt/dev-ssd/dev-tmp/gh291-3before-3after/logs/37411168218-job-112099699785.log"
+        },
+        "macos": {
+          "job_id": 112099700020,
+          "status": "success",
+          "runner": {
+            "label": "macos-latest",
+            "name": "GitHub Actions 1000013032",
+            "id": 1000013032,
+            "group": "GitHub Actions",
+            "image": "macos-26-arm64",
+            "image_version": "20260907.0351.1",
+            "image_group": "Runner Image"
+          },
+          "timestamps": {
+            "created_at": "2026-10-06T03:54:15Z",
+            "started_at": "2026-10-06T03:54:21Z",
+            "completed_at": "2026-10-06T04:16:44Z",
+            "created_to_runner_start_seconds": 6.0,
+            "runner_elapsed_seconds": 1343.0
+          },
+          "capture_step_seconds": 1281.0,
+          "release_small_build_seconds_from_cargo_finished_log": 125.0,
+          "toolchain": {
+            "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+            "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+            "python": "3.14.7",
+            "target": "aarch64-apple-darwin"
+          },
+          "benchmark": {
+            "fixture_version": 1,
+            "harness_version": 1,
+            "cache_state": "cold-and-warm",
+            "cold_seconds": 281.381,
+            "warm_samples_seconds": [
+              182.771,
+              157.398,
+              185.034,
+              158.352,
+              159.833
+            ],
+            "warm_sample_count": 5,
+            "warm_median_seconds": 159.833,
+            "scope_paths": 601,
+            "scope_iterations": 100,
+            "binary_sha256": "03b9711faf79810af1d9f7c894a3b08a562647472e8e0c5b98cd84bc4cac3ea2",
+            "binary_bytes": 6732384,
+            "scope_matcher_cached_median_us": 8023.74,
+            "scope_matcher_uncached_median_us": 13229.98
+          },
+          "cache": {
+            "cache_identity": "58b7283782a7984a0d5b95c6b828f7528a9799677461735597fa7bb9673b80b8",
+            "configuration_sha256": "e1f61912f61204a4fae784f1ef2983961377083733e7a1b8234c2d0834e70316",
+            "lock_sha256": "868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959",
+            "profiles": "release-small,test;default;cold",
+            "source_cache_restored": true,
+            "source_cache_key": "cargo-sources-v1-macOS-ARM64-868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959"
+          },
+          "artifact": {
+            "id": 11390365001,
+            "name": "quality-baseline-macos-latest-37411168218",
+            "size_bytes": 103975,
+            "digest": "sha256:d7f285e924d0609eee83302de43c1a00109fae5d9866f2211e4030fc00932cac",
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37411168218/artifacts/11390365001"
+          },
+          "retained_log": {
+            "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37411168218/job/112099700020",
+            "sha256": "1bbcbe6a09d4e685d5afc65baa431e57b0f8399767ad6df956ca867b3589b727"
+          },
+          "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37411168218/job/112099700020",
+          "retained_log_sha256": "1bbcbe6a09d4e685d5afc65baa431e57b0f8399767ad6df956ca867b3589b727",
+          "retained_log_path": "/mnt/dev-ssd/dev-tmp/gh291-3before-3after/logs/37411168218-job-112099700020.log"
+        }
+      },
+      "native_run": {
+        "conclusion": "success",
+        "head_sha": "64c6c59c30bbb76884cd767b8ae0ea35ed91d747",
+        "created_at": "2026-10-06T03:54:14Z",
+        "completed_at": "2026-10-06T04:05:48Z",
+        "end_to_end_seconds": 694.0,
+        "platform_jobs": {
+          "x86_64-apple-darwin": {
+            "job_id": 112099699566,
+            "status": "success",
+            "runner_labels": [
+              "macos-15-intel"
+            ],
+            "runner_name": "GitHub Actions 1000013021",
+            "runner_id": 1000013021,
+            "created_at": "2026-10-06T03:54:15Z",
+            "started_at": "2026-10-06T03:54:18Z",
+            "completed_at": "2026-10-06T04:05:47Z",
+            "runner_seconds": 689.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37411168215/job/112099699566"
+          },
+          "x86_64-unknown-linux-gnu": {
+            "job_id": 112099699681,
+            "status": "success",
+            "runner_labels": [
+              "ubuntu-24.04"
+            ],
+            "runner_name": "GitHub Actions 1000013020",
+            "runner_id": 1000013020,
+            "created_at": "2026-10-06T03:54:15Z",
+            "started_at": "2026-10-06T03:54:17Z",
+            "completed_at": "2026-10-06T03:59:36Z",
+            "runner_seconds": 319.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37411168215/job/112099699681"
+          },
+          "x86_64-pc-windows-msvc": {
+            "job_id": 112099699730,
+            "status": "success",
+            "runner_labels": [
+              "windows-2025"
+            ],
+            "runner_name": "GitHub Actions 1000013036",
+            "runner_id": 1000013036,
+            "created_at": "2026-10-06T03:54:15Z",
+            "started_at": "2026-10-06T03:54:18Z",
+            "completed_at": "2026-10-06T04:02:25Z",
+            "runner_seconds": 487.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37411168215/job/112099699730"
+          },
+          "aarch64-apple-darwin": {
+            "job_id": 112099699774,
+            "status": "success",
+            "runner_labels": [
+              "macos-15"
+            ],
+            "runner_name": "GitHub Actions 1000013037",
+            "runner_id": 1000013037,
+            "created_at": "2026-10-06T03:54:15Z",
+            "started_at": "2026-10-06T03:54:25Z",
+            "completed_at": "2026-10-06T04:01:23Z",
+            "runner_seconds": 418.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37411168215/job/112099699774"
+          }
+        }
+      },
+      "ci_run_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37411168218",
+      "native_run_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37411168215",
+      "retained_api_urls": {
+        "ci_run": "https://github.com/musutrade/Harness-Gate/actions/runs/37411168218",
+        "ci_jobs": "https://github.com/musutrade/Harness-Gate/actions/runs/37411168218?check_suite_focus=true",
+        "ci_artifacts": "https://github.com/musutrade/Harness-Gate/actions/runs/37411168218#artifacts",
+        "native_run": "https://github.com/musutrade/Harness-Gate/actions/runs/37411168215",
+        "native_artifacts": "https://github.com/musutrade/Harness-Gate/actions/runs/37411168215#artifacts"
+      },
+      "ci_run_updated_at_proxy_seconds": 1376.0,
+      "ci_end_to_end_seconds_definition": "run_started_at to API updated_at; lifecycle proxy only"
+    },
+    {
+      "ci_run_id": 37421759343,
+      "native_run_id": 37421759378,
+      "head_sha": "42d24e0012ba136e5d192248a9bee4f421034576",
+      "event": "push",
+      "branch": "main",
+      "conclusion": "failure",
+      "workflow_run_number": 597,
+      "created_at": "2026-10-06T06:04:25Z",
+      "run_started_at": "2026-10-06T06:04:25Z",
+      "completed_at": "2026-10-06T06:28:57Z",
+      "ci_end_to_end_seconds": 1472.0,
+      "non_skipped_ci_runner_work_seconds": 7565.0,
+      "ci_job_created_to_runner_start_median_seconds": 3.0,
+      "qpb_job_created_to_runner_start_median_seconds": 3.0,
+      "qpb_runner_elapsed_median_seconds": 1312.0,
+      "platforms": {
+        "linux": {
+          "job_id": 112132448838,
+          "status": "success",
+          "runner": {
+            "label": "ubuntu-latest",
+            "name": "GitHub Actions 1000013130",
+            "id": 1000013130,
+            "group": "GitHub Actions",
+            "image": "ubuntu-24.04",
+            "image_version": "20260927.320.1",
+            "image_group": "Runner Image"
+          },
+          "timestamps": {
+            "created_at": "2026-10-06T06:04:25Z",
+            "started_at": "2026-10-06T06:04:27Z",
+            "completed_at": "2026-10-06T06:21:52Z",
+            "created_to_runner_start_seconds": 2.0,
+            "runner_elapsed_seconds": 1045.0
+          },
+          "capture_step_seconds": 1012.0,
+          "release_small_build_seconds_from_cargo_finished_log": 113.0,
+          "toolchain": {
+            "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+            "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+            "python": "3.14.7",
+            "target": "x86_64-unknown-linux-gnu"
+          },
+          "benchmark": {
+            "fixture_version": 1,
+            "harness_version": 1,
+            "cache_state": "cold-and-warm",
+            "cold_seconds": 187.738,
+            "warm_samples_seconds": [
+              139.092,
+              137.529,
+              139.02,
+              138.668,
+              137.748
+            ],
+            "warm_sample_count": 5,
+            "warm_median_seconds": 138.668,
+            "scope_paths": 601,
+            "scope_iterations": 100,
+            "binary_sha256": "dccfe571ba08893ad663762fb6ec34a54a9645403c12927576f72518ba41c898",
+            "binary_bytes": 10249608,
+            "scope_matcher_cached_median_us": 6556.31,
+            "scope_matcher_uncached_median_us": 12522.9
+          },
+          "cache": {
+            "cache_identity": "2055f9209a3fb95b739502be38b8eb536370214d0e281966e21889c99fde9080",
+            "configuration_sha256": "dfcf2123857c680b4ddb763c64cd6d212894422c51abdadd04c89d5705a4ac2a",
+            "lock_sha256": "868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959",
+            "profiles": "release-small,test;default;cold",
+            "source_cache_restored": true,
+            "source_cache_key": "cargo-sources-v1-Linux-X64-868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959"
+          },
+          "artifact": {
+            "id": 11393693121,
+            "name": "quality-baseline-ubuntu-latest-37421759343",
+            "size_bytes": 102884,
+            "digest": "sha256:b140d61197e38b9be09393b8378a0b39d05fb3dd0dc8ca6ceb3c1ffa8a9705e3",
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37421759343/artifacts/11393693121"
+          },
+          "retained_log": {
+            "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37421759343/job/112132448838",
+            "sha256": "eba3b8f7a649195ab138892b2a1d6ffa163f02f8e1b99b4b3e199315750bd6ab"
+          },
+          "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37421759343/job/112132448838",
+          "retained_log_sha256": "eba3b8f7a649195ab138892b2a1d6ffa163f02f8e1b99b4b3e199315750bd6ab",
+          "retained_log_path": "/mnt/dev-ssd/dev-tmp/gh291-3before-3after/logs/37421759343-job-112132448838.log"
+        },
+        "macos": {
+          "job_id": 112132448985,
+          "status": "success",
+          "runner": {
+            "label": "macos-latest",
+            "name": "GitHub Actions 1000013135",
+            "id": 1000013135,
+            "group": "GitHub Actions",
+            "image": "macos-26-arm64",
+            "image_version": "20260907.0351.1",
+            "image_group": "Runner Image"
+          },
+          "timestamps": {
+            "created_at": "2026-10-06T06:04:26Z",
+            "started_at": "2026-10-06T06:04:33Z",
+            "completed_at": "2026-10-06T06:26:25Z",
+            "created_to_runner_start_seconds": 7.0,
+            "runner_elapsed_seconds": 1312.0
+          },
+          "capture_step_seconds": 1261.0,
+          "release_small_build_seconds_from_cargo_finished_log": 198.0,
+          "toolchain": {
+            "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+            "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+            "python": "3.14.7",
+            "target": "aarch64-apple-darwin"
+          },
+          "benchmark": {
+            "fixture_version": 1,
+            "harness_version": 1,
+            "cache_state": "cold-and-warm",
+            "cold_seconds": 211.592,
+            "warm_samples_seconds": [
+              149.715,
+              148.644,
+              177.906,
+              159.738,
+              187.29
+            ],
+            "warm_sample_count": 5,
+            "warm_median_seconds": 159.738,
+            "scope_paths": 601,
+            "scope_iterations": 100,
+            "binary_sha256": "03b9711faf79810af1d9f7c894a3b08a562647472e8e0c5b98cd84bc4cac3ea2",
+            "binary_bytes": 6732384,
+            "scope_matcher_cached_median_us": 7184.8,
+            "scope_matcher_uncached_median_us": 12348.43
+          },
+          "cache": {
+            "cache_identity": "dcfacc38a8811bcd72221f8d9afed48f0039c24d9bf4ae9bc24b5016a628b3cf",
+            "configuration_sha256": "dfcf2123857c680b4ddb763c64cd6d212894422c51abdadd04c89d5705a4ac2a",
+            "lock_sha256": "868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959",
+            "profiles": "release-small,test;default;cold",
+            "source_cache_restored": true,
+            "source_cache_key": "cargo-sources-v1-macOS-ARM64-868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959"
+          },
+          "artifact": {
+            "id": 11393674027,
+            "name": "quality-baseline-macos-latest-37421759343",
+            "size_bytes": 103910,
+            "digest": "sha256:ed70f84c45aa481093ca3e9bbce23a7719101b5b17e3c7ba5d08fa690fee5bd2",
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37421759343/artifacts/11393674027"
+          },
+          "retained_log": {
+            "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37421759343/job/112132448985",
+            "sha256": "2e2f49b37c4457f88bb19b118d17408724e212c661d6deb8a462708f5a6823a2"
+          },
+          "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37421759343/job/112132448985",
+          "retained_log_sha256": "2e2f49b37c4457f88bb19b118d17408724e212c661d6deb8a462708f5a6823a2",
+          "retained_log_path": "/mnt/dev-ssd/dev-tmp/gh291-3before-3after/logs/37421759343-job-112132448985.log"
+        },
+        "windows": {
+          "job_id": 112132449073,
+          "status": "failure",
+          "runner": {
+            "label": "windows-latest",
+            "name": "GitHub Actions 1000013140",
+            "id": 1000013140,
+            "group": "GitHub Actions",
+            "image": "windows-2025-vs2026",
+            "image_version": "20260925.250.1",
+            "image_group": "Runner Image"
+          },
+          "timestamps": {
+            "created_at": "2026-10-06T06:04:26Z",
+            "started_at": "2026-10-06T06:04:29Z",
+            "completed_at": "2026-10-06T06:28:36Z",
+            "created_to_runner_start_seconds": 3.0,
+            "runner_elapsed_seconds": 1447.0
+          },
+          "capture_step_seconds": 1386.0,
+          "release_small_build_seconds_from_cargo_finished_log": 218.0,
+          "toolchain": {
+            "rustc": null,
+            "cargo": null,
+            "python": null,
+            "target": null
+          },
+          "benchmark": null,
+          "cache": {
+            "cache_identity": "8726d1f0e43c41e9664280251adfdb3d458442d6628adbb002612b5b742d705d",
+            "configuration_sha256": "dfcf2123857c680b4ddb763c64cd6d212894422c51abdadd04c89d5705a4ac2a",
+            "lock_sha256": "868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959",
+            "profiles": "release-small,test;default;cold",
+            "source_cache_restored": true,
+            "source_cache_key": "cargo-sources-v1-Windows-X64-868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959"
+          },
+          "artifact": {
+            "id": 11394058278,
+            "name": "quality-baseline-windows-latest-37421759343",
+            "size_bytes": 59925,
+            "digest": "sha256:5ce07af5c828beb13fedf2ac40cc610a559b7ea3cb1ff6f4fdf55b3d88b5f3ba",
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37421759343/artifacts/11394058278"
+          },
+          "retained_log": {
+            "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37421759343/job/112132449073",
+            "sha256": "8ca9b369b8c89d8d20d65225d220b9c38f6557c972b1715ddf14570cd3617b44"
+          },
+          "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37421759343/job/112132449073",
+          "retained_log_sha256": "8ca9b369b8c89d8d20d65225d220b9c38f6557c972b1715ddf14570cd3617b44",
+          "retained_log_path": "/mnt/dev-ssd/dev-tmp/gh291-3before-3after/logs/37421759343-job-112132449073.log"
+        }
+      },
+      "native_run": {
+        "conclusion": "success",
+        "head_sha": "42d24e0012ba136e5d192248a9bee4f421034576",
+        "created_at": "2026-10-06T06:04:25Z",
+        "completed_at": "2026-10-06T06:15:31Z",
+        "end_to_end_seconds": 666.0,
+        "platform_jobs": {
+          "x86_64-unknown-linux-gnu": {
+            "job_id": 112132448236,
+            "status": "success",
+            "runner_labels": [
+              "ubuntu-24.04"
+            ],
+            "runner_name": "GitHub Actions 1000013118",
+            "runner_id": 1000013118,
+            "created_at": "2026-10-06T06:04:25Z",
+            "started_at": "2026-10-06T06:04:27Z",
+            "completed_at": "2026-10-06T06:08:58Z",
+            "runner_seconds": 271.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37421759378/job/112132448236"
+          },
+          "x86_64-pc-windows-msvc": {
+            "job_id": 112132448244,
+            "status": "success",
+            "runner_labels": [
+              "windows-2025"
+            ],
+            "runner_name": "GitHub Actions 1000013120",
+            "runner_id": 1000013120,
+            "created_at": "2026-10-06T06:04:25Z",
+            "started_at": "2026-10-06T06:04:29Z",
+            "completed_at": "2026-10-06T06:12:38Z",
+            "runner_seconds": 489.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37421759378/job/112132448244"
+          },
+          "aarch64-apple-darwin": {
+            "job_id": 112132448318,
+            "status": "success",
+            "runner_labels": [
+              "macos-15"
+            ],
+            "runner_name": "GitHub Actions 1000013121",
+            "runner_id": 1000013121,
+            "created_at": "2026-10-06T06:04:25Z",
+            "started_at": "2026-10-06T06:04:31Z",
+            "completed_at": "2026-10-06T06:10:11Z",
+            "runner_seconds": 340.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37421759378/job/112132448318"
+          },
+          "x86_64-apple-darwin": {
+            "job_id": 112132448357,
+            "status": "success",
+            "runner_labels": [
+              "macos-15-intel"
+            ],
+            "runner_name": "GitHub Actions 1000013119",
+            "runner_id": 1000013119,
+            "created_at": "2026-10-06T06:04:25Z",
+            "started_at": "2026-10-06T06:04:28Z",
+            "completed_at": "2026-10-06T06:15:30Z",
+            "runner_seconds": 662.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37421759378/job/112132448357"
+          }
+        }
+      },
+      "ci_run_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37421759343",
+      "native_run_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37421759378",
+      "retained_api_urls": {
+        "ci_run": "https://github.com/musutrade/Harness-Gate/actions/runs/37421759343",
+        "ci_jobs": "https://github.com/musutrade/Harness-Gate/actions/runs/37421759343?check_suite_focus=true",
+        "ci_artifacts": "https://github.com/musutrade/Harness-Gate/actions/runs/37421759343#artifacts",
+        "native_run": "https://github.com/musutrade/Harness-Gate/actions/runs/37421759378",
+        "native_artifacts": "https://github.com/musutrade/Harness-Gate/actions/runs/37421759378#artifacts"
+      },
+      "ci_run_updated_at_proxy_seconds": 1472.0,
+      "ci_end_to_end_seconds_definition": "run_started_at to API updated_at; lifecycle proxy only"
+    },
+    {
+      "ci_run_id": 37426739465,
+      "native_run_id": 37426739492,
+      "head_sha": "675195f7ddf690ff098311591dd75baa4d82d63b",
+      "event": "push",
+      "branch": "main",
+      "conclusion": "success",
+      "workflow_run_number": 600,
+      "created_at": "2026-10-06T06:57:40Z",
+      "run_started_at": "2026-10-06T06:57:40Z",
+      "completed_at": "2026-10-06T07:26:10Z",
+      "ci_end_to_end_seconds": 1710.0,
+      "non_skipped_ci_runner_work_seconds": 7942.0,
+      "ci_job_created_to_runner_start_median_seconds": 2.0,
+      "qpb_job_created_to_runner_start_median_seconds": 2.0,
+      "qpb_runner_elapsed_median_seconds": 1547.0,
+      "platforms": {
+        "macos": {
+          "job_id": 112147994799,
+          "status": "success",
+          "runner": {
+            "label": "macos-latest",
+            "name": "GitHub Actions 1000013189",
+            "id": 1000013189,
+            "group": "GitHub Actions",
+            "image": "macos-26-arm64",
+            "image_version": "20260907.0351.1",
+            "image_group": "Runner Image"
+          },
+          "timestamps": {
+            "created_at": "2026-10-06T06:57:41Z",
+            "started_at": "2026-10-06T06:57:48Z",
+            "completed_at": "2026-10-06T07:25:38Z",
+            "created_to_runner_start_seconds": 7.0,
+            "runner_elapsed_seconds": 1670.0
+          },
+          "capture_step_seconds": 1570.0,
+          "release_small_build_seconds_from_cargo_finished_log": 204.0,
+          "toolchain": {
+            "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+            "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+            "python": "3.14.7",
+            "target": "aarch64-apple-darwin"
+          },
+          "benchmark": {
+            "fixture_version": 1,
+            "harness_version": 1,
+            "cache_state": "cold-and-warm",
+            "cold_seconds": 303.501,
+            "warm_samples_seconds": [
+              216.653,
+              204.215,
+              222.813,
+              184.902,
+              202.036
+            ],
+            "warm_sample_count": 5,
+            "warm_median_seconds": 204.215,
+            "scope_paths": 601,
+            "scope_iterations": 100,
+            "binary_sha256": "03b9711faf79810af1d9f7c894a3b08a562647472e8e0c5b98cd84bc4cac3ea2",
+            "binary_bytes": 6732384,
+            "scope_matcher_cached_median_us": 10328.88,
+            "scope_matcher_uncached_median_us": 18458.18
+          },
+          "cache": {
+            "cache_identity": "7e45db79d882cb7dff61cb7f33f1be2b9e172f5487eb3fe1a4bdb4eb55493bfa",
+            "configuration_sha256": "e46b6244c165ab81a69ea6e15aeedc341ba13c8d2bf36c1e9b616ad63c171592",
+            "lock_sha256": "868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959",
+            "profiles": "release-small,test;default;cold",
+            "source_cache_restored": true,
+            "source_cache_key": "cargo-sources-v1-macOS-ARM64-868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959"
+          },
+          "artifact": {
+            "id": 11396107630,
+            "name": "quality-baseline-macos-latest-37426739465",
+            "size_bytes": 109032,
+            "digest": "sha256:44e5053dae815a1a4aeeab9a1bb1f7ba9f5fd1cf8f84901e4a0fa5c66797f7de",
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37426739465/artifacts/11396107630"
+          },
+          "retained_log": {
+            "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37426739465/job/112147994799",
+            "sha256": "7c37e3341c63fbd9d82714c4ff0eb8683d1332610d2c10f49321f076e3b56a24"
+          },
+          "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37426739465/job/112147994799",
+          "retained_log_sha256": "7c37e3341c63fbd9d82714c4ff0eb8683d1332610d2c10f49321f076e3b56a24",
+          "retained_log_path": "/mnt/dev-ssd/dev-tmp/gh291-3before-3after/logs/37426739465-job-112147994799.log"
+        },
+        "windows": {
+          "job_id": 112147994806,
+          "status": "success",
+          "runner": {
+            "label": "windows-latest",
+            "name": "GitHub Actions 1000013191",
+            "id": 1000013191,
+            "group": "GitHub Actions",
+            "image": "windows-2025-vs2026",
+            "image_version": "20260925.250.1",
+            "image_group": "Runner Image"
+          },
+          "timestamps": {
+            "created_at": "2026-10-06T06:57:41Z",
+            "started_at": "2026-10-06T06:57:43Z",
+            "completed_at": "2026-10-06T07:23:30Z",
+            "created_to_runner_start_seconds": 2.0,
+            "runner_elapsed_seconds": 1547.0
+          },
+          "capture_step_seconds": 1486.0,
+          "release_small_build_seconds_from_cargo_finished_log": 220.0,
+          "toolchain": {
+            "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+            "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+            "python": "3.14.7",
+            "target": "x86_64-pc-windows-msvc"
+          },
+          "benchmark": {
+            "fixture_version": 1,
+            "harness_version": 1,
+            "cache_state": "cold-and-warm",
+            "cold_seconds": 286.165,
+            "warm_samples_seconds": [
+              180.345,
+              189.459,
+              178.612,
+              209.156,
+              189.085
+            ],
+            "warm_sample_count": 5,
+            "warm_median_seconds": 189.085,
+            "scope_paths": 601,
+            "scope_iterations": 100,
+            "binary_sha256": "4c38aa99a9d83596b282d0675ce43354f7cddd30c535bdf4626d1815363da901",
+            "binary_bytes": 8327168,
+            "scope_matcher_cached_median_us": 8731.33,
+            "scope_matcher_uncached_median_us": 16330.37
+          },
+          "cache": {
+            "cache_identity": "48244e3670a74c34321dba5c9bd910a8c242ba366b2aa222b37915298dfb82a0",
+            "configuration_sha256": "e46b6244c165ab81a69ea6e15aeedc341ba13c8d2bf36c1e9b616ad63c171592",
+            "lock_sha256": "868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959",
+            "profiles": "release-small,test;default;cold",
+            "source_cache_restored": true,
+            "source_cache_key": "cargo-sources-v1-Windows-X64-868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959"
+          },
+          "artifact": {
+            "id": 11395847556,
+            "name": "quality-baseline-windows-latest-37426739465",
+            "size_bytes": 109264,
+            "digest": "sha256:66b231d3648758ebadcd0fe6051042757d5d77b8c22b6891b63572e090bcf1fd",
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37426739465/artifacts/11395847556"
+          },
+          "retained_log": {
+            "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37426739465/job/112147994806",
+            "sha256": "f58cb9937c24b9762c7f122ba204707691ee1df2310f15ae9c9f6acb6fb5c2d7"
+          },
+          "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37426739465/job/112147994806",
+          "retained_log_sha256": "f58cb9937c24b9762c7f122ba204707691ee1df2310f15ae9c9f6acb6fb5c2d7",
+          "retained_log_path": "/mnt/dev-ssd/dev-tmp/gh291-3before-3after/logs/37426739465-job-112147994806.log"
+        },
+        "linux": {
+          "job_id": 112147994884,
+          "status": "success",
+          "runner": {
+            "label": "ubuntu-latest",
+            "name": "GitHub Actions 1000013201",
+            "id": 1000013201,
+            "group": "GitHub Actions",
+            "image": "ubuntu-24.04",
+            "image_version": "20260927.320.1",
+            "image_group": "Runner Image"
+          },
+          "timestamps": {
+            "created_at": "2026-10-06T06:57:41Z",
+            "started_at": "2026-10-06T06:57:43Z",
+            "completed_at": "2026-10-06T07:15:23Z",
+            "created_to_runner_start_seconds": 2.0,
+            "runner_elapsed_seconds": 1060.0
+          },
+          "capture_step_seconds": 1026.0,
+          "release_small_build_seconds_from_cargo_finished_log": 116.0,
+          "toolchain": {
+            "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+            "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+            "python": "3.14.7",
+            "target": "x86_64-unknown-linux-gnu"
+          },
+          "benchmark": {
+            "fixture_version": 1,
+            "harness_version": 1,
+            "cache_state": "cold-and-warm",
+            "cold_seconds": 191.248,
+            "warm_samples_seconds": [
+              139.052,
+              140.387,
+              140.662,
+              139.63,
+              140.332
+            ],
+            "warm_sample_count": 5,
+            "warm_median_seconds": 140.332,
+            "scope_paths": 601,
+            "scope_iterations": 100,
+            "binary_sha256": "dccfe571ba08893ad663762fb6ec34a54a9645403c12927576f72518ba41c898",
+            "binary_bytes": 10249608,
+            "scope_matcher_cached_median_us": 6711.65,
+            "scope_matcher_uncached_median_us": 12514.06
+          },
+          "cache": {
+            "cache_identity": "00877a4a9bdf9d704cbde1b99b917c8928da3457a933abfe8a36d51e23e90d62",
+            "configuration_sha256": "e46b6244c165ab81a69ea6e15aeedc341ba13c8d2bf36c1e9b616ad63c171592",
+            "lock_sha256": "868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959",
+            "profiles": "release-small,test;default;cold",
+            "source_cache_restored": true,
+            "source_cache_key": "cargo-sources-v1-Linux-X64-868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959"
+          },
+          "artifact": {
+            "id": 11396281090,
+            "name": "quality-baseline-ubuntu-latest-37426739465",
+            "size_bytes": 107770,
+            "digest": "sha256:3b0de79da8dd1de8371719da58a12c7484d00611b145a4c71ae5c0f2992a870a",
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37426739465/artifacts/11396281090"
+          },
+          "retained_log": {
+            "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37426739465/job/112147994884",
+            "sha256": "49d864b4f39638175b05797b3332d49753a5e21b371ca27bf326133bb6602396"
+          },
+          "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37426739465/job/112147994884",
+          "retained_log_sha256": "49d864b4f39638175b05797b3332d49753a5e21b371ca27bf326133bb6602396",
+          "retained_log_path": "/mnt/dev-ssd/dev-tmp/gh291-3before-3after/logs/37426739465-job-112147994884.log"
+        }
+      },
+      "native_run": {
+        "conclusion": "success",
+        "head_sha": "675195f7ddf690ff098311591dd75baa4d82d63b",
+        "created_at": "2026-10-06T06:57:40Z",
+        "completed_at": "2026-10-06T07:11:45Z",
+        "end_to_end_seconds": 845.0,
+        "platform_jobs": {
+          "x86_64-pc-windows-msvc": {
+            "job_id": 112147995039,
+            "status": "success",
+            "runner_labels": [
+              "windows-2025"
+            ],
+            "runner_name": "GitHub Actions 1000013184",
+            "runner_id": 1000013184,
+            "created_at": "2026-10-06T06:57:41Z",
+            "started_at": "2026-10-06T06:57:43Z",
+            "completed_at": "2026-10-06T07:05:43Z",
+            "runner_seconds": 480.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37426739492/job/112147995039"
+          },
+          "aarch64-apple-darwin": {
+            "job_id": 112147995174,
+            "status": "success",
+            "runner_labels": [
+              "macos-15"
+            ],
+            "runner_name": "GitHub Actions 1000013185",
+            "runner_id": 1000013185,
+            "created_at": "2026-10-06T06:57:41Z",
+            "started_at": "2026-10-06T06:57:51Z",
+            "completed_at": "2026-10-06T07:04:38Z",
+            "runner_seconds": 407.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37426739492/job/112147995174"
+          },
+          "x86_64-unknown-linux-gnu": {
+            "job_id": 112147995359,
+            "status": "success",
+            "runner_labels": [
+              "ubuntu-24.04"
+            ],
+            "runner_name": "GitHub Actions 1000013187",
+            "runner_id": 1000013187,
+            "created_at": "2026-10-06T06:57:41Z",
+            "started_at": "2026-10-06T06:58:02Z",
+            "completed_at": "2026-10-06T07:03:25Z",
+            "runner_seconds": 323.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37426739492/job/112147995359"
+          },
+          "x86_64-apple-darwin": {
+            "job_id": 112147995368,
+            "status": "success",
+            "runner_labels": [
+              "macos-15-intel"
+            ],
+            "runner_name": "GitHub Actions 1000013186",
+            "runner_id": 1000013186,
+            "created_at": "2026-10-06T06:57:41Z",
+            "started_at": "2026-10-06T06:57:52Z",
+            "completed_at": "2026-10-06T07:11:44Z",
+            "runner_seconds": 832.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37426739492/job/112147995368"
+          }
+        }
+      },
+      "ci_run_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37426739465",
+      "native_run_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37426739492",
+      "retained_api_urls": {
+        "ci_run": "https://github.com/musutrade/Harness-Gate/actions/runs/37426739465",
+        "ci_jobs": "https://github.com/musutrade/Harness-Gate/actions/runs/37426739465?check_suite_focus=true",
+        "ci_artifacts": "https://github.com/musutrade/Harness-Gate/actions/runs/37426739465#artifacts",
+        "native_run": "https://github.com/musutrade/Harness-Gate/actions/runs/37426739492",
+        "native_artifacts": "https://github.com/musutrade/Harness-Gate/actions/runs/37426739492#artifacts"
+      },
+      "ci_run_updated_at_proxy_seconds": 1710.0,
+      "ci_end_to_end_seconds_definition": "run_started_at to API updated_at; lifecycle proxy only"
+    },
+    {
+      "ci_run_id": 37429831983,
+      "native_run_id": 37429831973,
+      "head_sha": "f3c6d62d511abff1044c69c42ae7c50a26416bfb",
+      "event": "push",
+      "branch": "main",
+      "conclusion": "success",
+      "workflow_run_number": 602,
+      "created_at": "2026-10-06T07:28:03Z",
+      "run_started_at": "2026-10-06T07:28:03Z",
+      "completed_at": "2026-10-06T07:54:27Z",
+      "ci_end_to_end_seconds": 1584.0,
+      "non_skipped_ci_runner_work_seconds": 7730.0,
+      "ci_job_created_to_runner_start_median_seconds": 3.0,
+      "qpb_job_created_to_runner_start_median_seconds": 2.0,
+      "qpb_runner_elapsed_median_seconds": 1482.0,
+      "platforms": {
+        "macos": {
+          "job_id": 112157846260,
+          "status": "success",
+          "runner": {
+            "label": "macos-latest",
+            "name": "GitHub Actions 1000013226",
+            "id": 1000013226,
+            "group": "GitHub Actions",
+            "image": "macos-26-arm64",
+            "image_version": "20260907.0351.1",
+            "image_group": "Runner Image"
+          },
+          "timestamps": {
+            "created_at": "2026-10-06T07:28:03Z",
+            "started_at": "2026-10-06T07:28:11Z",
+            "completed_at": "2026-10-06T07:52:53Z",
+            "created_to_runner_start_seconds": 8.0,
+            "runner_elapsed_seconds": 1482.0
+          },
+          "capture_step_seconds": 1434.0,
+          "release_small_build_seconds_from_cargo_finished_log": 188.0,
+          "toolchain": {
+            "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+            "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+            "python": "3.14.7",
+            "target": "aarch64-apple-darwin"
+          },
+          "benchmark": {
+            "fixture_version": 1,
+            "harness_version": 1,
+            "cache_state": "cold-and-warm",
+            "cold_seconds": 282.951,
+            "warm_samples_seconds": [
+              182.401,
+              194.97,
+              197.81,
+              179.738,
+              179.553
+            ],
+            "warm_sample_count": 5,
+            "warm_median_seconds": 182.401,
+            "scope_paths": 601,
+            "scope_iterations": 100,
+            "binary_sha256": "03b9711faf79810af1d9f7c894a3b08a562647472e8e0c5b98cd84bc4cac3ea2",
+            "binary_bytes": 6732384,
+            "scope_matcher_cached_median_us": 7122.36,
+            "scope_matcher_uncached_median_us": 12358.81
+          },
+          "cache": {
+            "cache_identity": "2ff2423bf14dc3114fad6cea07281ad054d6ea36de289e11693b78444ed4d70a",
+            "configuration_sha256": "e5ca7560704faad0bc51783dd45a47496603997d1bce8cbe9baa148110908ef2",
+            "lock_sha256": "868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959",
+            "profiles": "release-small,test;default;cold",
+            "source_cache_restored": true,
+            "source_cache_key": "cargo-sources-v1-macOS-ARM64-868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959"
+          },
+          "artifact": {
+            "id": 11396884982,
+            "name": "quality-baseline-macos-latest-37429831983",
+            "size_bytes": 109336,
+            "digest": "sha256:86688f2c8ecd103c85f38e89c4632962821217200c77c001eebab1d68646db59",
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37429831983/artifacts/11396884982"
+          },
+          "retained_log": {
+            "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37429831983/job/112157846260",
+            "sha256": "7d4846cb81f05a8991dd5237edef2f321f2cab190883299343f600ffe55444b9"
+          },
+          "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37429831983/job/112157846260",
+          "retained_log_sha256": "7d4846cb81f05a8991dd5237edef2f321f2cab190883299343f600ffe55444b9",
+          "retained_log_path": "/mnt/dev-ssd/dev-tmp/gh291-3before-3after/logs/37429831983-job-112157846260.log"
+        },
+        "windows": {
+          "job_id": 112157846483,
+          "status": "success",
+          "runner": {
+            "label": "windows-latest",
+            "name": "GitHub Actions 1000013247",
+            "id": 1000013247,
+            "group": "GitHub Actions",
+            "image": "windows-2025-vs2026",
+            "image_version": "20260925.250.1",
+            "image_group": "Runner Image"
+          },
+          "timestamps": {
+            "created_at": "2026-10-06T07:28:04Z",
+            "started_at": "2026-10-06T07:28:06Z",
+            "completed_at": "2026-10-06T07:54:03Z",
+            "created_to_runner_start_seconds": 2.0,
+            "runner_elapsed_seconds": 1557.0
+          },
+          "capture_step_seconds": 1497.0,
+          "release_small_build_seconds_from_cargo_finished_log": 241.0,
+          "toolchain": {
+            "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+            "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+            "python": "3.14.7",
+            "target": "x86_64-pc-windows-msvc"
+          },
+          "benchmark": {
+            "fixture_version": 1,
+            "harness_version": 1,
+            "cache_state": "cold-and-warm",
+            "cold_seconds": 322.178,
+            "warm_samples_seconds": [
+              182.257,
+              180.758,
+              179.374,
+              180.316,
+              180.008
+            ],
+            "warm_sample_count": 5,
+            "warm_median_seconds": 180.316,
+            "scope_paths": 601,
+            "scope_iterations": 100,
+            "binary_sha256": "ae71ee90f5aa870e8600543cce5b44585d8be1df64d435405521390ff8811ff8",
+            "binary_bytes": 8327168,
+            "scope_matcher_cached_median_us": 8741.07,
+            "scope_matcher_uncached_median_us": 16043.47
+          },
+          "cache": {
+            "cache_identity": "a81514930c8e3cd71500c83f47c0543e7b34ce82e48f92182d40d3e812d4b8d9",
+            "configuration_sha256": "e5ca7560704faad0bc51783dd45a47496603997d1bce8cbe9baa148110908ef2",
+            "lock_sha256": "868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959",
+            "profiles": "release-small,test;default;cold",
+            "source_cache_restored": true,
+            "source_cache_key": "cargo-sources-v1-Windows-X64-868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959"
+          },
+          "artifact": {
+            "id": 11397945734,
+            "name": "quality-baseline-windows-latest-37429831983",
+            "size_bytes": 109354,
+            "digest": "sha256:8c29d12b15cb3a58d8290f9bfd31f9004c50ff8267aecba1d644d93d56e5fbcf",
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37429831983/artifacts/11397945734"
+          },
+          "retained_log": {
+            "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37429831983/job/112157846483",
+            "sha256": "152cfadfdbde69d9fbddb0c2f7c29f258476bba7d1fc9c3484de19bffcb2529b"
+          },
+          "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37429831983/job/112157846483",
+          "retained_log_sha256": "152cfadfdbde69d9fbddb0c2f7c29f258476bba7d1fc9c3484de19bffcb2529b",
+          "retained_log_path": "/mnt/dev-ssd/dev-tmp/gh291-3before-3after/logs/37429831983-job-112157846483.log"
+        },
+        "linux": {
+          "job_id": 112157846508,
+          "status": "success",
+          "runner": {
+            "label": "ubuntu-latest",
+            "name": "GitHub Actions 1000013245",
+            "id": 1000013245,
+            "group": "GitHub Actions",
+            "image": "ubuntu-24.04",
+            "image_version": "20260927.320.1",
+            "image_group": "Runner Image"
+          },
+          "timestamps": {
+            "created_at": "2026-10-06T07:28:04Z",
+            "started_at": "2026-10-06T07:28:06Z",
+            "completed_at": "2026-10-06T07:45:42Z",
+            "created_to_runner_start_seconds": 2.0,
+            "runner_elapsed_seconds": 1056.0
+          },
+          "capture_step_seconds": 1023.0,
+          "release_small_build_seconds_from_cargo_finished_log": 117.0,
+          "toolchain": {
+            "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+            "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+            "python": "3.14.7",
+            "target": "x86_64-unknown-linux-gnu"
+          },
+          "benchmark": {
+            "fixture_version": 1,
+            "harness_version": 1,
+            "cache_state": "cold-and-warm",
+            "cold_seconds": 190.891,
+            "warm_samples_seconds": [
+              140.222,
+              138.339,
+              139.726,
+              139.685,
+              139.575
+            ],
+            "warm_sample_count": 5,
+            "warm_median_seconds": 139.685,
+            "scope_paths": 601,
+            "scope_iterations": 100,
+            "binary_sha256": "dccfe571ba08893ad663762fb6ec34a54a9645403c12927576f72518ba41c898",
+            "binary_bytes": 10249608,
+            "scope_matcher_cached_median_us": 6640.92,
+            "scope_matcher_uncached_median_us": 12567.47
+          },
+          "cache": {
+            "cache_identity": "7f3ae19a886d16751c6509d34139aca25b206715c07d12e7b22520e7f8095a18",
+            "configuration_sha256": "e5ca7560704faad0bc51783dd45a47496603997d1bce8cbe9baa148110908ef2",
+            "lock_sha256": "868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959",
+            "profiles": "release-small,test;default;cold",
+            "source_cache_restored": true,
+            "source_cache_key": "cargo-sources-v1-Linux-X64-868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959"
+          },
+          "artifact": {
+            "id": 11396713880,
+            "name": "quality-baseline-ubuntu-latest-37429831983",
+            "size_bytes": 107844,
+            "digest": "sha256:0d67b65409070641db57f51440bef88caa3584e3d91db38bcd0a9fd98a70d1f8",
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37429831983/artifacts/11396713880"
+          },
+          "retained_log": {
+            "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37429831983/job/112157846508",
+            "sha256": "46e89165eadf91aee314ce7c2ba6d38b010fb5edb53e76288577ed16787a33bb"
+          },
+          "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37429831983/job/112157846508",
+          "retained_log_sha256": "46e89165eadf91aee314ce7c2ba6d38b010fb5edb53e76288577ed16787a33bb",
+          "retained_log_path": "/mnt/dev-ssd/dev-tmp/gh291-3before-3after/logs/37429831983-job-112157846508.log"
+        }
+      },
+      "native_run": {
+        "conclusion": "success",
+        "head_sha": "f3c6d62d511abff1044c69c42ae7c50a26416bfb",
+        "created_at": "2026-10-06T07:28:03Z",
+        "completed_at": "2026-10-06T07:39:04Z",
+        "end_to_end_seconds": 661.0,
+        "platform_jobs": {
+          "aarch64-apple-darwin": {
+            "job_id": 112157846279,
+            "status": "success",
+            "runner_labels": [
+              "macos-15"
+            ],
+            "runner_name": "GitHub Actions 1000013224",
+            "runner_id": 1000013224,
+            "created_at": "2026-10-06T07:28:03Z",
+            "started_at": "2026-10-06T07:28:10Z",
+            "completed_at": "2026-10-06T07:34:28Z",
+            "runner_seconds": 378.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37429831973/job/112157846279"
+          },
+          "x86_64-unknown-linux-gnu": {
+            "job_id": 112157846481,
+            "status": "success",
+            "runner_labels": [
+              "ubuntu-24.04"
+            ],
+            "runner_name": "GitHub Actions 1000013235",
+            "runner_id": 1000013235,
+            "created_at": "2026-10-06T07:28:04Z",
+            "started_at": "2026-10-06T07:28:06Z",
+            "completed_at": "2026-10-06T07:33:36Z",
+            "runner_seconds": 330.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37429831973/job/112157846481"
+          },
+          "x86_64-pc-windows-msvc": {
+            "job_id": 112157846559,
+            "status": "success",
+            "runner_labels": [
+              "windows-2025"
+            ],
+            "runner_name": "GitHub Actions 1000013234",
+            "runner_id": 1000013234,
+            "created_at": "2026-10-06T07:28:04Z",
+            "started_at": "2026-10-06T07:28:06Z",
+            "completed_at": "2026-10-06T07:36:00Z",
+            "runner_seconds": 474.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37429831973/job/112157846559"
+          },
+          "x86_64-apple-darwin": {
+            "job_id": 112157846583,
+            "status": "success",
+            "runner_labels": [
+              "macos-15-intel"
+            ],
+            "runner_name": "GitHub Actions 1000013225",
+            "runner_id": 1000013225,
+            "created_at": "2026-10-06T07:28:04Z",
+            "started_at": "2026-10-06T07:28:07Z",
+            "completed_at": "2026-10-06T07:39:03Z",
+            "runner_seconds": 656.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37429831973/job/112157846583"
+          }
+        }
+      },
+      "ci_run_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37429831983",
+      "native_run_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37429831973",
+      "retained_api_urls": {
+        "ci_run": "https://github.com/musutrade/Harness-Gate/actions/runs/37429831983",
+        "ci_jobs": "https://github.com/musutrade/Harness-Gate/actions/runs/37429831983?check_suite_focus=true",
+        "ci_artifacts": "https://github.com/musutrade/Harness-Gate/actions/runs/37429831983#artifacts",
+        "native_run": "https://github.com/musutrade/Harness-Gate/actions/runs/37429831973",
+        "native_artifacts": "https://github.com/musutrade/Harness-Gate/actions/runs/37429831973#artifacts"
+      },
+      "ci_run_updated_at_proxy_seconds": 1584.0,
+      "ci_end_to_end_seconds_definition": "run_started_at to API updated_at; lifecycle proxy only"
+    },
+    {
+      "ci_run_id": 37722931483,
+      "native_run_id": 37722931421,
+      "head_sha": "05a05019232f967ab50acad277502e9088005d48",
+      "event": "push",
+      "branch": "main",
+      "conclusion": "success",
+      "workflow_run_number": 605,
+      "created_at": "2026-10-08T03:29:06Z",
+      "run_started_at": "2026-10-08T03:29:06Z",
+      "completed_at": "2026-10-08T03:54:36Z",
+      "ci_end_to_end_seconds": 1530.0,
+      "non_skipped_ci_runner_work_seconds": 7291.0,
+      "ci_job_created_to_runner_start_median_seconds": 2.0,
+      "qpb_job_created_to_runner_start_median_seconds": 2.0,
+      "qpb_runner_elapsed_median_seconds": 1384.0,
+      "platforms": {
+        "windows": {
+          "job_id": 113134516033,
+          "status": "success",
+          "runner": {
+            "label": "windows-latest",
+            "name": "GitHub Actions 1000013527",
+            "id": 1000013527,
+            "group": "GitHub Actions",
+            "image": "windows-2025-vs2026",
+            "image_version": "20260925.250.1",
+            "image_group": "Runner Image"
+          },
+          "timestamps": {
+            "created_at": "2026-10-08T03:29:07Z",
+            "started_at": "2026-10-08T03:29:09Z",
+            "completed_at": "2026-10-08T03:54:15Z",
+            "created_to_runner_start_seconds": 2.0,
+            "runner_elapsed_seconds": 1506.0
+          },
+          "capture_step_seconds": 1443.0,
+          "release_small_build_seconds_from_cargo_finished_log": 222.0,
+          "toolchain": {
+            "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+            "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+            "python": "3.14.7",
+            "target": "x86_64-pc-windows-msvc"
+          },
+          "benchmark": {
+            "fixture_version": 1,
+            "harness_version": 1,
+            "cache_state": "cold-and-warm",
+            "cold_seconds": 264.192,
+            "warm_samples_seconds": [
+              204.8,
+              181.059,
+              188.84,
+              176.677,
+              175.143
+            ],
+            "warm_sample_count": 5,
+            "warm_median_seconds": 181.059,
+            "scope_paths": 601,
+            "scope_iterations": 100,
+            "binary_sha256": "e275c2b3c3428b6521358f82c7be335fd1df342e38167555bd419d4e64bf87aa",
+            "binary_bytes": 8327680,
+            "scope_matcher_cached_median_us": 8298.9,
+            "scope_matcher_uncached_median_us": 15936.21
+          },
+          "cache": {
+            "cache_identity": "62c5cd161047e1e0b6cfa04fe38ff6101f7ec0c1bc8cb68693362ac0b881e157",
+            "configuration_sha256": "83511bcf9d052797cd890de8c53e4792e20f255124c92891eaf778165396fddf",
+            "lock_sha256": "868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959",
+            "profiles": "release-small,test;default;cold",
+            "source_cache_restored": true,
+            "source_cache_key": "cargo-sources-v1-Windows-X64-868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959"
+          },
+          "artifact": {
+            "id": 11527442486,
+            "name": "quality-baseline-windows-latest-37722931483",
+            "size_bytes": 109331,
+            "digest": "sha256:d24855b6260f7e20b9bd509466532f98c9c20b6a0ee685915dc8a0bec8f30272",
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37722931483/artifacts/11527442486"
+          },
+          "retained_log": {
+            "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37722931483/job/113134516033",
+            "sha256": "5b439a24d6eebfd3a1d02566c1a54a6ce33d7de7a4eb43ad5a479b6344578c9d"
+          },
+          "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37722931483/job/113134516033",
+          "retained_log_sha256": "5b439a24d6eebfd3a1d02566c1a54a6ce33d7de7a4eb43ad5a479b6344578c9d",
+          "retained_log_path": "/mnt/dev-ssd/dev-tmp/gh291-3before-3after/logs/37722931483-job-113134516033.log"
+        },
+        "macos": {
+          "job_id": 113134516068,
+          "status": "success",
+          "runner": {
+            "label": "macos-latest",
+            "name": "GitHub Actions 1000013531",
+            "id": 1000013531,
+            "group": "GitHub Actions",
+            "image": "macos-26-arm64",
+            "image_version": "20260907.0351.1",
+            "image_group": "Runner Image"
+          },
+          "timestamps": {
+            "created_at": "2026-10-08T03:29:07Z",
+            "started_at": "2026-10-08T03:29:13Z",
+            "completed_at": "2026-10-08T03:52:17Z",
+            "created_to_runner_start_seconds": 6.0,
+            "runner_elapsed_seconds": 1384.0
+          },
+          "capture_step_seconds": 1337.0,
+          "release_small_build_seconds_from_cargo_finished_log": 123.0,
+          "toolchain": {
+            "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+            "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+            "python": "3.14.7",
+            "target": "aarch64-apple-darwin"
+          },
+          "benchmark": {
+            "fixture_version": 1,
+            "harness_version": 1,
+            "cache_state": "cold-and-warm",
+            "cold_seconds": 252.086,
+            "warm_samples_seconds": [
+              188.889,
+              183.74,
+              200.538,
+              183.292,
+              178.365
+            ],
+            "warm_sample_count": 5,
+            "warm_median_seconds": 183.74,
+            "scope_paths": 601,
+            "scope_iterations": 100,
+            "binary_sha256": "c1d7911a8520d170e53b7560ebfbcc8799408bf81dd2c09059cd17965f5dcea5",
+            "binary_bytes": 6732384,
+            "scope_matcher_cached_median_us": 7953.8,
+            "scope_matcher_uncached_median_us": 12640.92
+          },
+          "cache": {
+            "cache_identity": "bf6648c71e09849646e2e0f29f619851a5a0e553ee8bb0608d8a3a8998759d62",
+            "configuration_sha256": "83511bcf9d052797cd890de8c53e4792e20f255124c92891eaf778165396fddf",
+            "lock_sha256": "868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959",
+            "profiles": "release-small,test;default;cold",
+            "source_cache_restored": true,
+            "source_cache_key": "cargo-sources-v1-macOS-ARM64-868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959"
+          },
+          "artifact": {
+            "id": 11526464447,
+            "name": "quality-baseline-macos-latest-37722931483",
+            "size_bytes": 109370,
+            "digest": "sha256:8ffc72c7c3167f4e04e6241c43c57b0029d632a344b326ecfaf3ab93b7ab249d",
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37722931483/artifacts/11526464447"
+          },
+          "retained_log": {
+            "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37722931483/job/113134516068",
+            "sha256": "50573b80a34ed87af1bd296a5a8797e44b6016de9b40a87f69afa48ba0b01ee0"
+          },
+          "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37722931483/job/113134516068",
+          "retained_log_sha256": "50573b80a34ed87af1bd296a5a8797e44b6016de9b40a87f69afa48ba0b01ee0",
+          "retained_log_path": "/mnt/dev-ssd/dev-tmp/gh291-3before-3after/logs/37722931483-job-113134516068.log"
+        },
+        "linux": {
+          "job_id": 113134516075,
+          "status": "success",
+          "runner": {
+            "label": "ubuntu-latest",
+            "name": "GitHub Actions 1000013523",
+            "id": 1000013523,
+            "group": "GitHub Actions",
+            "image": "ubuntu-24.04",
+            "image_version": "20261004.327.1",
+            "image_group": "Runner Image"
+          },
+          "timestamps": {
+            "created_at": "2026-10-08T03:29:07Z",
+            "started_at": "2026-10-08T03:29:08Z",
+            "completed_at": "2026-10-08T03:40:19Z",
+            "created_to_runner_start_seconds": 1.0,
+            "runner_elapsed_seconds": 671.0
+          },
+          "capture_step_seconds": 644.0,
+          "release_small_build_seconds_from_cargo_finished_log": 85.0,
+          "toolchain": {
+            "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+            "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+            "python": "3.14.8",
+            "target": "x86_64-unknown-linux-gnu"
+          },
+          "benchmark": {
+            "fixture_version": 1,
+            "harness_version": 1,
+            "cache_state": "cold-and-warm",
+            "cold_seconds": 118.626,
+            "warm_samples_seconds": [
+              83.992,
+              85.396,
+              86.042,
+              85.882,
+              84.556
+            ],
+            "warm_sample_count": 5,
+            "warm_median_seconds": 85.396,
+            "scope_paths": 601,
+            "scope_iterations": 100,
+            "binary_sha256": "9c7fc758aacf047a181f70e57615e93ca88012694da19a01bacb22cd620080b6",
+            "binary_bytes": 10249672,
+            "scope_matcher_cached_median_us": 3656.71,
+            "scope_matcher_uncached_median_us": 7140.61
+          },
+          "cache": {
+            "cache_identity": "322afcf67c77f06375956a4607a1a28d21e389559f1cd0908283220f8c312422",
+            "configuration_sha256": "83511bcf9d052797cd890de8c53e4792e20f255124c92891eaf778165396fddf",
+            "lock_sha256": "868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959",
+            "profiles": "release-small,test;default;cold",
+            "source_cache_restored": true,
+            "source_cache_key": "cargo-sources-v1-Linux-X64-868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959"
+          },
+          "artifact": {
+            "id": 11525799855,
+            "name": "quality-baseline-ubuntu-latest-37722931483",
+            "size_bytes": 107761,
+            "digest": "sha256:2d569f2925ca7e0ea85cf2ad85b7db8300535f774ef42e78e6a4bce59ad1f156",
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37722931483/artifacts/11525799855"
+          },
+          "retained_log": {
+            "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37722931483/job/113134516075",
+            "sha256": "337a335619c52dac64eda89102d552045f787f8605101103a0ce26475ab84ea9"
+          },
+          "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37722931483/job/113134516075",
+          "retained_log_sha256": "337a335619c52dac64eda89102d552045f787f8605101103a0ce26475ab84ea9",
+          "retained_log_path": "/mnt/dev-ssd/dev-tmp/gh291-3before-3after/logs/37722931483-job-113134516075.log"
+        }
+      },
+      "native_run": {
+        "conclusion": "success",
+        "head_sha": "05a05019232f967ab50acad277502e9088005d48",
+        "created_at": "2026-10-08T03:29:06Z",
+        "completed_at": "2026-10-08T03:39:44Z",
+        "end_to_end_seconds": 638.0,
+        "platform_jobs": {
+          "x86_64-unknown-linux-gnu": {
+            "job_id": 113134515653,
+            "status": "success",
+            "runner_labels": [
+              "ubuntu-24.04"
+            ],
+            "runner_name": "GitHub Actions 1000013510",
+            "runner_id": 1000013510,
+            "created_at": "2026-10-08T03:29:07Z",
+            "started_at": "2026-10-08T03:29:08Z",
+            "completed_at": "2026-10-08T03:33:26Z",
+            "runner_seconds": 258.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37722931421/job/113134515653"
+          },
+          "aarch64-apple-darwin": {
+            "job_id": 113134515794,
+            "status": "success",
+            "runner_labels": [
+              "macos-15"
+            ],
+            "runner_name": "GitHub Actions 1000013512",
+            "runner_id": 1000013512,
+            "created_at": "2026-10-08T03:29:07Z",
+            "started_at": "2026-10-08T03:29:14Z",
+            "completed_at": "2026-10-08T03:34:06Z",
+            "runner_seconds": 292.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37722931421/job/113134515794"
+          },
+          "x86_64-pc-windows-msvc": {
+            "job_id": 113134515831,
+            "status": "success",
+            "runner_labels": [
+              "windows-2025"
+            ],
+            "runner_name": "GitHub Actions 1000013513",
+            "runner_id": 1000013513,
+            "created_at": "2026-10-08T03:29:07Z",
+            "started_at": "2026-10-08T03:29:09Z",
+            "completed_at": "2026-10-08T03:37:16Z",
+            "runner_seconds": 487.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37722931421/job/113134515831"
+          },
+          "x86_64-apple-darwin": {
+            "job_id": 113134516073,
+            "status": "success",
+            "runner_labels": [
+              "macos-15-intel"
+            ],
+            "runner_name": "GitHub Actions 1000013530",
+            "runner_id": 1000013530,
+            "created_at": "2026-10-08T03:29:07Z",
+            "started_at": "2026-10-08T03:29:10Z",
+            "completed_at": "2026-10-08T03:39:43Z",
+            "runner_seconds": 633.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37722931421/job/113134516073"
+          }
+        }
+      },
+      "ci_run_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37722931483",
+      "native_run_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37722931421",
+      "retained_api_urls": {
+        "ci_run": "https://github.com/musutrade/Harness-Gate/actions/runs/37722931483",
+        "ci_jobs": "https://github.com/musutrade/Harness-Gate/actions/runs/37722931483?check_suite_focus=true",
+        "ci_artifacts": "https://github.com/musutrade/Harness-Gate/actions/runs/37722931483#artifacts",
+        "native_run": "https://github.com/musutrade/Harness-Gate/actions/runs/37722931421",
+        "native_artifacts": "https://github.com/musutrade/Harness-Gate/actions/runs/37722931421#artifacts"
+      },
+      "ci_run_updated_at_proxy_seconds": 1530.0,
+      "ci_end_to_end_seconds_definition": "run_started_at to API updated_at; lifecycle proxy only"
+    },
+    {
+      "ci_run_id": 37725407263,
+      "native_run_id": 37725407318,
+      "head_sha": "7b91803f8e7cee893e961d421da383dec6df80f3",
+      "event": "push",
+      "branch": null,
+      "conclusion": "success",
+      "workflow_run_number": null,
+      "created_at": "2026-10-08T04:00:29Z",
+      "run_started_at": "2026-10-08T04:00:29Z",
+      "completed_at": "2026-10-08T04:25:13Z",
+      "ci_end_to_end_seconds": 1484.0,
+      "non_skipped_ci_runner_work_seconds": 7636.0,
+      "ci_job_created_to_runner_start_median_seconds": 2.0,
+      "qpb_job_created_to_runner_start_median_seconds": 2.0,
+      "qpb_runner_elapsed_median_seconds": 1289.0,
+      "platforms": {
+        "macos": {
+          "job_id": 113142324736,
+          "status": "success",
+          "runner": {
+            "label": "macos-latest",
+            "name": "GitHub Actions 1000013556",
+            "id": 1000013556,
+            "group": "GitHub Actions",
+            "image": "macos-26-arm64",
+            "image_version": "20260907.0351.1",
+            "image_group": "Runner Image"
+          },
+          "timestamps": {
+            "created_at": "2026-10-08T04:00:30Z",
+            "started_at": "2026-10-08T04:00:39Z",
+            "completed_at": "2026-10-08T04:22:08Z",
+            "created_to_runner_start_seconds": 9.0,
+            "runner_elapsed_seconds": 1289.0
+          },
+          "capture_step_seconds": 1242.0,
+          "release_small_build_seconds_from_cargo_finished_log": 184.0,
+          "toolchain": {
+            "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+            "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+            "python": "3.14.7",
+            "target": "aarch64-apple-darwin"
+          },
+          "benchmark": {
+            "fixture_version": 1,
+            "harness_version": 1,
+            "cache_state": "cold-and-warm",
+            "cold_seconds": 255.242,
+            "warm_samples_seconds": [
+              162.694,
+              145.848,
+              151.471,
+              169.403,
+              146.747
+            ],
+            "warm_sample_count": 5,
+            "warm_median_seconds": 151.471,
+            "scope_paths": 601,
+            "scope_iterations": 100,
+            "binary_sha256": "1611be883555c865b5c6649a5e968da404e8563bcf6b0d5690df157ed58474a4",
+            "binary_bytes": 6732400,
+            "scope_matcher_cached_median_us": 6814.57,
+            "scope_matcher_uncached_median_us": 12103.49
+          },
+          "cache": {
+            "cache_identity": "5248792b014d9d876123a46e6a0e605b0acf96e0a7aea764477cae9ac00efa38",
+            "configuration_sha256": "51a99c3e1bde317a7f4cd365317ab9b097d1aa9bd15fcf8517102674535840cf",
+            "lock_sha256": "868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959",
+            "profiles": "release-small,test;default;cold",
+            "source_cache_restored": true,
+            "source_cache_key": "cargo-sources-v1-macOS-ARM64-868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959"
+          },
+          "artifact": {
+            "id": 11527289821,
+            "name": "quality-baseline-macos-latest-37725407263",
+            "size_bytes": 109366,
+            "digest": "sha256:c18d7a7dd7eb0e30d2b6d561f9c53fbb1f434ecb9c31f2c89a1324383f97544a",
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37725407263/artifacts/11527289821"
+          },
+          "retained_log": {
+            "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37725407263/job/113142324736",
+            "sha256": "60d5a545dc9184ae7dfcb54baf198f6d16f7d449dac34cfd06aeb60dbd379dc5"
+          },
+          "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37725407263/job/113142324736",
+          "retained_log_sha256": "60d5a545dc9184ae7dfcb54baf198f6d16f7d449dac34cfd06aeb60dbd379dc5",
+          "retained_log_path": "/mnt/dev-ssd/dev-tmp/gh291-3before-3after/logs/37725407263-job-113142324736.log"
+        },
+        "windows": {
+          "job_id": 113142324827,
+          "status": "success",
+          "runner": {
+            "label": "windows-latest",
+            "name": "GitHub Actions 1000013562",
+            "id": 1000013562,
+            "group": "GitHub Actions",
+            "image": "windows-2025-vs2026",
+            "image_version": "20260925.250.1",
+            "image_group": "Runner Image"
+          },
+          "timestamps": {
+            "created_at": "2026-10-08T04:00:30Z",
+            "started_at": "2026-10-08T04:00:32Z",
+            "completed_at": "2026-10-08T04:24:49Z",
+            "created_to_runner_start_seconds": 2.0,
+            "runner_elapsed_seconds": 1457.0
+          },
+          "capture_step_seconds": 1379.0,
+          "release_small_build_seconds_from_cargo_finished_log": 201.0,
+          "toolchain": {
+            "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+            "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+            "python": "3.14.7",
+            "target": "x86_64-pc-windows-msvc"
+          },
+          "benchmark": {
+            "fixture_version": 1,
+            "harness_version": 1,
+            "cache_state": "cold-and-warm",
+            "cold_seconds": 244.672,
+            "warm_samples_seconds": [
+              199.43,
+              173.293,
+              171.348,
+              174.373,
+              174.335
+            ],
+            "warm_sample_count": 5,
+            "warm_median_seconds": 174.335,
+            "scope_paths": 601,
+            "scope_iterations": 100,
+            "binary_sha256": "9050fb9ff7be73423a3988a39892ec9111079c1b8d638023e4f3051bfe9990d5",
+            "binary_bytes": 8329216,
+            "scope_matcher_cached_median_us": 6051.29,
+            "scope_matcher_uncached_median_us": 12167.23
+          },
+          "cache": {
+            "cache_identity": "bdd4762b022defae6da3056a6883117d0a98b03c7ad363bd93638bfdeec77d48",
+            "configuration_sha256": "51a99c3e1bde317a7f4cd365317ab9b097d1aa9bd15fcf8517102674535840cf",
+            "lock_sha256": "868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959",
+            "profiles": "release-small,test;default;cold",
+            "source_cache_restored": true,
+            "source_cache_key": "cargo-sources-v1-Windows-X64-868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959"
+          },
+          "artifact": {
+            "id": 11528317330,
+            "name": "quality-baseline-windows-latest-37725407263",
+            "size_bytes": 109410,
+            "digest": "sha256:b3127f720aaeb8216f8866a824e756e25e4eaf23ab1cb2347160c66a8706e6df",
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37725407263/artifacts/11528317330"
+          },
+          "retained_log": {
+            "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37725407263/job/113142324827",
+            "sha256": "6eea98e7b65603670418edd16bf158ee902b00912d7c9c7f3ac3469564345173"
+          },
+          "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37725407263/job/113142324827",
+          "retained_log_sha256": "6eea98e7b65603670418edd16bf158ee902b00912d7c9c7f3ac3469564345173",
+          "retained_log_path": "/mnt/dev-ssd/dev-tmp/gh291-3before-3after/logs/37725407263-job-113142324827.log"
+        },
+        "linux": {
+          "job_id": 113142324923,
+          "status": "success",
+          "runner": {
+            "label": "ubuntu-latest",
+            "name": "GitHub Actions 1000013569",
+            "id": 1000013569,
+            "group": "GitHub Actions",
+            "image": "ubuntu-24.04",
+            "image_version": "20260927.320.1",
+            "image_group": "Runner Image"
+          },
+          "timestamps": {
+            "created_at": "2026-10-08T04:00:30Z",
+            "started_at": "2026-10-08T04:00:32Z",
+            "completed_at": "2026-10-08T04:18:44Z",
+            "created_to_runner_start_seconds": 2.0,
+            "runner_elapsed_seconds": 1092.0
+          },
+          "capture_step_seconds": 1058.0,
+          "release_small_build_seconds_from_cargo_finished_log": 117.0,
+          "toolchain": {
+            "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+            "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+            "python": "3.14.7",
+            "target": "x86_64-unknown-linux-gnu"
+          },
+          "benchmark": {
+            "fixture_version": 1,
+            "harness_version": 1,
+            "cache_state": "cold-and-warm",
+            "cold_seconds": 192.317,
+            "warm_samples_seconds": [
+              145.599,
+              145.074,
+              147.101,
+              144.822,
+              145.868
+            ],
+            "warm_sample_count": 5,
+            "warm_median_seconds": 145.599,
+            "scope_paths": 601,
+            "scope_iterations": 100,
+            "binary_sha256": "4ef6ede3d4f6ca2177ff680eb0a96156f8049039742eda94db152832320c9767",
+            "binary_bytes": 10251296,
+            "scope_matcher_cached_median_us": 6790.32,
+            "scope_matcher_uncached_median_us": 12768.68
+          },
+          "cache": {
+            "cache_identity": "6fc19c8ed937ea08153e81e7706de5f3a4f19292441b1ff6ef51e6e996ec7ce5",
+            "configuration_sha256": "51a99c3e1bde317a7f4cd365317ab9b097d1aa9bd15fcf8517102674535840cf",
+            "lock_sha256": "868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959",
+            "profiles": "release-small,test;default;cold",
+            "source_cache_restored": true,
+            "source_cache_key": "cargo-sources-v1-Linux-X64-868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959"
+          },
+          "artifact": {
+            "id": 11528376077,
+            "name": "quality-baseline-ubuntu-latest-37725407263",
+            "size_bytes": 107790,
+            "digest": "sha256:4d6b6fc38d4f344a7fde5bc36caec48d98343cb962ee896390cc1ecdb90ebe57",
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37725407263/artifacts/11528376077"
+          },
+          "retained_log": {
+            "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37725407263/job/113142324923",
+            "sha256": "1a404ea23baf2bb3f3ac3c4108ec6205b4c1756fe2831d6f15cc75d83b121c0c"
+          },
+          "job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37725407263/job/113142324923",
+          "retained_log_sha256": "1a404ea23baf2bb3f3ac3c4108ec6205b4c1756fe2831d6f15cc75d83b121c0c",
+          "retained_log_path": "/mnt/dev-ssd/dev-tmp/gh291-3before-3after/logs/37725407263-job-113142324923.log"
+        }
+      },
+      "native_run": {
+        "conclusion": "success",
+        "head_sha": "7b91803f8e7cee893e961d421da383dec6df80f3",
+        "created_at": "2026-10-08T04:00:29Z",
+        "completed_at": "2026-10-08T04:15:36Z",
+        "end_to_end_seconds": 907.0,
+        "platform_jobs": {
+          "aarch64-apple-darwin": {
+            "job_id": 113142325220,
+            "status": "success",
+            "runner_labels": [
+              "macos-15"
+            ],
+            "runner_name": "GitHub Actions 1000013558",
+            "runner_id": 1000013558,
+            "created_at": "2026-10-08T04:00:30Z",
+            "started_at": "2026-10-08T04:00:36Z",
+            "completed_at": "2026-10-08T04:06:01Z",
+            "runner_seconds": 325.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37725407318/job/113142325220"
+          },
+          "x86_64-apple-darwin": {
+            "job_id": 113142325405,
+            "status": "success",
+            "runner_labels": [
+              "macos-15-intel"
+            ],
+            "runner_name": "GitHub Actions 1000013559",
+            "runner_id": 1000013559,
+            "created_at": "2026-10-08T04:00:30Z",
+            "started_at": "2026-10-08T04:00:33Z",
+            "completed_at": "2026-10-08T04:15:36Z",
+            "runner_seconds": 903.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37725407318/job/113142325405"
+          },
+          "x86_64-unknown-linux-gnu": {
+            "job_id": 113142325453,
+            "status": "success",
+            "runner_labels": [
+              "ubuntu-24.04"
+            ],
+            "runner_name": "GitHub Actions 1000013560",
+            "runner_id": 1000013560,
+            "created_at": "2026-10-08T04:00:30Z",
+            "started_at": "2026-10-08T04:00:32Z",
+            "completed_at": "2026-10-08T04:06:00Z",
+            "runner_seconds": 328.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37725407318/job/113142325453"
+          },
+          "x86_64-pc-windows-msvc": {
+            "job_id": 113142325590,
+            "status": "success",
+            "runner_labels": [
+              "windows-2025"
+            ],
+            "runner_name": "GitHub Actions 1000013577",
+            "runner_id": 1000013577,
+            "created_at": "2026-10-08T04:00:30Z",
+            "started_at": "2026-10-08T04:00:34Z",
+            "completed_at": "2026-10-08T04:08:32Z",
+            "runner_seconds": 478.0,
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37725407318/job/113142325590"
+          }
+        }
+      },
+      "ci_run_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37725407263",
+      "native_run_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37725407318",
+      "retained_api_urls": {
+        "ci_run": "https://github.com/musutrade/Harness-Gate/actions/runs/37725407263",
+        "ci_jobs": "https://github.com/musutrade/Harness-Gate/actions/runs/37725407263?check_suite_focus=true",
+        "ci_artifacts": "https://github.com/musutrade/Harness-Gate/actions/runs/37725407263#artifacts",
+        "native_run": "https://github.com/musutrade/Harness-Gate/actions/runs/37725407318",
+        "native_artifacts": "https://github.com/musutrade/Harness-Gate/actions/runs/37725407318#artifacts"
+      },
+      "ci_run_updated_at_proxy_seconds": 1484.0,
+      "ci_end_to_end_seconds_definition": "run_started_at to API updated_at; lifecycle proxy only"
+    }
+  ],
+  "limitations": [
+    "The six recent diagnostic/main-after samples use different source SHA, binary SHA, configuration hash and performance cache identity; no matched source/tool/config/cache experiment exists. Fixed original successful before cohorts remain separate.",
+    "Only recent_diagnostic_cohort: 37411168218 and 37421759343 failed Windows Quality Performance Baseline and aggregate; Windows perf metrics are censored. Never use failed E2E as gains. All fixed original before runs are successful.",
+    "Only recent_diagnostic_cohort: Windows five-warm/cold before n=1; successful after n=3. Linux/macOS n=3 each.",
+    "Runner labels are stable but runner instance IDs and image builds differ; Ubuntu image for 377229 is newer and Python is 3.14.8 there.",
+    "Only recent_diagnostic_cohort end-to-end medians include failed before runs. Fixed successful before/after acceptance cohorts exclude failures. Summed runner work is overlapping execution, not elapsed wall time.",
+    "These six natural samples do not replace PR-event samples or other required GH-291 acceptance. Later natural main runs are supplemental and do not replace this defined cohort.",
+    "Build seconds are the cargo Finished release-small profile durations embedded in QPB logs, not a controlled compile-only microbenchmark."
+  ],
+  "source_note": "Original API snapshots, artifact metadata/extractions, cache manifests and raw job logs are retained in an external SSD evidence directory; this repo proposal uses public run/job/artifact URLs and per-log SHA-256 rather than embedding machine-local paths.",
+  "primary_successful_push_comparison": {
+    "before": {
+      "run_ids": [
+        36023836720,
+        35716265337,
+        37250306480
+      ],
+      "conclusions": [
+        "success",
+        "success",
+        "success"
+      ],
+      "time_to_required_quality_aggregate_seconds": [
+        1533.0,
+        1416.0,
+        1785.0
+      ],
+      "time_to_aggregate_median_seconds": 1533.0,
+      "summed_non_skipped_runner_work_seconds": [
+        7586.0,
+        7551.0,
+        8157.0
+      ],
+      "runner_work_median_seconds": 7586.0,
+      "first_observed_job_start_delay_seconds_per_run": [
+        6.0,
+        8.0,
+        2.0
+      ],
+      "first_observed_job_start_delay_median_seconds": 6.0,
+      "source": "docs/quality/ci-topology/issue291-hosted-before.json",
+      "run_level_records": [
+        {
+          "run_id": 36023836720,
+          "created_at": "2026-09-24T15:56:33Z",
+          "aggregate_job_id": 107725336967,
+          "aggregate_completed_at": "2026-09-24T16:22:06Z",
+          "created_to_aggregate_seconds": 1533.0
+        },
+        {
+          "run_id": 35716265337,
+          "created_at": "2026-09-22T10:29:32Z",
+          "aggregate_job_id": 106715180321,
+          "aggregate_completed_at": "2026-09-22T10:53:08Z",
+          "created_to_aggregate_seconds": 1416.0
+        },
+        {
+          "run_id": 37250306480,
+          "created_at": "2026-10-05T01:09:33Z",
+          "aggregate_job_id": 111582085792,
+          "aggregate_completed_at": "2026-10-05T01:39:18Z",
+          "created_to_aggregate_seconds": 1785.0
+        }
+      ]
+    },
+    "after": {
+      "run_ids": [
+        37429831983,
+        37722931483,
+        37725407263
+      ],
+      "conclusions": [
+        "success",
+        "success",
+        "success"
+      ],
+      "run_level_records": [
+        {
+          "run_id": 37429831983,
+          "head_sha": "f3c6d62d511abff1044c69c42ae7c50a26416bfb",
+          "aggregate_job_id": 112166610769,
+          "aggregate_conclusion": "success",
+          "created_at": "2026-10-06T07:28:03Z",
+          "aggregate_completed_at": "2026-10-06T07:54:26Z",
+          "created_to_aggregate_seconds": 1583.0,
+          "runner_work_seconds": 7730.0,
+          "all_job_created_to_started_median_seconds_within_run": 3.0,
+          "first_job_start_delay_seconds": 2.0,
+          "updated_at_proxy_seconds": 1584.0
+        },
+        {
+          "run_id": 37722931483,
+          "head_sha": "05a05019232f967ab50acad277502e9088005d48",
+          "aggregate_job_id": 113140791485,
+          "aggregate_conclusion": "success",
+          "created_at": "2026-10-08T03:29:06Z",
+          "aggregate_completed_at": "2026-10-08T03:54:35Z",
+          "created_to_aggregate_seconds": 1529.0,
+          "runner_work_seconds": 7291.0,
+          "all_job_created_to_started_median_seconds_within_run": 2.0,
+          "first_job_start_delay_seconds": 2.0,
+          "updated_at_proxy_seconds": 1530.0
+        },
+        {
+          "run_id": 37725407263,
+          "head_sha": "7b91803f8e7cee893e961d421da383dec6df80f3",
+          "aggregate_job_id": 113148471775,
+          "aggregate_conclusion": "success",
+          "created_at": "2026-10-08T04:00:29Z",
+          "aggregate_completed_at": "2026-10-08T04:25:13Z",
+          "created_to_aggregate_seconds": 1484.0,
+          "runner_work_seconds": 7636.0,
+          "all_job_created_to_started_median_seconds_within_run": 2.0,
+          "first_job_start_delay_seconds": 3.0,
+          "updated_at_proxy_seconds": 1484.0
+        }
+      ],
+      "updated_at_proxy_median_seconds": 1530.0,
+      "summed_non_skipped_runner_work_median_seconds": 7636.0,
+      "ci_job_created_to_runner_start_median_of_run_medians_seconds": 2.0,
+      "qpb_job_created_to_runner_start_median_of_run_medians_seconds": 2.0,
+      "qpb_runner_elapsed_median_of_run_medians_seconds": 1384.0,
+      "time_to_required_quality_aggregate_seconds": [
+        1583.0,
+        1529.0,
+        1484.0
+      ],
+      "time_to_aggregate_median_seconds": 1529.0,
+      "updated_at_lifecycle_proxy_seconds": [
+        1584.0,
+        1530.0,
+        1484.0
+      ],
+      "updated_at_lifecycle_proxy_median_seconds": 1530.0,
+      "queue_definition": "Median of each run’s non-skipped job created_at→started_at delays, then median across the three run-level medians; historical record retains first observed start delay only, so not a like-for-like queue median."
+    },
+    "comparability": "Both successful push cohorts use workflow created_at → Required Quality Aggregate job completed_at. Exact API records retained for both; updated_at is not used for this comparison. Source/tool/cache/runner inputs differ, so the descriptive time difference is not causal.",
+    "time_to_aggregate_median_delta_after_minus_before_seconds": -4.0,
+    "time_to_aggregate_median_delta_percent": -0.2609262883235486
+  },
+  "recent_diagnostic_statistics": {
+    "definitions": {
+      "ci_end_to_end": "Recent diagnostic cohort only: run_started_at to GitHub run updated_at API value, treated as lifecycle proxy; updated_at is not assumed equal to completed_at or Required Quality Aggregate completion.",
+      "ci_job_queue_proxy": "For each run, median over job created_at→started_at; cohort value is median of those per-run medians. API-derived runner-start delay, not dependency-wait-free scheduler queue.",
+      "ci_runner_work": "sum of completed non-skipped CI job elapsed seconds; overlapping jobs are summed and this is not wall time",
+      "qpb_job_runner": "Quality Performance Baseline job started_at to completed_at; includes setup/tool install/capture/upload",
+      "build": "Cargo log Finished release-small profile duration, not whole job build wall time",
+      "warm": "median of five per-run warm samples; cohort summary is median of run-level five-sample medians",
+      "qpb_job_queue_proxy": "For each run, median over QPB job created_at→started_at; cohort value is median of those per-run medians.",
+      "qpb_runner_elapsed": "For each run, median of QPB job started_at→completed_at; cohort value is median of those run medians; includes setup/tool install/capture/upload."
+    },
+    "before": {
+      "sample_count": 3,
+      "ci_end_to_end_median_seconds": 1472.0,
+      "ci_job_created_to_runner_start_median_seconds": 2.0,
+      "ci_non_skipped_runner_work_median_seconds": 7565.0,
+      "qpb_job_created_to_runner_start_median_seconds": 2.0,
+      "qpb_runner_elapsed_median_seconds": 1312.0,
+      "platforms": {
+        "linux": {
+          "available_five_warm_records": 3,
+          "run_count": 3,
+          "cold_seconds_median": 187.7,
+          "warm_five_sample_median_seconds": 138.7,
+          "release_small_build_seconds_median": 113.0,
+          "qpb_job_runner_seconds_median": 1045.0,
+          "cache_restore_count": 3,
+          "cache_identities": [
+            "00877a4a9bdf9d704cbde1b99b917c8928da3457a933abfe8a36d51e23e90d62",
+            "2055f9209a3fb95b739502be38b8eb536370214d0e281966e21889c99fde9080",
+            "4d4d9e7238c704df370828dafe51dfe5e8fb84103c6a2855e8571afb8b897579"
+          ],
+          "release_small_build_record_count": 3
+        },
+        "macos": {
+          "available_five_warm_records": 3,
+          "run_count": 3,
+          "cold_seconds_median": 281.4,
+          "warm_five_sample_median_seconds": 159.8,
+          "release_small_build_seconds_median": 198.0,
+          "qpb_job_runner_seconds_median": 1343.0,
+          "cache_restore_count": 3,
+          "cache_identities": [
+            "58b7283782a7984a0d5b95c6b828f7528a9799677461735597fa7bb9673b80b8",
+            "7e45db79d882cb7dff61cb7f33f1be2b9e172f5487eb3fe1a4bdb4eb55493bfa",
+            "dcfacc38a8811bcd72221f8d9afed48f0039c24d9bf4ae9bc24b5016a628b3cf"
+          ],
+          "release_small_build_record_count": 3
+        },
+        "windows": {
+          "available_five_warm_records": 1,
+          "run_count": 3,
+          "cold_seconds_median": 286.2,
+          "warm_five_sample_median_seconds": 189.1,
+          "release_small_build_seconds_median": 218.0,
+          "qpb_job_runner_seconds_median": 1447.0,
+          "cache_restore_count": 3,
+          "cache_identities": [
+            "48244e3670a74c34321dba5c9bd910a8c242ba366b2aa222b37915298dfb82a0",
+            "8726d1f0e43c41e9664280251adfdb3d458442d6628adbb002612b5b742d705d",
+            "be10fc72229f98a2fe8b9faca95225c1102df13306d9a64f203c9ed73325699e"
+          ],
+          "release_small_build_record_count": 3
+        }
+      }
+    },
+    "after": {
+      "sample_count": 3,
+      "ci_end_to_end_median_seconds": 1530.0,
+      "ci_job_created_to_runner_start_median_seconds": 2.0,
+      "ci_non_skipped_runner_work_median_seconds": 7636.0,
+      "qpb_job_created_to_runner_start_median_seconds": 2.0,
+      "qpb_runner_elapsed_median_seconds": 1384.0,
+      "platforms": {
+        "linux": {
+          "available_five_warm_records": 3,
+          "run_count": 3,
+          "cold_seconds_median": 190.9,
+          "warm_five_sample_median_seconds": 139.7,
+          "release_small_build_seconds_median": 117.0,
+          "qpb_job_runner_seconds_median": 1056.0,
+          "cache_restore_count": 3,
+          "cache_identities": [
+            "322afcf67c77f06375956a4607a1a28d21e389559f1cd0908283220f8c312422",
+            "6fc19c8ed937ea08153e81e7706de5f3a4f19292441b1ff6ef51e6e996ec7ce5",
+            "7f3ae19a886d16751c6509d34139aca25b206715c07d12e7b22520e7f8095a18"
+          ],
+          "release_small_build_record_count": 3
+        },
+        "macos": {
+          "available_five_warm_records": 3,
+          "run_count": 3,
+          "cold_seconds_median": 255.2,
+          "warm_five_sample_median_seconds": 182.4,
+          "release_small_build_seconds_median": 184.0,
+          "qpb_job_runner_seconds_median": 1384.0,
+          "cache_restore_count": 3,
+          "cache_identities": [
+            "2ff2423bf14dc3114fad6cea07281ad054d6ea36de289e11693b78444ed4d70a",
+            "5248792b014d9d876123a46e6a0e605b0acf96e0a7aea764477cae9ac00efa38",
+            "bf6648c71e09849646e2e0f29f619851a5a0e553ee8bb0608d8a3a8998759d62"
+          ],
+          "release_small_build_record_count": 3
+        },
+        "windows": {
+          "available_five_warm_records": 3,
+          "run_count": 3,
+          "cold_seconds_median": 264.2,
+          "warm_five_sample_median_seconds": 180.3,
+          "release_small_build_seconds_median": 222.0,
+          "qpb_job_runner_seconds_median": 1506.0,
+          "cache_restore_count": 3,
+          "cache_identities": [
+            "62c5cd161047e1e0b6cfa04fe38ff6101f7ec0c1bc8cb68693362ac0b881e157",
+            "a81514930c8e3cd71500c83f47c0543e7b34ce82e48f92182d40d3e812d4b8d9",
+            "bdd4762b022defae6da3056a6883117d0a98b03c7ad363bd93638bfdeec77d48"
+          ],
+          "release_small_build_record_count": 3
+        }
+      }
+    },
+    "diagnostic_status_note": "The recent 37411168218 and 37421759343 runs failed and are censored diagnostics; 37426739465 succeeded but these three do not replace the original acceptance baseline."
+  },
+  "statistics": {
+    "definitions": {
+      "ci_end_to_end": "Recent diagnostic cohort only: run_started_at to GitHub run updated_at API value, treated as lifecycle proxy; updated_at is not assumed equal to completed_at or Required Quality Aggregate completion.",
+      "ci_job_queue_proxy": "For each run, median over job created_at→started_at; cohort value is median of those per-run medians. API-derived runner-start delay, not dependency-wait-free scheduler queue.",
+      "ci_runner_work": "sum of completed non-skipped CI job elapsed seconds; overlapping jobs are summed and this is not wall time",
+      "qpb_job_runner": "Quality Performance Baseline job started_at to completed_at; includes setup/tool install/capture/upload",
+      "build": "Cargo log Finished release-small profile duration, not whole job build wall time",
+      "warm": "median of five per-run warm samples; cohort summary is median of run-level five-sample medians",
+      "qpb_job_queue_proxy": "For each run, median over QPB job created_at→started_at; cohort value is median of those per-run medians.",
+      "qpb_runner_elapsed": "For each run, median of QPB job started_at→completed_at; cohort value is median of those run medians; includes setup/tool install/capture/upload."
+    },
+    "before": {
+      "sample_count": 3,
+      "ci_end_to_end_median_seconds": 1472.0,
+      "ci_job_created_to_runner_start_median_seconds": 2.0,
+      "ci_non_skipped_runner_work_median_seconds": 7565.0,
+      "qpb_job_created_to_runner_start_median_seconds": 2.0,
+      "qpb_runner_elapsed_median_seconds": 1312.0,
+      "platforms": {
+        "linux": {
+          "available_five_warm_records": 3,
+          "run_count": 3,
+          "cold_seconds_median": 187.7,
+          "warm_five_sample_median_seconds": 138.7,
+          "release_small_build_seconds_median": 113.0,
+          "qpb_job_runner_seconds_median": 1045.0,
+          "cache_restore_count": 3,
+          "cache_identities": [
+            "00877a4a9bdf9d704cbde1b99b917c8928da3457a933abfe8a36d51e23e90d62",
+            "2055f9209a3fb95b739502be38b8eb536370214d0e281966e21889c99fde9080",
+            "4d4d9e7238c704df370828dafe51dfe5e8fb84103c6a2855e8571afb8b897579"
+          ],
+          "release_small_build_record_count": 3
+        },
+        "macos": {
+          "available_five_warm_records": 3,
+          "run_count": 3,
+          "cold_seconds_median": 281.4,
+          "warm_five_sample_median_seconds": 159.8,
+          "release_small_build_seconds_median": 198.0,
+          "qpb_job_runner_seconds_median": 1343.0,
+          "cache_restore_count": 3,
+          "cache_identities": [
+            "58b7283782a7984a0d5b95c6b828f7528a9799677461735597fa7bb9673b80b8",
+            "7e45db79d882cb7dff61cb7f33f1be2b9e172f5487eb3fe1a4bdb4eb55493bfa",
+            "dcfacc38a8811bcd72221f8d9afed48f0039c24d9bf4ae9bc24b5016a628b3cf"
+          ],
+          "release_small_build_record_count": 3
+        },
+        "windows": {
+          "available_five_warm_records": 1,
+          "run_count": 3,
+          "cold_seconds_median": 286.2,
+          "warm_five_sample_median_seconds": 189.1,
+          "release_small_build_seconds_median": 218.0,
+          "qpb_job_runner_seconds_median": 1447.0,
+          "cache_restore_count": 3,
+          "cache_identities": [
+            "48244e3670a74c34321dba5c9bd910a8c242ba366b2aa222b37915298dfb82a0",
+            "8726d1f0e43c41e9664280251adfdb3d458442d6628adbb002612b5b742d705d",
+            "be10fc72229f98a2fe8b9faca95225c1102df13306d9a64f203c9ed73325699e"
+          ],
+          "release_small_build_record_count": 3
+        }
+      }
+    },
+    "after": {
+      "sample_count": 3,
+      "ci_end_to_end_median_seconds": 1530.0,
+      "ci_job_created_to_runner_start_median_seconds": 2.0,
+      "ci_non_skipped_runner_work_median_seconds": 7636.0,
+      "qpb_job_created_to_runner_start_median_seconds": 2.0,
+      "qpb_runner_elapsed_median_seconds": 1384.0,
+      "platforms": {
+        "linux": {
+          "available_five_warm_records": 3,
+          "run_count": 3,
+          "cold_seconds_median": 190.9,
+          "warm_five_sample_median_seconds": 139.7,
+          "release_small_build_seconds_median": 117.0,
+          "qpb_job_runner_seconds_median": 1056.0,
+          "cache_restore_count": 3,
+          "cache_identities": [
+            "322afcf67c77f06375956a4607a1a28d21e389559f1cd0908283220f8c312422",
+            "6fc19c8ed937ea08153e81e7706de5f3a4f19292441b1ff6ef51e6e996ec7ce5",
+            "7f3ae19a886d16751c6509d34139aca25b206715c07d12e7b22520e7f8095a18"
+          ],
+          "release_small_build_record_count": 3
+        },
+        "macos": {
+          "available_five_warm_records": 3,
+          "run_count": 3,
+          "cold_seconds_median": 255.2,
+          "warm_five_sample_median_seconds": 182.4,
+          "release_small_build_seconds_median": 184.0,
+          "qpb_job_runner_seconds_median": 1384.0,
+          "cache_restore_count": 3,
+          "cache_identities": [
+            "2ff2423bf14dc3114fad6cea07281ad054d6ea36de289e11693b78444ed4d70a",
+            "5248792b014d9d876123a46e6a0e605b0acf96e0a7aea764477cae9ac00efa38",
+            "bf6648c71e09849646e2e0f29f619851a5a0e553ee8bb0608d8a3a8998759d62"
+          ],
+          "release_small_build_record_count": 3
+        },
+        "windows": {
+          "available_five_warm_records": 3,
+          "run_count": 3,
+          "cold_seconds_median": 264.2,
+          "warm_five_sample_median_seconds": 180.3,
+          "release_small_build_seconds_median": 222.0,
+          "qpb_job_runner_seconds_median": 1506.0,
+          "cache_restore_count": 3,
+          "cache_identities": [
+            "62c5cd161047e1e0b6cfa04fe38ff6101f7ec0c1bc8cb68693362ac0b881e157",
+            "a81514930c8e3cd71500c83f47c0543e7b34ce82e48f92182d40d3e812d4b8d9",
+            "bdd4762b022defae6da3056a6883117d0a98b03c7ad363bd93638bfdeec77d48"
+          ],
+          "release_small_build_record_count": 3
+        }
+      }
+    },
+    "diagnostic_status_note": "The recent 37411168218 and 37421759343 runs failed and are censored diagnostics; 37426739465 succeeded but these three do not replace the original acceptance baseline."
+  },
+  "references": {
+    "successful_pr_after_runs": [
+      {
+        "pr": 298,
+        "run_id": 37721721679,
+        "head_sha": "a5db1f099f8d982adaa9be5e5781f1d2b6e853f3",
+        "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37721721679",
+        "aggregate_job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37721721679/job/113133984719",
+        "quality_job_id": 113130661259,
+        "quality_log_sha256": "8eb39311c8c03e7c90ac32c6723bd754ad4212245f82ec56b0ece44cb7e54ac4"
+      },
+      {
+        "pr": 299,
+        "run_id": 37724107517,
+        "head_sha": "3306b2aba5da9cbf4ff3e7c4a4a4bd9c2a4d9f2f",
+        "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37724107517",
+        "aggregate_job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37724107517/job/113141458303",
+        "quality_job_id": 113138232479,
+        "quality_log_sha256": "e6c1a47f74714fddb545b4173af71b169376b89d4fe0702659085c4436db1b78"
+      },
+      {
+        "pr": 300,
+        "run_id": 37726571334,
+        "head_sha": "bb813b8b82e8b5636f82cde941354f9c8eea9948",
+        "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37726571334",
+        "aggregate_job_url": "https://github.com/musutrade/Harness-Gate/actions/runs/37726571334/job/113149533534",
+        "quality_job_id": 113146489290,
+        "quality_log_sha256": "698fac05b733e89ae4d0f0e486aa93a65ca0b0f04bde416a53659d969dd82d25"
+      }
+    ],
+    "coverage_and_tool_installation": {
+      "pre_change_and_after_push_code_coverage_runs": [
+        {
+          "phase": "before",
+          "run_id": 37411168218,
+          "head_sha": "64c6c59c30bbb76884cd767b8ae0ea35ed91d747",
+          "issue291_commit_is_ancestor": false,
+          "code_coverage_job": {
+            "id": 112099699928,
+            "conclusion": "success",
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37411168218/job/112099699928"
+          },
+          "runner_image": "ubuntu-24.04",
+          "runner_image_version": "20260927.320.1",
+          "tool": "cargo-tarpaulin 0.37.5",
+          "installation_interval_seconds_from_raw_log": 117.790059,
+          "engine_command": "cargo tarpaulin --manifest-path tools/harness-gate/Cargo.toml --locked --engine llvm --timeout 300 --out Xml --output-dir \"$GITHUB_WORKSPACE/coverage\"",
+          "coverage_result": {
+            "percent": 87.99,
+            "covered_lines": 10248,
+            "total_lines": 11647
+          },
+          "raw_log_path": "/mnt/dev-ssd/dev-tmp/gh291-natural-main-analysis-20261008/push-coverage-logs/37411168218-code-coverage-job-112099699928.log",
+          "raw_log_sha256": "177ceb9b5288fa3f1f397c0b9a9322f39ac98efec916daded6c3e25e77e58d78",
+          "coverage_xml_generated_and_upload_attempted": true,
+          "codecov_action_step_conclusion": "success",
+          "codecov_server_upload_accepted": false,
+          "codecov_upload_response": "{\"message\":\"Token required - not valid tokenless upload\"}"
+        },
+        {
+          "phase": "after",
+          "run_id": 37429831983,
+          "head_sha": "f3c6d62d511abff1044c69c42ae7c50a26416bfb",
+          "issue291_commit_is_ancestor": true,
+          "code_coverage_job": {
+            "id": 112157846299,
+            "conclusion": "success",
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37429831983/job/112157846299"
+          },
+          "runner_image": "ubuntu-24.04",
+          "runner_image_version": "20260927.320.1",
+          "tool": "cargo-tarpaulin 0.37.5",
+          "installation_interval_seconds_from_raw_log": 0.775141,
+          "engine_command": "cargo tarpaulin --manifest-path tools/harness-gate/Cargo.toml --locked --engine llvm --timeout 300 --out Xml --output-dir \"$GITHUB_WORKSPACE/coverage\"",
+          "coverage_result": {
+            "percent": 87.99,
+            "covered_lines": 10248,
+            "total_lines": 11647
+          },
+          "raw_log_path": "/mnt/dev-ssd/dev-tmp/gh291-natural-main-analysis-20261008/push-coverage-logs/37429831983-code-coverage-job-112157846299.log",
+          "raw_log_sha256": "d5ba99240da7ebcb429fab47d2b0096856cd6cb2e79e481d82f9543046177973",
+          "coverage_xml_generated_and_upload_attempted": true,
+          "codecov_action_step_conclusion": "success",
+          "codecov_server_upload_accepted": false,
+          "codecov_upload_response": "{\"message\":\"Token required - not valid tokenless upload\"}"
+        },
+        {
+          "phase": "after",
+          "run_id": 37722931483,
+          "head_sha": "05a05019232f967ab50acad277502e9088005d48",
+          "issue291_commit_is_ancestor": true,
+          "code_coverage_job": {
+            "id": 113134516115,
+            "conclusion": "success",
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37722931483/job/113134516115"
+          },
+          "runner_image": "ubuntu-24.04",
+          "runner_image_version": "20260927.320.1",
+          "tool": "cargo-tarpaulin 0.37.5",
+          "installation_interval_seconds_from_raw_log": 0.443176,
+          "engine_command": "cargo tarpaulin --manifest-path tools/harness-gate/Cargo.toml --locked --engine llvm --timeout 300 --out Xml --output-dir \"$GITHUB_WORKSPACE/coverage\"",
+          "coverage_result": {
+            "percent": 87.99,
+            "covered_lines": 10249,
+            "total_lines": 11648
+          },
+          "raw_log_path": "/mnt/dev-ssd/dev-tmp/gh291-natural-main-analysis-20261008/push-coverage-logs/37722931483-code-coverage-job-113134516115.log",
+          "raw_log_sha256": "8dbd3ee27b59b31c81dd33f9eb53d224256899c7b79a9b3c98e395cbb5e59ed9",
+          "coverage_xml_generated_and_upload_attempted": true,
+          "codecov_action_step_conclusion": "success",
+          "codecov_server_upload_accepted": false,
+          "codecov_upload_response": "{\"message\":\"Token required - not valid tokenless upload\"}"
+        },
+        {
+          "phase": "after",
+          "run_id": 37725407263,
+          "head_sha": "7b91803f8e7cee893e961d421da383dec6df80f3",
+          "issue291_commit_is_ancestor": true,
+          "code_coverage_job": {
+            "id": 113142324870,
+            "conclusion": "success",
+            "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37725407263/job/113142324870"
+          },
+          "runner_image": "ubuntu-24.04",
+          "runner_image_version": "20260927.320.1",
+          "tool": "cargo-tarpaulin 0.37.5",
+          "installation_interval_seconds_from_raw_log": 0.412105,
+          "engine_command": "cargo tarpaulin --manifest-path tools/harness-gate/Cargo.toml --locked --engine llvm --timeout 300 --out Xml --output-dir \"$GITHUB_WORKSPACE/coverage\"",
+          "coverage_result": {
+            "percent": 87.97,
+            "covered_lines": 10249,
+            "total_lines": 11650
+          },
+          "raw_log_path": "/mnt/dev-ssd/dev-tmp/gh291-natural-main-analysis-20261008/push-coverage-logs/37725407263-code-coverage-job-113142324870.log",
+          "raw_log_sha256": "4d5792790b6a22271cb4ce3a2ac790974581650750bbc3313da0a2fb64c1f05b",
+          "coverage_xml_generated_and_upload_attempted": true,
+          "codecov_action_step_conclusion": "success",
+          "codecov_server_upload_accepted": false,
+          "codecov_upload_response": "{\"message\":\"Token required - not valid tokenless upload\"}"
+        }
+      ],
+      "interpretation": "The original pre-change Code Coverage job and three post-change successful natural-main Code Coverage jobs were read from raw Actions logs. All use tarpaulin 0.37.5 and the same locked LLVM/Cobertura command. The first post-change result exactly matches 87.99%, 10248/11647; later source snapshots report 10249/11648 and 10249/11650 at 87.99%/87.97%. Installation shifted from source compilation (117.79s in the pre-change log) to checksum-verified prebuilt binary install (0.775s, 0.443s, 0.412s in three post-change logs). The Cobertura report was generated and upload attempted, but retained logs show the non-blocking Codecov upload rejected tokenless submission; the Actions step still concluded success. This supports effective-version, command/output and measured-install parity from logs, not byte-identical XML or successful Codecov service ingestion, and not causal total-CI speedup. PR Code Coverage was skipped and is not used.",
+      "artifact_scope_note": "No quality-coverage-* artifact is associated with tarpaulin Code Coverage here. Those artifacts are separate Quality Coverage/Critical Paths LLVM source-risk outputs and are intentionally not represented as tarpaulin raw output or XML."
+    },
+    "supplementary_pr_after_run": {
+      "pr": 301,
+      "run_id": 37728180823,
+      "head_sha": "3d887a460bb72064b29a6f9ea71293e2949a16d7",
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37728180823"
+    }
+  },
+  "pr_after_comparison": {
+    "implementation_commit": "62c3d30ae3bb9d9afee312891c7a2ecf20b6af28",
+    "before_run_ids": [
+      36022253329,
+      35715449453,
+      37408616833
+    ],
+    "before": {
+      "create_to_aggregate_seconds": [
+        756.0,
+        529.0,
+        760.0
+      ],
+      "create_to_aggregate_median_seconds": 756.0,
+      "runner_work_seconds": [
+        2286.0,
+        2078.0,
+        2215.0
+      ],
+      "runner_work_median_seconds": 2215.0,
+      "historical_first_job_start_delay_seconds": [
+        3.0,
+        3.0,
+        3.0
+      ],
+      "historical_first_job_start_delay_median_seconds": 3.0,
+      "per_job_created_to_started_fields_retained": false
+    },
+    "after_run_ids": [
+      37721721679,
+      37724107517,
+      37726571334
+    ],
+    "after": {
+      "create_to_aggregate_seconds": [
+        809.0,
+        807.0,
+        879.0
+      ],
+      "create_to_aggregate_median_seconds": 809.0,
+      "runner_work_seconds": [
+        2194.0,
+        2161.0,
+        2347.0
+      ],
+      "runner_work_median_seconds": 2194.0,
+      "within_run_job_queue_medians_seconds": [
+        1.0,
+        2.0,
+        2.0
+      ],
+      "queue_median_of_run_medians_seconds": 2.0,
+      "first_job_start_delay_seconds": [
+        4.0,
+        2.0,
+        117.0
+      ],
+      "first_job_start_delay_median_seconds": 4.0
+    },
+    "observations": [
+      {
+        "pr": 298,
+        "ci_run_id": 37721721679,
+        "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37721721679",
+        "event": "pull_request",
+        "conclusion": "success",
+        "created_at": "2026-10-08T03:13:46Z",
+        "head_sha": "a5db1f099f8d982adaa9be5e5781f1d2b6e853f3",
+        "issue291_commit_is_ancestor": true,
+        "common_ancestor": "62c3d30ae3bb9d9afee312891c7a2ecf20b6af28",
+        "aggregate_job": {
+          "id": 113133984719,
+          "conclusion": "success",
+          "completed_at": "2026-10-08T03:27:15Z",
+          "created_to_aggregate_seconds": 809.0
+        },
+        "runner_work_seconds": 2194.0,
+        "non_skipped_job_created_to_started_median_seconds_within_run": 1.0,
+        "first_job_start_delay_seconds": 4.0,
+        "quality_coverage_critical_paths_job": {
+          "id": 113130661259,
+          "conclusion": "success",
+          "raw_log_sha256": "8eb39311c8c03e7c90ac32c6723bd754ad4212245f82ec56b0ece44cb7e54ac4",
+          "raw_log_path": "/mnt/dev-ssd/dev-tmp/gh291-natural-main-analysis-20261008/pr-after-api/logs/37721721679-quality-coverage-critical-paths-job-113130661259.log",
+          "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+          "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+          "source_cache_keys": [
+            "cargo-sources-v1-Linux-X64-868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959"
+          ]
+        },
+        "push_only_jobs": {
+          "Code Coverage": "skipped",
+          "Quality Performance Baseline": "skipped"
+        },
+        "head_branch": "fix/issue-287-text-redaction"
+      },
+      {
+        "pr": 299,
+        "ci_run_id": 37724107517,
+        "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37724107517",
+        "event": "pull_request",
+        "conclusion": "success",
+        "created_at": "2026-10-08T03:43:55Z",
+        "head_sha": "3306b2aba5da9cbf4ff3e7c4a4a4bd9c2a4d9f2f",
+        "issue291_commit_is_ancestor": true,
+        "common_ancestor": "62c3d30ae3bb9d9afee312891c7a2ecf20b6af28",
+        "aggregate_job": {
+          "id": 113141458303,
+          "conclusion": "success",
+          "completed_at": "2026-10-08T03:57:22Z",
+          "created_to_aggregate_seconds": 807.0
+        },
+        "runner_work_seconds": 2161.0,
+        "non_skipped_job_created_to_started_median_seconds_within_run": 2.0,
+        "first_job_start_delay_seconds": 2.0,
+        "quality_coverage_critical_paths_job": {
+          "id": 113138232479,
+          "conclusion": "success",
+          "raw_log_sha256": "e6c1a47f74714fddb545b4173af71b169376b89d4fe0702659085c4436db1b78",
+          "raw_log_path": "/mnt/dev-ssd/dev-tmp/gh291-natural-main-analysis-20261008/pr-after-api/logs/37724107517-quality-coverage-critical-paths-job-113138232479.log",
+          "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+          "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+          "source_cache_keys": [
+            "cargo-sources-v1-Linux-X64-868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959"
+          ]
+        },
+        "push_only_jobs": {
+          "Code Coverage": "skipped",
+          "Quality Performance Baseline": "skipped"
+        },
+        "head_branch": "fix/issue-284-282-290-integrity"
+      },
+      {
+        "pr": 300,
+        "ci_run_id": 37726571334,
+        "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37726571334",
+        "event": "pull_request",
+        "conclusion": "success",
+        "created_at": "2026-10-08T04:14:59Z",
+        "head_sha": "bb813b8b82e8b5636f82cde941354f9c8eea9948",
+        "issue291_commit_is_ancestor": true,
+        "common_ancestor": "62c3d30ae3bb9d9afee312891c7a2ecf20b6af28",
+        "aggregate_job": {
+          "id": 113149533534,
+          "conclusion": "success",
+          "completed_at": "2026-10-08T04:29:38Z",
+          "created_to_aggregate_seconds": 879.0
+        },
+        "runner_work_seconds": 2347.0,
+        "non_skipped_job_created_to_started_median_seconds_within_run": 2.0,
+        "first_job_start_delay_seconds": 117.0,
+        "quality_coverage_critical_paths_job": {
+          "id": 113146489290,
+          "conclusion": "success",
+          "raw_log_sha256": "698fac05b733e89ae4d0f0e486aa93a65ca0b0f04bde416a53659d969dd82d25",
+          "raw_log_path": "/mnt/dev-ssd/dev-tmp/gh291-natural-main-analysis-20261008/pr-after-api/logs/37726571334-quality-coverage-critical-paths-job-113146489290.log",
+          "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+          "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+          "source_cache_keys": [
+            "cargo-sources-v1-Linux-X64-868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959"
+          ]
+        },
+        "push_only_jobs": {
+          "Code Coverage": "skipped",
+          "Quality Performance Baseline": "skipped"
+        },
+        "head_branch": "fix/issue-289-baseline-delivery"
+      }
+    ],
+    "supplementary_pr301": {
+      "pr": 301,
+      "base_branch": "main",
+      "base_branch_api_verified": true,
+      "ci_run_id": 37728180823,
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/37728180823",
+      "event": "pull_request",
+      "conclusion": "success",
+      "created_at": "2026-10-08T04:35:03Z",
+      "head_sha": "3d887a460bb72064b29a6f9ea71293e2949a16d7",
+      "issue291_commit_is_ancestor": true,
+      "common_ancestor": "62c3d30ae3bb9d9afee312891c7a2ecf20b6af28",
+      "aggregate_job": {
+        "id": 113154183375,
+        "conclusion": "success",
+        "completed_at": "2026-10-08T04:47:57Z",
+        "created_to_aggregate_seconds": 774.0
+      },
+      "runner_work_seconds": 2337.0,
+      "non_skipped_job_created_to_started_median_seconds_within_run": 2.0,
+      "first_job_start_delay_seconds": 3.0,
+      "quality_coverage_critical_paths_job": {
+        "id": 113151013711,
+        "conclusion": "success",
+        "raw_log_sha256": "125a46f911650f03688263bf3a7fa0910d709c09ef0e95d7b81c4639dd642e46",
+        "raw_log_path": "/mnt/dev-ssd/dev-tmp/gh291-natural-main-analysis-20261008/pr-after-api/logs/37728180823-quality-coverage-critical-paths-job-113151013711.log",
+        "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+        "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+        "source_cache_keys": [
+          "cargo-sources-v1-Linux-X64-868ccabbd180e018f10128b31248c913487d40ef87fc7293d8fa485f1662e959"
+        ]
+      },
+      "push_only_jobs": {
+        "Code Coverage": "skipped",
+        "Quality Performance Baseline": "skipped"
+      },
+      "head_branch": "fix/issue-288-toolchain-compatibility"
+    },
+    "caveats": "All after heads have 62c3d30 as merge base (verified with GitHub compare API). Original PR-before third head 37408616833 is an ancestor of 62c3d30; the earlier two are September. All after PR Code Coverage and Quality Performance Baseline jobs are skipped by push-only conditions and are not tarpaulin parity evidence. Tool versions and cache keys are preserved per raw log; sources differ. Small cohorts do not establish causality.",
+    "pr_301_additional": {
+      "run_id": 37728180823,
+      "created_to_aggregate_seconds": 774.0,
+      "runner_work_seconds": 2337.0,
+      "queue_median_seconds": 2.0,
+      "head_sha": "3d887a460bb72064b29a6f9ea71293e2949a16d7"
+    },
+    "first_job_definition": "Workflow created_at to earliest started_at among non-skipped real runner jobs; skipped virtual jobs excluded."
+  },
+  "a5_new_boundary_evidence": {
+    "root": "/mnt/dev-ssd/dev-tmp/gh291-push-20261008/a5-installer-20261008T074405950771Z",
+    "summary_sha256": "b8ec1c655b3605e2ca7aeb41e6a42e1f67dbfbf15e7f650ebd1983647bbbc12d",
+    "manifest_sha256": "200b6b59da5d4243434da1ffafa6292bad8418651f031033ddd9335e02c80614",
+    "audit": "/mnt/dev-ssd/dev-tmp/gh291-audit-20261008/a5-installer-consumption/audit.json",
+    "checks": 54,
+    "cases": 5,
+    "state": "pass",
+    "boundary": "Pinned real upstream installer with isolated Cargo/download stubs; no second actual source compilation. Earlier documented raw directory could not be located; new raw evidence is separately identified."
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "npm",
+  "argv": [
+    "npm",
+    "--version"
+  ],
+  "started_at": "2026-09-10T08:26:35.735837+00:00",
+  "completed_at": "2026-09-10T08:26:35.845202+00:00",
+  "elapsed_seconds": 0.109384156,
+  "exit_code": 0
+}

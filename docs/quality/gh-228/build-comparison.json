@@ -1,0 +1,25 @@
+{
+  "schema": "gh-228-assembly-comparison/1",
+  "build_command": [
+    "python3",
+    "tools/quality/build_rust_collector.py",
+    "--lock",
+    "target/gh-228/runtime-inputs-v6.json",
+    "--output",
+    "<path without .tar>"
+  ],
+  "builds": [
+    {
+      "path": "target/gh-228/bundle-v6-one.tar",
+      "bytes": 996761600,
+      "sha256": "357ad48de6f2387363a00bfcf1d1bed81518cc84ed1a763bdbe146d828ff4548"
+    },
+    {
+      "path": "target/gh-228/bundle-v6-two.tar",
+      "bytes": 996761600,
+      "sha256": "357ad48de6f2387363a00bfcf1d1bed81518cc84ed1a763bdbe146d828ff4548"
+    }
+  ],
+  "equal": true,
+  "scope": "Two assemblies of identical pinned prebuilt compiler/runtime inputs; not two native-driver/compiler rebuilds."
+}

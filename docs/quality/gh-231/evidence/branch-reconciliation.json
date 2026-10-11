@@ -1,0 +1,10 @@
+{
+  "schema": "rust-collector-branch-reconciliation/v1",
+  "local_baseline": "48099c48f1fded35af5d71638bf57160cb8e0b31",
+  "remote_issue_head": "a9a121a10fb42055ad16a2312c1342b69fcb9ac5",
+  "remote_only_commit_changes": [
+    "docs/quality/gh-231/validation.md"
+  ],
+  "historical_blob_in_both_trees": "78a8cca51db040913ee48933387a8bba391acf39",
+  "delivery": "Create preparation tree from local reviewed main; preserve old remote issue head as second parent for non-force fast-forward API update. No historical content is dropped. Local Git metadata remains read-only."
+}

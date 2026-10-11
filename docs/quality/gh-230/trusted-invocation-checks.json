@@ -1,0 +1,143 @@
+{
+  "status": "incomplete; diagnostic evidence only",
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "tools/quality/build_rust_collector.py",
+        "--lock",
+        "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/trusted-invocation-progress/inputs.json",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/trusted-invocation-progress/runtime"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 15.51094072900014
+    },
+    {
+      "name": "diff-check-final",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.01661332801450044
+    },
+    {
+      "name": "docs-consistency-after-retention",
+      "command": [
+        "python3",
+        "tools/quality/docs_consistency.py",
+        "--output",
+        "target/quality/docs-consistency.json"
+      ],
+      "exit_code": 0,
+      "seconds": 3.3885598800261505
+    },
+    {
+      "name": "docs-consistency-final",
+      "command": [
+        "python3",
+        "tools/quality/docs_consistency.py",
+        "--output",
+        "target/quality/docs-consistency.json"
+      ],
+      "exit_code": 1,
+      "seconds": 3.4877977590076625
+    },
+    {
+      "command": [
+        "python3",
+        "tools/quality/build_rust_collector.py",
+        "--inventory",
+        "--driver",
+        "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/operator-native-runtime/build/debug/harness-gate-rust-native-driver",
+        "--sysroot",
+        "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/operator-native-runtime/sysroot",
+        "--crate-cache",
+        "/home/gem/.cargo/registry/cache/index.crates.io-1949cf8c6b5b557f",
+        "--rustc-dev",
+        "/mnt/dev-ssd/workspaces/symphony/GH-230/target/symphony-inputs/rustc-dev-1.97.1-x86_64-unknown-linux-gnu.tar.xz",
+        "--build-record",
+        "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/operator-native-runtime/bootstrap.json",
+        "--lock",
+        "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/trusted-invocation-progress/inputs.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 25.10667604196351
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "test_rust_collector_runtime.StandaloneNativeTests.test_actual_core_authenticates_private_collector_and_rejects_replay",
+        "-v"
+      ],
+      "environment": {
+        "RUST_COLLECTOR_RUNTIME": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/trusted-invocation-progress/runtime",
+        "HARNESS_GATE_NATIVE_POLICY_BINARY": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo/debug/harness-gate",
+        "PYTHONPATH": "/mnt/dev-ssd/workspaces/symphony/GH-230/tools/quality/tests",
+        "TMPDIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/tmp",
+        "CARGO_TARGET_DIR": "/mnt/dev-ssd/workspaces/symphony/GH-230/target/gh-230/cargo"
+      },
+      "exit_code": 0,
+      "wall_seconds": 22.824868116003927
+    },
+    {
+      "name": "openspec-final",
+      "command": [
+        "openspec",
+        "validate",
+        "package-official-rust-collector-for-independent-delivery",
+        "--strict",
+        "--no-interactive"
+      ],
+      "exit_code": 0,
+      "seconds": 0.5700579589465633
+    },
+    {
+      "command": [
+        "strace",
+        "-f",
+        "-qq",
+        "-e",
+        "trace=execve",
+        "-o",
+        "target/gh-230/trusted-invocation-progress/logs/strace-probe.log",
+        "/usr/bin/true"
+      ],
+      "exit_code": 1,
+      "stderr": "strace: do_test_ptrace_get_syscall_info: PTRACE_TRACEME: Operation not permitted\nstrace: attach: ptrace(PTRACE_SEIZE, 4): Operation not permitted\n",
+      "impact": "No observed producer launch counts from syscall tracing; not acceptance evidence."
+    }
+  ],
+  "summary": {
+    "status": "diagnostic; not acceptance",
+    "native_work": "target/gh-228/runtime-tests/tmp5n_ztlp0",
+    "artifacts": [
+      {
+        "path": "target/gh-230/trusted-invocation-progress/runtime.tar",
+        "bytes": 1623480320,
+        "sha256": "04d2b2a05a11f30c20b7a3d19ea5784c1471c1dc0a39ab50db634c68a7ac8011"
+      },
+      {
+        "path": "target/gh-230/trusted-invocation-progress/runtime/runtime.json",
+        "bytes": 187678,
+        "sha256": "31622eb6c532a681f6b63acc3c2fff4b0272b882382dee167c4eb9b7f6dd6173"
+      },
+      {
+        "path": "target/gh-230/cargo/debug/harness-gate",
+        "bytes": 128122568,
+        "sha256": "63607e8f9d3b0243b3d42ac574d27d531dd5e0630195fa632f748c7324a4b88d"
+      }
+    ],
+    "producer_counts": "Not observed: ptrace denied. No count inference from empty output directory."
+  },
+  "unchanged_validation": "recovery-checks.json: Rust nextest/fmt/clippy; invocation-error-checks.json: Python discovery 408 tests, three opt-in skips. Only native opt-in test/docs changed.",
+  "not_applicable": [
+    "harness-gate config check",
+    "harness-gate verify --profile ci --all"
+  ],
+  "limitations": "Checkout-built Core, disposable test signer, existing host, no observed launch counts or complete durable runtime package. Private test signing key excluded; public key, payload, signature and signed requests retained."
+}

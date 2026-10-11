@@ -1,0 +1,158 @@
+[
+  {
+    "name": "nextest",
+    "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+    "started_at": "2026-09-07T10:55:45.044294+00:00",
+    "seconds": 53.091,
+    "exit_code": 0,
+    "log": "nextest.log"
+  },
+  {
+    "name": "fmt",
+    "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+    "started_at": "2026-09-07T10:56:38.135202+00:00",
+    "seconds": 1.071,
+    "exit_code": 0,
+    "log": "fmt.log"
+  },
+  {
+    "name": "clippy",
+    "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+    "started_at": "2026-09-07T10:56:39.207887+00:00",
+    "seconds": 36.601,
+    "exit_code": 0,
+    "log": "clippy.log"
+  },
+  {
+    "name": "quality-tests",
+    "command": "python3 -m unittest discover -s tools/quality/tests -v",
+    "started_at": "2026-09-07T10:57:15.808948+00:00",
+    "seconds": 10.306,
+    "exit_code": 0,
+    "log": "quality-tests.log"
+  },
+  {
+    "name": "release-tests",
+    "command": "python3 -m unittest discover -s tools/release/tests -v",
+    "started_at": "2026-09-07T10:57:26.115247+00:00",
+    "seconds": 1.086,
+    "exit_code": 0,
+    "log": "release-tests.log"
+  },
+  {
+    "name": "bytecode",
+    "command": "python3 -m py_compile tools/quality/*.py tools/quality/tests/*.py tools/release/*.py tools/release/tests/*.py",
+    "started_at": "2026-09-07T10:57:27.202324+00:00",
+    "seconds": 0.272,
+    "exit_code": 0,
+    "log": "bytecode.log"
+  },
+  {
+    "name": "contracts",
+    "command": "python3 tools/quality/contracts.py --output target/quality/gh97-local/contracts.json",
+    "started_at": "2026-09-07T10:57:27.474499+00:00",
+    "seconds": 16.674,
+    "exit_code": 1,
+    "log": "contracts.log"
+  },
+  {
+    "name": "contracts-structured",
+    "command": "python3 tools/quality/contracts.py --output target/quality/gh97-local/contracts-structured.json --structured",
+    "started_at": "2026-09-07T10:57:44.148879+00:00",
+    "seconds": 0.293,
+    "exit_code": 1,
+    "log": "contracts-structured.log"
+  },
+  {
+    "name": "docs-consistency",
+    "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+    "started_at": "2026-09-07T10:57:44.442265+00:00",
+    "seconds": 3.006,
+    "exit_code": 0,
+    "log": "docs-consistency.log"
+  },
+  {
+    "name": "contracts-default-target",
+    "command": "python3 tools/quality/contracts.py --output target/quality/gh97-local/contracts.json",
+    "started_at": "2026-09-07T11:00:19.672226+00:00",
+    "elapsed_seconds": 0.267,
+    "exit_code": 1,
+    "log": "contracts-default-target.log",
+    "environment": {
+      "CARGO_TARGET_DIR": "unset; default tools/harness-gate/target"
+    }
+  },
+  {
+    "name": "contracts-structured-default-target",
+    "command": "python3 tools/quality/contracts.py --output target/quality/gh97-local/contracts-structured.json",
+    "started_at": "2026-09-07T11:00:19.939284+00:00",
+    "elapsed_seconds": 0.264,
+    "exit_code": 1,
+    "log": "contracts-structured-default-target.log",
+    "environment": {
+      "CARGO_TARGET_DIR": "unset; default tools/harness-gate/target"
+    }
+  },
+  {
+    "name": "contracts-explicit-target",
+    "command": "python3 tools/quality/contracts.py --output target/quality/gh97-local/contracts.json",
+    "started_at": "2026-09-07T11:00:45.269183+00:00",
+    "elapsed_seconds": 52.877,
+    "exit_code": 0,
+    "log": "contracts-explicit-target.log",
+    "environment": {
+      "CARGO_TARGET_DIR": "/home/gem/symphony-workspaces/GH-97/tools/harness-gate/target"
+    }
+  },
+  {
+    "name": "contracts-structured-explicit-target",
+    "command": "python3 tools/quality/contracts.py --output target/quality/gh97-local/contracts-structured.json --structured",
+    "started_at": "2026-09-07T11:01:38.146252+00:00",
+    "elapsed_seconds": 2.678,
+    "exit_code": 0,
+    "log": "contracts-structured-explicit-target.log",
+    "environment": {
+      "CARGO_TARGET_DIR": "/home/gem/symphony-workspaces/GH-97/tools/harness-gate/target"
+    }
+  },
+  {
+    "name": "extension-collect",
+    "command": "python3 tools/quality/ci_quality.py collect --base-sha 381d5f418655969d29b81f89069845e6667f35c9 --head-sha 381d5f418655969d29b81f89069845e6667f35c9 --run-id gh97-final-local --output target/quality/gh97-candidate",
+    "started_at": "2026-09-07T10:56:27.556621+00:00",
+    "seconds": 397.0041892360023,
+    "exit_code": 0,
+    "log": "collection.log",
+    "environment": {
+      "PATH": "workspace-scoped target/gh97-bin/git wrapper",
+      "CARGO_TARGET_DIR": "collector-owned target directories"
+    }
+  },
+  {
+    "name": "verify",
+    "command": "python3 tools/quality/ci_quality.py verify --base-sha 381d5f418655969d29b81f89069845e6667f35c9 --head-sha 381d5f418655969d29b81f89069845e6667f35c9 --run-id gh97-final-local --output target/quality/gh97-candidate",
+    "exit_code": 0,
+    "log": "verify.log"
+  },
+  {
+    "name": "verify-restored",
+    "command": "python3 tools/quality/ci_quality.py verify --base-sha 381d5f418655969d29b81f89069845e6667f35c9 --head-sha 381d5f418655969d29b81f89069845e6667f35c9 --run-id gh97-final-local --output target/quality/gh97-restored",
+    "exit_code": 0,
+    "log": "verify-restored.log"
+  },
+  {
+    "name": "final-docs-consistency",
+    "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+    "started_at": "2026-09-07T11:06:06.647855+00:00",
+    "seconds": 2.722,
+    "exit_code": 0,
+    "log": "final-docs-consistency.log"
+  },
+  {
+    "name": "openspec-strict",
+    "command": "openspec validate strict-json-results-and-risk-based-quality-gates --strict",
+    "started_at": "2026-09-07T11:06:09.370146+00:00",
+    "seconds": 1.197,
+    "exit_code": 0,
+    "log": "openspec-strict.log"
+  }
+]

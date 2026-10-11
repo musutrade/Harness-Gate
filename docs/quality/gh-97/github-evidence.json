@@ -1,0 +1,876 @@
+{
+  "retrieved_at": {
+    "current_time": "2026-09-07 10:56:26 UTC"
+  },
+  "dependencies": [
+    {
+      "number": 97,
+      "state": "open",
+      "state_reason": null,
+      "closed_at": null,
+      "url": "https://github.com/musutrade/Harness-Gate/issues/97"
+    },
+    {
+      "number": 96,
+      "state": "closed",
+      "state_reason": "completed",
+      "closed_at": "2026-09-07T10:53:12Z",
+      "url": "https://github.com/musutrade/Harness-Gate/issues/96"
+    },
+    {
+      "number": 95,
+      "state": "closed",
+      "state_reason": "completed",
+      "closed_at": "2026-09-07T10:12:37Z",
+      "url": "https://github.com/musutrade/Harness-Gate/issues/95"
+    },
+    {
+      "number": 94,
+      "state": "closed",
+      "state_reason": "completed",
+      "closed_at": "2026-09-07T09:34:38Z",
+      "url": "https://github.com/musutrade/Harness-Gate/issues/94"
+    },
+    {
+      "number": 93,
+      "state": "closed",
+      "state_reason": "completed",
+      "closed_at": "2026-09-07T07:43:39Z",
+      "url": "https://github.com/musutrade/Harness-Gate/issues/93"
+    },
+    {
+      "number": 92,
+      "state": "closed",
+      "state_reason": "completed",
+      "closed_at": "2026-09-07T07:10:04Z",
+      "url": "https://github.com/musutrade/Harness-Gate/issues/92"
+    },
+    {
+      "number": 91,
+      "state": "closed",
+      "state_reason": "completed",
+      "closed_at": "2026-09-07T06:25:03Z",
+      "url": "https://github.com/musutrade/Harness-Gate/issues/91"
+    },
+    {
+      "number": 90,
+      "state": "closed",
+      "state_reason": "completed",
+      "closed_at": "2026-09-05T16:28:23Z",
+      "url": "https://github.com/musutrade/Harness-Gate/issues/90"
+    },
+    {
+      "number": 89,
+      "state": "closed",
+      "state_reason": "completed",
+      "closed_at": "2026-09-05T13:44:32Z",
+      "url": "https://github.com/musutrade/Harness-Gate/issues/89"
+    },
+    {
+      "number": 88,
+      "state": "closed",
+      "state_reason": "completed",
+      "closed_at": "2026-09-05T08:09:38Z",
+      "url": "https://github.com/musutrade/Harness-Gate/issues/88"
+    }
+  ],
+  "current_run": [
+    {
+      "id": 34113753638,
+      "status": "queued",
+      "conclusion": null,
+      "head_sha": "381d5f418655969d29b81f89069845e6667f35c9",
+      "url": "https://github.com/musutrade/Harness-Gate/actions/runs/34113753638"
+    }
+  ],
+  "historical_runs": [
+    {
+      "run": {
+        "id": 34112797811,
+        "head_sha": "d5efbb17c6a8f8005ea26317d2d455a6a773e3c5",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34112797811",
+        "created_at": "2026-09-07T10:41:56Z",
+        "updated_at": "2026-09-07T10:52:10Z"
+      },
+      "jobs": [
+        {
+          "id": 101712645552,
+          "name": "Clippy",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34112797811/job/101712645552",
+          "started_at": "2026-09-07T10:41:58Z",
+          "completed_at": "2026-09-07T10:42:33Z",
+          "runner_name": "GitHub Actions 1000006531",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101712645804,
+          "name": "Build",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34112797811/job/101712645804",
+          "started_at": "2026-09-07T10:41:58Z",
+          "completed_at": "2026-09-07T10:44:35Z",
+          "runner_name": "GitHub Actions 1000006533",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101712645819,
+          "name": "Quality Coverage and Critical Paths",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34112797811/job/101712645819",
+          "started_at": "2026-09-07T10:41:58Z",
+          "completed_at": "2026-09-07T10:52:01Z",
+          "runner_name": "GitHub Actions 1000006532",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101712645850,
+          "name": "Release Governance Contracts",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34112797811/job/101712645850",
+          "started_at": "2026-09-07T10:41:59Z",
+          "completed_at": "2026-09-07T10:42:07Z",
+          "runner_name": "GitHub Actions 1000006536",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101712645860,
+          "name": "Security Audit",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34112797811/job/101712645860",
+          "started_at": "2026-09-07T10:41:58Z",
+          "completed_at": "2026-09-07T10:45:05Z",
+          "runner_name": "GitHub Actions 1000006534",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101712645889,
+          "name": "Test",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34112797811/job/101712645889",
+          "started_at": "2026-09-07T10:41:59Z",
+          "completed_at": "2026-09-07T10:42:59Z",
+          "runner_name": "GitHub Actions 1000006535",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101712645892,
+          "name": "Format",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34112797811/job/101712645892",
+          "started_at": "2026-09-07T10:41:59Z",
+          "completed_at": "2026-09-07T10:42:14Z",
+          "runner_name": "GitHub Actions 1000006538",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101712645915,
+          "name": "Quality CLI Contracts",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34112797811/job/101712645915",
+          "started_at": "2026-09-07T10:41:59Z",
+          "completed_at": "2026-09-07T10:42:54Z",
+          "runner_name": "GitHub Actions 1000006537",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101712645995,
+          "name": "Documentation Consistency",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34112797811/job/101712645995",
+          "started_at": "2026-09-07T10:41:58Z",
+          "completed_at": "2026-09-07T10:42:54Z",
+          "runner_name": "GitHub Actions 1000006539",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101712646098,
+          "name": "Quality Script Tests",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34112797811/job/101712646098",
+          "started_at": "2026-09-07T10:41:59Z",
+          "completed_at": "2026-09-07T10:42:24Z",
+          "runner_name": "GitHub Actions 1000006540",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101712646724,
+          "name": "Code Coverage",
+          "status": "completed",
+          "conclusion": "skipped",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34112797811/job/101712646724",
+          "started_at": "2026-09-07T10:41:57Z",
+          "completed_at": "2026-09-07T10:41:56Z",
+          "runner_name": null,
+          "runner_group_name": null,
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101712646866,
+          "name": "Quality CLI Contracts (${{ matrix.os }})",
+          "status": "completed",
+          "conclusion": "skipped",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34112797811/job/101712646866",
+          "started_at": "2026-09-07T10:41:57Z",
+          "completed_at": "2026-09-07T10:41:56Z",
+          "runner_name": null,
+          "runner_group_name": null,
+          "labels": []
+        },
+        {
+          "id": 101712646886,
+          "name": "Quality Performance Baseline",
+          "status": "completed",
+          "conclusion": "skipped",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34112797811/job/101712646886",
+          "started_at": "2026-09-07T10:41:57Z",
+          "completed_at": "2026-09-07T10:41:56Z",
+          "runner_name": null,
+          "runner_group_name": null,
+          "labels": []
+        },
+        {
+          "id": 101712646904,
+          "name": "Test (${{ matrix.os }})",
+          "status": "completed",
+          "conclusion": "skipped",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34112797811/job/101712646904",
+          "started_at": "2026-09-07T10:41:57Z",
+          "completed_at": "2026-09-07T10:41:56Z",
+          "runner_name": null,
+          "runner_group_name": null,
+          "labels": []
+        },
+        {
+          "id": 101712646932,
+          "name": "Build (${{ matrix.os }})",
+          "status": "completed",
+          "conclusion": "skipped",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34112797811/job/101712646932",
+          "started_at": "2026-09-07T10:41:57Z",
+          "completed_at": "2026-09-07T10:41:56Z",
+          "runner_name": null,
+          "runner_group_name": null,
+          "labels": []
+        },
+        {
+          "id": 101715362748,
+          "name": "Required Quality Aggregate",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34112797811/job/101715362748",
+          "started_at": "2026-09-07T10:52:04Z",
+          "completed_at": "2026-09-07T10:52:10Z",
+          "runner_name": "GitHub Actions 1000006541",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        }
+      ],
+      "artifacts": {
+        "artifacts": [
+          {
+            "archive_download_url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10015346346/zip",
+            "created_at": "2026-09-07T10:51:59Z",
+            "digest": "sha256:33b7e774e078da30aa278832ddf414dfefc058148012a72ae7db8eb9afdd3c13",
+            "expired": false,
+            "expires_at": "2026-12-06T10:41:56Z",
+            "id": 10015346346,
+            "name": "quality-coverage-34112797811-1",
+            "node_id": "MDg6QXJ0aWZhY3QxMDAxNTM0NjM0Ng==",
+            "size_in_bytes": 9267017,
+            "updated_at": "2026-09-07T10:51:59Z",
+            "url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10015346346",
+            "workflow_run": {
+              "head_branch": "symphony/GH-96",
+              "head_repository_id": 1346842829,
+              "head_sha": "d5efbb17c6a8f8005ea26317d2d455a6a773e3c5",
+              "id": 34112797811,
+              "repository_id": 1346842829
+            }
+          },
+          {
+            "archive_download_url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10015101425/zip",
+            "created_at": "2026-09-07T10:44:34Z",
+            "digest": "sha256:6ff4db381f9640ff76f9c6f0d3756b9c4b0cd50471872705581a96b255fdc7e8",
+            "expired": false,
+            "expires_at": "2026-12-06T10:41:56Z",
+            "id": 10015101425,
+            "name": "harness-gate-ubuntu-latest",
+            "node_id": "MDg6QXJ0aWZhY3QxMDAxNTEwMTQyNQ==",
+            "size_in_bytes": 4632983,
+            "updated_at": "2026-09-07T10:44:34Z",
+            "url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10015101425",
+            "workflow_run": {
+              "head_branch": "symphony/GH-96",
+              "head_repository_id": 1346842829,
+              "head_sha": "d5efbb17c6a8f8005ea26317d2d455a6a773e3c5",
+              "id": 34112797811,
+              "repository_id": 1346842829
+            }
+          },
+          {
+            "archive_download_url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10015046267/zip",
+            "created_at": "2026-09-07T10:42:53Z",
+            "digest": "sha256:55f86d1519214df36da63769f5fb43ab72606317addd07399fe2d7d9b667f004",
+            "expired": false,
+            "expires_at": "2026-12-06T10:41:56Z",
+            "id": 10015046267,
+            "name": "docs-consistency-34112797811",
+            "node_id": "MDg6QXJ0aWZhY3QxMDAxNTA0NjI2Nw==",
+            "size_in_bytes": 655,
+            "updated_at": "2026-09-07T10:42:53Z",
+            "url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10015046267",
+            "workflow_run": {
+              "head_branch": "symphony/GH-96",
+              "head_repository_id": 1346842829,
+              "head_sha": "d5efbb17c6a8f8005ea26317d2d455a6a773e3c5",
+              "id": 34112797811,
+              "repository_id": 1346842829
+            }
+          },
+          {
+            "archive_download_url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10015045920/zip",
+            "created_at": "2026-09-07T10:42:52Z",
+            "digest": "sha256:d95220a3392080d917e2ce2ddb5982f1107aa589587570e8ba13084a413c0c69",
+            "expired": false,
+            "expires_at": "2026-12-06T10:41:56Z",
+            "id": 10015045920,
+            "name": "quality-contracts-ubuntu-latest-34112797811",
+            "node_id": "MDg6QXJ0aWZhY3QxMDAxNTA0NTkyMA==",
+            "size_in_bytes": 9297,
+            "updated_at": "2026-09-07T10:42:52Z",
+            "url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10015045920",
+            "workflow_run": {
+              "head_branch": "symphony/GH-96",
+              "head_repository_id": 1346842829,
+              "head_sha": "d5efbb17c6a8f8005ea26317d2d455a6a773e3c5",
+              "id": 34112797811,
+              "repository_id": 1346842829
+            }
+          }
+        ],
+        "total_count": 4
+      }
+    },
+    {
+      "run": {
+        "id": 34110236230,
+        "head_sha": "c0e612351c2efd515fde96bcefad80c1365534a2",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "failure",
+        "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34110236230",
+        "created_at": "2026-09-07T10:12:35Z",
+        "updated_at": "2026-09-07T10:28:20Z"
+      },
+      "jobs": [
+        {
+          "id": 101704516514,
+          "name": "Clippy",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34110236230/job/101704516514",
+          "started_at": "2026-09-07T10:12:39Z",
+          "completed_at": "2026-09-07T10:13:22Z",
+          "runner_name": "GitHub Actions 1000006512",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101704516581,
+          "name": "Quality Performance Baseline (ubuntu-latest)",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34110236230/job/101704516581",
+          "started_at": "2026-09-07T10:12:38Z",
+          "completed_at": "2026-09-07T10:20:27Z",
+          "runner_name": "GitHub Actions 1000006510",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101704516701,
+          "name": "Test (windows-latest)",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34110236230/job/101704516701",
+          "started_at": "2026-09-07T10:12:38Z",
+          "completed_at": "2026-09-07T10:14:12Z",
+          "runner_name": "GitHub Actions 1000006514",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "windows-latest"
+          ]
+        },
+        {
+          "id": 101704516726,
+          "name": "Quality Script Tests",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34110236230/job/101704516726",
+          "started_at": "2026-09-07T10:12:38Z",
+          "completed_at": "2026-09-07T10:13:01Z",
+          "runner_name": "GitHub Actions 1000006511",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101704516755,
+          "name": "Security Audit",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34110236230/job/101704516755",
+          "started_at": "2026-09-07T10:12:39Z",
+          "completed_at": "2026-09-07T10:15:12Z",
+          "runner_name": "GitHub Actions 1000006518",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101704516783,
+          "name": "Build (windows-latest)",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34110236230/job/101704516783",
+          "started_at": "2026-09-07T10:12:39Z",
+          "completed_at": "2026-09-07T10:17:31Z",
+          "runner_name": "GitHub Actions 1000006513",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "windows-latest"
+          ]
+        },
+        {
+          "id": 101704516800,
+          "name": "Test (macos-latest)",
+          "status": "completed",
+          "conclusion": "failure",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34110236230/job/101704516800",
+          "started_at": "2026-09-07T10:12:42Z",
+          "completed_at": "2026-09-07T10:14:09Z",
+          "runner_name": "GitHub Actions 1000006515",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "macos-latest"
+          ]
+        },
+        {
+          "id": 101704516806,
+          "name": "Quality CLI Contracts (windows-latest)",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34110236230/job/101704516806",
+          "started_at": "2026-09-07T10:12:39Z",
+          "completed_at": "2026-09-07T10:14:44Z",
+          "runner_name": "GitHub Actions 1000006516",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "windows-latest"
+          ]
+        },
+        {
+          "id": 101704516813,
+          "name": "Build (macos-latest)",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34110236230/job/101704516813",
+          "started_at": "2026-09-07T10:12:44Z",
+          "completed_at": "2026-09-07T10:16:09Z",
+          "runner_name": "GitHub Actions 1000006527",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "macos-latest"
+          ]
+        },
+        {
+          "id": 101704516817,
+          "name": "Format",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34110236230/job/101704516817",
+          "started_at": "2026-09-07T10:12:38Z",
+          "completed_at": "2026-09-07T10:12:51Z",
+          "runner_name": "GitHub Actions 1000006523",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101704516822,
+          "name": "Quality CLI Contracts (macos-latest)",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34110236230/job/101704516822",
+          "started_at": "2026-09-07T10:12:44Z",
+          "completed_at": "2026-09-07T10:14:13Z",
+          "runner_name": "GitHub Actions 1000006528",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "macos-latest"
+          ]
+        },
+        {
+          "id": 101704516865,
+          "name": "Test",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34110236230/job/101704516865",
+          "started_at": "2026-09-07T10:12:38Z",
+          "completed_at": "2026-09-07T10:13:32Z",
+          "runner_name": "GitHub Actions 1000006519",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101704516936,
+          "name": "Build",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34110236230/job/101704516936",
+          "started_at": "2026-09-07T10:12:38Z",
+          "completed_at": "2026-09-07T10:14:57Z",
+          "runner_name": "GitHub Actions 1000006524",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101704516972,
+          "name": "Quality Performance Baseline (windows-latest)",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34110236230/job/101704516972",
+          "started_at": "2026-09-07T10:12:38Z",
+          "completed_at": "2026-09-07T10:28:13Z",
+          "runner_name": "GitHub Actions 1000006517",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "windows-latest"
+          ]
+        },
+        {
+          "id": 101704516977,
+          "name": "Documentation Consistency",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34110236230/job/101704516977",
+          "started_at": "2026-09-07T10:12:39Z",
+          "completed_at": "2026-09-07T10:13:33Z",
+          "runner_name": "GitHub Actions 1000006520",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101704517020,
+          "name": "Quality Performance Baseline (macos-latest)",
+          "status": "completed",
+          "conclusion": "failure",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34110236230/job/101704517020",
+          "started_at": "2026-09-07T10:12:48Z",
+          "completed_at": "2026-09-07T10:22:10Z",
+          "runner_name": "GitHub Actions 1000006529",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "macos-latest"
+          ]
+        },
+        {
+          "id": 101704517039,
+          "name": "Code Coverage",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34110236230/job/101704517039",
+          "started_at": "2026-09-07T10:12:39Z",
+          "completed_at": "2026-09-07T10:17:09Z",
+          "runner_name": "GitHub Actions 1000006521",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101704517062,
+          "name": "Quality Coverage and Critical Paths",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34110236230/job/101704517062",
+          "started_at": "2026-09-07T10:12:39Z",
+          "completed_at": "2026-09-07T10:22:44Z",
+          "runner_name": "GitHub Actions 1000006522",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101704517133,
+          "name": "Quality CLI Contracts",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34110236230/job/101704517133",
+          "started_at": "2026-09-07T10:12:39Z",
+          "completed_at": "2026-09-07T10:13:36Z",
+          "runner_name": "GitHub Actions 1000006526",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101704517154,
+          "name": "Release Governance Contracts",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34110236230/job/101704517154",
+          "started_at": "2026-09-07T10:12:39Z",
+          "completed_at": "2026-09-07T10:12:47Z",
+          "runner_name": "GitHub Actions 1000006525",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        },
+        {
+          "id": 101708890495,
+          "name": "Required Quality Aggregate",
+          "status": "completed",
+          "conclusion": "failure",
+          "html_url": "https://github.com/musutrade/Harness-Gate/actions/runs/34110236230/job/101708890495",
+          "started_at": "2026-09-07T10:28:16Z",
+          "completed_at": "2026-09-07T10:28:19Z",
+          "runner_name": "GitHub Actions 1000006530",
+          "runner_group_name": "GitHub Actions",
+          "labels": [
+            "ubuntu-latest"
+          ]
+        }
+      ],
+      "artifacts": {
+        "artifacts": [
+          {
+            "archive_download_url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10014552778/zip",
+            "created_at": "2026-09-07T10:28:09Z",
+            "digest": "sha256:de46246d35520fb2da94c548ac71ed160cc4fc789efafadcfdb32778baadf56c",
+            "expired": false,
+            "expires_at": "2026-12-06T10:12:36Z",
+            "id": 10014552778,
+            "name": "quality-baseline-windows-latest-34110236230",
+            "node_id": "MDg6QXJ0aWZhY3QxMDAxNDU1Mjc3OA==",
+            "size_in_bytes": 103167,
+            "updated_at": "2026-09-07T10:28:09Z",
+            "url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10014552778",
+            "workflow_run": {
+              "head_branch": "main",
+              "head_repository_id": 1346842829,
+              "head_sha": "c0e612351c2efd515fde96bcefad80c1365534a2",
+              "id": 34110236230,
+              "repository_id": 1346842829
+            }
+          },
+          {
+            "archive_download_url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10014372904/zip",
+            "created_at": "2026-09-07T10:22:42Z",
+            "digest": "sha256:6fa30131b045c9a7d0c157b5c25845695719f8a25a4e1887598937821d50a8b2",
+            "expired": false,
+            "expires_at": "2026-12-06T10:12:36Z",
+            "id": 10014372904,
+            "name": "quality-coverage-34110236230",
+            "node_id": "MDg6QXJ0aWZhY3QxMDAxNDM3MjkwNA==",
+            "size_in_bytes": 7014136,
+            "updated_at": "2026-09-07T10:22:42Z",
+            "url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10014372904",
+            "workflow_run": {
+              "head_branch": "main",
+              "head_repository_id": 1346842829,
+              "head_sha": "c0e612351c2efd515fde96bcefad80c1365534a2",
+              "id": 34110236230,
+              "repository_id": 1346842829
+            }
+          },
+          {
+            "archive_download_url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10014293723/zip",
+            "created_at": "2026-09-07T10:20:24Z",
+            "digest": "sha256:1595cda7b695cc62a820f76a5ee06f9c559fc5e313447673965f053a48720e52",
+            "expired": false,
+            "expires_at": "2026-12-06T10:12:36Z",
+            "id": 10014293723,
+            "name": "quality-baseline-ubuntu-latest-34110236230",
+            "node_id": "MDg6QXJ0aWZhY3QxMDAxNDI5MzcyMw==",
+            "size_in_bytes": 102049,
+            "updated_at": "2026-09-07T10:20:24Z",
+            "url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10014293723",
+            "workflow_run": {
+              "head_branch": "main",
+              "head_repository_id": 1346842829,
+              "head_sha": "c0e612351c2efd515fde96bcefad80c1365534a2",
+              "id": 34110236230,
+              "repository_id": 1346842829
+            }
+          },
+          {
+            "archive_download_url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10014096900/zip",
+            "created_at": "2026-09-07T10:14:55Z",
+            "digest": "sha256:8b8d28831b882b0bfc0f4841af6930b212db05d0423a6dfc3035b5f5f785d4af",
+            "expired": false,
+            "expires_at": "2026-12-06T10:12:36Z",
+            "id": 10014096900,
+            "name": "harness-gate-ubuntu-latest",
+            "node_id": "MDg6QXJ0aWZhY3QxMDAxNDA5NjkwMA==",
+            "size_in_bytes": 4632983,
+            "updated_at": "2026-09-07T10:14:55Z",
+            "url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10014096900",
+            "workflow_run": {
+              "head_branch": "main",
+              "head_repository_id": 1346842829,
+              "head_sha": "c0e612351c2efd515fde96bcefad80c1365534a2",
+              "id": 34110236230,
+              "repository_id": 1346842829
+            }
+          },
+          {
+            "archive_download_url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10014087173/zip",
+            "created_at": "2026-09-07T10:14:39Z",
+            "digest": "sha256:630cebaa62e7509b42e8b830547757a8ba057ff544d677135324895858993025",
+            "expired": false,
+            "expires_at": "2026-12-06T10:12:36Z",
+            "id": 10014087173,
+            "name": "quality-contracts-windows-latest-34110236230",
+            "node_id": "MDg6QXJ0aWZhY3QxMDAxNDA4NzE3Mw==",
+            "size_in_bytes": 9796,
+            "updated_at": "2026-09-07T10:14:39Z",
+            "url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10014087173",
+            "workflow_run": {
+              "head_branch": "main",
+              "head_repository_id": 1346842829,
+              "head_sha": "c0e612351c2efd515fde96bcefad80c1365534a2",
+              "id": 34110236230,
+              "repository_id": 1346842829
+            }
+          },
+          {
+            "archive_download_url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10014068242/zip",
+            "created_at": "2026-09-07T10:14:08Z",
+            "digest": "sha256:2fe9339f57f4b0321a7c2a0b7f139674d18d02820cc0c9005e6e68d2e7efbc0f",
+            "expired": false,
+            "expires_at": "2026-12-06T10:12:36Z",
+            "id": 10014068242,
+            "name": "quality-contracts-macos-latest-34110236230",
+            "node_id": "MDg6QXJ0aWZhY3QxMDAxNDA2ODI0Mg==",
+            "size_in_bytes": 9285,
+            "updated_at": "2026-09-07T10:14:08Z",
+            "url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10014068242",
+            "workflow_run": {
+              "head_branch": "main",
+              "head_repository_id": 1346842829,
+              "head_sha": "c0e612351c2efd515fde96bcefad80c1365534a2",
+              "id": 34110236230,
+              "repository_id": 1346842829
+            }
+          },
+          {
+            "archive_download_url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10014047792/zip",
+            "created_at": "2026-09-07T10:13:34Z",
+            "digest": "sha256:f928157c13e19d3f9e0a67269cb92b73587497703eed5242582c5c44a4046e38",
+            "expired": false,
+            "expires_at": "2026-12-06T10:12:36Z",
+            "id": 10014047792,
+            "name": "quality-contracts-ubuntu-latest-34110236230",
+            "node_id": "MDg6QXJ0aWZhY3QxMDAxNDA0Nzc5Mg==",
+            "size_in_bytes": 9295,
+            "updated_at": "2026-09-07T10:13:34Z",
+            "url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10014047792",
+            "workflow_run": {
+              "head_branch": "main",
+              "head_repository_id": 1346842829,
+              "head_sha": "c0e612351c2efd515fde96bcefad80c1365534a2",
+              "id": 34110236230,
+              "repository_id": 1346842829
+            }
+          },
+          {
+            "archive_download_url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10014046276/zip",
+            "created_at": "2026-09-07T10:13:31Z",
+            "digest": "sha256:9965afa4c604a138501649dd41be1e400b9bb8aa3cb527ad173f777000c10931",
+            "expired": false,
+            "expires_at": "2026-12-06T10:12:36Z",
+            "id": 10014046276,
+            "name": "docs-consistency-34110236230",
+            "node_id": "MDg6QXJ0aWZhY3QxMDAxNDA0NjI3Ng==",
+            "size_in_bytes": 654,
+            "updated_at": "2026-09-07T10:13:31Z",
+            "url": "https://api.github.com/repos/musutrade/Harness-Gate/actions/artifacts/10014046276",
+            "workflow_run": {
+              "head_branch": "main",
+              "head_repository_id": 1346842829,
+              "head_sha": "c0e612351c2efd515fde96bcefad80c1365534a2",
+              "id": 34110236230,
+              "repository_id": 1346842829
+            }
+          }
+        ],
+        "total_count": 8
+      }
+    }
+  ]
+}

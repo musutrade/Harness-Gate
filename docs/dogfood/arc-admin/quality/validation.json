@@ -1,0 +1,97 @@
+{
+  "issue": "GH-203",
+  "scope": [
+    "4.1",
+    "4.2",
+    "4.3",
+    "4.4"
+  ],
+  "baseline_commit": "bdd3ca459cf1c67cbf27fff6cbb2754e748b058a",
+  "arc_admin_source_commit": "9982ed556eaf997910824d7b682946147c81a16a",
+  "cargo_environment": {
+    "CARGO_TARGET_DIR": "$PWD/target",
+    "HARNESS_GATE_CI_ACCEPTANCE": "$PWD/target/quality/gh-203/workflow-acceptance (nextest only)"
+  },
+  "checks": [
+    {
+      "command": "cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked",
+      "status": "pass",
+      "result": "386 passed; 0 skipped",
+      "local_log": "target/quality/gh-203/nextest.log"
+    },
+    {
+      "command": "cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check",
+      "status": "pass",
+      "result": "exit 0",
+      "local_log": "target/quality/gh-203/fmt.log"
+    },
+    {
+      "command": "cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings",
+      "status": "pass",
+      "result": "exit 0",
+      "local_log": "target/quality/gh-203/clippy.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -v",
+      "status": "pass",
+      "result": "357 passed; clean full rerun after creating the linked validation record",
+      "local_log": "target/quality/gh-203/python.log"
+    },
+    {
+      "command": "python3 -m unittest discover -s tools/quality/tests -p test_docs_consistency.py -v",
+      "status": "pass",
+      "result": "5 passed after creating the linked validation record",
+      "local_log": "target/quality/gh-203/python-docs-recheck.log"
+    },
+    {
+      "command": "python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json",
+      "status": "pass",
+      "result": "exit 0; status pass; schemas synchronized; no link failures",
+      "local_log": "target/quality/gh-203/docs-consistency.log"
+    },
+    {
+      "command": "openspec validate dogfood-harness-gate-on-arc-admin --strict",
+      "status": "pass",
+      "result": "Change is valid; rerun after task checkboxes",
+      "local_log": "target/quality/gh-203/openspec.log"
+    },
+    {
+      "command": "python3 tools/quality/ci_acceptance.py --directory target/quality/gh-203/workflow-acceptance",
+      "status": "pass",
+      "result": "12 workflow acceptance cases; signed collector/compiler/baseline paths; not hosted Required Quality Aggregate",
+      "local_log": "target/quality/gh-203/workflow-acceptance.log"
+    },
+    {
+      "command": "python3 -c 'import json, tomllib, jsonschema; from pathlib import Path; jsonschema.validate(tomllib.loads(Path(\"docs/dogfood/arc-admin/quality/quality.toml\").read_text()), json.loads(Path(\"schema/quality.schema.json\").read_text())); print(\"Arc-Admin quality schema: pass\")'",
+      "status": "pass",
+      "result": "Arc-Admin quality.toml validates against schema/quality.schema.json",
+      "local_log": "target/quality/gh-203/schema.log"
+    }
+  ],
+  "initial_failure": {
+    "command": "python3 -m unittest discover -s tools/quality/tests -v",
+    "result": "357 run; one docs consistency error (SystemExit: 1). The newly linked validation.json did not exist yet. The standalone docs check identified that missing link. Creating the record resolved it; five targeted documentation tests and standalone docs consistency subsequently passed.",
+    "local_log": "target/quality/gh-203/python-initial.log"
+  },
+  "not_applicable": [
+    {
+      "command": "harness-gate config check",
+      "reason": "This checkout has no .harness-gate/flow.toml and no declared ci profile; no generic root configuration was invented."
+    },
+    {
+      "command": "harness-gate verify --profile ci --all",
+      "reason": "This checkout has no .harness-gate/flow.toml and no declared ci profile; no generic root configuration was invented."
+    }
+  ],
+  "limitations": [
+    "No Arc-Admin checkout was accessed or modified; only the pinned GH-201/GH-202 records in this workspace were used.",
+    "Configuration and certified reference paths do not establish Arc-Admin runtime quality or shadow parity. Host-provisioned canonical subjects, trusted state, signed collector requests/keys and authenticated baseline evidence remain prerequisites.",
+    "Only full and hook profiles exist in the pinned import. Hook intentionally declares partial assurance; Angular CRAP remains unsupported.",
+    "Required Quality Aggregate: CI pending at submission; no hosted green result claimed. Observation/shadow/cost/authority transfer and complete proposal acceptance remain pending."
+  ],
+  "delivery_environment": {
+    "failed_command": "git add docs/dogfood/arc-admin/README.md docs/dogfood/arc-admin/import/README.md docs/dogfood/arc-admin/quality openspec/changes/dogfood-harness-gate-on-arc-admin/design.md openspec/changes/dogfood-harness-gate-on-arc-admin/specs/project-validation-extension-boundary/spec.md openspec/changes/dogfood-harness-gate-on-arc-admin/tasks.md tools/harness-gate/src/config/quality/tests.rs tools/quality/tests/test_arc_admin_quality.py",
+    "error": "fatal: Unable to create '/mnt/dev-ssd/workspaces/symphony/GH-203/.git/index.lock': Read-only file system",
+    "impact": "Normal staging and local ref updates are unavailable. Delivery uses a temporary index and object store under target/quality/gh-203, reads existing objects from this checkout, and pushes the resulting commit directly to the same symphony/GH-203 remote branch. Protected local Git refs remain at the original baseline; the handoff records the full pushed SHA."
+  }
+}

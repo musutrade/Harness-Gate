@@ -1,0 +1,16 @@
+{
+  "invocation_id": "inv-1789034326-920721777-15059-1",
+  "created_at": "2026-09-10T09:58:46.924250892+00:00",
+  "profile": "full",
+  "staged": false,
+  "input_mode": "all",
+  "project_identity": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source",
+  "source_identity": "working-tree:9982ed556eaf997910824d7b682946147c81a16a",
+  "execution_root": "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/parity/source",
+  "configuration_digest": "sha256:cf7d181395a2a71827cc50fccfd5cba93ebe9c103cd9ae488ff491335cb393dc",
+  "executor_version": "0.3.7",
+  "commit": "9982ed556eaf997910824d7b682946147c81a16a",
+  "platform": "linux-x86_64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+  "request_id": null
+}

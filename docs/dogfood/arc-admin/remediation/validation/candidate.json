@@ -1,0 +1,250 @@
+{
+  "artifacts": {},
+  "base_sha": "ed0270a82be8b699f6bcb7916e7a03462f0a52c6",
+  "candidate": true,
+  "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+  "commands": [
+    {
+      "argv": [
+        "cargo",
+        "build",
+        "--locked",
+        "--manifest-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/tools/quality/rust-measure/Cargo.toml"
+      ],
+      "exit_code": 0,
+      "name": "analyzer-build",
+      "seconds": 5.358027321984991
+    },
+    {
+      "argv": [
+        "git",
+        "archive",
+        "--format=tar",
+        "--output=/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/base-source.tar",
+        "ed0270a82be8b699f6bcb7916e7a03462f0a52c6",
+        "tools/harness-gate",
+        "tools/quality",
+        "schema",
+        "docs"
+      ],
+      "exit_code": 0,
+      "name": "base-archive",
+      "seconds": 0.2694708200288005
+    },
+    {
+      "argv": [
+        "/usr/bin/python3",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/tools/quality/source_measure.py",
+        "prepare",
+        "--crate",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/snapshots/base/tools/harness-gate",
+        "--binary",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/build/debug/harness-gate-rust-measure",
+        "--manifest",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/base-manifest.json"
+      ],
+      "exit_code": 0,
+      "name": "base-prepare",
+      "seconds": 1.3059737639850937
+    },
+    {
+      "argv": [
+        "cargo",
+        "llvm-cov",
+        "nextest",
+        "--workspace",
+        "--locked",
+        "--manifest-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/snapshots/base/tools/harness-gate/Cargo.toml",
+        "--json",
+        "--output-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/base-coverage.json"
+      ],
+      "exit_code": 0,
+      "name": "base-coverage",
+      "seconds": 264.50165258703055
+    },
+    {
+      "argv": [
+        "cargo",
+        "llvm-cov",
+        "report",
+        "--workspace",
+        "--manifest-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/snapshots/base/tools/harness-gate/Cargo.toml",
+        "--lcov",
+        "--output-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/base-coverage.lcov"
+      ],
+      "exit_code": 0,
+      "name": "base-lcov",
+      "seconds": 0.8807161840377375
+    },
+    {
+      "argv": [
+        "cargo",
+        "llvm-cov",
+        "report",
+        "--workspace",
+        "--manifest-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/snapshots/base/tools/harness-gate/Cargo.toml",
+        "--cobertura",
+        "--output-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/base-coverage.cobertura.xml"
+      ],
+      "exit_code": 0,
+      "name": "base-cobertura.xml",
+      "seconds": 0.7954973999876529
+    },
+    {
+      "argv": [
+        "/usr/bin/python3",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/tools/quality/source_measure.py",
+        "measure",
+        "--crate",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/snapshots/base/tools/harness-gate",
+        "--binary",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/build/debug/harness-gate-rust-measure",
+        "--manifest",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/base-manifest.json",
+        "--llvm",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/base-coverage.json",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/base-risk.json"
+      ],
+      "exit_code": 0,
+      "name": "base-measure",
+      "seconds": 13.229115723981522
+    },
+    {
+      "argv": [
+        "git",
+        "archive",
+        "--format=tar",
+        "--output=/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/head-source.tar",
+        "2fb418dd6fbdbe68f9a1d36a53d8436adf4af295",
+        "tools/harness-gate",
+        "tools/quality",
+        "schema",
+        "docs"
+      ],
+      "exit_code": 0,
+      "name": "head-archive",
+      "seconds": 0.4764975220314227
+    },
+    {
+      "argv": [
+        "/usr/bin/python3",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/tools/quality/source_measure.py",
+        "prepare",
+        "--crate",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/snapshots/head/tools/harness-gate",
+        "--binary",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/build/debug/harness-gate-rust-measure",
+        "--manifest",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/head-manifest.json"
+      ],
+      "exit_code": 0,
+      "name": "head-prepare",
+      "seconds": 1.2859937690082006
+    },
+    {
+      "argv": [
+        "cargo",
+        "llvm-cov",
+        "nextest",
+        "--workspace",
+        "--locked",
+        "--manifest-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/snapshots/head/tools/harness-gate/Cargo.toml",
+        "--json",
+        "--output-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/head-coverage.json"
+      ],
+      "exit_code": 0,
+      "name": "head-coverage",
+      "seconds": 227.47071150300326
+    },
+    {
+      "argv": [
+        "cargo",
+        "llvm-cov",
+        "report",
+        "--workspace",
+        "--manifest-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/snapshots/head/tools/harness-gate/Cargo.toml",
+        "--lcov",
+        "--output-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/head-coverage.lcov"
+      ],
+      "exit_code": 0,
+      "name": "head-lcov",
+      "seconds": 0.7835297270212322
+    },
+    {
+      "argv": [
+        "cargo",
+        "llvm-cov",
+        "report",
+        "--workspace",
+        "--manifest-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/snapshots/head/tools/harness-gate/Cargo.toml",
+        "--cobertura",
+        "--output-path",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/head-coverage.cobertura.xml"
+      ],
+      "exit_code": 0,
+      "name": "head-cobertura.xml",
+      "seconds": 0.794791730993893
+    },
+    {
+      "argv": [
+        "/usr/bin/python3",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/tools/quality/source_measure.py",
+        "measure",
+        "--crate",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/snapshots/head/tools/harness-gate",
+        "--binary",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/build/debug/harness-gate-rust-measure",
+        "--manifest",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/head-manifest.json",
+        "--llvm",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/head-coverage.json",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/head-risk.json"
+      ],
+      "exit_code": 0,
+      "name": "head-measure",
+      "seconds": 13.122067706019152
+    },
+    {
+      "argv": [
+        "/usr/bin/python3",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/tools/quality/source_measure.py",
+        "compare",
+        "--base",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/base-risk.json",
+        "--head",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/head-risk.json",
+        "--output",
+        "/mnt/dev-ssd/workspaces/symphony/GH-207/target/quality/gh-207/risk/risk.json"
+      ],
+      "exit_code": 0,
+      "name": "risk-compare",
+      "seconds": 0.19798695598728955
+    }
+  ],
+  "commit": "2fb418dd6fbdbe68f9a1d36a53d8436adf4af295",
+  "logical_cpus": 8,
+  "machine": "x86_64",
+  "os": "Linux-7.0.0-31-generic-x86_64-with-glibc2.43",
+  "processor": "",
+  "python": "3.14.4",
+  "run_id": "gh-207-local",
+  "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+  "schema_version": 1,
+  "stages": {},
+  "target": "x86_64-unknown-linux-gnu",
+  "timestamp_utc": "2026-09-10T09:53:58.366959+00:00"
+}
