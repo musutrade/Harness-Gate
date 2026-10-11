@@ -135,7 +135,7 @@ fn arc_admin_controlled_quality_negatives_retain_truthful_outcomes() {
         ));
     }
     let mut matrix: Value = serde_json::from_str(include_str!(
-        "../../../../../../quality/fixtures/workflow/ci-matrix.json"
+        "../../../../../fixtures/workflow/ci-matrix.json"
     ))
     .unwrap();
     // Isolate CRAP from coverage: the negative keeps coverage at its passing value.

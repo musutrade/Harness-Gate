@@ -2,8 +2,8 @@ use super::{model::*, *};
 use crate::test_support::TestWorkspace;
 use std::fs;
 
-const QUALITY: &str = include_str!("../../../../quality/fixtures/workflow/quality.toml");
-const POLICY: &str = include_str!("../../../../quality/fixtures/workflow/policy.json");
+const QUALITY: &str = include_str!("../../../fixtures/workflow/quality.toml");
+const POLICY: &str = include_str!("../../../fixtures/workflow/policy.json");
 
 #[test]
 fn arc_admin_quality_validates_with_imported_flow_and_rejects_binding_loss() {
@@ -555,7 +555,7 @@ fn quality_rejects_malformed_policy_and_empty_intent() {
 fn unknown_pack_configures_cheap_and_expensive_profiles_without_ecosystem_dispatch() {
     let (root, mut flow, mut quality) = fixture();
     let metadata: serde_json::Value = serde_json::from_str(include_str!(
-        "../../../../quality/fixtures/workflow/collectors/unknown-profiles.json"
+        "../../../fixtures/workflow/collectors/unknown-profiles.json"
     ))
     .unwrap();
     let mut policy: serde_json::Value = serde_json::from_str(POLICY).unwrap();
@@ -631,7 +631,7 @@ fn unknown_pack_configures_cheap_and_expensive_profiles_without_ecosystem_dispat
 #[test]
 fn certified_reference_policy_participates_in_complete_profiles_with_original_limits_and_series() {
     let reference: serde_json::Value = serde_json::from_str(include_str!(
-        "../../../../quality/fixtures/workflow/collectors/certified-rust-profiles.json"
+        "../../../fixtures/workflow/collectors/certified-rust-profiles.json"
     ))
     .unwrap();
     let (root, mut flow, mut config) = fixture();

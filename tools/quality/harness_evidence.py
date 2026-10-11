@@ -69,9 +69,10 @@ def _canonical(value):
                       ensure_ascii=False, allow_nan=False).encode("utf-8")
 
 
-def _shape(value, filename="harness-evidence.schema.json", definition=None):
+def _shape(value, filename="harness-evidence.schema.json", definition=None, directory=None):
     _json_domain(value)
-    schema = json.loads((SCHEMA_DIR / filename).read_text())
+    root = SCHEMA_DIR if directory is None else Path(directory)
+    schema = json.loads((root / filename).read_text())
     shape = schema if definition is None else schema["definitions"][definition]
     errors = _schema_matches(value, shape, schema, "$")
     require(not errors, "; ".join(errors))

@@ -202,7 +202,7 @@ def run(output: Path) -> int:
             examples.append({"path": str(preset.relative_to(ROOT)),
                              "quality_generated": quality_generated,
                              "status": "pass" if checked else "fail"})
-    migration_fixture = Path(__file__).with_name("fixtures") / "v1-flow.toml"
+    migration_fixture = ROOT / "tools" / "harness-gate" / "fixtures" / "v1-flow.toml"
     with tempfile.TemporaryDirectory(prefix="harness-gate-migration-") as directory:
         root = Path(directory)
         shutil.copy2(migration_fixture, root / "legacy.flow.toml")
@@ -218,7 +218,7 @@ def run(output: Path) -> int:
         ).returncode == 0
         migration_checked = (migration_checked and (root / ".harness-gate" / "secrets.toml").is_file()
                              and not (root / ".harness-gate/quality.toml").exists())
-    workflow_fixture = Path(__file__).with_name("fixtures") / "workflow"
+    workflow_fixture = ROOT / "tools" / "harness-gate" / "fixtures" / "workflow"
     with tempfile.TemporaryDirectory(prefix="harness-gate-quality-example-") as directory:
         root = Path(directory)
         config = root / ".harness-gate"

@@ -42,8 +42,8 @@ a baseline.
 
 ## Model
 
-The complete [quality fixture](../tools/quality/fixtures/workflow/quality.toml)
-and its [policy document](../tools/quality/fixtures/workflow/policy.json) pair with
+The complete [quality fixture](../tools/harness-gate/fixtures/workflow/quality.toml)
+and its [policy document](../tools/harness-gate/fixtures/workflow/policy.json) pair with
 the `rust-api` flow preset. Docs consistency checks this pair in a temporary
 project and also cross-validates all generated reference presets and flow-only migration. Its illustrative series hash is not
 certified measurement evidence.

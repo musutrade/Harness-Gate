@@ -12,7 +12,7 @@ from pathlib import Path, PurePosixPath
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
-MATRIX = ROOT / 'tools/quality/fixtures/workflow/ci-matrix.json'
+MATRIX = ROOT / 'tools/harness-gate/fixtures/workflow/ci-matrix.json'
 IDENTITY = ('GITHUB_SHA', 'GITHUB_RUN_ID', 'GITHUB_RUN_ATTEMPT', 'RUNNER_OS', 'RUNNER_ARCH')
 
 

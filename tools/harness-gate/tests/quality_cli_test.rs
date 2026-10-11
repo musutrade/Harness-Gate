@@ -55,7 +55,7 @@ fn compiled_configuration_matches_direct_rust_and_rejects_stale_inputs() {
     let work = tempfile::tempdir().unwrap();
     let root = Path::new(env!("CARGO_MANIFEST_DIR"));
     let output = Command::new("python3")
-        .arg(root.join("../quality/fixtures/workflow/compiler/acceptance.py"))
+        .arg(root.join("fixtures/workflow/compiler/acceptance.py"))
         .arg("--harness-gate")
         .arg(env!("CARGO_BIN_EXE_harness-gate"))
         .arg("--output")
@@ -75,7 +75,7 @@ fn trusted_baselines_preserve_lineage_and_reject_stale_unknown_ecosystem_inputs(
     let work = tempfile::tempdir().unwrap();
     let root = Path::new(env!("CARGO_MANIFEST_DIR"));
     let output = Command::new("python3")
-        .arg(root.join("../quality/fixtures/workflow/baseline/acceptance.py"))
+        .arg(root.join("fixtures/workflow/baseline/acceptance.py"))
         .arg("--harness-gate")
         .arg(env!("CARGO_BIN_EXE_harness-gate"))
         .arg("--output")
@@ -95,7 +95,7 @@ fn explicit_policy_scopes_include_failing_components_and_reject_invalid_input() 
     let work = tempfile::tempdir().unwrap();
     let root = Path::new(env!("CARGO_MANIFEST_DIR"));
     let output = Command::new("python3")
-        .arg(root.join("../quality/fixtures/workflow/compiler/scope_acceptance.py"))
+        .arg(root.join("fixtures/workflow/compiler/scope_acceptance.py"))
         .arg("--harness-gate")
         .arg(env!("CARGO_BIN_EXE_harness-gate"))
         .arg("--output")

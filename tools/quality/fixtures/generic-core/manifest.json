@@ -507,8 +507,8 @@
   },
   "schema": "generic-core-corpus/v1",
   "schemas": {
+    "schema/collector-protocol.schema.json": "a3c23c578783dd4cbb1f4be3bb41a5c3552aee563e89116a5ff53fd4c159e545",
     "tools/quality/schema/capability-requirements.schema.json": "763da8a3a15cde9c338e8ca076e52488f5d0795ff61e05f8018b61cdc63c40ea",
-    "tools/quality/schema/collector-protocol.schema.json": "a3c23c578783dd4cbb1f4be3bb41a5c3552aee563e89116a5ff53fd4c159e545",
     "tools/quality/schema/harness-evidence.schema.json": "fbd0b737f73f8d65f196581859fcdf18d8d47da522c98d1020c22d2e0660d406",
     "tools/quality/schema/policy-exceptions.schema.json": "da3c0439d1a7484cef7571e9fd5bd5e3446f64419d51a7556ea69c7a004ead78",
     "tools/quality/schema/policy.schema.json": "3d3cb56ee6f5010bcc0a1a27284fcac69fb6cc59d91471d853af2bd570d82ba6",

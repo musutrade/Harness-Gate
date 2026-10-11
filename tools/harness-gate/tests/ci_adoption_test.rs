@@ -93,7 +93,7 @@ fn compatibility_cli_preserves_comparison_and_rollback_evidence() {
 #[test]
 fn migration_cli_preserves_source_and_refuses_overwrite() {
     let root = TempDir::new().unwrap();
-    let legacy = include_str!("../../quality/fixtures/v1-flow.toml");
+    let legacy = include_str!("../fixtures/v1-flow.toml");
     fs::write(root.path().join("legacy.toml"), legacy).unwrap();
     fs::create_dir(root.path().join(".harness-gate")).unwrap();
     fs::write(

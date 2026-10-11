@@ -38,8 +38,20 @@ def require(condition, code, message):
         raise CollectionError(code, message)
 
 
+HOST_SCHEMA = "collector-protocol.schema.json"
+
+
+def host_schema_directory():
+    """Resolve the host-contract schema in source and installed layouts."""
+    installed = Path(__file__).resolve().parent / "schema"
+    if (installed / HOST_SCHEMA).is_file():
+        return installed
+    return Path(__file__).resolve().parents[2] / "schema"
+
+
 def _shape(value, definition):
-    evidence._shape(value, "collector-protocol.schema.json", definition)
+    evidence._shape(value, HOST_SCHEMA, definition,
+                    directory=host_schema_directory())
 
 
 @dataclass(frozen=True)

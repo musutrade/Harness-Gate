@@ -99,10 +99,9 @@ mod parity_tests {
     use super::*;
 
     fn fixture() -> (Value, Value, Value) {
-        let source: Value = serde_json::from_str(include_str!(
-            "../../quality/fixtures/workflow/compiler/direct.json"
-        ))
-        .unwrap();
+        let source: Value =
+            serde_json::from_str(include_str!("../fixtures/workflow/compiler/direct.json"))
+                .unwrap();
         let mut policy = source["policy"].clone();
         policy["rules"][0]["id"] = json!("z-rule");
         let mut second = policy["rules"][0].clone();

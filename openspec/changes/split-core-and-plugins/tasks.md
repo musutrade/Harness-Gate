@@ -7,18 +7,18 @@ semantics, gate names, branch protection or release authority.
 
 ## 1. Tidy ownership in the current repository (no algorithm change)
 
-- [ ] 1.1 [P0][M] Assign a source of truth for each schema role (host contract / generic evidence / plugin raw output) across `schema/`, `quality-core/schema/`, `tools/quality/schema/`; acceptance: each duplicated basename has exactly one editable source and any copy is marked generated.
-- [ ] 1.2 [P0][S] Move `tools/quality/schema/collector-protocol.schema.json` to the core host-contract location; acceptance: the protocol schema is authoritative in core and referenced by path.
-- [ ] 1.3 [P0][M] Re-house the decision-engine fixture currently referenced by `src/config/quality/collectors/ci_acceptance.rs` into core; acceptance: core builds with no `include_str!` that reaches `tools/quality/fixtures/**`.
-- [ ] 1.4 [P0][M] Split fixture ownership: keep generic decision / invalid-evidence / timeout / replay fixtures in core, mark collector-specific fixtures for GateProbes; acceptance: a reviewed list shows each fixture's owner and no core test depends on a plugin fixture.
-- [ ] 1.5 [P1][S] Update `tools/quality/README.md` and any boundary note so the roles match D4/D5; acceptance: documentation states each schema role and fixture ownership without implying a merge by filename.
+- [x] 1.1 [P0][M] Assign a source of truth for each schema role (host contract / generic evidence / plugin raw output) across `schema/`, `quality-core/schema/`, `tools/quality/schema/`; acceptance: each duplicated basename has exactly one editable source and any copy is marked generated.
+- [x] 1.2 [P0][S] Move `tools/quality/schema/collector-protocol.schema.json` to the core host-contract location; acceptance: the protocol schema is authoritative in core and referenced by path.
+- [x] 1.3 [P0][M] Re-house the decision-engine fixture currently referenced by `src/config/quality/collectors/ci_acceptance.rs` into core; acceptance: core builds with no `include_str!` that reaches `tools/quality/fixtures/**`.
+- [x] 1.4 [P0][M] Split fixture ownership: keep generic decision / invalid-evidence / timeout / replay fixtures in core, mark collector-specific fixtures for GateProbes; acceptance: a reviewed list shows each fixture's owner and no core test depends on a plugin fixture.
+- [x] 1.5 [P1][S] Update `tools/quality/README.md` and any boundary note so the roles match D4/D5; acceptance: documentation states each schema role and fixture ownership without implying a merge by filename.
 
 ## 2. Prove one independent plugin chain (TypeScript-risk)
 
-- [ ] 2.1 [P0][M] Package the TypeScript-risk collector as a versioned artifact that core can consume by pinned reference; acceptance: the artifact installs and runs without core source and reports its exact version.
-- [ ] 2.2 [P0][M] Run core against the pinned TypeScript-risk artifact; acceptance: verify/decision path works end-to-end with the collector present only as a pinned artifact.
-- [ ] 2.3 [P0][S] Define the explicit-error behavior for an incompatible collector protocol version; acceptance: an incompatible version fails closed with a clear diagnostic instead of a silent or partial result.
-- [ ] 2.4 [P1][S] Record the independent chain evidence (commands, versions, artifacts); acceptance: reviewable record shows the chain is independent of core source.
+- [x] 2.1 [P0][M] Package the TypeScript-risk collector as a versioned artifact that core can consume by pinned reference; acceptance: the artifact installs and runs without core source and reports its exact version.
+- [x] 2.2 [P0][M] Run core against the pinned TypeScript-risk artifact; acceptance: verify/decision path works end-to-end with the collector present only as a pinned artifact.
+- [x] 2.3 [P0][S] Define the explicit-error behavior for an incompatible collector protocol version; acceptance: an incompatible version fails closed with a clear diagnostic instead of a silent or partial result.
+- [x] 2.4 [P1][S] Record the independent chain evidence (commands, versions, artifacts); acceptance: reviewable record shows the chain is independent of core source.
 
 ## 3. Core CI consumes pinned plugin artifacts, then move GateProbes release
 
@@ -27,6 +27,21 @@ semantics, gate names, branch protection or release authority.
 - [ ] 3.3 [P1][M] Split `tools/release/` into core-release and plugin-release groups by target; acceptance: each script has a single owning repository.
 - [ ] 3.4 [P1][M] Move plugin build/sign/publish machinery and the four collector workflows to GateProbes; acceptance: GateProbes tests, packages and publishes independently, and core no longer references them.
 - [ ] 3.5 [P1][M] Re-verify signing identity after the move; acceptance: Sigstore certificate identity and provenance reference the GateProbes repository/workflow, not only a new URL.
+
+> **Blocked (2026-10-11):** 3.1, 3.2, 3.4 and 3.5 cannot complete inside this
+> repository. The core-CI measurer build is `tools/quality/ci_quality.py`'s
+> `cargo build --manifest-path tools/quality/rust-measure/Cargo.toml`
+> (`harness-gate-rust-measure/0.3.1`, consumed by `source_measure.py`). No pinned
+> release artifact of that measurer exists: `package_independent_collectors.py`
+> packages only `typescript-risk`, `http-json-contract` and `rust-source-risk`,
+> and `source_measure.py` pins the analyzer identity, so `rust-source-risk` cannot
+> substitute without changing measurement semantics (a non-goal). 3.4/3.5 are
+> cross-repository moves whose signed provenance must be produced and re-verified
+> in GateProbes. No destructive change was made to required CI. 3.3 remains
+> doable in-repo but needs the 🟨 core/plugin decision for the shared
+> `release_policy.py`, `release_inventory.py`, `generate-sbom.py`,
+> `production_installer.py`, `build_user_installer.py` and
+> `publish_user_installer.py`.
 
 ## 4. Remove compatibility paths and handle the rest
 

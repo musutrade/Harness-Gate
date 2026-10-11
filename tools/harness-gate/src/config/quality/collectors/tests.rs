@@ -34,7 +34,7 @@ impl Fixture {
 
     fn in_dir(mode: &str, custom: bool, dir: TempDir) -> Self {
         let root = dir.path();
-        let fixtures = Path::new(env!("CARGO_MANIFEST_DIR")).join("../quality/fixtures/workflow");
+        let fixtures = Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/workflow");
         fs::create_dir(root.join(".harness-gate")).unwrap();
         fs::create_dir(root.join("src")).unwrap();
         fs::create_dir_all(root.join("target/evidence")).unwrap();
@@ -392,8 +392,8 @@ fn configured_multiple_producers_combine_distinct_series_and_reject_overlap() {
             record["metrics"][0]["value"] = json!({"type":"size","value":5,"unit":"bytes"});
         }
         payload["response"]["artifacts"] = record["artifacts"].clone();
-        let template = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("../quality/fixtures/workflow/collectors/collector.py");
+        let template =
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/workflow/collectors/collector.py");
         let script = fs::read_to_string(template)
             .unwrap()
             .replace("raw.json", "second.json")

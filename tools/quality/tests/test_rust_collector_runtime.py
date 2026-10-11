@@ -37,6 +37,33 @@ class BuildInputTests(unittest.TestCase):
             self.assertFalse((root / 'output').exists())
 
 
+class InstalledLayoutTests(unittest.TestCase):
+    """The assembled runtime resolves host contracts without a source checkout."""
+
+    def test_installed_runtime_resolves_the_host_contract_schema(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            runtime = Path(temporary) / 'runtime'
+            app = runtime / 'app'
+            (app / 'schema').mkdir(parents=True)
+            for name in builder.MODULES:
+                shutil.copyfile(QUALITY / (name + '.py'), app / (name + '.py'))
+            for filename, destination in builder.HOST_SCHEMA_FILES.items():
+                source = builder.ROOT.parents[1] / 'schema' / filename
+                self.assertTrue(source.is_file(), source)
+                shutil.copyfile(source, runtime / destination)
+            request = {'schema': 'harness-collector-request/v1', 'project': 'project',
+                       'component': 'component', 'collector': {'name': 'collector', 'version': '1'},
+                       'context': {'commit': 'a' * 40}, 'requested_capabilities': ['coverage.line'],
+                       'workspace_root': '/workspace', 'output_root': '/output', 'parameters': {}}
+            code = ('import json, sys; sys.path.insert(0, sys.argv[1]); '
+                    'import collector_runner as runner; '
+                    'runner._shape(json.loads(sys.argv[2]), "Request"); print("installed-layout ok")')
+            result = subprocess.run([sys.executable, '-I', '-S', '-B', '-c', code, str(app),
+                                     json.dumps(request)], text=True, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn('installed-layout ok', result.stdout)
+
+
 class StandaloneNativeTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

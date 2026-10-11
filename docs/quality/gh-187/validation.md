@@ -40,7 +40,7 @@ See [TypeScript certification](../typescript-certification.md),
 
 ## Unknown-ecosystem end-to-end evidence
 
-The unchanged [shared acceptance matrix](../../../tools/quality/fixtures/workflow/ci-matrix.json)
+The unchanged [shared acceptance matrix](../../../tools/harness-gate/fixtures/workflow/ci-matrix.json)
 contains `nebula-unregistered-2049`, alongside Rust, Angular/reference and mixed
 shapes. It supplies arbitrary producer/tool/runtime/series identities and a
 required `bundle.size <= 10 bytes` policy. Its passing value is 5 bytes; its

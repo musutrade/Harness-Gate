@@ -377,11 +377,11 @@ fn quality_config_commands_cross_validate_both_planes() {
         include_str!("../presets/rust-api.flow.toml")
     );
     assert_failure(&ctx.run_harness_gate(&["config", "print", "--quality"]));
-    let quality = include_str!("../../quality/fixtures/workflow/quality.toml");
+    let quality = include_str!("../fixtures/workflow/quality.toml");
     ctx.write_file(".harness-gate/quality.toml", quality);
     ctx.write_file(
         ".harness-gate/policy.json",
-        include_str!("../../quality/fixtures/workflow/policy.json"),
+        include_str!("../fixtures/workflow/policy.json"),
     );
     assert_success(&ctx.run_harness_gate(&["config", "check"]));
     assert_success(&ctx.run_harness_gate(&["config", "check", "--format", "json"]));

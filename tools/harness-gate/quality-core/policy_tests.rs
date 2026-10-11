@@ -195,10 +195,8 @@ fn green_local_gates_and_breaking_contract_block_project_with_provenance(referen
 }
 
 fn scope_policy(scope: Value) -> Value {
-    let fixture: Value = serde_json::from_str(include_str!(
-        "../../quality/fixtures/workflow/compiler/direct.json"
-    ))
-    .unwrap();
+    let fixture: Value =
+        serde_json::from_str(include_str!("../fixtures/workflow/compiler/direct.json")).unwrap();
     let mut policy = fixture["policy"].clone();
     policy["rules"][0]["scope"] = scope;
     if policy["rules"][0]["scope"]["kind"] == "relationship" {
@@ -250,10 +248,8 @@ fn scope_documents_validate_every_supported_kind_and_reject_invalid_fields() {
 
 #[test]
 fn resolved_scope_validation_preserves_alias_compilation_and_canonical_selection() {
-    let fixture: Value = serde_json::from_str(include_str!(
-        "../../quality/fixtures/workflow/compiler/direct.json"
-    ))
-    .unwrap();
+    let fixture: Value =
+        serde_json::from_str(include_str!("../fixtures/workflow/compiler/direct.json")).unwrap();
     let project = &fixture["project"];
     let canonical = &project["subjects"][0]["id"];
     let alias = scope_policy(json!({"kind":"subject", "subject":"module-alias"}));

@@ -23,6 +23,8 @@ ROOT = Path(__file__).resolve().parent
 MODULES = ('rust_collector_entry', 'rust_native_driver', 'rust_native_classify', 'rust_collector_contract',
            'rust_collector_project', 'rust_collector_delivery', 'collector_runner', 'harness_evidence',
            'project_model', 'quality_evidence')
+# Host contracts live in the repository schema root but install under app/schema.
+HOST_SCHEMA_FILES = {'collector-protocol.schema.json': 'app/schema/collector-protocol.schema.json'}
 HOST_LIBS = {'libc.so.6', 'libm.so.6', 'libpthread.so.0', 'libdl.so.2',
              'librt.so.1', 'ld-linux-x86-64.so.2'}
 
@@ -82,6 +84,8 @@ def inventory(driver, sysroot, crate_cache, rustc_dev, build_record):
     for name in extensions:
         add(name, 'python/lib/' + stdlib.name + '/lib-dynload/' + Path(name).name)
     tree(ROOT / 'schema', 'app/schema')
+    for filename, destination in HOST_SCHEMA_FILES.items():
+        add(ROOT.parents[1] / 'schema' / filename, destination)
     for name in ('harness-gate-rust-collector', 'native-wrapper', 'pkg-config'):
         add(ROOT / 'rust-collector-runtime' / name, 'bin/' + name)
     add(ROOT / 'rust-collector-runtime/native_wrapper.py', 'app/native_wrapper.py')

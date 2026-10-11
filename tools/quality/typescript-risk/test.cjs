@@ -354,6 +354,21 @@ test("protocol rejects stale sources, coverage, context, missing subjects, escap
     });
 });
 
+test("incompatible collector protocol version fails closed with an explicit diagnostic", () =>
+  scenario(({ request }) => {
+    request.schema = "harness-collector-request/v2";
+    assert.throws(
+      () => collect(request),
+      /incompatible collector protocol version: expected request schema harness-collector-request\/v1, received "harness-collector-request\/v2"/,
+    );
+    request.schema = "harness-collector-request/v1";
+    request.collector = { ...COLLECTOR, version: "9.9.9" };
+    assert.throws(
+      () => collect(request),
+      /incompatible collector version: expected typescript-risk@0\.1\.0-rc\.4, received/,
+    );
+  }));
+
 test("subprocess supports version/inventory and strict one-response error semantics", () =>
   scenario(({ request }) => {
     const version = spawnSync(
