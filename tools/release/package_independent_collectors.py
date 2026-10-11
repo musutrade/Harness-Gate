@@ -25,6 +25,73 @@ def run(*args: str, cwd: Path = ROOT, env=None, echo=True, combine=False) -> str
     return result.stdout
 
 
+def measurer_archive_name(version: str) -> str:
+    return "harness-gate-rust-measure-" + version + "-linux-amd64.tar.gz"
+
+
+def measurer_identity(source: Path) -> dict:
+    manifest = tomllib.loads((source / "Cargo.toml").read_text())
+    identity = json.loads((source / "plugin.json").read_text())
+    if manifest["package"]["name"] != identity["name"]:
+        raise RuntimeError("measurer plugin identity name mismatch")
+    if manifest["package"]["version"] != identity["version"]:
+        raise RuntimeError("measurer plugin identity version mismatch")
+    return identity
+
+
+def check_measurer_identity(binary: Path, source: Path, identity: dict) -> None:
+    result = subprocess.run([str(binary), str(source), "--target-cfg"],
+                            input=json.dumps({"target": "packaged", "cfg": []}),
+                            capture_output=True, text=True, check=True)
+    report = json.loads(result.stdout)
+    if (report.get("analyzer"), report.get("version"), report.get("rule")) != (
+            identity["analyzer"], identity["version"], identity["rule"]):
+        raise RuntimeError("packaged measurer identity mismatch")
+
+
+def rust_measure_package(output: Path) -> None:
+    source = ROOT / "tools/quality/rust-measure"
+    manifest = source / "Cargo.toml"
+    identity = measurer_identity(source)
+    version = identity["version"]
+    with tempfile.TemporaryDirectory(prefix="rust-measure-package-") as tmp:
+        stage = Path(tmp)
+        env = dict(os.environ, CARGO_TARGET_DIR=str(stage / "target"))
+        run("cargo", "test", "--locked", "--manifest-path", str(manifest), env=env)
+        run("cargo", "build", "--locked", "--release", "--manifest-path", str(manifest), env=env)
+        binary = stage / "target/release" / identity["executable"]
+        name = "harness-gate-rust-measure-" + version + "-linux-amd64"
+        package = stage / name
+        package.mkdir()
+        for filename in ("plugin.json", "Cargo.toml", "Cargo.lock", "README.md"):
+            shutil.copy2(source / filename, package / filename)
+        shutil.copy2(ROOT / "LICENSE", package / "LICENSE")
+        shutil.copy2(binary, package / identity["executable"])
+        smoke = stage / "smoke.rs"
+        smoke.write_text("fn packaged_measure(x: bool) { if x {} }\n")
+        check_measurer_identity(package / identity["executable"], smoke, identity)
+        archive = output / measurer_archive_name(version)
+        with tarfile.open(archive, "w:gz") as stream:
+            stream.add(package, arcname=name)
+        # Extracting the archive catches omitted files before publication.
+        consumer = stage / "consumer"
+        consumer.mkdir()
+        with tarfile.open(archive) as stream:
+            stream.extractall(consumer, filter="data")
+        installed = consumer / name
+        for filename in ("plugin.json", "Cargo.toml", "Cargo.lock", "README.md",
+                         "LICENSE", identity["executable"]):
+            if not (installed / filename).is_file():
+                raise RuntimeError("incomplete measurer archive: " + filename)
+        check_measurer_identity(installed / identity["executable"], smoke, identity)
+        metadata = stage / "cargo-metadata.json"
+        metadata.write_text(run("cargo", "metadata", "--locked", "--format-version", "1",
+                                "--manifest-path", str(manifest), env=env, echo=False))
+        run("python3", "tools/release/generate-sbom.py", "--metadata", str(metadata),
+            "--lockfile", str(source / "Cargo.lock"),
+            "--output", str(output / (measurer_archive_name(version) + ".sbom.cdx.json")))
+
+
 def node_package(directory: str, output: Path) -> None:
     source = ROOT / "tools/quality" / directory
     package = json.loads((source / "package.json").read_text())
@@ -152,6 +219,7 @@ def main() -> None:
     node_package("typescript-risk", output)
     node_package("http-json-contract", output)
     rust_package(output)
+    rust_measure_package(output)
 
 
 if __name__ == "__main__":

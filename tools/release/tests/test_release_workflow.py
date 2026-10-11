@@ -21,6 +21,7 @@ class ReleaseWorkflowTests(unittest.TestCase):
             "harness-gate-typescript-collector-0.1.0-rc.4.tgz",
             "harness-gate-http-json-contract-collector-0.1.0-rc.5.tgz",
             "harness-gate-rust-source-risk-0.1.0-rc.7-linux-amd64.tar.gz",
+            "harness-gate-rust-measure-0.3.1-linux-amd64.tar.gz",
         ):
             self.assertIn("--package " + package, self.source)
             self.assertIn("--sbom " + package + ".sbom.cdx.json", self.source)
