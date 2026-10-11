@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import contextlib
+import importlib.util
 import io
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -15,6 +17,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import benchmarks
 import benchmark_fixture_probe as probe
+
+MODULE = importlib.util.spec_from_file_location(
+    "benchmark_worker",
+    Path(__file__).resolve().parents[1] / "fixtures" / "benchmark" / "benchmark_worker.py",
+)
+worker = importlib.util.module_from_spec(MODULE)
+MODULE.loader.exec_module(worker)
 
 
 class BenchmarkEvidenceTests(unittest.TestCase):
@@ -273,6 +282,35 @@ class BenchmarkEvidenceTests(unittest.TestCase):
             archive = output.parent / "nextest-samples"
             self.assertEqual((archive / "warm-1.stdout.txt").read_text(), "warm-head")
             self.assertEqual((archive / "warm-1.stderr.txt").read_text(), "warm-tail")
+
+
+    def test_worker_retries_windows_lock_contention(self):
+        with tempfile.TemporaryDirectory() as directory:
+            state = Path(directory) / "state.json"
+            real_open = os.open
+            attempts = {"count": 0}
+
+            def contended(*args, **kwargs):
+                attempts["count"] += 1
+                if attempts["count"] <= 2:
+                    raise PermissionError(13, "lock held")
+                return real_open(*args, **kwargs)
+
+            with patch.object(worker.os, "open", side_effect=contended), \
+                    patch.object(worker.time, "sleep", return_value=None):
+                worker.update_state(state, 1)
+            self.assertEqual(json.loads(state.read_text())["current"], 1)
+            self.assertEqual(attempts["count"], 3)
+            self.assertFalse(state.with_suffix(".json.lock").exists())
+
+    def test_worker_fails_closed_when_the_lock_never_clears(self):
+        with tempfile.TemporaryDirectory() as directory:
+            state = Path(directory) / "state.json"
+            with patch.object(worker.os, "open", side_effect=PermissionError(13, "lock held")), \
+                    patch.object(worker.time, "sleep", return_value=None), \
+                    patch.object(worker.time, "monotonic", side_effect=[0.0, 0.0, 0.0, 11.0, 11.0]):
+                with self.assertRaisesRegex(RuntimeError, "timed out acquiring benchmark state lock"):
+                    worker.update_state(state, 1)
 
 
 if __name__ == "__main__":
