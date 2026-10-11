@@ -232,9 +232,11 @@ jobs:
             --package harness-gate-typescript-collector-0.1.0-rc.4.tgz \
             --package harness-gate-http-json-contract-collector-0.1.0-rc.5.tgz \
             --package harness-gate-rust-source-risk-0.1.0-rc.7-linux-amd64.tar.gz \
+            --package harness-gate-rust-measure-0.3.1-linux-amd64.tar.gz \
             --sbom harness-gate-typescript-collector-0.1.0-rc.4.tgz.sbom.cdx.json \
             --sbom harness-gate-http-json-contract-collector-0.1.0-rc.5.tgz.sbom.cdx.json \
             --sbom harness-gate-rust-source-risk-0.1.0-rc.7-linux-amd64.tar.gz.sbom.cdx.json \
+            --sbom harness-gate-rust-measure-0.3.1-linux-amd64.tar.gz.sbom.cdx.json \
             --tag "$TAG" \
             --commit "$COMMIT" \
             --repository "$REPOSITORY"
