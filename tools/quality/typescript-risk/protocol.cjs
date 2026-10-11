@@ -5,6 +5,7 @@ const assert = require("node:assert/strict");
 const { inventory, measure, sha } = require("./measure.cjs");
 const parse = require("./strict-json.cjs");
 const COLLECTOR = { name: "typescript-risk", version: "0.1.0-rc.4" };
+const REQUEST_SCHEMA = "harness-collector-request/v1";
 const TYPES = {
   "complexity.cyclomatic": "count",
   "coverage.function": "ratio",
@@ -268,8 +269,14 @@ function collect(request) {
       /^[a-f0-9]{40}$/.test(request.context.base_commit),
     "invalid source revision",
   );
-  assert.equal(request.schema, "harness-collector-request/v1");
-  equal(request.collector, COLLECTOR, "collector version mismatch");
+  if (request.schema !== REQUEST_SCHEMA)
+    throw new Error(
+      `incompatible collector protocol version: expected request schema ${REQUEST_SCHEMA}, received ${JSON.stringify(request.schema)}`,
+    );
+  if (canonical(request.collector) !== canonical(COLLECTOR))
+    throw new Error(
+      `incompatible collector version: expected ${COLLECTOR.name}@${COLLECTOR.version}, received ${JSON.stringify(request.collector)}`,
+    );
   assert(
     request.requested_capabilities.length > 0 &&
       request.requested_capabilities.every((m) => m in TYPES),
