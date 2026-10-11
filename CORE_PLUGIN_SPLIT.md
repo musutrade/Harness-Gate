@@ -65,6 +65,21 @@ A release package may carry a generated copy, but the two sides must not edit
 their own versions independently. These distinctions are confirmable in the
 existing core differential tests and the Python reference implementation.
 
+### 2.4 Some `docs/` files are build- and CI-critical
+
+`docs/` is not documentation-only and MUST stay with core:
+
+- `tools/harness-gate/tests/import_test.rs` compile-time `include_str!`s
+  `docs/dogfood/arc-admin/{import/flow.toml,import/flow.import.json,sources/.arc-flow/flow.toml.txt}`.
+- `tools/quality/ci_quality.py` archives `docs/dogfood` from **both** the base and
+  head commits (`SNAPSHOT_PATHS`), so every measured commit must contain it.
+- `tools/quality/docs_consistency.py` guards normative anchors in
+  `docs/engineering-policy.md`, `docs/configuration*.md` and `schema/README.md`.
+- quality tests reference `docs/dogfood/arc-admin/**` and `docs/benchmarks/phase-1/**`.
+
+Removing `docs/` from history stops the core build and every quality gate.
+When reducing the repository, keep the build/CI-critical subset with core.
+
 ## 3. CI ownership
 
 - Do not split a third platform out of the core CI.
