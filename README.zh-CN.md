@@ -13,9 +13,9 @@
 
 ## 当前版本
 
-Core **0.4.7** 已发布，支持配置采集产物容量，修正 Rust source-risk 安装包，并提供独立安装的 Rust source-risk RC6、TypeScript risk RC4 与 HTTP JSON contract RC5 候选包。Core 负责编排和质量决策；版本说明与安装见[发布指南](docs/releases/0.4.7.zh-CN.md)，验证回执见[交付状态](docs/release-status.md)。
+Core **0.4.8** 为 core/plugin 拆分做准备：每种 schema 角色只有一个可编辑源，决策夹具移入核心 crate，并首次把固定版本的 Rust 测量器 `0.3.1` 作为独立包发布。本次同时提供独立安装的 Rust source-risk RC7、TypeScript risk RC4、HTTP JSON contract RC5 与 Rust 测量器 0.3.1。Core 负责编排和质量决策；版本说明与安装见[发布指南](docs/releases/0.4.8.zh-CN.md)，验证回执见[交付状态](docs/release-status.md)。
 
-Core **0.4.7** 的可选 Rust 安装默认选择独立插件 **0.1.0-rc.7**，增加依赖归属缓存与签名 monorepo 源路径绑定。Rust/LLVM 和 Python 仍作为外部依赖；固定版本用法见[独立插件安装指南](docs/quality/standalone-installation.md)。
+Core **0.4.8** 的可选 Rust 安装默认选择独立插件 **0.1.0-rc.7**，增加依赖归属缓存与签名 monorepo 源路径绑定。Rust/LLVM 和 Python 仍作为外部依赖；固定版本用法见[独立插件安装指南](docs/quality/standalone-installation.md)。
 
 ## 阅读导航
 
@@ -60,12 +60,12 @@ component、profile、命令、路径、parser 和 service 都来自 TOML。常�
 ### 从 Crates.io 安装（推荐）
 
 ```bash
-cargo install harness-gate --version 0.4.7 --locked
+cargo install harness-gate --version 0.4.8 --locked
 ```
 
 ### 从 GitHub Release 安装（预编译二进制）
 
-从不可变的 [GitHub Release tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.7) 下载适合你平台的二进制文件：
+从不可变的 [GitHub Release tag](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.8) 下载适合你平台的二进制文件：
 
 - **Linux (x86_64)**: `harness-gate-linux-amd64`
 - **macOS (Intel)**: `harness-gate-macos-amd64`
@@ -78,8 +78,8 @@ cargo install harness-gate --version 0.4.7 --locked
 ```bash
 curl --fail --show-error --location --proto '=https' --tlsv1.2 \
   -o /tmp/harness-gate-install.sh \
-  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.4.7/install.sh
-bash /tmp/harness-gate-install.sh --version v0.4.7
+  https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.4.8/install.sh
+bash /tmp/harness-gate-install.sh --version v0.4.8
 harness-gate --version
 ```
 
@@ -89,7 +89,7 @@ harness-gate --version
 
 ### 可选 Rust 插件
 
-默认仅安装 Core，不下载 Rust 分析工具链。原生插件沿用 MIR 测量引擎，匹配的 Rust/LLVM 和 Python 由用户独立安装。原生插件 `0.1.0-rc.7` 已完成四平台发布；Core `0.4.7` 也已发布并完成公开安装验收，详见交付状态。三个新增独立候选插件的安装、验证和测量序列边界见[本次发布指南](docs/releases/0.4.7.zh-CN.md)。
+默认仅安装 Core，不下载 Rust 分析工具链。原生插件沿用 MIR 测量引擎，匹配的 Rust/LLVM 和 Python 由用户独立安装。原生插件 `0.1.0-rc.7` 已完成四平台发布；Core `0.4.8` 也已发布并完成公开安装验收，详见交付状态。本次独立候选包（含首次发布的 Rust 测量器）的安装、验证和测量序列边界见[本次发布指南](docs/releases/0.4.8.zh-CN.md)。
 
 [独立插件安装指南](docs/quality/standalone-installation.md)说明 `--with-rust`、`--rust-only` 和独立的 `--rust-version` 选择。stable 引擎保留为显式候选，不自动切换度量系列或基线。安装不会替项目接受可信证据或修改默认 Rust 工具链。
 
@@ -135,12 +135,12 @@ sha256sum --check SHA256SUMS
 cosign verify-blob --signature harness-gate-linux-amd64.sig \
   --certificate harness-gate-linux-amd64.crt \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity 'https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v0.4.7' \
+  --certificate-identity 'https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v0.4.8' \
   harness-gate-linux-amd64
 cosign verify-blob --signature harness-gate.sbom.cdx.json.sig \
   --certificate harness-gate.sbom.cdx.json.crt \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity 'https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v0.4.7' \
+  --certificate-identity 'https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v0.4.8' \
   harness-gate.sbom.cdx.json
 ```
 

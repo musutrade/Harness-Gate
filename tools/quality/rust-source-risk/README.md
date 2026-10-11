@@ -168,7 +168,7 @@ Exact `#[cfg(test)]` modules are excluded from the production boundary, includin
 
 The Linux x86-64 archive includes the compiled `inventory`, Python entrypoints,
 license, manifest and this guide. Rust/LLVM and Python remain external. See the
-[release installation guide](../../../docs/releases/0.4.7.zh-CN.md).
+[release installation guide](../../../docs/releases/0.4.8.zh-CN.md).
 
 ## rc.6 package completeness
 
