@@ -96,7 +96,7 @@ bundle, not an authenticated cache or delivery decision. The existing Rust polic
 evaluator owns requiredness, thresholds and approval. Unavailable capability
 states remain distinct; no numeric values or CRAP series are synthesized.
 
-The signed executable fixture in `tools/quality/fixtures/workflow/collectors/`
+The signed executable fixture in `tools/harness-gate/fixtures/workflow/collectors/`
 launches an arbitrary ecosystem with a custom binding, package, tool and series
 through the same code as the reference fixture. The configured `bundle.size`
 contract succeeds; an arbitrary `quasar.payload_bytes` capability is resolved and

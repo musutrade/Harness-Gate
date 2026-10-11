@@ -15,7 +15,7 @@ later OpenSpec tasks. Synthetic ecosystem data does not certify real adapters.
 
 ## Request and response
 
-The [protocol schema](../../tools/quality/schema/collector-protocol.schema.json)
+The [protocol schema](../../schema/collector-protocol.schema.json)
 defines `Request`, `Response` and `Error` envelope shapes. The runner additionally
 validates nested context/collector, every evidence record and artifact against
 the existing normalized schema and the caller-owned project model. Unknown

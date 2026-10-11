@@ -3,7 +3,7 @@
 use super::*;
 use std::time::Instant;
 
-const MATRIX: &str = include_str!("../../../../../quality/fixtures/workflow/ci-matrix.json");
+const MATRIX: &str = include_str!("../../../../fixtures/workflow/ci-matrix.json");
 
 pub(super) fn configured_fixture(shape: &Value, mode: &str, profile: &str) -> Fixture {
     let mut fixture = Fixture::workflow("pass", true, false);

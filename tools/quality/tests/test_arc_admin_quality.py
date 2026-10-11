@@ -33,7 +33,7 @@ class ArcAdminQualityTests(unittest.TestCase):
                     self.assertEqual(self.quality[section][key], value)
 
     def test_rust_binds_certified_series_and_unchanged_thresholds(self):
-        reference = read(ROOT / "tools/quality/fixtures/workflow/collectors/certified-rust-profiles.json")
+        reference = read(ROOT / "tools/harness-gate/fixtures/workflow/collectors/certified-rust-profiles.json")
         capabilities = read(QUALITY / "packs/backend/capabilities.json")
         self.assertEqual(capabilities["series"], reference["series"])
         rules = copy.deepcopy(reference["rules"])

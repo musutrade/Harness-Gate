@@ -38,8 +38,12 @@ def require(condition, code, message):
         raise CollectionError(code, message)
 
 
+HOST_SCHEMA_DIR = Path(__file__).resolve().parents[2] / "schema"
+
+
 def _shape(value, definition):
-    evidence._shape(value, "collector-protocol.schema.json", definition)
+    evidence._shape(value, "collector-protocol.schema.json", definition,
+                    directory=HOST_SCHEMA_DIR)
 
 
 @dataclass(frozen=True)

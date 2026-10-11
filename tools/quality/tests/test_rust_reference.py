@@ -62,7 +62,7 @@ class RustReferenceTests(unittest.TestCase):
 
     def test_complete_profile_fixture_preserves_certified_required_policy_and_series(self):
         self.shadow()
-        reference = json.loads((ROOT / 'tools/quality/fixtures/workflow/collectors/certified-rust-profiles.json').read_text())
+        reference = json.loads((ROOT / 'tools/harness-gate/fixtures/workflow/collectors/certified-rust-profiles.json').read_text())
         rules = json.loads((self.case / 'shadow/head-risk-policy.json').read_text())['rules']
         records = json.loads((self.case / 'shadow/head-risk-evidence.json').read_text())
         self.assertEqual(reference['rules'], [r for r in rules if r['required'] and r['scope']['boundary'] == 'high'])

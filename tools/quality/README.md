@@ -10,6 +10,20 @@ tooling; final C-class module dispositions belong to task 7.
 The [shared compatibility corpus](fixtures/generic-core/README.md) retains exact
 inputs, full expected outputs and native/source bytes for that migration.
 
+## Schema and fixture ownership
+
+Each schema role has exactly one editable source: host contracts in
+[`schema/`](../../schema/README.md), generic evidence and policy in
+`tools/harness-gate/quality-core/schema/`, and plugin raw output in
+[`tools/quality/schema/`](schema). The generic schemas here are byte-identical
+generated copies, not a merge by filename; see
+[schema ownership](../../docs/quality/schema-ownership.md).
+
+Every fixture has one owner. Generic decision, evidence, policy and host-protocol
+fixtures stay with core; only language/tool-specific collection fixtures belong
+to GateProbes. See
+[fixture ownership](../../docs/quality/fixture-ownership.md).
+
 [GH-151](../../docs/quality/gh-151/README.md) records the exact hosted candidate
 acceptance, retained comparisons, separate authority switch and rollback. The
 opt-in differential workflow retains both engines. Existing required CI names,

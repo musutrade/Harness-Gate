@@ -23,7 +23,7 @@ cache or a release decision.
 
 Compilation uses the default `.harness-gate/flow.toml` and `quality.toml` under
 `--repository-root`. The strict `quality-trusted-state/v1` JSON contract is
-illustrated by the retained [fixture](../tools/quality/fixtures/workflow/compiler/state.json).
+illustrated by the retained [fixture](../tools/harness-gate/fixtures/workflow/compiler/state.json).
 Its fields are:
 
 - `profile` and `expected`: selected quality profile and the generic core's exact
@@ -91,7 +91,7 @@ the core remains responsible for rejecting unsupported metrics at evaluation.
 
 ## Retained equivalence evidence
 
-`tools/quality/fixtures/workflow/compiler/acceptance.py` drives the actual CLI
+`tools/harness-gate/fixtures/workflow/compiler/acceptance.py` drives the actual CLI
 from the nextest integration suite. It retains separate direct and compiled
 reports and compares their JSON and exit status, checks expected PASS/FAIL,
 checks repeated compilation and reordered subject discovery, and exercises

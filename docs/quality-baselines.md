@@ -91,6 +91,6 @@ cannot silently erase historical debt.
 Ecosystem names are opaque metadata. Transport validates canonical series and
 typed evidence for arbitrary declared capabilities without certifying metric
 semantics. Evaluation still uses the unchanged supported metric registry and fails
-closed on unsupported metrics. The [baseline corpus](../tools/quality/fixtures/workflow/baseline/README.md)
+closed on unsupported metrics. The [baseline corpus](../tools/harness-gate/fixtures/workflow/baseline/README.md)
 tests both providers with an unregistered ecosystem and custom capabilities, plus
 existing Rust debt and generic rename/move lineage. See [ADR-0044](adr/0044-trusted-quality-baselines.md).

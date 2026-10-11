@@ -14,6 +14,7 @@ editor validation, CI checks, and downstream integrations.
 | [artifact-manifest.schema.json](artifact-manifest.schema.json) | Invocation artifact manifest | Manifest schema version 1. |
 | [artifact-registry.schema.json](artifact-registry.schema.json) | Invocation artifact registry | Registry schema version 1. |
 | [adapter-request.schema.json](adapter-request.schema.json) | Signed out-of-process adapter request | Adapter protocol version 2; result schema version 1. |
+| [collector-protocol.schema.json](collector-protocol.schema.json) | Collector request/response/error envelope | Harness collector protocol version 1. |
 
 The schemas describe structure and closed vocabularies. They do not replace
 harness-gate config check, which also evaluates environment interpolation,

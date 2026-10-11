@@ -434,20 +434,19 @@ pub(super) mod optimization_tests {
     }
 
     pub(crate) fn two_subjects_fixture() -> Fixture {
-        let mut data: Value = serde_json::from_str(include_str!(
-            "../../quality/fixtures/workflow/compiler/direct.json"
-        ))
-        .unwrap();
+        let mut data: Value =
+            serde_json::from_str(include_str!("../fixtures/workflow/compiler/direct.json"))
+                .unwrap();
         let root = tempfile::tempdir().unwrap();
         fs::create_dir(root.path().join("src")).unwrap();
         fs::write(
             root.path().join("src/lib.rs"),
-            include_bytes!("../../quality/fixtures/workflow/compiler/source.txt"),
+            include_bytes!("../fixtures/workflow/compiler/source.txt"),
         )
         .unwrap();
         fs::write(
             root.path().join("raw.json"),
-            include_bytes!("../../quality/fixtures/workflow/compiler/artifact.txt"),
+            include_bytes!("../fixtures/workflow/compiler/artifact.txt"),
         )
         .unwrap();
         let mut subject = data["project"]["subjects"][0].clone();

@@ -207,7 +207,7 @@ fn unknown_ecosystem_pack_composes_without_catalog_or_core_changes() {
     let recipe = r#"[{"pack":"nebula-unregistered-2049","bindings":{"binding":"project","source_root":"sources"}}]"#;
     let packs = [(
         "nebula-unregistered-2049",
-        include_str!("../../../quality/fixtures/workflow/nebula-unregistered.pack.json"),
+        include_str!("../../fixtures/workflow/nebula-unregistered.pack.json"),
     )];
     let mut composed =
         super::composition::compose(recipe, &packs, &project.config.project.name).unwrap();
