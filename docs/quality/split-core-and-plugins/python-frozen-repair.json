@@ -1,0 +1,27 @@
+{
+  "schema": "python-frozen-repair-evidence/v1",
+  "date": "2026-10-11",
+  "change": "split-core-and-plugins",
+  "review": "Reviewed compatibility repair under docs/quality/python-retention.md. The collector protocol schema moved to the core host-contract catalogue (schema/collector-protocol.schema.json). harness_evidence._shape gained an optional directory argument and collector_runner passes HOST_SCHEMA_DIR. This is path resolution only: no decision, measurement, evidence or transport semantics changed, and the generic-core corpus bytes are unchanged.",
+  "modules": [
+    {
+      "module": "tools/quality/harness_evidence.py",
+      "before": "f08736199f6e192b8e3ab3c9269ce2743f5624940561663919f99790545281e2",
+      "after": "fcb07569d8fa386fb11324003ba939a9bf2522a7baf60a7ef9194ac703414368",
+      "delta": "optional directory parameter on _shape; default SCHEMA_DIR preserved"
+    },
+    {
+      "module": "tools/quality/collector_runner.py",
+      "before": "f79a21dadc950d2cf54a97c0bb7a73d2990f7329e084037d505946db51e057e9",
+      "after": "419b247072ff2e8c15f8a60c6924d67fc388d6d78a6972d1e0a61e9421ae0115",
+      "delta": "HOST_SCHEMA_DIR constant; _shape resolves collector-protocol from the core host-contract root"
+    }
+  ],
+  "evidence": {
+    "command": "python3 -m unittest tools.quality.tests.test_generic_core_corpus tools.quality.tests.test_collector_runner tools.quality.tests.test_harness_evidence tools.quality.tests.test_preset_packs",
+    "tests": 40,
+    "passed": 40,
+    "failed": 0,
+    "frozen_corpus": "tools/quality/fixtures/generic-core corpus and negative matrix replay with unchanged expected outputs"
+  }
+}

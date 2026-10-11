@@ -12,6 +12,7 @@ import typescript_semantics as ts
 ROOT = Path(__file__).resolve().parents[3]
 PRESETS = ROOT / 'tools/harness-gate/presets'
 FIXTURES = ROOT / 'tools/quality/fixtures'
+CORE_FIXTURES = ROOT / 'tools/harness-gate/fixtures'
 
 
 def read(path):
@@ -20,7 +21,7 @@ def read(path):
 
 class PresetPackTests(unittest.TestCase):
     def test_rust_preserves_entire_accepted_series_and_policy(self):
-        reference = read(FIXTURES / 'workflow/collectors/certified-rust-profiles.json')
+        reference = read(CORE_FIXTURES / 'workflow/collectors/certified-rust-profiles.json')
         pack = read(PRESETS / 'packs/rust.json')
         self.assertEqual(pack['files']['.harness-gate/packs/${binding}/capabilities.json']['series'], reference['series'])
         rules = copy.deepcopy(reference['rules'])

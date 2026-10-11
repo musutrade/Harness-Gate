@@ -115,7 +115,7 @@
       "module": "tools/quality/collector_runner.py",
       "purpose": "Collector transport and validation boundary; never a release evaluator.",
       "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
-      "sha256": "f79a21dadc950d2cf54a97c0bb7a73d2990f7329e084037d505946db51e057e9"
+      "sha256": "419b247072ff2e8c15f8a60c6924d67fc388d6d78a6972d1e0a61e9421ae0115"
     },
     {
       "authoritative_status": "Repository Rust required-path helper; authoritative within its existing CI responsibility",
@@ -270,7 +270,7 @@
       "module": "tools/quality/harness_evidence.py",
       "purpose": "Standalone normalized evidence contracts; no release decision or collector.",
       "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
-      "sha256": "f08736199f6e192b8e3ab3c9269ce2743f5624940561663919f99790545281e2"
+      "sha256": "fcb07569d8fa386fb11324003ba939a9bf2522a7baf60a7ef9194ac703414368"
     },
     {
       "authoritative_status": "Repository Rust required-path helper; authoritative within its existing CI responsibility",
