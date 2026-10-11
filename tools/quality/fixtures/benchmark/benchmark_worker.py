@@ -10,19 +10,36 @@ import time
 from pathlib import Path
 
 
-def update_state(path: Path, delta: int) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    lock_path = path.with_suffix(path.suffix + ".lock")
-    deadline = time.monotonic() + 10
+def acquire_lock(lock_path: Path, deadline: float) -> None:
     while True:
         try:
             descriptor = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
             os.close(descriptor)
-            break
-        except FileExistsError:
+            return
+        except (FileExistsError, PermissionError):
+            # Windows reports access-denied while another process briefly holds
+            # the lock file open, so both errors mean the lock is contended.
             if time.monotonic() >= deadline:
                 raise RuntimeError("timed out acquiring benchmark state lock")
             time.sleep(0.01)
+
+
+def release_lock(lock_path: Path) -> None:
+    deadline = time.monotonic() + 1
+    while True:
+        try:
+            lock_path.unlink(missing_ok=True)
+            return
+        except PermissionError:
+            if time.monotonic() >= deadline:
+                return
+            time.sleep(0.01)
+
+
+def update_state(path: Path, delta: int) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lock_path = path.with_suffix(path.suffix + ".lock")
+    acquire_lock(lock_path, time.monotonic() + 10)
     try:
         if path.is_file():
             state = json.loads(path.read_text())
@@ -34,7 +51,7 @@ def update_state(path: Path, delta: int) -> None:
             state["observed_peak"] = max(state["observed_peak"], state["current"])
         path.write_text(json.dumps(state, sort_keys=True) + "\n")
     finally:
-        lock_path.unlink(missing_ok=True)
+        release_lock(lock_path)
 
 
 def main() -> int:
