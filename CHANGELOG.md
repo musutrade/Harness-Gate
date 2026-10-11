@@ -7,8 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.8] - 2026-10-11
+
+### Added
+
+- Publish the pinned Rust measurer as
+  `harness-gate-rust-measure-0.3.1-linux-amd64.tar.gz` with a clean-extract
+  identity check and SBOM, so core CI can consume a released analyzer instead of
+  compiling `tools/quality/rust-measure` from source. Analyzer identity, the
+  `mccabe-rust-3` rule and every gate threshold are unchanged.
+- TypeScript-risk collector: reject an incompatible collector request schema or
+  collector version with an explicit expected/received diagnostic instead of a
+  bare assertion.
+
+### Changed
+
+- Assign one editable source per schema role (host contract, generic evidence,
+  plugin raw output), mark the byte-identical mirrors as generated, move the
+  collector protocol schema into the core host-contract catalogue, and relocate
+  the decision/workflow fixtures into the core crate. Schema and fixture
+  ownership are recorded and enforced; measured semantics are unchanged.
+
 ### Fixed
 
+- Resolve the collector protocol schema from the installed runtime `app/schema`
+  layout with a source-root fallback, and package it through the runtime build
+  lock, so the assembled runtime no longer raises `FileNotFoundError`.
+- Keep the benchmark integration probe out of the benchmark's own timed nextest
+  suite, record the excluded binary, and retain a failed sample's full
+  stdout/stderr under `nextest-samples` with a bounded head+tail diagnostic.
 - Share durable adapter nonce protection between `verify` and `quality collect`.
   Global `--replay-state-dir` selects persistent host storage outside read-only
   snapshots. Atomic claims, protected directory handles and fail-closed path
