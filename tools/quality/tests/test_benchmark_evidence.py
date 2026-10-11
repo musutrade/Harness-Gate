@@ -227,5 +227,53 @@ class BenchmarkEvidenceTests(unittest.TestCase):
         self.assertLess(len(output.getvalue()), limit + 2048)
 
 
+    def test_nextest_command_excludes_the_recursive_probe_binary(self):
+        command = benchmarks.nextest_command()
+        self.assertEqual(command[:3], ["cargo", "nextest", "run"])
+        self.assertEqual(command[command.index("--filter-expr") + 1],
+                         "not binary(benchmark_fixture_test)")
+
+    def test_failed_sample_retains_full_output_and_bounded_head_and_tail(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "benchmarks.json"
+            result = subprocess.CompletedProcess([], 1, "PROBE-FAILURE " + "x" * 9000, "tail-marker")
+            archive = benchmarks.retain_nextest_sample(output, "warm-3", result)
+            self.assertEqual((archive / "warm-3.stdout.txt").read_text(), result.stdout)
+            self.assertEqual((archive / "warm-3.stderr.txt").read_text(), result.stderr)
+        bounded = benchmarks.bounded_head_tail(result.stdout)
+        self.assertIn("PROBE-FAILURE", bounded)
+        self.assertIn("[... truncated ...]", bounded)
+        self.assertTrue(bounded.endswith("x" * 4000))
+        self.assertEqual(benchmarks.bounded_head_tail("short"), "short")
+
+    def test_nextest_timings_uses_the_filtered_command_and_retains_cold_failure(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "benchmarks.json"
+            failure = subprocess.CompletedProcess([], 1, "cold-failure", "cold-stderr")
+            with patch.object(benchmarks, "timed", return_value=(1.0, failure)) as timed, \
+                    contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+                benchmarks.nextest_timings(output, samples=2)
+            self.assertEqual(timed.call_args.args[0], benchmarks.nextest_command())
+            archive = output.parent / "nextest-samples"
+            self.assertEqual((archive / "cold.stdout.txt").read_text(), "cold-failure")
+            self.assertEqual((archive / "cold.stderr.txt").read_text(), "cold-stderr")
+
+    def test_nextest_warm_failure_is_numbered_and_retains_head_and_tail(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "benchmarks.json"
+            success = subprocess.CompletedProcess([], 0, "ok", "")
+            failure = subprocess.CompletedProcess([], 1, "warm-head", "warm-tail")
+            error = io.StringIO()
+            with patch.object(benchmarks, "timed", side_effect=[(1.0, success), (2.0, failure)]), \
+                    contextlib.redirect_stderr(error), self.assertRaises(SystemExit):
+                benchmarks.nextest_timings(output, samples=2)
+            self.assertIn("warm nextest sample 1 failed", error.getvalue())
+            self.assertIn("warm-head", error.getvalue())
+            self.assertIn("warm-tail", error.getvalue())
+            archive = output.parent / "nextest-samples"
+            self.assertEqual((archive / "warm-1.stdout.txt").read_text(), "warm-head")
+            self.assertEqual((archive / "warm-1.stderr.txt").read_text(), "warm-tail")
+
+
 if __name__ == "__main__":
     unittest.main()

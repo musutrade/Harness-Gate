@@ -22,6 +22,7 @@ FIXTURE_VERSION = 1
 REGRESSION_THRESHOLD_PERCENT = 15.0
 FIXTURE = Path(__file__).with_name("fixtures") / "benchmark"
 STATE_RELATIVE = Path(".harness-gate") / "parallel-state" / "state.json"
+NEXTEST_EXCLUDED_BINARY = "benchmark_fixture_test"
 
 
 def timed(
@@ -235,6 +236,66 @@ def verification_sample(
     }
 
 
+def nextest_command() -> list[str]:
+    # benchmark_fixture_test launches the product's parallel benchmark probe.
+    # Excluding it keeps the timed suite from running the benchmark inside the
+    # benchmark under the same constrained runner. The probe stays required in
+    # the normal Test and Quality Script Tests jobs.
+    return [
+        "cargo",
+        "nextest",
+        "run",
+        "--manifest-path",
+        str(CRATE / "Cargo.toml"),
+        "--locked",
+        "--filter-expr",
+        "not binary(" + NEXTEST_EXCLUDED_BINARY + ")",
+    ]
+
+
+def bounded_head_tail(text: str, limit: int = 4000) -> str:
+    """Keep the failure head (probe message) as well as the diagnostic tail."""
+    if len(text) <= limit:
+        return text
+    return text[:limit] + "\n[... truncated ...]\n" + text[-limit:]
+
+
+def retain_nextest_sample(
+    output: Path, label: str, result: subprocess.CompletedProcess[str]
+) -> Path:
+    archive = output.parent / "nextest-samples"
+    archive.mkdir(parents=True, exist_ok=True)
+    (archive / (label + ".stdout.txt")).write_text(result.stdout or "")
+    (archive / (label + ".stderr.txt")).write_text(result.stderr or "")
+    return archive
+
+
+def nextest_timings(output: Path, samples: int) -> tuple[float, list[float]]:
+    command = nextest_command()
+    cold_seconds, cold_result = timed(command, CRATE.parent.parent)
+    if cold_result.returncode != 0:
+        archive = retain_nextest_sample(output, "cold", cold_result)
+        fail(
+            "cold nextest sample failed\n"
+            f"retained: {archive}\n"
+            f"stdout:\n{bounded_head_tail(cold_result.stdout)}\n"
+            f"stderr:\n{bounded_head_tail(cold_result.stderr)}"
+        )
+    warm_seconds = []
+    for number in range(1, samples + 1):
+        seconds, result = timed(command, CRATE.parent.parent)
+        if result.returncode != 0:
+            archive = retain_nextest_sample(output, f"warm-{number}", result)
+            fail(
+                f"warm nextest sample {number} failed\n"
+                f"retained: {archive}\n"
+                f"stdout:\n{bounded_head_tail(result.stdout)}\n"
+                f"stderr:\n{bounded_head_tail(result.stderr)}"
+            )
+        warm_seconds.append(seconds)
+    return cold_seconds, warm_seconds
+
+
 def run(output: Path, samples: int, raw_dir: Path | None = None) -> int:
     if samples < 1:
         fail("at least one warm sample is required")
@@ -262,23 +323,7 @@ def run(output: Path, samples: int, raw_dir: Path | None = None) -> int:
     if not binary.is_file():
         fail(f"release-small binary missing: {binary}")
 
-    cold_seconds, cold_result = timed(["cargo", "nextest", "run", "--manifest-path", str(CRATE / "Cargo.toml"), "--locked"], CRATE.parent.parent)
-    if cold_result.returncode != 0:
-        fail(
-            "cold nextest sample failed\n"
-            f"stdout:\n{cold_result.stdout[-4000:]}\n"
-            f"stderr:\n{cold_result.stderr[-4000:]}"
-        )
-    warm_seconds = []
-    for _ in range(samples):
-        seconds, result = timed(["cargo", "nextest", "run", "--manifest-path", str(CRATE / "Cargo.toml"), "--locked"], CRATE.parent.parent)
-        if result.returncode != 0:
-            fail(
-                "warm nextest sample failed\n"
-                f"stdout:\n{result.stdout[-4000:]}\n"
-                f"stderr:\n{result.stderr[-4000:]}"
-            )
-        warm_seconds.append(seconds)
+    cold_seconds, warm_seconds = nextest_timings(output, samples)
 
     raw_root = raw_dir or output.parent / "benchmark-runs"
     shutil.rmtree(raw_root, ignore_errors=True)
@@ -371,7 +416,12 @@ def run(output: Path, samples: int, raw_dir: Path | None = None) -> int:
                 ),
             },
         },
-        "tests_seconds": {"cold": cold_seconds, "warm_samples": warm_seconds, **stats(warm_seconds)},
+        "tests_seconds": {
+            "cold": cold_seconds,
+            "warm_samples": warm_seconds,
+            "excluded_binaries": [NEXTEST_EXCLUDED_BINARY],
+            **stats(warm_seconds),
+        },
         "scope_matcher": scope_summary,
         "binary": {"path": str(binary), "bytes": binary.stat().st_size, "sha256": sha256(binary)},
     }
