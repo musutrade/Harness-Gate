@@ -831,9 +831,7 @@ fn lease_state(record: &LeaseRecord, now: u64) -> LeaseState {
 /// Test builds may replace host process observation for one thread.
 #[cfg(test)]
 fn lease_state(record: &LeaseRecord, now: u64) -> LeaseState {
-    let observe = *tests::OBSERVE_PROCESS
-        .lock()
-        .unwrap_or_else(std::sync::PoisonError::into_inner);
+    let observe = tests::OBSERVE_PROCESS.with(std::cell::Cell::get);
     match observe {
         Some(observe) => {
             let (alive, identity) = observe(record.pid);
@@ -1165,10 +1163,13 @@ mod tests {
 
     type ProcessObservation = fn(u32) -> (Option<bool>, Option<String>);
 
-    /// Test-only replacement for host process observation. Each nextest test
-    /// runs in its own process, so a process-global override is isolated.
-    pub(super) static OBSERVE_PROCESS: std::sync::Mutex<Option<ProcessObservation>> =
-        std::sync::Mutex::new(None);
+    thread_local! {
+        /// Test-only, per-thread replacement for host process observation.
+        /// Parallel `cargo test` threads cannot observe another test's
+        /// replacement, and the override ends with the test thread.
+        pub(super) static OBSERVE_PROCESS: std::cell::Cell<Option<ProcessObservation>> =
+            const { std::cell::Cell::new(None) };
+    }
     use super::{
         cleanup_with_runtime, is_stale, ownership_labels, read_record, resource_key, write_record,
         LeaseRecord, RuntimeOperations, LEASE_SCHEMA_VERSION, OWNER_MARKER,
@@ -1734,7 +1735,7 @@ mod tests {
         write_record(&path, &expired).expect("write expired fixture");
         lease.retain();
 
-        *OBSERVE_PROCESS.lock().unwrap() = Some(|_| (Some(true), None));
+        OBSERVE_PROCESS.with(|slot| slot.set(Some(|_| (Some(true), None))));
         let (fake, remove_calls) = fake_runtime(ContainerRuntimeKind::Docker, None);
         for dry_run in [true, false] {
             let report = cleanup_with_runtime(&project, dry_run, &fake).expect("cleanup report");
@@ -1757,7 +1758,7 @@ mod tests {
         ) else {
             panic!("live holder keeps the lease");
         };
-        *OBSERVE_PROCESS.lock().unwrap() = None;
+        OBSERVE_PROCESS.with(|slot| slot.set(None));
         assert!(format!("{error:#}").contains("LEASE_OWNERSHIP_UNCERTAIN"));
         assert_eq!(remove_calls.load(Ordering::SeqCst), 0);
         assert!(path.exists(), "live holder's marker must be retained");
