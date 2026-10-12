@@ -6,6 +6,8 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[3]
+WORKFLOW = ROOT / 'retired/workflows/native-collector-release.yml'
+ACTIVE = ROOT / '.github/workflows/native-collector-release.yml'
 SPEC = importlib.util.spec_from_file_location('release_inventory', ROOT / 'tools/release/release_inventory.py')
 assert SPEC and SPEC.loader
 inventory = importlib.util.module_from_spec(SPEC)
@@ -13,8 +15,14 @@ SPEC.loader.exec_module(inventory)
 
 
 class NativeReleaseWorkflowTests(unittest.TestCase):
+    def test_retired_entry_is_archived_and_not_active(self):
+        self.assertFalse(ACTIVE.exists())
+        source = WORKFLOW.read_text()
+        self.assertIn('RETIRED', source.splitlines()[0])
+        self.assertIn('6aaa234249574c9a321a8819213b4c936c02605e', source)
+
     def test_native_publication_requires_eligibility_and_actual_binary_acceptance(self):
-        source = (ROOT / '.github/workflows/native-collector-release.yml').read_text()
+        source = WORKFLOW.read_text()
         policy, build, publish = source.split('  policy:\n')[1].split('  build:\n')[0], \
             source.split('  build:\n')[1].split('  publish:\n')[0], source.split('  publish:\n')[1]
         self.assertIn('--tag-prefix rust-collector-v', policy)
@@ -38,7 +46,7 @@ class NativeReleaseWorkflowTests(unittest.TestCase):
         self.assertNotIn('publish-crate', source)
 
     def test_each_core_platform_requires_its_own_native_acceptance_and_sbom(self):
-        source = (ROOT / '.github/workflows/native-collector-release.yml').read_text()
+        source = WORKFLOW.read_text()
         build = source.split('  build:\n')[1].split('  publish:\n')[0]
         publish = source.split('  publish:\n')[1]
         for target, asset in (
@@ -56,7 +64,7 @@ class NativeReleaseWorkflowTests(unittest.TestCase):
         self.assertIn('native-acceptance-${{ github.run_id }}-${{ matrix.target }}', build)
 
     def test_native_publish_inventory_seals_all_four_platform_sboms(self):
-        source = (ROOT / '.github/workflows/native-collector-release.yml').read_text()
+        source = WORKFLOW.read_text()
         publish = source.split('  publish:\n')[1]
         subjects = re.findall(r'--(binary|sbom) ([\w.-]+)', publish)
         binaries = {name for kind, name in subjects if kind == 'binary'}

@@ -69,6 +69,17 @@ class ReleaseOwnershipTests(unittest.TestCase):
             if "revival_owner" in row:
                 self.assertIn(row["revival_owner"], {"gatehouse", "gateprobes"}, path)
 
+    def test_retired_workflows_are_archived_and_restorable(self):
+        retired = self.manifest["retired_workflows"]
+        self.assertTrue(retired)
+        for path, row in retired.items():
+            self.assertTrue((ROOT / path).is_file(), path)
+            self.assertEqual(row["owner"], "gatehouse", path)
+            self.assertEqual(row["disposition"], "retired-restorable", path)
+            self.assertRegex(row["restore_commit"], r"^[0-9a-f]{40}$")
+            self.assertTrue(row["was"].startswith(".github/workflows/"), path)
+            self.assertFalse((ROOT / row["was"]).exists(), row["was"])
+
     def test_paused_production_chain_stays_separate_and_unprovisioned(self):
         paused = self.manifest["workflows"][".github/workflows/rust-collector-release.yml"]
         self.assertEqual(paused["disposition"], "paused-not-migrated")

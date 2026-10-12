@@ -77,6 +77,14 @@ semantics, gate names, branch protection or release authority.
 - [ ] 4.4 [P1][M] Remove compatibility paths only after both repositories are proven green; acceptance: removal is a separate reviewed change and rollback remains possible until then.
 - [ ] 4.5 [P1][M] Run final strict OpenSpec validation and update related records; acceptance: the change validates and no claim implies new ecosystem certification or new measurement semantics.
 
+> **Old native entry retired (2026-10-12):** `.github/workflows/native-collector-release.yml`
+> moved to `retired/workflows/` with its restore commit `6aaa2342` recorded, so
+> no PR, main or tag event triggers it and no new tag is produced. Historical
+> releases, signatures and source are retained. Compatibility reads stay:
+> rust-measure source and its core tests, collector fixtures, and the paused
+> bundled-chain hold protections are untouched and must not be deleted without
+> their own reviewed change (4.4).
+
 ## 5. GateProbes bootstrap, CI classification and migration scope
 
 Decisions D10–D13 in the design govern this section. Development order: scaffold

@@ -156,7 +156,8 @@ every plugin change.
 | `tools/quality/http-json-contract/`, `collect_typescript_contracts.py` | plugin |
 | Collector-specific fixtures | plugin |
 | `tools/quality/schema/`: `rust-collector-*.json`, `quality-evidence`, `project-config` | plugin |
-| collector release workflows (`native-collector-release`, `rust-collector-release`, `rust-measure-native`, `rust-generic-shadow`) | plugin |
+| collector release workflows (`native-collector-release`, `rust-collector-release`, `rust-measure-native`) | plugin |
+| `rust-generic-shadow.yml` reference equivalence shadow | core (D11) |
 | `tools/release/collector_*.py`, collector installers/packagers | plugin |
 
 ### To isolate / decide

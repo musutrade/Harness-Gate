@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   GateProbes workflow identity; the default collector version moves to
   `0.1.0-rc.8`. Core binary installs keep their Harness-Gate identity, and no
   quality threshold or measurement semantic changes.
+- Retire the superseded native collector publication entry from this
+  repository's active workflows (archived at
+  `retired/workflows/native-collector-release.yml` with its restore commit
+  recorded); GateProbes publishes the native collector. Historical releases,
+  signatures and tags are retained, and compatibility reads (measurer source,
+  fixtures, paused bundled-chain protections) are unchanged.
 
 ## [0.4.8] - 2026-10-11
 

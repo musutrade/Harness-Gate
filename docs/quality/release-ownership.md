@@ -51,7 +51,7 @@ production chain are separate products and are recorded separately.
 
 | Workflow | Owner | Disposition |
 | --- | --- | --- |
-| `native-collector-release.yml` | GateHouse | Legacy entry retained for rollback; superseded by the GateProbes chain. No new tag is produced from it. |
+| `native-collector-release.yml` | GateHouse | Retired from active workflows on 2026-10-12: archived at `retired/workflows/`, restore commit `6aaa2342`, no PR/main/tag trigger, no new tag. Historical releases, signatures and tags are retained. |
 | `rust-collector-release.yml` | GateHouse | Paused legacy bundled-runtime RSA/Sigstore six-asset chain; not migrated, not provisioned, and not the RC8 native chain. |
 | `rust-measure-native.yml` | GateHouse | Compatibility validation retained while the measurer source and its core tests remain here. |
 

@@ -118,7 +118,8 @@ When reducing the repository, keep the build/CI-critical subset with core.
 | `tools/quality/http-json-contract/`, `collect_typescript_contracts.py` | 🟩 | HTTP / TS contract collectors |
 | Collector-specific `tools/quality/fixtures/**` | 🟩 | Collector fixtures |
 | `tools/quality/schema/`: `rust-collector-*.json`, `quality-evidence`, `project-config` | 🟩 | Plugin raw-output schemas |
-| `.github/workflows/`: `native-collector-release.yml`, `rust-collector-release.yml`, `rust-measure-native.yml`, `rust-generic-shadow.yml` | 🟩 | Plugin release/measurement pipelines |
+| `.github/workflows/`: `native-collector-release.yml` (retired 2026-10-12, archived at `retired/workflows/`), `rust-collector-release.yml` (paused), `rust-measure-native.yml` (compatibility) | 🟩 | Plugin release/measurement pipelines; GateProbes publishes the native chain |
+| `.github/workflows/rust-generic-shadow.yml` | 🟦 | Core reference-equivalence validation (D11) |
 | `tools/release/`: `collector_*.py`, `install_collector.py`, `friendly_collector_install.py`, `download_collector_release.py`, `package_independent_collectors.py`, `production_collector_release.py`, `rust-collector-release.production.yml` | 🟩 | Plugin packaging/signing/distribution |
 
 ### B. Needs decision / to isolate
