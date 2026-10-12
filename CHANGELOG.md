@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The required core CI risk stage consumes the published Rust measurer
+  (`v0.4.8`, digest-verified through `tools/quality/rust-measure-release.json`)
+  instead of compiling `tools/quality/rust-measure`. Analyzer identity and
+  measurement semantics are unchanged.
+
 ## [0.4.8] - 2026-10-11
 
 ### Added
@@ -36,6 +43,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Keep the benchmark integration probe out of the benchmark's own timed nextest
   suite, record the excluded binary, and retain a failed sample's full
   stdout/stderr under `nextest-samples` with a bounded head+tail diagnostic.
+- Retry the benchmark worker's state lock on Windows access-denied contention so
+  a parallel sample cannot fail on a transient lock race.
 - Share durable adapter nonce protection between `verify` and `quality collect`.
   Global `--replay-state-dir` selects persistent host storage outside read-only
   snapshots. Atomic claims, protected directory handles and fail-closed path

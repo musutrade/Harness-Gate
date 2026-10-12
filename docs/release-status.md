@@ -1,5 +1,35 @@
 # Published releases and acceptance
 
+## Public Linux x86_64 acceptance, 2026-10-11
+
+Core [0.4.8](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.8)
+was published from `938a34b27cda8c13a706ca22adcfda567453f1ab` with the pinned
+**Rust measurer 0.3.1** package. This record covers only the checks below; it
+does not claim installation acceptance for other Core platforms, the other
+candidate packages, the native plugin or crates.io.
+
+- **Platform:** Linux x86_64 (`Linux 7.0.0-38-generic x86_64`).
+- **Core:** the tagged
+  [install.sh](https://raw.githubusercontent.com/musutrade/Harness-Gate/v0.4.8/install.sh)
+  (SHA-256 `a19180fadd6cfa9b86b29fdc70ad301484d30136bb57c22dcb2d40534dcc86eb`)
+  was run in an isolated temporary directory as
+  `bash install.sh --version v0.4.8 --install-dir <temp>` without
+  `--with-rust`. The installer verified `SHA256SUMS` and the Sigstore keyless
+  certificate for identity
+  `https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v0.4.8`
+  using its checksum-pinned cosign 3.1.3 verifier. The installed binary reports
+  `harness-gate 0.4.8` (SHA-256
+  `888fa1527eae37e3163aac2e1479e91ec03a0c8380b3c49da6e9266575597418`).
+- **Rust measurer:** downloaded from
+  `https://github.com/musutrade/Harness-Gate/releases/download/v0.4.8/harness-gate-rust-measure-0.3.1-linux-amd64.tar.gz`.
+  Its SHA-256 `09645a8b53075d89172efde67250e4bea2967f02184d4f8a5bfdfb389da0eac1`
+  matches `tools/quality/rust-measure-release.json`, `SHA256SUMS` and the
+  signed release inventory. `cosign verify-blob` with the same tag identity
+  returned `Verified OK`. The extracted analyzer reports
+  `harness-gate-rust-measure / 0.3.1 / mccabe-rust-3` through the packaging
+  smoke check; the binary has no `--version` flag and acceptance does not use
+  one.
+
 ## Verified corrected release, 2026-09-22
 
 Core [0.4.7](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.7)
