@@ -24,7 +24,7 @@ semantics, gate names, branch protection or release authority.
 
 - [x] 3.1 [P0][L] Remove the core-CI step that builds the Rust measurer from collector source; acceptance: core CI no longer compiles collector source and uses a pinned plugin artifact instead.
 - [x] 3.2 [P0][M] Make core CI select a pinned collector version explicitly (no "latest source"); acceptance: the exact version is recorded in CI config and logs.
-- [ ] 3.3 [P1][M] Split `tools/release/` into core-release and plugin-release groups by target; acceptance: each script has a single owning repository.
+- [x] 3.3 [P1][M] Split `tools/release/` into core-release and plugin-release groups by target; acceptance: each script has a single owning repository.
 - [ ] 3.4 [P1][M] Move plugin build/sign/publish machinery and the four collector workflows to GateProbes; acceptance: GateProbes tests, packages and publishes independently, and core no longer references them.
 - [ ] 3.5 [P1][M] Re-verify signing identity after the move; acceptance: Sigstore certificate identity and provenance reference the GateProbes repository/workflow, not only a new URL.
 
@@ -37,12 +37,18 @@ semantics, gate names, branch protection or release authority.
 > `rust-measure-native` workflow still builds the analyzer on Windows/macOS for
 > native validation and moves with 3.4.
 >
+> **3.3 complete (2026-10-11):** `docs/quality/release-ownership.{md,json}` and
+> `tools/quality/tests/test_release_ownership.py` assign every release script one
+> owner. GateHouse keeps `.github/workflows/release.yml` and `install.sh`;
+> GateProbes owns the collector lifecycle, candidate staging/signing, production
+> release and the Rust collector installers (`production_installer.py`,
+> `build_user_installer.py`, `publish_user_installer.py`).
+> `release_policy.py`, `release_inventory.py` and `generate-sbom.py` keep one
+> editable source in GateHouse; plugin copies are generated from a pinned
+> revision. No repository move or signing-identity change is included.
+>
 > **Remaining blocker (2026-10-11):** 3.4/3.5 are cross-repository moves whose
-> signed provenance must be produced and re-verified in GateProbes. 3.3 remains
-> doable in-repo but needs the 🟨 core/plugin decision for the shared
-> `release_policy.py`, `release_inventory.py`, `generate-sbom.py`,
-> `production_installer.py`, `build_user_installer.py` and
-> `publish_user_installer.py`.
+> signed provenance must be produced and re-verified in GateProbes.
 
 ## 4. Remove compatibility paths and handle the rest
 
