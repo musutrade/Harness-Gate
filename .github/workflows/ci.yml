@@ -18,8 +18,46 @@ env:
   RUST_BACKTRACE: 1
 
 jobs:
+  classify:
+    name: Classify change
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      run_full: ${{ steps.classify.outputs.run_full }}
+      docs_only: ${{ steps.classify.outputs.docs_only }}
+      files: ${{ steps.classify.outputs.files }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+
+      - name: Install Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: '3.x'
+
+      - name: Classify changed paths
+        id: classify
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            BASE="$PR_BASE"; HEAD="${{ github.sha }}"
+          elif [ "$EVENT_NAME" = "push" ]; then
+            BASE="$PUSH_BEFORE"; HEAD="${{ github.sha }}"
+          else
+            BASE=""; HEAD=""
+          fi
+          python3 tools/quality/ci_quality.py classify --base-sha "$BASE" --head-sha "$HEAD" \
+            --github-output "$GITHUB_OUTPUT"
+
   test:
     name: Test
+    needs: [classify]
+    if: ${{ needs.classify.outputs.run_full == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
@@ -63,6 +101,8 @@ jobs:
 
   test-cross-platform:
     name: Test (${{ matrix.os }})
+    needs: [classify]
+    if: ${{ needs.classify.outputs.run_full == 'true' }}
     strategy:
       fail-fast: false
       matrix:
@@ -90,6 +130,8 @@ jobs:
 
   security-audit:
     name: Security Audit
+    needs: [classify]
+    if: ${{ needs.classify.outputs.run_full == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
@@ -108,6 +150,8 @@ jobs:
 
   fmt:
     name: Format
+    needs: [classify]
+    if: ${{ needs.classify.outputs.run_full == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
@@ -122,6 +166,8 @@ jobs:
 
   clippy:
     name: Clippy
+    needs: [classify]
+    if: ${{ needs.classify.outputs.run_full == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
@@ -142,6 +188,8 @@ jobs:
 
   build:
     name: Build
+    needs: [classify]
+    if: ${{ needs.classify.outputs.run_full == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
@@ -168,7 +216,8 @@ jobs:
 
   build-cross-platform:
     name: Build (${{ matrix.os }})
-    if: ${{ github.event_name == 'push' }}
+    needs: [classify]
+    if: ${{ needs.classify.outputs.run_full == 'true' && github.event_name == 'push' }}
     strategy:
       fail-fast: false
       matrix:
@@ -191,7 +240,8 @@ jobs:
 
   coverage:
     name: Code Coverage
-    if: ${{ github.event_name == 'push' }}
+    needs: [classify]
+    if: ${{ needs.classify.outputs.run_full == 'true' && github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
@@ -224,6 +274,8 @@ jobs:
 
   quality-coverage:
     name: Quality Coverage and Critical Paths
+    needs: [classify]
+    if: ${{ needs.classify.outputs.run_full == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       manifest-sha256: ${{ steps.seal.outputs.manifest-sha256 }}
@@ -288,8 +340,8 @@ jobs:
   quality-generic-shadow:
     name: Generic Quality Shadow
     # Advisory only: never add this job to quality-required's dependencies.
-    if: ${{ always() }}
-    needs: [quality-coverage]
+    if: ${{ always() && needs.classify.outputs.run_full == 'true' }}
+    needs: [classify, quality-coverage]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
@@ -336,6 +388,8 @@ jobs:
 
   quality-contracts:
     name: Quality CLI Contracts
+    needs: [classify]
+    if: ${{ needs.classify.outputs.run_full == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
@@ -375,7 +429,8 @@ jobs:
 
   quality-contracts-cross-platform:
     name: Quality CLI Contracts (${{ matrix.os }})
-    if: ${{ github.event_name == 'push' }}
+    needs: [classify]
+    if: ${{ needs.classify.outputs.run_full == 'true' && github.event_name == 'push' }}
     strategy:
       fail-fast: false
       matrix:
@@ -414,7 +469,8 @@ jobs:
 
   quality-baseline:
     name: Quality Performance Baseline
-    if: ${{ github.event_name == 'push' }}
+    needs: [classify]
+    if: ${{ needs.classify.outputs.run_full == 'true' && github.event_name == 'push' }}
     strategy:
       fail-fast: false
       matrix:
@@ -458,21 +514,32 @@ jobs:
 
   docs-consistency:
     name: Documentation Consistency
+    needs: [classify]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
 
       - name: Install Rust
+        if: needs.classify.outputs.run_full == 'true'
         uses: dtolnay/rust-toolchain@4360b52568e2003a75bf9bc1d59f33a8e3fc893c # stable
 
       - name: Configure Cargo state
+        if: needs.classify.outputs.run_full == 'true'
         uses: ./.github/actions/cargo-state
         with:
           class: docs
           profiles: 'dev;default'
 
       - name: Check documentation, examples, and schema
-        run: python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json
+        env:
+          RUN_FULL: ${{ needs.classify.outputs.run_full }}
+        run: |
+          set -euo pipefail
+          if [ "$RUN_FULL" = "true" ]; then
+            python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json
+          else
+            python3 tools/quality/docs_consistency.py --pure --output target/quality/docs-consistency.json
+          fi
 
       - name: Upload documentation evidence
         if: ${{ always() }}
@@ -484,6 +551,8 @@ jobs:
 
   release-contracts:
     name: Release Governance Contracts
+    needs: [classify]
+    if: ${{ needs.classify.outputs.run_full == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
@@ -502,6 +571,8 @@ jobs:
 
   quality-scripts:
     name: Quality Script Tests
+    needs: [classify]
+    if: ${{ needs.classify.outputs.run_full == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
@@ -551,7 +622,7 @@ jobs:
     # Full macOS/Windows tests are required on PRs and pushes. Additional
     # cross-platform builds/contracts and performance collection are push-only.
     needs:
-      [test, test-cross-platform, security-audit, fmt, clippy, build, build-cross-platform,
+      [classify, test, test-cross-platform, security-audit, fmt, clippy, build, build-cross-platform,
        coverage, quality-coverage, quality-contracts, quality-contracts-cross-platform,
        quality-baseline, docs-consistency, release-contracts, quality-scripts]
     runs-on: ubuntu-latest
@@ -567,4 +638,5 @@ jobs:
         env:
           EVENT_NAME: ${{ github.event_name }}
           NEEDS_JSON: ${{ toJSON(needs) }}
+          RUN_FULL: ${{ needs.classify.outputs.run_full }}
         run: python3 tools/quality/ci_quality.py aggregate

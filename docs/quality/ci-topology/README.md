@@ -24,6 +24,11 @@ Its only work is checkout, Python setup and fail-closed evaluation of `needs`.
 Missing, malformed, failed, cancelled or unexpectedly skipped required children
 block it; only existing event-specific push-only exemptions are allowed.
 It does not compile, test or collect replacement measurements.
+A documentation-only change is an explicit, validated selection rather than an
+unexpected skip: `classify` and the pure documentation checker must succeed,
+heavy children may be skipped only when the classifier selected the reduced set,
+and a heavy child that ran and failed still blocks. See the
+[documentation-only routing contract](../ci-docs-routing.md).
 
 Quality Coverage and Critical Paths owns collection for each series. Generic
 Quality Shadow verifies and projects that retained evidence; it remains advisory.

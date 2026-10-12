@@ -40,7 +40,7 @@ class ShadowWorkflowTests(unittest.TestCase):
         workflow = (acceptance.ROOT / '.github/workflows/ci.yml').read_text()
         shadow = workflow.split('  quality-generic-shadow:\n')[1].split('  quality-contracts:\n')[0]
         collection = workflow.split('  quality-coverage:\n')[1].split('  quality-generic-shadow:\n')[0]
-        self.assertIn('needs: [quality-coverage]', shadow)
+        self.assertIn('needs: [classify, quality-coverage]', shadow)
         self.assertIn('actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6', shadow)
         for identity in (
                 'BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}',
@@ -55,7 +55,7 @@ class ShadowWorkflowTests(unittest.TestCase):
         self.assertIn('target/quality/artifact-validation.json', shadow)
         self.assertIn('needs.quality-coverage.outputs.manifest-sha256', shadow)
         self.assertLess(shadow.index('ci_artifact.py verify'), shadow.index('rust_reference.py'))
-        self.assertEqual(shadow.count('if: ${{ always() }}'), 2)
+        self.assertEqual(shadow.count('if: ${{ always() }}'), 1)
         self.assertNotIn('continue-on-error', shadow)
         for expensive in ('cargo ', 'ci_quality.py collect', 'source_measure.py', 'critical_paths.py'):
             self.assertNotIn(expensive, shadow)
@@ -65,7 +65,7 @@ class ShadowWorkflowTests(unittest.TestCase):
         required = workflow.split('  quality-required:\n')[1]
         self.assertIn('name: Required Quality Aggregate\n', required)
         self.assertIn('if: ${{ always() }}', required)
-        expected = ['test', 'test-cross-platform', 'security-audit', 'fmt', 'clippy', 'build',
+        expected = ['classify', 'test', 'test-cross-platform', 'security-audit', 'fmt', 'clippy', 'build',
                     'build-cross-platform', 'coverage', 'quality-coverage', 'quality-contracts',
                     'quality-contracts-cross-platform', 'quality-baseline', 'docs-consistency',
                     'release-contracts', 'quality-scripts']
