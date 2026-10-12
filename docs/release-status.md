@@ -1,5 +1,28 @@
 # Published releases and acceptance
 
+## GateProbes native collector rc.8, 2026-10-12
+
+The native Rust/MIR collector's signed publication moved to GateProbes, which
+published the prerelease
+[rust-collector-v0.1.0-rc.8](https://github.com/musutrade/GateProbes/releases/tag/rust-collector-v0.1.0-rc.8)
+from `155b2334d5d1ee6e95d9be3e3cdf8d3d0c15c1d0` ([run 38218575101](https://github.com/musutrade/GateProbes/actions/runs/38218575101))
+after the required `ci.yml` run on GateProbes main succeeded.
+
+- Four platform binaries (Linux x86-64, macOS Intel/Apple Silicon, Windows
+  x86-64) were built in release mode from the migrated source and accepted per
+  platform against the pinned Core 0.4.8 binary digest: 23-case `accept.py` and
+  zero-skip helper tests passed on every platform.
+- Assets: the four binaries and SBOMs, `SHA256SUMS`, `release-inventory.json`
+  and keyless Sigstore signatures/certificates for all ten integrity subjects,
+  plus GitHub build provenance attestations. The signing identity is
+  `https://github.com/musutrade/GateProbes/.github/workflows/native-collector-release.yml@refs/tags/rust-collector-v0.1.0-rc.8`.
+- Independent local re-verification passed 10/10 `cosign verify-blob` against
+  that certificate identity, 10/10 `gh attestation verify` against the signer
+  workflow, the certificate SAN, `SHA256SUMS` and the exact inventory.
+- Core installation and trust are unchanged: they still pin the previous
+  identity and artifacts until the explicit switch (task 5.6). No Core gate,
+  threshold, baseline or consumption pin changed in this step.
+
 ## Public Linux x86_64 acceptance, 2026-10-11
 
 Core [0.4.8](https://github.com/musutrade/Harness-Gate/releases/tag/v0.4.8)

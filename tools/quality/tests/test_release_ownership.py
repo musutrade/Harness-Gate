@@ -1,4 +1,5 @@
 """Every release script has one owning repository; shared tools have one source."""
+import hashlib
 import json
 import unittest
 from pathlib import Path
@@ -46,7 +47,21 @@ class ReleaseOwnershipTests(unittest.TestCase):
     def test_plugin_identity_and_shared_copy_rules_are_declared(self):
         self.assertTrue(self.manifest["plugin_release_identity"].strip())
         self.assertTrue(self.manifest["shared_copy_rule"].strip())
-        self.assertEqual(self.manifest["generated_copies"], {})
+
+    def test_generated_copies_pin_one_source_and_exact_bytes(self):
+        copies = self.manifest["generated_copies"]
+        self.assertEqual(set(copies), {
+            "tools/release/release_policy.py",
+            "tools/release/release_inventory.py",
+        })
+        for source, row in copies.items():
+            path = ROOT / source
+            self.assertTrue(path.is_file(), source)
+            self.assertEqual(row["plugin_repository"], "musutrade/GateProbes")
+            self.assertTrue(row["plugin_path"].endswith(path.name), source)
+            self.assertRegex(row["revision"], r"^[0-9a-f]{40}$")
+            actual = hashlib.sha256(path.read_bytes()).hexdigest()
+            self.assertEqual(actual, row["sha256"], source)
 
 
 if __name__ == "__main__":

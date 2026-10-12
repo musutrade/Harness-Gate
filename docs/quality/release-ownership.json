@@ -38,7 +38,20 @@
     "tools/release/release_inventory.py": "gatehouse",
     "tools/release/release_policy.py": "gatehouse"
   },
-  "generated_copies": {},
+  "generated_copies": {
+    "tools/release/release_policy.py": {
+      "plugin_repository": "musutrade/GateProbes",
+      "plugin_path": "tools/release/release_policy.py",
+      "revision": "dcc9194d4c01c4994983af505cf1191774fea70e",
+      "sha256": "19640e4d97e5e02a759ce267a1bb6a5663fcbda6ae7a9e4a2a2829c4dcebf21e"
+    },
+    "tools/release/release_inventory.py": {
+      "plugin_repository": "musutrade/GateProbes",
+      "plugin_path": "tools/release/release_inventory.py",
+      "revision": "dcc9194d4c01c4994983af505cf1191774fea70e",
+      "sha256": "0993aee8cd44a2d1106394719d7c8bfacf7f034e669cf49b6a887b70a2c8d45d"
+    }
+  },
   "shared_copy_rule": "Gatehouse owns the single editable source. When GateProbes is created it carries generated copies of these files from a pinned GateHouse revision; it never edits its own copy independently.",
   "plugin_release_identity": "Declared by GateProbes: its own repository, tag prefix, workflow path and environment rules. A URL substitution must never implicitly change the signed identity GateHouse trusts.",
   "unowned_note": "tools/release/tests follows the scripts it covers and splits with them; it is not classified here."
