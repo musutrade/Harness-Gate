@@ -5,7 +5,7 @@
 The native Rust/MIR collector's signed publication moved to GateProbes, which
 published the prerelease
 [rust-collector-v0.1.0-rc.8](https://github.com/musutrade/GateProbes/releases/tag/rust-collector-v0.1.0-rc.8)
-from `155b2334d5d1ee6e95d9be3e3cdf8d3d0c15c1d0` ([run 38218575101](https://github.com/musutrade/GateProbes/actions/runs/38218575101))
+from `155b233fb2f525f520b4fcc0ed73e017154345e0` ([run 38218575101](https://github.com/musutrade/GateProbes/actions/runs/38218575101))
 after the required `ci.yml` run on GateProbes main succeeded.
 
 - Four platform binaries (Linux x86-64, macOS Intel/Apple Silicon, Windows

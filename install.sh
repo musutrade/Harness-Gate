@@ -158,13 +158,15 @@ verify_checksum() {
 verify_signature() {
     local dist="$1"
     local filename="$2"
+    local identity_repo="$3"
     command -v cosign >/dev/null 2>&1 \
         || die "cosign is required for Sigstore verification (see https://docs.sigstore.dev/cosign/system_config/installation/)"
 
     # The release workflow's OIDC identity is bound to this exact immutable tag.
     # Core releases verify the Harness-Gate workflow; the Rust collector verifies
-    # the explicitly provisioned GateProbes workflow (never a substituted URL).
-    local identity_repo="${SIGNATURE_REPO:-$REPO}"
+    # the explicitly provisioned GateProbes workflow. The expected signer is a
+    # script-owned constant passed by the caller; it is never read from the
+    # calling environment, so an exported lookalike variable cannot change it.
     cosign verify-blob \
         --signature "$dist/${filename}.sig" \
         --certificate "$dist/${filename}.crt" \
@@ -205,7 +207,7 @@ prepare_rust() {
     local VERSION="rust-collector-v${RUST_VERSION}"
     local RELEASE_WORKFLOW="native-collector-release.yml"
     local RELEASE_BASE_URL="$COLLECTOR_RELEASE_BASE_URL"
-    local SIGNATURE_REPO="$COLLECTOR_REPO"
+    local SIGNER_REPO="$COLLECTOR_REPO"
     local BINARY_NAME="harness-gate-rust-collector"
     prepare_binary "$temporary"
     RUST_STAGED_BINARY="$STAGED_BINARY"
@@ -315,9 +317,9 @@ prepare_binary() {
     download "${base_url}/SHA256SUMS.crt" "$temporary_root/SHA256SUMS.crt"
     download "${base_url}/${filename}.sig" "$temporary_root/${filename}.sig"
     download "${base_url}/${filename}.crt" "$temporary_root/${filename}.crt"
-    verify_signature "$temporary_root" "SHA256SUMS"
+    verify_signature "$temporary_root" "SHA256SUMS" "$SIGNER_REPO"
     verify_checksum "$temporary_root" "$filename"
-    verify_signature "$temporary_root" "$filename"
+    verify_signature "$temporary_root" "$filename" "$SIGNER_REPO"
     STAGED_BINARY="$temporary_root/$filename"
 }
 
@@ -355,6 +357,9 @@ install_from_source() {
 main() {
     local from_source=0
     local with_rust=0 rust_only=0 rust_options=0
+    # Core releases always verify the Harness-Gate workflow; prepare_rust
+    # shadows this with the explicitly provisioned GateProbes repository.
+    local SIGNER_REPO="$REPO"
     while (($# > 0)); do
         case "$1" in
             --with-rust) with_rust=1; shift ;;
