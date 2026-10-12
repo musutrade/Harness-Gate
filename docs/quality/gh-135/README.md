@@ -6,7 +6,7 @@ GH-134 is closed and its implementation is present in baseline commit
 `2de3b1c0baf909f7b5f6a0f52fb1b893b6f25fbc` (merged PR #142).
 
 The manual [Frontend Advisory workflow](../../../.github/workflows/frontend-advisory.yml)
-runs the [advisory runner](../../../tools/quality/typescript_advisory.py) using
+runs the [advisory runner](https://github.com/musutrade/Harness-Gate/blob/8d93ea53c7cf8b314bda816eafe13209da25c742/tools/quality/typescript_advisory.py) using
 retained GH-134 coverage and GH-133 contract artifacts. It performs no native
 frontend collection. Its 30-day artifact upload runs even after failure and
 includes raw replay inputs, normalized evidence, policy/project reports, test

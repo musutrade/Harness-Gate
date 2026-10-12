@@ -1,6 +1,6 @@
 # Frozen Python product boundary
 
-GH-146 implements OpenSpec task 1.1. This inventory assigns the production modules; the machine inventory is authoritative; it does not transfer runtime authority. A = CI/dev tooling, B = ecosystem adapter, C = generic product semantics, D = migration/reference tooling.
+GH-146 implements OpenSpec task 1.1. This inventory assigns the production modules; the machine inventory is authoritative; it does not transfer runtime authority. A = CI/dev tooling, B = ecosystem adapter, C = generic product semantics, D = migration/reference tooling. Rows with `plugin_owner` are explicitly approved plugin-owned: their absence in a core-only tree is allowed per file, while core, frozen and oracle rows must exist and unregistered files must fail.
 
 The [machine inventory](python-boundary.json) records direct callers, source hashes, purpose, CI role, release impact, current authority and final disposition for every module. Nested `tests/` and `fixtures/` programs are test assets, including the new D-class corpus replay helper. Source hashes pin the reviewed boundary; caller lists exclude documentation examples.
 

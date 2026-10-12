@@ -52,8 +52,10 @@ the aggregate.
 the native collector, so no PR or `main` push starts that four-platform build
 from current main anymore. This does not prohibit creating tags, and a tag that
 points at a historical commit still runs the workflow as it existed at that
-commit. Historical releases, signatures and tags are retained. `rust-generic-shadow.yml` keeps its opt-in condition and
-`rust-measure-native.yml` already filters its pull requests.
+commit. Historical releases, signatures and tags are retained. `rust-generic-shadow.yml` keeps its opt-in condition.
+`rust-measure-native.yml` was retired from active workflows on 2026-10-12 (archived at
+`retired/workflows/rust-measure-native.yml`, restore commit `4ec65a76`): core acceptance uses the pinned Linux
+amd64 measurer release, so no PR or `main` push starts the Windows/macOS analyzer build from core source.
 
 ## Measured routing
 

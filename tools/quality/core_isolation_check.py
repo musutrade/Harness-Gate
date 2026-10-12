@@ -33,6 +33,7 @@ TEST_RESULT = re.compile(
     r'^test result: (ok|FAILED)\. (\d+) passed; (\d+) failed; \d+ ignored; '
     r'\d+ measured; (\d+) filtered out', re.M)
 UNITTEST_SUMMARY = re.compile(r'^Ran (\d+) tests? in ', re.M)
+UNITTEST_RESULT = re.compile(r'^(OK|FAILED)(?: \(([^)]*)\))?$', re.M)
 
 # Plugin implementation sources owned by GateProbes (`CORE_PLUGIN_SPLIT.md`,
 # design boundary table). The list must stay exact: a missing path fails the
@@ -51,14 +52,12 @@ PLUGIN_IMPLEMENTATION = (
     'tools/quality/rust_collector_delivery.py',
     'tools/quality/rust_collector_entry.py',
     'tools/quality/rust_collector_project.py',
-    'tools/quality/rust_equivalence.py',
     'tools/quality/rust_native.py',
     'tools/quality/rust_native_classify.py',
     'tools/quality/rust_native_config.py',
     'tools/quality/rust_native_driver.py',
     'tools/quality/rust_native_policy.py',
     'tools/quality/rust_native_replay.py',
-    'tools/quality/rust_reference.py',
     'tools/quality/typescript_acceptance.py',
     'tools/quality/typescript_advisory.py',
     'tools/quality/typescript_contracts.py',
@@ -76,11 +75,9 @@ PLUGIN_OWNED_TESTS = (
     'test_rust_collector_delivery',
     'test_rust_collector_project',
     'test_rust_collector_runtime',
-    'test_rust_equivalence',
     'test_rust_native',
     'test_rust_native_classify',
     'test_rust_native_driver',
-    'test_rust_reference',
     'test_typescript_acceptance',
     'test_typescript_advisory',
     'test_typescript_contracts',
@@ -179,17 +176,22 @@ def python_selection(copy: Path, workdir: Path) -> dict[str, object]:
     environment = {**os.environ, 'PYTHONDONTWRITEBYTECODE': '1'}
     result = run([sys.executable, '-m', 'unittest', *selected],
                  tests, log=workdir / 'logs' / 'python-selection.log', env=environment)
-    summary = UNITTEST_SUMMARY.search(result.stdout + result.stderr)
+    output = result.stdout + result.stderr
+    summary = UNITTEST_SUMMARY.search(output)
+    outcome = UNITTEST_RESULT.search(output)
+    counts = dict(item.split('=') for item in (outcome.group(2) or '').split(', ') if '=' in item) if outcome else {}
     report = {
         'selected_modules': selected,
         'excluded_plugin_owned': [name for name in available if name in PLUGIN_OWNED_TESTS],
         'tests_run': int(summary.group(1)) if summary else 0,
+        'failed': int(counts.get('failures', 0)) + int(counts.get('errors', 0)),
+        'skipped': int(counts.get('skipped', 0)),
         'exit_code': result.returncode,
-        'passed': result.returncode == 0,
     }
+    report['passed'] = report['tests_run'] - report['failed'] - report['skipped']
     if result.returncode != 0:
         report['failures'] = [
-            line for line in (result.stdout + result.stderr).splitlines()
+            line for line in output.splitlines()
             if re.match(r'^(ERROR|FAIL): ', line)
         ]
     return report

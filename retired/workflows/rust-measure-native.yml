@@ -1,3 +1,13 @@
+# RETIRED (2026-10-12): archived, inactive workflow. It built the plugin
+# analyzer from core source on windows-latest and macos-latest; core
+# acceptance now uses the pinned Linux amd64 measurer release, and
+# cross-platform analyzer builds belong to GateProbes. Current main no
+# longer triggers it, and no pull request or main push starts it.
+# It was active at .github/workflows/rust-measure-native.yml through commit
+# 4ec65a7666511cb80c89d7d369a56ec71cb878df; restore with
+# `git mv retired/workflows/rust-measure-native.yml
+# .github/workflows/rust-measure-native.yml` after reverting the ownership
+# record in docs/quality/release-ownership.json.
 name: Rust Measure Native Validation
 
 on:

@@ -44,8 +44,10 @@ semantics, gate names, branch protection or release authority.
 > pinned artifact through `tools/quality/rust-measure-release.json` and records
 > the exact release/asset/digest in the candidate report and command log; it no
 > longer compiles `tools/quality/rust-measure`. The supplemental
-> `rust-measure-native` workflow still builds the analyzer on Windows/macOS for
-> native validation and moves with 3.4.
+> `rust-measure-native` workflow was retired from active workflows on
+> 2026-10-12 (`retired/workflows/`, restore commit `4ec65a76`): core acceptance
+> uses the pinned Linux amd64 measurer release, and cross-platform analyzer
+> builds are plugin-owned.
 >
 > **3.3 complete (2026-10-11):** `docs/quality/release-ownership.{md,json}` and
 > `tools/quality/tests/test_release_ownership.py` assign every release script one

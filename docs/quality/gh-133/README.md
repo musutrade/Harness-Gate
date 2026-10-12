@@ -2,9 +2,9 @@
 
 Scope: [OpenSpec task 3.3](../../../openspec/changes/typescript-angular-reference-adapter/tasks.md),
 following [ADR-0040](../../adr/0040-language-agnostic-evidence-policy.md).
-The [native collector](../../../tools/quality/collect_typescript_contracts.py)
+The [native collector](https://github.com/musutrade/Harness-Gate/blob/8d93ea53c7cf8b314bda816eafe13209da25c742/tools/quality/collect_typescript_contracts.py)
 runs the existing Angular fixture against its live Rust provider in disposable
-copies. The [adapter](../../../tools/quality/typescript_contracts.py) parses actual
+copies. The [adapter](https://github.com/musutrade/Harness-Gate/blob/8d93ea53c7cf8b314bda816eafe13209da25c742/tools/quality/typescript_contracts.py) parses actual
 oasdiff output and compares complete freshly generated client trees, then emits
 the existing evidence, project and policy contracts. No generic policy, report,
 collector protocol or schema implementation changes.

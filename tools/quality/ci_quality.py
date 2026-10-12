@@ -78,6 +78,40 @@ def verify_measurer_asset(path: Path, pin: dict) -> None:
     require(sha256(path) == pin['sha256'], 'pinned measurer asset digest mismatch')
 
 
+def ensure_measurer(cache: Path) -> Path:
+    """Download, digest-verify, bound-check and extract the pinned measurer.
+
+    The release archive is the only source of the analyzer. Extraction accepts
+    regular files and directories strictly inside the single release root, so an
+    archive can never write outside its cache directory, and the declared
+    executable must exist with its executable bit set.
+    """
+    pin = load_measurer_pin()
+    cache.mkdir(parents=True, exist_ok=True)
+    archive = cache / pin['asset']
+    if not archive.is_file() or sha256(archive) != pin['sha256']:
+        subprocess.run(['curl', '--fail', '--show-error', '--location', '--proto', '=https',
+                        '--tlsv1.2', '--retry', '3', '--retry-all-errors', '--output', str(archive),
+                        f'{MEASURER_RELEASE_URL}/{pin["release"]}/{pin["asset"]}'], check=True)
+    verify_measurer_asset(archive, pin)
+    root = pin['asset'].removesuffix('.tar.gz')
+    executable = cache / root / pin['executable']
+    with tarfile.open(archive) as source:
+        members = source.getmembers()
+        require(bool(members), 'empty measurer release archive')
+        for member in members:
+            require(not member.name.startswith('/') and '..' not in Path(member.name).parts,
+                    f'unsafe measurer archive member: {member.name}')
+            require(member.isfile() or member.isdir(),
+                    f'unsupported measurer archive member: {member.name}')
+            require(member.name == root or member.name.startswith(root + '/'),
+                    f'measurer archive member outside the release root: {member.name}')
+        source.extractall(cache, filter='data')
+    require(executable.is_file(), 'pinned measurer executable missing from the release archive')
+    require(os.access(executable, os.X_OK), 'pinned measurer executable is not executable')
+    return executable
+
+
 def relocated_migration_sources(base: str, head: str) -> set[str]:
     """Recognize only the unchanged move of the unpublished replay executable."""
     old, new = REPLAY_RELOCATION

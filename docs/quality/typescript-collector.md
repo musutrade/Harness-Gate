@@ -1,7 +1,7 @@
 # TypeScript/Angular retained collector v1
 
 GH-131 implements only OpenSpec `typescript-angular-reference-adapter` task 3.1.
-[typescript_reference.py](../../tools/quality/typescript_reference.py) projects
+[typescript_reference.py](https://github.com/musutrade/Harness-Gate/blob/8d93ea53c7cf8b314bda816eafe13209da25c742/tools/quality/typescript_reference.py) projects
 the real GH-129 native archive and GH-130 parser index using the existing
 [source semantics](typescript-source-semantics.md), [project model](project-model.md)
 and [collector protocol](collector-protocol.md). It returns measurement facts in

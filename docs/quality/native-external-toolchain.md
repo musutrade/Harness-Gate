@@ -116,7 +116,7 @@ library loading, executable suffixes and path separators are handled by the
 adapter; these changes do not introduce a new measurement formula.
 Independent typed-MIR basic-block counters cover the old validated compiler-owner
 scope, including derived methods, macro expansions, constructors, closures and
-async bodies. The [native engine contract](../../tools/quality/rust-native-driver/README.md)
+async bodies. The [native engine contract](https://github.com/musutrade/GateProbes/blob/155b233fb2f525f520b4fcc0ed73e017154345e0/plugins/rust-native-driver/README.md)
 defines the precise limits. This delivery does not certify arbitrary macros or
 projects beyond that contract.
 
@@ -170,5 +170,5 @@ immutable `gh release create`; existing releases cannot be overwritten.
 
 There is no private candidate signing round, bundled-runtime installer or second
 approval packet. The old bundled workflow stays suspended. See the
-[build and acceptance commands](../../tools/quality/rust-native-plugin/README.md)
+[build and acceptance commands](https://github.com/musutrade/GateProbes/blob/155b233fb2f525f520b4fcc0ed73e017154345e0/plugins/rust-native-plugin/README.md)
 and the [local validation record](native-external-toolchain-validation.md).

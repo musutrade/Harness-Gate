@@ -1,7 +1,7 @@
 # TypeScript collector plugin local acceptance
 
 Implementation and independent installation contract:
-[`tools/quality/typescript-risk/README.md`](../../../tools/quality/typescript-risk/README.md).
+[`tools/quality/typescript-risk/README.md`](https://github.com/musutrade/GateProbes/blob/155b233fb2f525f520b4fcc0ed73e017154345e0/plugins/typescript-risk/README.md).
 This candidate leaves existing Engineering Policy semantics and all existing
 certified series/required checks unchanged. Generic Core code is not modified.
 
