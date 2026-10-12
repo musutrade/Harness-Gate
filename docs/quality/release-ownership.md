@@ -43,11 +43,32 @@ installs keep the Harness-Gate `release.yml` identity; a new download URL still
 never changes a trusted identity by itself. The protected production chain
 keeps its separate RSA/Sigstore trust and remains tasks 4.3.
 
+## Remaining collector workflows
+
+The split leaves collector-related workflows in GateHouse with a recorded
+owner and disposition; the RC8 native plugin chain and the legacy six-asset
+production chain are separate products and are recorded separately.
+
+| Workflow | Owner | Disposition |
+| --- | --- | --- |
+| `native-collector-release.yml` | GateHouse | Legacy entry retained for rollback; superseded by the GateProbes chain. No new tag is produced from it. |
+| `rust-collector-release.yml` | GateHouse | Paused legacy bundled-runtime RSA/Sigstore six-asset chain; not migrated, not provisioned, and not the RC8 native chain. |
+| `rust-measure-native.yml` | GateHouse | Compatibility validation retained while the measurer source and its core tests remain here. |
+
+The paused production chain is not a prerequisite for the RC8 native delivery
+and is not re-enabled by this split. Its hold step suspends signing and
+publication; any revival requires a reviewed measurement migration and an
+explicit product decision. No RSA key, self-hosted runner group, environment
+approval or publication path is provisioned while it stays paused. GateProbes
+owns the scripts and any future revival.
+
 ## Enforcement
 
 `tools/quality/tests/test_release_ownership.py` checks that every top-level
 `tools/release` file has exactly one owner, that GateHouse keeps
 `release.yml`/`install.sh`, that every shared tool's editable source is
-GateHouse, and that each recorded generated copy still matches the digest of
-the GateHouse source it was copied from. `tools/release/tests` follows the
-scripts it covers and is not classified here.
+GateHouse, that each recorded generated copy still matches the digest of the
+GateHouse source it was copied from, and that every workflow under
+`.github/workflows/` has exactly one recorded owner and an allowed
+disposition. `tools/release/tests` follows the scripts it covers and is not
+classified here.

@@ -48,6 +48,36 @@ class ReleaseOwnershipTests(unittest.TestCase):
         self.assertTrue(self.manifest["plugin_release_identity"].strip())
         self.assertTrue(self.manifest["shared_copy_rule"].strip())
 
+    def test_every_workflow_has_one_owner_and_disposition(self):
+        workflows = self.manifest["workflows"]
+        actual = {
+            path.relative_to(ROOT).as_posix()
+            for path in (ROOT / ".github/workflows").iterdir()
+            if path.is_file() and path.suffix in {".yml", ".yaml"}
+        }
+        self.assertEqual(set(workflows), actual)
+        allowed = {
+            "core-retained",
+            "legacy-entry-retained",
+            "paused-not-migrated",
+            "compatibility-validation-retained",
+        }
+        for path, row in workflows.items():
+            self.assertIn(row["owner"], {"gatehouse", "gateprobes"}, path)
+            self.assertIn(row["disposition"], allowed, path)
+            self.assertTrue(row["note"].strip(), path)
+            if "revival_owner" in row:
+                self.assertIn(row["revival_owner"], {"gatehouse", "gateprobes"}, path)
+
+    def test_paused_production_chain_stays_separate_and_unprovisioned(self):
+        paused = self.manifest["workflows"][".github/workflows/rust-collector-release.yml"]
+        self.assertEqual(paused["disposition"], "paused-not-migrated")
+        self.assertEqual(paused["owner"], "gatehouse")
+        self.assertEqual(paused["revival_owner"], "gateprobes")
+        source = (ROOT / ".github/workflows/rust-collector-release.yml").read_text()
+        self.assertIn("Legacy collector signing/publication is suspended", source)
+        self.assertIn("github.repository == 'musutrade/Harness-Gate'", source)
+
     def test_generated_copies_pin_one_source_and_exact_bytes(self):
         copies = self.manifest["generated_copies"]
         self.assertEqual(set(copies), {
