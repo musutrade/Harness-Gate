@@ -31,9 +31,27 @@ SNAPSHOT_PATHS = ('tools/harness-gate', 'tools/quality', 'schema', 'docs/dogfood
 REPLAY_RELOCATION = ('tools/harness-gate/quality-core/examples/differential_replay.rs',
                      'tools/harness-gate/quality-replay/examples/differential_replay.rs')
 # Reviewed 2026-10-12: the Postgres recipe left service/postgres.rs for the
-# measured recipes series (source_measure.SOURCE_FILES); the removed path no
-# longer carries production code. Any other removed source still needs review.
+# measured recipes series (source_measure.SOURCE_FILES). The exemption covers
+# only the confirmed deletion: it applies while the old path exists at base and
+# is absent at head. Recreating or modifying the old path fails the measurement
+# review. This records the reviewed removal only; it does not establish
+# function-level continuity between old and new sources, which are measured as
+# separate functions.
 REVIEWED_REMOVED_SOURCES = ('tools/harness-gate/src/service/postgres.rs',)
+
+
+def reviewed_removals(base: str, head: str) -> set[str]:
+    """Exempt a reviewed removal only while the old path is actually gone."""
+    removals = set()
+    for path in REVIEWED_REMOVED_SOURCES:
+        present = [
+            subprocess.run(['git', 'cat-file', '-e', f'{commit}:{path}'],
+                           cwd=ROOT, capture_output=True).returncode == 0
+            for commit in (base, head)
+        ]
+        if present == [True, False]:
+            removals.add(path)
+    return removals
 REQUIRED_ARTIFACTS = {'coverage.json', 'coverage.raw.json', 'coverage.lcov',
                       'coverage.cobertura.xml', 'production.json', 'risk.json',
                       'critical-paths.json', 'critical-path-runs/bundle.json'} | {
@@ -266,9 +284,10 @@ class Collector:
         changed = subprocess.check_output(['git', 'diff', '--name-only', base, head, '--',
                                             'tools/harness-gate/src', 'tools/harness-gate/quality-core'], cwd=ROOT, text=True).splitlines()
         relocated = relocated_migration_sources(base, head)
+        removed = reviewed_removals(base, head)
         unsupported = [p for p in changed if p.endswith('.rs') and
                        p not in relocated and
-                       p not in REVIEWED_REMOVED_SOURCES and
+                       p not in removed and
                        p not in {str((ROOT / 'tools/harness-gate/src' / source).resolve().relative_to(ROOT))
                                  for source in SOURCE_FILES} and not
                        (p.startswith('tools/harness-gate/quality-core/tests/') or

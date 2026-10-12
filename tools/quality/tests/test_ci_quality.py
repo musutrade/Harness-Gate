@@ -451,5 +451,72 @@ class CollectionTests(unittest.TestCase):
             self.assertEqual(marker.read_text(), 'retained')
 
 
+class ReviewedRemovalTests(unittest.TestCase):
+    """The reviewed deletion is exempt only while the old path is actually gone."""
+
+    PATH = 'tools/harness-gate/src/service/postgres.rs'
+
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name)
+        self.path = self.root / self.PATH
+        self.path.parent.mkdir(parents=True)
+        self.git('init')
+        self.git('config', 'user.name', 'Reviewed Removal')
+        self.git('config', 'user.email', 'removal@example.invalid')
+
+    def git(self, *args):
+        return subprocess.check_output(['git', *args], cwd=self.root,
+                                       stderr=subprocess.PIPE, text=True).strip()
+
+    def commit(self, message):
+        self.git('add', '-A')
+        self.git('commit', '--allow-empty', '-m', message)
+        return self.git('rev-parse', 'HEAD')
+
+    def risk(self, base, head, name):
+        return gate.Collector(self.root / name, base, head, name)
+
+    def test_deletion_at_head_is_the_only_exemption(self):
+        self.path.write_text('fn validate() {}\n')
+        base = self.commit('base with the old path')
+        self.path.unlink()
+        head = self.commit('delete the old path')
+        collector = self.risk(base, head, 'confirmed-deletion')
+        with patch.object(gate, 'ROOT', self.root), \
+                patch.object(collector, 'command',
+                             side_effect=RuntimeError('pinned measurer reached')) as command:
+            with self.assertRaisesRegex(RuntimeError, 'pinned measurer reached'):
+                collector.risk()
+        self.assertEqual(command.call_args.args[0], 'measurer-download')
+
+    def test_recreated_path_is_rejected(self):
+        (self.root / 'README.md').write_text('base without the old path\n')
+        base = self.commit('base without the old path')
+        self.path.write_text('fn validate() {}\n')
+        head = self.commit('recreate the old path')
+        collector = self.risk(base, head, 'recreated-path')
+        with patch.object(gate, 'ROOT', self.root), \
+                patch.object(collector, 'command',
+                             side_effect=RuntimeError('pinned measurer reached')) as command:
+            with self.assertRaisesRegex(ValueError, 'outside supported risk series'):
+                collector.risk()
+        command.assert_not_called()
+
+    def test_modified_path_is_rejected(self):
+        self.path.write_text('fn validate() {}\n')
+        base = self.commit('base with the old path')
+        self.path.write_text('fn validate() { let _ = 1; }\n')
+        head = self.commit('modify the old path')
+        collector = self.risk(base, head, 'modified-path')
+        with patch.object(gate, 'ROOT', self.root), \
+                patch.object(collector, 'command',
+                             side_effect=RuntimeError('pinned measurer reached')) as command:
+            with self.assertRaisesRegex(ValueError, 'outside supported risk series'):
+                collector.risk()
+        command.assert_not_called()
+
+
 if __name__ == '__main__':
     unittest.main()
