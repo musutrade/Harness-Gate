@@ -161,12 +161,13 @@
     "service-core": {
       "blocking": true,
       "files": [
+        "src/recipes/mod.rs",
+        "src/recipes/postgres.rs",
         "src/service/commands.rs",
         "src/service/docker.rs",
         "src/service/inspection.rs",
         "src/service/lease.rs",
         "src/service/mod.rs",
-        "src/service/postgres.rs",
         "src/service/report_directory.rs"
       ]
     },
