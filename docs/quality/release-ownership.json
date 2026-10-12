@@ -105,7 +105,7 @@
       "disposition": "retired-restorable",
       "was": ".github/workflows/native-collector-release.yml",
       "restore_commit": "6aaa234249574c9a321a8819213b4c936c02605e",
-      "note": "Superseded by the GateProbes native collector chain (rc.8 verified, run 38218575101). Inactive: no pull request, main push or tag event triggers it, and no new tag is produced. Historical releases, signatures and tags are retained. Restore by moving the file back to .github/workflows/ after reverting this record."
+      "note": "Superseded by the GateProbes native collector chain (rc.8 verified, run 38218575101). Current main no longer triggers it and pull requests and main pushes no longer start it. This does not prohibit creating tags; a tag pointing at a historical commit still runs the workflow as it existed at that commit. Historical releases, signatures and tags are retained. Restore by moving the file back to .github/workflows/ after reverting this record."
     }
   }
 }
