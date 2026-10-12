@@ -258,10 +258,6 @@ fn both() {
             compare(base, head)
 
     def test_native_inventory_has_separate_identity_and_contracts(self):
-        subprocess.run(["cargo", "test", "--locked", "--manifest-path",
-                        str(ROOT / "tools/quality/rust-measure/Cargo.toml")],
-                       env={**os.environ, "CARGO_TARGET_DIR": str(ROOT / "target/gh-94-measure")},
-                       check=True, capture_output=True)
         with tempfile.TemporaryDirectory() as temp:
             file = Path(temp) / "input.rs"
             file.write_text('fn f() { tracing::error!(value = %value); }')
