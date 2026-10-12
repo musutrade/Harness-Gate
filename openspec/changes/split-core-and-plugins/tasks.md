@@ -26,8 +26,19 @@ semantics, gate names, branch protection or release authority.
 - [x] 3.2 [P0][M] Make core CI select a pinned collector version explicitly (no "latest source"); acceptance: the exact version is recorded in CI config and logs.
 - [x] 3.3 [P1][M] Split `tools/release/` into core-release and plugin-release groups by target; acceptance: each script has a single owning repository.
 - [ ] 3.4 [P1][M] Move plugin build/sign/publish machinery and the four collector workflows to GateProbes; acceptance: GateProbes tests, packages and publishes independently, and core no longer references them.
-- [ ] 3.5 [P1][M] Re-verify signing identity after the move; acceptance: Sigstore certificate identity and provenance reference the GateProbes repository/workflow, not only a new URL.
+- [x] 3.5 [P1][M] Re-verify signing identity after the move; acceptance: Sigstore certificate identity and provenance reference the GateProbes repository/workflow, not only a new URL.
 
+> **3.5 verified with a real publication (2026-10-12):** GateProbes published
+> `rust-collector-v0.1.0-rc.8` (prerelease, [run 38218575101](https://github.com/musutrade/GateProbes/actions/runs/38218575101))
+> from its own workflow. The certificate SAN and provenance signer workflow are
+> `https://github.com/musutrade/GateProbes/.github/workflows/native-collector-release.yml@refs/tags/rust-collector-v0.1.0-rc.8`;
+> independent local re-verification passed 10/10 `cosign verify-blob`, 10/10
+> `gh attestation verify`, the certificate SAN, `SHA256SUMS` and the exact
+> inventory. Core install/trust still pins the previous identity until the
+> explicit 5.6 switch; the old repository entry and pinned artifacts are kept.
+> The remaining collector workflows and the protected production chain stay
+> under 3.4/4.3.
+>
 > **3.1/3.2 complete (2026-10-11):** `harness-gate-rust-measure-0.3.1-linux-amd64.tar.gz`
 > is published with the `v0.4.8` release (signed, SBOM, recorded in the release
 > inventory). The required risk stage now downloads and digest-verifies the
