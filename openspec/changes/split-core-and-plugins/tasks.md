@@ -58,6 +58,19 @@ semantics, gate names, branch protection or release authority.
 - [ ] 4.4 [P1][M] Remove compatibility paths only after both repositories are proven green; acceptance: removal is a separate reviewed change and rollback remains possible until then.
 - [ ] 4.5 [P1][M] Run final strict OpenSpec validation and update related records; acceptance: the change validates and no claim implies new ecosystem certification or new measurement semantics.
 
+## 5. GateProbes bootstrap, CI classification and migration scope
+
+Decisions D10–D13 in the design govern this section. Development order: scaffold
+and classification framework first, then one low-dependency plugin, then the
+remaining plugins, and the release/signing identity switch last.
+
+- [ ] 5.1 [P0][M] Scaffold GateProbes minimal source and the always-on CI classification framework; acceptance: the workflow always starts, classifies changes, selects subtasks, and ends in one fixed aggregate check; unknown changes fall back to the conservative set and no required workflow uses `paths-ignore`.
+- [ ] 5.2 [P0][M] Split pure-documentation checks from executable-example checks and classify GateHouse paths; acceptance: a pure-doc change does not invoke Cargo, and `ownership.json`, protocol specifications and test inputs under `docs/` are classified as inputs, not documentation.
+- [ ] 5.3 [P0][M] Migrate one low-dependency plugin and validate the independent flow; acceptance: the plugin repo builds, tests, runs its pinned-Core contract acceptance and clean-installs without the core source.
+- [ ] 5.4 [P1][M] Migrate the remaining plugins under D10 (source, manifests/lockfiles, tests, minimal fixtures, protocol copies, licenses, build/install/release scripts; no history, caches, old binaries); acceptance: each migration records source repository, full commit SHA and path mapping.
+- [ ] 5.5 [P1][S] Keep the rust-reference equivalence suite and `rust-generic-shadow` in core; acceptance: no historical input under `docs/quality/gh-96`/`gh-97` is deleted, and no moved test is skipped for a missing input.
+- [ ] 5.6 [P1][M] Switch plugin release and signing identity last; acceptance: provenance and certificate identity reference GateProbes explicitly, and core keeps consuming pinned artifacts without recompiling.
+
 ## Validation
 
 - Core builds and tests with no plugin source checked out.
