@@ -35,6 +35,24 @@ REQUIRED_ARTIFACTS = {'coverage.json', 'coverage.raw.json', 'coverage.lcov',
     f'{label}-{suffix}' for label in ('base', 'head') for suffix in (
         'source.tar', 'manifest.json', 'coverage.json', 'coverage.lcov',
         'coverage.cobertura.xml', 'risk.json')}
+MEASURER_PIN = ROOT / 'tools/quality/rust-measure-release.json'
+MEASURER_RELEASE_URL = 'https://github.com/musutrade/Harness-Gate/releases/download'
+
+
+def load_measurer_pin() -> dict:
+    """The analyzer is consumed as a pinned release artifact, never built here."""
+    pin = json.loads(MEASURER_PIN.read_text())
+    require(pin.get('schema') == 'rust-measure-release-pin/v1', 'unknown measurer pin schema')
+    for field in ('release', 'asset', 'sha256', 'version', 'executable'):
+        require(isinstance(pin.get(field), str) and pin[field], f'invalid measurer pin {field}')
+    require(re.fullmatch(r'[0-9a-f]{64}', pin['sha256']) is not None, 'invalid measurer pin sha256')
+    require(pin['asset'].startswith('harness-gate-rust-measure-' + pin['version'] + '-'),
+            'measurer pin asset/version mismatch')
+    return pin
+
+
+def verify_measurer_asset(path: Path, pin: dict) -> None:
+    require(sha256(path) == pin['sha256'], 'pinned measurer asset digest mismatch')
 
 
 def relocated_migration_sources(base: str, head: str) -> set[str]:
@@ -151,6 +169,28 @@ class Collector:
     def python(self, name: str, script: str, *args: str, allowed=(0,)):
         self.command(name, [sys.executable, str(ROOT / 'tools/quality' / script), *map(str, args)], allowed)
 
+    def measurer(self) -> Path:
+        """Download the pinned analyzer release artifact and verify its digest."""
+        pin = load_measurer_pin()
+        cache = self.directory / 'measurer'
+        cache.mkdir(exist_ok=True)
+        archive = cache / pin['asset']
+        url = f'{MEASURER_RELEASE_URL}/{pin["release"]}/{pin["asset"]}'
+        self.command('measurer-download', ['curl', '--fail', '--show-error', '--location',
+                                           '--proto', '=https', '--tlsv1.2',
+                                           '--output', str(archive), url])
+        verify_measurer_asset(archive, pin)
+        installed = cache / pin['asset'].removesuffix('.tar.gz')
+        with tarfile.open(archive) as source:
+            source.extractall(cache, filter='data')
+        binary = installed / pin['executable']
+        require(binary.is_file(), 'pinned measurer executable missing from archive')
+        self.report['measurer'] = {'release': pin['release'], 'asset': pin['asset'],
+                                   'sha256': pin['sha256'], 'version': pin['version'],
+                                   'rule': pin['rule']}
+        self.save()
+        return binary
+
     def legacy(self):
         self.python('legacy', 'coverage.py', '--output', self.directory / 'coverage.json')
 
@@ -193,9 +233,7 @@ class Collector:
         unsupported = [p for p in unsupported if not only_terminal_test_module_changed(base, head, p)]
         require(not unsupported, 'production changes outside supported risk series; measurement review required: '
                 + ', '.join(unsupported))
-        self.command('analyzer-build', ['cargo', 'build', '--locked', '--manifest-path',
-                                      str(ROOT / 'tools/quality/rust-measure/Cargo.toml')])
-        binary = Path(self.environment['CARGO_TARGET_DIR']) / 'debug' / ('harness-gate-rust-measure' + ('.exe' if os.name == 'nt' else ''))
+        binary = self.measurer()
         target = compiler_configuration()['target']
         for label, commit in (('base', base), ('head', head)):
             snapshot = self.snapshot(label, commit)

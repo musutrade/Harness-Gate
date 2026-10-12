@@ -22,22 +22,23 @@ semantics, gate names, branch protection or release authority.
 
 ## 3. Core CI consumes pinned plugin artifacts, then move GateProbes release
 
-- [ ] 3.1 [P0][L] Remove the core-CI step that builds the Rust measurer from collector source; acceptance: core CI no longer compiles collector source and uses a pinned plugin artifact instead.
-- [ ] 3.2 [P0][M] Make core CI select a pinned collector version explicitly (no "latest source"); acceptance: the exact version is recorded in CI config and logs.
+- [x] 3.1 [P0][L] Remove the core-CI step that builds the Rust measurer from collector source; acceptance: core CI no longer compiles collector source and uses a pinned plugin artifact instead.
+- [x] 3.2 [P0][M] Make core CI select a pinned collector version explicitly (no "latest source"); acceptance: the exact version is recorded in CI config and logs.
 - [ ] 3.3 [P1][M] Split `tools/release/` into core-release and plugin-release groups by target; acceptance: each script has a single owning repository.
 - [ ] 3.4 [P1][M] Move plugin build/sign/publish machinery and the four collector workflows to GateProbes; acceptance: GateProbes tests, packages and publishes independently, and core no longer references them.
 - [ ] 3.5 [P1][M] Re-verify signing identity after the move; acceptance: Sigstore certificate identity and provenance reference the GateProbes repository/workflow, not only a new URL.
 
-> **Blocked (2026-10-11):** 3.1, 3.2, 3.4 and 3.5 cannot complete inside this
-> repository. The core-CI measurer build is `tools/quality/ci_quality.py`'s
-> `cargo build --manifest-path tools/quality/rust-measure/Cargo.toml`
-> (`harness-gate-rust-measure/0.3.1`, consumed by `source_measure.py`). No pinned
-> release artifact of that measurer exists: `package_independent_collectors.py`
-> packages only `typescript-risk`, `http-json-contract` and `rust-source-risk`,
-> and `source_measure.py` pins the analyzer identity, so `rust-source-risk` cannot
-> substitute without changing measurement semantics (a non-goal). 3.4/3.5 are
-> cross-repository moves whose signed provenance must be produced and re-verified
-> in GateProbes. No destructive change was made to required CI. 3.3 remains
+> **3.1/3.2 complete (2026-10-11):** `harness-gate-rust-measure-0.3.1-linux-amd64.tar.gz`
+> is published with the `v0.4.8` release (signed, SBOM, recorded in the release
+> inventory). The required risk stage now downloads and digest-verifies the
+> pinned artifact through `tools/quality/rust-measure-release.json` and records
+> the exact release/asset/digest in the candidate report and command log; it no
+> longer compiles `tools/quality/rust-measure`. The supplemental
+> `rust-measure-native` workflow still builds the analyzer on Windows/macOS for
+> native validation and moves with 3.4.
+>
+> **Remaining blocker (2026-10-11):** 3.4/3.5 are cross-repository moves whose
+> signed provenance must be produced and re-verified in GateProbes. 3.3 remains
 > doable in-repo but needs the 🟨 core/plugin decision for the shared
 > `release_policy.py`, `release_inventory.py`, `generate-sbom.py`,
 > `production_installer.py`, `build_user_installer.py` and

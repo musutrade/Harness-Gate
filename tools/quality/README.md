@@ -66,6 +66,14 @@ rows). Changed production Rust files outside the supported risk boundary fail
 with a measurement-review diagnostic; these reports do not certify whole-project
 CRAP. See [ADR-0039](../../docs/adr/0039-required-risk-and-traceability-gates.md).
 
+The required risk stage consumes the analyzer as a pinned release artifact
+instead of compiling `tools/quality/rust-measure`. `rust-measure-release.json`
+pins the `v0.4.8` asset, its SHA-256 and the exact
+`harness-gate-rust-measure/0.3.1` / `mccabe-rust-3` identity; the download is
+recorded in the candidate log and fails closed on a digest or archive mismatch.
+The supplemental `rust-measure-native` workflow still builds the analyzer on
+Windows and macOS for native validation until it moves to GateProbes.
+
 GH-151 extends the inventory to `production-source-2`: `src/` and the linked
 `quality-core/` are production, including the public replay module. The core is
 an eleventh blocking boundary. Test-only modules retain explicit cfg(test)
