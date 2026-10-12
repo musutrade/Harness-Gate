@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`v0.4.8`, digest-verified through `tools/quality/rust-measure-release.json`)
   instead of compiling `tools/quality/rust-measure`. Analyzer identity and
   measurement semantics are unchanged.
+- `install.sh --rust-only` (and `--with-rust`) download the native Rust/MIR
+  collector from the GateProbes releases and verify the explicitly provisioned
+  GateProbes workflow identity; the default collector version moves to
+  `0.1.0-rc.8`. Core binary installs keep their Harness-Gate identity, and no
+  quality threshold or measurement semantic changes.
 
 ## [0.4.8] - 2026-10-11
 

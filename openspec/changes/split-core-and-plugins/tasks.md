@@ -34,10 +34,9 @@ semantics, gate names, branch protection or release authority.
 > `https://github.com/musutrade/GateProbes/.github/workflows/native-collector-release.yml@refs/tags/rust-collector-v0.1.0-rc.8`;
 > independent local re-verification passed 10/10 `cosign verify-blob`, 10/10
 > `gh attestation verify`, the certificate SAN, `SHA256SUMS` and the exact
-> inventory. Core install/trust still pins the previous identity until the
-> explicit 5.6 switch; the old repository entry and pinned artifacts are kept.
-> The remaining collector workflows and the protected production chain stay
-> under 3.4/4.3.
+> inventory. The consuming side switched to this identity in 5.6 on the same
+> date; the old repository entry and pinned artifacts are kept. The remaining
+> collector workflows and the protected production chain stay under 3.4/4.3.
 >
 > **3.1/3.2 complete (2026-10-11):** `harness-gate-rust-measure-0.3.1-linux-amd64.tar.gz`
 > is published with the `v0.4.8` release (signed, SBOM, recorded in the release
@@ -80,7 +79,17 @@ remaining plugins, and the release/signing identity switch last.
 - [ ] 5.3 [P0][M] Migrate one low-dependency plugin and validate the independent flow; acceptance: the plugin repo builds, tests, runs its pinned-Core contract acceptance and clean-installs without the core source.
 - [ ] 5.4 [P1][M] Migrate the remaining plugins under D10 (source, manifests/lockfiles, tests, minimal fixtures, protocol copies, licenses, build/install/release scripts; no history, caches, old binaries); acceptance: each migration records source repository, full commit SHA and path mapping.
 - [ ] 5.5 [P1][S] Keep the rust-reference equivalence suite and `rust-generic-shadow` in core; acceptance: no historical input under `docs/quality/gh-96`/`gh-97` is deleted, and no moved test is skipped for a missing input.
-- [ ] 5.6 [P1][M] Switch plugin release and signing identity last; acceptance: provenance and certificate identity reference GateProbes explicitly, and core keeps consuming pinned artifacts without recompiling.
+- [x] 5.6 [P1][M] Switch plugin release and signing identity last; acceptance: provenance and certificate identity reference GateProbes explicitly, and core keeps consuming pinned artifacts without recompiling.
+
+> **5.6 complete (2026-10-12):** `install.sh` now downloads the Rust/MIR
+> collector from the GateProbes releases, verifies the provisioned GateProbes
+> workflow identity for the exact tag, and defaults to `0.1.0-rc.8`; Core
+> binary installs keep the Harness-Gate `release.yml` identity and the core CI
+> risk stage keeps consuming the pinned rust-measure artifact without
+> recompiling. The offline installer contract tests pin the new repository and
+> identity, including wrong-workflow and wrong-tag negatives. The protected
+> production chain (RSA/Sigstore, six assets, x86_64 Linux) keeps its separate
+> trust and moves with 4.3.
 
 ## Validation
 

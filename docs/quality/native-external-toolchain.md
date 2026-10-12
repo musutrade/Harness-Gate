@@ -49,22 +49,27 @@ of the measurement evidence and cannot silently replace an existing baseline.
 ## Install and collect
 
 After a tagged release exists, download the exact `rust-collector-v<VERSION>`
-assets. Use Core's verification procedure: verify Sigstore against the exact tag
-and this workflow identity, check `SHA256SUMS`, and verify the inventory/provenance
-before copying the executable to a private installation directory:
+assets from the GateProbes releases. Use the explicit identity provisioning
+below: verify Sigstore against the exact tag and the GateProbes workflow
+identity, check `SHA256SUMS`, and verify the inventory/provenance before copying
+the executable to a private installation directory:
 
 ```text
-https://github.com/musutrade/Harness-Gate/.github/workflows/native-collector-release.yml@refs/tags/rust-collector-v<VERSION>
+https://github.com/musutrade/GateProbes/.github/workflows/native-collector-release.yml@refs/tags/rust-collector-v<VERSION>
 ```
 
-For example, the per-binary check uses the same Core Sigstore mechanism:
+A different repository or workflow, a new download URL or a moved repository
+must never silently replace this identity. `install.sh --rust-only` provisions
+the same identity for its default version.
+
+For example, the per-binary check uses the same Sigstore mechanism:
 
 ```sh
 cosign verify-blob \
   --signature harness-gate-rust-collector-linux-amd64.sig \
   --certificate harness-gate-rust-collector-linux-amd64.crt \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity "https://github.com/musutrade/Harness-Gate/.github/workflows/native-collector-release.yml@refs/tags/$TAG" \
+  --certificate-identity "https://github.com/musutrade/GateProbes/.github/workflows/native-collector-release.yml@refs/tags/$TAG" \
   harness-gate-rust-collector-linux-amd64
 sha256sum --check SHA256SUMS
 ```
