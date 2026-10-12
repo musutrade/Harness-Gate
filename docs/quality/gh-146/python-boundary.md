@@ -1,6 +1,6 @@
 # Frozen Python product boundary
 
-GH-146 implements OpenSpec task 1.1. This inventory assigns all 31 production modules; it does not transfer runtime authority. A = CI/dev tooling, B = ecosystem adapter, C = generic product semantics, D = migration/reference tooling.
+GH-146 implements OpenSpec task 1.1. This inventory assigns the production modules; the machine inventory is authoritative; it does not transfer runtime authority. A = CI/dev tooling, B = ecosystem adapter, C = generic product semantics, D = migration/reference tooling.
 
 The [machine inventory](python-boundary.json) records direct callers, source hashes, purpose, CI role, release impact, current authority and final disposition for every module. Nested `tests/` and `fixtures/` programs are test assets, including the new D-class corpus replay helper. Source hashes pin the reviewed boundary; caller lists exclude documentation examples.
 
@@ -37,6 +37,7 @@ The [machine inventory](python-boundary.json) records direct callers, source has
 | `typescript_contracts.py` | B | Development-only native contract adapter; tool parsing stays outside policy. |
 | `typescript_reference.py` | B | Version 1 retained TypeScript/Angular collector; no policy decisions. |
 | `typescript_semantics.py` | B | TypeScript identity/measurement primitives; not a collector or policy engine. |
+| `core_isolation_check.py` | A | Manual isolation acceptance: build and test core with the plugin implementation sources removed. |
 
 C-class final disposition is **frozen Python reference code after explicit authority-transfer acceptance**, with generic production callers routed through Rust. `collector_runner.py` retains Python transport; `quality_evidence.py` retains legacy Rust measurement validation while its shared generic schema semantics move. These mixed modules must not conceal generic authority behind adapter classification. A/B required-path helpers retain their existing authority and behavior. D tools remain advisory and can be retired only with reviewed replacement evidence.
 

@@ -793,6 +793,20 @@
       "authoritative_status": "Policy input resolution and validation only; the released Rust Core compares limits and owns every gate/debt/non-regression decision.",
       "final_disposition": "Retain native adapter configuration glue under the external-toolchain delivery amendment; no unconfigured compatibility fallback.",
       "sha256": "4e1c80301839111098ffa17fb27830aabdd253f3088e0541b0884b24fb24edef"
+    },
+    {
+      "module": "tools/quality/core_isolation_check.py",
+      "category": "A",
+      "purpose": "Manual isolation acceptance: build and test core with the plugin implementation sources removed.",
+      "callers": [
+        "manual CLI use",
+        "docs/quality/core-without-plugins-acceptance.md"
+      ],
+      "ci_role": "Manual acceptance tooling only; not wired into any workflow and not part of the required aggregate.",
+      "release_impact": "Not packaged. Reads a full repository archive and never modifies the source repository.",
+      "authoritative_status": "Diagnostic only; no gate, threshold or release authority.",
+      "final_disposition": "Retain as the repeatable acceptance entry for the core-without-plugins gap; no generic release-approval path.",
+      "sha256": "eb5dad5520fd441c12a1f33d08dc62d16e0a11108459f9f50944f9f219db1452"
     }
   ],
   "schema": "python-product-boundary/v1",

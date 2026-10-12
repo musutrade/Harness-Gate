@@ -159,6 +159,18 @@ semantics, gate names, branch protection or release authority.
 > plugin source checked out" is still not demonstrated: CI checks out the full
 > repository, so the aggregate cannot prove it. It stays tracked in the
 > Validation list and is not claimed by 4.4/4.5; it does not block 4.2.
+>
+> **Isolation acceptance, partial (2026-10-12):** the repeatable entry point
+> `tools/quality/core_isolation_check.py` ran commit
+> `398b0b2f5807092b462aa799c402ef40a3c54bea` with the 26 plugin implementation
+> paths removed: `cargo build` and all 492 cargo tests pass in an isolated
+> target directory. The Python core selection (41 modules, 363 tests) still
+> fails on four core-owned couplings: core docs linking plugin paths, the
+> measurer pin reading `rust-measure/plugin.json`, `test_source_measure`
+> building the analyzer, and the gh-146 inventory requiring every module.
+> Findings, ownership judgments and proposed minimal fixes are recorded in
+> `docs/quality/core-without-plugins-acceptance.md`; the gap stays open until
+> those fixes land and the entry point passes.
 
 ## 5. GateProbes bootstrap, CI classification and migration scope
 
