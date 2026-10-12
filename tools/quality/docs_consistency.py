@@ -170,17 +170,8 @@ def anchor(value: str) -> str:
     return re.sub(r"[-\s]+", "-", value).strip("-")
 
 
-def run(output: Path) -> int:
-    link_failures = local_links()
-    sandbox_failures = sandbox_wording_failures()
-    policy_failures = engineering_policy_failures()
-    english_config = ROOT / "docs" / "configuration.md"
-    chinese_config = ROOT / "docs" / "configuration.zh-CN.md"
-    schema_catalog = ROOT / "schema" / "README.md"
-    language_docs_valid = (
-        english_config.is_file() and chinese_config.is_file() and schema_catalog.is_file()
-        and "# harness-gate schema v2 configuration reference" in english_config.read_text(errors="replace").lower()
-    )
+def executable_checks() -> dict:
+    """Checks that execute the locked CLI: examples, migration and schema sync."""
     command = ["cargo", "run", "--quiet", "--locked", "--manifest-path",
                str(CRATE / "Cargo.toml"), "--"]
     examples = []
@@ -245,8 +236,37 @@ def run(output: Path) -> int:
             generated = schema_root / filename
             committed = ROOT / "schema" / filename
             schemas_synced[plane] = schema.returncode == 0 and generated.is_file() and generated.read_bytes() == committed.read_bytes()
-    schema_synced = schemas_synced["flow"]
-    quality_schema_synced = schemas_synced["quality"]
+    return {"examples": examples,
+            "migration_path": str(migration_fixture.relative_to(ROOT)),
+            "migration_checked": migration_checked,
+            "schema_synced": schemas_synced["flow"],
+            "quality_schema_synced": schemas_synced["quality"],
+            "quality_checked": quality_checked}
+
+
+def run(output: Path, pure: bool = False) -> int:
+    link_failures = local_links()
+    sandbox_failures = sandbox_wording_failures()
+    policy_failures = engineering_policy_failures()
+    english_config = ROOT / "docs" / "configuration.md"
+    chinese_config = ROOT / "docs" / "configuration.zh-CN.md"
+    schema_catalog = ROOT / "schema" / "README.md"
+    language_docs_valid = (
+        english_config.is_file() and chinese_config.is_file() and schema_catalog.is_file()
+        and "# harness-gate schema v2 configuration reference" in english_config.read_text(errors="replace").lower()
+    )
+    if pure:
+        executable = {"examples": [], "migration_path": "tools/harness-gate/fixtures/v1-flow.toml",
+                      "migration_checked": None, "schema_synced": None,
+                      "quality_schema_synced": None, "quality_checked": None}
+        executable_ok = True
+        migration_status = "skipped"
+    else:
+        executable = executable_checks()
+        executable_ok = (executable["schema_synced"] and executable["quality_schema_synced"]
+                         and executable["quality_checked"] and executable["migration_checked"]
+                         and all(item["status"] == "pass" for item in executable["examples"]))
+        migration_status = "pass" if executable["migration_checked"] else "fail"
     machine_schema = ROOT / "schema" / "machine-result.schema.json"
     machine_schema_valid = False
     try:
@@ -279,15 +299,20 @@ def run(output: Path) -> int:
         registry_schema_valid = False
     sandbox_wording = {"failures": sandbox_failures, "status": "fail" if sandbox_failures else "pass"}
     engineering_policy = {"failures": policy_failures, "status": "fail" if policy_failures else "pass"}
+    status_pass = (not link_failures and language_docs_valid and executable_ok
+                   and machine_schema_valid and manifest_schema_valid and registry_schema_valid
+                   and sandbox_wording["status"] == "pass" and engineering_policy["status"] == "pass")
     result = {
-        **metadata(tool="docs-consistency"), "link_failures": link_failures, "examples": examples,
-        "migration": {"path": str(migration_fixture.relative_to(ROOT)), "status": "pass" if migration_checked else "fail"},
-        "language_docs_valid": language_docs_valid, "schema_synced": schema_synced,
-        "quality_schema_synced": quality_schema_synced, "quality_example_valid": quality_checked,
+        **metadata(tool="docs-consistency"), "mode": "pure" if pure else "full",
+        "link_failures": link_failures, "examples": executable["examples"],
+        "migration": {"path": executable["migration_path"], "status": migration_status},
+        "language_docs_valid": language_docs_valid, "schema_synced": executable["schema_synced"],
+        "quality_schema_synced": executable["quality_schema_synced"],
+        "quality_example_valid": executable["quality_checked"],
         "machine_schema_valid": machine_schema_valid, "manifest_schema_valid": manifest_schema_valid,
         "registry_schema_valid": registry_schema_valid, "sandbox_wording": sandbox_wording,
         "engineering_policy": engineering_policy,
-        "status": "pass" if not link_failures and language_docs_valid and schema_synced and quality_schema_synced and quality_checked and machine_schema_valid and manifest_schema_valid and registry_schema_valid and migration_checked and all(item["status"] == "pass" for item in examples) and sandbox_wording["status"] == "pass" and engineering_policy["status"] == "pass" else "fail",
+        "status": "pass" if status_pass else "fail",
     }
     write_json(output, result)
     if result["status"] != "pass":
@@ -302,5 +327,7 @@ def run(output: Path) -> int:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, default=QUALITY_ROOT / "docs-consistency.json")
+    parser.add_argument("--pure", action="store_true",
+                        help="run link/anchor/wording checks only; never invokes Cargo")
     args = parser.parse_args()
-    raise SystemExit(run(args.output))
+    raise SystemExit(run(args.output, pure=args.pure))

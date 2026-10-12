@@ -10,6 +10,11 @@ on:
       - '.github/workflows/native-collector-release.yml'
   push:
     branches: [main]
+    paths:
+      - 'tools/quality/**'
+      - 'tools/release/**'
+      - 'tools/harness-gate/**'
+      - '.github/workflows/native-collector-release.yml'
     tags: ['rust-collector-v*']
 
 permissions:

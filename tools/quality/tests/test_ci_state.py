@@ -168,7 +168,7 @@ class WorkflowBoundaryTests(unittest.TestCase):
         self.assertEqual(owners, ['quality-coverage'])
         self.assertEqual(jobs['quality-coverage'].count('ci_quality.py collect'), 1)
         consumer = jobs['quality-generic-shadow']
-        self.assertIn('needs: [quality-coverage]', consumer)
+        self.assertIn('needs: [classify, quality-coverage]', consumer)
         self.assertIn('quality-coverage-${{ github.run_id }}-${{ github.run_attempt }}', consumer)
         self.assertIn('--candidate target/quality/candidate/candidate.json', consumer)
         self.assertNotRegex(consumer, r'cargo|rust-toolchain|install-ci-tool|--collect|coverage\.py|source_measure\.py')

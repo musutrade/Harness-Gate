@@ -18,8 +18,9 @@ from production_coverage import CoverageTokenizer, require
 from quality_common import ROOT, git_sha, metadata, sha256, write_json
 from source_measure import SOURCE_FILES, compiler_configuration
 
-COMMON = ('test', 'test-cross-platform', 'security-audit', 'fmt', 'clippy', 'build', 'quality-coverage',
-          'quality-contracts', 'docs-consistency', 'release-contracts', 'quality-scripts')
+COMMON = ('classify', 'test', 'test-cross-platform', 'security-audit', 'fmt', 'clippy', 'build',
+          'quality-coverage', 'quality-contracts', 'docs-consistency', 'release-contracts',
+          'quality-scripts')
 PUSH_ONLY = ('build-cross-platform', 'coverage',
              'quality-contracts-cross-platform', 'quality-baseline')
 STAGES = ('legacy', 'production', 'risk', 'matrix')
@@ -111,13 +112,59 @@ def only_terminal_test_module_changed(base: str, head: str, path: str) -> bool:
         return False
 
 
-def aggregate(event: str, needs: dict) -> list[str]:
+PURE_DOC_EXCLUDED_PREFIXES = ('docs/dogfood/', 'docs/benchmarks/', 'docs/quality/')
+
+
+def is_pure_document(path: str) -> bool:
+    """Only prose markdown. Fixtures, records, specs and ownership are inputs."""
+    if not path.endswith('.md'):
+        return False
+    if '/' not in path:
+        return True
+    return path.startswith('docs/') and not path.startswith(PURE_DOC_EXCLUDED_PREFIXES)
+
+
+def changed_paths(base: str, head: str) -> list[str]:
+    output = subprocess.check_output(
+        ['git', 'diff', '--name-status', '--find-renames', base, head], cwd=ROOT, text=True,
+        stderr=subprocess.PIPE)
+    paths = []
+    for line in output.splitlines():
+        parts = line.split('\t')
+        if len(parts) >= 2 and parts[1]:
+            paths.append(parts[1])
+        if len(parts) >= 3 and parts[2]:
+            paths.append(parts[2])
+    return paths
+
+
+def classify(base: str, head: str) -> dict:
+    """Pure docs select light checks only; unknown or empty scope stays full."""
+    if not base or not head or set(base) == {'0'}:
+        return {'docs_only': False, 'run_full': True, 'files': 0}
+    paths = changed_paths(base, head)
+    docs_only = bool(paths) and all(is_pure_document(path) for path in paths)
+    return {'docs_only': docs_only, 'run_full': not docs_only, 'files': len(paths)}
+
+
+def aggregate(event: str, needs: dict, full: bool = True) -> list[str]:
     """Evaluate child outcomes only; never collect evidence or launch tools here."""
     require(event in ('push', 'pull_request'), 'unsupported CI event')
     require(isinstance(needs, dict), 'CI needs must be an object')
     required = COMMON + (PUSH_ONLY if event == 'push' else ())
-    return [name for name in required
-            if not isinstance(needs.get(name), dict) or needs[name].get('result') != 'success']
+    if full:
+        return [name for name in required
+                if not isinstance(needs.get(name), dict) or needs[name].get('result') != 'success']
+    failures = []
+    for name in required:
+        entry = needs.get(name)
+        result = entry.get('result') if isinstance(entry, dict) else None
+        if name in ('classify', 'docs-consistency'):
+            if result != 'success':
+                failures.append(name)
+        elif result not in ('skipped', 'success'):
+            failures.append(name)
+    return failures
 
 
 def verify(path: Path, head: str, base: str, run_id: str) -> dict:
@@ -310,18 +357,28 @@ class Collector:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('operation', choices=('aggregate', 'collect', 'verify'))
+    parser.add_argument('operation', choices=('aggregate', 'classify', 'collect', 'verify'))
     parser.add_argument('--event', default=os.environ.get('EVENT_NAME'))
     parser.add_argument('--needs', default=os.environ.get('NEEDS_JSON'))
     parser.add_argument('--base-sha')
     parser.add_argument('--head-sha')
     parser.add_argument('--run-id', default=str(uuid.uuid4()))
     parser.add_argument('--output', type=Path, default=ROOT / 'target/quality/candidate')
+    parser.add_argument('--github-output', type=Path)
     args = parser.parse_args()
     try:
         if args.operation == 'aggregate':
-            failures = aggregate(args.event, json.loads(args.needs or '{}'))
+            full = os.environ.get('RUN_FULL', 'true').strip().lower() != 'false'
+            failures = aggregate(args.event, json.loads(args.needs or '{}'), full=full)
             require(not failures, f'required jobs did not succeed: {failures}')
+        elif args.operation == 'classify':
+            result = classify(args.base_sha or '', args.head_sha or '')
+            print('classify: ' + json.dumps(result, sort_keys=True))
+            if args.github_output:
+                args.github_output.write_text(
+                    f"run_full={'true' if result['run_full'] else 'false'}\n"
+                    f"docs_only={'true' if result['docs_only'] else 'false'}\n"
+                    f"files={result['files']}\n")
         else:
             for commit in (args.base_sha, args.head_sha):
                 require(bool(re.fullmatch('[0-9a-f]{40}', commit or '')), 'full base/head SHAs required')

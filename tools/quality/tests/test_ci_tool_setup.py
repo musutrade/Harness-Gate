@@ -105,7 +105,7 @@ class ToolSetupTests(unittest.TestCase):
     def test_tarpaulin_setup_preserves_coverage_execution(self):
         ci = (ROOT / '.github/workflows/ci.yml').read_text()
         body = ci.split('  coverage:\n', 1)[1].split('  quality-coverage:\n', 1)[0]
-        self.assertIn("if: ${{ github.event_name == 'push' }}", body)
+        self.assertIn("if: ${{ needs.classify.outputs.run_full == 'true' && github.event_name == 'push' }}", body)
         self.assertIn('runs-on: ubuntu-latest', body)
         self.assertIn('class: tarpaulin', body)
         self.assertIn("profiles: 'instrumented;default'", body)

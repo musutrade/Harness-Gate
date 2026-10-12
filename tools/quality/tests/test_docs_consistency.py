@@ -85,6 +85,27 @@ class DocsExecutionTests(unittest.TestCase):
                 _, report = self.exercise(failure)
                 self.assertEqual(report["status"], "fail")
 
+    def test_pure_mode_never_invokes_cargo_and_marks_executable_checks_skipped(self):
+        def explode(*args, **kwargs):
+            raise AssertionError("pure mode must not invoke cargo")
+
+        with tempfile.TemporaryDirectory() as directory, \
+                patch.object(docs.subprocess, "run", side_effect=explode), \
+                patch.object(docs, "metadata", return_value={}):
+            output = Path(directory) / "report.json"
+            self.assertEqual(docs.run(output, pure=True), 0)
+            report = json.loads(output.read_text())
+        self.assertEqual(report["mode"], "pure")
+        self.assertEqual(report["status"], "pass")
+        self.assertEqual(report["examples"], [])
+        self.assertIsNone(report["schema_synced"])
+        self.assertIsNone(report["quality_schema_synced"])
+        self.assertIsNone(report["quality_example_valid"])
+        self.assertEqual(report["migration"]["status"], "skipped")
+        self.assertEqual(report["link_failures"], [])
+        self.assertEqual(report["sandbox_wording"]["status"], "pass")
+        self.assertEqual(report["engineering_policy"]["status"], "pass")
+
 
 class DocsConsistencySandboxWordingTests(unittest.TestCase):
     def test_rejects_positive_os_sandbox_claim(self) -> None:

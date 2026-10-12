@@ -28,8 +28,11 @@
         "pull_request",
         "push"
       ],
-      "needs": [],
-      "outcome": "Full locked Linux nextest suite; exported schema must match committed schema."
+      "needs": [
+        "classify"
+      ],
+      "outcome": "Full locked Linux nextest suite; exported schema must match committed schema.",
+      "condition": "${{ needs.classify.outputs.run_full == 'true' }}"
     },
     "test-cross-platform": {
       "name": "Test (${{ matrix.os }})",
@@ -49,8 +52,11 @@
         "pull_request",
         "push"
       ],
-      "needs": [],
-      "outcome": "Full locked native macOS and Windows nextest suites with --no-fail-fast; both PR-required."
+      "needs": [
+        "classify"
+      ],
+      "outcome": "Full locked native macOS and Windows nextest suites with --no-fail-fast; both PR-required.",
+      "condition": "${{ needs.classify.outputs.run_full == 'true' }}"
     },
     "security-audit": {
       "name": "Security Audit",
@@ -68,8 +74,11 @@
         "pull_request",
         "push"
       ],
-      "needs": [],
-      "outcome": "cargo audit --deny warnings; installation errors block."
+      "needs": [
+        "classify"
+      ],
+      "outcome": "cargo audit --deny warnings; installation errors block.",
+      "condition": "${{ needs.classify.outputs.run_full == 'true' }}"
     },
     "fmt": {
       "name": "Format",
@@ -87,8 +96,11 @@
         "pull_request",
         "push"
       ],
-      "needs": [],
-      "outcome": "cargo fmt --check."
+      "needs": [
+        "classify"
+      ],
+      "outcome": "cargo fmt --check.",
+      "condition": "${{ needs.classify.outputs.run_full == 'true' }}"
     },
     "clippy": {
       "name": "Clippy",
@@ -106,8 +118,11 @@
         "pull_request",
         "push"
       ],
-      "needs": [],
-      "outcome": "Locked all-targets/all-features Clippy with warnings denied."
+      "needs": [
+        "classify"
+      ],
+      "outcome": "Locked all-targets/all-features Clippy with warnings denied.",
+      "condition": "${{ needs.classify.outputs.run_full == 'true' }}"
     },
     "build": {
       "name": "Build",
@@ -125,8 +140,11 @@
         "pull_request",
         "push"
       ],
-      "needs": [],
-      "outcome": "Locked Linux release build; artifact absence retains existing ignore policy."
+      "needs": [
+        "classify"
+      ],
+      "outcome": "Locked Linux release build; artifact absence retains existing ignore policy.",
+      "condition": "${{ needs.classify.outputs.run_full == 'true' }}"
     },
     "build-cross-platform": {
       "name": "Build (${{ matrix.os }})",
@@ -144,8 +162,11 @@
       "required_events": [
         "push"
       ],
-      "needs": [],
-      "outcome": "Locked native macOS and Windows release builds."
+      "needs": [
+        "classify"
+      ],
+      "outcome": "Locked native macOS and Windows release builds.",
+      "condition": "${{ needs.classify.outputs.run_full == 'true' && github.event_name == 'push' }}"
     },
     "coverage": {
       "name": "Code Coverage",
@@ -161,8 +182,11 @@
       "required_events": [
         "push"
       ],
-      "needs": [],
-      "outcome": "Full tarpaulin LLVM coverage; Codecov upload retains fail_ci_if_error: false."
+      "needs": [
+        "classify"
+      ],
+      "outcome": "Full tarpaulin LLVM coverage; Codecov upload retains fail_ci_if_error: false.",
+      "condition": "${{ needs.classify.outputs.run_full == 'true' && github.event_name == 'push' }}"
     },
     "quality-coverage": {
       "name": "Quality Coverage and Critical Paths",
@@ -180,8 +204,11 @@
         "pull_request",
         "push"
       ],
-      "needs": [],
-      "outcome": "Fresh legacy coverage, production coverage, base/head exact risk and isolated critical-path evidence; all four stages required; always retain available candidate evidence."
+      "needs": [
+        "classify"
+      ],
+      "outcome": "Fresh legacy coverage, production coverage, base/head exact risk and isolated critical-path evidence; all four stages required; always retain available candidate evidence.",
+      "condition": "${{ needs.classify.outputs.run_full == 'true' }}"
     },
     "quality-generic-shadow": {
       "name": "Generic Quality Shadow",
@@ -197,9 +224,11 @@
       ],
       "required_events": [],
       "needs": [
+        "classify",
         "quality-coverage"
       ],
-      "outcome": "Advisory projection of retained candidate with identity/hash validation; no aggregate dependency or release authority."
+      "outcome": "Advisory projection of retained candidate with identity/hash validation; no aggregate dependency or release authority.",
+      "condition": "${{ always() && needs.classify.outputs.run_full == 'true' }}"
     },
     "quality-contracts": {
       "name": "Quality CLI Contracts",
@@ -217,8 +246,11 @@
         "pull_request",
         "push"
       ],
-      "needs": [],
-      "outcome": "Linux CLI contract snapshots, exit codes and output evidence."
+      "needs": [
+        "classify"
+      ],
+      "outcome": "Linux CLI contract snapshots, exit codes and output evidence.",
+      "condition": "${{ needs.classify.outputs.run_full == 'true' }}"
     },
     "quality-contracts-cross-platform": {
       "name": "Quality CLI Contracts (${{ matrix.os }})",
@@ -236,8 +268,11 @@
       "required_events": [
         "push"
       ],
-      "needs": [],
-      "outcome": "Native macOS/Windows structured CLI contracts."
+      "needs": [
+        "classify"
+      ],
+      "outcome": "Native macOS/Windows structured CLI contracts.",
+      "condition": "${{ needs.classify.outputs.run_full == 'true' && github.event_name == 'push' }}"
     },
     "quality-baseline": {
       "name": "Quality Performance Baseline",
@@ -257,8 +292,11 @@
       "required_events": [
         "push"
       ],
-      "needs": [],
-      "outcome": "Native Linux/macOS/Windows benchmark and size candidates, five samples, existing performance policy."
+      "needs": [
+        "classify"
+      ],
+      "outcome": "Native Linux/macOS/Windows benchmark and size candidates, five samples, existing performance policy.",
+      "condition": "${{ needs.classify.outputs.run_full == 'true' && github.event_name == 'push' }}"
     },
     "docs-consistency": {
       "name": "Documentation Consistency",
@@ -276,7 +314,9 @@
         "pull_request",
         "push"
       ],
-      "needs": [],
+      "needs": [
+        "classify"
+      ],
       "outcome": "Documentation/examples/presets/migration/schema/policy-anchor/link/sandbox consistency."
     },
     "release-contracts": {
@@ -295,8 +335,11 @@
         "pull_request",
         "push"
       ],
-      "needs": [],
-      "outcome": "Release governance unit tests and compile checks; publication authority unchanged."
+      "needs": [
+        "classify"
+      ],
+      "outcome": "Release governance unit tests and compile checks; publication authority unchanged.",
+      "condition": "${{ needs.classify.outputs.run_full == 'true' }}"
     },
     "quality-scripts": {
       "name": "Quality Script Tests",
@@ -314,8 +357,11 @@
         "pull_request",
         "push"
       ],
-      "needs": [],
-      "outcome": "All quality Python unit tests and compile checks."
+      "needs": [
+        "classify"
+      ],
+      "outcome": "All quality Python unit tests and compile checks.",
+      "condition": "${{ needs.classify.outputs.run_full == 'true' }}"
     },
     "quality-required": {
       "name": "Required Quality Aggregate",
@@ -331,6 +377,7 @@
       ],
       "required_events": [],
       "needs": [
+        "classify",
         "test",
         "test-cross-platform",
         "security-audit",
@@ -347,7 +394,25 @@
         "release-contracts",
         "quality-scripts"
       ],
-      "outcome": "Always evaluate event-applicable needs; only exact success passes. Stable ruleset check name; no collection or product compilation."
+      "outcome": "Always evaluate event-applicable needs; only exact success passes. Stable ruleset check name; no collection or product compilation.",
+      "condition": "${{ always() }}"
+    },
+    "classify": {
+      "name": "Classify change",
+      "check_names": [
+        "Classify change"
+      ],
+      "runner_labels": [
+        "ubuntu-latest"
+      ],
+      "events": [
+        "pull_request",
+        "push"
+      ],
+      "required_events": [],
+      "aggregate_required": true,
+      "needs": [],
+      "outcome": "Pure-docs vs full selection from changed paths; conservative for unknown or empty scope."
     }
   },
   "observed_pre_change_aggregate_gap": "test-cross-platform ran on both events but was mistakenly in ci_quality.PUSH_ONLY. GH-164 enforces the already specified PR requirement; no scheduling change."
