@@ -10,6 +10,7 @@ mod net_policy;
 mod preset;
 mod process;
 mod project;
+mod recipes;
 mod scope;
 mod secrets;
 mod service;

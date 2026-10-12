@@ -569,6 +569,64 @@ timeout_secs = 60
     assert_eq!(migrated.project.name, "example");
     assert_eq!(migrated.paths.secrets_config, ".harness-gate/secrets.toml");
     assert!(migrated.policy.required_steps.contains(&"app.check".into()));
+
+    // The legacy database becomes the recipe's frozen service. This exact
+    // mapping is the compatibility contract for version 1 configurations.
+    let service = migrated
+        .services
+        .get(crate::recipes::postgres::LEGACY_SERVICE_ID)
+        .expect("legacy database service");
+    assert_eq!(
+        serde_json::to_value(service).expect("serialize migrated service"),
+        serde_json::json!({
+            "kind": "docker",
+            "runtime": "docker",
+            "image": "postgres:16-alpine",
+            "image_env": "HARNESS_GATE_POSTGRES_IMAGE",
+            "external_env": "TEST_DATABASE_URL",
+            "inject_env": "TEST_DATABASE_URL",
+            "external_value_policy": "isolated-postgres",
+            "startup_timeout_secs": 30,
+            "timeout_env": "HARNESS_GATE_DATABASE_TIMEOUT_SECS",
+            "container_port": 5432,
+            "environment": {
+                "POSTGRES_USER": "test",
+                "POSTGRES_PASSWORD": "test",
+                "POSTGRES_DB": "test"
+            },
+            "healthcheck": ["pg_isready", "-U", "test", "-d", "test"],
+            "connection": "postgres://test:test@127.0.0.1:{host_port}/test"
+        })
+    );
+    assert!(migrated.doctor.checks.iter().any(|check| {
+        matches!(
+            &check.kind,
+            DoctorCheckKind::Service { service }
+                if service == crate::recipes::postgres::LEGACY_SERVICE_ID
+        )
+    }));
+}
+
+#[test]
+fn unknown_external_value_policy_is_rejected() {
+    let source = r#"
+kind = "docker"
+image = "postgres:16-alpine"
+external_env = "TEST_DATABASE_URL"
+inject_env = "TEST_DATABASE_URL"
+external_value_policy = "isolated-mysql"
+startup_timeout_secs = 30
+container_port = 5432
+healthcheck = ["true"]
+connection = "postgres://unused"
+"#;
+    let error = toml::from_str::<ServiceConfig>(source)
+        .expect_err("unknown service recipes must keep failing closed");
+    let message = error.to_string();
+    assert!(
+        message.contains("unknown variant") && message.contains("isolated-postgres"),
+        "{message}"
+    );
 }
 
 #[test]

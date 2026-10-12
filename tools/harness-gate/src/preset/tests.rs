@@ -3,7 +3,7 @@ use super::catalog::PRESETS;
 use super::filesystem::resolve_inside;
 use super::filesystem::{atomic_write, atomic_write_batch};
 use super::initialize::{init, project_id};
-use crate::config::FlowConfig;
+use crate::config::{ExternalValuePolicy, FlowConfig, ServiceConfig};
 use crate::test_support::TestWorkspace;
 use std::fs;
 use std::path::Path;
@@ -187,7 +187,32 @@ fn generated_reference_presets_cross_validate_quality_and_profile_boundaries() {
                 ["backend", "frontend"]
             );
             assert_eq!(quality.relationships.len(), 1);
-            assert!(project.config.services.contains_key("test-postgres"));
+            match project
+                .config
+                .services
+                .get(crate::recipes::postgres::LEGACY_SERVICE_ID)
+            {
+                Some(ServiceConfig::Docker {
+                    external_env,
+                    inject_env,
+                    external_value_policy,
+                    container_port,
+                    healthcheck,
+                    connection,
+                    ..
+                }) => {
+                    assert_eq!(external_env.as_deref(), Some("TEST_DATABASE_URL"));
+                    assert_eq!(inject_env, "TEST_DATABASE_URL");
+                    assert_eq!(
+                        *external_value_policy,
+                        ExternalValuePolicy::IsolatedPostgres
+                    );
+                    assert_eq!(*container_port, 5432);
+                    assert_eq!(healthcheck.first().map(String::as_str), Some("pg_isready"));
+                    assert!(connection.starts_with("postgres://"), "{connection}");
+                }
+                other => panic!("unexpected legacy database service: {other:?}"),
+            }
             let contract = &quality.collectors["frontend-api"];
             assert_eq!(contract.produces.len(), 3);
             assert!(contract

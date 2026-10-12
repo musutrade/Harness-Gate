@@ -63,7 +63,22 @@ semantics, gate names, branch protection or release authority.
 ## 4. Remove compatibility paths and handle the rest
 
 - [ ] 4.1 [P1][M] Keep the `harness-gate` command, crate and legacy install entry working through the move; acceptance: existing install and verify commands still succeed.
-- [ ] 4.2 [P1][M] Isolate the Postgres recipe (`service/postgres.rs`, `ExternalValuePolicy::IsolatedPostgres`) out of the generic config model; acceptance: no Postgres-specific rule remains in the generic core config, and generic process execution/resource reclamation still work.
+- [x] 4.2 [P1][M] Isolate the Postgres recipe (`service/postgres.rs`, `ExternalValuePolicy::IsolatedPostgres`) out of the generic config model; acceptance: no Postgres-specific rule remains in the generic core config, and generic process execution/resource reclamation still work.
+
+> **4.2 complete (2026-10-12):** Postgres-specific code is centralized in the
+> closed `recipes` module (`src/recipes/postgres.rs`): external-value URL
+> validation (loopback/remote override, `_test`/`-test` suffix, `DATABASE_URL`
+> conflict), the frozen legacy v1 database mapping and the v1 service
+> construction. The generic service layer calls the dispatcher in
+> `src/recipes/mod.rs` selected by the closed `ExternalValuePolicy` enum; the
+> migration layer passes a narrow `LegacyPostgres` view and no longer contains
+> Postgres literals. Docker/Podman execution, timeouts, leases and cleanup stay
+> in `service/`; no generic service platform or dynamic plugin system is
+> introduced. Startup and doctor paths both keep validation; unknown policy
+> values still fail closed. `schema/flow.schema.json` and
+> `schema/quality.schema.json` are unchanged. URL positives/negatives, remote
+> restriction, production conflict, migration output, preset compatibility and
+> affected cleanup tests pass.
 - [ ] 4.3 [P1][L] Handle the Rust complex release chain separately; acceptance: the Rust collector release chain is owned by GateProbes with an explicit, documented process.
 
 > **4.3 disposition recorded (2026-10-12):** the legacy six-asset RSA/Sigstore
@@ -134,6 +149,11 @@ semantics, gate names, branch protection or release authority.
 > - CI time and artifact disk do not increase versus the pre-split baseline:
 >   routing measurement recorded in `docs/quality/ci-docs-routing.md`; no new
 >   ecosystem certification or measurement-semantic claim is made.
+
+> **Open acceptance gap (not completed):** "Core builds and tests with no
+> plugin source checked out" is still not demonstrated: CI checks out the full
+> repository, so the aggregate cannot prove it. It stays tracked in the
+> Validation list and is not claimed by 4.4/4.5; it does not block 4.2.
 
 ## 5. GateProbes bootstrap, CI classification and migration scope
 
