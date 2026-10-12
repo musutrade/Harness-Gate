@@ -74,16 +74,66 @@ semantics, gate names, branch protection or release authority.
 > revival, which requires a product decision and a reviewed measurement
 > migration. Workflow ownership and disposition are recorded and enforced in
 > `docs/quality/release-ownership.json` and `test_release_ownership.py`.
-- [ ] 4.4 [P1][M] Remove compatibility paths only after both repositories are proven green; acceptance: removal is a separate reviewed change and rollback remains possible until then.
-- [ ] 4.5 [P1][M] Run final strict OpenSpec validation and update related records; acceptance: the change validates and no claim implies new ecosystem certification or new measurement semantics.
+- [x] 4.4 [P1][M] Remove compatibility paths only after both repositories are proven green; acceptance: removal is a separate reviewed change and rollback remains possible until then.
+- [x] 4.5 [P1][M] Run final strict OpenSpec validation and update related records; acceptance: the change validates and no claim implies new ecosystem certification or new measurement semantics.
+
+> **4.4 completed for the retired entry only (2026-10-12):** reviewed change
+> [#343](https://github.com/musutrade/Harness-Gate/pull/343) retired the old
+> native publication entry (archived at
+> `retired/workflows/native-collector-release.yml`, restore commit
+> `6aaa234249574c9a321a8819213b4c936c02605e`). Current main no longer triggers
+> publication from it, and pull requests and main pushes no longer start it.
+> This does not prohibit creating tags, and a `rust-collector-v*` tag pointing
+> at a historical commit still runs the workflow as it existed at that commit;
+> no tag protection or historical rewrite is claimed here. Compatibility reads
+> (rust-measure source and its core tests, collector fixtures, paused
+> bundled-chain hold protections) are deliberately retained. The wider removal
+> set stays open: 4.2 Postgres isolation is not done, and the paused bundled
+> product stays disabled-retained per the 4.3 disposition; neither blocks this
+> change's closure.
 
 > **Old native entry retired (2026-10-12):** `.github/workflows/native-collector-release.yml`
-> moved to `retired/workflows/` with its restore commit `6aaa2342` recorded, so
-> no PR, main or tag event triggers it and no new tag is produced. Historical
-> releases, signatures and source are retained. Compatibility reads stay:
-> rust-measure source and its core tests, collector fixtures, and the paused
-> bundled-chain hold protections are untouched and must not be deleted without
-> their own reviewed change (4.4).
+> moved to `retired/workflows/` with its restore commit `6aaa2342` recorded.
+> Current main no longer triggers it; tag creation is not prohibited and
+> historical-commit tags still run that commit's workflow. Historical releases,
+> signatures and source are retained. Compatibility reads stay: rust-measure
+> source and its core tests, collector fixtures, and the paused bundled-chain
+> hold protections are untouched and must not be deleted without their own
+> reviewed change (4.4).
+
+> **4.5 closed against existing acceptance (2026-10-12), no historical suites re-run:**
+> - Strict OpenSpec validation: `openspec validate split-core-and-plugins --strict`
+>   → `valid` on tree `4ca947b59d0e85a712fb2eb9e2aa118c207fd67c`; the main run for
+>   that tree is
+>   [38235224213](https://github.com/musutrade/Harness-Gate/actions/runs/38235224213)
+>   (first attempt, Required Quality Aggregate pass).
+> - Core CI and pinned-artifact consumption checks pass: main
+>   [run 38235224213](https://github.com/musutrade/Harness-Gate/actions/runs/38235224213)
+>   at `4ca947b59d0e85a712fb2eb9e2aa118c207fd67c`, plus the pinned measurer
+>   release-pin test (`tools/quality/tests/test_rust_measure_release_pin.py`).
+> - The PR #343 run
+>   [38231628449](https://github.com/musutrade/Harness-Gate/actions/runs/38231628449)
+>   failed once on an unrelated lease-test flake and passed on rerun; that is
+>   flake evidence, not a root-cause fix, and is kept as the observation record
+>   in [#344](https://github.com/musutrade/Harness-Gate/issues/344). The main
+>   run above passed on its first attempt.
+> - A plugin version bump needs no core rebuild or re-release: GateProbes published
+>   independently in [run 38218575101](https://github.com/musutrade/GateProbes/actions/runs/38218575101)
+>   ([release rust-collector-v0.1.0-rc.8](https://github.com/musutrade/GateProbes/releases/tag/rust-collector-v0.1.0-rc.8),
+>   source commit `155b233fb2f525f520b4fcc0ed73e017154345e0`); core consumption is a
+>   pinned-artifact switch ([PR #340](https://github.com/musutrade/Harness-Gate/pull/340),
+>   `77b0109472441095b20e5e0ae70b83100755fc77`).
+> - Core and plugin release/rollback independently: core identity unchanged
+>   (0.4.8 binary `888fa1527eae37e3163aac2e1479e91ec03a0c8380b3c49da6e9266575597418`);
+>   plugin rollback materials retained (archived entry restore commit `6aaa2342`,
+>   pinned artifacts; installer signer fix `892d6974a9fa3dd36c9c8f1bee20bd1a4d3b82dd`).
+> - An incompatible protocol version fails explicitly: covered by the existing
+>   GateProbes chain acceptance (helper 8/8 zero-skip, accept 23/23 on all four
+>   platforms, [run 38215704216](https://github.com/musutrade/GateProbes/actions/runs/38215704216))
+>   and not re-run here.
+> - CI time and artifact disk do not increase versus the pre-split baseline:
+>   routing measurement recorded in `docs/quality/ci-docs-routing.md`; no new
+>   ecosystem certification or measurement-semantic claim is made.
 
 ## 5. GateProbes bootstrap, CI classification and migration scope
 

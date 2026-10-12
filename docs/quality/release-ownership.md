@@ -51,7 +51,7 @@ production chain are separate products and are recorded separately.
 
 | Workflow | Owner | Disposition |
 | --- | --- | --- |
-| `native-collector-release.yml` | GateHouse | Retired from active workflows on 2026-10-12: archived at `retired/workflows/`, restore commit `6aaa2342`, no PR/main/tag trigger, no new tag. Historical releases, signatures and tags are retained. |
+| `native-collector-release.yml` | GateHouse | Retired from active workflows on 2026-10-12: archived at `retired/workflows/`, restore commit `6aaa2342`; current main no longer triggers it. Tag creation is not prohibited, and a tag pointing at a historical commit still runs that commit's workflow. Historical releases, signatures and tags are retained. |
 | `rust-collector-release.yml` | GateHouse | Paused legacy bundled-runtime RSA/Sigstore six-asset chain; not migrated, not provisioned, and not the RC8 native chain. |
 | `rust-measure-native.yml` | GateHouse | Compatibility validation retained while the measurer source and its core tests remain here. |
 

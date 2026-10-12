@@ -49,9 +49,10 @@ the aggregate.
 `native-collector-release.yml` was retired from active workflows on 2026-10-12
 (archived at `retired/workflows/native-collector-release.yml`, restore commit
 `6aaa2342`, ownership record in `release-ownership.json`): GateProbes publishes
-the native collector, so no PR, `main` push or tag in this repository starts
-that four-platform build anymore. Historical releases, signatures and tags are
-retained. `rust-generic-shadow.yml` keeps its opt-in condition and
+the native collector, so no PR or `main` push starts that four-platform build
+from current main anymore. This does not prohibit creating tags, and a tag that
+points at a historical commit still runs the workflow as it existed at that
+commit. Historical releases, signatures and tags are retained. `rust-generic-shadow.yml` keeps its opt-in condition and
 `rust-measure-native.yml` already filters its pull requests.
 
 ## Measured routing

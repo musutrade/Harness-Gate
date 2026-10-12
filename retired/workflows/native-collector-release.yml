@@ -1,7 +1,9 @@
 # RETIRED (2026-10-12): archived, inactive workflow. This file no longer
-# lives under .github/workflows, so no pull request, main push or tag event
-# triggers it, and no new rust-collector tag is produced from this
-# repository. It was active at .github/workflows/native-collector-release.yml
+# lives under .github/workflows: current main no longer triggers publication
+# from it, and pull requests and main pushes no longer start it. This does
+# not prohibit creating tags, and a tag that points at a historical commit
+# still runs the workflow as it existed at that commit.
+# It was active at .github/workflows/native-collector-release.yml
 # through commit 6aaa234249574c9a321a8819213b4c936c02605e; restore with
 # `git mv retired/workflows/native-collector-release.yml
 # .github/workflows/native-collector-release.yml` after reverting the
