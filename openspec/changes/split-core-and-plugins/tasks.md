@@ -65,6 +65,15 @@ semantics, gate names, branch protection or release authority.
 - [ ] 4.1 [P1][M] Keep the `harness-gate` command, crate and legacy install entry working through the move; acceptance: existing install and verify commands still succeed.
 - [ ] 4.2 [P1][M] Isolate the Postgres recipe (`service/postgres.rs`, `ExternalValuePolicy::IsolatedPostgres`) out of the generic config model; acceptance: no Postgres-specific rule remains in the generic core config, and generic process execution/resource reclamation still work.
 - [ ] 4.3 [P1][L] Handle the Rust complex release chain separately; acceptance: the Rust collector release chain is owned by GateProbes with an explicit, documented process.
+
+> **4.3 disposition recorded (2026-10-12):** the legacy six-asset RSA/Sigstore
+> production chain is a paused bundled-runtime product, not the RC8 native
+> plugin chain. It stays in GateHouse, unprovisioned and unpublished (its own
+> hold step suspends signing/publication); no RSA key, runner group, environment
+> approval or publication path is configured. GateProbes owns any future
+> revival, which requires a product decision and a reviewed measurement
+> migration. Workflow ownership and disposition are recorded and enforced in
+> `docs/quality/release-ownership.json` and `test_release_ownership.py`.
 - [ ] 4.4 [P1][M] Remove compatibility paths only after both repositories are proven green; acceptance: removal is a separate reviewed change and rollback remains possible until then.
 - [ ] 4.5 [P1][M] Run final strict OpenSpec validation and update related records; acceptance: the change validates and no claim implies new ecosystem certification or new measurement semantics.
 
@@ -87,9 +96,10 @@ remaining plugins, and the release/signing identity switch last.
 > binary installs keep the Harness-Gate `release.yml` identity and the core CI
 > risk stage keeps consuming the pinned rust-measure artifact without
 > recompiling. The offline installer contract tests pin the new repository and
-> identity, including wrong-workflow and wrong-tag negatives. The protected
-> production chain (RSA/Sigstore, six assets, x86_64 Linux) keeps its separate
-> trust and moves with 4.3.
+> identity, including wrong-workflow, wrong-tag and environment-pollution
+> negatives. The protected production chain (RSA/Sigstore, six assets, x86_64
+> Linux) is a separate paused product and stays unprovisioned; see the 4.3
+> disposition note.
 
 ## Validation
 

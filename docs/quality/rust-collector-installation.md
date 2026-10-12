@@ -5,6 +5,15 @@
 > [standalone binary with external dependencies](native-external-toolchain.md),
 > using Core's release process. That product is not yet signed or published.
 > Stable remains a candidate. The old bundled publication workflow stays suspended.
+>
+> Separation record (2026-10-12): this page's six-asset RSA/Sigstore production
+> chain is **paused and unprovisioned** — its workflow hold suspends signing and
+> publication, and no RSA key, runner group or publication path is configured.
+> The separate RC8 native Rust/MIR external plugin is now signed and published
+> from GateProbes with a keyless identity, documented in
+> [native-external-toolchain.md](native-external-toolchain.md) and installed
+> with `install.sh --rust-only`. The two products have separate trust and
+> lifecycle; neither status change re-enables or replaces the other.
 
 For the **unreleased GH-255 source implementation**, see the
 [lightweight lifecycle guide](lightweight-collector-installation.md). Its component
