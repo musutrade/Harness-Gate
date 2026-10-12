@@ -68,11 +68,6 @@
       "disposition": "core-retained",
       "note": "Core advisory workflow; unaffected by the split."
     },
-    ".github/workflows/native-collector-release.yml": {
-      "owner": "gatehouse",
-      "disposition": "legacy-entry-retained",
-      "note": "Legacy native collector build/publish entry. Superseded by the GateProbes chain (rc.8 verified); retained for rollback until removal is reviewed (4.4). No new tag is produced from it."
-    },
     ".github/workflows/quality-baseline-refresh.yml": {
       "owner": "gatehouse",
       "disposition": "core-retained",
@@ -103,5 +98,14 @@
   },
   "shared_copy_rule": "Gatehouse owns the single editable source. When GateProbes is created it carries generated copies of these files from a pinned GateHouse revision; it never edits its own copy independently.",
   "plugin_release_identity": "Declared by GateProbes: its own repository, tag prefix, workflow path and environment rules. A URL substitution must never implicitly change the signed identity GateHouse trusts.",
-  "unowned_note": "tools/release/tests follows the scripts it covers and splits with them; it is not classified here."
+  "unowned_note": "tools/release/tests follows the scripts it covers and splits with them; it is not classified here.",
+  "retired_workflows": {
+    "retired/workflows/native-collector-release.yml": {
+      "owner": "gatehouse",
+      "disposition": "retired-restorable",
+      "was": ".github/workflows/native-collector-release.yml",
+      "restore_commit": "6aaa234249574c9a321a8819213b4c936c02605e",
+      "note": "Superseded by the GateProbes native collector chain (rc.8 verified, run 38218575101). Inactive: no pull request, main push or tag event triggers it, and no new tag is produced. Historical releases, signatures and tags are retained. Restore by moving the file back to .github/workflows/ after reverting this record."
+    }
+  }
 }

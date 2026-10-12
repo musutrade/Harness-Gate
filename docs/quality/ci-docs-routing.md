@@ -46,12 +46,13 @@ the aggregate.
 
 ## Independent workflows
 
-`native-collector-release.yml` now applies the same path set to `main` pushes as
-to pull requests, so a documentation-only push no longer starts the four-platform
-collector build and acceptance. Tag pushes (`rust-collector-v*`) are unaffected:
-path filters are not evaluated for tag pushes. `rust-generic-shadow.yml` keeps
-its opt-in condition and `rust-measure-native.yml` already filters its pull
-requests.
+`native-collector-release.yml` was retired from active workflows on 2026-10-12
+(archived at `retired/workflows/native-collector-release.yml`, restore commit
+`6aaa2342`, ownership record in `release-ownership.json`): GateProbes publishes
+the native collector, so no PR, `main` push or tag in this repository starts
+that four-platform build anymore. Historical releases, signatures and tags are
+retained. `rust-generic-shadow.yml` keeps its opt-in condition and
+`rust-measure-native.yml` already filters its pull requests.
 
 ## Measured routing
 
