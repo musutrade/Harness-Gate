@@ -2,7 +2,6 @@ mod commands;
 mod docker;
 mod inspection;
 mod lease;
-mod postgres;
 mod report_directory;
 mod runtime;
 
@@ -11,9 +10,9 @@ mod tests;
 
 use crate::config::ServiceConfig;
 use crate::project::Project;
+use crate::recipes::validate_external_value;
 use anyhow::{bail, Context, Result};
 use docker::{start_docker, DockerStartOptions};
-use postgres::validate_external_value;
 use runtime::ContainerRuntime;
 use std::collections::BTreeMap;
 use std::sync::{Arc, Condvar, Mutex};

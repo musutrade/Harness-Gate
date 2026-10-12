@@ -1,5 +1,4 @@
 use super::lease::{cleanup, ResourceLease};
-use super::postgres::{validate_isolated_postgres_url, ALLOW_REMOTE_TEST_DATABASE_ENV};
 use super::{check_available, ServiceManager};
 use crate::config::ServiceConfig;
 use crate::project::Project;
@@ -142,69 +141,6 @@ fn proven_identity_fixture() -> &'static str {
     {
         "unavailable:test"
     }
-}
-
-#[test]
-fn accepts_an_isolated_loopback_database() {
-    let result = validate_isolated_postgres_url(
-        "postgres://tester:secret@127.0.0.1:5432/arc_admin_test",
-        Some("postgres://developer:secret@localhost:5432/arc_admin"),
-        false,
-    );
-    assert!(result.is_ok(), "{result:?}");
-}
-
-#[test]
-fn accepts_an_ipv6_loopback_database() {
-    assert!(validate_isolated_postgres_url(
-        "postgres://tester:secret@[::1]:5432/arc_admin_test",
-        None,
-        false,
-    )
-    .is_ok());
-}
-
-#[test]
-fn rejects_a_database_without_a_test_suffix() {
-    let error =
-        validate_isolated_postgres_url("postgres://tester:secret@localhost/arc_admin", None, false)
-            .expect_err("production-like database name must fail");
-    assert!(error.to_string().contains("must end with"));
-}
-
-#[test]
-fn rejects_a_remote_database_without_an_explicit_override() {
-    let error = validate_isolated_postgres_url(
-        "postgresql://tester:secret@test-db.example.com/arc_admin_test",
-        None,
-        false,
-    )
-    .expect_err("remote database must fail closed");
-    assert!(error.to_string().contains(ALLOW_REMOTE_TEST_DATABASE_ENV));
-}
-
-#[test]
-fn accepts_an_explicitly_allowed_remote_test_database() {
-    assert!(validate_isolated_postgres_url(
-        "postgres://tester:secret@test-db.example.com/arc-admin-test",
-        None,
-        true,
-    )
-    .is_ok());
-}
-
-#[test]
-fn rejects_the_configured_runtime_database() {
-    let error = validate_isolated_postgres_url(
-        "postgres://tester:secret@127.0.0.1:5432/arc_admin_test",
-        Some("postgresql://runtime:secret@localhost:5432/arc_admin_test"),
-        false,
-    )
-    .expect_err("same database target must fail");
-    assert!(
-        error.to_string().contains("DATABASE_URL database"),
-        "{error:?}"
-    );
 }
 
 fn project() -> (TestWorkspace, Project) {
@@ -474,6 +410,36 @@ fn docker_service_uses_a_valid_external_value_without_docker() {
             "postgres://test:test@127.0.0.1:5432/quality_test".into()
         )
     );
+    std::env::remove_var(name);
+}
+
+#[test]
+fn docker_service_rejects_an_invalid_external_value_before_any_runtime() {
+    let (_workspace, mut project) = project();
+    let name = "HARNESS_GATE_DOCKER_INVALID_EXTERNAL_FIXTURE";
+    std::env::set_var(name, "postgres://test:test@127.0.0.1:5432/quality");
+    project.config.services.insert(
+        "database".into(),
+        ServiceConfig::Docker {
+            runtime: crate::config::ContainerRuntimeKind::Docker,
+            image: "postgres:16-alpine".into(),
+            image_env: None,
+            external_env: Some(name.into()),
+            inject_env: "TEST_DATABASE_URL".into(),
+            external_value_policy: crate::config::ExternalValuePolicy::IsolatedPostgres,
+            startup_timeout_secs: 1,
+            timeout_env: None,
+            container_port: 5432,
+            environment: Default::default(),
+            healthcheck: vec!["true".into()],
+            connection: "postgres://unused".into(),
+        },
+    );
+    let mut manager = ServiceManager::new(&project);
+    let error = manager
+        .environment("database")
+        .expect_err("a production-like database name must fail closed");
+    assert!(error.to_string().contains("must end with"), "{error:?}");
     std::env::remove_var(name);
 }
 

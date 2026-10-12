@@ -1,8 +1,7 @@
 use super::model::{
-    default_doctor_timeout, ContainerRuntimeKind, DoctorCheck, DoctorCheckKind, DoctorConfig,
-    ExecutionConfig, ExternalValuePolicy, FlowConfig, NotificationsConfig, ParserConfig, PathAlias,
-    PathScope, PathType, PathsConfig, PolicyConfig, ProjectConfig, ReportTemplatesConfig,
-    ScopeConfig, ServiceConfig, StepConfig, CONFIG_VERSION,
+    default_doctor_timeout, DoctorCheck, DoctorCheckKind, DoctorConfig, ExecutionConfig,
+    FlowConfig, NotificationsConfig, ParserConfig, PathAlias, PathScope, PathType, PathsConfig,
+    PolicyConfig, ProjectConfig, ReportTemplatesConfig, ScopeConfig, StepConfig, CONFIG_VERSION,
 };
 use anyhow::{bail, Context, Result};
 use serde::Deserialize;
@@ -97,37 +96,18 @@ pub fn migrate_v1(source: &str, project_name: &str) -> Result<FlowConfig> {
         },
     );
 
-    let service_id = "test-postgres".to_string();
+    let service_id = crate::recipes::postgres::LEGACY_SERVICE_ID.to_string();
     let mut services = BTreeMap::new();
     services.insert(
         service_id.clone(),
-        ServiceConfig::Docker {
-            runtime: ContainerRuntimeKind::Docker,
-            image: legacy.database.image,
-            image_env: Some("HARNESS_GATE_POSTGRES_IMAGE".into()),
-            external_env: Some("TEST_DATABASE_URL".into()),
-            inject_env: "TEST_DATABASE_URL".into(),
-            external_value_policy: ExternalValuePolicy::IsolatedPostgres,
+        crate::recipes::postgres::legacy_service(&crate::recipes::postgres::LegacyPostgres {
+            image: &legacy.database.image,
             startup_timeout_secs: legacy.database.startup_timeout_secs,
-            timeout_env: Some("HARNESS_GATE_DATABASE_TIMEOUT_SECS".into()),
             container_port: legacy.database.container_port,
-            environment: BTreeMap::from([
-                ("POSTGRES_USER".into(), legacy.database.user.clone()),
-                ("POSTGRES_PASSWORD".into(), legacy.database.password.clone()),
-                ("POSTGRES_DB".into(), legacy.database.name.clone()),
-            ]),
-            healthcheck: vec![
-                "pg_isready".into(),
-                "-U".into(),
-                legacy.database.user.clone(),
-                "-d".into(),
-                legacy.database.name.clone(),
-            ],
-            connection: format!(
-                "postgres://{}:{}@127.0.0.1:{{host_port}}/{}",
-                legacy.database.user, legacy.database.password, legacy.database.name
-            ),
-        },
+            user: &legacy.database.user,
+            password: &legacy.database.password,
+            name: &legacy.database.name,
+        }),
     );
 
     let mut parsers = BTreeMap::new();

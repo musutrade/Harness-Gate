@@ -42,6 +42,54 @@ fn doctor_project(name: &str) -> (TestWorkspace, crate::project::Project) {
 }
 
 #[test]
+fn doctor_service_check_keeps_recipe_validation_on_both_outcomes() {
+    let (_root, mut project) = doctor_project("doctor-service-recipe");
+    let name = "HARNESS_GATE_DOCTOR_SERVICE_RECIPE_FIXTURE";
+    project.config.services.insert(
+        "database".into(),
+        crate::config::ServiceConfig::Docker {
+            runtime: crate::config::ContainerRuntimeKind::Docker,
+            image: "postgres:16-alpine".into(),
+            image_env: None,
+            external_env: Some(name.into()),
+            inject_env: "TEST_DATABASE_URL".into(),
+            external_value_policy: crate::config::ExternalValuePolicy::IsolatedPostgres,
+            startup_timeout_secs: 1,
+            timeout_env: None,
+            container_port: 5432,
+            environment: Default::default(),
+            healthcheck: vec!["true".into()],
+            connection: "postgres://unused".into(),
+        },
+    );
+    project.config.doctor.checks = vec![crate::config::DoctorCheck {
+        id: "service.database".into(),
+        label: "test database".into(),
+        required: true,
+        help: None,
+        timeout_secs: 5,
+        kind: crate::config::DoctorCheckKind::Service {
+            service: "database".into(),
+        },
+    }];
+
+    std::env::set_var(name, "postgres://test:test@127.0.0.1:5432/quality");
+    let report = super::run(&project).expect("doctor run");
+    assert_eq!(
+        report.failures, 1,
+        "an invalid recipe value must fail the doctor service check"
+    );
+
+    std::env::set_var(name, "postgres://test:test@127.0.0.1:5432/quality_test");
+    let report = super::run(&project).expect("doctor run");
+    assert_eq!(
+        report.failures, 0,
+        "a valid recipe value must pass the doctor service check"
+    );
+    std::env::remove_var(name);
+}
+
+#[test]
 fn repository_scoped_paths_cannot_probe_outside_the_repository() {
     let (root, project) = doctor_project("doctor-scope");
     let outside = tempfile::tempdir().unwrap();
