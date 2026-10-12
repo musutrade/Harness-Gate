@@ -23,7 +23,7 @@ inferring compatibility from their names. `cargo llvm-cov` and OpenSSL must be
 available. A missing tool, wrong commit/LLVM/host, failed command or timeout is
 blocking, with retained original diagnostics.
 
-The [runner](../../tools/quality/rust-source-risk/test_toolchain_compatibility.py)
+The [runner](https://github.com/musutrade/Harness-Gate/blob/8d93ea53c7cf8b314bda816eafe13209da25c742/tools/quality/rust-source-risk/test_toolchain_compatibility.py)
 sets `RUSTUP_TOOLCHAIN` only in child-process environments and derives actual
 rustc, cargo, LLVM paths from that selected compiler's sysroot/host. Two combinations
 have separate plugin/source snapshots, analyzer target directories, compiled

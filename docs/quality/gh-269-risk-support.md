@@ -46,7 +46,7 @@ cargo fmt --manifest-path tools/quality/rust-measure/Cargo.toml -- --check
 
 The fixtures read real compiler configurations for Linux and Windows; host
 assertions select the compiler's actual target. The
-[Native Validation workflow](../../.github/workflows/rust-measure-native.yml)
+[Native Validation workflow](https://github.com/musutrade/Harness-Gate/blob/8d93ea53c7cf8b314bda816eafe13209da25c742/.github/workflows/rust-measure-native.yml)
 builds `rust-measure/0.3.1` on Windows first, then macOS, and runs the small source
 measurement suite on each host. Each job has a 15-minute timeout and retains only
 fixture profiles, LLVM exports, the instrumentation manifest, tool/source hashes,

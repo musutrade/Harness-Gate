@@ -5,9 +5,9 @@ backend for the declared build configuration. Its genuine measurements fail the
 unchanged quality thresholds. Acceptance and CI remain controller-owned; this
 submission does not release GH-221 before merge/acceptance or complete GH-215.
 
-The implementation is in [the pinned driver](../../../tools/quality/rust-native-driver/README.md),
-[collector](../../../tools/quality/rust_native_driver.py) and
-[typed policy projection](../../../tools/quality/rust_native_policy.py).
+The implementation is in [the pinned driver](https://github.com/musutrade/Harness-Gate/blob/8d93ea53c7cf8b314bda816eafe13209da25c742/tools/quality/rust-native-driver/README.md),
+[collector](https://github.com/musutrade/Harness-Gate/blob/8d93ea53c7cf8b314bda816eafe13209da25c742/tools/quality/rust_native_driver.py) and
+[typed policy projection](https://github.com/musutrade/Harness-Gate/blob/8d93ea53c7cf8b314bda816eafe13209da25c742/tools/quality/rust_native_policy.py).
 Generic Core, Arc-Admin application tests, formal gates and baselines are unchanged.
 
 ## Actual backend scope and result

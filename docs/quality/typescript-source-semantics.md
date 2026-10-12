@@ -100,7 +100,7 @@ similarity cannot authorize reuse. Full policy/ratchet integration remains 3.2.
 
 ## Reproduction and evidence
 
-- [Semantic implementation](../../tools/quality/typescript_semantics.py)
+- [Semantic implementation](https://github.com/musutrade/Harness-Gate/blob/8d93ea53c7cf8b314bda816eafe13209da25c742/tools/quality/typescript_semantics.py)
 - [Pinned parser, native oracle and reproduction commands](../../tools/quality/fixtures/typescript-angular/semantics/README.md)
 - [Native collection](../../tools/quality/fixtures/typescript-angular/evidence/README.md)
 - [Adversarial and native replay tests](../../tools/quality/tests/test_typescript_semantics.py)

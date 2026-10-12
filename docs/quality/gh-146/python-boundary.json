@@ -131,7 +131,8 @@
       "notes": "",
       "purpose": "Collect real task-3.3 contract runs in an isolated, disposable output directory.",
       "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
-      "sha256": "7bcc45f52f5a2d8fdebc6294523ed9101f33f10a9e3eaec8a87bcf31e75f82c0"
+      "sha256": "7bcc45f52f5a2d8fdebc6294523ed9101f33f10a9e3eaec8a87bcf31e75f82c0",
+      "plugin_owner": "musutrade/GateProbes"
     },
     {
       "authoritative_status": "Non-authoritative for release; generic shadow/reference or development tooling",
@@ -571,7 +572,8 @@
       "notes": "Mixed native fixture collection and replay; final role is bounded reference acceptance tooling.",
       "purpose": "GH-134: collect and replay two real, locked frontend history pairs.",
       "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
-      "sha256": "73d3f5a6cfb65b162863074c23815a6044fde64bd578423316e68503bb180342"
+      "sha256": "73d3f5a6cfb65b162863074c23815a6044fde64bd578423316e68503bb180342",
+      "plugin_owner": "musutrade/GateProbes"
     },
     {
       "authoritative_status": "Non-authoritative for release; generic shadow/reference or development tooling",
@@ -586,7 +588,8 @@
       "notes": "",
       "purpose": "Opt-in replay of the bounded frontend window; owns no required CI authority.",
       "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
-      "sha256": "2f1bb5b82b5b83717db499240c84028d6c9a9a77bdcd1ae5b4d6d0033c9ab3d5"
+      "sha256": "2f1bb5b82b5b83717db499240c84028d6c9a9a77bdcd1ae5b4d6d0033c9ab3d5",
+      "plugin_owner": "musutrade/GateProbes"
     },
     {
       "authoritative_status": "Non-authoritative for release; generic shadow/reference or development tooling",
@@ -602,7 +605,8 @@
       "notes": "",
       "purpose": "Development-only native contract adapter; tool parsing stays outside policy.",
       "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
-      "sha256": "be30cd166091ab263cf344620fdaaedd3cfaa7a4ff61c0f3cdd971606b3637e9"
+      "sha256": "be30cd166091ab263cf344620fdaaedd3cfaa7a4ff61c0f3cdd971606b3637e9",
+      "plugin_owner": "musutrade/GateProbes"
     },
     {
       "authoritative_status": "Non-authoritative for release; generic shadow/reference or development tooling",
@@ -617,7 +621,8 @@
       "notes": "",
       "purpose": "Version 1 retained TypeScript/Angular collector; no policy decisions.",
       "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
-      "sha256": "347ec0c980e77d519a5b956af49762f6be9a3d15d6d03a8ad697ded1186b490b"
+      "sha256": "347ec0c980e77d519a5b956af49762f6be9a3d15d6d03a8ad697ded1186b490b",
+      "plugin_owner": "musutrade/GateProbes"
     },
     {
       "authoritative_status": "Non-authoritative for release; generic shadow/reference or development tooling",
@@ -635,7 +640,8 @@
       "notes": "",
       "purpose": "TypeScript identity/measurement primitives; not a collector or policy engine.",
       "release_impact": "Not packaged in release binary. Cannot approve or replace required Rust release checks.",
-      "sha256": "71ac267b84ca2c2cb24f88ec0d03fd05df84d63d61687f40d3eea0cd642647bc"
+      "sha256": "71ac267b84ca2c2cb24f88ec0d03fd05df84d63d61687f40d3eea0cd642647bc",
+      "plugin_owner": "musutrade/GateProbes"
     },
     {
       "module": "tools/quality/rust_native.py",
@@ -649,7 +655,8 @@
       "authoritative_status": "Non-authoritative development experiment; GH-220 acceptance incomplete.",
       "final_disposition": "Retain ecosystem-specific experiment pending complete production provenance and acceptance.",
       "notes": "GH-220: experimental, not integrated with production debt or baseline.",
-      "sha256": "cafd5670a7d040f2beb7dbc5f5880825391bc19a6ccafece30e7bcd6b0ea5767"
+      "sha256": "cafd5670a7d040f2beb7dbc5f5880825391bc19a6ccafece30e7bcd6b0ea5767",
+      "plugin_owner": "musutrade/GateProbes"
     },
     {
       "module": "tools/quality/rust_native_replay.py",
@@ -663,7 +670,8 @@
       "authoritative_status": "Non-authoritative development experiment; GH-220 acceptance incomplete.",
       "final_disposition": "Retain ecosystem-specific experiment pending complete production provenance and acceptance.",
       "notes": "GH-220: experimental, not integrated with production debt or baseline.",
-      "sha256": "a09d13ec1ae36919a9622e518d21c3fa37ac693f031b2a6bfc3ae9425d03bee9"
+      "sha256": "a09d13ec1ae36919a9622e518d21c3fa37ac693f031b2a6bfc3ae9425d03bee9",
+      "plugin_owner": "musutrade/GateProbes"
     },
     {
       "module": "tools/quality/rust_native_driver.py",
@@ -679,7 +687,8 @@
       "release_impact": "Not packaged in release binary; cannot approve a release or accept a baseline.",
       "authoritative_status": "Native measurement facts only; released Rust Core retains policy authority.",
       "final_disposition": "Retain ecosystem measurement tooling outside Generic Core (ADR-0040/0044/0049).",
-      "sha256": "88657a0654e7d1c0376a1697c27d03b226ccf4efe212eb892b3369d8de2573ae"
+      "sha256": "88657a0654e7d1c0376a1697c27d03b226ccf4efe212eb892b3369d8de2573ae",
+      "plugin_owner": "musutrade/GateProbes"
     },
     {
       "module": "tools/quality/rust_native_policy.py",
@@ -692,7 +701,8 @@
       "release_impact": "Not packaged in release binary; cannot approve a release or accept a baseline.",
       "authoritative_status": "Native measurement facts only; released Rust Core retains policy authority.",
       "final_disposition": "Retain ecosystem measurement tooling outside Generic Core (ADR-0040/0044/0049).",
-      "sha256": "72872de33986555d44c2ae99beecbf71a7e851352da37db60815ac9eab4b192b"
+      "sha256": "72872de33986555d44c2ae99beecbf71a7e851352da37db60815ac9eab4b192b",
+      "plugin_owner": "musutrade/GateProbes"
     },
     {
       "module": "tools/quality/rust_native_classify.py",
@@ -707,7 +717,8 @@
       "release_impact": "Not packaged in release binary; cannot approve a release or accept a baseline.",
       "authoritative_status": "Native measurement facts only; released Rust Core retains policy authority.",
       "final_disposition": "Retain ecosystem measurement tooling outside Generic Core (ADR-0040/0044/0049).",
-      "sha256": "b83b1c799dea5e68b24e4b5aaff3db6947e12cda464e66532804285a9010b6f6"
+      "sha256": "b83b1c799dea5e68b24e4b5aaff3db6947e12cda464e66532804285a9010b6f6",
+      "plugin_owner": "musutrade/GateProbes"
     },
     {
       "module": "tools/quality/rust_collector_contract.py",
@@ -720,7 +731,8 @@
       "release_impact": "Not packaged in released Core; no release approval or baseline acceptance authority.",
       "authoritative_status": "Delivery/transport preflight only; released Rust Core retains all generic policy decisions.",
       "final_disposition": "Retain development delivery contract helper; frozen helpers used solely for schema/transport validation.",
-      "sha256": "4e5bf1a7fa874ebec1c900813c627db43d7e61d01721b2abee845b6bfd0757fb"
+      "sha256": "4e5bf1a7fa874ebec1c900813c627db43d7e61d01721b2abee845b6bfd0757fb",
+      "plugin_owner": "musutrade/GateProbes"
     },
     {
       "module": "tools/quality/build_rust_collector.py",
@@ -734,7 +746,8 @@
       "release_impact": "Build candidate only; no signature, publication or policy authority.",
       "authoritative_status": "Packaging input validation only.",
       "final_disposition": "Retain bounded local bundle builder; lifecycle and release supply chain require separate acceptance.",
-      "sha256": "755386c77e983de16e97e474fe7c99aa8147fa59fa7bd0ce4cbd53c794b1ad5f"
+      "sha256": "755386c77e983de16e97e474fe7c99aa8147fa59fa7bd0ce4cbd53c794b1ad5f",
+      "plugin_owner": "musutrade/GateProbes"
     },
     {
       "module": "tools/quality/rust_collector_entry.py",
@@ -748,7 +761,8 @@
       "release_impact": "Independent runtime candidate; released Core retains all policy decisions.",
       "authoritative_status": "Measurement integrity only; unknown Core/ABI combinations cannot sample.",
       "final_disposition": "Retain measurement entry; trusted installed-host collect integration remains P6.",
-      "sha256": "321302db2b7fec51a15fd3dd770233d3fdf8b9c171b92249a467d652e7fe1548"
+      "sha256": "321302db2b7fec51a15fd3dd770233d3fdf8b9c171b92249a467d652e7fe1548",
+      "plugin_owner": "musutrade/GateProbes"
     },
     {
       "module": "tools/quality/rust_collector_project.py",
@@ -763,7 +777,8 @@
       "release_impact": "Private runtime candidate only; no policy, baseline acceptance or release authority.",
       "authoritative_status": "Measurement integrity and typed projection only; Core authenticates requests and decides policy.",
       "final_disposition": "Retain ecosystem measurement projection; GH-230 installed fixture integration does not certify native projects.",
-      "sha256": "de72ceb4d9a6d18a93198eab0ff6b45e03866b0e4c2f8c899bf035c539f1e1e0"
+      "sha256": "de72ceb4d9a6d18a93198eab0ff6b45e03866b0e4c2f8c899bf035c539f1e1e0",
+      "plugin_owner": "musutrade/GateProbes"
     },
     {
       "module": "tools/quality/rust_collector_delivery.py",
@@ -778,7 +793,8 @@
       "release_impact": "Collector measurement compatibility only; no policy, baseline acceptance or release authority.",
       "authoritative_status": "Host authenticates distribution and requests; Core decides requiredness and final outcomes.",
       "final_disposition": "Retain ecosystem measurement compatibility checks; GH-230 fixture evidence is separate from native project acceptance.",
-      "sha256": "c720bd954ea923a0c980df3917ee93c838dbb7c7d2bb4e0dd6989c5061aa6ae6"
+      "sha256": "c720bd954ea923a0c980df3917ee93c838dbb7c7d2bb4e0dd6989c5061aa6ae6",
+      "plugin_owner": "musutrade/GateProbes"
     },
     {
       "module": "tools/quality/rust_native_config.py",
@@ -792,7 +808,8 @@
       "release_impact": "Packaged in the standalone native plugin; cannot approve a release or accept/reset a baseline.",
       "authoritative_status": "Policy input resolution and validation only; the released Rust Core compares limits and owns every gate/debt/non-regression decision.",
       "final_disposition": "Retain native adapter configuration glue under the external-toolchain delivery amendment; no unconfigured compatibility fallback.",
-      "sha256": "4e1c80301839111098ffa17fb27830aabdd253f3088e0541b0884b24fb24edef"
+      "sha256": "4e1c80301839111098ffa17fb27830aabdd253f3088e0541b0884b24fb24edef",
+      "plugin_owner": "musutrade/GateProbes"
     },
     {
       "module": "tools/quality/core_isolation_check.py",

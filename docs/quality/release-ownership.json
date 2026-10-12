@@ -88,12 +88,6 @@
       "owner": "gatehouse",
       "disposition": "core-retained",
       "note": "Rust reference equivalence shadow; stays in core (5.5)."
-    },
-    ".github/workflows/rust-measure-native.yml": {
-      "owner": "gatehouse",
-      "disposition": "compatibility-validation-retained",
-      "note": "Supplemental Windows/macOS validation that runs core source_measure tests against a locally built measurer. Retained as compatibility validation while the measurer source and its core tests remain in this repository; cross-platform plugin validation beyond this follows the plugin under 3.4.",
-      "revival_owner": "gateprobes"
     }
   },
   "shared_copy_rule": "Gatehouse owns the single editable source. When GateProbes is created it carries generated copies of these files from a pinned GateHouse revision; it never edits its own copy independently.",
@@ -106,6 +100,13 @@
       "was": ".github/workflows/native-collector-release.yml",
       "restore_commit": "6aaa234249574c9a321a8819213b4c936c02605e",
       "note": "Superseded by the GateProbes native collector chain (rc.8 verified, run 38218575101). Current main no longer triggers it and pull requests and main pushes no longer start it. This does not prohibit creating tags; a tag pointing at a historical commit still runs the workflow as it existed at that commit. Historical releases, signatures and tags are retained. Restore by moving the file back to .github/workflows/ after reverting this record."
+    },
+    "retired/workflows/rust-measure-native.yml": {
+      "owner": "gatehouse",
+      "disposition": "retired-restorable",
+      "was": ".github/workflows/rust-measure-native.yml",
+      "restore_commit": "4ec65a7666511cb80c89d7d369a56ec71cb878df",
+      "note": "Built the plugin analyzer from core source on Windows/macOS. Core acceptance now uses the pinned Linux amd64 measurer release; cross-platform analyzer builds belong to GateProbes. Inactive: no pull request or main push triggers it. Restore by moving the file back after reverting this record."
     }
   }
 }

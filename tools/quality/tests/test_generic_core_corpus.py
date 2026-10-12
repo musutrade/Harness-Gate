@@ -8,6 +8,32 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[3]
 FIXTURE = ROOT / 'tools/quality/fixtures/generic-core'
+REQUIRED_FIELDS = ('purpose', 'callers', 'ci_role', 'release_impact',
+                   'authoritative_status', 'final_disposition')
+
+
+def validate_python_boundary(root: Path, inventory: dict) -> None:
+    """Core, frozen and oracle rows must exist; plugin rows need explicit approval."""
+    rows = inventory['modules']
+    modules = [row['module'] for row in rows]
+    if len(modules) != len(set(modules)):
+        raise ValueError('duplicate module rows in the python boundary inventory')
+    present = {str(path.relative_to(root)) for path in (root / 'tools/quality').glob('*.py')}
+    unregistered = sorted(present - set(modules))
+    if unregistered:
+        raise ValueError('unregistered tools/quality python modules: ' + ', '.join(unregistered))
+    for row in rows:
+        if row['category'] not in 'ABCD':
+            raise ValueError(f"unknown python boundary category: {row['module']}")
+        for field in REQUIRED_FIELDS:
+            if not row.get(field):
+                raise ValueError(f"missing {field} for {row['module']}")
+        if row['module'] in present:
+            continue
+        if not row.get('plugin_owner'):
+            raise ValueError('missing required core module: ' + row['module'])
+
+
 spec = importlib.util.spec_from_file_location('generic_core_replay', FIXTURE / 'replay.py')
 replay = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(replay)
@@ -65,12 +91,67 @@ class FrozenCorpusTests(unittest.TestCase):
 
     def test_inventory_covers_all_production_python_modules(self):
         inventory = json.loads((ROOT / 'docs/quality/gh-146/python-boundary.json').read_text())
-        rows = inventory['modules']
-        self.assertEqual({row['module'] for row in rows}, {
-            str(p.relative_to(ROOT)) for p in (ROOT / 'tools/quality').glob('*.py')})
-        self.assertEqual(len(rows), len({row['module'] for row in rows}))
-        for row in rows:
-            self.assertIn(row['category'], 'ABCD')
-            for field in ('purpose', 'callers', 'ci_role', 'release_impact',
-                          'authoritative_status', 'final_disposition'):
-                self.assertTrue(row[field], (row['module'], field))
+        validate_python_boundary(ROOT, inventory)
+
+
+class PythonBoundaryTests(unittest.TestCase):
+    """Only per-file approved plugin absences are allowed; everything else fails."""
+
+    def fixture(self, files, rows):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name)
+        (root / 'tools/quality').mkdir(parents=True)
+        for name, content in files.items():
+            (root / 'tools/quality' / name).write_text(content)
+        return root, {'modules': rows}
+
+    @staticmethod
+    def row(module, category='B', **extra):
+        return {'module': module, 'category': category, 'purpose': 'p', 'callers': ['x'],
+                'ci_role': 'c', 'release_impact': 'r', 'authoritative_status': 'a',
+                'final_disposition': 'd', **extra}
+
+    def test_present_core_rows_and_approved_plugin_absence_pass(self):
+        root, inventory = self.fixture(
+            {'core.py': 'CORE = 1\n'},
+            [self.row('tools/quality/core.py', category='A')])
+        validate_python_boundary(root, inventory)
+        root, inventory = self.fixture(
+            {'core.py': 'CORE = 1\n'},
+            [self.row('tools/quality/core.py', category='A'),
+             self.row('tools/quality/plugin.py', plugin_owner='musutrade/GateProbes')])
+        validate_python_boundary(root, inventory)
+
+    def test_missing_core_oracle_or_frozen_row_fails(self):
+        for category in ('A', 'C', 'D'):
+            with self.subTest(category=category):
+                root, inventory = self.fixture(
+                    {'core.py': 'CORE = 1\n'},
+                    [self.row('tools/quality/core.py', category='A'),
+                     self.row('tools/quality/missing.py', category=category)])
+                with self.assertRaisesRegex(ValueError, 'missing required core module'):
+                    validate_python_boundary(root, inventory)
+
+    def test_unapproved_plugin_absence_fails(self):
+        root, inventory = self.fixture(
+            {'core.py': 'CORE = 1\n'},
+            [self.row('tools/quality/core.py', category='A'),
+             self.row('tools/quality/plugin.py')])
+        with self.assertRaisesRegex(ValueError, 'missing required core module'):
+            validate_python_boundary(root, inventory)
+
+    def test_present_but_unregistered_module_fails(self):
+        root, inventory = self.fixture(
+            {'core.py': 'CORE = 1\n', 'stray.py': 'STRAY = 1\n'},
+            [self.row('tools/quality/core.py', category='A')])
+        with self.assertRaisesRegex(ValueError, 'unregistered'):
+            validate_python_boundary(root, inventory)
+
+    def test_duplicate_rows_fail(self):
+        root, inventory = self.fixture(
+            {'core.py': 'CORE = 1\n'},
+            [self.row('tools/quality/core.py', category='A'),
+             self.row('tools/quality/core.py', category='A')])
+        with self.assertRaisesRegex(ValueError, 'duplicate module rows'):
+            validate_python_boundary(root, inventory)

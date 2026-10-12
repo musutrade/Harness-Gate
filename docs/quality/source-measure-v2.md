@@ -10,7 +10,7 @@ measured source trees and results.
 ## Versioned contract
 
 [`source_measure.py`](../../tools/quality/source_measure.py) uses the MIT-licensed
-[`harness-gate-rust-measure`](../../tools/quality/rust-measure/Cargo.toml) 0.2.0
+[`harness-gate-rust-measure`](https://github.com/musutrade/GateProbes/blob/155b233fb2f525f520b4fcc0ed73e017154345e0/plugins/rust-measure/Cargo.toml) 0.2.0
 helper, with exact dependencies and a committed Cargo lockfile. Its series is:
 
 | Dimension | Identity |

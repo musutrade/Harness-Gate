@@ -2,7 +2,7 @@
 
 Scope: [OpenSpec task 4.1](../../../openspec/changes/typescript-angular-reference-adapter/tasks.md),
 following [ADR-0040](../../adr/0040-language-agnostic-evidence-policy.md).
-The [acceptance runner](../../../tools/quality/typescript_acceptance.py) creates
+The [acceptance runner](https://github.com/musutrade/Harness-Gate/blob/8d93ea53c7cf8b314bda816eafe13209da25c742/tools/quality/typescript_acceptance.py) creates
 two local fixture Git histories and independently collects all four revisions
 with the locked Angular/Node/TypeScript toolchain and live Rust provider.
 Each collection performs two locked npm installs, client generation, provider

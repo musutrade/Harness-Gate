@@ -74,11 +74,17 @@ def ast(source: Path, binary: Path, configuration=None) -> dict:
 
 
 def provenance(binary: Path) -> dict:
+    """Record the real pinned release identity, never plugin source hashes."""
     root = Path(__file__).resolve().parent
-    files = ["source_measure.py", "function_risk.py", "production_coverage.py",
-             "rust-measure/Cargo.toml", "rust-measure/Cargo.lock", "rust-measure/src/main.rs",
-             "rust-measure/src/configuration.rs"]
+    pin = json.loads((root / 'rust-measure-release.json').read_text())
+    require(pin.get('schema') == 'rust-measure-release-pin/v1', 'unknown measurer pin schema')
+    for field in ('release', 'asset', 'sha256', 'analyzer', 'version', 'rule'):
+        require(isinstance(pin.get(field), str) and pin[field], f'invalid measurer pin {field}')
+    files = ["source_measure.py", "function_risk.py", "production_coverage.py"]
     return {"sources": {p: digest((root / p).read_bytes()) for p in files},
+            "release": {"repository": "musutrade/Harness-Gate", "tag": pin['release'],
+                        "asset": pin['asset'], "sha256": pin['sha256']},
+            "analyzer": {"name": pin['analyzer'], "version": pin['version'], "rule": pin['rule']},
             "binary_sha256": digest(binary.read_bytes()),
             "rustc": subprocess.check_output(["rustc", "-vV"], text=True).strip()}
 

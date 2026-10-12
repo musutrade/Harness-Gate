@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import json
 import os
+import platform
 import re
 import shutil
 import subprocess
@@ -14,6 +15,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "tools/quality"))
+import ci_quality
 from source_measure import HOTSPOTS, SERIES, SOURCE_FILES, prepare, ast, byte_span, closure_name, compare, compiler_configuration, complexity, digest, instrument, measure, original_point, provenance
 
 PROCESS_COMMAND_BASE_COMMIT = '3d887a460bb72064b29a6f9ea71293e2949a16d7'
@@ -132,66 +134,25 @@ pub fn unused() -> u8 { 11 }
 class SourceMeasureTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        target = Path(os.environ.get('CARGO_TARGET_DIR', ROOT / 'target/gh-94-measure')).resolve()
-        retained = Path(os.environ.get('RUST_MEASURE_NATIVE_EVIDENCE', ROOT / 'target/gh285-native-evidence')).resolve()
+        retained = Path(os.environ.get('RUST_MEASURE_NATIVE_EVIDENCE',
+                                       ROOT / 'target/gh285-native-evidence')).resolve()
         retained.mkdir(parents=True, exist_ok=True)
-        evidence = Path(tempfile.mkdtemp(prefix='analyzer-build-', dir=retained))
-        environment = {**os.environ, 'CARGO_TARGET_DIR': str(target)}
-        sources = ('Cargo.toml', 'Cargo.lock', 'src/main.rs', 'src/configuration.rs')
-        hashes = {p: digest((ROOT / 'tools/quality/rust-measure' / p).read_bytes()) for p in sources}
-        record = {'series': SERIES, 'target_directory': str(target), 'source_hashes': hashes,
-                  'commands': [], 'validated': False}
-
-        def run(argv):
-            item = {'argv': argv, 'cwd': str(ROOT), 'environment': {key: environment.get(key) for key in (
-                'CARGO_TARGET_DIR', 'RUSTUP_TOOLCHAIN', 'RUSTC', 'RUSTC_WRAPPER', 'RUSTC_WORKSPACE_WRAPPER',
-                'CARGO_BUILD_TARGET', 'RUSTFLAGS', 'CARGO_ENCODED_RUSTFLAGS')}}
-            record['commands'].append(item)
-            try:
-                result = subprocess.run(argv, cwd=ROOT, env=environment, capture_output=True, timeout=120)
-            except (OSError, subprocess.TimeoutExpired) as error:
-                item['error'] = str(error)
-                if isinstance(error, subprocess.TimeoutExpired):
-                    (evidence / f'command-{len(record["commands"])}.stdout').write_bytes(error.stdout or b'')
-                    (evidence / f'command-{len(record["commands"])}.stderr').write_bytes(error.stderr or b'')
-                (evidence / 'build-record.json').write_text(json.dumps(record, indent=2) + '\n')
-                raise
-            item['returncode'] = result.returncode
-            (evidence / f'command-{len(record["commands"])}.stdout').write_bytes(result.stdout)
-            (evidence / f'command-{len(record["commands"])}.stderr').write_bytes(result.stderr)
-            (evidence / 'build-record.json').write_text(json.dumps(record, indent=2) + '\n')
-            if result.returncode:
-                raise subprocess.CalledProcessError(result.returncode, argv, output=result.stdout, stderr=result.stderr)
-            return result.stdout
-
-        version = run(['rustc', '-vV']).decode().strip()
-        host = next(line.removeprefix('host: ') for line in version.splitlines() if line.startswith('host: '))
-        record.update(rustc=version, host_target=host, checkout_sha=run(['git', 'rev-parse', 'HEAD']).decode().strip())
-        cargo_lock = (ROOT / 'tools/quality/rust-measure/Cargo.lock').read_bytes()
-        compiled = run(['cargo', 'build', '--locked', '--manifest-path',
-                        str(ROOT / 'tools/quality/rust-measure/Cargo.toml'), '--target', host,
-                        '--profile', 'dev', '--message-format=json-render-diagnostics'])
-        messages = [json.loads(line) for line in compiled.splitlines()]
-        artifacts = [row for row in messages if row.get('reason') == 'compiler-artifact'
-                     and row['target']['name'] == 'harness-gate-rust-measure'
-                     and 'bin' in row['target']['kind'] and row.get('executable')]
-        def reject(message):
-            record['error'] = message
-            (evidence / 'build-record.json').write_text(json.dumps(record, indent=2) + '\n')
-            raise AssertionError(message)
-
-        if len(artifacts) != 1:
-            reject('analyzer build must produce exactly one bound executable')
-        cls.binary = target / host / 'debug' / ('harness-gate-rust-measure' + ('.exe' if os.name == 'nt' else ''))
-        if Path(artifacts[0]['executable']).resolve() != cls.binary.resolve():
-            reject('analyzer executable differs from explicit target/host build')
-        if (ROOT / 'tools/quality/rust-measure/Cargo.lock').read_bytes() != cargo_lock:
-            reject('analyzer locked build changed lock bytes')
-        if hashes != {p: digest((ROOT / 'tools/quality/rust-measure' / p).read_bytes()) for p in sources}:
-            reject('analyzer sources changed during build')
-        record.update(binary_path=str(cls.binary.resolve()), binary_sha256=digest(cls.binary.read_bytes()),
-                      cargo_artifact=artifacts[0], validated=True)
-        cls.build_record = evidence / 'build-record.json'
+        evidence = Path(tempfile.mkdtemp(prefix='measurer-release-', dir=retained))
+        if sys.platform != 'linux' or platform.machine() != 'x86_64':
+            raise unittest.SkipTest(
+                'the pinned measurer release supports Linux amd64 only; '
+                'cross-platform analyzer builds belong to the plugin')
+        cache = Path(os.environ.get('HARNESS_GATE_MEASURER_CACHE',
+                                    ROOT / 'target/rust-measure-release')).resolve()
+        pin = ci_quality.load_measurer_pin()
+        cls.binary = ci_quality.ensure_measurer(cache)
+        record = {'schema': 'rust-measure-release-record/v1', 'series': SERIES,
+                  'release': {'tag': pin['release'], 'asset': pin['asset'], 'sha256': pin['sha256']},
+                  'analyzer': {'name': pin['analyzer'], 'version': pin['version'], 'rule': pin['rule']},
+                  'executable': str(cls.binary.resolve()),
+                  'binary_sha256': digest(cls.binary.read_bytes()),
+                  'rustc': subprocess.check_output(['rustc', '-vV'], text=True).strip()}
+        cls.build_record = evidence / 'release-record.json'
         cls.build_record.write_text(json.dumps(record, indent=2) + '\n')
 
     def inventory(self, source, target=None):
@@ -297,10 +258,6 @@ fn both() {
             compare(base, head)
 
     def test_native_inventory_has_separate_identity_and_contracts(self):
-        subprocess.run(["cargo", "test", "--locked", "--manifest-path",
-                        str(ROOT / "tools/quality/rust-measure/Cargo.toml")],
-                       env={**os.environ, "CARGO_TARGET_DIR": str(ROOT / "target/gh-94-measure")},
-                       check=True, capture_output=True)
         with tempfile.TemporaryDirectory() as temp:
             file = Path(temp) / "input.rs"
             file.write_text('fn f() { tracing::error!(value = %value); }')
