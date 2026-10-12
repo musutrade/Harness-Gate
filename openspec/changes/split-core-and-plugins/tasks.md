@@ -162,17 +162,20 @@ semantics, gate names, branch protection or release authority.
 > repository, so the aggregate cannot prove it. It stays tracked in the
 > Validation list and is not claimed by 4.4/4.5; it does not block 4.2.
 >
-> **Isolation acceptance, partial (2026-10-12):** the repeatable entry point
-> `tools/quality/core_isolation_check.py` ran commit
-> `398b0b2f5807092b462aa799c402ef40a3c54bea` with the 26 plugin implementation
-> paths removed: `cargo build` and all 492 cargo tests pass in an isolated
-> target directory. The Python core selection (41 modules, 363 tests) still
-> fails on four core-owned couplings: core docs linking plugin paths, the
-> measurer pin reading `rust-measure/plugin.json`, `test_source_measure`
-> building the analyzer, and the gh-146 inventory requiring every module.
-> Findings, ownership judgments and proposed minimal fixes are recorded in
-> `docs/quality/core-without-plugins-acceptance.md`; the gap stays open until
-> those fixes land and the entry point passes.
+> **Isolation acceptance, pass (2026-10-12, Linux amd64):** the repeatable
+> entry point `tools/quality/core_isolation_check.py` ran commit
+> `7c922cc234c436b1a0604be222f24d0bfa1f501d` with the 24 plugin implementation
+> paths removed: `cargo build` passes and all 492 cargo tests pass in an
+> isolated target directory; the corrected Python core selection passes with
+> 43 modules and 426 tests (0 failed, 0 skipped) while 15 plugin-owned test
+> modules are excluded per file. The couplings recorded in
+> `docs/quality/core-without-plugins-acceptance.md` are fixed: core reference
+> equivalence stays in core, docs link the fixed GateProbes snapshot and
+> historical versions, the pin test and `source_measure` consume the verified
+> pinned release, and gh-146 requires per-file plugin-absence approvals. The
+> entry point stays manual and is not part of the required aggregate, and the
+> verified scope is Linux amd64 only (cross-platform analyzer builds are
+> plugin-owned; `rust-measure-native` was retired).
 
 ## 5. GateProbes bootstrap, CI classification and migration scope
 
