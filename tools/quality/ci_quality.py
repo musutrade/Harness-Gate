@@ -30,6 +30,10 @@ STAGES = ('legacy', 'production', 'risk', 'matrix')
 SNAPSHOT_PATHS = ('tools/harness-gate', 'tools/quality', 'schema', 'docs/dogfood')
 REPLAY_RELOCATION = ('tools/harness-gate/quality-core/examples/differential_replay.rs',
                      'tools/harness-gate/quality-replay/examples/differential_replay.rs')
+# Reviewed 2026-10-12: the Postgres recipe left service/postgres.rs for the
+# measured recipes series (source_measure.SOURCE_FILES); the removed path no
+# longer carries production code. Any other removed source still needs review.
+REVIEWED_REMOVED_SOURCES = ('tools/harness-gate/src/service/postgres.rs',)
 REQUIRED_ARTIFACTS = {'coverage.json', 'coverage.raw.json', 'coverage.lcov',
                       'coverage.cobertura.xml', 'production.json', 'risk.json',
                       'critical-paths.json', 'critical-path-runs/bundle.json'} | {
@@ -264,6 +268,7 @@ class Collector:
         relocated = relocated_migration_sources(base, head)
         unsupported = [p for p in changed if p.endswith('.rs') and
                        p not in relocated and
+                       p not in REVIEWED_REMOVED_SOURCES and
                        p not in {str((ROOT / 'tools/harness-gate/src' / source).resolve().relative_to(ROOT))
                                  for source in SOURCE_FILES} and not
                        (p.startswith('tools/harness-gate/quality-core/tests/') or
@@ -274,6 +279,7 @@ class Collector:
                               'tools/harness-gate/src/preset/tests.rs',
                               'tools/harness-gate/src/process/tests.rs',
                               'tools/harness-gate/src/doctor/tests.rs',
+                              'tools/harness-gate/src/service/tests.rs',
                               'tools/harness-gate/src/config/quality/collectors/tests.rs',
                               'tools/harness-gate/src/config/quality/collectors/tests/dogfood_acceptance.rs',
                               'tools/harness-gate/src/config/quality/collectors/ci_acceptance.rs'))]
