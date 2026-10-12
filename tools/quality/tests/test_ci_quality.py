@@ -88,18 +88,18 @@ class RiskScopeTests(unittest.TestCase):
                         patch.object(gate, 'relocated_migration_sources', return_value=set()), \
                         patch.object(gate, 'only_terminal_test_module_changed', return_value=False), \
                         patch.object(collector, 'command',
-                                     side_effect=RuntimeError('measurement build reached')) as command:
+                                     side_effect=RuntimeError('pinned measurer reached')) as command:
                     if supported:
-                        with self.assertRaisesRegex(RuntimeError, 'measurement build reached'):
+                        with self.assertRaisesRegex(RuntimeError, 'pinned measurer reached'):
                             collector.risk()
                         command.assert_called_once()
-                        self.assertEqual(command.call_args.args[0], 'analyzer-build')
+                        self.assertEqual(command.call_args.args[0], 'measurer-download')
                     else:
                         with self.assertRaisesRegex(ValueError, 'outside supported risk series'):
                             collector.risk()
                         command.assert_not_called()
 
-    def test_report_retention_sources_reach_analyzer_build_but_unknown_service_blocks(self):
+    def test_report_retention_sources_reach_measurer_download_but_unknown_service_blocks(self):
         with tempfile.TemporaryDirectory() as temporary:
             collector = gate.Collector(Path(temporary) / 'candidate', 'base', 'head', 'retention-scope')
             for path, supported in (
@@ -113,12 +113,12 @@ class RiskScopeTests(unittest.TestCase):
                         patch.object(gate, 'relocated_migration_sources', return_value=set()), \
                         patch.object(gate, 'only_terminal_test_module_changed', return_value=False), \
                         patch.object(collector, 'command',
-                                     side_effect=RuntimeError('measurement build reached')) as command:
+                                     side_effect=RuntimeError('pinned measurer reached')) as command:
                     if supported:
-                        with self.assertRaisesRegex(RuntimeError, 'measurement build reached'):
+                        with self.assertRaisesRegex(RuntimeError, 'pinned measurer reached'):
                             collector.risk()
                         command.assert_called_once()
-                        self.assertEqual(command.call_args.args[0], 'analyzer-build')
+                        self.assertEqual(command.call_args.args[0], 'measurer-download')
                     else:
                         with self.assertRaisesRegex(ValueError, 'outside supported risk series'):
                             collector.risk()
@@ -236,12 +236,12 @@ class InlineTestScopeTests(unittest.TestCase):
                 with patch.object(gate, 'ROOT', root):
                     collector = gate.Collector(root / f'candidate-{index}', base, head, 'test-scope')
                     with patch.object(collector, 'command',
-                                      side_effect=RuntimeError('measurement build reached')) as command:
+                                      side_effect=RuntimeError('pinned measurer reached')) as command:
                         if allowed:
-                            with self.assertRaisesRegex(RuntimeError, 'measurement build reached'):
+                            with self.assertRaisesRegex(RuntimeError, 'pinned measurer reached'):
                                 collector.risk()
                             command.assert_called_once()
-                            self.assertEqual(command.call_args.args[0], 'analyzer-build')
+                            self.assertEqual(command.call_args.args[0], 'measurer-download')
                         else:
                             with self.assertRaisesRegex(ValueError, 'outside supported risk series'):
                                 collector.risk()
