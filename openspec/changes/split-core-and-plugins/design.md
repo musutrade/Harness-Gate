@@ -80,6 +80,65 @@ Moving the repository changes signed provenance: repository identity and workflo
 identity in Sigstore certificate identity and attestation. These MUST be
 re-verified in the plugin release chain, not only download URLs.
 
+### D10 — Migration scope and provenance
+
+GateProbes receives plugin source, dependency manifests and lockfiles, test
+source, minimal test fixtures needed for independent measurement, protocol
+copies, licenses, and build/install/release scripts. It does NOT receive
+historical CI logs, screenshots, manual acceptance reports, build caches, old
+binaries or the full Git history. The new repository starts from a clean source
+snapshot that records the source repository, the full commit SHA and the path
+mapping. Historical releases, signatures and records stay with the old
+repository and are never regenerated or deleted.
+
+### D11 — rust-reference equivalence stays in core
+
+The rust-reference equivalence tests read historical candidate packages under
+`docs/quality/gh-96` and `docs/quality/gh-97`. That comparison suite stays in
+core; GateProbes carries only the minimal fixtures its own measurement needs.
+Inputs are not deleted to make a moved test skip.
+
+### D12 — CI topology: always-on classification with a fixed aggregate
+
+Both repositories keep one always-started workflow: classify changes, select
+subtasks, and finish in a fixed aggregate check. Selected tasks must succeed;
+only tasks that are provably inapplicable may be skipped. Classification
+failure, unknown changes or unresolved scope MUST fall back to the conservative
+full set. `paths-ignore` is not added to a required workflow, because a
+path-filtered required check can stay Pending forever.
+
+Tiers:
+
+1. Pure documentation: formatting, links and claim checks only, no Rust/Node
+   toolchain.
+2. Single-plugin change: that plugin's checks, tests, required coverage and
+   pinned-Core contract acceptance.
+3. Shared protocol, shared scripts, toolchain or CI-rule change: expand tests
+   along the dependency edges.
+4. Platform, path, process, install or packaging change: add the relevant native
+   platform tests.
+5. Release: only then run the full platform, packaging, clean-install, signing
+   and provenance acceptance for the plugin to be released.
+
+`ownership.json`, protocol specifications and test inputs under `docs/` are
+inputs, not "ordinary documentation", and MUST NOT be classified into the pure
+documentation tier. Doc-only and executable-example checks are separate:
+GateHouse splits its documentation consistency check so a pure-doc change does
+not invoke Cargo. Speed targets (1–2 minutes for pure docs, 5–10 minutes for a
+normal plugin PR) are design goals to be measured before they are claimed.
+
+### D13 — Migration order
+
+1. Create GateProbes minimal source and the CI classification framework
+   (classify → selected jobs → fixed aggregate).
+2. Migrate one low-dependency plugin and validate the independent flow.
+3. Migrate the remaining plugins under D10, keeping rust-reference equivalence
+   (D11) and `rust-generic-shadow` in core.
+4. Switch release and signing identity last (D9).
+
+Core keeps consuming pinned plugin release artifacts and does not recompile on
+every plugin change.
+
 ## Boundary table
 
 ### Clear ownership
