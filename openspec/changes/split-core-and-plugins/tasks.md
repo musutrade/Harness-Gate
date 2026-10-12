@@ -103,13 +103,20 @@ semantics, gate names, branch protection or release authority.
 
 > **4.5 closed against existing acceptance (2026-10-12), no historical suites re-run:**
 > - Strict OpenSpec validation: `openspec validate split-core-and-plugins --strict`
->   → `valid` on tree `4ca947b59d0e85a712fb2eb9e2aa118c207fd67c`; CI for that tree:
->   [run 38231628449](https://github.com/musutrade/Harness-Gate/actions/runs/38231628449)
->   (Required Quality Aggregate pass after an unrelated flake rerun; flake recorded
->   separately in [#344](https://github.com/musutrade/Harness-Gate/issues/344)).
-> - Core builds and tests with no plugin source checked out: core CI
->   [run 38231628449](https://github.com/musutrade/Harness-Gate/actions/runs/38231628449)
->   at `4ca947b59d0e85a712fb2eb9e2aa118c207fd67c`.
+>   → `valid` on tree `4ca947b59d0e85a712fb2eb9e2aa118c207fd67c`; the main run for
+>   that tree is
+>   [38235224213](https://github.com/musutrade/Harness-Gate/actions/runs/38235224213)
+>   (first attempt, Required Quality Aggregate pass).
+> - Core CI and pinned-artifact consumption checks pass: main
+>   [run 38235224213](https://github.com/musutrade/Harness-Gate/actions/runs/38235224213)
+>   at `4ca947b59d0e85a712fb2eb9e2aa118c207fd67c`, plus the pinned measurer
+>   release-pin test (`tools/quality/tests/test_rust_measure_release_pin.py`).
+> - The PR #343 run
+>   [38231628449](https://github.com/musutrade/Harness-Gate/actions/runs/38231628449)
+>   failed once on an unrelated lease-test flake and passed on rerun; that is
+>   flake evidence, not a root-cause fix, and is kept as the observation record
+>   in [#344](https://github.com/musutrade/Harness-Gate/issues/344). The main
+>   run above passed on its first attempt.
 > - A plugin version bump needs no core rebuild or re-release: GateProbes published
 >   independently in [run 38218575101](https://github.com/musutrade/GateProbes/actions/runs/38218575101)
 >   ([release rust-collector-v0.1.0-rc.8](https://github.com/musutrade/GateProbes/releases/tag/rust-collector-v0.1.0-rc.8),
