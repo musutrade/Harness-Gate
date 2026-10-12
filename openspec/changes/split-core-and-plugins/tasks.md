@@ -78,7 +78,12 @@ semantics, gate names, branch protection or release authority.
 > values still fail closed. `schema/flow.schema.json` and
 > `schema/quality.schema.json` are unchanged. URL positives/negatives, remote
 > restriction, production conflict, migration output, preset compatibility and
-> affected cleanup tests pass.
+> affected cleanup tests pass. The reviewed removal exemption covers only the
+> confirmed deletion of `src/service/postgres.rs` (present at base, absent at
+> head); recreating or modifying that path fails the measurement review, with
+> regression tests. The exemption does not establish function-level continuity
+> across the move: the new recipe files are measured as new functions, and no
+> old-to-new comparison is claimed.
 - [ ] 4.3 [P1][L] Handle the Rust complex release chain separately; acceptance: the Rust collector release chain is owned by GateProbes with an explicit, documented process.
 
 > **4.3 disposition recorded (2026-10-12):** the legacy six-asset RSA/Sigstore
