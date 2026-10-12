@@ -5,8 +5,10 @@ set -Eeuo pipefail
 umask 022
 
 REPO="musutrade/Harness-Gate"
+COLLECTOR_REPO="musutrade/GateProbes"
 BINARY_NAME="harness-gate"
 RELEASE_BASE_URL="https://github.com/${REPO}/releases/download"
+COLLECTOR_RELEASE_BASE_URL="https://github.com/${COLLECTOR_REPO}/releases/download"
 VERSION="${HARNESS_GATE_VERSION:-}"
 INSTALL_DIR="${INSTALL_DIR:-${HOME}/.local/bin}"
 OS=""
@@ -16,7 +18,7 @@ INSTALL_NAME="$BINARY_NAME"
 ATOMIC_TEMPORARY=""
 INSTALL_TEMPORARY_ROOT=""
 RELEASE_WORKFLOW="release.yml"
-RUST_VERSION="${HARNESS_GATE_RUST_VERSION:-0.1.0-rc.7}"
+RUST_VERSION="${HARNESS_GATE_RUST_VERSION:-0.1.0-rc.8}"
 RUST_INSTALL_DIR=""
 VERIFIER_CACHE_DIR="${HOME}/.cache/harness-gate/collector"
 STAGED_BINARY=""
@@ -33,9 +35,11 @@ The Core version is required unless --rust-only is selected. Every download is
 bound to an immutable release tag.
 The installer verifies SHA256 and the Sigstore keyless certificate before it
 changes the destination directory.
-The optional Rust collector is a standalone binary, versioned independently of
-Core. It defaults to 0.1.0-rc.7; --rust-version selects another exact version.
-Rust 1.97.1, matching LLVM tools and Python 3.12+ remain external dependencies.
+The optional Rust collector is a standalone binary published from the
+GateProbes repository and verified against that repository's release workflow
+identity. It defaults to 0.1.0-rc.8; --rust-version selects another exact
+version from the same repository. Rust 1.97.1, matching LLVM tools and
+Python 3.12+ remain external dependencies.
 --rust-root DIR installs only the collector executable in DIR/bin.
 --cache-dir DIR selects an existing checksum-pinned verifier cache.
 Legacy bundled-runtime --offline archives require their historical installer.
@@ -158,11 +162,14 @@ verify_signature() {
         || die "cosign is required for Sigstore verification (see https://docs.sigstore.dev/cosign/system_config/installation/)"
 
     # The release workflow's OIDC identity is bound to this exact immutable tag.
+    # Core releases verify the Harness-Gate workflow; the Rust collector verifies
+    # the explicitly provisioned GateProbes workflow (never a substituted URL).
+    local identity_repo="${SIGNATURE_REPO:-$REPO}"
     cosign verify-blob \
         --signature "$dist/${filename}.sig" \
         --certificate "$dist/${filename}.crt" \
         --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
-        --certificate-identity "https://github.com/${REPO}/.github/workflows/${RELEASE_WORKFLOW}@refs/tags/${VERSION}" \
+        --certificate-identity "https://github.com/${identity_repo}/.github/workflows/${RELEASE_WORKFLOW}@refs/tags/${VERSION}" \
         "$dist/$filename" \
         || die "Sigstore verification failed for $filename"
 }
@@ -197,6 +204,8 @@ prepare_rust() {
     local temporary="$1"
     local VERSION="rust-collector-v${RUST_VERSION}"
     local RELEASE_WORKFLOW="native-collector-release.yml"
+    local RELEASE_BASE_URL="$COLLECTOR_RELEASE_BASE_URL"
+    local SIGNATURE_REPO="$COLLECTOR_REPO"
     local BINARY_NAME="harness-gate-rust-collector"
     prepare_binary "$temporary"
     RUST_STAGED_BINARY="$STAGED_BINARY"

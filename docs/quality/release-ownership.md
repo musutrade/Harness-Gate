@@ -37,10 +37,11 @@ one inferred from a substituted download URL.
 The native Rust/MIR collector now publishes from GateProbes. Its prerelease
 `rust-collector-v0.1.0-rc.8` carries the Sigstore certificate identity
 `https://github.com/musutrade/GateProbes/.github/workflows/native-collector-release.yml@refs/tags/rust-collector-v0.1.0-rc.8`
-with matching provenance, re-verified independently. Core install and trust
-still pin the previous identity: switching the consuming side is a separate
-explicit step (5.6) and is never inferred from the new download URL. The other
-collector workflows and the protected production chain remain tasks 3.4/4.3.
+with matching provenance, re-verified independently. `install.sh` provisions
+that identity for the Rust collector (default `0.1.0-rc.8`) while Core binary
+installs keep the Harness-Gate `release.yml` identity; a new download URL still
+never changes a trusted identity by itself. The protected production chain
+keeps its separate RSA/Sigstore trust and remains tasks 4.3.
 
 ## Enforcement
 

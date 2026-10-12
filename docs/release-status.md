@@ -19,9 +19,18 @@ after the required `ci.yml` run on GateProbes main succeeded.
 - Independent local re-verification passed 10/10 `cosign verify-blob` against
   that certificate identity, 10/10 `gh attestation verify` against the signer
   workflow, the certificate SAN, `SHA256SUMS` and the exact inventory.
-- Core installation and trust are unchanged: they still pin the previous
-  identity and artifacts until the explicit switch (task 5.6). No Core gate,
-  threshold, baseline or consumption pin changed in this step.
+- `install.sh --rust-only` (and `--with-rust`) now download and verify this
+  release from the GateProbes identity above; the default collector version is
+  `0.1.0-rc.8`. Core binary installation keeps its Harness-Gate identity. No
+  Core gate, threshold, baseline or consumption pin changed in this step.
+- Real Linux x86_64 installation through the updated installer passed with the
+  pinned cosign 3.1.3 verifier (`Verified OK` for `SHA256SUMS` and the binary);
+  the installed digest
+  `da9b52b7097d5b824db44af80b82a7a9f03f0e9ed8c90801cf8ba2e65ab69744` matches the
+  signed `SHA256SUMS`, and the installed binary reports
+  `harness-gate-rust-collector 0.1.0-rc.8`. A `--rust-version 0.1.0-rc.7`
+  request fails closed on the GateProbes boundary instead of silently falling
+  back to the previous repository.
 
 ## Public Linux x86_64 acceptance, 2026-10-11
 

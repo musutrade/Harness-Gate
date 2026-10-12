@@ -56,7 +56,9 @@ printf 'signed-subject=%s\n' "$windows_binary_name" >"$FIXTURE/$windows_binary_n
 printf 'identity=https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v0.3.3\n' >"$FIXTURE/$windows_binary_name.crt"
 
 # Native fixture tags are intentionally independent of the Core fixture tag.
-for rust_version in 0.1.0-rc.4 0.1.0-rc.7; do
+# They are served from the GateProbes release repository and carry its workflow
+# identity; a Harness-Gate identity or URL must not be accepted for them.
+for rust_version in 0.1.0-rc.4 0.1.0-rc.8; do
     native_fixture="$FIXTURE/rust-collector-v$rust_version"
     mkdir -p "$native_fixture"
     : >"$native_fixture/SHA256SUMS"
@@ -67,7 +69,7 @@ for rust_version in 0.1.0-rc.4 0.1.0-rc.7; do
     done
     for asset in "$native_fixture/SHA256SUMS" "$native_fixture"/harness-gate-rust-collector-*; do
         printf 'signed-subject=%s\n' "${asset##*/}" >"$asset.sig"
-        printf 'identity=https://github.com/musutrade/Harness-Gate/.github/workflows/native-collector-release.yml@refs/tags/rust-collector-v%s\n' "$rust_version" >"$asset.crt"
+        printf 'identity=https://github.com/musutrade/GateProbes/.github/workflows/native-collector-release.yml@refs/tags/rust-collector-v%s\n' "$rust_version" >"$asset.crt"
     done
 done
 
@@ -82,15 +84,24 @@ for argument in "${expected[@]}"; do
 done
 output="$1"
 url="$2"
-expected_prefix="https://github.com/musutrade/Harness-Gate/releases/download/"
-[[ "$url" == "$expected_prefix"* && "$url" != *'?'* && "$url" != *'#'* ]] || exit 22
+[[ "$url" != *'?'* && "$url" != *'#'* ]] || exit 22
+case "$url" in
+    https://github.com/musutrade/Harness-Gate/releases/download/*)
+        prefix="https://github.com/musutrade/Harness-Gate/releases/download/" ;;
+    https://github.com/musutrade/GateProbes/releases/download/*)
+        prefix="https://github.com/musutrade/GateProbes/releases/download/" ;;
+    *) exit 22 ;;
+esac
 filename="${url##*/}"
 [[ "${HARNESS_GATE_TEST_DOWNLOAD_FAIL:-0}" != 1 ]] || exit 22
 [[ -n "$filename" && "$filename" != */* ]] || exit 22
-relative="${url#"$expected_prefix"}"
+relative="${url#"$prefix"}"
 case "$relative" in
-    v0.3.3/*) source_file="$HARNESS_GATE_TEST_FIXTURE/$filename" ;;
-    rust-collector-v0.1.0-rc.4/*|rust-collector-v0.1.0-rc.7/*)
+    v0.3.3/*)
+        [[ "$prefix" == 'https://github.com/musutrade/Harness-Gate/releases/download/' ]] || exit 22
+        source_file="$HARNESS_GATE_TEST_FIXTURE/$filename" ;;
+    rust-collector-v0.1.0-rc.4/*|rust-collector-v0.1.0-rc.8/*)
+        [[ "$prefix" == 'https://github.com/musutrade/GateProbes/releases/download/' ]] || exit 22
         source_file="$HARNESS_GATE_TEST_FIXTURE/$relative" ;;
     *) exit 22 ;;
 esac
@@ -122,7 +133,7 @@ while (($# > 0)); do
     esac
 done
 case "$subject" in
-    */rust/*) expected_identity="https://github.com/musutrade/Harness-Gate/.github/workflows/native-collector-release.yml@refs/tags/rust-collector-v${HARNESS_GATE_TEST_EXPECTED_RUST_VERSION:-0.1.0-rc.7}" ;;
+    */rust/*) expected_identity="https://github.com/musutrade/GateProbes/.github/workflows/native-collector-release.yml@refs/tags/rust-collector-v${HARNESS_GATE_TEST_EXPECTED_RUST_VERSION:-0.1.0-rc.8}" ;;
     *) expected_identity='https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/v0.3.3' ;;
 esac
 [[ "$issuer" == 'https://token.actions.githubusercontent.com' ]] || exit 1
@@ -475,7 +486,7 @@ for platform in linux macos-amd64 macos-arm64 windows; do
         windows) asset=windows-amd64.exe; executable=harness-gate-rust-collector.exe ;;
         *) asset="$platform"; executable=harness-gate-rust-collector ;;
     esac
-    cmp "$FIXTURE/rust-collector-v0.1.0-rc.7/harness-gate-rust-collector-$asset" "$destination/$executable"
+    cmp "$FIXTURE/rust-collector-v0.1.0-rc.8/harness-gate-rust-collector-$asset" "$destination/$executable"
     [[ "$(mode_of "$destination/$executable")" == 755 ]]
     [[ ! -e "$destination/harness-gate" && ! -e "$destination/harness-gate.exe" ]]
 done
@@ -495,12 +506,13 @@ cmp "$FIXTURE/rust-collector-v0.1.0-rc.4/harness-gate-rust-collector-linux-amd64
     "$TEMP_ROOT/native-older/harness-gate-rust-collector"
 [[ "$(wc -l <"$TEMP_ROOT/download.log")" -eq 6 ]]
 [[ "$(grep -c '/rust-collector-v0.1.0-rc.4/' "$TEMP_ROOT/download.log")" -eq 6 ]]
+[[ "$(grep -c '^https://github.com/musutrade/GateProbes/releases/download/rust-collector-v0.1.0-rc.4/' "$TEMP_ROOT/download.log")" -eq 6 ]]
 
 combined="$TEMP_ROOT/combined"
 : >"$TEMP_ROOT/cosign.log"
 run_installer "$combined" --with-rust >/dev/null
 assert_file_content "$combined/harness-gate"
-native_fixture="$FIXTURE/rust-collector-v0.1.0-rc.7"
+native_fixture="$FIXTURE/rust-collector-v0.1.0-rc.8"
 native_asset=harness-gate-rust-collector-linux-amd64
 cmp "$native_fixture/$native_asset" "$combined/harness-gate-rust-collector"
 [[ "$(wc -l <"$TEMP_ROOT/cosign.log")" -eq 4 ]]
@@ -530,8 +542,8 @@ for failure in tampered missing-signature wrong-workflow wrong-tag; do
     case "$failure" in
         tampered) printf 'corrupted\n' >"$native_fixture/$native_asset" ;;
         missing-signature) mv "$native_fixture/$native_asset.sig" "$TEMP_ROOT/missing-native-signature" ;;
-        wrong-workflow) printf 'identity=https://github.com/musutrade/Harness-Gate/.github/workflows/release.yml@refs/tags/rust-collector-v0.1.0-rc.7\n' >"$native_fixture/$native_asset.crt" ;;
-        wrong-tag) printf 'identity=https://github.com/musutrade/Harness-Gate/.github/workflows/native-collector-release.yml@refs/tags/rust-collector-v0.1.0-rc.4\n' >"$native_fixture/$native_asset.crt" ;;
+        wrong-workflow) printf 'identity=https://github.com/musutrade/GateProbes/.github/workflows/release.yml@refs/tags/rust-collector-v0.1.0-rc.8\n' >"$native_fixture/$native_asset.crt" ;;
+        wrong-tag) printf 'identity=https://github.com/musutrade/GateProbes/.github/workflows/native-collector-release.yml@refs/tags/rust-collector-v0.1.0-rc.4\n' >"$native_fixture/$native_asset.crt" ;;
     esac
     if run_installer "$rejected" --with-rust >/dev/null 2>&1; then
         printf 'unexpected native success: %s\n' "$failure" >&2
