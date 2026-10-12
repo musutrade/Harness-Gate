@@ -529,6 +529,31 @@ assert_file_content "$TEMP_ROOT/custom-core/harness-gate"
 cmp "$native_fixture/$native_asset" "$custom_root/bin/harness-gate-rust-collector"
 [[ ! -e "$TEMP_ROOT/custom-core/harness-gate-rust-collector" ]]
 
+# Exported lookalike variables must not change the expected signer identity or
+# the download repository: the expected identity is an explicit script-owned
+# constant, and the fake verifier/downloader reject any substitution.
+pollution_dir="$TEMP_ROOT/pollution"
+mkdir -m 700 "$pollution_dir"
+(
+    export SIGNATURE_REPO='evil/repo' SIGNER_REPO='evil/repo' \
+        COLLECTOR_REPO='evil/repo' REPO='evil/repo' \
+        RELEASE_BASE_URL='https://example.invalid/releases/download' \
+        RELEASE_WORKFLOW='evil.yml' COLLECTOR_RELEASE_BASE_URL='https://example.invalid/collector'
+    run_installer "$pollution_dir" --with-rust
+) >/dev/null
+assert_file_content "$pollution_dir/harness-gate"
+cmp "$FIXTURE/rust-collector-v0.1.0-rc.8/harness-gate-rust-collector-linux-amd64" \
+    "$pollution_dir/harness-gate-rust-collector"
+
+pollution_only="$TEMP_ROOT/pollution-only"
+mkdir -m 700 "$pollution_only"
+(
+    export SIGNATURE_REPO='evil/repo' SIGNER_REPO='evil/repo' COLLECTOR_REPO='evil/repo'
+    run_installer "$pollution_only" --rust-only
+) >/dev/null
+cmp "$FIXTURE/rust-collector-v0.1.0-rc.8/harness-gate-rust-collector-linux-amd64" \
+    "$pollution_only/harness-gate-rust-collector"
+
 # A missing/tampered native asset or a certificate from the wrong workflow/tag
 # must fail before replacing either previously installed executable.
 for failure in tampered missing-signature wrong-workflow wrong-tag; do
