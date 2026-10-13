@@ -27,9 +27,9 @@ records and 22 numeric metrics against the unchanged retained fixture.
 | `python3 -m unittest discover -s tools/quality/tests -p test_typescript_reference.py -v` | Exit 0; 11 tests passed |
 | `python3 -m unittest discover -s tools/quality/tests -p test_typescript_semantics.py -v` | Exit 0; 18 baseline tests passed |
 
-[validation.tar.gz](validation.tar.gz) retains logs, command/status records,
+[validation.tar.gz](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-131/validation.tar.gz) retains logs, command/status records,
 the docs report, replay request/project and normalized evidence.
-[index.json](index.json) pins the archive and relevant adapter/fixture digests.
+[index.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-131/index.json) pins the archive and relevant adapter/fixture digests.
 To replay, extract the archive, set the saved request's `workspace_root` to
 `tools/quality/fixtures/typescript-angular` as an absolute path and `output_root`
 to a new empty directory, then invoke the generic runner as documented in the

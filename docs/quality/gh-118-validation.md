@@ -22,9 +22,9 @@ job reuses the existing collection artifact and original event identities.
 The `quality-required` job and `ci_quality.py` are unchanged.
 
 Actual commands and outcomes are recorded in the
-[machine summary](gh-118/validation-summary.json). Complete logs, normalized
+[machine summary](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-118/validation-summary.json). Complete logs, normalized
 projections, policies and compatibility reports are retained in the
-[evidence archive](gh-118/local-evidence.tar.gz). Original candidates remain in
+[evidence archive](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-118/local-evidence.tar.gz). Original candidates remain in
 the linked GH-96/GH-97 archives; the archive avoids duplicating those raw files.
 
 | Command | Actual result |

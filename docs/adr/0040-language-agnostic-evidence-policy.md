@@ -147,7 +147,7 @@ task 7 and full-proposal acceptance remain outstanding.
 ## Final Python dispositions and consolidation closure (GH-152)
 
 PR #158 merged at `63a7f9538b13d4f8888eff6b35663cda40270e70` with successful
-required CI, completing tasks 6.1–6.3. The [final inventory](../quality/gh-152/python-boundary.json)
+required CI, completing tasks 6.1–6.3. The [final inventory](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-152/python-boundary.json)
 freezes all eight C-class modules as non-authoritative reference implementations.
 The two Python decision CLIs require explicit `--reference-only` use. Source-hash
 and import-boundary regressions prevent silent oracle drift and required-tool

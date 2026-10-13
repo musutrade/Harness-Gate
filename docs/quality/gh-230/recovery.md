@@ -23,7 +23,7 @@ The fresh operator driver and bootstrap overlay under
 `target/gh-230/operator-native-runtime/` were inventoried and assembled using
 `tools/quality/build_rust_collector.py`. Exact input identities, bootstrap record,
 native test log, command arrays and output are in the
-[recovery archive](recovery-evidence.tar.gz.parts/manifest.json). This resolves the original missing
+[recovery archive](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/recovery-evidence.tar.gz.parts/manifest.json). This resolves the original missing
 archive blocker. The archive was not downloaded again.
 
 ## Fresh native observations
@@ -86,7 +86,7 @@ To unblock that acceptance prerequisite, provision the original
 verification material. GitHub release metadata reports asset ID 542733258,
 8,716,944 bytes, SHA-256
 `7b148bd293acaff6a58fb15ac5e44929b5a2fe9232a5acc658d02883c3a79ff3`.
-The [release metadata](recovery-release-metadata.json) records asset digests and
+The [release metadata](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/recovery-release-metadata.json) records asset digests and
 URLs; metadata alone is not binary execution or signature verification.
 
 ## Local validation and remaining work
@@ -105,7 +105,7 @@ With workspace-local `CARGO_TARGET_DIR=$PWD/target/gh-230/cargo`,
   three skipped native classes. Those skips are not acceptance evidence; the
   five explicit native tests above ran separately with private-runtime inputs.
 - Documentation consistency, strict OpenSpec and whitespace results are recorded
-  in [recovery checks](recovery-checks.json), with their complete logs archived.
+  in [recovery checks](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/recovery-checks.json), with their complete logs archived.
 - `harness-gate config check` and `harness-gate verify --profile ci --all`:
   not applicable because `.harness-gate/flow.toml` is absent.
 

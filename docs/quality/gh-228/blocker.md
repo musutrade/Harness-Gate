@@ -109,7 +109,7 @@ after that prerequisite is available; supplying the archive alone does not finis
 P2/P3 or establish clean-host acceptance.
 
 Repository checks and exact command environments are retained in
-[validation.json](validation.json), [the validation runner](run-validation.py),
+[validation.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-228/validation.json), [the validation runner](run-validation.py),
 and [complete logs](archive.md). Successful repository checks cannot
 establish native positive measurement. No task completion,
 delivery PR, `.symphony-handoff.json`, release publication, GH-215 enablement,

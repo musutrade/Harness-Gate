@@ -23,14 +23,14 @@ hardens malformed input handling, with no change to successful execution.
 Their workflow blobs differ and are retained explicitly, not treated as the same
 source identity. PR head, tested merge HEAD_SHA, collection BASE_SHA, RUN_ID,
 workflow blob at both heads, run/attempt, job/step timestamps, labels, conclusions
-and source URLs are in [hosted-after-input.json](hosted-after-input.json).
-[Log excerpts and full-log SHA-256s](hosted-after-log-audit.json) retain effective
+and source URLs are in [hosted-after-input.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/hosted-after-input.json).
+[Log excerpts and full-log SHA-256s](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/hosted-after-log-audit.json) retain effective
 tool versions, collection identities, cache decisions, nested action timings,
 artifact digests and compressed upload sizes. Capture used GitHub's run,
 attempt-jobs, contents and job-logs APIs on 2026-09-09; no runs were dispatched.
 
 The GH-165 and GH-166 successful runs 34307555998 and 34309500125 are retained in
-[stage input](hosted-stage-input.json) and [stage normalization](hosted-stages.json)
+[stage input](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/hosted-stage-input.json) and [stage normalization](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/hosted-stages.json)
 for rollback diagnosis only. Their 737/666-second critical paths are excluded
 from the primary after cohort; selecting them would overstate the latency gain.
 Two latest runs are a small sample with changing commits, hosted contention and
@@ -54,7 +54,7 @@ setup/cleanup; adding them to job totals would double count.
 
 ## Comparison
 
-All figures below come from [the generated comparison](hosted-comparison.json).
+All figures below come from [the generated comparison](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/hosted-comparison.json).
 Seconds summed across concurrent steps are work, not elapsed PR latency.
 | Measure | Before median (range) | After median (range) |
 | --- | --- | --- |
@@ -149,7 +149,7 @@ controller will run Required Quality Aggregate for the submitted SHA.
 
 ## Semantic parity review (task 6.3)
 
-The [source comparison](semantic-parity-source.json) binds the latest baseline
+The [source comparison](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/semantic-parity-source.json) binds the latest baseline
 PR head and GH-168 PR head, lists changed files, retains reviewed boundary
 patches and records identical blob IDs for policy, measurement, Rust product/
 quality-core and schema sources. The comparison has 39 changed files and is
@@ -166,7 +166,7 @@ and local negative tests, not a claim that green CI alone proves all semantics.
 | Authority and release | Existing Rust risk/generic/release decisions remain authoritative under ADR-0039/0040. Generic Shadow remains advisory and cannot recollect/reseal. Release workflow changes only pinned audit installation; lockfile scope and deny-warnings remain. The Linux Build upload is informational and creates no publishing authority. |
 | Docs rollback | All four init/check preset pairs, v1 migration/check/secrets, exported schema bytes, machine/manifest/registry schemas, links, bilingual docs, policy anchors and bounded sandbox wording remain checked. Each CLI operation still fails closed. |
 
-See [local validation](after-validation.json) for exact results and environment
+See [local validation](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/after-validation.json) for exact results and environment
 limitations. Governing records remain [Engineering Policy](../../engineering-policy.md),
 [ADR-0039](../../adr/0039-required-risk-and-traceability-gates.md) and
 [ADR-0040](../../adr/0040-language-agnostic-evidence-policy.md). No policy delta

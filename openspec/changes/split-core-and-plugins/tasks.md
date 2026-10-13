@@ -266,3 +266,10 @@ remaining plugins, and the release/signing identity switch last.
 > Core test snapshots and the actual consumers that prevent broader deletion.
 > No historical evidence, measurement series, required Core check or paused
 > bundled release authority changes. Repository naming remains 6.4.
+
+> **Migration resumed by user decision (2026-10-13):** after in-place cleanup,
+> clone still includes large historical data. The user approved externalizing
+> pinned regression data and exporting a lean source snapshot to GateHouse.
+> This supersedes the earlier deferral of 6.4; 4.1/6.4 remain pending until
+> migration, baseline continuity, protection and installation acceptance pass.
+> See `externalize-repository-data` for the implementation and evidence.

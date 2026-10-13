@@ -27,7 +27,7 @@ Each raw log shows Cobertura XML generation and an upload attempt. The non-block
 
 ### Recent natural-main diagnostics and platform observations
 
-The existing API snapshots, artifacts, cache manifests and QPB logs are indexed in [the structured record](issue291-natural-main-20261008.json) and retained under `/mnt/dev-ssd/dev-tmp/gh291-3before-3after/`; the four Code Coverage raw logs remain under `/mnt/dev-ssd/dev-tmp/gh291-natural-main-analysis-20261008/push-coverage-logs/`, with exact paths and hashes in the structured record. All 18 QPB image versions were parsed from the exact `##[group]Runner Image` through `##[endgroup]` block, never `Runner Image Provisioner`; original log SHA values remain unchanged.
+The existing API snapshots, artifacts, cache manifests and QPB logs are indexed in [the structured record](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/issue291-natural-main-20261008.json) and retained under `/mnt/dev-ssd/dev-tmp/gh291-3before-3after/`; the four Code Coverage raw logs remain under `/mnt/dev-ssd/dev-tmp/gh291-natural-main-analysis-20261008/push-coverage-logs/`, with exact paths and hashes in the structured record. All 18 QPB image versions were parsed from the exact `##[group]Runner Image` through `##[endgroup]` block, never `Runner Image Provisioner`; original log SHA values remain unchanged.
 
 | Platform | Diagnostic recent before: cold / five-warm / release-small build | Current successful after: cold / five-warm / release-small build | Records |
 |---|---:|---:|---|

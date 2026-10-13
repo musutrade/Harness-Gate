@@ -39,7 +39,7 @@ are retained alongside the final logs.
 
 Production coverage passes: **13,219 / 14,887 lines (88.796%)**, with every
 blocking boundary passing its unchanged threshold. The instrumented nextest run
-also passed all 360 tests. The [coverage summary](coverage-summary.json) retains
+also passed all 360 tests. The [coverage summary](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-183/coverage-summary.json) retains
 aggregate and boundary results. Its source inventory includes the new verify
 composition source; source-risk selection advances to
 `gh183-quality-verification/1` for both base and head without threshold changes.

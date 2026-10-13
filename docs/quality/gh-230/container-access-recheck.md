@@ -17,7 +17,7 @@ The original read-only `.git` remains unchanged.
 The staged official Core SHA-256 matches
 `8e3df8303ca8f650d4ef768b29cfefb60ca115122a47b116245cc19e4649bbdd`.
 The early wrapper probe, with exact command, timestamp, stdout, stderr and exit
-status retained in [the original probe record](container-access-recheck.json),
+status retained in [the original probe record](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/container-access-recheck.json),
 exited 1 before starting a container:
 
 ```text
@@ -38,7 +38,7 @@ is declared for unfinished work. The existing source changes are preserved for
 continuation once access is provisioned.
 
 Fresh documentation consistency and strict change-scoped OpenSpec validation
-both exited 0; [exact commands and output](container-access-recheck-validation.json)
+both exited 0; [exact commands and output](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/container-access-recheck-validation.json)
 are retained. The Rust/Python implementation suites were not repeated for this
 documentation-only recheck. Project-local `harness-gate config check` and
 `harness-gate verify --profile ci --all` remain not applicable because this

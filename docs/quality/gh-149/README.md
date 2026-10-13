@@ -40,8 +40,8 @@ corpus contains 826 comparisons, including 133 complete reports, with zero
 unexplained mismatches. Formatting, Clippy, documentation consistency and strict
 OpenSpec validation passed.
 
-Actual command results and complete logs are retained in [validation.json](validation.json)
-and [validation.tar.gz](validation.tar.gz). The only normalized diagnostic
+Actual command results and complete logs are retained in [validation.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-149/validation.json)
+and [validation.tar.gz](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-149/validation.tar.gz). The only normalized diagnostic
 variation is the previously classified Rust/Python missing-file wording: the
 same source/artifact path and missing-file failure must be present. No semantic
 fields are dropped. Cargo uses workspace-local cache/build directories because

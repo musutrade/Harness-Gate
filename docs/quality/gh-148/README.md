@@ -41,8 +41,8 @@ replay commands, CI integration and authority transfer remain tasks 4–7 under
 [ADR-0040](../../adr/0040-language-agnostic-evidence-policy.md). Existing required
 workflow definitions and the CLI measurement/coverage boundary are unchanged.
 
-Actual local results and complete logs are retained in [validation.json](validation.json)
-and [validation.tar.gz](validation.tar.gz). Cargo uses workspace-local
+Actual local results and complete logs are retained in [validation.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-148/validation.json)
+and [validation.tar.gz](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-148/validation.tar.gz). Cargo uses workspace-local
 `target/gh-148/cargo-home` and `target/gh-148/build` because the shared Cargo cache
 and target directory are read-only in this environment. Python is needed for
 the differential tests only. This is bounded compatibility evidence for the

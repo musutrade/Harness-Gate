@@ -34,7 +34,7 @@ less than one second locally and use no native compiler.
 ## Commands and results
 
 Commands ran from the assigned workspace. Full local outputs are retained in
-`target/gh-227/`; complete compressed copies are retained in [validation-logs.tar.gz](validation-logs.tar.gz).
+`target/gh-227/`; complete compressed copies are retained in [validation-logs.tar.gz](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-227/validation-logs.tar.gz).
 Archive members use the log names below; original failures are included.
 CI and controller acceptance are pending for this implementation PR.
 

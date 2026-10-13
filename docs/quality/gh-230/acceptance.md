@@ -41,7 +41,7 @@ The generic request signer is separately provisioned by the test host.
 
 ## Frozen fixture combination
 
-The exact [fixture manifest](fixture-manifest.json) and [matrix](fixture-matrix.json)
+The exact [fixture manifest](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/fixture-manifest.json) and [matrix](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/fixture-matrix.json)
 freeze the locally successful candidate tuple, including all payload/tool hashes,
 protocols, configuration, projection/classifier identities, series and license
 inventory. The matrix's receipt kind describes the native/Core evidence submitted
@@ -98,7 +98,7 @@ capture-path or measurement-series equivalence. An absent native owner is reject
 only after the full native re-export, proving the native owner check is exercised.
 
 Independent successful `execve` counts are retained in
-[producer-counts.json](producer-counts.json), including every argv and separate failed
+[producer-counts.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/producer-counts.json), including every argv and separate failed
 PATH lookup. Version probes are distinct from sampling; failed linker PATH probes
 are not fallback collectors. Counts below are complete phase totals.
 
@@ -115,7 +115,7 @@ are not fallback collectors. Counts below are complete phase totals.
 
 ## Cost and durable evidence
 
-[Setup measurements](setup-cost-measured.json) record the real package SHA
+[Setup measurements](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/setup-cost-measured.json) record the real package SHA
 `24ba89a7bdf43cc84237221461ef8df1875a0ae19e4530c05a1d97c27adabdc2`, size
 1,623,490,560 bytes; all release assets total 1,624,188,998 bytes. Inventory/build
 assembly took 25.12/20.15 seconds. A fresh install directory took 38.4017 seconds,
@@ -136,11 +136,11 @@ Phase command wall time includes wrapper/observer overhead; installed generic
 collect was 27.17 seconds and evaluation including baseline re-export 9.08 seconds.
 These are observations, not performance guarantees.
 
-[clean-host-evidence.tar.gz](clean-host-evidence.tar.gz.parts/manifest.json) retains original native
+[clean-host-evidence.tar.gz](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/clean-host-evidence.tar.gz.parts/manifest.json) retains original native
 executables, profiles, inventories, source, anchors, seals, exports and replay
 outputs; generic requests/decisions; raw traces; package metadata, public test trust,
 license inventory, commands, failures and source snapshots. Its
-[archive receipt](clean-host-archive.json) and [per-file inventory](clean-host-inventory.json)
+[archive receipt](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/clean-host-archive.json) and [per-file inventory](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/clean-host-inventory.json)
 verify all 812 retained files after compression. The 1.62 GB package and duplicate
 relocated runtime stay workspace-local; exact inventories and hashes are retained.
 Disposable private signers, operator secrets and Python bytecode are excluded.

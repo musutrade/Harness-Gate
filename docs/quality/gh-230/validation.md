@@ -11,12 +11,12 @@ Commands ran from the assigned checkout with `CARGO_TARGET_DIR=$PWD/target/gh-23
 `TMPDIR=$PWD/target/gh-230/tmp` and
 `GIT_CEILING_DIRECTORIES=$PWD/target/gh-230/tmp`, except the initial documentation
 command noted below. Exact command arrays and process
-exit codes are in [checks.json](checks.json).
+exit codes are in [checks.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/checks.json).
 
 - `cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked`:
   exit 100; 354 passed, one loopback webhook failed with `io: Connection refused`,
   and 37 tests were not run after failure. No complete-suite pass is claimed.
-- The [targeted loopback rerun](loopback.json), with proxy environment variables
+- The [targeted loopback rerun](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/loopback.json), with proxy environment variables
   removed for the local listener, exited 0: one passed, 391 filtered out.
 - `cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check`: exit 0.
 - `cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings`:
@@ -33,8 +33,8 @@ exit codes are in [checks.json](checks.json).
 - `python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json`:
   initial exit 1 without the explicit workspace environment above, with CLI
   example/migration/schema failures and no link failures. The original report
-  is [retained](docs-consistency-initial.json). Rerun with the explicit environment:
-  exit 0, [all checks passed](docs-consistency-final.json).
+  is [retained](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/docs-consistency-initial.json). Rerun with the explicit environment:
+  exit 0, [all checks passed](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/docs-consistency-final.json).
 - `OPENSPEC_TELEMETRY=0 openspec validate package-official-rust-collector-for-independent-delivery --strict --no-interactive`:
   exit 0, CLI 1.10.0, change valid.
 - `harness-gate config check` and `harness-gate verify --profile ci --all`:

@@ -42,10 +42,10 @@ remain applicable because no Rust source or Cargo inputs changed. Project-local
 `config check` and `verify --profile ci --all` remain not applicable: the checkout
 has no `.harness-gate/flow.toml`. Required hosted CI remains pending.
 
-[Exact check results](invocation-error-checks.json),
+[Exact check results](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/invocation-error-checks.json),
 [original logs and changed sources](archive.md),
-[file inventory](invocation-error-inventory.json) and
-[archive receipt](invocation-error-archive.json) retain this follow-up separately
+[file inventory](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/invocation-error-inventory.json) and
+[archive receipt](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/invocation-error-archive.json) retain this follow-up separately
 from previous evidence. Strict OpenSpec, documentation consistency and whitespace
 validation results are included in the check results.
 

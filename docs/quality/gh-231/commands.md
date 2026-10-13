@@ -5,9 +5,9 @@
 
 Run from the assigned checkout at source base
 `48099c48f1fded35af5d71638bf57160cb8e0b31` plus this PR's preparation changes.
-The checked-in [evidence index](evidence/index.json) records log hashes and sizes;
+The checked-in [evidence index](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-231/evidence/index.json) records log hashes and sizes;
 copies of the original logs are retained there and under `target/gh-231/evidence/`.
-The [source digest receipt](source-digests.json) identifies
+The [source digest receipt](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-231/source-digests.json) identifies
 the code tested. Historical failures are not converted into successful checks.
 
 ## Required local checks
@@ -149,7 +149,7 @@ production run; actionlint was unavailable.
 
 The old remote issue branch's only changed file is the historical validation
 receipt, already present byte-for-byte on the reviewed main baseline. The
-[branch reconciliation receipt](evidence/branch-reconciliation.json) records the
+[branch reconciliation receipt](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-231/evidence/branch-reconciliation.json) records the
 comparison. Because local Git metadata is read-only, the GitHub Git Data API
 submits a tree based on the reviewed main with both main and the old issue head
 as parents, preserving history and permitting a non-force branch update.

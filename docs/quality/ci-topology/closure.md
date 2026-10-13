@@ -15,7 +15,7 @@ The final GH-169 [PR #176](https://github.com/musutrade/Harness-Gate/pull/176)
 head `855b310caa58d6361a984609a36e531c95a0bbf8` was merged as
 `7777511ec62c609aa664789a05d6dc376df30aa7`, this issue's prepared baseline.
 Its [CI run 34315031483, attempt 1](https://github.com/musutrade/Harness-Gate/actions/runs/34315031483)
-completed successfully. [Retained API evidence](closure-hosted.json) binds PR,
+completed successfully. [Retained API evidence](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/closure-hosted.json) binds PR,
 head/merge identities, run/attempt and all 18 jobs with steps and conclusions.
 This was a read-only capture of the completed dependency run; no CI was dispatched.
 
@@ -28,8 +28,8 @@ and Quality Performance Baseline were skipped under the existing PR exemption.
 This is PR assurance evidence, not execution evidence for those push-only jobs.
 
 The [task 6 comparison and parity review](after-state.md),
-[comparison data](hosted-comparison.json) and
-[source boundary review](semantic-parity-source.json) retain the before/after
+[comparison data](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/hosted-comparison.json) and
+[source boundary review](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/semantic-parity-source.json) retain the before/after
 cohort and assurance analysis. Run 34315031483 validates the code **after** the
 individual rollbacks; it is not inserted into the earlier performance cohort
 or used to extrapolate a new speedup.
@@ -51,7 +51,7 @@ remove native platforms or bypass artifact verification to retain an optimizatio
 
 ## Validation and final acceptance boundary
 
-[Exact local commands, results and log hashes](closure-validation.json) record
+[Exact local commands, results and log hashes](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/closure-validation.json) record
 the required nextest, format, Clippy, Python tests, docs consistency and strict
 OpenSpec checks. Complete local logs are in `target/quality/gh170/`; the committed
 record retains outcomes and hashes beyond ephemeral workspace logs.

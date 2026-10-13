@@ -13,15 +13,15 @@ The measured implementation is `381d5f418655969d29b81f89069845e6667f35c9`
 Submitted-PR checks must identify their own tested SHA; these results are not
 relabeled as measurements of a later documentation commit.
 
-[Environment](gh-97/environment.json): Linux x86_64, target
+[Environment](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-97/environment.json): Linux x86_64, target
 `x86_64-unknown-linux-gnu`, rustc 1.97.1 (`8bab26f4f`, LLVM 22.1.6),
 Cargo 1.97.1 (`c980f4866`), nextest 0.9.143 (`60fa45f63`),
 cargo-llvm-cov 0.9.0, Python 3.14.4, OpenSpec 1.10.0 and Node 24.18.0.
 The machine-readable record retains full version output and UTC timestamps.
 
-[Command ledger](gh-97/commands.json) records exact commands, exits, elapsed times
+[Command ledger](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-97/commands.json) records exact commands, exits, elapsed times
 and logs, including failed attempts. Complete logs are in
-[local evidence](gh-97/local-evidence.tar.gz).
+[local evidence](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-97/local-evidence.tar.gz).
 
 | Command | Actual result |
 | --- | --- |
@@ -55,7 +55,7 @@ required stages and missing critical-path evidence, and stale identity/raw-file,
 missing artifact, symbol, coverage and observable failures. The CLI negatives
 assert nonzero exits. Contracts also check expected failure exits (1 or 2) against
 actual exits, rather than requiring every scenario to exit zero. Individual
-results are retained in the logs and [contract report](gh-97/contracts.json).
+results are retained in the logs and [contract report](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-97/contracts.json).
 
 ## Extension gates and raw evidence
 
@@ -80,8 +80,8 @@ independently archived and measured. This checks final reproducibility; the
 [GH-94 comparison](gh-94-validation.md) remains the before/after refactoring
 evidence. It does not accept a baseline or establish absence of historical debt.
 
-See [candidate manifest](gh-97/candidate.json),
-[raw candidate archive](gh-97/candidate.tar.gz) and
+See [candidate manifest](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-97/candidate.json),
+[raw candidate archive](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-97/candidate.tar.gz) and
 [archive hashes](gh-97/SHA256SUMS). The archive retains the manifest and every
 hashed artifact, including source snapshots, raw LLVM/LCOV/Cobertura, function
 risk counters, isolated path runs and command logs. Build caches are excluded.
@@ -106,14 +106,14 @@ and nonselected historical debt retain the existing policy treatment.
 
 ## Hosted evidence and platform applicability
 
-[GitHub evidence](gh-97/github-evidence.json) records all implementation issues
+[GitHub evidence](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-97/github-evidence.json) records all implementation issues
 #88–#96 as closed/completed when retrieved. GH-96
 [PR #107](https://github.com/musutrade/Harness-Gate/pull/107) merged;
 its [PR CI run](https://github.com/musutrade/Harness-Gate/actions/runs/34112797811)
 passed all required PR jobs. Its candidate measured the PR merge SHA
 `ba99094fd6da0f9efe2429412a414ac9506b8485`, not the PR branch head
 `d5efbb17c6a8f8005ea26317d2d455a6a773e3c5` or the squash commit.
-The [hosted manifest](gh-97/gh96-hosted-candidate.json) records all four stages
+The [hosted manifest](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-97/gh96-hosted-candidate.json) records all four stages
 successful and 137 hashed artifacts, on Linux with Rust/Cargo 1.98.1 and
 Python 3.14.7. Push-only platform jobs were skipped by PR policy; PR aggregate
 success does not certify those jobs.
@@ -124,13 +124,13 @@ Each platform's CLI contracts passed 20/20 scenarios:
 
 | Evidence | Target | Command |
 | --- | --- | --- |
-| [Linux](gh-97/linux-historical-contracts.json) | `x86_64-unknown-linux-gnu` | `python tools/quality/contracts.py --output target/quality/contracts.json` |
-| [macOS](gh-97/macos-historical-contracts.json) | `aarch64-apple-darwin` | Same command with `--structured` |
-| [Windows](gh-97/windows-historical-contracts.json) | `x86_64-pc-windows-msvc` | Same command with `--structured` |
+| [Linux](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-97/linux-historical-contracts.json) | `x86_64-unknown-linux-gnu` | `python tools/quality/contracts.py --output target/quality/contracts.json` |
+| [macOS](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-97/macos-historical-contracts.json) | `aarch64-apple-darwin` | Same command with `--structured` |
+| [Windows](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-97/windows-historical-contracts.json) | `x86_64-pc-windows-msvc` | Same command with `--structured` |
 
 All three reports record rustc 1.98.1 (`48a229cea`), Cargo 1.98.1 (`797e8a9bc`)
 and Python 3.14.7, with exact OS and timestamps. Original downloaded artifact
-IDs and SHA-256 hashes are in [download provenance](gh-97/downloaded-artifacts.json).
+IDs and SHA-256 hashes are in [download provenance](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-97/downloaded-artifacts.json).
 
 That push run **failed overall**. macOS nextest failed
 `extracted_cli_handlers_preserve_text_json_and_hook_snapshot_contracts` with

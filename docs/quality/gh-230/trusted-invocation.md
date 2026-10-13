@@ -63,7 +63,7 @@ authenticated generic collection, actual Core capability/producer behavior,
 clean-host native acceptance and cost measurements remain outstanding. All P6/P7
 checkboxes remain unchecked. No release, baseline or Arc-Admin action was taken.
 
-[Exact commands and results](trusted-invocation-checks.json),
-[retained diagnostic bytes](trusted-invocation-evidence.tar.gz.parts/manifest.json),
-[file inventory](trusted-invocation-inventory.json) and
-[archive receipt](trusted-invocation-archive.json) describe this follow-up.
+[Exact commands and results](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/trusted-invocation-checks.json),
+[retained diagnostic bytes](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/trusted-invocation-evidence.tar.gz.parts/manifest.json),
+[file inventory](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/trusted-invocation-inventory.json) and
+[archive receipt](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/trusted-invocation-archive.json) describe this follow-up.

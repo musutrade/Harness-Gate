@@ -91,14 +91,14 @@ Existing push-only jobs are skipped by their event rules; this change adds no
 conditional platform policy. This is prerequisite evidence, not GH-187 CI success.
 
 The downloaded `workflow-acceptance-34419625673-1` artifact is retained as a
-[compressed receipt](hosted-prerequisite-receipt.json.gz) and
-[validated summary](hosted-prerequisite-summary.json), with its receipt hash and
+[compressed receipt](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-187/hosted-prerequisite-receipt.json.gz) and
+[validated summary](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-187/hosted-prerequisite-summary.json), with its receipt hash and
 original GitHub artifact digest.
 The validator rechecks exact identity, all 12 cases, embedded file hashes,
 direct/verify equality, retained inventories, launch counts and all 40 negatives.
-[Raw run/jobs and collection-log identity](hosted-prerequisite-input.json),
-[artifact metadata](hosted-prerequisite-artifacts.json) and
-[normalized timing](hosted-prerequisite-timing.json) preserve the audit trail.
+[Raw run/jobs and collection-log identity](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-187/hosted-prerequisite-input.json),
+[artifact metadata](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-187/hosted-prerequisite-artifacts.json) and
+[normalized timing](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-187/hosted-prerequisite-timing.json) preserve the audit trail.
 
 Using the existing `ci_timing.py` model and the accepted
 [after cohort](../ci-topology/after-state.md):
@@ -125,15 +125,15 @@ unweighted runner occupancy, not billing. No new hosted run was dispatched or po
 ## Local checks and retained evidence
 
 The focused shared acceptance test passed before the CLI help edits. The final
-full Rust run passes all 379 tests; its [compressed receipt](local-receipt.json.gz)
-and [validated summary](local-summary.json) retain the 12 cases and 40 negatives.
+full Rust run passes all 379 tests; its [compressed receipt](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-187/local-receipt.json.gz)
+and [validated summary](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-187/local-summary.json) retain the 12 cases and 40 negatives.
 Cargo commands use `CARGO_TARGET_DIR=$PWD/target` because the default
 `/home/gem/cargo-target` is outside this workspace's write permission. The final
 nextest run retains a fresh receipt with empty hosted identity fields, clearly
 distinguished from the downloaded hosted receipt.
 
-The [command manifest](validation.json) records exact commands, exit codes,
-environment, durations and SHA-256 hashes; [retained logs](validation-logs.tar.gz)
+The [command manifest](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-187/validation.json) records exact commands, exit codes,
+environment, durations and SHA-256 hashes; [retained logs](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-187/validation-logs.tar.gz)
 include complete output, help captures, check runners and the docs/contract reports.
 
 | Final local check | Result |

@@ -60,7 +60,7 @@ file was written; the completed file and five documentation tests passed.
 The final full-suite result above supersedes these intermediate attempts.
 
 Production coverage passes every blocking boundary at the unchanged threshold;
-the [coverage summary](coverage-summary.json) retains exact aggregate and boundary
+the [coverage summary](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-184/coverage-summary.json) retains exact aggregate and boundary
 counts. The independent instrumented run passed all 373 tests. Commands below
 all passed, with `CARGO_TARGET_DIR=$PWD/target/gh184-coverage-final`,
 `CARGO_INCREMENTAL=0`, `CARGO_PROFILE_DEV_DEBUG=0` and
@@ -85,7 +85,7 @@ The source-inventory declaration hash was refreshed after the AST tool confirmed
 file was excluded, no measurement selection changed, and no threshold changed.
 AST complexity checks drove extraction of request preparation and retained
 validation; all measured functions in changed production modules are at most 23.
-The [AST summary](complexity-summary.json) retains symbol counts and maxima.
+The [AST summary](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-184/complexity-summary.json) retains symbol counts and maxima.
 
 `harness-gate config check` and `harness-gate verify --profile ci --all` are
 **not applicable**, not passed: this checkout has no `.harness-gate/flow.toml`

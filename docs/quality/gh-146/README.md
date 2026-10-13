@@ -14,8 +14,8 @@ workflow, required-check name/dependency, branch protection or runtime evaluator
 changes in this issue. Generic Rust implementation, differential acceptance and
 authority transfer remain unchecked tasks.
 
-Local evidence is recorded in [validation.json](validation.json) and
-[validation.tar.gz](validation.tar.gz). It includes pre-change Python behavior,
+Local evidence is recorded in [validation.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-146/validation.json) and
+[validation.tar.gz](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-146/validation.tar.gz). It includes pre-change Python behavior,
 final required local checks, oracle replay, strict OpenSpec validation and an
 unchanged-authority comparison. Cargo uses workspace-local `target/build`.
 This checkout has no `.harness-gate/flow.toml` declaring a `ci` profile; config

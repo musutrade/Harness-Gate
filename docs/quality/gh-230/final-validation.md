@@ -43,7 +43,7 @@ was accessed or changed.
 
 The [validation archive](archive.md) contains exact environment,
 command/exit records and full original/corrected logs, with an
-[archive receipt](final-validation-archive.json). Genuine failures are retained:
+[archive receipt](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/final-validation-archive.json). Genuine failures are retained:
 
 - Initial nextest: 38 passed, 1 failed, 353 not run. A temporary directory nested
   in this checkout discovered its enclosing Git repository in `scope_without_git`.

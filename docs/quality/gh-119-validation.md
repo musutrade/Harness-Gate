@@ -3,7 +3,7 @@
 Scope: task 10.5 and final closure documentation only. Starting commit:
 `ee1a5ab50ef2e1a77636e8a554326bd7d43dbc85` on `symphony/GH-119`.
 The [closure ledger](architecture-closure.md) and
-[API evidence](gh-119/predecessor-acceptance.json) establish accepted tasks
+[API evidence](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-119/predecessor-acceptance.json) establish accepted tasks
 0.3–10.4, including the merged/closed GH-118 dependency.
 
 Before edits, `openspec validate language-agnostic-evidence-policy-architecture
@@ -18,7 +18,7 @@ belongs to the follow-up. No runtime or workflow behavior changed.
 Cargo builds and the documentation checker use
 `CARGO_TARGET_DIR=$PWD/target/gh-119-cargo` to keep build output in this workspace.
 Full command logs are retained under `target/quality/gh-119/`; the committed
-[validation summary](gh-119/validation-summary.json) retains results and log hashes.
+[validation summary](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-119/validation-summary.json) retains results and log hashes.
 
 | Command | Result |
 | --- | --- |

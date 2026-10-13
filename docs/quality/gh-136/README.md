@@ -13,7 +13,7 @@ GitHub records checked on 2026-09-08 confirm all seven predecessor issues closed
 all implementation PRs merged, and each submitted head's Required Quality
 Aggregate successful. Task 4.2's formerly pending hosted condition is satisfied
 by PR #143. Its merge `67b0927f66be7768458ae4f1a433194925345e44` is this
-workspace's starting revision. The [retained API snapshot](predecessors.json)
+workspace's starting revision. The [retained API snapshot](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-136/predecessors.json)
 records full head/merge SHAs, completion times, individual check conclusions and
 changed-file inventories. Skipped event-specific jobs remain recorded as skipped;
 no skipped job is counted as passed. Historical milestone records saying
@@ -72,7 +72,7 @@ have its own reviewed OpenSpec delta plus Rust regression and real frontend
 validation before adoption; it cannot be accepted through this adapter's scope.
 [ADR-0040](../../adr/0040-language-agnostic-evidence-policy.md) continues to govern.
 
-The [authority comparison](authority.json) verifies the required CI workflow,
+The [authority comparison](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-136/authority.json) verifies the required CI workflow,
 release workflow, aggregate evaluator and frozen toolchain against the retained
 GH-135 hashes. Required Quality Aggregate's identity, event-specific dependencies,
 Rust defaults and required release authority stay unchanged. Migration requires
@@ -82,8 +82,8 @@ preserving raw evidence, accepted baselines and debt.
 
 ## Validation and closure condition
 
-[Validation results](validation.json), [replay summary](summary.json) and
-[artifact digests](index.json) retain the final local commands and outcomes.
+[Validation results](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-136/validation.json), [replay summary](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-136/summary.json) and
+[artifact digests](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-136/index.json) retain the final local commands and outcomes.
 Complete command logs and the replay artifact inventory are in `validation.tar.gz`.
 Cargo and Cargo subprocesses use `CARGO_TARGET_DIR=$PWD/target`, inside this
 workspace. The replay checkout identifies the starting revision plus this

@@ -8,7 +8,7 @@ GH-227 was accepted and merged through PR #233 at
 The operator supplied the pinned compiler-private archive after the
 [original dependency failure](blocker.md). Its verified SHA-256 is
 `0109304e1995cce9e3362208f5d4ec0944e52a2ddfbc0a85d4ce5bea5d3081ab`.
-[operator-bootstrap.json](operator-bootstrap.json) retains the successful build
+[operator-bootstrap.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-228/operator-bootstrap.json) retains the successful build
 command, compiler identity, workspace-local overlay and exit code. The original
 download/build failures and operator tests remain retained; recovery did not
 change the global Rust toolchain.
@@ -53,7 +53,7 @@ No accepted CRAP, coverage, debt, lineage, requiredness or capability rule chang
 
 ## Inputs, imports and license inventory
 
-[runtime-inputs.json](runtime-inputs.json) records 842 payload files, original
+[runtime-inputs.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-228/runtime-inputs.json) records 842 payload files, original
 input paths and SHA-256 values, payload modes, 21 checksum-verified original
 Cargo crate archives and their declared licenses/notice members, compiler commit,
 Python version, operating-system package versions, extension imports and recursive
@@ -63,11 +63,11 @@ Assembly validates every source byte before creating the destination and refuses
 to overwrite an existing destination or input lock. The runtime inventory excludes
 source paths; it is not the future signed delivery manifest.
 
-[import-inventory.json](import-inventory.json) covers all selected local modules
+[import-inventory.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-228/import-inventory.json) covers all selected local modules
 and conditional imports. Only observed Python extension modules are included;
 interactive, site/user, database and optional network Python facilities are outside
 this runtime's command scope. All selected imports and native paths run in tests.
-[frozen-helpers.json](frozen-helpers.json) verifies the four frozen C-module hashes.
+[frozen-helpers.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-228/frozen-helpers.json) verifies the four frozen C-module hashes.
 Their mixed-module validation helpers keep the roles in
 [python-retention.md](../python-retention.md); their generic policy functions are
 never an authoritative product execution path. `rust_native_policy` is inventoried
@@ -105,7 +105,7 @@ Native tests run from retained fixture directories with only bundle `bin` on PAT
 an empty workspace-local Cargo home, offline dependency resolution and no ambient
 Python module path. Project dependencies are separate caller inputs: the Cargo
 fixture's original locked Tokio and pin-project-lite archives were staged and
-vendored locally; [project-inputs.json](project-inputs.json) records them. No
+vendored locally; [project-inputs.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-228/project-inputs.json) records them. No
 general C/C++ build-script toolchain or arbitrary project dependency cache is
 promised. Unsupported external commands must fail rather than discover host tools.
 
@@ -127,7 +127,7 @@ python3 tools/quality/build_rust_collector.py --lock target/gh-228/runtime-input
 python3 tools/quality/build_rust_collector.py --lock target/gh-228/runtime-inputs-v6.json --output target/gh-228/bundle-v6-two
 ```
 
-All three exited 0. [build-comparison.json](build-comparison.json) records two
+All three exited 0. [build-comparison.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-228/build-comparison.json) records two
 996,761,600-byte tar files with identical SHA-256:
 `357ad48de6f2387363a00bfcf1d1bed81518cc84ed1a763bdbe146d828ff4548`.
 Assembly normalizes ordering, timestamps, owner/group and directory/file modes.
@@ -143,11 +143,11 @@ these differences are retained, never normalized into measurement equivalence.
 
 See [validation.md](validation.md) for actual checks and genuine failures.
 The committed native evidence archive (nineteen parts listed in
-[retained-evidence.json](retained-evidence.json)) retains 14
+[retained-evidence.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-228/retained-evidence.json)) retains 14
 verified native capture manifests and complete original fixture/cargo captures: binaries, profiles, LLVM exports, native inventories, source bytes,
 tool identities, manifests, anchors and Core evaluation inputs/outputs. No
 hash-only or reconstructed native positive substitutes for those bytes.
-[retained-evidence.json](retained-evidence.json) inventories every archived file
+[retained-evidence.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-228/retained-evidence.json) inventories every archived file
 and records archive hashes; retention verified the archived bytes against their
 originals. See [transport.md](transport.md) for byte-preserving restoration and
 the submission transport limitation. [resumed-validation-logs.tar.gz](archive.md) retains

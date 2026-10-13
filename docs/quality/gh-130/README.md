@@ -24,9 +24,9 @@ parser inventory and native counter oracle without changing the measured sources
 | Pinned compiler inventory and native Istanbul oracle regeneration | Both exit 0; outputs byte-identical to committed fixtures |
 | `npm ci --no-audit --no-fund --cache /tmp/gh130-npm-cache` in fixture `app` | Exit 0 |
 
-[validation.tar.gz](validation.tar.gz) retains full logs, command/status records,
+[validation.tar.gz](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-130/validation.tar.gz) retains full logs, command/status records,
 the docs report, regeneration outputs and all 11 normalized subjects from five
-original TypeScript files. [index.json](index.json) records archive size/digest
+original TypeScript files. [index.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-130/index.json) records archive size/digest
 and fixture/generator digests. Regeneration commands are in the
 [semantic fixture README](../../../tools/quality/fixtures/typescript-angular/semantics/README.md).
 Hosted required CI must pass before merge and is pending at submission.

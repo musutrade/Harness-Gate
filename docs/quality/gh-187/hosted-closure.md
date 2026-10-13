@@ -13,17 +13,17 @@ these receipts establish the prerequisite heads, not GH-198's own CI result.
 | Tested merge SHA | `ffe3bc0e5f7dea4f864ceab653b26debb78d235d` | `a75928522eb714bc569aaef5928c8e94411107ee` |
 | Collection base SHA | `9fcc319d976aed1aad4311355cece60df798ff96` | `fd0d040fad1f051c64adb18b9a644fbe3c3dd24a` |
 | Required Quality Aggregate, completed success | [102695650692](https://github.com/musutrade/Harness-Gate/actions/runs/34419625673/job/102695650692) | [102704478218](https://github.com/musutrade/Harness-Gate/actions/runs/34422630969/job/102704478218) |
-| Raw run/jobs and collection identity | [GH-186 input](hosted-prerequisite-input.json) | [GH-187 input](hosted-closure-input.json) |
-| Normalized timing | [GH-186 timing](hosted-prerequisite-timing.json) | [GH-187 timing](hosted-closure-timing.json) |
-| Configured acceptance | [receipt](hosted-prerequisite-receipt.json.gz), [summary](hosted-prerequisite-summary.json) | [receipt](hosted-closure-receipt.json.gz), [summary](hosted-closure-summary.json) |
-| GitHub artifact metadata | [GH-186 artifacts](hosted-prerequisite-artifacts.json) | [GH-187 artifact](hosted-closure-artifact.json) |
+| Raw run/jobs and collection identity | [GH-186 input](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-187/hosted-prerequisite-input.json) | [GH-187 input](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-187/hosted-closure-input.json) |
+| Normalized timing | [GH-186 timing](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-187/hosted-prerequisite-timing.json) | [GH-187 timing](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-187/hosted-closure-timing.json) |
+| Configured acceptance | [receipt](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-187/hosted-prerequisite-receipt.json.gz), [summary](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-187/hosted-prerequisite-summary.json) | [receipt](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-187/hosted-closure-receipt.json.gz), [summary](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-187/hosted-closure-summary.json) |
+| GitHub artifact metadata | [GH-186 artifacts](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-187/hosted-prerequisite-artifacts.json) | [GH-187 artifact](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-187/hosted-closure-artifact.json) |
 
 Both runs completed `success` under the existing `pull_request` contract. Every
 required child succeeded: Linux Test (`Test`), Windows Test, macOS Test, Quality
 Coverage and Critical Paths, Security Audit, Format, Clippy, Build, Quality CLI
 Contracts, Documentation Consistency, Release Governance Contracts and Quality
 Script Tests. Generic Quality Shadow also succeeded and remains advisory.
-The [machine-readable reconciliation](hosted-closure.json) retains every successful
+The [machine-readable reconciliation](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-187/hosted-closure.json) retains every successful
 job's exact ID/name/conclusion. Push-only checks retain their event-defined skips.
 Both PR-head and tested-merge workflow blobs are
 `502f79d8b6e9a3af43927569ca99b888c324a63c`.
@@ -32,7 +32,7 @@ Both PR-head and tested-merge workflow blobs are
 
 The existing `ci_timing.py` normalizer and frozen topology contract are unchanged.
 GH-186's existing input uses the
-[hosted-after-input envelope](../ci-topology/hosted-after-input.json); all retained
+[hosted-after-input envelope](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/hosted-after-input.json); all retained
 raw jobs and run identity/timestamps were checked against GitHub again, and its
 normalization reproduces byte-for-byte. GH-187 uses the same envelope.
 
@@ -137,8 +137,8 @@ with `GITHUB_SHA` set to its tested merge SHA, `GITHUB_RUN_ID` to its run,
 Both validations pass with 12 cases and 40 negatives, including exact report
 parity and embedded evidence hashes.
 
-GH-198's [validation manifest](../gh-198/validation.json) and
-[complete logs](../gh-198/validation-logs.tar.gz) retain actual command results.
+GH-198's [validation manifest](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-198/validation.json) and
+[complete logs](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-198/validation-logs.tar.gz) retain actual command results.
 All required checks passed: nextest (379 tests), Python unittest (346 tests),
 Rust formatting, Clippy, docs consistency, strict OpenSpec validation and
 `git diff --check`. Every task from 1.1 through 9.4 now has acceptance evidence.

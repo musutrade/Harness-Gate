@@ -28,14 +28,14 @@ It uses the complete environment from the preceding corrected discovery,
 including workspace-local build/capture directories and the existing private
 Cargo vendor directory. There were no failures in this new test run.
 
-The [command records](malformed-core-checks.json) retain exact commands,
+The [command records](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/malformed-core-checks.json) retain exact commands,
 environments and results. The [validation archive](archive.md)
 contains original output and tested source snapshots, with a
-[verified inventory](malformed-core-validation-archive.json).
-The [native evidence archive](malformed-core-evidence.tar.gz.parts/manifest.json) retains the new
+[verified inventory](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/malformed-core-validation-archive.json).
+The [native evidence archive](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/malformed-core-evidence.tar.gz.parts/manifest.json) retains the new
 capture/re-export bytes, signed fixture inputs and individual process records;
-its [inventory](malformed-core-inventory.json) and
-[receipt](malformed-core-archive.json) verify every retained member's SHA-256.
+its [inventory](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/malformed-core-inventory.json) and
+[receipt](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/malformed-core-archive.json) verify every retained member's SHA-256.
 These local native bytes are diagnostic evidence, not clean-host acceptance.
 
 Only test code changed in this continuation. The preceding full Python run

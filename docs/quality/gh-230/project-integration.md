@@ -70,13 +70,13 @@ changed.
 ## Retention and validation
 
 Exact commands, exit codes, timing and original stdout/stderr are indexed in
-[project-checks.json](project-checks.json). The archive
-[project-evidence.tar.gz](project-evidence.tar.gz.parts/manifest.json) includes all three new native
+[project-checks.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/project-checks.json). The archive
+[project-evidence.tar.gz](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/project-evidence.tar.gz.parts/manifest.json) includes all three new native
 test work directories (including the failed run), binaries, raw profiles,
 re-export outputs, request bindings, Core reports, both installed adapter source
-versions and validation logs. [project-inventory.json](project-inventory.json)
+versions and validation logs. [project-inventory.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/project-inventory.json)
 records every retained file's size and SHA-256;
-[project-archive.json](project-archive.json) identifies the archive itself.
+[project-archive.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/project-archive.json) identifies the archive itself.
 The historical `target/gh-228/runtime-tests` prefix belongs to the test harness:
 these three directories were freshly created inside this GH-230 workspace.
 
@@ -94,7 +94,7 @@ has no durable complete-package acceptance receipt. Inventory/assembly took
 22.145/18.652 seconds on this already-used host. These are diagnostic assembly
 times, not cold/warm clean-host installation costs or peak-disk measurements.
 
-The previous [Rust checks](recovery-checks.json) remain applicable: nextest
+The previous [Rust checks](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/recovery-checks.json) remain applicable: nextest
 (392 tests), formatting and clippy passed. No Rust source or Cargo input changed.
 `harness-gate config check` and `harness-gate verify --profile ci --all` are not
 applicable because `.harness-gate/flow.toml` is absent. Required hosted CI remains

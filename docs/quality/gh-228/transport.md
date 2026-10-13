@@ -8,7 +8,7 @@ The native evidence archive is stored as nineteen ordered parts of at most
 SHA-256 `09388d2b355091bc00ea086e5fed97cddc90fb9db2c78711d3871c50ea8ebb06`.
 No capture, compression stream, timestamp, manifest or anchor was regenerated.
 The original archive remains in the assigned workspace, ignored by Git.
-[retained-evidence.json](retained-evidence.json) records each part's size/hash,
+[retained-evidence.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-228/retained-evidence.json) records each part's size/hash,
 the original archive hash, and every archived file's original identity.
 
 From the repository root, restore into a fresh workspace-local directory:
@@ -27,7 +27,7 @@ subject to the separate workspace-retention requirement in [runtime.md](runtime.
 
 ## Genuine submission failures and recovery
 
-The existing [submission-blocker.json](submission-blocker.json) remains an
+The existing [submission-blocker.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-228/submission-blocker.json) remains an
 unaltered historical record. On resumption, the ordinary Git push again returned
 exit 128: `Failed to connect to github.com port 443 via 192.168.0.34`.
 Uploading the complete archive through the GitHub API failed locally with
@@ -50,6 +50,6 @@ hardlinks. Documentation consistency and strict OpenSpec validation are rerun.
 The earlier native, Rust and Python test results still apply to unchanged runtime
 implementation files; this conversion makes no measurement or policy changes.
 
-Results: [archive restoration](transport-validation.json) verified all 1,563
-archived members and all nineteen parts. [Final checks](transport-checks/docs-openspec-diff.json)
+Results: [archive restoration](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-228/transport-validation.json) verified all 1,563
+archived members and all nineteen parts. [Final checks](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-228/transport-checks/docs-openspec-diff.json)
 record documentation consistency, strict OpenSpec and diff checks exiting 0.

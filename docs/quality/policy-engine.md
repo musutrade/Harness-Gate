@@ -198,7 +198,7 @@ ownership, exact comparison boundaries, coverage/CRAP/mutation/breaking counts
 and booleans across four synthetic ecosystems, capability states, corrupt and
 missing evidence, every aggregate state, base-series compatibility, remediation
 serialization and CLI exit behavior. Actual command evidence is recorded in the
-[GH-114 validation summary](gh-114/validation-summary.json).
+[GH-114 validation summary](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-114/validation-summary.json).
 
 [GH-115 focused tests](../../tools/quality/tests/test_policy_ratchet.py) exercise
 four synthetic ecosystems and negative identity/series/exception paths. See the

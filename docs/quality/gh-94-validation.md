@@ -17,7 +17,7 @@ OpenSpec proposal or a replacement repository baseline.
 - GitHub API confirmed #92 and #93 are closed with `state_reason=completed` on
   2026-09-07. GH-94 already has `symphony-ready`.
 
-The [collection manifest](gh-94-v2/collection.json) verifies all six original
+The [collection manifest](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-94-v2/collection.json) verifies all six original
 source hashes against both commits, plus Cargo files and the relevant CLI and
 failure-path tests. Complete original source and AST inventories are retained
 in compressed manifests, alongside raw LLVM exports and collection logs.
@@ -73,9 +73,9 @@ presentation values.
 | `verify/parser.rs` | 12 / 12.00 | 3 | 11 | 93.33% | 93.48% | 11.04 |
 | `process/adapter.rs` | 55 / 113.35 | 6 | 16 | 80.95% | 84.62% | 16.03 |
 
-The complete [base report](gh-94-v2/base-risk.json),
-[head report](gh-94-v2/head-risk.json) and
-[source identity comparison](gh-94-v2/comparison.json) retain every function,
+The complete [base report](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-94-v2/base-risk.json),
+[head report](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-94-v2/head-risk.json) and
+[source identity comparison](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-94-v2/comparison.json) retain every function,
 span, decision count, raw region/counter, exact CRAP and decomposition mapping.
 The base export was reused only after verifying that the final AST metadata
 produces exactly the same instrumentation edits and source bytes. The final
@@ -97,15 +97,15 @@ All commands ran from this workspace. Rust builds use workspace-local targets.
 
 | Command | Actual result |
 | --- | --- |
-| `CARGO_TARGET_DIR=target/gh-94-validation cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked` | 312 passed, 0 skipped; [log](gh-94-v2/final-nextest.log) |
+| `CARGO_TARGET_DIR=target/gh-94-validation cargo nextest run --manifest-path tools/harness-gate/Cargo.toml --locked` | 312 passed, 0 skipped; [log](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-94-v2/final-nextest.log) |
 | `cargo fmt --manifest-path tools/harness-gate/Cargo.toml -- --check` | Exit 0 |
-| `CARGO_TARGET_DIR=target/gh-94-validation cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings` | Exit 0; [log](gh-94-v2/final-clippy.log) |
-| `python3 -m unittest discover -s tools/quality/tests -v` | 92 passed; includes real LLVM distinguishing/negative fixtures; [log](gh-94-v2/quality-tests.log) |
-| `CARGO_TARGET_DIR=target/gh-94-measure cargo clippy --manifest-path tools/quality/rust-measure/Cargo.toml --all-targets --locked -- -D warnings` | Exit 0; [log](gh-94-v2/analyzer-clippy.log) |
+| `CARGO_TARGET_DIR=target/gh-94-validation cargo clippy --manifest-path tools/harness-gate/Cargo.toml --all-targets -- -D warnings` | Exit 0; [log](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-94-v2/final-clippy.log) |
+| `python3 -m unittest discover -s tools/quality/tests -v` | 92 passed; includes real LLVM distinguishing/negative fixtures; [log](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-94-v2/quality-tests.log) |
+| `CARGO_TARGET_DIR=target/gh-94-measure cargo clippy --manifest-path tools/quality/rust-measure/Cargo.toml --all-targets --locked -- -D warnings` | Exit 0; [log](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-94-v2/analyzer-clippy.log) |
 | `cargo fmt --manifest-path tools/quality/rust-measure/Cargo.toml -- --check` | Exit 0 |
-| `CARGO_TARGET_DIR=target/gh-94-validation python3 tools/quality/contracts.py --output target/quality/gh-94/final-contracts.json` | All 20 scenarios and unchanged textual golden snapshot pass; [report](gh-94-v2/final-contracts.json) |
-| `CARGO_TARGET_DIR=target/gh-94-validation python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json` | Exit 0; [report](gh-94-v2/docs-consistency.json) |
-| `openspec validate strict-json-results-and-risk-based-quality-gates --strict` | Exit 0; [log](gh-94-v2/final-openspec.log) |
+| `CARGO_TARGET_DIR=target/gh-94-validation python3 tools/quality/contracts.py --output target/quality/gh-94/final-contracts.json` | All 20 scenarios and unchanged textual golden snapshot pass; [report](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-94-v2/final-contracts.json) |
+| `CARGO_TARGET_DIR=target/gh-94-validation python3 tools/quality/docs_consistency.py --output target/quality/docs-consistency.json` | Exit 0; [report](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-94-v2/docs-consistency.json) |
+| `openspec validate strict-json-results-and-risk-based-quality-gates --strict` | Exit 0; [log](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-94-v2/final-openspec.log) |
 | `harness-gate config check` | Not applicable: `.harness-gate/flow.toml` is absent |
 | `harness-gate verify --profile ci --all` | Not applicable: no project-local config or declared `ci` profile |
 
@@ -121,15 +121,15 @@ its Cargo-backed checks because the environment default target was read-only.
 The reproducing command `cargo run --manifest-path tools/harness-gate/Cargo.toml
 --locked -- config schema` exited 101 before CLI execution: `failed to open:
 /home/gem/cargo-target/debug/.cargo-build-lock`, caused by `Read-only file system
-(os error 30)`. The [original error](gh-94-v2/docs-cargo-error.log) is retained.
+(os error 30)`. The [original error](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-94-v2/docs-cargo-error.log) is retained.
 Setting the workspace-local target resolved this dependency; the final report
 passes all schema, example, migration, language, link and sandbox-wording checks.
 
 ## Preserved diagnostics and remaining scope
 
 The [original draft validation](gh-94-draft-validation.md),
-[parser failures](gh-94-measurement-errors.json),
-[native closure gap](gh-94-coverage-gap.json) and their linked probes remain
+[parser failures](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-94-measurement-errors.json),
+[native closure gap](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-94-coverage-gap.json) and their linked probes remain
 unchanged. They describe the superseded blocked draft, not passing version 1
 measurements. The original Git sandbox failure no longer reproduces after the
 operator made this task's `.git` writable. Other draft probes were not rerun.

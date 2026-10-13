@@ -33,7 +33,7 @@ fixtures first exposed 135 malformed-input subcase errors, then passed after the
 input guards. They cover all frozen children across both events, explicit push-only
 exemptions, unexpected result values, native test failure through the CLI, exact
 workflow topology, and the minimal execution boundary. Full local command results
-and environment limitations are retained in [the validation record](aggregate-validation.json).
+and environment limitations are retained in [the validation record](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/aggregate-validation.json).
 
 Submitted-commit hosted Required Quality Aggregate acceptance is pending and
 controller-owned. No hosted speedup is claimed. Tasks 6–7 and overall OpenSpec

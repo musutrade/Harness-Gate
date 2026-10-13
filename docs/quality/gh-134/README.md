@@ -19,7 +19,7 @@ At the additional 9/10 threshold, the compatible pair passes only because the
 policy explicitly permits unchanged legacy debt; its ledger retains that debt.
 The regression fails and retains regressed debt. Independent rational arithmetic
 over native counters agrees with the generic engine's outcome, full ratchet
-comparison and debt presence. [Results](results.json) retain both policies and
+comparison and debt presence. [Results](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-134/results.json) retain both policies and
 complete reports; no unexplained outcome, counter or debt mismatch remains.
 
 Each snapshot retains native covered/total line and function counts for every
@@ -30,7 +30,7 @@ unmeasured metrics retain their existing explicit capability states.
 
 ## Retained provenance and reproduction
 
-[Window](window.json) records real fixture base/head commits, targets and run IDs.
+[Window](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-134/window.json) records real fixture base/head commits, targets and run IDs.
 `compatible.bundle` and `regression.bundle` preserve both Git histories. Each
 snapshot directory contains `native.tar.gz` (manifest, commands, logs, source
 bytes, raw Istanbul coverage and production/test source maps), parser index,

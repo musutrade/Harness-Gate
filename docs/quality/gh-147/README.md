@@ -29,8 +29,8 @@ baseline. Policy, ratchets, cross-component evidence evaluation, reporting, repl
 entry points and authority transfer remain tasks 3–7 under
 [ADR-0040](../../adr/0040-language-agnostic-evidence-policy.md).
 
-Actual local results and full logs are retained in [validation.json](validation.json)
-and [validation.tar.gz](validation.tar.gz). Cargo uses workspace-local
+Actual local results and full logs are retained in [validation.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-147/validation.json)
+and [validation.tar.gz](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-147/validation.tar.gz). Cargo uses workspace-local
 `target/cargo-home` and `target/build` because the initial dependency download
 failed with `Read-only file system (os error 30)` in the global Cargo cache.
 The workspace-local retry succeeded. Python is required only for the candidate's

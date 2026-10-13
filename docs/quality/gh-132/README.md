@@ -40,8 +40,8 @@ remain tasks 4.1–4.3. No required Rust gate, release authority or baseline cha
 ## Validation
 
 Validation uses `CARGO_TARGET_DIR=$PWD/target` within this workspace. Full command
-logs and exit statuses are retained in [validation.tar.gz](validation.tar.gz);
-[index.json](index.json) pins the
+logs and exit statuses are retained in [validation.tar.gz](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-132/validation.tar.gz);
+[index.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-132/index.json) pins the
 archive, integration test and native inputs. Required hosted CI is pending and
 must pass before merge.
 

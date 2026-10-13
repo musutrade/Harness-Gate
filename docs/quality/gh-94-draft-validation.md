@@ -31,7 +31,7 @@ unchanged. The Issue #93 regression suite ran before and after the changes.
 The unchanged analyzer from #92 is `harness-gate-complexity 0.1.1`, rule
 `mccabe-rust-1` version 1. It fails on **all six selected source files at both
 base and head**. See the committed
-[commands, exit statuses and source SHA-256 identities](gh-94-measurement-errors.json).
+[commands, exit statuses and source SHA-256 identities](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-94-measurement-errors.json).
 All six retained base files were verified byte-for-byte against Git commit
 `764482ca64c754cdb56e3a3f97bc267023497736`. Head hashes identify the draft's
 production source bytes, independently of the documentation commit.
@@ -71,7 +71,7 @@ frozen risk tooling and its thresholds are unchanged by this draft.
 ## Follow-up: independently reproduced coverage gap
 
 A standalone Rust program now reproduces a second blocker independently of the
-analyzer. The [complete source, exact commands, toolchain and raw LLVM export](gh-94-coverage-gap.json)
+analyzer. The [complete source, exact commands, toolchain and raw LLVM export](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-94-coverage-gap.json)
 are retained together. All four commands exited 0; the executable asserts both
 true and false outcomes for each of these closures:
 
@@ -134,7 +134,7 @@ passes through `std::hint::black_box`.
 
 All nine tool commands passed. The source, commands, result assertions and both
 raw exports are retained in `indistinguishable_execution_probe` in the
-[coverage diagnostic](gh-94-coverage-gap.json), with local artifacts under
+[coverage diagnostic](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-94-coverage-gap.json), with local artifacts under
 `target/quality/gh-94/closure-distinguish/`. This establishes that using parent
 counters to fill the missing closure record can report executed coverage for
 an unexecuted closure. A syntax or mapper repair alone cannot supply the

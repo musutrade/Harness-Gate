@@ -97,7 +97,7 @@ with explicit absent-source records for predecessor files. Both revisions use th
 same analyzer, instrumentation and thresholds. Every measured production symbol
 must join real LLVM counters. Historical debt retains syntax-based lineage.
 
-The [hosted API records and explicit decision](accepted-candidate/decision.json)
+The [hosted API records and explicit decision](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-151/accepted-candidate/decision.json)
 accept reviewed candidate `0fc96d7644d623f31e31fe1a512cb68db0b2003b` only after:
 
 - [Rust Generic Shadow run 34243502830](https://github.com/musutrade/Harness-Gate/actions/runs/34243502830) succeeded: 33 cases (14 Rust, 16 Angular, 3 contract), zero unresolved mismatches, and complete CLI reports with an empty executable search path.
@@ -105,7 +105,7 @@ accept reviewed candidate `0fc96d7644d623f31e31fe1a512cb68db0b2003b` only after:
 - The retained required test log records 332 passing tests, including the consolidated 12-category negative matrix and the shipped CLI corpus test.
 - Rollback below was documented before acceptance.
 
-[All raw Python/Rust/CLI comparisons](shadow-0fc96d7.tar.xz) are retained with
+[All raw Python/Rust/CLI comparisons](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-151/shadow-0fc96d7.tar.xz) are retained with
 identity, the original artifact index and per-file SHA-256 hashes. Archive SHA-256:
 `de982349e25a5d8e0c138130eca7e51d8c569d2e99eb0abdbbab520f5f25b7a2`.
 Hosted artifact `10063111207` retains complete materialized evidence for 30 days;
@@ -113,7 +113,7 @@ the frozen corpus retains original inputs. Required coverage/risk evidence is
 artifact `10063624125`. The raw API records retain every job conclusion, including
 push-only jobs correctly skipped by the unchanged pull-request workflow.
 
-[Downloaded required quality reports and collection logs](quality-0fc96d7.tar.xz)
+[Downloaded required quality reports and collection logs](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-151/quality-0fc96d7.tar.xz)
 retain the successful production, risk and critical-path stages, both risk
 reports, candidate identity and archive/per-file manifests. Archive SHA-256:
 `b70587783a33dc116dad2e7275aacaf4bf63d76dca436e645ac5c0a52754d557`.
@@ -132,7 +132,7 @@ workspace's Git metadata; staging has been verified. They are not current blocke
 
 ## Local transfer validation
 
-[Exact commands, environment, exit statuses and complete logs](local-transfer/validation.json)
+[Exact commands, environment, exit statuses and complete logs](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-151/local-transfer/validation.json)
 record 332 passing Rust tests and 293 passing Python tests. Cargo formatting,
 Clippy with warnings denied, documentation consistency and strict OpenSpec
 validation pass. The CLI corpus test exercises authoritative `quality evaluate`
@@ -156,7 +156,7 @@ all linked core production symbols remain in the measured series. A real Git
 fixture tests both the exact move and changed-content rejection. Required check
 names, dependencies, measurement thresholds and failure handling are unchanged.
 
-[Retained raw comparisons](shadow-7870dcc.tar.xz) contain all 133 downloaded
+[Retained raw comparisons](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-151/shadow-7870dcc.tar.xz) contain all 133 downloaded
 Python/Rust/CLI comparison, report, stderr and identity files, plus a per-file
 SHA-256 manifest and the original archive index. Their archive SHA-256 is
 `78b3e6edba669a4a46f0742e18c29fd1753ca3a3596b02196da106a11e7bce4a`.

@@ -644,3 +644,5 @@ per collection and runs up to two isolated tests concurrently by default;
 the [collection benchmark](docs/benchmarks/critical-path-collection/README.md).
 Generated baselines remain review-only candidates; adoption policy is
 [ADR-0039](docs/adr/0039-required-risk-and-traceability-gates.md).
+
+Full regression data is fetched explicitly and cached by digest; ordinary source builds need no evidence download. See [test data](test-data/README.md).

@@ -62,7 +62,7 @@ download, namespace and tracing denials have not been retried or bypassed.
 No P6/P7 checkbox is completed. Fixture evidence does not certify Arc-Admin;
 no release, baseline or #215 action was taken.
 
-[Exact commands and results](capability-checks.json),
-[retained diagnostic bytes](capability-evidence.tar.gz.parts/manifest.json),
-[file inventory](capability-inventory.json) and
-[archive receipt](capability-archive.json) describe this follow-up.
+[Exact commands and results](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/capability-checks.json),
+[retained diagnostic bytes](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/capability-evidence.tar.gz.parts/manifest.json),
+[file inventory](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/capability-inventory.json) and
+[archive receipt](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/capability-archive.json) describe this follow-up.

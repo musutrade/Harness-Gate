@@ -8,7 +8,7 @@ are unchanged. No policy delta is proposed.
 
 ## Profile first, optimize a demonstrated cost
 
-The local [profile record](issue291-profile.json) retains source hashes, interpreter
+The local [profile record](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/issue291-profile.json) retains source hashes, interpreter
 and platform, wall/process/child CPU times, startup probes, function call counts,
 selected cumulative/self times, full-profile hashes, every fresh-process sample
 and exact output-parity hashes. The opt-in driver retains complete cProfile data,
@@ -101,7 +101,7 @@ so no corresponding end-to-end saving is claimed.
 
 ## Hosted evidence and remaining acceptance
 
-[Historical observations](issue291-hosted-before.json) retain run/attempt, API head SHA, independently logged checkout SHA, PR quality
+[Historical observations](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/issue291-hosted-before.json) retain run/attempt, API head SHA, independently logged checkout SHA, PR quality
 collection base/head (synthetic merge) SHAs, job/step timestamps, runner labels, critical-job tool/cache log excerpts and
 full-log hashes for three successful PR and three successful push runs. They
 are separate source/toolchain/cache cohorts, not matched repetitions:
@@ -140,7 +140,7 @@ Codecov rejected tokenless transport; nonblocking action success does not
 prove ingestion. Separate source-risk artifacts are not tarpaulin output.
 
 See [the hosted evidence appendix](issue291-natural-main-appendix.md) and
-[structured run/identity record](issue291-natural-main-20261008.json).
+[structured run/identity record](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/issue291-natural-main-20261008.json).
 The five upstream installer boundary cases are now independently audited
 using separately identified new raw logs; the missing historical raw path
 is recorded, not relabeled as consumed.

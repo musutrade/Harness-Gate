@@ -45,11 +45,11 @@ for one capability to prove state preservation.
 
 ## Retained evidence and scope acceptance
 
-[Machine-readable validation](gh-112/validation.json) retains exact commands,
+[Machine-readable validation](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-112/validation.json) retains exact commands,
 exit codes, source input digests and not-applicable decisions.
-[Contract outcomes](gh-112/contract-cases.json) retain the 16 expected negative
+[Contract outcomes](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-112/contract-cases.json) retain the 16 expected negative
 fixture rejections and 12 cross-ecosystem capability requirement results.
-[Full local logs and reports](gh-112/local-evidence.tar.gz) include the initial
+[Full local logs and reports](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-112/local-evidence.tar.gz) include the initial
 failures and successful reruns. Reports name the checkout base commit because
 validation ran before committing; input digests identify the tested modified files.
 The old Rust schema, validator and CI workflow have no diff. Task checkmarks refer to these local contract tests;

@@ -31,7 +31,7 @@ versioned in the [design](../../../openspec/changes/rust-native-production-mappi
 Every per-function report retains exact rational CRAP, raw block counts, LLVM
 instance symbols, and one-to-many source lines. Compiler definitions additionally
 retain generated types and constant-evaluation MIR, including permission macros.
-The [expansion audit](production-expansions.json) indexes actual tracing/select,
+The [expansion audit](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-220/production-expansions.json) indexes actual tracing/select,
 task_local, macro_rules, metrics, anyhow, try_join and derive provenance.
 
 The complete selected backend mapping is verified; no missing owner is waived.
@@ -49,7 +49,7 @@ official archive SHA and compiler commit; its successful local replay is retaine
 All build targets and profiles stay inside this task workspace. Incremental MIR
 caches are disabled: the earlier compiler panic and raw failure remain preserved.
 
-[production-artifacts.json](production-artifacts.json) is the artifact inventory:
+[production-artifacts.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-220/production-artifacts.json) is the artifact inventory:
 full backend mapping/report and raw compiler/profile/LLVM bundle, exact retained
 binary paths/hashes, source and tool identities, native fixture evidence and
 validation. Large backend binaries remain in this workspace rather than Git;
@@ -75,7 +75,7 @@ legacy debt and rejects changed debt or new regression. Tests use real compiled
 captures and the actual Rust command, including CRAP 7 → 56 failure. No Arc-Admin
 baseline is accepted or synthesized for the first production measurement.
 
-[production-validation.json](production-validation.json) records exact final local
+[production-validation.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-220/production-validation.json) records exact final local
 commands, exit codes and logs. Native positive regressions compile/sample/export
 real Rust; mutated JSON only exercises negative rejection. Earlier failed attempts
 are preserved. Project-local `config check` and `verify --profile ci --all` are not

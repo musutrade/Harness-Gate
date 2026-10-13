@@ -47,9 +47,9 @@ Ambiguous destinations, invalid mappings and any unmapped changed identity rejec
 baseline lookup. Mapping success supplies lineage only, never accepted debt or
 metric inheritance.
 
-Retained evidence: [command manifest](gh-111/validation.json),
-[complete logs](gh-111/validation.tar.gz), and
-[docs consistency report](gh-111/docs-consistency.json). The manifest hashes the
+Retained evidence: [command manifest](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-111/validation.json),
+[complete logs](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-111/validation.tar.gz), and
+[docs consistency report](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-111/docs-consistency.json). The manifest hashes the
 logs and changed contract/fixture files. Reports identify the pre-implementation
 checkout commit; the PR commit contains the implementation and these records.
 The existing Rust implementation, quality workflows, evidence schema and release

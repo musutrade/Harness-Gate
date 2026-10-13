@@ -116,7 +116,7 @@ See [the exact cohorts and limitations](issue291-natural-main-appendix.md).
 
 ## GH-165 hosted evidence and remaining acceptance
 
-The retained [hosted baseline](hosted-baseline.json) contains three successful
+The retained [hosted baseline](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/hosted-baseline.json) contains three successful
 pre-change runs (34303413318, 34301967575, 34291282719). Audit installs took
 169/183/172 seconds; combined nextest/llvm-cov source installs took
 279/236/215 seconds. Existing prebuilt nextest test setup took 1 second on
@@ -138,7 +138,7 @@ GH-164 event contract. Source inspection reproduced the ineffective audit cache:
 restoring it was unconditionally followed by `cargo install --force`.
 
 Validation logs and downloaded manifest/binary smoke evidence are retained under
-`target/quality/gh-165/`. The retained [prebuilt smoke evidence](tool-setup-smoke.json) records that
+`target/quality/gh-165/`. The retained [prebuilt smoke evidence](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/tool-setup-smoke.json) records that
 Linux prebuilt nextest, llvm-cov and audit were fetched
 from the immutable installer's manifest URLs, checked against its SHA-256 hashes,
 and executed through the same Cargo version verifier (all exit 0). This verifies

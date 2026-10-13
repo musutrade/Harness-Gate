@@ -22,12 +22,16 @@
 git clone https://github.com/musutrade/Harness-Gate.git
 cd Harness-Gate
 cargo build --manifest-path tools/harness-gate/Cargo.toml
+python3 tools/maintenance/test_data.py
 cargo test --manifest-path tools/harness-gate/Cargo.toml
 ```
 
 ### 运行测试
 
 ```bash
+# 准备完整回归数据（固定摘要、缓存复用）
+python3 tools/maintenance/test_data.py
+
 # 运行单元测试
 cargo test --manifest-path tools/harness-gate/Cargo.toml
 
@@ -160,3 +164,5 @@ Closes #123
 发布完成后将公开运行、签名/下载验证和兼容性凭据写入交付状态，并按各自验收项更新 issue/OpenSpec。历史 ADR 和验收报告保留原有日期与失败记录，不批量替换历史版本。
 新增兼容性声明必须有对应真实验收；安装成功不能代替采集认证，插件发布不能代替使用项目接入完成。
 运行 `python3 tools/quality/docs_consistency.py` 检查本地链接、配置示例与 schema 同步，并按正常 PR/CI 流程合并。
+
+完整回归数据按需获取，基础构建无需下载。见 [数据准备与离线缓存](test-data/README.md)。

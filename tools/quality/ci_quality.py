@@ -307,10 +307,22 @@ class Collector:
         archive = self.directory / f'{label}-source.tar'
         # Integration tests embed documentation fixtures. Archive them from the
         # measured commit too, preserving their repository-relative paths.
+        paths = list(SNAPSHOT_PATHS)
+        external = subprocess.run(['git', 'cat-file', '-e', f'{commit}:test-data/manifest.json'],
+                                  cwd=ROOT, capture_output=True).returncode == 0
+        if external:
+            paths.extend(('tools/maintenance', 'test-data'))
         self.command(f'{label}-archive', ['git', 'archive', '--format=tar', f'--output={archive}',
-                                          commit, *SNAPSHOT_PATHS])
+                                          commit, *paths])
         with tarfile.open(archive) as source:
             source.extractall(snapshot, filter='data')
+        if external:
+            # Each measured commit supplies its own pinned bytes; never reuse
+            # head data for the base or substitute a missing/corrupt payload.
+            self.command(f'{label}-test-data', [sys.executable,
+                         str(snapshot / 'tools/maintenance/test_data.py'),
+                         '--root', str(snapshot), '--group', 'regression-corpus',
+                         '--group', 'arc-admin-replay'])
         return snapshot
 
     def risk(self):
