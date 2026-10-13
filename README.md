@@ -177,13 +177,13 @@ Verify installation and explore presets:
 
 ```bash
 harness-gate --version
-harness-gate presets
+harness-gate presets --presets-dir /path/to/GateProbes/presets
 ```
 
 Initialize in an existing Git project (run `git init` first for a new directory):
 
 ```bash
-harness-gate --project-root /path/to/new-project init --preset rust-api
+harness-gate --project-root /path/to/new-project init --preset rust-api --presets-dir /path/to/GateProbes/presets
 harness-gate --project-root /path/to/new-project config check
 harness-gate --project-root /path/to/new-project doctor
 # Review generated QUALITY.md; provision trusted state, signed requests and keys.
@@ -207,7 +207,14 @@ state. Until those inputs exist, quality verification fails closed. Follow the
 
 `init` creates the target directory, but `scope` and `verify` require the target directory to be a Git worktree. Refuses to overwrite when the project already has configuration; only use `--force` when confirming the target content is replaceable.
 
-## Built-in Presets
+<a id="built-in-presets"></a>
+## Project Presets
+
+Core embeds only `generic`. The three ecosystem presets below are owned by
+GateProbes and require a reviewed checkout selected through `--presets-dir PATH`
+or `HARNESS_GATE_PRESETS_DIR`. See [external preset setup](docs/quality-presets.md).
+These loader options require a Core build containing the preset migration;
+released 0.4.8 still embeds the earlier presets.
 
 | Preset                    | Purpose                     | Initial Steps                           |
 | ------------------------- | --------------------------- | --------------------------------------- |
@@ -231,7 +238,7 @@ Presets are starting points, not runtime branches. After initialization is compl
 
 | Command                                                      | Purpose                                   |
 | ------------------------------------------------------------ | ----------------------------------------- |
-| `harness-gate presets`                                       | List built-in project presets             |
+| `harness-gate presets`                                       | List generic and the explicitly selected external catalog             |
 | `harness-gate init --preset <name>`                          | Generate execution configuration and reference quality packs |
 | `harness-gate doctor [--strict] [--json]`                    | Execute environment checks declared in config |
 | `harness-gate cleanup [--dry-run] [--json]`                 | Inspect or reclaim stale resource leases  |

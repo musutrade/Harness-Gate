@@ -219,9 +219,9 @@ remaining plugins, and the release/signing identity switch last.
 
 ## 6. Complete ordinary CI and release independence
 
-- [ ] 6.1 Transfer only plugin tests with demonstrated GateProbes parity out of ordinary Core CI; retain all unmigrated compatibility/reference tests and preserve required Core checks. The first bounded handoff is recorded in `docs/quality/ci-plugin-test-handoff.md`.
+- [x] 6.1 Transfer only plugin tests with demonstrated GateProbes parity out of ordinary Core CI; retain all unmigrated compatibility/reference tests and preserve required Core checks. The first bounded handoff is recorded in `docs/quality/ci-plugin-test-handoff.md`.
 - [x] 6.2 Publish the four remaining plugins independently from GateProbes with packaging, clean-install, signed inventory and provenance acceptance; then remove their build/publication dependency from Core release.
-- [ ] 6.3 Externalize ecosystem presets through the plain file loader, then review source/fixture cleanup against actual consumers and preserved rollback materials.
+- [x] 6.3 Externalize ecosystem presets through the plain file loader, then review source/fixture cleanup against actual consumers and preserved rollback materials.
 - [ ] 6.4 Complete repository naming and legacy install compatibility with explicit signing-identity acceptance; retain the `harness-gate` command and crate names.
 
 > **3.4/5.4/6.2 complete (2026-10-13):** GateProbes PR #13 supplied the
@@ -244,3 +244,14 @@ remaining plugins, and the release/signing identity switch last.
 - Core and plugin release/rollback independently.
 - An incompatible protocol version fails explicitly.
 - CI time and artifact disk do not increase versus the pre-split baseline.
+
+> **6.1/6.3 complete (2026-10-13):** the renewed
+> [ordinary CI handoff](../../../docs/quality/ci-plugin-test-handoff.md) records
+> GateProbes run 38342999155 and the two additional native modules, preserving
+> the original Linux classification scope and four-platform native baseline.
+> All eleven unmigrated compatibility/reference modules remain selected.
+> [Preset externalization and consumer review](../../../docs/quality/preset-externalization.md)
+> records the plain local loader, nine byte-preserved ecosystem inputs, frozen
+> Core test snapshots and the actual consumers that prevent broader deletion.
+> No historical evidence, measurement series, required Core check or paused
+> bundled release authority changes. Repository naming remains 6.4.

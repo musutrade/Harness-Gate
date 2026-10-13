@@ -53,7 +53,7 @@
 
 ### R-01：hook 只有部分节点使用 staged snapshot
 
-**证据：**[`verify/scheduler.rs`](../tools/harness-gate/src/verify/scheduler.rs) 仅将 `staged` 传给 secret scan；`run_architecture_audit` 和 `run_external_step` 都使用发现时的 project root。README 却将 `hook` 定义为 staged snapshot。以 [`rust-api.flow.toml`](../tools/harness-gate/presets/rust-api.flow.toml) 为例，hook profile 中的 fmt/clippy 也会读取 working tree；只有 generic preset 的 `git diff --cached` 因命令自身显式读取 index 而例外。
+**证据：**[`verify/scheduler.rs`](../tools/harness-gate/src/verify/scheduler.rs) 仅将 `staged` 传给 secret scan；`run_architecture_audit` 和 `run_external_step` 都使用发现时的 project root。README 却将 `hook` 定义为 staged snapshot。以 [`rust-api.flow.toml`](https://github.com/musutrade/Harness-Gate/blob/da9a1082f698f17418b9d20ed077bd1aca2adfc8/tools/harness-gate/presets/rust-api.flow.toml) 为例，hook profile 中的 fmt/clippy 也会读取 working tree；只有 generic preset 的 `git diff --cached` 因命令自身显式读取 index 而例外。
 
 **影响：**index 中实际提交的架构违规、格式或编译问题可被 working tree 的干净版本掩盖；未暂存内容也可能造成与提交无关的失败。
 

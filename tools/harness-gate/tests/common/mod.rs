@@ -22,6 +22,10 @@ impl TestContext {
     /// Run harness-gate with the given arguments
     pub fn run_harness_gate(&self, args: &[&str]) -> Output {
         let mut cmd = Command::new(env!("CARGO_BIN_EXE_harness-gate"));
+        cmd.env(
+            "HARNESS_GATE_PRESETS_DIR",
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/preset-compat"),
+        );
         cmd.args(args)
             .arg("--project-root")
             .arg(&self.project_root)

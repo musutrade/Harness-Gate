@@ -18,7 +18,7 @@ CRAP_RULE = {'id': 'rust.crap', 'scope': {'kind': 'component', 'component': 'rus
 def prepare(root, report, capture, context, project_id='native-fixture', hotspots=(), component='rust'):
     config = root / '.harness-gate'
     config.mkdir(parents=True)
-    shutil.copyfile(QUALITY.parent / 'harness-gate/presets/rust-api.flow.toml', config / 'flow.toml')
+    shutil.copyfile(QUALITY.parent / 'harness-gate/fixtures/preset-compat/rust-api.flow.toml', config / 'flow.toml')
     shutil.copyfile(QUALITY.parent / 'harness-gate/presets/empty.audit.toml', config / 'audit.toml')
     shutil.copyfile(QUALITY.parent / 'harness-gate/presets/default.secrets.toml', config / 'secrets.toml')
     shutil.copyfile(capture / 'fixture.rs', root / 'fixture.rs')

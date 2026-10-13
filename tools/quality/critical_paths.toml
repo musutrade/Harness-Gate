@@ -198,7 +198,7 @@ path = "tests/integration_test.rs"
 symbol = "test_config_check_invalid"
 start = 114
 end = 125
-sha256 = "d784995f60b780c2f5b971b975c19645ffee1fd02d2e19518595d3c8f9350085"
+sha256 = "71b8eb53defc51863c70aa8d95c928d86de72bc8a1dcb41b658c5b04b573853c"
 [[paths.probes]]
 line = 83
 column = 32

@@ -30,7 +30,7 @@ def prepare(test, binary, output):
     binding['capture']['path'] = str(test.work / 'head')
     source_project = binding['project']
     series = binding['series']
-    shutil.copyfile(quality.parent / 'harness-gate/presets/rust-api.flow.toml', config / 'flow.toml')
+    shutil.copyfile(quality.parent / 'harness-gate/fixtures/preset-compat/rust-api.flow.toml', config / 'flow.toml')
     declared = '''version = 1
 [project]
 id = "native-test"

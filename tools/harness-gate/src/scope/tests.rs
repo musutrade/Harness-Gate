@@ -4,7 +4,10 @@ use crate::test_support::TestWorkspace;
 use std::collections::BTreeSet;
 
 fn config() -> crate::config::FlowConfig {
-    toml::from_str(include_str!("../../presets/rust-api.flow.toml")).expect("parse config")
+    toml::from_str(include_str!(
+        "../../fixtures/preset-compat/rust-api.flow.toml"
+    ))
+    .expect("parse config")
 }
 
 #[test]
@@ -42,7 +45,13 @@ fn unmatched_paths_are_reported() {
 #[test]
 fn detects_working_tree_changes() {
     let workspace = TestWorkspace::new("scope-working-tree");
-    crate::preset::init(&workspace.root, "rust-api", false).expect("initialize fixture");
+    crate::preset::init_from(
+        &workspace.root,
+        "rust-api",
+        false,
+        Some(&std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/preset-compat")),
+    )
+    .expect("initialize fixture");
     workspace.init_git();
     std::fs::create_dir_all(workspace.root.join("src")).expect("create source directory");
     std::fs::write(workspace.root.join("src/main.rs"), "fn main() {}\n").expect("write fixture");
@@ -58,7 +67,13 @@ fn detects_working_tree_changes() {
 #[test]
 fn detects_staged_changes() {
     let workspace = TestWorkspace::new("scope-staged");
-    crate::preset::init(&workspace.root, "rust-api", false).expect("initialize fixture");
+    crate::preset::init_from(
+        &workspace.root,
+        "rust-api",
+        false,
+        Some(&std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/preset-compat")),
+    )
+    .expect("initialize fixture");
     workspace.init_git();
     std::fs::create_dir_all(workspace.root.join("src")).expect("create source directory");
     std::fs::write(workspace.root.join("src/main.rs"), "fn main() {}\n").expect("write fixture");
@@ -79,7 +94,13 @@ fn detects_staged_changes() {
 #[test]
 fn detects_changes_against_a_base_revision() {
     let workspace = TestWorkspace::new("scope-base");
-    crate::preset::init(&workspace.root, "rust-api", false).expect("initialize fixture");
+    crate::preset::init_from(
+        &workspace.root,
+        "rust-api",
+        false,
+        Some(&std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/preset-compat")),
+    )
+    .expect("initialize fixture");
     workspace.init_git();
     std::fs::create_dir_all(workspace.root.join("src")).expect("create source directory");
     std::fs::write(workspace.root.join("src/main.rs"), "fn main() {}\n").expect("write fixture");
@@ -113,7 +134,13 @@ fn detects_changes_against_a_base_revision() {
 #[test]
 fn rejects_a_missing_base_revision() {
     let workspace = TestWorkspace::new("scope-missing-base");
-    crate::preset::init(&workspace.root, "rust-api", false).expect("initialize fixture");
+    crate::preset::init_from(
+        &workspace.root,
+        "rust-api",
+        false,
+        Some(&std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/preset-compat")),
+    )
+    .expect("initialize fixture");
     workspace.init_git();
     let project = Project::discover(Some(workspace.root.clone()), None).expect("discover fixture");
     let error =
@@ -124,7 +151,13 @@ fn rejects_a_missing_base_revision() {
 #[test]
 fn unmatched_scope_can_fail_closed() {
     let workspace = TestWorkspace::new("scope-unmatched");
-    crate::preset::init(&workspace.root, "rust-api", false).expect("initialize fixture");
+    crate::preset::init_from(
+        &workspace.root,
+        "rust-api",
+        false,
+        Some(&std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/preset-compat")),
+    )
+    .expect("initialize fixture");
     workspace.init_git();
     std::fs::write(workspace.root.join("unmatched.txt"), "change\n").expect("write fixture");
     let mut project =

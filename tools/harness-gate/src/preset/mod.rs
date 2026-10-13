@@ -9,5 +9,5 @@ mod tests;
 
 pub use catalog::print_presets;
 pub(crate) use import::import_arc_flow;
-pub use initialize::init;
+pub use initialize::{init, init_from};
 pub use migration::migrate;

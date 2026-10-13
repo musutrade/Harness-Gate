@@ -44,7 +44,7 @@ impl Fixture {
         )
         .unwrap();
         fs::copy(
-            Path::new(env!("CARGO_MANIFEST_DIR")).join("presets/rust-api.flow.toml"),
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/preset-compat/rust-api.flow.toml"),
             root.join(DEFAULT_CONFIG_PATH),
         )
         .unwrap();

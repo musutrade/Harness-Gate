@@ -64,7 +64,10 @@ fn fixture() -> (TestWorkspace, FlowConfig, QualityConfig) {
     let root = TestWorkspace::new("quality-config");
     root.child(".harness-gate");
     fs::write(root.join(".harness-gate/policy.json"), POLICY).unwrap();
-    let flow = toml::from_str(include_str!("../../../presets/rust-api.flow.toml")).unwrap();
+    let flow = toml::from_str(include_str!(
+        "../../../fixtures/preset-compat/rust-api.flow.toml"
+    ))
+    .unwrap();
     (root, flow, toml::from_str(QUALITY).unwrap())
 }
 

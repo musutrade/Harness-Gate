@@ -1,18 +1,29 @@
-use super::catalog::PRESETS;
+use super::catalog;
 #[cfg(unix)]
 use super::filesystem::resolve_inside;
 use super::filesystem::{atomic_write, atomic_write_batch};
-use super::initialize::{init, project_id};
+use super::initialize::{init, init_from, project_id};
 use crate::config::{ExternalValuePolicy, FlowConfig, ServiceConfig};
 use crate::test_support::TestWorkspace;
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
+
+const PRESETS: &[&str] = &[
+    "generic",
+    "rust-api",
+    "angular-only",
+    "angular-rust-postgres",
+];
+fn external() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/preset-compat")
+}
 
 #[test]
-fn every_embedded_preset_is_valid() {
-    for preset in PRESETS {
-        FlowConfig::from_source(preset.flow)
-            .unwrap_or_else(|error| panic!("preset {} is invalid: {error:#}", preset.name));
+fn generic_and_frozen_external_presets_are_valid() {
+    for name in PRESETS {
+        let preset = catalog::find(name, Some(&external())).unwrap();
+        FlowConfig::from_source(&preset.flow)
+            .unwrap_or_else(|error| panic!("preset {name} is invalid: {error:#}"));
     }
 }
 
@@ -140,9 +151,10 @@ fn atomic_write_batch_rejects_broken_symlink() {
 #[test]
 fn generated_reference_presets_cross_validate_quality_and_profile_boundaries() {
     use crate::config::quality::{Assurance, QualityConfig};
-    for preset in PRESETS {
-        let root = TestWorkspace::new(preset.name);
-        init(&root, preset.name, false).unwrap();
+    for name in PRESETS {
+        let preset = catalog::find(name, Some(&external())).unwrap();
+        let root = TestWorkspace::new(name);
+        init_from(&root, name, false, Some(&external())).unwrap();
         let project = crate::project::Project::discover(Some(root.root.clone()), None).unwrap();
         let quality = QualityConfig::load_optional(&root, &project.config).unwrap();
         if preset.recipe.is_none() {
@@ -177,7 +189,7 @@ fn generated_reference_presets_cross_validate_quality_and_profile_boundaries() {
             .unwrap();
             assert!(QualityConfig::load_optional(&root, &project.config).is_err());
         }
-        if preset.name == "angular-rust-postgres" {
+        if *name == "angular-rust-postgres" {
             assert_eq!(
                 quality
                     .components
@@ -299,8 +311,146 @@ fn quality_support_file_conflict_does_not_partially_initialize_project() {
     let path = root.join(".harness-gate/packs/app/policy.json");
     fs::create_dir_all(path.parent().unwrap()).unwrap();
     fs::write(&path, "existing policy").unwrap();
-    assert!(init(&root, "rust-api", false).is_err());
+    assert!(init_from(&root, "rust-api", false, Some(&external())).is_err());
     assert!(!root.join(".harness-gate/flow.toml").exists());
     assert!(!root.join(".harness-gate/quality.toml").exists());
     assert_eq!(fs::read_to_string(path).unwrap(), "existing policy");
+}
+
+fn custom_catalog(root: &Path, entry: serde_json::Value) {
+    fs::write(
+        root.join("catalog.json"),
+        serde_json::json!({
+            "schema": "harness-preset-catalog/v1", "presets": {"future": entry}, "packs": {}
+        })
+        .to_string(),
+    )
+    .unwrap();
+    fs::write(
+        root.join("flow.toml"),
+        include_str!("../../presets/generic.flow.toml"),
+    )
+    .unwrap();
+}
+
+#[test]
+fn arbitrary_external_preset_uses_plain_files_without_core_catalog_changes() {
+    let source = TestWorkspace::new("external-source");
+    custom_catalog(
+        &source,
+        serde_json::json!({"description":"Future ecosystem", "flow":"flow.toml"}),
+    );
+    let project = TestWorkspace::new("external-project");
+    init_from(&project, "future", false, Some(&source)).unwrap();
+    let loaded = crate::project::Project::discover(Some(project.root.clone()), None).unwrap();
+    assert!(!loaded.config.steps.is_empty());
+    assert!(!project.join(".harness-gate/quality.toml").exists());
+    catalog::print_presets(Some(&source)).unwrap();
+    catalog::print_presets(None).unwrap();
+    assert!(init(&TestWorkspace::new("no-fallback"), "rust-api", false).is_err());
+    assert!(catalog::find("absent", Some(&source)).is_err());
+    let path = source.join("catalog.json");
+    let catalog = fs::read_to_string(&path)
+        .unwrap()
+        .replace("future", "future-2049");
+    fs::write(path, catalog).unwrap();
+    assert!(catalog::find("future-2049", Some(&source)).is_ok());
+}
+
+#[test]
+fn invalid_external_catalogs_fail_before_configuration_publication() {
+    let source = TestWorkspace::new("invalid-catalog");
+    let project = TestWorkspace::new("invalid-catalog-project");
+    let entry = serde_json::json!({"description":"Future", "flow":"flow.toml"});
+    custom_catalog(&source, entry);
+    let path = source.join("catalog.json");
+    let original = fs::read_to_string(&path).unwrap();
+    for invalid in [
+        original.replace("harness-preset-catalog/v1", "harness-preset-catalog/v2"),
+        original.replace("\"future\"", "\"generic\""),
+        original.replace("\"future\"", "\"../escape\""),
+        original.replace("\"future\"", "\"\""),
+        original.replace("\"future\"", "\"future_name\""),
+        original.replace("future", &"a".repeat(129)),
+        original.replace("\"Future\"", "\"\""),
+        original.replace("\"packs\":{}", "\"packs\":{},\"packs\":{}"),
+        original.replace("\"packs\":{}", "\"packs\":{\"../escape\":\"pack.json\"}"),
+        original.replace("\"packs\":{}", "\"unexpected\":true,\"packs\":{}"),
+        "{".into(),
+        " ".repeat(1024 * 1024 + 1),
+    ] {
+        fs::write(&path, invalid).unwrap();
+        assert!(init_from(&project, "future", false, Some(&source)).is_err());
+        assert!(catalog::print_presets(Some(&source)).is_err());
+        assert!(!project.join(".harness-gate/flow.toml").exists());
+    }
+    let mut oversized: serde_json::Value = serde_json::from_str(&original).unwrap();
+    for index in 0..65 {
+        oversized["presets"][format!("future-{index}")] =
+            serde_json::json!({"description":"Future", "flow":"flow.toml"});
+    }
+    fs::write(&path, oversized.to_string()).unwrap();
+    assert!(catalog::print_presets(Some(&source)).is_err());
+    assert!(!project.join(".harness-gate/flow.toml").exists());
+    fs::write(&path, original).unwrap();
+    assert!(init_from(&project, "generic", false, Some(&source.join("missing"))).is_err());
+}
+
+#[test]
+fn external_files_reject_escape_missing_non_regular_and_oversized_inputs() {
+    let source = TestWorkspace::new("external-inputs");
+    let project = TestWorkspace::new("external-input-project");
+    for flow in [
+        "../escape",
+        "/absolute",
+        "C:\\escape",
+        "./flow.toml",
+        "missing",
+        "directory",
+        "",
+    ] {
+        custom_catalog(
+            &source,
+            serde_json::json!({"description":"Future", "flow":flow}),
+        );
+        fs::create_dir_all(source.join("directory")).unwrap();
+        assert!(
+            init_from(&project, "future", false, Some(&source)).is_err(),
+            "{flow}"
+        );
+    }
+    custom_catalog(
+        &source,
+        serde_json::json!({"description":"Future", "flow":"flow.toml", "recipe":"missing.json"}),
+    );
+    assert!(init_from(&project, "future", false, Some(&source)).is_err());
+    custom_catalog(
+        &source,
+        serde_json::json!({"description":"Future", "flow":"flow.toml"}),
+    );
+    fs::write(source.join("flow.toml"), " ".repeat(1024 * 1024 + 1)).unwrap();
+    assert!(init_from(&project, "future", false, Some(&source)).is_err());
+    assert!(!project.join(".harness-gate/flow.toml").exists());
+}
+
+#[cfg(unix)]
+#[test]
+fn external_catalog_rejects_symlink_files_and_directories() {
+    use std::os::unix::fs::symlink;
+    let source = TestWorkspace::new("linked-catalog");
+    let outside = TestWorkspace::new("outside-catalog");
+    fs::write(
+        outside.join("flow.toml"),
+        include_str!("../../presets/generic.flow.toml"),
+    )
+    .unwrap();
+    symlink(outside.join("flow.toml"), source.join("linked.toml")).unwrap();
+    symlink(&outside.root, source.join("linked-dir")).unwrap();
+    for flow in ["linked.toml", "linked-dir/flow.toml"] {
+        custom_catalog(
+            &source,
+            serde_json::json!({"description":"Future", "flow":flow}),
+        );
+        assert!(catalog::find("future", Some(&source)).is_err());
+    }
 }

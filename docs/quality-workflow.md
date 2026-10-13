@@ -16,7 +16,7 @@ interfaces; they do not replace the complete project verification command.
 Run in an existing Git project with the project's build tools available:
 
 ```bash
-harness-gate init --preset rust-api
+harness-gate init --preset rust-api --presets-dir /path/to/GateProbes/presets
 harness-gate config check
 harness-gate doctor
 # Review generated QUALITY.md and provision trusted host inputs described below.

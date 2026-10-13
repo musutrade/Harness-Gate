@@ -155,13 +155,13 @@ SBOM 记录源码提交、`Cargo.lock` 摘要和构建工具链。发布流程�
 
 ```bash
 harness-gate --version
-harness-gate presets
+harness-gate presets --presets-dir /path/to/GateProbes/presets
 ```
 
 在已有 Git 项目中初始化（新目录先运行 `git init`）：
 
 ```bash
-harness-gate --project-root /path/to/new-project init --preset rust-api
+harness-gate --project-root /path/to/new-project init --preset rust-api --presets-dir /path/to/GateProbes/presets
 harness-gate --project-root /path/to/new-project config check
 harness-gate --project-root /path/to/new-project doctor
 # 阅读生成的 QUALITY.md；由可信 host 配置 state、签名请求和密钥。
@@ -185,7 +185,13 @@ harness-gate --project-root /path/to/new-project verify --profile ci --all
 
 `init` 会创建目标目录，但 `scope` 和 `verify` 需要目标目录是 Git worktree。项目已有配置时默认拒绝覆盖；只有确认目标内容可替换时才使用 `--force`。
 
-## 内置预设
+<a id="内置预设"></a>
+## 项目预设
+
+Core 仅内置 `generic`。下列三个生态预设由 GateProbes 维护，需通过
+`--presets-dir PATH` 或 `HARNESS_GATE_PRESETS_DIR` 指向审阅过的预设目录。
+详见[外部预设接入](docs/quality-presets.md)。此加载方式需要包含本次迁移的
+Core 构建；已发布的 0.4.8 仍使用旧版内置预设。
 
 | 预设                    | 用途                        | 初始步骤                                |
 | ----------------------- | --------------------------- | --------------------------------------- |
@@ -202,7 +208,7 @@ harness-gate --project-root /path/to/new-project verify --profile ci --all
 
 | 命令                                                         | 用途                                  |
 | ------------------------------------------------------------ | ------------------------------------- |
-| `harness-gate presets`                                       | 列出内置项目预设                      |
+| `harness-gate presets`                                       | 列出 generic 及显式指定目录中的生态预设                      |
 | `harness-gate init --preset <name>`                          | 生成执行配置及参考质量 pack；generic 仅生成执行配置 |
 | `harness-gate doctor [--strict] [--json]`                    | 执行配置声明的环境检查                |
 | `harness-gate cleanup [--dry-run] [--json]`                 | 检查或回收过期的 Harness-Gate 资源租约 |

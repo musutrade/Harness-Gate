@@ -63,7 +63,8 @@ def select(root=ROOT):
     for relative, expected in sources.items():
         path = Path(relative)
         require(not path.is_absolute() and '..' not in path.parts
-                and relative.startswith(('tools/quality/', 'tools/harness-gate/presets/')),
+                and relative.startswith(('tools/quality/', 'tools/harness-gate/presets/',
+                                            'tools/harness-gate/fixtures/preset-compat/')),
                 f'invalid guarded source: {relative}')
         require(re.fullmatch(r'[0-9a-f]{64}', str(expected)),
                 f'invalid source digest: {relative}')
