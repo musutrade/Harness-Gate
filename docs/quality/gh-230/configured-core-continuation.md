@@ -78,21 +78,21 @@ project has its own configuration and does not change that applicability.
 Required hosted CI has not run for this unfinished work.
 
 
-[Exact commands and environments](configured-core-checks.json) and
+[Exact commands and environments](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/configured-core-checks.json) and
 [original validation logs and tested source snapshots](archive.md)
 retain the focused runs, both full discovery runs, and documentation checks.
 The successful full run includes all nine standalone native tests. For a future
 run, use the corrected discovery's complete environment, including the existing
 `RUST_COLLECTOR_TEST_VENDOR` path; do not repeat the omitted-setting failure.
 
-The [initial evidence archive](configured-core-initial-evidence.tar.gz.parts/manifest.json) retains
+The [initial evidence archive](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/configured-core-initial-evidence.tar.gz.parts/manifest.json) retains
 1,557 original files (69,907,309 compressed bytes), with a per-file
-[inventory](configured-core-initial-inventory.json) and
-[verified archive receipt](configured-core-initial-archive.json).
-The [corrected discovery evidence](configured-core-corrected-evidence.tar.gz.parts/manifest.json)
+[inventory](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/configured-core-initial-inventory.json) and
+[verified archive receipt](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/configured-core-initial-archive.json).
+The [corrected discovery evidence](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/configured-core-corrected-evidence.tar.gz.parts/manifest.json)
 retains 1,431 original files (71,702,622 compressed bytes), with its
-[inventory](configured-core-corrected-inventory.json) and
-[verified archive receipt](configured-core-corrected-archive.json).
+[inventory](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/configured-core-corrected-inventory.json) and
+[verified archive receipt](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/configured-core-corrected-archive.json).
 Every archived file was read back and checked against its SHA-256. Disposable
 signing keys in these test archives are fixture inputs and authorize no release.
 These archives retain local native diagnostics, not complete delivery-package

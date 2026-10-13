@@ -120,7 +120,7 @@ tasks 6.1–6.4, not locally established performance results.
 
 ## Validation and diagnosis
 
-The retained [validation record](cargo-artifacts-validation.json) gives exact
+The retained [validation record](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/cargo-artifacts-validation.json) gives exact
 commands, outcomes and limitations. Regression tests cover path mismatch, cache
 identity dimensions, stale executable/build failure and the artifact rejection
 cases above. A real Cargo metadata smoke test confirms the configured directory.

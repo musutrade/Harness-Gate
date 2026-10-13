@@ -64,10 +64,10 @@ variations. Formatting, Clippy, documentation consistency and strict OpenSpec
 validation passed. The executable also returned exit 1 with the exact field path
 for an injected favorable outcome and exit 2 for an empty transport.
 
-The [acceptance summary](acceptance-summary.json) records every case outcome and
+The [acceptance summary](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-150/acceptance-summary.json) records every case outcome and
 the exact retained Angular source identities and coverage counters.
-Validation results and exact commands are recorded in [validation.json](validation.json),
-with complete logs and differential field evidence in [validation.tar.gz](validation.tar.gz).
+Validation results and exact commands are recorded in [validation.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-150/validation.json),
+with complete logs and differential field evidence in [validation.tar.gz](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-150/validation.tar.gz).
 The checkout has no `.harness-gate/flow.toml` declaring a `ci` profile, so
 `harness-gate config check` and `harness-gate verify --profile ci --all` are not
 applicable, not passed. The initial shared Cargo cache failure is retained and

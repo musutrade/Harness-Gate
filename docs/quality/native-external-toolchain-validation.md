@@ -34,8 +34,8 @@ This is an unsigned development binary, not a signed release.
 
 Machine results and retained logs are in
 [validation.json](native-external-evidence/validation.json),
-[native acceptance](native-external-evidence/native-acceptance.log),
-[release tests](native-external-evidence/release-tests.log) and
+[native acceptance](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/native-external-evidence/native-acceptance.log),
+[release tests](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/native-external-evidence/release-tests.log) and
 [build inventory](native-external-evidence/build.json). The machine record names
 the complete local evidence directory and its independently retained fixture
 anchor. Raw local evidence remains available there; it is not a production trust

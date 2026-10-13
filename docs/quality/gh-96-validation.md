@@ -49,8 +49,8 @@ mandatory path, policy or historical baseline was weakened.
 
 ## Gate results and collection cost
 
-The [candidate manifest](gh-96/candidate.json) records all four stages as
-successful and hashes **137 artifacts**. The [complete raw archive](gh-96/candidate.tar.gz)
+The [candidate manifest](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-96/candidate.json) records all four stages as
+successful and hashes **137 artifacts**. The [complete raw archive](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-96/candidate.tar.gz)
 contains those artifacts and the manifest, including original base/head source
 archives, LLVM JSON/LCOV/Cobertura, source manifests, exact risk counters,
 isolated matrix evidence and command logs. Extracting it into a fresh directory
@@ -74,21 +74,21 @@ excluding tool installation and hosted runner scheduling. Some standalone checks
 overlapped matrix collection, so these are observed wall times, not an isolated
 microbenchmark. CI records its own stage times in every uploaded manifest.
 
-[Production counts](gh-96/production.json) preserve different line, function and
+[Production counts](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-96/production.json) preserve different line, function and
 region denominators. App is 317/390 lines (81.28%); project is 341/422 (80.81%).
 Both margins are narrow and remain blocking at the unchanged 80% threshold.
-[Legacy counts](gh-96/coverage.json) retain the original six-module calculation.
-[Risk comparison](gh-96/risk.json) uses exact rational CRAP for decisions, with
+[Legacy counts](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-96/coverage.json) retain the original six-module calculation.
+[Risk comparison](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-96/risk.json) uses exact rational CRAP for decisions, with
 75 unmodified nonselected debt identities retained in archived `head-risk.json`.
 Risk scope remains six files; branch coverage is unsupported. These results do
 not claim repository-wide risk coverage or rounded-threshold acceptance.
-[Matrix evidence](gh-96/critical-paths.json) is Linux-only and does not claim
-real Docker/Podman execution. [Initial failures](gh-96/initial-failures.json)
+[Matrix evidence](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-96/critical-paths.json) is Linux-only and does not claim
+real Docker/Podman execution. [Initial failures](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-96/initial-failures.json)
 retain the unsuccessful candidate identities and stage diagnostics.
 
 ## Existing performance fixture
 
-The [five-sample report](gh-96/benchmarks.json) records serial median verification
+The [five-sample report](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-96/benchmarks.json) records serial median verification
 at **0.972 s** and parallel median at **0.644 s**, a **33.73% reduction**.
 Its unchanged policy compares parallel versus serial median, allowing at most
 a 15% increase; `regression` is false. All scope samples report equivalent
@@ -100,7 +100,7 @@ The uninstrumented release-small binary is 8,711,168 bytes, SHA-256
 `3efaf9115eebf7a75e2f0f8ffeb6a44a2ffeed6b065fa9d96b8bc6137b0f0c5b`.
 The fixture and product source are unchanged. These numbers describe this local
 series, not a cross-machine comparison against ADR-0025. Raw per-sample reports,
-logs and invocation records are retained in [validation evidence](gh-96/validation.tar.gz).
+logs and invocation records are retained in [validation evidence](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-96/validation.tar.gz).
 
 ## Validation commands
 
@@ -136,6 +136,6 @@ Final results: **315 Rust tests passed, zero skipped; 119 quality-tool tests
 passed; fmt, Clippy, bytecode compilation, documentation/schema consistency and
 strict OpenSpec validation passed.** Collection, extracted-archive verification
 and the benchmark command all returned 0. Exact commands, results and local
-environment limitations are recorded in [validation.json](gh-96/validation.json);
+environment limitations are recorded in [validation.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-96/validation.json);
 complete logs are in the validation archive. Tasks 8.1–8.4 are locally validated;
 tasks 9.1–9.4 and full-change acceptance remain unchecked.

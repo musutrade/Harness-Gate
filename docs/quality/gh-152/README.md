@@ -8,14 +8,14 @@ certification changes are introduced.
 
 [GH-151 / PR #158](https://github.com/musutrade/Harness-Gate/pull/158) merged at
 `63a7f9538b13d4f8888eff6b35663cda40270e70`, this issue's starting baseline.
-The [observed GitHub record](predecessor-acceptance.json) pins head
+The [observed GitHub record](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-152/predecessor-acceptance.json) pins head
 `8059d70d488fb5b3755cde248b43dee4d9f29d92`, merge identity and successful required
 checks, including `Required Quality Aggregate`, Test and Generic Quality Shadow.
 This satisfies the predecessor dependency; it does not claim CI for this PR.
 
 ## Final dispositions and boundary
 
-The [final inventory](python-boundary.json) covers all 31 production Python modules
+The [final inventory](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-152/python-boundary.json) covers all 31 production Python modules
 and freezes all eight C-class source hashes. Each module explicitly declares its
 non-authoritative reference status. Python policy/report CLIs require
 `--reference-only`; existing explicit reference invocations retain their contract
@@ -33,7 +33,7 @@ TypeScript/Angular evidence gains no additional ecosystem certification.
 
 ## Validation and final acceptance
 
-The [validation record](validation.json) and [complete logs](validation.tar.gz)
+The [validation record](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-152/validation.json) and [complete logs](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-152/validation.tar.gz)
 record exact commands, results and environment limitations. Baseline Python
 validation passed 293 tests before edits. Final checks cover frozen-source drift,
 required Python import boundaries, CLI reference opt-in, both Rust/Angular corpora,

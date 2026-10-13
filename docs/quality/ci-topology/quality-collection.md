@@ -2,7 +2,7 @@
 
 The [measured run](https://github.com/musutrade/Harness-Gate/actions/runs/34806146019/job/103858306352)
 took 844 seconds in Quality Coverage and Critical Paths. The retained
-[timing extract](quality-collection-before.json) records the candidate identity
+[timing extract](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/quality-collection-before.json) records the candidate identity
 and its SHA-256, command durations, archive sizes and test-run summaries.
 
 | Stage | Seconds |

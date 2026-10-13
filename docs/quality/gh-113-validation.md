@@ -41,9 +41,9 @@ its report shows failed Cargo-backed examples/migration and unsynchronized schem
 with no link failures. The same workspace-target override made it pass.
 No generic project-local configuration was invented.
 
-[Machine validation summary](gh-113/validation-summary.json) records commands,
+[Machine validation summary](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-113/validation-summary.json) records commands,
 exit codes, durations, tested source digests and not-applicable decisions.
-[Retained full logs/reports](gh-113/local-evidence.tar.gz) contain baseline,
+[Retained full logs/reports](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-113/local-evidence.tar.gz) contain baseline,
 focused and full suites, initial failures, successful reruns and docs reports.
 Reports identify the pre-commit checkout base; source digests bind the modified
 implementation that was tested. Only OpenSpec tasks 4.1–4.4 are checked off here.

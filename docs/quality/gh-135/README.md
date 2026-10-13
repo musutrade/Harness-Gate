@@ -20,7 +20,7 @@ supported capabilities and explicit unavailable states. TS-01–TS-04 each link
 reproducers and evidence. Rollback disables the manual workflow or opt-in adapter
 selection while retaining evidence and accepted baselines.
 
-[Workflow validation](workflow-validation.json) parses the workflow and confirms
+[Workflow validation](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-135/workflow-validation.json) parses the workflow and confirms
 manual-only dispatch, read-only permissions, independent job, always-upload and
 30-day retention. SHA-256 comparisons against the baseline confirm `ci.yml`,
 `release.yml`, `ci_quality.py` and the fixture toolchain are byte-identical.
@@ -30,7 +30,7 @@ and release authority are unchanged.
 ## Actual validation
 
 Complete local logs and summaries are retained in `validation.tar.gz`, indexed by
-[artifact digests](index.json). [Advisory summary](summary.json) records the native
+[artifact digests](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-135/index.json). [Advisory summary](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-135/summary.json) records the native
 fixture revisions and full measurement series. Its checkout field is the
 pre-commit baseline used for this local working-tree run; it is not the PR SHA.
 Hosted executions record the actual checked-out SHA and environment.

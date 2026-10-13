@@ -12,7 +12,7 @@ does not confer CI, release, baseline or measurement-series acceptance.
 ## Exact checks
 
 Run from the assigned checkout using [run-resumed-validation.py](run-resumed-validation.py).
-The [combined result](resumed-validation.json) retains command arrays, exit codes,
+The [combined result](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-228/resumed-validation.json) retains command arrays, exit codes,
 elapsed times and command-local environment. `CARGO_TARGET_DIR`, `TMPDIR`, `GIT_CEILING_DIRECTORIES`, native driver,
 Core binary and private runtime/capture paths are workspace-local. The six proxy
 variables are removed for localhost webhook tests. `NATIVE_DRIVER_SYSROOT` is the
@@ -115,14 +115,14 @@ A direct submission-time docs check without the runner's command-local environme
 returned exit 1: generated examples/schema and migration subprocess checks failed.
 The checker suppresses their stderr, so no more specific subprocess cause is
 asserted. This invocation omitted the recorded Cargo and scratch environment. Its original JSON is retained in
-[submission-docs-missing-environment.json](submission-docs-missing-environment.json).
+[submission-docs-missing-environment.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-228/submission-docs-missing-environment.json).
 The runner was then used again with its recorded `CARGO_TARGET_DIR` and scratch
 environment; docs, strict OpenSpec and diff checks each exited 0 again. Their
 command records and logs are retained under `submission-checks/`.
 
 ## Push blocked
 
-[submission-blocker.json](submission-blocker.json) retains both exact push commands,
+[submission-blocker.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-228/submission-blocker.json) retains both exact push commands,
 exit 128 results and errors: the configured proxy could not connect to GitHub,
 and a direct attempt could not resolve `github.com`. Implementation and local
 validation are complete, but no push, PR, CI acceptance or completion declaration

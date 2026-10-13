@@ -52,7 +52,7 @@ are byte-identical to that recorded build. The build identity remains bb813b8:
 source equivalence does not change an executed command's `source_commit`.
 The source-risk implementation and case hashes were independently checked
 against the retained `tools.json` snapshots (164 file/hash checks).
-The [certification identity index](gh-288-certification-identity.json) records
+The [certification identity index](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-288-certification-identity.json) records
 the exact five committed blobs and hashes, per-combination implementation
 hashes, Core subtree equivalence and retained evidence digests.
 

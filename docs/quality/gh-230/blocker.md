@@ -36,7 +36,7 @@ exec_command failed: ProcessFailed { message: "Network access to \"https://stati
 ```
 
 No process exit code was returned by the tool. The original
-[stderr](bootstrap.stderr) ends with
+[stderr](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/bootstrap.stderr) ends with
 `urllib.error.URLError: <urlopen error Remote end closed connection without response>`.
 No archive was downloaded and no native driver was built. No alternate download
 route or global toolchain mutation was attempted.
@@ -62,7 +62,7 @@ integration, clean-host installation, re-export retention, negative acceptance
 and costs remain unproven. Historical GH-228 bytes and synthetic tests cannot
 certify this host. No supported matrix row or task checkbox was added.
 
-Local baseline check results are recorded in [checks.json](checks.json) and
+Local baseline check results are recorded in [checks.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/checks.json) and
 [validation](validation.md). They do not resolve the native prerequisite.
 No PR or completion handoff declaration is issued for this unfinished work.
 No tag, release, Arc-Admin write or GH-215 enablement was attempted.
@@ -71,7 +71,7 @@ No tag, release, Arc-Admin write or GH-215 enablement was attempted.
 
 The subsequent unattended invocation reconfirmed PR #235 merged and GH-229
 closed through GitHub API reads. HEAD and origin/main still match the accepted
-predecessor above. The [local prerequisite recheck](prerequisite-recheck.json)
+predecessor above. The [local prerequisite recheck](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/prerequisite-recheck.json)
 records exact read-only commands and results: rustc-dev is still not installed,
 the native runtime environment inputs are unset, and a workspace-only scan found
 no rustc-dev archive or native driver. The scan did not follow symlinks or access
@@ -82,7 +82,7 @@ baseline validation was not repeated. The original evidence is preserved.
 
 The next retry at 2026-09-11 06:50 UTC again confirmed the controller acceptance
 receipt and remote main at the same predecessor merge. The additional
-[prerequisite recheck](prerequisite-recheck-2.json) preserves the exact local
+[prerequisite recheck](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/prerequisite-recheck-2.json) preserves the exact local
 commands and results without replacing the earlier evidence: rustc-dev remains
 absent, runtime inputs remain unset, and the workspace-only scan still finds no
 archive or native driver. The download denial has not been resolved; no network

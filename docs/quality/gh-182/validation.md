@@ -17,7 +17,7 @@ checks use `CARGO_TARGET_DIR=/tmp/gh182-cargo`, `CARGO_INCREMENTAL=0`,
 | `openspec validate integrate-generic-quality-into-project-workflow --strict` | Passed | `openspec.log` |
 | `python3 tools/quality/fixtures/workflow/baseline/acceptance.py --harness-gate /tmp/gh182-cargo/debug/harness-gate --output target/quality/gh-182/baseline-validated` | 39 cases passed | `baseline-validated.log`, `baseline-validated/acceptance.json` |
 
-The committed [corpus summary](baseline-corpus.json) records each expected
+The committed [corpus summary](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-182/baseline-corpus.json) records each expected
 resolution outcome. The integration test invokes the same fixture through the
 shipped CLI. Cases cover exact Git/ref/merge-base and retained-artifact resolution,
 unknown ecosystem with a custom series and supported numeric custom capability,
@@ -40,7 +40,7 @@ python3 tools/quality/coverage.py --production --raw target/quality/gh-182/cover
 ```
 
 Logs: `coverage-retry.log`, `coverage-export.log`, `coverage-production.log`.
-The [coverage summary](coverage-summary.json) retains aggregate and boundary
+The [coverage summary](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-182/coverage-summary.json) retains aggregate and boundary
 results. Hosted source risk comparison and Required Quality Aggregate are pending;
 local production coverage alone does not establish their status.
 
@@ -112,6 +112,6 @@ All five required local commands were rerun after the repair: nextest passed
 354 tests (0 skipped), Python unittest passed 329 tests, formatting and Clippy
 passed, and documentation consistency reported `pass`. The two project-local
 configuration commands remain not applicable because `flow.toml` is absent.
-The [repair evidence archive](repair-evidence.tar.xz) retains the complete logs,
+The [repair evidence archive](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-182/repair-evidence.tar.xz) retains the complete logs,
 completed failed-CI log, Windows reproduction wrapper and 39-case result, and
 exact validation commands. Hosted acceptance for the repair is pending.

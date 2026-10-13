@@ -3,7 +3,7 @@
 The authentic v0.3.7 release fails the native/Core test because it has no
 `quality` command. The 0.4.0 candidate built from accepted main plus release
 metadata passed all nine native driver tests, including real native debt policy
-evaluation. [Candidate identity](candidate.json) and [test output](native-tests.log)
+evaluation. [Candidate identity](candidate.json) and [test output](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/release-0.4.0/native-tests.log)
 retain the exact binary identity and test result. The test uses fresh captures
 in the assigned GH-230 workspace, not an earlier task's native capture.
 
@@ -15,7 +15,7 @@ separately after the protected publication workflow.
 ## Local release checks
 
 [Exact commands, timings and exits](checks.json), [runner](run-gates.py) and
-[full logs](validation-logs.tar.gz) retain the checks. Rust nextest: 392 passed,
+[full logs](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/release-0.4.0/validation-logs.tar.gz) retain the checks. Rust nextest: 392 passed,
 zero skipped. Python: 402 tests, three opt-in native classes skipped; the nine
 native tests above ran explicitly. Strict all-target/all-feature Clippy, CLI
 snapshots, documentation consistency and verified Cargo packaging passed.

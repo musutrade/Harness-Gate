@@ -23,8 +23,8 @@ keys, path traversal and symlink escape. Existing quality tests still pass.
 Before implementation, the focused policy suite passed 9 tests.
 
 Actual commands and outcomes are recorded in the
-[machine summary](gh-117/validation-summary.json). Complete logs and machine
-reports are retained in the [evidence archive](gh-117/local-evidence.tar.gz).
+[machine summary](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-117/validation-summary.json). Complete logs and machine
+reports are retained in the [evidence archive](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-117/local-evidence.tar.gz).
 
 | Command | Actual result |
 | --- | --- |

@@ -3,7 +3,7 @@
 GH-152 applies the final dispositions after GH-151's authority transfer, merged
 as PR #158 at `63a7f9538b13d4f8888eff6b35663cda40270e70` with successful required
 CI. The [original inventory](gh-146/python-boundary.md) remains historical evidence;
-the [final inventory](gh-152/python-boundary.json) governs current retention.
+the [final inventory](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-152/python-boundary.json) governs current retention.
 
 The released `harness-gate` binary uses its own `harness_gate::quality` library
 module (production sources in `tools/harness-gate/quality-core`) and owns

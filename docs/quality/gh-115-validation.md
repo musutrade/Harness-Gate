@@ -21,9 +21,9 @@ The [policy contract](policy-engine.md) documents the implementation. The
   changes a failed quality result to pass. The CLI retains the debt ledger.
 
 The pre-change evaluator suite passed 9 tests. Final local validation is recorded
-in the [machine summary](gh-115/validation-summary.json); complete command logs
+in the [machine summary](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-115/validation-summary.json); complete command logs
 and a representative improved-debt/new-failure report are retained in the
-[evidence archive](gh-115/local-evidence.tar.gz).
+[evidence archive](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-115/local-evidence.tar.gz).
 
 | Command | Actual result |
 | --- | --- |

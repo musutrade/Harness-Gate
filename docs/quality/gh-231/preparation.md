@@ -46,7 +46,7 @@ readiness. The source tree's Git metadata is sandbox read-only: the initial
 reads confirmed the baseline; delivery uses the same remote issue branch without
 altering local Git metadata or accessing another checkout. The submission
 preserves the old issue head as a second parent; its only changed file is already
-in main byte-for-byte ([reconciliation receipt](evidence/branch-reconciliation.json)).
+in main byte-for-byte ([reconciliation receipt](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-231/evidence/branch-reconciliation.json)).
 
 ## Actual candidate bytes and dependency audit
 
@@ -54,7 +54,7 @@ The new runtime was bootstrapped from the operator-provisioned official archive,
 using a new workspace-local compiler overlay and build directory. It does not
 reuse GH-230 captures or its archive. The candidate source is the reviewed SHA
 above and its manifest version is `0.1.0-rc.1`; it is **unsigned and ineligible**.
-The [machine receipt](preparation-receipt.json) records the actual observed ABI,
+The [machine receipt](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-231/preparation-receipt.json) records the actual observed ABI,
 tool identities, Core identity, crate notices and OS package closure.
 
 | Local asset under `target/gh-231/candidate/` | Bytes | SHA-256 |
@@ -68,7 +68,7 @@ The independently distributed installer is outside the six collector assets:
 `e5e2029ec7b33493ca2ef05e89eba3630c40a4b4c4dd9ed53958d0fbf1a72408`.
 Its 687 inventoried files include the reviewed-source candidate installer.
 The launcher SHA is in the machine receipt. The
-[host-input receipt](bootstrap-host-inputs.json) records the actual shell, tar,
+[host-input receipt](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-231/bootstrap-host-inputs.json) records the actual shell, tar,
 core utilities and loader/library hashes; observation does not authenticate them
 or establish fresh-host acceptance. These are descriptive build hashes,
 not an authenticated public trust channel or controller approval.

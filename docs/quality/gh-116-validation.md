@@ -23,9 +23,9 @@ archive remains a passing candidate, not an accepted baseline. No new expensive
 coverage collection or production baseline acceptance is claimed.
 
 Before changes, the Python quality suite passed 177 tests. Actual final commands
-and outcomes are recorded in the [machine summary](gh-116/validation-summary.json).
+and outcomes are recorded in the [machine summary](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-116/validation-summary.json).
 Complete validation logs and a compact historical shadow report are retained in
-the [evidence archive](gh-116/local-evidence.tar.gz).
+the [evidence archive](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-116/local-evidence.tar.gz).
 
 | Command | Actual result |
 | --- | --- |

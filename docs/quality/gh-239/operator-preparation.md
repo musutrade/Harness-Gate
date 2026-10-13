@@ -106,7 +106,7 @@ collector candidate, provision its production RSA key or satisfy final RC trust.
 
 ## Local validation of this proposed delta
 
-[Retained evidence](evidence/index.json) records actual operator checks and
+[Retained evidence](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-239/evidence/index.json) records actual operator checks and
 proposed environment/main-branch JSON payloads. `python3 -m unittest discover
 -s tools/release/tests -v` passed **55 tests** after correcting the new test's
 fixture version from a non-release placeholder to `0.1.0-rc.1`; the original

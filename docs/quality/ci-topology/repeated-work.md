@@ -60,7 +60,7 @@ advisory, and Required Quality Aggregate retains its existing dependency set.
 
 ## Linux compilation audit and rejected opportunities
 
-The [audit input](repeated-work-hosted-audit.json) derives from the three retained
+The [audit input](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/repeated-work-hosted-audit.json) derives from the three retained
 [hosted baseline](baseline.md) runs, with input hash and run/source identities.
 These pre-optimization samples cannot establish post-GH-166 cache hit rates or
 separate compilation from tests inside a step.
@@ -85,7 +85,7 @@ tests, contracts, release or performance claims. Job count is unchanged.
 ## Validation
 
 Exact commands, results and local evidence hashes are retained in
-[the validation record](repeated-work-validation.json). Local Cargo commands use
+[the validation record](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/repeated-work-validation.json). Local Cargo commands use
 `CARGO_TARGET_DIR=$PWD/target/gh-167` to keep all build writes in this workspace.
 The checkout has no `.harness-gate/flow.toml`; project-local `harness-gate config
 check` and `harness-gate verify --profile ci --all` are not applicable. No generic

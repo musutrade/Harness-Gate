@@ -50,9 +50,9 @@ Policy and decision records: [Engineering Policy](../../engineering-policy.md), 
 
 The sample is the three most recent successful `pull_request` CI runs returned on 2026-09-09 before implementation: PRs #163, #162 and #161, each attempt 1. These are successful documentation and test-repair PRs using the identical workflow blob above. They are a small observational sample, not a cold/warm-cache experiment or a guaranteed performance budget. Failed/cancelled runs and earlier workflow versions are excluded.
 
-[Retained API fields and collection-log excerpts](hosted-input.json) bind repository, workflow ID/path, run/attempt, PR URL, branch head, event, timestamps, conclusions, runner labels, job URLs and every step timestamp. The run API returned an empty `pull_requests` array; PR numbers were resolved by branch. Exact event base and tested merge SHAs come from `BASE_SHA`, `HEAD_SHA`, and `RUN_ID` in each collection job log, not from today’s PR base or an inferred parent. Log URLs, excerpts and full downloaded-log SHA-256s are retained. No local timing is used.
+[Retained API fields and collection-log excerpts](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/hosted-input.json) bind repository, workflow ID/path, run/attempt, PR URL, branch head, event, timestamps, conclusions, runner labels, job URLs and every step timestamp. The run API returned an empty `pull_requests` array; PR numbers were resolved by branch. Exact event base and tested merge SHAs come from `BASE_SHA`, `HEAD_SHA`, and `RUN_ID` in each collection job log, not from today’s PR base or an inferred parent. Log URLs, excerpts and full downloaded-log SHA-256s are retained. No local timing is used.
 
-[Normalized timing evidence](hosted-baseline.json) retains input SHA-256, identities, per-job/per-step wall time, categories, critical path and runner minutes. Reproduce it with:
+[Normalized timing evidence](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/ci-topology/hosted-baseline.json) retains input SHA-256, identities, per-job/per-step wall time, categories, critical path and runner minutes. Reproduce it with:
 
 ```bash
 python3 tools/quality/ci_timing.py --input docs/quality/ci-topology/hosted-input.json --output target/quality/ci-topology-baseline.json

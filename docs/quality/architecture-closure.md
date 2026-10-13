@@ -25,7 +25,7 @@ CI success for GH-119 or cross-ecosystem stability certification.
 Observed through the GitHub API on 2026-09-08: all eight issues are closed as
 completed, all associated PRs are merged, and every PR head has a successful
 `Required Quality Aggregate`. No returned check has a failed or pending
-conclusion. The [machine record](gh-119/predecessor-acceptance.json) pins full
+conclusion. The [machine record](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-119/predecessor-acceptance.json) pins full
 head and merge SHAs, merge/closure times, check counts and aggregate job links.
 
 | Architecture tasks | Accepted issue / merged PR | Required CI on PR head | Implementation and validation |
@@ -33,7 +33,7 @@ head and merge SHAs, merge/closure times, check counts and aggregate job links.
 | 0.3, 1.1–1.4 | [GH-111](https://github.com/musutrade/Harness-Gate/issues/111), [PR #120](https://github.com/musutrade/Harness-Gate/pull/120) | [success](https://github.com/musutrade/Harness-Gate/actions/runs/34178533051/job/101914341654) | [evidence](gh-111-validation.md) |
 | 2.1–2.5, 3.1–3.4 | [GH-112](https://github.com/musutrade/Harness-Gate/issues/112), [PR #121](https://github.com/musutrade/Harness-Gate/pull/121) | [success](https://github.com/musutrade/Harness-Gate/actions/runs/34180255773/job/101919169031) | [evidence](gh-112-validation.md) |
 | 4.1–4.4 | [GH-113](https://github.com/musutrade/Harness-Gate/issues/113), [PR #122](https://github.com/musutrade/Harness-Gate/pull/122) | [success](https://github.com/musutrade/Harness-Gate/actions/runs/34181669768/job/101923557047) | [evidence](gh-113-validation.md) |
-| 5.1–5.5 | [GH-114](https://github.com/musutrade/Harness-Gate/issues/114), [PR #123](https://github.com/musutrade/Harness-Gate/pull/123) | [success](https://github.com/musutrade/Harness-Gate/actions/runs/34183102612/job/101927723864) | [evidence](gh-114/validation-summary.json) |
+| 5.1–5.5 | [GH-114](https://github.com/musutrade/Harness-Gate/issues/114), [PR #123](https://github.com/musutrade/Harness-Gate/pull/123) | [success](https://github.com/musutrade/Harness-Gate/actions/runs/34183102612/job/101927723864) | [evidence](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-114/validation-summary.json) |
 | 6.1–6.4 | [GH-115](https://github.com/musutrade/Harness-Gate/issues/115), [PR #124](https://github.com/musutrade/Harness-Gate/pull/124) | [success](https://github.com/musutrade/Harness-Gate/actions/runs/34184710465/job/101932271380) | [evidence](gh-115-validation.md) |
 | 7.1–7.5 | [GH-116](https://github.com/musutrade/Harness-Gate/issues/116), [PR #125](https://github.com/musutrade/Harness-Gate/pull/125) | [success](https://github.com/musutrade/Harness-Gate/actions/runs/34187050998/job/101939150767) | [evidence](gh-116-validation.md) |
 | 8.1–8.3, 9.1–9.3 | [GH-117](https://github.com/musutrade/Harness-Gate/issues/117), [PR #126](https://github.com/musutrade/Harness-Gate/pull/126) | [success](https://github.com/musutrade/Harness-Gate/actions/runs/34188949046/job/101944676206) | [evidence](gh-117-validation.md) |

@@ -13,7 +13,7 @@ certification. This record confers no release authority or general Angular/platf
 ## Exact fixture and toolchain
 
 The fixture is `tools/quality/fixtures/typescript-angular`, including its live
-Rust quote provider. [GH-134's window](gh-134/window.json) and Git bundles retain
+Rust quote provider. [GH-134's window](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-134/window.json) and Git bundles retain
 these complete, clean fixture histories (distinct from delivery commits):
 
 | Measurement pair | Base revision | Head revision | Target / run IDs |
@@ -21,7 +21,7 @@ these complete, clean fixture histories (distinct from delivery commits):
 | Compatible | `c549ccc9994d63c28fc979a1d4d34203816adbd6` | `e8c569b30461a1502eb7d35336672799157465d3` | `node-jsdom`; `compatible-base`, `compatible-head` |
 | Regression | `e09b480256c2bc9ca30d4d1e5f70dea5b312eae4` | `6322986c399e84b161e947bda5c72c983b78c7bf` | `node-jsdom`; `regression-base`, `regression-head` |
 
-The independent [contract fixtures](gh-133/index.json) retain native revision
+The independent [contract fixtures](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-133/index.json) retain native revision
 `9dbb950e57f0985976cc0f5db04c47d6cb401d23`, target `native-contract`, runs
 `gh133-compatible` and `gh133-breaking`; their archives pin the actual scenario
 source bytes, generated clients and caller receipts. They are not a coverage
@@ -57,8 +57,8 @@ Coverage uses collector `typescript-reference@1`, identity
 `node-jsdom`. Its exact series ID is
 `measurement-series/v1:b680df6dc529cafbbadf4ebba23627d2f34c6c16d30d22dcf5210b29c727a408`.
 The full descriptor, including tool/configuration fingerprint and requested
-metric set, is retained in [normalized evidence](gh-134/compatible-head/normalized.json)
-and the [advisory summary](gh-135/summary.json). A series listing a metric does
+metric set, is retained in [normalized evidence](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-134/compatible-head/normalized.json)
+and the [advisory summary](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-135/summary.json). A series listing a metric does
 not imply support: each record's capability state determines availability.
 Contract/provider/consumer series descriptors and exact IDs are separately
 published in that summary under `checks.contracts.*.series`.
@@ -67,7 +67,7 @@ explicit baseline migration; Rust and frontend series cannot share baselines.
 
 | Capability / scope | Bounded disposition | Reproducer and evidence |
 | --- | --- | --- |
-| Original TypeScript file/function/method line and function coverage | Supported: exact integer statement-start line/function-hit counters for the five source paths in the acceptance window; zero denominators are `not_applicable`, with no value | [88 native comparisons, two pairs, threshold and debt reports](gh-134/results.json); [acceptance tests](../../tools/quality/tests/test_typescript_acceptance.py) |
+| Original TypeScript file/function/method line and function coverage | Supported: exact integer statement-start line/function-hit counters for the five source paths in the acceptance window; zero denominators are `not_applicable`, with no value | [88 native comparisons, two pairs, threshold and debt reports](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-134/results.json); [acceptance tests](../../tools/quality/tests/test_typescript_acceptance.py) |
 | Source identity and map validation | Supported for uniquely mapped original TypeScript declarations and digested transformation inputs; ambiguity/staleness fails closed | [Identity evidence](gh-130/README.md); [semantic reproducers](../../tools/quality/tests/test_typescript_semantics.py) |
 | Generic thresholds, regression, legacy/new/regressed debt | Supported for the retained line-coverage policies and compatible series; compatible pass and deliberate regression fail | [Policy evidence](gh-132/README.md); [real window](gh-134/README.md) |
 | OpenAPI breaking-change count, compatibility and generated-client drift | Supported only for retained quote-contract scenarios; breaking interface blocks despite green local components; changed inputs/equal output bytes fail closed | [Contract results and limitations](gh-133/README.md); [contract reproducers](../../tools/quality/tests/test_typescript_contracts.py) |

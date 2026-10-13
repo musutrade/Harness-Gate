@@ -107,29 +107,29 @@ this existing host. The local runtime tar is 996,782,080 bytes with SHA-256
 These timings and bytes are diagnostics, not clean-host cold/warm or peak-disk
 acceptance measurements. The complete runtime tar remains workspace-local.
 
-[Exact validation commands and environments](core-0.4.0-checks.json),
+[Exact validation commands and environments](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/core-0.4.0-checks.json),
 [original validation and failure logs](archive.md), and
-[validation archive receipt](core-0.4.0-validation-archive.json) retain this run.
-[Fresh native evidence and distributed Core bytes](core-0.4.0-native-evidence.tar.gz.parts/manifest.json)
+[validation archive receipt](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/core-0.4.0-validation-archive.json) retain this run.
+[Fresh native evidence and distributed Core bytes](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/core-0.4.0-native-evidence.tar.gz.parts/manifest.json)
 contain 1,515 files, including original binaries and profiles for both standalone
 test runs and the new native driver/classification fixtures. Every archived file
 was read back and checked against its
-[SHA-256 inventory](core-0.4.0-native-inventory.json); the
-[native archive receipt](core-0.4.0-native-archive.json) records 90,491,981 compressed
+[SHA-256 inventory](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/core-0.4.0-native-inventory.json); the
+[native archive receipt](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/core-0.4.0-native-archive.json) records 90,491,981 compressed
 bytes and its digest. This archive does not substitute for complete delivery
 package retention or clean-host certification.
 
 The corrected full discovery is retained separately in
-[its evidence archive](core-0.4.0-python-final-evidence.tar.gz.parts/manifest.json), including exact
+[its evidence archive](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/core-0.4.0-python-final-evidence.tar.gz.parts/manifest.json), including exact
 command/environment/stdout/stderr and the three fresh native test directories
 with original binaries and profiles. Its
-[inventory](core-0.4.0-python-final-inventory.json) and
-[receipt](core-0.4.0-python-final-archive.json) record every member's SHA-256 and
+[inventory](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/core-0.4.0-python-final-inventory.json) and
+[receipt](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/core-0.4.0-python-final-archive.json) record every member's SHA-256 and
 successful read-back verification. Earlier evidence is unchanged. This closes
 the local Python validation gap only; P6/P7 remain incomplete and the existing
 container denial was not retried.
 
-The [documentation consistency record](core-0.4.0-docs-consistency.json) retains
+The [documentation consistency record](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-230/core-0.4.0-docs-consistency.json) retains
 its command, output and report. Its automatic `commit` field reads the original
 read-only `.git` at the predecessor, while the tested working files include main
 as described above. This is uncommitted diagnostic evidence, not acceptance of

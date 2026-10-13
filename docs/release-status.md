@@ -116,7 +116,7 @@ Public clean installation passed 23 Core/native tests, 20 TypeScript tests and
 runtime tests because `ast/Cargo.lock` was omitted. This is a package defect,
 not a signature failure or a quality waiver. The
 [partial acceptance record](quality/release-0.4.6/public-install-verification.json)
-and [failed runtime output](quality/release-0.4.6/rust-source-public-tests.log)
+and [failed runtime output](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/release-0.4.6/rust-source-public-tests.log)
 retain that result. The existing release notes identify the defect; no asset or
 tag was overwritten.
 

@@ -46,6 +46,9 @@ jobs:
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
 
+      - name: Restore pinned regression data
+        uses: ./.github/actions/test-data
+
       - name: Precheck PR delivery policy
         id: precheck
         run: python3 tools/quality/baseline_delivery.py precheck

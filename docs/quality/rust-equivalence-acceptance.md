@@ -14,8 +14,8 @@ comparison with this PR.
 
 The [window manifest](../../tools/quality/fixtures/rust-reference/equivalence-window.json)
 pins archive hashes, candidate hashes, required counts and original identities.
-The [GH-96 archive](gh-96/candidate.tar.gz) and
-[GH-97 archive](gh-97/candidate.tar.gz) remain unchanged. The first run supplies
+The [GH-96 archive](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-96/candidate.tar.gz) and
+[GH-97 archive](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-97/candidate.tar.gz) remain unchanged. The first run supplies
 distinct base/head snapshots; the second supplies a same-commit comparison.
 Both retain native historical debt and unsupported branch coverage.
 

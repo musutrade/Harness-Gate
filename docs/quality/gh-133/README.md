@@ -37,12 +37,12 @@ demonstrating that the tool parser supplies facts and generic policy decides.
 
 ## Retained evidence and reproduction
 
-[index.json](index.json) pins both native archives, their complete-file receipts,
-explicit run/commit/base/target contexts and [reports.tar.gz](reports.tar.gz).
+[index.json](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-133/index.json) pins both native archives, their complete-file receipts,
+explicit run/commit/base/target contexts and [reports.tar.gz](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-133/reports.tar.gz).
 The reports archive contains project, policy, normalized evidence, context and
 full project report JSON for each scenario. Raw artifacts are retained in
-[compatible-native.tar.gz](compatible-native.tar.gz) and
-[breaking-native.tar.gz](breaking-native.tar.gz); source, lockfiles, both generated
+[compatible-native.tar.gz](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-133/compatible-native.tar.gz) and
+[breaking-native.tar.gz](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-133/breaking-native.tar.gz); source, lockfiles, both generated
 trees and all command outputs are included. Dependency caches and build outputs
 are removed after collection. Absolute invocation paths are historical provenance;
 offline replay uses the extracted artifact root.
@@ -121,7 +121,7 @@ remain open; existing required Rust authority is unchanged.
 
 ## Validation
 
-Full logs and exit statuses are retained in [validation.tar.gz](validation.tar.gz).
+Full logs and exit statuses are retained in [validation.tar.gz](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-133/validation.tar.gz).
 Rust checks use `CARGO_TARGET_DIR=$PWD/target` inside this workspace. Required
 hosted CI is pending and must pass before merge.
 

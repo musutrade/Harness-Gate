@@ -9,7 +9,7 @@ based on `caeeca3a34fb450e5de742fb8e09ff550d81a6bd`.
 Before implementation, the existing quality configuration suite passed 11 tests
 (334 skipped); log: `target/quality/gh-180/before.log`.
 The new retained compiler corpus is invoked by the shipped Rust CLI integration
-suite. [Acceptance results](acceptance.json) contain 50 cases, with zero
+suite. [Acceptance results](https://github.com/musutrade/Harness-Gate/blob/d9a932b23dcfea709175285b594ca200450a9971/docs/quality/gh-180/acceptance.json) contain 50 cases, with zero
 unexplained semantic mismatches. Twenty cases compare direct and compiled
 Rust reports byte-for-byte and their exit status; 25 negative cases reject
 stale/mixed/malformed inputs; four reject output aliases without damaging inputs;
