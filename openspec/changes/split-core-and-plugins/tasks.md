@@ -224,6 +224,17 @@ remaining plugins, and the release/signing identity switch last.
 - [x] 6.3 Externalize ecosystem presets through the plain file loader, then review source/fixture cleanup against actual consumers and preserved rollback materials.
 - [ ] 6.4 Complete repository naming and legacy install compatibility with explicit signing-identity acceptance; retain the `harness-gate` command and crate names.
 
+> **6.4 deferred by user decision (2026-10-13):** the motivation for GateHouse
+> was repository size and unrelated historical material. The selected approach
+> is in-place storage housekeeping, evidence archival and incremental size
+> limits, documented in [repository size policy](../../../docs/repository-size-policy.md)
+> and [local storage maintenance](../../../docs/local-storage.md). Harness-Gate
+> remains the active Core repository; GateHouse migration is optional future
+> work rather than a remaining requirement for this housekeeping change.
+> Naming and migration-specific legacy-install/signing acceptance (4.1/6.4)
+> are not claimed complete. Existing command, crate and release identities stay
+> unchanged; the paused bundled-product disposition under 4.3 also remains.
+
 > **3.4/5.4/6.2 complete (2026-10-13):** GateProbes PR #13 supplied the
 > independent packaging/signing workflow. All four plugin tags at
 > `f9834a988e9e55ec99b7ebe81fb67a9ca16b2928` subsequently published successfully.
