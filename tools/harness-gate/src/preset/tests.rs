@@ -349,6 +349,12 @@ fn arbitrary_external_preset_uses_plain_files_without_core_catalog_changes() {
     catalog::print_presets(None).unwrap();
     assert!(init(&TestWorkspace::new("no-fallback"), "rust-api", false).is_err());
     assert!(catalog::find("absent", Some(&source)).is_err());
+    let path = source.join("catalog.json");
+    let catalog = fs::read_to_string(&path)
+        .unwrap()
+        .replace("future", "future-2049");
+    fs::write(path, catalog).unwrap();
+    assert!(catalog::find("future-2049", Some(&source)).is_ok());
 }
 
 #[test]
@@ -363,6 +369,9 @@ fn invalid_external_catalogs_fail_before_configuration_publication() {
         original.replace("harness-preset-catalog/v1", "harness-preset-catalog/v2"),
         original.replace("\"future\"", "\"generic\""),
         original.replace("\"future\"", "\"../escape\""),
+        original.replace("\"future\"", "\"\""),
+        original.replace("\"future\"", "\"future_name\""),
+        original.replace("future", &"a".repeat(129)),
         original.replace("\"Future\"", "\"\""),
         original.replace("\"packs\":{}", "\"packs\":{},\"packs\":{}"),
         original.replace("\"packs\":{}", "\"packs\":{\"../escape\":\"pack.json\"}"),
@@ -375,6 +384,14 @@ fn invalid_external_catalogs_fail_before_configuration_publication() {
         assert!(catalog::print_presets(Some(&source)).is_err());
         assert!(!project.join(".harness-gate/flow.toml").exists());
     }
+    let mut oversized: serde_json::Value = serde_json::from_str(&original).unwrap();
+    for index in 0..65 {
+        oversized["presets"][format!("future-{index}")] =
+            serde_json::json!({"description":"Future", "flow":"flow.toml"});
+    }
+    fs::write(&path, oversized.to_string()).unwrap();
+    assert!(catalog::print_presets(Some(&source)).is_err());
+    assert!(!project.join(".harness-gate/flow.toml").exists());
     fs::write(&path, original).unwrap();
     assert!(init_from(&project, "generic", false, Some(&source.join("missing"))).is_err());
 }

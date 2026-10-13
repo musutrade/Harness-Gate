@@ -53,3 +53,16 @@ Reverting this migration restores the previous embedded catalog and file paths.
 Historical files remain byte-identical and the exact source commit is recorded.
 Existing initialized project files need no regeneration. GateProbes preset changes
 can proceed independently once a user explicitly selects that reviewed directory.
+
+## Isolated acceptance
+
+The [machine-readable result](preset-isolation-acceptance.json) records Core
+`d1a8bb406ac16594ac3707cfa794c99744aac001` with all 24 declared plugin
+implementation paths removed: build passed, 497 Rust tests passed, and 441
+selected Core Python tests passed without skips. This is the Core-only isolation
+selection, not a claim that historical compatibility tests can be deleted.
+Subsequent changes renew the ordinary CI receipt, classify the existing
+`#[cfg(test)]` scope tests correctly, and add catalog boundary cases; they do not
+change the tested production loader. GateProbes PR #15 merged as
+`ae7a3a200817c67081d52a58cd580b1be12631c4` after ordinary CI and all four native
+release-acceptance platform jobs passed.
