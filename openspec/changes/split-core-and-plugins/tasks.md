@@ -25,7 +25,7 @@ semantics, gate names, branch protection or release authority.
 - [x] 3.1 [P0][L] Remove the core-CI step that builds the Rust measurer from collector source; acceptance: core CI no longer compiles collector source and uses a pinned plugin artifact instead.
 - [x] 3.2 [P0][M] Make core CI select a pinned collector version explicitly (no "latest source"); acceptance: the exact version is recorded in CI config and logs.
 - [x] 3.3 [P1][M] Split `tools/release/` into core-release and plugin-release groups by target; acceptance: each script has a single owning repository.
-- [ ] 3.4 [P1][M] Move plugin build/sign/publish machinery and the four collector workflows to GateProbes; acceptance: GateProbes tests, packages and publishes independently, and core no longer references them.
+- [x] 3.4 [P1][M] Move plugin build/sign/publish machinery and the four collector workflows to GateProbes; acceptance: GateProbes tests, packages and publishes independently, and core no longer references them.
 - [x] 3.5 [P1][M] Re-verify signing identity after the move; acceptance: Sigstore certificate identity and provenance reference the GateProbes repository/workflow, not only a new URL.
 
 > **3.5 verified with a real publication (2026-10-12):** GateProbes published
@@ -36,7 +36,8 @@ semantics, gate names, branch protection or release authority.
 > `gh attestation verify`, the certificate SAN, `SHA256SUMS` and the exact
 > inventory. The consuming side switched to this identity in 5.6 on the same
 > date; the old repository entry and pinned artifacts are kept. The remaining
-> collector workflows and the protected production chain stay under 3.4/4.3.
+> active collectors were subsequently published under 3.4/6.2 below; the paused
+> production chain retains its separate 4.3 disposition.
 >
 > **3.1/3.2 complete (2026-10-11):** `harness-gate-rust-measure-0.3.1-linux-amd64.tar.gz`
 > is published with the `v0.4.8` release (signed, SBOM, recorded in the release
@@ -186,7 +187,7 @@ remaining plugins, and the release/signing identity switch last.
 - [x] 5.1 [P0][M] Scaffold GateProbes minimal source and the always-on CI classification framework; acceptance: the workflow always starts, classifies changes, selects subtasks, and ends in one fixed aggregate check; unknown changes fall back to the conservative set and no required workflow uses `paths-ignore`.
 - [x] 5.2 [P0][M] Split pure-documentation checks from executable-example checks and classify GateHouse paths; acceptance: a pure-doc change does not invoke Cargo, and `ownership.json`, protocol specifications and test inputs under `docs/` are classified as inputs, not documentation.
 - [x] 5.3 [P0][M] Migrate one low-dependency plugin and validate the independent flow; acceptance: the plugin repo builds, tests, runs its pinned-Core contract acceptance and clean-installs without the core source.
-- [ ] 5.4 [P1][M] Migrate the remaining plugins under D10 (source, manifests/lockfiles, tests, minimal fixtures, protocol copies, licenses, build/install/release scripts; no history, caches, old binaries); acceptance: each migration records source repository, full commit SHA and path mapping.
+- [x] 5.4 [P1][M] Migrate the remaining plugins under D10 (source, manifests/lockfiles, tests, minimal fixtures, protocol copies, licenses, build/install/release scripts; no history, caches, old binaries); acceptance: each migration records source repository, full commit SHA and path mapping.
 - [x] 5.5 [P1][S] Keep the rust-reference equivalence suite and `rust-generic-shadow` in core; acceptance: no historical input under `docs/quality/gh-96`/`gh-97` is deleted, and no moved test is skipped for a missing input.
 - [x] 5.6 [P1][M] Switch plugin release and signing identity last; acceptance: provenance and certificate identity reference GateProbes explicitly, and core keeps consuming pinned artifacts without recompiling.
 
@@ -207,8 +208,9 @@ remaining plugins, and the release/signing identity switch last.
 > [run 38218221468](https://github.com/musutrade/GateProbes/actions/runs/38218221468)
 > passed at `155b233fb2f525f520b4fcc0ed73e017154345e0`, including the TypeScript
 > pinned-Core contract and clean-install steps. This references existing hosted
-> evidence rather than rerunning historical acceptance. Remaining independent
-> publication of the four non-native plugins keeps 3.4/5.4 open.
+> evidence rather than rerunning historical acceptance. Independent
+> publication of the four non-native plugins was still pending at that receipt;
+> the 2026-10-13 publication acceptance below closes 3.4/5.4/6.2.
 >
 > **5.5 evidence reconciled (2026-10-13):** the passing isolation run above
 > includes the Core reference tests. The fixture ownership manifest now records
@@ -218,9 +220,22 @@ remaining plugins, and the release/signing identity switch last.
 ## 6. Complete ordinary CI and release independence
 
 - [ ] 6.1 Transfer only plugin tests with demonstrated GateProbes parity out of ordinary Core CI; retain all unmigrated compatibility/reference tests and preserve required Core checks. The first bounded handoff is recorded in `docs/quality/ci-plugin-test-handoff.md`.
-- [ ] 6.2 Publish the four remaining plugins independently from GateProbes with packaging, clean-install, signed inventory and provenance acceptance; then remove their build/publication dependency from Core release.
+- [x] 6.2 Publish the four remaining plugins independently from GateProbes with packaging, clean-install, signed inventory and provenance acceptance; then remove their build/publication dependency from Core release.
 - [ ] 6.3 Externalize ecosystem presets through the plain file loader, then review source/fixture cleanup against actual consumers and preserved rollback materials.
 - [ ] 6.4 Complete repository naming and legacy install compatibility with explicit signing-identity acceptance; retain the `harness-gate` command and crate names.
+
+> **3.4/5.4/6.2 complete (2026-10-13):** GateProbes PR #13 supplied the
+> independent packaging/signing workflow. All four plugin tags at
+> `f9834a988e9e55ec99b7ebe81fb67a9ca16b2928` subsequently published successfully.
+> [Publication and installation acceptance](../../../docs/quality/independent-plugin-release-acceptance.md)
+> records the four runs, 48 public files, 16 exact-tag signatures and 16
+> exact-source provenance checks. Downloaded public packages pass fresh
+> installation and pinned Core contracts (Node suites 21 + 21, Rust source-risk
+> 26 without skips, measurer identity/AST consumer). Core release no longer
+> packages or publishes the plugins. This closes active plugin publication;
+> legacy compatibility helpers stay until consumer review, and the paused
+> bundled product remains disabled under 4.3. Ordinary CI handoff, ecosystem
+> presets and repository naming remain 6.1/6.3/6.4.
 
 ## Validation
 

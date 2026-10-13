@@ -1,5 +1,15 @@
 # Published releases and acceptance
 
+## Four independent GateProbes packages, 2026-10-13
+
+TypeScript risk RC4, HTTP/JSON contract RC5, Rust source-risk RC7 and Rust
+measurer 0.3.1 are now published under their independent GateProbes tags.
+All four immutable releases passed public download, exact-tag signature,
+exact-source provenance and fresh installation acceptance. See the
+[release handoff and evidence](quality/independent-plugin-release-acceptance.md).
+Core's next release no longer packages these plugins; historical releases,
+Core's current consumption pin and the native RC8 chain remain unchanged.
+
 ## GateProbes native collector rc.8, 2026-10-12
 
 The native Rust/MIR collector's signed publication moved to GateProbes, which
