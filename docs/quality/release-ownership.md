@@ -1,9 +1,9 @@
 # Release and install ownership
 
 This note assigns release and install machinery to one owning repository for the
-core/plugin split (OpenSpec task 3.3). It is a classification only: nothing moves
-between repositories here, no signing identity changes, and the Postgres recipe,
-repository rename and compatibility-path cleanup remain later steps.
+core/plugin split (OpenSpec task 3.3). The initial task classified ownership;
+subsequent publication handoffs are recorded below. Repository naming and wider compatibility-path cleanup remain
+separate work.
 
 | Owner | Path | Why |
 | --- | --- | --- |
@@ -42,6 +42,18 @@ that identity for the Rust collector (default `0.1.0-rc.8`) while Core binary
 installs keep the Harness-Gate `release.yml` identity; a new download URL still
 never changes a trusted identity by itself. The protected production chain
 keeps its separate RSA/Sigstore trust and remains tasks 4.3.
+
+## Four independent package releases
+
+TypeScript risk, HTTP/JSON contract, Rust source risk and Rust measurer now
+publish through GateProbes `collector-release.yml`. Their signed public releases
+and fresh installation acceptance are recorded in the
+[publication handoff](independent-plugin-release-acceptance.md). Core `release.yml`
+no longer invokes `package_independent_collectors.py` or includes their packages
+in its inventory. The historical helper remains for compatibility tests and
+rollback; keeping its source does not make it an active Core publication path.
+Shared policy/inventory tools still have the single editable source described
+above. The existing Core consumption pin is unchanged.
 
 ## Remaining collector workflows
 

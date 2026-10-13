@@ -57,10 +57,12 @@ other thirteen modules, with their individual reasons recorded in the receipt:
   contracts without complete replacement coverage in GateProbes.
 
 Core reference equivalence and its `rust-reference` fixture directory remain
-Core-owned. All release governance tests remain in Core while its release
-workflow still packages four plugins. The remaining release and compatibility
-dependencies require their own reviewed migration; this change does not claim
-that ordinary Core CI or Core publication is fully independent of plugin source.
+Core-owned. Release governance and retained compatibility tests remain in Core.
+The later
+[four-plugin publication handoff](independent-plugin-release-acceptance.md) removes
+plugin packaging from Core release after signed public installation acceptance.
+That separate handoff does not complete ordinary Core CI independence or remove
+the retained source/fixture consumers described here.
 
 ## Verification and rollback
 

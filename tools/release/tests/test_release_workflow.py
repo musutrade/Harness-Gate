@@ -14,17 +14,22 @@ class ReleaseWorkflowTests(unittest.TestCase):
     def setUp(self) -> None:
         self.source = WORKFLOW.read_text(encoding="utf-8")
 
-    def test_collector_packages_require_acceptance_and_inventory(self) -> None:
-        self.assertIn("needs: [policy, build, quality, collectors]", self.source)
-        self.assertIn("package_independent_collectors.py --output collector-dist", self.source)
-        for package in (
-            "harness-gate-typescript-collector-0.1.0-rc.4.tgz",
-            "harness-gate-http-json-contract-collector-0.1.0-rc.5.tgz",
-            "harness-gate-rust-source-risk-0.1.0-rc.7-linux-amd64.tar.gz",
-            "harness-gate-rust-measure-0.3.1-linux-amd64.tar.gz",
-        ):
-            self.assertIn("--package " + package, self.source)
-            self.assertIn("--sbom " + package + ".sbom.cdx.json", self.source)
+    def test_core_publication_is_independent_of_plugin_builds(self) -> None:
+        self.assertIn("needs: [policy, build, quality]", self.source)
+        self.assertNotRegex(self.source, r"(?m)^  collectors:")
+        self.assertNotIn("package_independent_collectors.py", self.source)
+        self.assertNotIn("release-harness-gate-independent-collectors", self.source)
+        inventory = self.source.split("- name: Generate release inventory", 1)[1].split(
+            "- name: Generate checksum manifest", 1)[0]
+        self.assertNotIn("--package ", inventory)
+        self.assertEqual(re.findall(r"--binary (\S+)", self.source), [
+            "harness-gate-linux-amd64",
+            "harness-gate-macos-amd64",
+            "harness-gate-macos-arm64",
+            "harness-gate-windows-amd64.exe",
+        ])
+        self.assertEqual(re.findall(r"--sbom (\S+)", self.source),
+                         ["harness-gate.sbom.cdx.json"])
 
     def test_publication_download_excludes_policy_evidence(self) -> None:
         """Only build-matrix artifacts may be copied into the release dist."""
