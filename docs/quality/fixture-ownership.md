@@ -23,8 +23,17 @@ only collector-specific fixtures go to GateProbes.
 | `tools/quality/fixtures/risk` | core | Bounded function-risk mapping |
 | `tools/quality/fixtures/rust-macro-observation` | plugin | Rust macro collection measurement |
 | `tools/quality/fixtures/rust-native` | plugin | Rust native collector inputs |
-| `tools/quality/fixtures/rust-reference` | plugin | Rust collector equivalence history |
+| `tools/quality/fixtures/rust-reference` | core | Frozen historical equivalence window and accepted baseline (D11) |
 | `tools/quality/fixtures/typescript-angular` | plugin | TypeScript/Angular collector inputs |
+
+The `rust-reference` directory stays in core under D11. Its
+`equivalence-window.json` and `history.json` are inputs to
+`rust_equivalence.py` and `tests/test_rust_reference.py`; the history manifest
+also references `phase-1-accepted-b92755f.json` in that directory. These replay
+existing evidence and preserve historical decision compatibility without
+collecting new measurements. The candidate archives under `docs/quality/gh-96`
+and `docs/quality/gh-97` also remain in core. Engineering-policy semantics are
+unchanged.
 
 The decision fixtures that core embeds at compile time were relocated out of
 `tools/quality/fixtures/` into the core crate so core no longer reaches into the
@@ -39,4 +48,6 @@ The machine-readable manifest is
 [`fixture-ownership.json`](fixture-ownership.json). It is enforced by
 `tools/quality/tests/test_fixture_ownership.py`, which checks that every
 fixture entry is classified exactly once and that no core Rust source or test
-references a plugin fixture path.
+references a plugin fixture path. It also checks the literal fixture inputs of
+the two frozen Python equivalence consumers above, requiring each input to
+exist and belong to core.

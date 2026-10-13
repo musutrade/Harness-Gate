@@ -15,12 +15,12 @@
       "tools/quality/fixtures/json-results",
       "tools/quality/fixtures/policy",
       "tools/quality/fixtures/project-model",
-      "tools/quality/fixtures/risk"
+      "tools/quality/fixtures/risk",
+      "tools/quality/fixtures/rust-reference"
     ],
     "plugin": [
       "tools/quality/fixtures/rust-macro-observation",
       "tools/quality/fixtures/rust-native",
-      "tools/quality/fixtures/rust-reference",
       "tools/quality/fixtures/typescript-angular"
     ]
   },
