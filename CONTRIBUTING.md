@@ -1,5 +1,7 @@
 # 贡献指南
 
+后续贡献请提交到 [GateHouse](https://github.com/musutrade/GateHouse)。以下内容作为历史开发记录保留。
+
 感谢你对 Harness-Gate 的关注！我们欢迎各种形式的贡献。
 
 ## 规范性工程政策
