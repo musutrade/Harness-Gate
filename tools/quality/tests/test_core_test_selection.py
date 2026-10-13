@@ -81,6 +81,42 @@ class CoreTestSelectionTests(unittest.TestCase):
                     run_core.select(self.root)
                 path.write_bytes(previous)
 
+    def copy_accepted_core_input(self, relative):
+        # Use the real receipt so an omitted dependency cannot pass this test.
+        accepted = run_core.read_receipt(run_core.ROOT)['guarded_sources']
+        self.assertIn(relative, accepted)
+        path = self.root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes((run_core.ROOT / relative).read_bytes())
+        self.receipt['guarded_sources'][relative] = accepted[relative]
+        self.save()
+        self.assertEqual(run_core.select(self.root), ['test_core'])
+        return path
+
+    def test_changed_core_evidence_helpers_invalidate_project_handoff(self):
+        for name in ('harness_evidence', 'project_model', 'quality_evidence', 'collector_runner'):
+            relative = f'tools/quality/{name}.py'
+            with self.subTest(path=relative):
+                path = self.copy_accepted_core_input(relative)
+                previous = path.read_bytes()
+                path.write_bytes(previous + b'\n# Changed Core consumer implementation.\n')
+                with self.assertRaisesRegex(ValueError, 'handoff is stale: ' + relative):
+                    run_core.select(self.root)
+                path.write_bytes(previous)
+
+    def test_changed_core_evidence_schema_invalidates_project_handoff(self):
+        for name in ('harness-evidence', 'project-model'):
+            relative = f'tools/quality/schema/{name}.schema.json'
+            with self.subTest(path=relative):
+                path = self.copy_accepted_core_input(relative)
+                previous = path.read_bytes()
+                schema = json.loads(previous)
+                schema['required'].append('new_core_required_field')
+                path.write_text(json.dumps(schema))
+                with self.assertRaisesRegex(ValueError, 'handoff is stale: ' + relative):
+                    run_core.select(self.root)
+                path.write_bytes(previous)
+
     def test_missing_guarded_input_fails(self):
         self.source.unlink()
         with self.assertRaisesRegex(ValueError, 'missing guarded source'):

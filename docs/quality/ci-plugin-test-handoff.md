@@ -23,10 +23,21 @@ was not part of either discovery command and is not newly claimed here.
 [`run_core.py`](../../tools/quality/tests/run_core.py). It first checks the
 handoff and retained source digests, then runs every discovered `test_*.py`
 module except the two accepted native modules. New modules run by default.
-Missing or modified delegated tests or guarded plugin inputs fail selection;
+Missing or modified delegated tests or guarded plugin/Core inputs fail selection;
 restore local execution or renew the reviewed parity evidence before changing
 those retained implementations. The check uses committed evidence, without a
 GateProbes checkout or a new network dependency in Core CI.
+
+The eight project tests also depend on Core's `harness_evidence.py`,
+`project_model.py`, `quality_evidence.py` and `collector_runner.py`, plus
+`harness-evidence.schema.json` and `project-model.schema.json`. All six inputs
+are digest-guarded alongside the existing plugin binding schema. Their bytes
+match Core `8d93ea53c7cf8b314bda816eafe13209da25c742`, which the accepted
+GateProbes CI pins through the top-level `source_commit`. Changing a Core
+consumer or either schema invalidates that handoff even if plugin code is
+unchanged. Renew acceptance against the changed inputs or restore the eight
+local project tests under a revised handoff; updating hashes alone is not
+renewed acceptance.
 
 The original test files remain available: legacy runtime tests still import
 fixture helpers from `test_rust_collector_project`. This change transfers
@@ -53,10 +64,11 @@ that ordinary Core CI or Core publication is fully independent of plugin source.
 
 ## Verification and rollback
 
-Focused tests cover stale source/test digests, missing inputs, malformed or
-unpinned handoffs, missing execution evidence and conservative selection of new
-tests. Existing CI topology tests continue to enforce the unchanged required
-job and platform contract. The fixture ownership test guards the historical
+Focused tests cover stale source/test digests, changes to the project tests'
+Core consumers and evidence/model schemas using the actual receipt, missing
+inputs, malformed or unpinned handoffs, missing execution evidence and
+conservative selection of new tests. Existing CI topology tests continue to
+enforce the unchanged required job and platform contract. The fixture ownership test guards the historical
 Core Python equivalence inputs as well as Rust fixture references.
 
 Reverting the workflow change restores the original discovery command and
