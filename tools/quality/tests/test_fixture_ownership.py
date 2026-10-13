@@ -1,5 +1,6 @@
 """Every fixture has one owner; core tests never reach a plugin fixture."""
 import json
+import re
 import unittest
 from pathlib import Path
 
@@ -48,6 +49,27 @@ class FixtureOwnershipTests(unittest.TestCase):
                 if f"fixtures/{name}" in text:
                     offenders.append((source.relative_to(ROOT).as_posix(), name))
         self.assertEqual(offenders, [])
+
+    def test_frozen_python_equivalence_inputs_stay_with_core(self):
+        # D11 keeps these historical replay consumers in Core. Inspect their
+        # literal inputs without importing/running the replay or collectors.
+        for source in (
+            "tools/quality/rust_equivalence.py",
+            "tools/quality/tests/test_rust_reference.py",
+        ):
+            references = re.findall(
+                r"['\"](tools/quality/fixtures/[^'\"]+)['\"]",
+                (ROOT / source).read_text(),
+            )
+            self.assertTrue(references, source)
+            for reference in references:
+                with self.subTest(source=source, fixture=reference):
+                    self.assertTrue((ROOT / reference).is_file(), reference)
+                    owners = [
+                        owner for owner, paths in self.owners.items()
+                        if any(Path(reference).is_relative_to(path) for path in paths)
+                    ]
+                    self.assertEqual(owners, ["core"], reference)
 
 
 if __name__ == "__main__":

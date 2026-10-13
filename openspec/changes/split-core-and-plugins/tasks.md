@@ -59,7 +59,7 @@ semantics, gate names, branch protection or release authority.
 > editable source in GateHouse; plugin copies are generated from a pinned
 > revision. No repository move or signing-identity change is included.
 >
-> **Remaining blocker (2026-10-11):** 3.4/3.5 are cross-repository moves whose
+> **Historical blocker (2026-10-11, 3.5 resolved above):** 3.4/3.5 are cross-repository moves whose
 > signed provenance must be produced and re-verified in GateProbes.
 
 ## 4. Remove compatibility paths and handle the rest
@@ -110,7 +110,7 @@ semantics, gate names, branch protection or release authority.
 > no tag protection or historical rewrite is claimed here. Compatibility reads
 > (rust-measure source and its core tests, collector fixtures, paused
 > bundled-chain hold protections) are deliberately retained. The wider removal
-> set stays open: 4.2 Postgres isolation is not done, and the paused bundled
+> set stays open. Postgres isolation was subsequently completed in 4.2; the paused bundled
 > product stays disabled-retained per the 4.3 disposition; neither blocks this
 > change's closure.
 
@@ -157,10 +157,10 @@ semantics, gate names, branch protection or release authority.
 >   routing measurement recorded in `docs/quality/ci-docs-routing.md`; no new
 >   ecosystem certification or measurement-semantic claim is made.
 
-> **Open acceptance gap (not completed):** "Core builds and tests with no
+> **Historical acceptance gap (resolved by the isolation run below):** "Core builds and tests with no
 > plugin source checked out" is still not demonstrated: CI checks out the full
-> repository, so the aggregate cannot prove it. It stays tracked in the
-> Validation list and is not claimed by 4.4/4.5; it does not block 4.2.
+> repository, so the aggregate alone cannot prove it. The manual acceptance
+> below closes this specific gap; required CI independence remains separate.
 >
 > **Isolation acceptance, pass (2026-10-12, Linux amd64):** the repeatable
 > entry point `tools/quality/core_isolation_check.py` ran commit
@@ -183,11 +183,11 @@ Decisions D10–D13 in the design govern this section. Development order: scaffo
 and classification framework first, then one low-dependency plugin, then the
 remaining plugins, and the release/signing identity switch last.
 
-- [ ] 5.1 [P0][M] Scaffold GateProbes minimal source and the always-on CI classification framework; acceptance: the workflow always starts, classifies changes, selects subtasks, and ends in one fixed aggregate check; unknown changes fall back to the conservative set and no required workflow uses `paths-ignore`.
+- [x] 5.1 [P0][M] Scaffold GateProbes minimal source and the always-on CI classification framework; acceptance: the workflow always starts, classifies changes, selects subtasks, and ends in one fixed aggregate check; unknown changes fall back to the conservative set and no required workflow uses `paths-ignore`.
 - [x] 5.2 [P0][M] Split pure-documentation checks from executable-example checks and classify GateHouse paths; acceptance: a pure-doc change does not invoke Cargo, and `ownership.json`, protocol specifications and test inputs under `docs/` are classified as inputs, not documentation.
-- [ ] 5.3 [P0][M] Migrate one low-dependency plugin and validate the independent flow; acceptance: the plugin repo builds, tests, runs its pinned-Core contract acceptance and clean-installs without the core source.
+- [x] 5.3 [P0][M] Migrate one low-dependency plugin and validate the independent flow; acceptance: the plugin repo builds, tests, runs its pinned-Core contract acceptance and clean-installs without the core source.
 - [ ] 5.4 [P1][M] Migrate the remaining plugins under D10 (source, manifests/lockfiles, tests, minimal fixtures, protocol copies, licenses, build/install/release scripts; no history, caches, old binaries); acceptance: each migration records source repository, full commit SHA and path mapping.
-- [ ] 5.5 [P1][S] Keep the rust-reference equivalence suite and `rust-generic-shadow` in core; acceptance: no historical input under `docs/quality/gh-96`/`gh-97` is deleted, and no moved test is skipped for a missing input.
+- [x] 5.5 [P1][S] Keep the rust-reference equivalence suite and `rust-generic-shadow` in core; acceptance: no historical input under `docs/quality/gh-96`/`gh-97` is deleted, and no moved test is skipped for a missing input.
 - [x] 5.6 [P1][M] Switch plugin release and signing identity last; acceptance: provenance and certificate identity reference GateProbes explicitly, and core keeps consuming pinned artifacts without recompiling.
 
 > **5.6 complete (2026-10-12):** `install.sh` now downloads the Rust/MIR
@@ -200,6 +200,27 @@ remaining plugins, and the release/signing identity switch last.
 > negatives. The protected production chain (RSA/Sigstore, six assets, x86_64
 > Linux) is a separate paused product and stays unprovisioned; see the 4.3
 > disposition note.
+
+> **5.1/5.3 evidence reconciled (2026-10-13):** GateProbes PRs #1–#12
+> established classification, selected plugin checks, a fixed aggregate and all
+> five plugin source snapshots. Main
+> [run 38218221468](https://github.com/musutrade/GateProbes/actions/runs/38218221468)
+> passed at `155b233fb2f525f520b4fcc0ed73e017154345e0`, including the TypeScript
+> pinned-Core contract and clean-install steps. This references existing hosted
+> evidence rather than rerunning historical acceptance. Remaining independent
+> publication of the four non-native plugins keeps 3.4/5.4 open.
+>
+> **5.5 evidence reconciled (2026-10-13):** the passing isolation run above
+> includes the Core reference tests. The fixture ownership manifest now records
+> the `rust-reference` historical replay inputs as Core-owned, matching D11;
+> no historical evidence is removed.
+
+## 6. Complete ordinary CI and release independence
+
+- [ ] 6.1 Transfer only plugin tests with demonstrated GateProbes parity out of ordinary Core CI; retain all unmigrated compatibility/reference tests and preserve required Core checks. The first bounded handoff is recorded in `docs/quality/ci-plugin-test-handoff.md`.
+- [ ] 6.2 Publish the four remaining plugins independently from GateProbes with packaging, clean-install, signed inventory and provenance acceptance; then remove their build/publication dependency from Core release.
+- [ ] 6.3 Externalize ecosystem presets through the plain file loader, then review source/fixture cleanup against actual consumers and preserved rollback materials.
+- [ ] 6.4 Complete repository naming and legacy install compatibility with explicit signing-identity acceptance; retain the `harness-gate` command and crate names.
 
 ## Validation
 
