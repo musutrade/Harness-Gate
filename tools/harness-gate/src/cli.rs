@@ -9,9 +9,12 @@ use std::path::PathBuf;
     version,
     about = "Configuration-driven project verification: init -> verify -> one project decision",
     arg_required_else_help = true,
-    after_help = "Project workflow:\n  harness-gate init --preset rust-api\n  harness-gate config check\n  harness-gate verify --profile ci --all\n\nReference presets generate flow + quality configuration. Provision trusted collector\nstate, signed requests and keys before verify; see generated QUALITY.md.\nEcosystem identity is configuration/pack data; collectors measure, Rust decides.\nAdvanced interfaces: quality evaluate and adapter run (explicit trusted inputs)."
+    after_help = "Project workflow:\n  harness-gate init --preset rust-api --presets-dir /path/to/GateProbes/presets\n  harness-gate config check\n  harness-gate verify --profile ci --all\n\nReference presets generate flow + quality configuration. Provision trusted collector\nstate, signed requests and keys before verify; see generated QUALITY.md.\nEcosystem identity is configuration/pack data; collectors measure, Rust decides.\nAdvanced interfaces: quality evaluate and adapter run (explicit trusted inputs)."
 )]
 pub(crate) struct Cli {
+    /// Directory containing a reviewed external catalog.json and preset files.
+    #[arg(long, global = true, value_name = "PATH")]
+    pub presets_dir: Option<PathBuf>,
     /// Control colored terminal output.
     #[arg(long, global = true, value_enum, default_value_t = ColorMode::Auto)]
     pub(crate) color: ColorMode,
@@ -142,7 +145,7 @@ pub(crate) enum Commands {
         #[arg(long)]
         force: bool,
     },
-    /// List embedded project presets.
+    /// List the generic preset and an explicitly selected external catalog.
     Presets,
 }
 

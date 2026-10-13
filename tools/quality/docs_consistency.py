@@ -175,12 +175,14 @@ def executable_checks() -> dict:
     command = ["cargo", "run", "--quiet", "--locked", "--manifest-path",
                str(CRATE / "Cargo.toml"), "--"]
     examples = []
-    for preset in sorted((CRATE / "presets").glob("*.flow.toml")):
+    for preset in sorted([*(CRATE / "presets").glob("*.flow.toml"),
+                          *(CRATE / "fixtures/preset-compat").glob("*.flow.toml")], key=lambda path: path.name):
         with tempfile.TemporaryDirectory(prefix="harness-gate-example-") as directory:
             root = Path(directory)
             preset_name = preset.name.removesuffix(".flow.toml")
             initialized = subprocess.run(
-                [*command, "init", "--project-root", str(root), "--preset", preset_name],
+                [*command, "init", "--project-root", str(root), "--preset", preset_name,
+                 "--presets-dir", str(CRATE / "fixtures/preset-compat")],
                 cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
             )
             checked = initialized.returncode == 0 and subprocess.run(
@@ -214,7 +216,7 @@ def executable_checks() -> dict:
         root = Path(directory)
         config = root / ".harness-gate"
         config.mkdir()
-        shutil.copy2(CRATE / "presets/rust-api.flow.toml", config / "flow.toml")
+        shutil.copy2(CRATE / "fixtures/preset-compat/rust-api.flow.toml", config / "flow.toml")
         shutil.copy2(CRATE / "presets/empty.audit.toml", config / "audit.toml")
         shutil.copy2(CRATE / "presets/default.secrets.toml", config / "secrets.toml")
         for filename in ("quality.toml", "policy.json"):

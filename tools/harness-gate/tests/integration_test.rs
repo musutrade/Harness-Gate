@@ -158,6 +158,8 @@ fn test_config_check_json_is_machine_readable_for_success_and_failure() {
 fn test_presets_lists_available() {
     let output = std::process::Command::new(env!("CARGO_BIN_EXE_harness-gate"))
         .arg("presets")
+        .arg("--presets-dir")
+        .arg(std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/preset-compat"))
         .output()
         .expect("Failed to execute command");
 

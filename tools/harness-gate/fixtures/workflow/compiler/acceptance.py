@@ -32,7 +32,7 @@ def prepare(root, unknown=False):
     (root / 'target/evidence').mkdir(parents=True)
     shutil.copyfile(ROOT / 'source.txt', root / 'src/lib.rs')
     shutil.copyfile(ROOT / 'artifact.txt', root / 'target/evidence/raw.json')
-    shutil.copyfile(REPO / 'tools/harness-gate/presets/rust-api.flow.toml', root / '.harness-gate/flow.toml')
+    shutil.copyfile(REPO / 'tools/harness-gate/fixtures/preset-compat/rust-api.flow.toml', root / '.harness-gate/flow.toml')
     direct = load(ROOT / 'direct.json')
     state = load(ROOT / ('unknown-ecosystem.json' if unknown else 'state.json'))
     quality = (ROOT / 'quality.toml').read_text()

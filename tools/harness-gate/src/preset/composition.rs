@@ -30,14 +30,18 @@ pub(super) fn compose(recipe: &str, packs: &[(&str, &str)], project: &str) -> Re
         &bindings,
     )?;
     let mut files = BTreeMap::new();
-    for selection in serde_json::from_str::<Vec<Selection>>(recipe)? {
+    for selection in
+        serde_json::from_value::<Vec<Selection>>(harness_gate::quality::parse(recipe)?)?
+    {
         let source = packs
             .iter()
             .find(|(id, _)| *id == selection.pack)
             .with_context(|| format!("unknown pack {}", selection.pack))?
             .1;
-        let pack: Pack =
-            serde_json::from_value(expand(serde_json::from_str(source)?, &selection.bindings)?)?;
+        let pack: Pack = serde_json::from_value(expand(
+            harness_gate::quality::parse(source)?,
+            &selection.bindings,
+        )?)?;
         merge(&mut quality, pack.quality)?;
         for (path, value) in pack.files {
             ensure!(

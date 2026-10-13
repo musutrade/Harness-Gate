@@ -1,6 +1,7 @@
 """Reference pack defaults stay data, pinned to accepted measurement boundaries."""
 import copy
 import gzip
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -10,7 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import typescript_semantics as ts
 
 ROOT = Path(__file__).resolve().parents[3]
-PRESETS = ROOT / 'tools/harness-gate/presets'
+PRESETS = ROOT / 'tools/harness-gate/fixtures/preset-compat'
 FIXTURES = ROOT / 'tools/quality/fixtures'
 CORE_FIXTURES = ROOT / 'tools/harness-gate/fixtures'
 
@@ -75,3 +76,13 @@ class PresetPackTests(unittest.TestCase):
                        'quality-collectors.md', 'quality-compilation.md', 'registry',
                        'Required Quality Aggregate'):
             self.assertIn(anchor, docs)
+
+
+class FrozenPresetProvenanceTests(unittest.TestCase):
+    def test_frozen_inputs_match_recorded_inventory_and_digests(self):
+        manifest = json.loads((PRESETS / 'provenance.json').read_text())
+        actual = {p.relative_to(PRESETS).as_posix() for p in PRESETS.rglob('*') if p.is_file()}
+        self.assertEqual(actual, set(manifest['files']) | {'provenance.json'})
+        for relative, record in manifest['files'].items():
+            self.assertEqual(hashlib.sha256((PRESETS / relative).read_bytes()).hexdigest(),
+                             record['sha256'], relative)

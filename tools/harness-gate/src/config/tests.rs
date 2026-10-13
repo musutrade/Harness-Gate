@@ -8,7 +8,10 @@ use std::collections::BTreeSet;
 use std::fs;
 
 fn repository_config() -> FlowConfig {
-    toml::from_str(include_str!("../../presets/rust-api.flow.toml")).expect("parse fixture")
+    toml::from_str(include_str!(
+        "../../fixtures/preset-compat/rust-api.flow.toml"
+    ))
+    .expect("parse fixture")
 }
 
 fn diagnostics_for(config: &FlowConfig) -> Vec<ConfigDiagnostic> {
@@ -247,7 +250,7 @@ fn runner_contract_rejects_invalid_fields() {
     config.steps[step_index].runner = None;
     let unknown_kind = format!(
         "{}\n[[steps]]\nid = \"future.step\"\nlabel = \"future\"\nprofiles = [\"full\"]\nkind = \"future-step\"\n",
-        include_str!("../../presets/rust-api.flow.toml")
+        include_str!("../../fixtures/preset-compat/rust-api.flow.toml")
     );
     assert!(toml::from_str::<FlowConfig>(&unknown_kind)
         .expect_err("unknown step kind")
@@ -272,7 +275,7 @@ fn runner_contract_rejects_invalid_fields() {
 
 #[test]
 fn existing_v2_config_defaults_the_secret_rule_path() {
-    let source = include_str!("../../presets/rust-api.flow.toml")
+    let source = include_str!("../../fixtures/preset-compat/rust-api.flow.toml")
         .lines()
         .filter(|line| !line.starts_with("secrets_config = "))
         .collect::<Vec<_>>()
@@ -390,7 +393,7 @@ fn runner_thread_environment_cannot_shadow_service_injection() {
 
 #[test]
 fn unknown_fields_are_rejected() {
-    let source = include_str!("../../presets/rust-api.flow.toml").replacen(
+    let source = include_str!("../../fixtures/preset-compat/rust-api.flow.toml").replacen(
         "version = 2",
         "version = 2\nunknown = true",
         1,
@@ -468,7 +471,7 @@ fn unknown_built_in_gate_types_fail_closed() {
     gate.depends_on.clear();
     let unknown_gate = format!(
         "{}\n[[steps]]\nid = \"builtin.future\"\nlabel = \"future gate\"\nprofiles = [\"full\"]\nkind = \"builtin-gate\"\ngate_type = \"future-gate\"\n",
-        include_str!("../../presets/rust-api.flow.toml")
+        include_str!("../../fixtures/preset-compat/rust-api.flow.toml")
     );
     assert!(toml::from_str::<FlowConfig>(&unknown_gate)
         .expect_err("unknown gate must fail")
@@ -489,7 +492,7 @@ fn external_steps_reject_gate_fields() {
 
 #[test]
 fn environment_interpolation_supports_defaults() {
-    let source = include_str!("../../presets/rust-api.flow.toml").replace(
+    let source = include_str!("../../fixtures/preset-compat/rust-api.flow.toml").replace(
         "name = \"rust-api\"",
         "name = \"${HG_TEST_NAME:-interpolated}\"",
     );
@@ -499,7 +502,7 @@ fn environment_interpolation_supports_defaults() {
 
 #[test]
 fn environment_interpolation_requires_defined_variables() {
-    let source = include_str!("../../presets/rust-api.flow.toml")
+    let source = include_str!("../../fixtures/preset-compat/rust-api.flow.toml")
         .replace("name = \"rust-api\"", "name = \"${HG_MISSING_VARIABLE}\"");
     let error = FlowConfig::from_source(&source).expect_err("missing variable must fail");
     assert!(error.to_string().contains("HG_MISSING_VARIABLE"));
@@ -507,7 +510,7 @@ fn environment_interpolation_requires_defined_variables() {
 
 #[test]
 fn audit_configuration_path_rejects_environment_interpolation() {
-    let source = include_str!("../../presets/rust-api.flow.toml").replace(
+    let source = include_str!("../../fixtures/preset-compat/rust-api.flow.toml").replace(
         "audit_config = \".harness-gate/audit.toml\"",
         "audit_config = \"${HG_PROJECT_AUDIT_CONFIG:-policies/audit.toml}\"",
     );
@@ -901,7 +904,7 @@ fn template_paths_must_stay_inside_a_disjoint_repository_root() {
     let path = workspace.root.join("flow.toml");
     let source = format!(
         "{}\n[report_templates]\nroot = \"templates\"\ntemplate = \"templates/report.tera\"\n",
-        include_str!("../../presets/rust-api.flow.toml")
+        include_str!("../../fixtures/preset-compat/rust-api.flow.toml")
     );
     fs::write(&path, source).expect("write config");
     FlowConfig::load_with_diagnostics(&path, Some(&workspace.root)).expect("safe template config");
@@ -910,7 +913,7 @@ fn template_paths_must_stay_inside_a_disjoint_repository_root() {
         &path,
         format!(
             "{}\n[report_templates]\nroot = \".harness-gate/reports\"\ntemplate = \".harness-gate/reports/report.tera\"\n",
-            include_str!("../../presets/rust-api.flow.toml")
+            include_str!("../../fixtures/preset-compat/rust-api.flow.toml")
         ),
     )
     .expect("write overlapping config");
@@ -932,7 +935,7 @@ fn template_paths_must_stay_inside_a_disjoint_repository_root() {
 
 #[test]
 fn windows_prefixed_paths_are_rejected_on_every_platform() {
-    let source = include_str!("../../presets/rust-api.flow.toml").replace(
+    let source = include_str!("../../fixtures/preset-compat/rust-api.flow.toml").replace(
         "reports = \".harness-gate/reports\"",
         "reports = \"C:\\\\reports\"",
     );
@@ -942,7 +945,7 @@ fn windows_prefixed_paths_are_rejected_on_every_platform() {
 
 #[test]
 fn windows_style_parent_traversal_is_rejected_on_every_platform() {
-    let source = include_str!("../../presets/rust-api.flow.toml").replace(
+    let source = include_str!("../../fixtures/preset-compat/rust-api.flow.toml").replace(
         "reports = \".harness-gate/reports\"",
         "reports = \"..\\\\outside\"",
     );
@@ -969,7 +972,7 @@ fn template_symlink_escape_is_rejected() {
         &path,
         format!(
             "{}\n[report_templates]\nroot = \"templates\"\ntemplate = \"templates/escape.tera\"\n",
-            include_str!("../../presets/rust-api.flow.toml")
+            include_str!("../../fixtures/preset-compat/rust-api.flow.toml")
         ),
     )
     .expect("write config");
@@ -987,7 +990,7 @@ fn template_symlink_escape_is_rejected() {
 fn junit_report_path_must_stay_relative_to_the_report_directory() {
     let source = format!(
         "{}\n[report_templates]\njunit = \"../junit.xml\"\n",
-        include_str!("../../presets/rust-api.flow.toml")
+        include_str!("../../fixtures/preset-compat/rust-api.flow.toml")
     );
     let error = FlowConfig::from_source(&source).expect_err("JUnit traversal must fail");
     assert!(error.to_string().contains("report_templates.junit"));
@@ -997,14 +1000,14 @@ fn junit_report_path_must_stay_relative_to_the_report_directory() {
 fn webhook_configuration_requires_http_url_and_an_enabled_result() {
     let invalid_scheme = format!(
         "{}\n[[notifications.webhooks]]\nurl = \"ftp://example.test/hook\"\nallowed_hosts = [\"example.test\"]\n",
-        include_str!("../../presets/rust-api.flow.toml")
+        include_str!("../../fixtures/preset-compat/rust-api.flow.toml")
     );
     let error = FlowConfig::from_source(&invalid_scheme).expect_err("FTP webhook must fail");
     assert!(error.to_string().contains("notifications"));
 
     let disabled = format!(
         "{}\n[[notifications.webhooks]]\nurl = \"https://example.test/hook\"\nallowed_hosts = [\"example.test\"]\non_failure = false\non_success = false\n",
-        include_str!("../../presets/rust-api.flow.toml")
+        include_str!("../../fixtures/preset-compat/rust-api.flow.toml")
     );
     let error = FlowConfig::from_source(&disabled).expect_err("disabled webhook must fail");
     assert!(error.to_string().contains("notifications"));

@@ -55,7 +55,7 @@ fn test_presets_command() {
     let stdout = stdout_str(&output);
 
     // Should list available presets
-    assert!(stdout.contains("rust-api") || stdout.contains("Available presets"));
+    assert!(stdout.contains("generic"));
 }
 
 #[test]
@@ -366,7 +366,7 @@ fn quality_config_commands_cross_validate_both_planes() {
     ctx.init_preset("generic");
     ctx.write_file(
         ".harness-gate/flow.toml",
-        include_str!("../presets/rust-api.flow.toml"),
+        include_str!("../fixtures/preset-compat/rust-api.flow.toml"),
     );
     let legacy = ctx.run_harness_gate(&["config", "print", "--resolved"]);
     assert_success(&legacy);
@@ -374,7 +374,7 @@ fn quality_config_commands_cross_validate_both_planes() {
     assert_success(&raw_flow);
     assert_eq!(
         stdout_str(&raw_flow),
-        include_str!("../presets/rust-api.flow.toml")
+        include_str!("../fixtures/preset-compat/rust-api.flow.toml")
     );
     assert_failure(&ctx.run_harness_gate(&["config", "print", "--quality"]));
     let quality = include_str!("../fixtures/workflow/quality.toml");
@@ -444,4 +444,49 @@ fn quality_schema_exports_without_project_or_enabling_quality() {
     ctx.init_preset("generic");
     assert_success(&ctx.run_harness_gate(&["config", "check"]));
     assert_failure(&ctx.run_harness_gate(&["config", "print", "--quality"]));
+}
+
+#[test]
+fn external_catalog_cli_precedence_and_missing_directory_fail_closed() {
+    let catalog = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/preset-compat");
+    let binary = env!("CARGO_BIN_EXE_harness-gate");
+    let builtin = Command::new(binary)
+        .arg("presets")
+        .env_remove("HARNESS_GATE_PRESETS_DIR")
+        .output()
+        .unwrap();
+    assert_success(&builtin);
+    assert!(!stdout_str(&builtin).contains("rust-api"));
+    let external = Command::new(binary)
+        .arg("presets")
+        .env("HARNESS_GATE_PRESETS_DIR", &catalog)
+        .output()
+        .unwrap();
+    assert_success(&external);
+    assert!(stdout_str(&external).contains("rust-api"));
+    let missing = catalog.join("missing");
+    let explicit = Command::new(binary)
+        .args(["presets", "--presets-dir"])
+        .arg(&catalog)
+        .env("HARNESS_GATE_PRESETS_DIR", &missing)
+        .output()
+        .unwrap();
+    assert_success(&explicit);
+    let invalid = Command::new(binary)
+        .args(["presets", "--presets-dir"])
+        .arg(&missing)
+        .env("HARNESS_GATE_PRESETS_DIR", &catalog)
+        .output()
+        .unwrap();
+    assert_failure(&invalid);
+    let ctx = TestContext::new();
+    let no_catalog = Command::new(binary)
+        .arg("--project-root")
+        .arg(&ctx.project_root)
+        .args(["init", "--preset", "rust-api"])
+        .env_remove("HARNESS_GATE_PRESETS_DIR")
+        .output()
+        .unwrap();
+    assert_failure(&no_catalog);
+    assert!(!ctx.project_root.join(".harness-gate/flow.toml").exists());
 }

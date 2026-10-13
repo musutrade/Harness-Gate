@@ -51,3 +51,9 @@ fixture entry is classified exactly once and that no core Rust source or test
 references a plugin fixture path. It also checks the literal fixture inputs of
 the two frozen Python equivalence consumers above, requiring each input to
 exist and belong to core.
+
+The ecosystem preset snapshots under
+`tools/harness-gate/fixtures/preset-compat` are also Core-owned compatibility
+inputs. Current templates live in GateProbes; the snapshots have an exact
+inventory, original commit/path mapping and digest checks. See the
+[preset consumer review](preset-externalization.md).

@@ -23,11 +23,26 @@ pub(crate) fn run_cli(cli: Cli) -> Result<bool, CliError> {
             quality::run(action, cli.replay_state_dir.as_deref()).map_err(Into::into)
         }
         Commands::Init { preset, force } => {
-            crate::preset::init(&standalone_root(&cli)?, preset, *force)?;
+            let directory = cli.presets_dir.clone().or_else(|| {
+                std::env::var_os("HARNESS_GATE_PRESETS_DIR").map(std::path::PathBuf::from)
+            });
+            if let Some(directory) = directory {
+                crate::preset::init_from(
+                    &standalone_root(&cli)?,
+                    preset,
+                    *force,
+                    Some(&directory),
+                )?;
+            } else {
+                crate::preset::init(&standalone_root(&cli)?, preset, *force)?;
+            }
             Ok(true)
         }
         Commands::Presets => {
-            crate::preset::print_presets();
+            let directory = cli.presets_dir.clone().or_else(|| {
+                std::env::var_os("HARNESS_GATE_PRESETS_DIR").map(std::path::PathBuf::from)
+            });
+            crate::preset::print_presets(directory.as_deref())?;
             Ok(true)
         }
         Commands::Adapter { action } => run_adapter(action, cli.replay_state_dir.as_deref()),

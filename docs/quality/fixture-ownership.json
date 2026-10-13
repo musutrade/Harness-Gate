@@ -26,6 +26,7 @@
   },
   "relocated_core_fixtures": [
     "tools/harness-gate/fixtures/workflow",
-    "tools/harness-gate/fixtures/v1-flow.toml"
+    "tools/harness-gate/fixtures/v1-flow.toml",
+    "tools/harness-gate/fixtures/preset-compat"
   ]
 }

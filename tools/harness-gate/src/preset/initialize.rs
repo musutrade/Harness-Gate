@@ -1,4 +1,4 @@
-use super::catalog::{self, AUDIT_TEMPLATE, GITIGNORE_TEMPLATE, PACKS, SECRETS_TEMPLATE};
+use super::catalog::{self, AUDIT_TEMPLATE, GITIGNORE_TEMPLATE, SECRETS_TEMPLATE};
 use super::filesystem::{atomic_write_batch, ensure_writable, resolve_inside};
 use crate::config::{FlowConfig, DEFAULT_CONFIG_PATH};
 use anyhow::{Context, Result};
@@ -6,8 +6,11 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 pub fn init(target: &Path, name: &str, force: bool) -> Result<()> {
-    let preset = catalog::find(name)
-        .ok_or_else(|| anyhow::anyhow!("unknown preset {name:?}; run `harness-gate presets`"))?;
+    init_from(target, name, force, None)
+}
+
+pub fn init_from(target: &Path, name: &str, force: bool, directory: Option<&Path>) -> Result<()> {
+    let preset = catalog::find(name, directory)?;
     fs::create_dir_all(target)
         .with_context(|| format!("create project directory {}", target.display()))?;
     let root = target
@@ -20,14 +23,22 @@ pub fn init(target: &Path, name: &str, force: bool) -> Result<()> {
     ensure_writable(&audit_path, force)?;
     ensure_writable(&secrets_path, force)?;
 
-    let mut config = FlowConfig::from_source(preset.flow)?;
+    let mut config = FlowConfig::from_source(&preset.flow)?;
     config.project.name = project_id(&root);
     config.validate()?;
     let directory = flow_path.parent().context("flow config has no parent")?;
     let flow_content = toml::to_string_pretty(&config)?;
     let mut extra_files = Vec::new();
-    if let Some(recipe) = preset.recipe {
-        let composition = super::composition::compose(recipe, PACKS, &config.project.name)?;
+    if let Some(recipe) = &preset.recipe {
+        let composition = super::composition::compose(
+            recipe,
+            &preset
+                .packs
+                .iter()
+                .map(|(id, text)| (id.as_str(), text.as_str()))
+                .collect::<Vec<_>>(),
+            &config.project.name,
+        )?;
         let mut files = composition.files;
         files.insert(
             crate::config::quality::QUALITY_CONFIG_PATH.into(),

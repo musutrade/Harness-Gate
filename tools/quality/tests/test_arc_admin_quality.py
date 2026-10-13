@@ -8,7 +8,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[3]
 ARC = ROOT / "docs/dogfood/arc-admin"
 QUALITY = ARC / "quality"
-PRESETS = ROOT / "tools/harness-gate/presets"
+PRESETS = ROOT / "tools/harness-gate/fixtures/preset-compat"
 
 
 def read(path):

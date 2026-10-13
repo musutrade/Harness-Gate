@@ -19,7 +19,7 @@
   "guarded_sources": {
     "tools/harness-gate/presets/default.secrets.toml": "f50ee579024104cc20818cd628d1cad42404a6d3c53e11cdb85d464afefe3345",
     "tools/harness-gate/presets/empty.audit.toml": "5f8421315aac8c39fb6ad09dba572297b5ca264f111b231ad46f04e836f30adf",
-    "tools/harness-gate/presets/rust-api.flow.toml": "450683bc424d105454f5afa00e1cf8e05ccd1e51aac0b3096afdd70ca60d081c",
+    "tools/harness-gate/fixtures/preset-compat/rust-api.flow.toml": "450683bc424d105454f5afa00e1cf8e05ccd1e51aac0b3096afdd70ca60d081c",
     "tools/quality/collector_runner.py": "9dc0321243e388295572c49c0848310da0ff8bf7ba29f006446ed102b8646dcb",
     "tools/quality/fixtures/rust-native/cargo-complete/Cargo.lock": "40bb4824db9814094513a24216188e8127d6514cece5e593d922fc8ebc28ec74",
     "tools/quality/fixtures/rust-native/cargo-complete/Cargo.toml": "cd28b127d7a5f47d8a9155a7c84769b5c83833b853c9454424cf9674f7ac065c",
@@ -69,7 +69,7 @@
     "tools/quality/schema/rust-collector-delivery.schema.json": "25b196707810bb48e36f7ee7740f459126f0b1f958af4466517f934b8d764266",
     "tools/quality/schema/rust-collector-plugin.schema.json": "432ee89d57eb08b1a0606d544391d8d5ef704948fc4a37d9f3bd96246a4ed8ef",
     "tools/quality/schema/rust-project-collector-binding.schema.json": "59cac4184eefc1ae3dc227b0c706d2748df761fc62bf7304dd4c6407761effee",
-    "tools/quality/tests/native_policy_fixture.py": "4f085cf7abcbc6134cdc5c6356e3b056879200b5f4c7e67acd751502a3294886",
+    "tools/quality/tests/native_policy_fixture.py": "02edf6dff3b4b7ccba3afcde1a09ec0f40b0565e8afbf638f572ece302d934af",
     "tools/quality/tests/test_rust_collector_project.py": "456eba2acfb29f002039d94d929eea6359eb21aec35d2274ebc51ba7b5ea49e7",
     "tools/quality/tests/test_rust_native_driver.py": "71e523d8c829bb476483ddb35b825e93a086eb9d8e1a5f2bbaf7575b9091bcc7"
   },
@@ -103,10 +103,10 @@
       {
         "core_path": "tools/quality/tests/native_policy_fixture.py",
         "path": "plugins/rust-native-plugin/tests/native_policy_fixture.py",
-        "core_sha256": "4f085cf7abcbc6134cdc5c6356e3b056879200b5f4c7e67acd751502a3294886",
+        "core_sha256": "02edf6dff3b4b7ccba3afcde1a09ec0f40b0565e8afbf638f572ece302d934af",
         "gateprobes_sha256": "8e38fdb271b268297491210663ae2fc2aaf7de2de297612667f37c2c1fc3168e",
         "byte_identical": false,
-        "reason": "GateProbes imports os and reads the three Core templates from HARNESS_GATE_PRESETS_DIR instead of the sibling Core source tree; missing pinned templates fail explicitly. CI downloads them from its fixed Core source revision. This is an environment/path adaptation, not byte equivalence or a policy change."
+        "reason": "GateProbes imports os and reads the three Core templates from HARNESS_GATE_PRESETS_DIR instead of the sibling Core source tree; missing pinned templates fail explicitly. CI downloads them from its fixed Core source revision. This is an environment/path adaptation, not byte equivalence or a policy change. Core relocation from da9a108 changes only the rust-api template literal to fixtures/preset-compat; template bytes remain identical and frozen provenance is tested."
       }
     ],
     "retain_test_sources": "Keep the delegated test files as compatibility/helper source for now; legacy runtime tests still import binding_for/request_for from test_rust_collector_project."

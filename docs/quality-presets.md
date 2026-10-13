@@ -1,6 +1,6 @@
 # Quality presets and explicit migration
 
-`init --preset rust-api`, `angular-only`, and `angular-rust-postgres` now write
+`init --presets-dir /path/to/GateProbes/presets --preset rust-api`, `angular-only`, and `angular-rust-postgres` now write
 coherent flow + quality configuration, policy/series files under
 `.harness-gate/packs/`, security configuration and `.harness-gate/QUALITY.md`.
 Full and CI participate in quality. Hook omits expensive collection with partial
@@ -19,6 +19,26 @@ native reference scopes onto configured targets. TypeScript does not gain a
 certified CRAP or branch/complexity capability through a preset. Unsupported CRAP
 has no numeric measurement and cannot satisfy a required policy. Component
 coverage defaults are explicit adoption policy, not claims about measured code.
+
+## Selecting external files
+
+Check out a reviewed GateProbes revision and select its `presets/` directory:
+
+```sh
+export HARNESS_GATE_PRESETS_DIR=/path/to/GateProbes/presets
+harness-gate presets
+harness-gate init --project-root /tmp/review-quality --preset rust-api
+```
+
+The directory contains `catalog.json` with schema `harness-preset-catalog/v1`,
+`presets` entries (`description`, `flow`, optional `recipe`) and `packs` mapping
+pack names to JSON files. Paths are relative to this directory. Core rejects
+escaping paths, symbolic links, duplicate JSON keys, unknown catalog fields,
+files over 1 MiB and catalogs over 64 presets or packs. A missing or invalid
+explicit directory fails without falling back to embedded ecosystem templates.
+The loader does not download, install or discover packages. Listing without an
+external directory shows only `generic`. Released Core 0.4.8 predates this loader;
+use a Core build containing the migration when following these instructions.
 
 ## Reference UX and pack composition
 
@@ -41,8 +61,9 @@ The long-term direction is composable ecosystem/preset packs: a project can choo
 `frontend=vue`, `backend=go`, `database=postgres`, then compose component execution,
 collector/capability and policy data plus any explicit contract pack. A database
 pack contributes quality only when a selected capability requires it. This avoids
-bespoke `vue-go-postgres` or `react-java-postgres` logic. Today flow templates and
-pack catalog embedding remain built-in reference data. A future registry/package
+bespoke `vue-go-postgres` or `react-java-postgres` logic. Ecosystem flow templates, recipes and packs now live in GateProbes. Core embeds
+only `generic` and loads a reviewed directory through `--presets-dir PATH` or
+`HARNESS_GATE_PRESETS_DIR`; the explicit flag takes precedence. A future registry/package
 manager can supply the same fragments and composed flow configuration; registry
 discovery, installation, version resolution and trust provisioning are not shipped
 here. No language-specific behavior belongs in generic preset plumbing.
