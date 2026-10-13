@@ -1,5 +1,7 @@
 # Harness-Gate
 
+> **历史归档仓库：** 后续开发已迁移到 [musutrade/GateHouse](https://github.com/musutrade/GateHouse)，使用精简源码历史和按需下载的固定测试数据。新 clone、Issue 和 PR 请使用 GateHouse。本仓库保留原提交、问题、证据、发行版及签名身份；`harness-gate` 命令、crate 和 v0.4.8 及以前的安装入口保持兼容。未审基线候选 [#346](https://github.com/musutrade/Harness-Gate/pull/346) 没有被自动采纳，后续审查见 [GateHouse #2](https://github.com/musutrade/GateHouse/issues/2)。
+
 [![CI](https://github.com/musutrade/Harness-Gate/actions/workflows/ci.yml/badge.svg)](https://github.com/musutrade/Harness-Gate/actions/workflows/ci.yml)
 [![Crates.io](https://img.shields.io/crates/v/harness-gate.svg)](https://crates.io/crates/harness-gate)
 [![Documentation](https://docs.rs/harness-gate/badge.svg)](https://docs.rs/harness-gate)

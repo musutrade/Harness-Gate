@@ -1,5 +1,7 @@
 # Harness-Gate
 
+> **Historical archive:** active development has moved to [musutrade/GateHouse](https://github.com/musutrade/GateHouse), with lean source history and optional pinned regression data. Use GateHouse for new clones, issues and pull requests. This repository preserves earlier commits, issues, evidence, releases and their original signing identities. The existing `harness-gate` CLI/crate and installations through v0.4.8 remain supported by their immutable historical artifacts. The outstanding baseline candidate [#346](https://github.com/musutrade/Harness-Gate/pull/346) remains unapproved and is tracked in [GateHouse #2](https://github.com/musutrade/GateHouse/issues/2).
+
 [![CI](https://github.com/musutrade/Harness-Gate/actions/workflows/ci.yml/badge.svg)](https://github.com/musutrade/Harness-Gate/actions/workflows/ci.yml)
 [![Crates.io](https://img.shields.io/crates/v/harness-gate.svg)](https://crates.io/crates/harness-gate)
 [![Documentation](https://docs.rs/harness-gate/badge.svg)](https://docs.rs/harness-gate)
