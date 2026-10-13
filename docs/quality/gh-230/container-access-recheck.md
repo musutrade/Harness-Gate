@@ -1,5 +1,8 @@
 # GH-230 container access recheck
 
+> Storage update (2026-10-13): historical raw logs/bundles are available through
+> the [verified archive guide](archive.md). Dates, digests and outcomes below are unchanged.
+
 Status: blocked; P6/P7 remain incomplete. All relevant Engineering Policy
 semantics remain unchanged. Existing source edits and original evidence are preserved.
 

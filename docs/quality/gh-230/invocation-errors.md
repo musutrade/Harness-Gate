@@ -1,5 +1,8 @@
 # GH-230 generic operational-error follow-up
 
+> Storage update (2026-10-13): historical raw logs/bundles are available through
+> the [verified archive guide](archive.md). Dates, digests and outcomes below are unchanged.
+
 Status: incomplete P6/P7; no supported combination, acceptance PR or handoff.
 This follows [project integration](project-integration.md). Prior diagnostic
 records and evidence archives are unchanged.
@@ -40,7 +43,7 @@ remain applicable because no Rust source or Cargo inputs changed. Project-local
 has no `.harness-gate/flow.toml`. Required hosted CI remains pending.
 
 [Exact check results](invocation-error-checks.json),
-[original logs and changed sources](invocation-error-evidence.tar.gz),
+[original logs and changed sources](archive.md),
 [file inventory](invocation-error-inventory.json) and
 [archive receipt](invocation-error-archive.json) retain this follow-up separately
 from previous evidence. Strict OpenSpec, documentation consistency and whitespace

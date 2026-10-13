@@ -1,5 +1,8 @@
 # GH-230 official Core continuation
 
+> Storage update (2026-10-13): historical raw logs/bundles are available through
+> the [verified archive guide](archive.md). Dates, digests and outcomes below are unchanged.
+
 Status: incomplete P6/P7. This record supersedes the released-Core prerequisite
 in earlier GH-230 diagnostics; their original failures and archives remain intact.
 The remaining clean-host prerequisite is blocked in this agent environment.
@@ -105,7 +108,7 @@ These timings and bytes are diagnostics, not clean-host cold/warm or peak-disk
 acceptance measurements. The complete runtime tar remains workspace-local.
 
 [Exact validation commands and environments](core-0.4.0-checks.json),
-[original validation and failure logs](core-0.4.0-validation-logs.tar.gz), and
+[original validation and failure logs](archive.md), and
 [validation archive receipt](core-0.4.0-validation-archive.json) retain this run.
 [Fresh native evidence and distributed Core bytes](core-0.4.0-native-evidence.tar.gz.parts/manifest.json)
 contain 1,515 files, including original binaries and profiles for both standalone

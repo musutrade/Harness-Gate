@@ -1,5 +1,8 @@
 # GH-230 native-input recovery diagnostics
 
+> Storage update (2026-10-13): historical raw logs/bundles are available through
+> the [verified archive guide](archive.md). Dates, digests and outcomes below are unchanged.
+
 Status: **incomplete; no acceptance or delivery declaration**. This record
 supersedes the current-status statements in the original [blocker](blocker.md)
 and [validation](validation.md); those original failures are preserved unchanged.

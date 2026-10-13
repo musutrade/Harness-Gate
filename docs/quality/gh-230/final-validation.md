@@ -1,5 +1,8 @@
 # GH-230 final local validation
 
+> Storage update (2026-10-13): historical raw logs/bundles are available through
+> the [verified archive guide](archive.md). Dates, digests and outcomes below are unchanged.
+
 See [acceptance](acceptance.md) for native evidence and scope. Commands below ran
 against integrated main `ee544690662645806cda7dd4cd2c9192566f7929` plus this PR's
 source edits. Hosted required CI and controller acceptance remain pending.
@@ -38,7 +41,7 @@ Fixture test commands did not inherit these overrides. All build, test temporary
 and capture paths are workspace-local. No source checkout or another workspace
 was accessed or changed.
 
-The [validation archive](final-validation-logs.tar.gz) contains exact environment,
+The [validation archive](archive.md) contains exact environment,
 command/exit records and full original/corrected logs, with an
 [archive receipt](final-validation-archive.json). Genuine failures are retained:
 

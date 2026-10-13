@@ -1,5 +1,8 @@
 # GH-231 validation
 
+> Storage update (2026-10-13): historical raw logs/bundles are available through
+> the [verified archive guide](archive.md). Dates, digests and outcomes below are unchanged.
+
 Historical PR #232 receipt, retained verbatim below including its failed checks
 and malformed transcription. It is not current release eligibility. See the
 [reopened preparation record](preparation.md) for fresh evidence after PR #237.

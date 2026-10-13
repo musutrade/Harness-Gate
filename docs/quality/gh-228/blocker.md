@@ -1,5 +1,8 @@
 # GH-228 runtime dependency blocker
 
+> Storage update (2026-10-13): historical raw logs/bundles are available through
+> the [verified archive guide](archive.md). Dates, digests and outcomes below are unchanged.
+
 Historical status: blocked before standalone implementation. The operator recovery
 on 2026-09-11 supplied the pinned archive and built the driver in this assigned
 workspace. See [resumed runtime work](runtime.md) and [validation](validation.md)
@@ -107,7 +110,7 @@ P2/P3 or establish clean-host acceptance.
 
 Repository checks and exact command environments are retained in
 [validation.json](validation.json), [the validation runner](run-validation.py),
-and [complete logs](validation-logs.tar.gz). Successful repository checks cannot
+and [complete logs](archive.md). Successful repository checks cannot
 establish native positive measurement. No task completion,
 delivery PR, `.symphony-handoff.json`, release publication, GH-215 enablement,
 baseline acceptance or dependent-issue readiness is asserted by this record.

@@ -1,5 +1,8 @@
 # GH-230 Core capability diagnostic
 
+> Storage update (2026-10-13): historical raw logs/bundles are available through
+> the [verified archive guide](archive.md). Dates, digests and outcomes below are unchanged.
+
 Status: incomplete P6/P7; no supported combination, acceptance PR or handoff.
 This continues the [trusted invocation diagnostic](trusted-invocation.md).
 All earlier diagnostics, including genuine failures, remain retained unchanged.

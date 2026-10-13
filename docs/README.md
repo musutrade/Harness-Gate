@@ -15,6 +15,7 @@ was true when recorded; use the current guides below for installation and use.
 | Release or contribute / 发布与贡献 | [Release governance](release-governance.md), [contributing](../CONTRIBUTING.md), [engineering policy](engineering-policy.md), [CI guide](quality/ci-topology/README.md) |
 | Route documentation-only CI changes / 文档 CI 分流 | [Documentation-only routing](quality/ci-docs-routing.md) |
 | Review delivered work / 验收与待办 | [Current release and issue status](release-status.md), [Arc Admin native acceptance](quality/arc-native-20260913/README.md), [historical specifications](specs/README.md), [decisions](adr/README.md) |
+| Restore historical evidence / 历史证据恢复 | [Archive index, scope and verified restoration](quality/archived-evidence.md) |
 
 Core installation, collector installation, native measurement certification and
 project policy adoption are separate milestones. A preset or an installed plugin

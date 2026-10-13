@@ -1,5 +1,8 @@
 # GH-230 authenticated invocation diagnostic
 
+> Storage update (2026-10-13): historical raw logs/bundles are available through
+> the [verified archive guide](archive.md). Dates, digests and outcomes below are unchanged.
+
 Status: incomplete P6/P7; no supported combination, acceptance PR or handoff.
 This follows the [operational-error correction](invocation-errors.md). All
 previous diagnostic records and archives remain retained.
