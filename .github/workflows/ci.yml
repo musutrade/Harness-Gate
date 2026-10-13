@@ -51,6 +51,8 @@ jobs:
           else
             BASE=""; HEAD=""
           fi
+          python3 tools/maintenance/repository_size.py --base-sha "$BASE" --head-sha "$HEAD" \
+            --output target/quality/repository-size.json
           python3 tools/quality/ci_quality.py classify --base-sha "$BASE" --head-sha "$HEAD" \
             --github-output "$GITHUB_OUTPUT"
 
