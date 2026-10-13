@@ -1,5 +1,8 @@
 # GH-228 resumed validation
 
+> Storage update (2026-10-13): historical raw logs/bundles are available through
+> the [verified archive guide](archive.md). Dates, digests and outcomes below are unchanged.
+
 The accepted predecessor and original failed attempt are recorded in
 [blocker.md](blocker.md). Operator recovery supplied the pinned rustc-dev archive;
 [runtime.md](runtime.md) describes the resulting private runtime, host boundary,

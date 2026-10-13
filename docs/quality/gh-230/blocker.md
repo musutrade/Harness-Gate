@@ -1,5 +1,8 @@
 # GH-230 native acceptance dependency wait
 
+> Storage update (2026-10-13): historical raw logs/bundles are available through
+> the [verified archive guide](archive.md). Dates, digests and outcomes below are unchanged.
+
 Status: environment-blocked before P6/P7 implementation, 2026-09-11.
 No scoped task is complete. Relevant Engineering Policy semantics are unchanged.
 

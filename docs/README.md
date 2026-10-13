@@ -16,6 +16,7 @@ was true when recorded; use the current guides below for installation and use.
 | Route documentation-only CI changes / 文档 CI 分流 | [Documentation-only routing](quality/ci-docs-routing.md) |
 | Keep the checkout small / 仓库与本地产物整理 | [Incremental size limits](repository-size-policy.md), [Local storage preview and cleanup](local-storage.md) |
 | Review delivered work / 验收与待办 | [Current release and issue status](release-status.md), [Arc Admin native acceptance](quality/arc-native-20260913/README.md), [historical specifications](specs/README.md), [decisions](adr/README.md) |
+| Restore historical evidence / 历史证据恢复 | [Archive index, scope and verified restoration](quality/archived-evidence.md) |
 
 Core installation, collector installation, native measurement certification and
 project policy adoption are separate milestones. A preset or an installed plugin

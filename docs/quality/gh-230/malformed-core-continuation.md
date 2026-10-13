@@ -1,5 +1,8 @@
 # GH-230 malformed configured-output continuation
 
+> Storage update (2026-10-13): historical raw logs/bundles are available through
+> the [verified archive guide](archive.md). Dates, digests and outcomes below are unchanged.
+
 Status: partial diagnostic; P6/P7 remain incomplete. All relevant Engineering
 Policy semantics remain unchanged.
 
@@ -26,7 +29,7 @@ including workspace-local build/capture directories and the existing private
 Cargo vendor directory. There were no failures in this new test run.
 
 The [command records](malformed-core-checks.json) retain exact commands,
-environments and results. The [validation archive](malformed-core-validation-logs.tar.gz)
+environments and results. The [validation archive](archive.md)
 contains original output and tested source snapshots, with a
 [verified inventory](malformed-core-validation-archive.json).
 The [native evidence archive](malformed-core-evidence.tar.gz.parts/manifest.json) retains the new

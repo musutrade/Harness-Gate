@@ -1,5 +1,8 @@
 # GH-231 current-source command receipts
 
+> Storage update (2026-10-13): historical raw logs/bundles are available through
+> the [verified archive guide](archive.md). Dates, digests and outcomes below are unchanged.
+
 Run from the assigned checkout at source base
 `48099c48f1fded35af5d71638bf57160cb8e0b31` plus this PR's preparation changes.
 The checked-in [evidence index](evidence/index.json) records log hashes and sizes;
