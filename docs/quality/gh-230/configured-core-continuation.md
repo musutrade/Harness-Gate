@@ -1,5 +1,8 @@
 # GH-230 configured Core invocation continuation
 
+> Storage update (2026-10-13): historical raw logs/bundles are available through
+> the [verified archive guide](archive.md). Dates, digests and outcomes below are unchanged.
+
 Status: partial diagnostic; P6/P7 remain incomplete. All relevant Engineering
 Policy semantics remain unchanged.
 
@@ -76,7 +79,7 @@ Required hosted CI has not run for this unfinished work.
 
 
 [Exact commands and environments](configured-core-checks.json) and
-[original validation logs and tested source snapshots](configured-core-validation-logs.tar.gz)
+[original validation logs and tested source snapshots](archive.md)
 retain the focused runs, both full discovery runs, and documentation checks.
 The successful full run includes all nine standalone native tests. For a future
 run, use the corrected discovery's complete environment, including the existing

@@ -1,5 +1,8 @@
 # GH-230 blocked-attempt validation
 
+> Storage update (2026-10-13): historical raw logs/bundles are available through
+> the [verified archive guide](archive.md). Dates, digests and outcomes below are unchanged.
+
 This is baseline diagnostic evidence, not completion of P6/P7. See the
 [native prerequisite blocker](blocker.md). Production code, task checkboxes and
 the empty compatibility matrix are unchanged.
@@ -40,7 +43,7 @@ exit codes are in [checks.json](checks.json).
 
 `git diff --check` exited 0 (tracked files remain unchanged). Complete command
 logs are retained under `target/gh-230/logs/` and in
-[validation-logs.tar.gz](validation-logs.tar.gz). Native positive acceptance has
+[validation-logs.tar.gz](archive.md). Native positive acceptance has
 not run, and required CI has not run for this unfinished attempt. No complete
 local validation pass or acceptance is claimed. The environment input described
 in the blocker must be supplied before implementation resumes.

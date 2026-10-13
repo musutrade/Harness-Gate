@@ -1,5 +1,8 @@
 # GH-228 private Linux runtime candidate
 
+> Storage update (2026-10-13): historical raw logs/bundles are available through
+> the [verified archive guide](archive.md). Dates, digests and outcomes below are unchanged.
+
 GH-227 was accepted and merged through PR #233 at
 `b627bbc0e202b6e8a40354b731bd1a4291f31d7a`, the preserved baseline of this branch.
 The operator supplied the pinned compiler-private archive after the
@@ -147,7 +150,7 @@ hash-only or reconstructed native positive substitutes for those bytes.
 [retained-evidence.json](retained-evidence.json) inventories every archived file
 and records archive hashes; retention verified the archived bytes against their
 originals. See [transport.md](transport.md) for byte-preserving restoration and
-the submission transport limitation. [resumed-validation-logs.tar.gz](resumed-validation-logs.tar.gz) retains
+the submission transport limitation. [resumed-validation-logs.tar.gz](archive.md) retains
 complete resumed logs, including the failed intermediate runs.
 
 The roughly 1 GB runtime tar files, compiler-private archive and intermediate

@@ -1,5 +1,8 @@
 # GH-231 reopened release preparation
 
+> Storage update (2026-10-13): historical raw logs/bundles are available through
+> the [verified archive guide](archive.md). Dates, digests and outcomes below are unchanged.
+
 Preparation implementation is ready for review; publication approval is **blocked**.
 No tag, production signature or release was created. P8.1a–f remain unchecked
 where their full acceptance depends on the inputs below; P8.2/P8.3 and GH-215

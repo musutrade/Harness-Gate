@@ -1,5 +1,8 @@
 # GH-230 generic projection progress
 
+> Storage update (2026-10-13): historical raw logs/bundles are available through
+> the [verified archive guide](archive.md). Dates, digests and outcomes below are unchanged.
+
 Status: **incomplete; no acceptance, supported tuple, PR or handoff declaration**.
 This continues the [native-input recovery diagnostics](recovery.md), which remain
 unchanged. No P6/P7 checkbox is complete. All relevant Engineering Policy semantics

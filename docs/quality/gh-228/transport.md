@@ -1,5 +1,8 @@
 # GH-228 evidence transport
 
+> Storage update (2026-10-13): historical raw logs/bundles are available through
+> the [verified archive guide](archive.md). Dates, digests and outcomes below are unchanged.
+
 The native evidence archive is stored as nineteen ordered parts of at most
 4 MiB. Concatenation restores the original 79,452,501-byte gzip archive with
 SHA-256 `09388d2b355091bc00ea086e5fed97cddc90fb9db2c78711d3871c50ea8ebb06`.

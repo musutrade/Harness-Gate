@@ -1,5 +1,8 @@
 # GH-230 local integration and clean-container acceptance
 
+> Storage update (2026-10-13): historical raw logs/bundles are available through
+> the [verified archive guide](archive.md). Dates, digests and outcomes below are unchanged.
+
 P6.1–P6.2 and P7.1–P7.3 have local evidence below. Controller review and required CI
 remain pending; this is not a release, baseline acceptance, or Arc-Admin certification.
 The earlier [blocker](blocker.md), [Core continuation](core-0.4.0-continuation.md),
